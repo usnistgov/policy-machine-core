@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.decider;
 
-import gov.nist.csd.pm.exceptions.PMDBException;
-import gov.nist.csd.pm.exceptions.PMGraphException;
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
@@ -31,7 +30,7 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public boolean hasPermissions(long userID, long processID, long targetID, String... perms) throws PMGraphException, PMDBException {
+    public boolean hasPermissions(long userID, long processID, long targetID, String... perms) throws PMException {
         List<String> permsToCheck = Arrays.asList(perms);
         HashSet<String> permissions = listPermissions(userID, processID, targetID);
 
@@ -51,7 +50,7 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public HashSet<String> listPermissions(long userID, long processID, long targetID) throws PMDBException, PMGraphException {
+    public HashSet<String> listPermissions(long userID, long processID, long targetID) throws PMException {
         HashSet<String> perms = new HashSet<>();
 
         //walk the user side and get all target nodes reachable by the user through associations
@@ -92,12 +91,12 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public HashSet<NodeContext> filter(long userID, long processID, HashSet<NodeContext> nodes, String... perms) {
+    public Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms) {
         nodes.removeIf((n) -> {
             try {
-                return !hasPermissions(userID, processID, n.getID(), perms);
+                return !hasPermissions(userID, processID, n, perms);
             }
-            catch (PMGraphException | PMDBException e) {
+            catch (PMException e) {
                 return true;
             }
         });
@@ -105,8 +104,8 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public HashSet<NodeContext> getChildren(long userID, long processID, long targetID, String... perms) throws PMGraphException, PMDBException {
-        HashSet<NodeContext> children = graph.getChildren(targetID);
+    public Collection<Long> getChildren(long userID, long processID, long targetID, String... perms) throws PMException {
+        HashSet<Long> children = graph.getChildren(targetID);
         return filter(userID, processID, children, perms);
     }
 
@@ -118,16 +117,16 @@ public class PReviewDecider implements Decider {
      * new operations to the already existing ones.
      * @return a Map of target nodes that the user can reach via associations and the operations the user has on each.
      */
-    private synchronized HashMap<Long, HashSet<String>> getBorderTargets(long userID) throws PMGraphException, PMDBException {
+    private synchronized HashMap<Long, HashSet<String>> getBorderTargets(long userID) throws PMException {
         HashMap<Long, HashSet<String>> borderTargets = new HashMap<>();
 
         //get the parents of the user to start bfs on user side
-        HashSet<NodeContext> parents = graph.getParents(userID);
+        HashSet<Long> parents = graph.getParents(userID);
         while(!parents.isEmpty()){
-            NodeContext parentNode = parents.iterator().next();
+            Long parentNode = parents.iterator().next();
 
             //get the associations the current parent node is the source of
-            HashMap<Long, HashSet<String>> assocs = graph.getSourceAssociations(parentNode.getID());
+            HashMap<Long, HashSet<String>> assocs = graph.getSourceAssociations(parentNode);
 
             //collect the target and operation information for each association
             for (long targetID : assocs.keySet()) {
@@ -144,7 +143,7 @@ public class PReviewDecider implements Decider {
             }
 
             //add all of the current parent node's parents to the queue
-            parents.addAll(graph.getParents(parentNode.getID()));
+            parents.addAll(graph.getParents(parentNode));
 
             //remove the current parent from the queue
             parents.remove(parentNode);
@@ -162,21 +161,20 @@ public class PReviewDecider implements Decider {
      * @param visitedNodes the map of nodes that have been visited.
      * @param borderTargets the target nodes reachable by the user via associations.
      */
-    private synchronized void dfs(long targetID, HashMap<Long, HashMap<Long, HashSet<String>>> visitedNodes, HashMap<Long, HashSet<String>> borderTargets) throws PMGraphException, PMDBException {
-        //visit the current target node
+    private synchronized void dfs(long targetID, HashMap<Long, HashMap<Long, HashSet<String>>> visitedNodes, HashMap<Long, HashSet<String>> borderTargets) throws PMException {        //visit the current target node
         visitedNodes.put(targetID, new HashMap<>());
 
-        HashSet<NodeContext> parents = graph.getParents(targetID);
+        HashSet<Long> parents = graph.getParents(targetID);
 
         //iterate over the parents of the target node
-        for(NodeContext parent : parents){
+        for(Long parent : parents){
             //if the parent has not been visited yet, make recursive call to dfs on it
-            if(!visitedNodes.containsKey(parent.getID())){
-                dfs(parent.getID(), visitedNodes, borderTargets);
+            if(!visitedNodes.containsKey(parent)){
+                dfs(parent, visitedNodes, borderTargets);
             }
 
             //store all the operations and policy classes for this target node
-            HashMap<Long, HashSet<String>> pcSet = visitedNodes.get(parent.getID());
+            HashMap<Long, HashSet<String>> pcSet = visitedNodes.get(parent);
             for(long pc : pcSet.keySet()){
                 HashSet<String> ops = pcSet.get(pc);
                 HashSet<String> exOps = visitedNodes.get(targetID).computeIfAbsent(pc, k -> new HashSet<>());
@@ -199,10 +197,9 @@ public class PReviewDecider implements Decider {
      *
      * @param userID the ID of the User.
      * @return a Map of nodes the user has access to and the permissions on each.
-     * @throws PMDBException if the graph accesses a database and encounters an error.
-     * @throws PMGraphException if there is an error traversing the graph.
+     * @throws PMException if there is an error traversing the graph.
      */
-    public synchronized HashMap<Long, HashSet<String>> getAccessibleNodes(long userID) throws PMDBException, PMGraphException {
+    public synchronized HashMap<Long, HashSet<String>> getAccessibleNodes(long userID) throws PMException {
         //Node->{ops}
         HashMap<Long, HashSet<String>> results = new HashMap<>();
 
@@ -223,11 +220,9 @@ public class PReviewDecider implements Decider {
             visitedNodes.put(pc, pcMap);
         }
 
-        HashSet<NodeContext> objects = getAscendants(vNode);
+        HashSet<Long> objects = getAscendants(vNode);
 
-        for(NodeContext objectNode : objects){
-            long objectID = objectNode.getID();
-
+        for(Long objectID : objects){
             // run dfs on the object
             dfs(objectID, visitedNodes, borderTargets);
 
@@ -254,23 +249,23 @@ public class PReviewDecider implements Decider {
         return results;
     }
 
-    private HashSet<NodeContext> getAscendants(Long vNode) throws PMGraphException, PMDBException {
-        HashSet<NodeContext> ascendants = new HashSet<>();
-        HashSet<NodeContext> children = graph.getChildren(vNode);
+    private HashSet<Long> getAscendants(Long vNode) throws PMException {
+        HashSet<Long> ascendants = new HashSet<>();
+        HashSet<Long> children = graph.getChildren(vNode);
         if(children.isEmpty()){
             return ascendants;
         }
 
         ascendants.addAll(children);
-        for(NodeContext child : children){
-            ascendants.addAll(getAscendants(child.getID()));
+        for(Long child : children){
+            ascendants.addAll(getAscendants(child));
         }
 
         return ascendants;
     }
 
 
-    private synchronized long createVNode(HashMap<Long, HashSet<String>> dc) throws PMGraphException, PMDBException {
+    private synchronized long createVNode(HashMap<Long, HashSet<String>> dc) throws PMException {
         NodeContext vNode = new NodeContext(new Random().nextLong(), "VNODE", NodeType.OA, null);
         long vNodeID = graph.createNode(vNode);
         for(long nodeID : dc.keySet()){

@@ -1,9 +1,8 @@
 package gov.nist.csd.pm.decider;
 
-import gov.nist.csd.pm.exceptions.PMDBException;
-import gov.nist.csd.pm.exceptions.PMGraphException;
-import gov.nist.csd.pm.graph.model.nodes.NodeContext;
+import gov.nist.csd.pm.exceptions.PMException;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 /**
@@ -19,10 +18,9 @@ public interface Decider {
      * @param targetID the ID of the target node.
      * @param perms the array of permission sto check for.
      * @return true if the user has the permissions on the target node, false otherwise.
-     * @throws PMDBException if there is an error accessing the graph in a database.
-     * @throws PMGraphException if there is an exception traversing the graph.
+     * @throws PMException if there is an exception traversing the graph.
      */
-    boolean hasPermissions(long userID, long processID, long targetID, String... perms) throws PMGraphException, PMDBException;
+    boolean hasPermissions(long userID, long processID, long targetID, String... perms) throws PMException;
 
     /**
      * List the permissions that the user has on the target node.
@@ -31,10 +29,9 @@ public interface Decider {
      * @param processID the of the process.
      * @param targetID the ID of the target node.
      * @return the set of operations that the user is allowed to perform on the target.
-     * @throws PMDBException if there is an error accessing the graph in a database.
-     * @throws PMGraphException if there is an exception traversing the graph.
+     * @throws PMException if there is an exception traversing the graph.
      */
-    HashSet<String> listPermissions(long userID, long processID, long targetID) throws PMDBException, PMGraphException;
+    HashSet<String> listPermissions(long userID, long processID, long targetID) throws PMException;
 
     /**
      * Given a list of nodes filter out any nodes that the given user does not have the given permissions on. To filter
@@ -45,7 +42,7 @@ public interface Decider {
      * @param perms the permissions to check for.
      * @return a subset of the given nodes that the user has the given permissions on.
      */
-    HashSet<NodeContext> filter(long userID, long processID, HashSet<NodeContext> nodes, String... perms);
+    Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms);
 
     /**
      * Get the children of the target node that the user has the given permissions on.
@@ -55,8 +52,7 @@ public interface Decider {
      * @param targetID the ID of the target node.
      * @param perms the permissions the user must have on the child nodes.
      * @return the set of NGACNodes that are children of the target node and the user has the given permissions on.
-     * @throws PMDBException if there is an error accessing the graph in a database.
-     * @throws PMGraphException if there is an exception traversing the graph.
+     * @throws PMException if there is an exception traversing the graph.
      */
-    HashSet<NodeContext> getChildren(long userID, long processID, long targetID, String... perms) throws PMGraphException, PMDBException;
+    Collection<Long> getChildren(long userID, long processID, long targetID, String... perms) throws PMException;
 }

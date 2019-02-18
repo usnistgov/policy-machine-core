@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.graph.model.relationships;
 
-import gov.nist.csd.pm.exceptions.PMGraphException;
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
 
 import java.io.Serializable;
@@ -30,9 +30,9 @@ public class Assignment extends Relationship implements Serializable {
      * Check if the assignment provided, is valid under NGAC.
      * @param childType The type of the child.
      * @param parentType The type of the parent.
-     * @throws PMGraphException if the child type is not allowed to be assigned to the parent type.
+     * @throws PMException if the child type is not allowed to be assigned to the parent type.
      */
-    public static void checkAssignment(NodeType childType, NodeType parentType) throws PMGraphException {
+    public static void checkAssignment(NodeType childType, NodeType parentType) throws PMException {
         NodeType[] check = validAssignments.get(childType);
         for(NodeType nt : check) {
             if(nt.equals(parentType)) {
@@ -40,7 +40,7 @@ public class Assignment extends Relationship implements Serializable {
             }
         }
 
-        throw new PMGraphException(String.format("cannot assign a node of type %s to a node of type %s", childType, parentType));
+        throw new PMException(String.format("cannot assign a node of type %s to a node of type %s", childType, parentType));
     }
 
     @Override

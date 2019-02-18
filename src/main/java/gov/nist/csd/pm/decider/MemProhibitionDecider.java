@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.decider;
 
-import gov.nist.csd.pm.exceptions.PMDBException;
-import gov.nist.csd.pm.exceptions.PMGraphException;
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import gov.nist.csd.pm.prohibitions.model.Prohibition;
@@ -27,7 +26,7 @@ public class MemProhibitionDecider implements ProhibitionDecider {
     }
 
     @Override
-    public HashSet<String> listProhibitedPermissions(long subjectID, long targetID) throws PMDBException, PMGraphException {
+    public HashSet<String> listProhibitedPermissions(long subjectID, long targetID) throws PMException {
         HashSet<String> prohibitedOps = new HashSet<>();
 
         //if the subject ID or target ID are 0, return an empty set
@@ -104,21 +103,21 @@ public class MemProhibitionDecider implements ProhibitionDecider {
         return prohibitedOps;
     }
 
-    private HashSet<Long> getSubGraph(long id) throws PMGraphException, PMDBException {
+    private HashSet<Long> getSubGraph(long id) throws PMException {
         HashSet<Long> nodes = new HashSet<>();
-        HashSet<NodeContext> children = graph.getChildren(id);
+        HashSet<Long> children = graph.getChildren(id);
         if(children.isEmpty()){
             return nodes;
         }
 
         //add all the children to the set of nodes
-        for(NodeContext node : children) {
-            nodes.add(node.getID());
+        for(Long node : children) {
+            nodes.add(node);
         }
 
         //for each child add it's subgraph
-        for(NodeContext child : children){
-            nodes.addAll(getSubGraph(child.getID()));
+        for(Long child : children){
+            nodes.addAll(getSubGraph(child));
         }
 
         return nodes;
