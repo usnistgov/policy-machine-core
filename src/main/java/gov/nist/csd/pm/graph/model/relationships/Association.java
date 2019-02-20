@@ -4,7 +4,10 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
 

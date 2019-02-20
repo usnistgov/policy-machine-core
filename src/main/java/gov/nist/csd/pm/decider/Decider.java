@@ -3,7 +3,8 @@ package gov.nist.csd.pm.decider;
 import gov.nist.csd.pm.exceptions.PMException;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for making access decisions.  These methods do not take into account prohibited permissions.
@@ -31,18 +32,19 @@ public interface Decider {
      * @return the set of operations that the user is allowed to perform on the target.
      * @throws PMException if there is an exception traversing the graph.
      */
-    HashSet<String> listPermissions(long userID, long processID, long targetID) throws PMException;
+    Set<String> listPermissions(long userID, long processID, long targetID) throws PMException;
 
     /**
      * Given a list of nodes filter out any nodes that the given user does not have the given permissions on. To filter
      * based on any permissions use Operations.ANY as the permission to check for.
+     *
      * @param userID the ID of the user.
      * @param processID the of the process.
      * @param nodes the nodes to filter from.
      * @param perms the permissions to check for.
      * @return a subset of the given nodes that the user has the given permissions on.
      */
-    Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms);
+    Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms) throws PMException;
 
     /**
      * Get the children of the target node that the user has the given permissions on.
@@ -55,4 +57,13 @@ public interface Decider {
      * @throws PMException if there is an exception traversing the graph.
      */
     Collection<Long> getChildren(long userID, long processID, long targetID, String... perms) throws PMException;
+
+    /**
+     * Given a User ID, return every node the user has access to and the permissions they have on each.
+     *
+     * @param userID the ID of the User.
+     * @return a map of nodes the user has access to and the permissions on each.
+     * @throws PMException if there is an error traversing the graph.
+     */
+    Map<Long, Set<String>> getAccessibleNodes(long userID) throws PMException;
 }

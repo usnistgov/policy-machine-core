@@ -21,9 +21,7 @@ class PReviewDeciderTest {
     private static long o1ID;
     private static long o2ID;
     private static long o3ID;
-    private static long ua1ID;
     private static long oa1ID;
-    private static long pc1ID;
 
     @BeforeAll
     static void setUp() throws PMException {
@@ -33,9 +31,9 @@ class PReviewDeciderTest {
         o1ID = graph.createNode(new NodeContext(31, "o1", O, null));
         o2ID = graph.createNode(new NodeContext(32, "o2", O, null));
         o3ID = graph.createNode(new NodeContext(33, "o3", O, null));
-        ua1ID = graph.createNode(new NodeContext(4, "ua1", NodeType.UA, null));
+        long ua1ID = graph.createNode(new NodeContext(4, "ua1", NodeType.UA, null));
         oa1ID = graph.createNode(new NodeContext(2, "oa1", OA, null));
-        pc1ID = graph.createNode(new NodeContext(1, "pc1", NodeType.PC, null));
+        long pc1ID = graph.createNode(new NodeContext(1, "pc1", NodeType.PC, null));
 
         graph.assign(new NodeContext(u1ID, NodeType.U), new NodeContext(ua1ID, NodeType.UA));
         graph.assign(new NodeContext(o1ID, O), new NodeContext(oa1ID, OA));
@@ -85,7 +83,7 @@ class PReviewDeciderTest {
     @Test
     void testGetAccessibleNodes() throws PMException {
         PReviewDecider decider = new PReviewDecider(graph);
-        HashMap<Long, HashSet<String>> accessibleNodes = decider.getAccessibleNodes(u1ID);
+        Map<Long, Set<String>> accessibleNodes = decider.getAccessibleNodes(u1ID);
 
         assertTrue(accessibleNodes.containsKey(oa1ID));
         assertTrue(accessibleNodes.containsKey(o1ID));

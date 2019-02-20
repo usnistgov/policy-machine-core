@@ -2,7 +2,7 @@ package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public interface ProhibitionDecider {
     /**
@@ -13,5 +13,5 @@ public interface ProhibitionDecider {
      * @return the set of permissions that are denied for the subject on the target.
      * @throws PMException if there is an error accessing the graph.
      */
-    HashSet<String> listProhibitedPermissions(long subjectID, long targetID) throws PMException;
+    Set<String> listProhibitedPermissions(long subjectID, long targetID) throws PMException;
 }

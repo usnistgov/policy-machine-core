@@ -12,8 +12,8 @@ import java.util.*;
  */
 public class PReviewDecider implements Decider {
 
-    public static String ANY_OPERATIONS = "any";
-    public static String ALL_OPERATIONS = "*";
+    public static final String ANY_OPERATIONS = "any";
+    public static final String ALL_OPERATIONS = "*";
 
     private Graph              graph;
 
@@ -21,7 +21,7 @@ public class PReviewDecider implements Decider {
      * Create a new Decider with with the given NGAC graph, user ID, and process ID.
      * @param graph the NGAC Graph to use in the policy decision.
      */
-    public PReviewDecider(Graph graph) throws IllegalArgumentException {
+    public PReviewDecider(Graph graph) {
         if (graph == null) {
             throw new IllegalArgumentException("NGAC graph cannot be null");
         }
@@ -32,7 +32,7 @@ public class PReviewDecider implements Decider {
     @Override
     public boolean hasPermissions(long userID, long processID, long targetID, String... perms) throws PMException {
         List<String> permsToCheck = Arrays.asList(perms);
-        HashSet<String> permissions = listPermissions(userID, processID, targetID);
+        Set<String> permissions = listPermissions(userID, processID, targetID);
 
         //if just checking for any operations, return true if the resulting permissions set is not empty.
         //if the resulting permissions set contains * or all operations, return true.
@@ -50,20 +50,20 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public HashSet<String> listPermissions(long userID, long processID, long targetID) throws PMException {
-        HashSet<String> perms = new HashSet<>();
+    public Set<String> listPermissions(long userID, long processID, long targetID) throws PMException {
+        Set<String> perms = new HashSet<>();
 
         //walk the user side and get all target nodes reachable by the user through associations
-        HashMap<Long, HashSet<String>> dc = getBorderTargets(userID);
+        Map<Long, Set<String>> dc = getBorderTargets(userID);
         if(dc.isEmpty()){
             return perms;
         }
 
-        HashMap<Long, HashMap<Long, HashSet<String>>> visitedNodes = new HashMap<>();
-        HashSet<Long> pcs = graph.getPolicies();
+        Map<Long, Map<Long, Set<String>>> visitedNodes = new HashMap<>();
+        Set<Long> pcs = graph.getPolicies();
         //visit the policy class nodes to signal the end of the dfs
         for(long pc : pcs){
-            HashMap<Long, HashSet<String>> pcMap = new HashMap<>();
+            Map<Long, Set<String>> pcMap = new HashMap<>();
             pcMap.put(pc, new HashSet<>());
             visitedNodes.put(pc, pcMap);
         }
@@ -72,10 +72,10 @@ public class PReviewDecider implements Decider {
         dfs(targetID, visitedNodes, dc);
 
         //get the intersection of permissions the user has on the target in each policy class
-        HashMap<Long, HashSet<String>> pcMap = visitedNodes.get(targetID);
+        Map<Long, Set<String>> pcMap = visitedNodes.get(targetID);
         boolean addOps = true;
         for(long pc : pcMap.keySet()){
-            HashSet<String> ops = pcMap.get(pc);
+            Set<String> ops = pcMap.get(pc);
             if(ops.isEmpty()) {// if the ops for the pc are empty then the user has no permissions on the target
                 perms.clear();
                 break;
@@ -92,7 +92,7 @@ public class PReviewDecider implements Decider {
 
     @Override
     public Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms) {
-        nodes.removeIf((n) -> {
+        nodes.removeIf(n -> {
             try {
                 return !hasPermissions(userID, processID, n, perms);
             }
@@ -105,7 +105,7 @@ public class PReviewDecider implements Decider {
 
     @Override
     public Collection<Long> getChildren(long userID, long processID, long targetID, String... perms) throws PMException {
-        HashSet<Long> children = graph.getChildren(targetID);
+        Set<Long> children = graph.getChildren(targetID);
         return filter(userID, processID, children, perms);
     }
 
@@ -117,21 +117,21 @@ public class PReviewDecider implements Decider {
      * new operations to the already existing ones.
      * @return a Map of target nodes that the user can reach via associations and the operations the user has on each.
      */
-    private synchronized HashMap<Long, HashSet<String>> getBorderTargets(long userID) throws PMException {
-        HashMap<Long, HashSet<String>> borderTargets = new HashMap<>();
+    private synchronized Map<Long, Set<String>> getBorderTargets(long userID) throws PMException {
+        Map<Long, Set<String>> borderTargets = new HashMap<>();
 
         //get the parents of the user to start bfs on user side
-        HashSet<Long> parents = graph.getParents(userID);
+        Set<Long> parents = graph.getParents(userID);
         while(!parents.isEmpty()){
             Long parentNode = parents.iterator().next();
 
             //get the associations the current parent node is the source of
-            HashMap<Long, HashSet<String>> assocs = graph.getSourceAssociations(parentNode);
+            Map<Long, Set<String>> assocs = graph.getSourceAssociations(parentNode);
 
             //collect the target and operation information for each association
             for (long targetID : assocs.keySet()) {
-                HashSet<String> ops = assocs.get(targetID);
-                HashSet<String> exOps = borderTargets.get(targetID);
+                Set<String> ops = assocs.get(targetID);
+                Set<String> exOps = borderTargets.get(targetID);
                 //if the target is not in the map already, put it
                 //else add the found operations to the existing ones.
                 if (exOps == null) {
@@ -161,10 +161,10 @@ public class PReviewDecider implements Decider {
      * @param visitedNodes the map of nodes that have been visited.
      * @param borderTargets the target nodes reachable by the user via associations.
      */
-    private synchronized void dfs(long targetID, HashMap<Long, HashMap<Long, HashSet<String>>> visitedNodes, HashMap<Long, HashSet<String>> borderTargets) throws PMException {        //visit the current target node
+    private synchronized void dfs(long targetID, Map<Long, Map<Long, Set<String>>> visitedNodes, Map<Long, Set<String>> borderTargets) throws PMException {        //visit the current target node
         visitedNodes.put(targetID, new HashMap<>());
 
-        HashSet<Long> parents = graph.getParents(targetID);
+        Set<Long> parents = graph.getParents(targetID);
 
         //iterate over the parents of the target node
         for(Long parent : parents){
@@ -174,37 +174,30 @@ public class PReviewDecider implements Decider {
             }
 
             //store all the operations and policy classes for this target node
-            HashMap<Long, HashSet<String>> pcSet = visitedNodes.get(parent);
+            Map<Long, Set<String>> pcSet = visitedNodes.get(parent);
             for(long pc : pcSet.keySet()){
-                HashSet<String> ops = pcSet.get(pc);
-                HashSet<String> exOps = visitedNodes.get(targetID).computeIfAbsent(pc, k -> new HashSet<>());
+                Set<String> ops = pcSet.get(pc);
+                Set<String> exOps = visitedNodes.get(targetID).computeIfAbsent(pc, k -> new HashSet<>());
                 exOps.addAll(ops);
             }
         }
 
         //if the target node is a border target, add the operations found during bfs
         if(borderTargets.containsKey(targetID)){
-            HashMap<Long, HashSet<String>> pcSet = visitedNodes.get(targetID);
-            HashSet<String> ops = borderTargets.get(targetID);
+            Map<Long, Set<String>> pcSet = visitedNodes.get(targetID);
+            Set<String> ops = borderTargets.get(targetID);
             for(long pcId : pcSet.keySet()){
                 visitedNodes.get(targetID).get(pcId).addAll(ops);
             }
         }
     }
 
-    /**
-     * Given a User ID, return every node the user has access to and the permissions they have on each.
-     *
-     * @param userID the ID of the User.
-     * @return a Map of nodes the user has access to and the permissions on each.
-     * @throws PMException if there is an error traversing the graph.
-     */
-    public synchronized HashMap<Long, HashSet<String>> getAccessibleNodes(long userID) throws PMException {
-        //Node->{ops}
-        HashMap<Long, HashSet<String>> results = new HashMap<>();
+    @Override
+    public synchronized Map<Long, Set<String>> getAccessibleNodes(long userID) throws PMException {
+        Map<Long, Set<String>> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no OAs are reachable
-        HashMap<Long, HashSet<String>> borderTargets = getBorderTargets(userID);
+        Map<Long, Set<String>> borderTargets = getBorderTargets(userID);
         if(borderTargets.isEmpty()){
             return results;
         }
@@ -213,22 +206,22 @@ public class PReviewDecider implements Decider {
         // all children/grand children of the virtual node will be al the nodes accessible by the user
         long vNode = createVNode(borderTargets);
 
-        HashMap<Long, HashMap<Long, HashSet<String>>> visitedNodes = new HashMap<>();
+        Map<Long, Map<Long, Set<String>>> visitedNodes = new HashMap<>();
         for(long pc : graph.getPolicies()){
-            HashMap<Long, HashSet<String>> pcMap = new HashMap<>();
+            Map<Long, Set<String>> pcMap = new HashMap<>();
             pcMap.put(pc, new HashSet<>());
             visitedNodes.put(pc, pcMap);
         }
 
-        HashSet<Long> objects = getAscendants(vNode);
+        Set<Long> objects = getAscendants(vNode);
 
         for(Long objectID : objects){
             // run dfs on the object
             dfs(objectID, visitedNodes, borderTargets);
 
             //for every pc the object reaches check to see if they have a common access1 right.
-            HashSet<String> finalOps = new HashSet<>();
-            HashMap<Long, HashSet<String>> pcMap = visitedNodes.get(objectID);
+            Set<String> finalOps = new HashSet<>();
+            Map<Long, Set<String>> pcMap = visitedNodes.get(objectID);
             boolean addOps = true;
             for(long pc : pcMap.keySet()){
                 if(addOps){
@@ -249,9 +242,9 @@ public class PReviewDecider implements Decider {
         return results;
     }
 
-    private HashSet<Long> getAscendants(Long vNode) throws PMException {
-        HashSet<Long> ascendants = new HashSet<>();
-        HashSet<Long> children = graph.getChildren(vNode);
+    private Set<Long> getAscendants(Long vNode) throws PMException {
+        Set<Long> ascendants = new HashSet<>();
+        Set<Long> children = graph.getChildren(vNode);
         if(children.isEmpty()){
             return ascendants;
         }
@@ -265,7 +258,7 @@ public class PReviewDecider implements Decider {
     }
 
 
-    private synchronized long createVNode(HashMap<Long, HashSet<String>> dc) throws PMException {
+    private synchronized long createVNode(Map<Long, Set<String>> dc) throws PMException {
         NodeContext vNode = new NodeContext(new Random().nextLong(), "VNODE", NodeType.OA, null);
         long vNodeID = graph.createNode(vNode);
         for(long nodeID : dc.keySet()){

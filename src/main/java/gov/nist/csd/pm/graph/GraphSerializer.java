@@ -1,10 +1,8 @@
-package gov.nist.csd.pm.serializer;
+package gov.nist.csd.pm.graph;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.graph.Graph;
-import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import gov.nist.csd.pm.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.graph.model.relationships.Association;
@@ -17,6 +15,15 @@ public class GraphSerializer {
 
     private GraphSerializer() {}
 
+    /**
+     * Given a Graph interface, serialize the graph to a json string. The format of the json will be:
+     *
+     *
+     *
+     * @param graph
+     * @return
+     * @throws PMException
+     */
     public static String toJson(Graph graph) throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

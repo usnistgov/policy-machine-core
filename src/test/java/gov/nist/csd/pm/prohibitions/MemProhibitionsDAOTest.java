@@ -3,7 +3,6 @@ package gov.nist.csd.pm.prohibitions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import gov.nist.csd.pm.prohibitions.model.Prohibition;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

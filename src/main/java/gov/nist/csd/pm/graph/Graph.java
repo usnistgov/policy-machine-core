@@ -4,8 +4,8 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for maintaining an NGAC graph.

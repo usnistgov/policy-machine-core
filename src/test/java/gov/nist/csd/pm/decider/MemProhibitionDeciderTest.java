@@ -9,9 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MemProhibitionDeciderTest {
 
@@ -45,7 +46,7 @@ class MemProhibitionDeciderTest {
         // create a new policy decider
         ProhibitionDecider decider = new MemProhibitionDecider(graph, Arrays.asList(prohibition));
 
-        HashSet<String> permissions = decider.listProhibitedPermissions(u1, o1);
+        Set<String> permissions = decider.listProhibitedPermissions(u1, o1);
         assertTrue(permissions.contains("read"));
     }
 }

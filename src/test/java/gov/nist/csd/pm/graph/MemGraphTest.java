@@ -1,14 +1,10 @@
 package gov.nist.csd.pm.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,7 +54,7 @@ class MemGraphTest {
     }
 
     @Test
-    void testDeleteNode() throws PMException {
+    void testDeleteNode() {
         MemGraph graph = new MemGraph();
         long id = graph.createNode(new NodeContext(123, "node", PC, NodeContext.toProperties("namespace", "test")));
 
@@ -107,7 +103,7 @@ class MemGraphTest {
         graph.assign(new NodeContext(child1ID, OA), new NodeContext(parentID, OA));
         graph.assign(new NodeContext(child2ID, OA), new NodeContext(parentID, OA));
 
-        HashSet<Long> children = graph.getChildren(parentID);
+        Set<Long> children = graph.getChildren(parentID);
         assertTrue(children.containsAll(Arrays.asList(child1ID, child2ID)));
     }
 
@@ -124,7 +120,7 @@ class MemGraphTest {
         graph.assign(new NodeContext(child1ID, OA), new NodeContext(parent1ID, OA));
         graph.assign(new NodeContext(child1ID, OA), new NodeContext(parent2ID, OA));
 
-        HashSet<Long> parents = graph.getParents(child1ID);
+        Set<Long> parents = graph.getParents(child1ID);
         assertTrue(parents.contains(parent1ID));
         assertTrue(parents.contains(parent2ID));
     }
@@ -175,7 +171,7 @@ class MemGraphTest {
 
         graph.associate(new NodeContext(uaID, UA), new NodeContext(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
 
-        HashMap<Long, HashSet<String>> associations = graph.getSourceAssociations(uaID);
+        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaID);
         assertTrue(associations.containsKey(targetID));
         assertTrue(associations.get(targetID).containsAll(Arrays.asList("read", "write")));
 
@@ -194,7 +190,7 @@ class MemGraphTest {
         graph.associate(new NodeContext(uaID, UA), new NodeContext(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
         graph.dissociate(new NodeContext(uaID, UA), new NodeContext(targetID, OA));
 
-        HashMap<Long, HashSet<String>> associations = graph.getSourceAssociations(uaID);
+        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaID);
         assertFalse(associations.containsKey(targetID));
 
         associations = graph.getTargetAssociations(targetID);
@@ -210,7 +206,7 @@ class MemGraphTest {
 
         graph.associate(new NodeContext(uaID, UA), new NodeContext(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
 
-        HashMap<Long, HashSet<String>> associations = graph.getSourceAssociations(uaID);
+        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaID);
         assertTrue(associations.containsKey(targetID));
         assertTrue(associations.get(targetID).containsAll(Arrays.asList("read", "write")));
 
@@ -226,7 +222,7 @@ class MemGraphTest {
 
         graph.associate(new NodeContext(uaID, UA), new NodeContext(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
 
-        HashMap<Long, HashSet<String>> associations = graph.getTargetAssociations(targetID);
+        Map<Long, Set<String>> associations = graph.getTargetAssociations(targetID);
         assertTrue(associations.containsKey(uaID));
         assertTrue(associations.get(uaID).containsAll(Arrays.asList("read", "write")));
 
@@ -242,7 +238,7 @@ class MemGraphTest {
         graph.createNode(new NodeContext(3, "oa3", OA, NodeContext.toProperties("key1", "value1", "key2", "value2")));
 
         // name and type no properties
-        HashSet<NodeContext> nodes = graph.search("oa1", OA.toString(), null);
+        Set<NodeContext> nodes = graph.search("oa1", OA.toString(), null);
         assertEquals(1, nodes.size());
 
         // one property
@@ -268,7 +264,7 @@ class MemGraphTest {
     }
 
     @Test
-    public void testGetNodes() throws PMException {
+    void testGetNodes() {
         MemGraph graph = new MemGraph();
 
         assertTrue(graph.getNodes().isEmpty());

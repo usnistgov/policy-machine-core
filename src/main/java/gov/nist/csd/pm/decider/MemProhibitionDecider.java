@@ -26,7 +26,7 @@ public class MemProhibitionDecider implements ProhibitionDecider {
     }
 
     @Override
-    public HashSet<String> listProhibitedPermissions(long subjectID, long targetID) throws PMException {
+    public Set<String> listProhibitedPermissions(long subjectID, long targetID) throws PMException {
         HashSet<String> prohibitedOps = new HashSet<>();
 
         //if the subject ID or target ID are 0, return an empty set
@@ -46,12 +46,12 @@ public class MemProhibitionDecider implements ProhibitionDecider {
                 boolean inter = prohibition.isIntersection();
                 List<NodeContext> nodes = prohibition.getNodes();
 
-                HashMap<NodeContext, HashSet<Long>> drSubGraph = new HashMap<>();
+                Map<NodeContext, Set<Long>> drSubGraph = new HashMap<>();
                 HashSet<Long> nodeIDs = new HashSet<>();
                 // iterate over all nodes that are part of this prohibition
                 // collect all of the nodes that are descendants of the node (entire subgraph with the current node as the root)
                 for (NodeContext dr : nodes) {
-                    HashSet<Long> subGraph = getSubGraph(dr.getID());
+                    Set<Long> subGraph = getSubGraph(dr.getID());
                     drSubGraph.put(dr, subGraph);
 
                     // store all IDs collected
@@ -81,7 +81,7 @@ public class MemProhibitionDecider implements ProhibitionDecider {
                     // contained in each of the prohibition nodes.
                     addOps = true;
                     for (NodeContext dr : drSubGraph.keySet()) {
-                        HashSet<Long> subGraph = drSubGraph.get(dr);
+                        Set<Long> subGraph = drSubGraph.get(dr);
                         if (dr.isComplement()) {
                             if(subGraph.contains(targetID)){
                                 addOps = false;
@@ -103,17 +103,15 @@ public class MemProhibitionDecider implements ProhibitionDecider {
         return prohibitedOps;
     }
 
-    private HashSet<Long> getSubGraph(long id) throws PMException {
-        HashSet<Long> nodes = new HashSet<>();
-        HashSet<Long> children = graph.getChildren(id);
+    private Set<Long> getSubGraph(long id) throws PMException {
+        Set<Long> nodes = new HashSet<>();
+        Set<Long> children = graph.getChildren(id);
         if(children.isEmpty()){
             return nodes;
         }
 
         //add all the children to the set of nodes
-        for(Long node : children) {
-            nodes.add(node);
-        }
+        nodes.addAll(children);
 
         //for each child add it's subgraph
         for(Long child : children){
