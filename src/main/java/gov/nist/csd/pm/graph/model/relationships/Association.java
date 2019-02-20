@@ -4,10 +4,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
 
@@ -17,8 +14,8 @@ import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
  */
 public class Association extends Relationship implements Serializable {
 
-    private static HashMap<NodeType, NodeType[]> validAssociations = new HashMap<>();
-    {
+    private static Map<NodeType, NodeType[]> validAssociations = new EnumMap<>(NodeType.class);
+    static {
         validAssociations.put(PC, new NodeType[]{});
         validAssociations.put(OA, new NodeType[]{});
         validAssociations.put(O, new NodeType[]{});
@@ -26,18 +23,18 @@ public class Association extends Relationship implements Serializable {
         validAssociations.put(U, new NodeType[]{});
     }
 
-    private HashSet<String> operations;
+    private Set<String> operations;
 
-    public Association(long uaID, long targetID, HashSet<String> operations) {
+    public Association(long uaID, long targetID, Set<String> operations) {
         super(uaID, targetID);
         this.operations = operations;
     }
 
-    public HashSet<String> getOperations() {
+    public Set<String> getOperations() {
         return operations;
     }
 
-    public void setOperations(HashSet<String> operations) {
+    public void setOperations(Set<String> operations) {
         this.operations = operations;
     }
 

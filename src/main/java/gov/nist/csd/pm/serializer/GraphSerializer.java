@@ -1,19 +1,21 @@
-package gov.nist.csd.pm.graph;
+package gov.nist.csd.pm.serializer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.graph.Graph;
+import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 import gov.nist.csd.pm.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.graph.model.relationships.Association;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import static gov.nist.csd.pm.graph.model.nodes.NodeType.UA;
 
 public class GraphSerializer {
+
+    private GraphSerializer() {}
 
     public static String toJson(Graph graph) throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -22,15 +24,15 @@ public class GraphSerializer {
         HashSet<Assignment> jsonAssignments = new HashSet<>();
         HashSet<Association> jsonAssociations = new HashSet<>();
         for(NodeContext node : nodes) {
-            HashSet<Long> parents = graph.getParents(node.getID());
+            Set<Long> parents = graph.getParents(node.getID());
 
             for (Long parent : parents) {
                 jsonAssignments.add(new Assignment(node.getID(), parent));
             }
 
-            HashMap<Long, HashSet<String>> associations = graph.getSourceAssociations(node.getID());
+            Map<Long, Set<String>> associations = graph.getSourceAssociations(node.getID());
             for (long targetID : associations.keySet()) {
-                HashSet<String> ops = associations.get(targetID);
+                Set<String> ops = associations.get(targetID);
                 NodeContext targetNode = graph.getNode(targetID);
 
                 jsonAssociations.add(new Association(node.getID(), targetNode.getID(), ops));
@@ -51,14 +53,14 @@ public class GraphSerializer {
             nodesMap.put(node.getID(), node.id(newNodeID));
         }
 
-        HashSet<Assignment> assignments = jsonGraph.getAssignments();
+        Set<Assignment> assignments = jsonGraph.getAssignments();
         for(Assignment assignment : assignments) {
             NodeContext childCtx = nodesMap.get(assignment.getSourceID());
             NodeContext parentCtx = nodesMap.get(assignment.getTargetID());
             graph.assign(childCtx, parentCtx);
         }
 
-        HashSet<Association> associations = jsonGraph.getAssociations();
+        Set<Association> associations = jsonGraph.getAssociations();
         for(Association association : associations) {
             long uaID = association.getSourceID();
             long targetID = association.getTargetID();
@@ -71,10 +73,10 @@ public class GraphSerializer {
 
     static class JsonGraph {
         Collection<NodeContext>     nodes;
-        HashSet<Assignment>  assignments;
-        HashSet<Association> associations;
+        Set<Assignment>  assignments;
+        Set<Association> associations;
 
-        public JsonGraph(Collection<NodeContext> nodes, HashSet<Assignment> assignments, HashSet<Association> associations) {
+        public JsonGraph(Collection<NodeContext> nodes, Set<Assignment> assignments, Set<Association> associations) {
             this.nodes = nodes;
             this.assignments = assignments;
             this.associations = associations;
@@ -84,11 +86,11 @@ public class GraphSerializer {
             return nodes;
         }
 
-        public HashSet<Assignment> getAssignments() {
+        public Set<Assignment> getAssignments() {
             return assignments;
         }
 
-        public HashSet<Association> getAssociations() {
+        public Set<Association> getAssociations() {
             return associations;
         }
     }

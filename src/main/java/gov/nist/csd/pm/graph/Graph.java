@@ -4,8 +4,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -52,7 +51,7 @@ public interface Graph {
      * @return the set of policy class IDs.
      * @throws PMException if there is an error retrieving the IDs of the policy classes.
      */
-    HashSet<Long> getPolicies() throws PMException;
+    Set<Long> getPolicies() throws PMException;
 
     /**
      * Retrieve the set of all nodes in the graph.
@@ -80,7 +79,7 @@ public interface Graph {
      * @return a set of nodes that match the given search criteria.
      * @throws PMException if there is an error searching the graph.
      */
-    HashSet<NodeContext> search(String name, String type, Map<String, String> properties) throws PMException;
+    Set<NodeContext> search(String name, String type, Map<String, String> properties) throws PMException;
 
     /**
      * Get the set of nodes that are assigned to the node with the given ID.
@@ -88,7 +87,7 @@ public interface Graph {
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the children of the node.
      */
-    HashSet<Long> getChildren(long nodeID) throws PMException;
+    Set<Long> getChildren(long nodeID) throws PMException;
 
     /**
      * Get the set of nodes that the node with the given ID is assigned to.
@@ -96,7 +95,7 @@ public interface Graph {
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the parents of the node.
      */
-    HashSet<Long> getParents(long nodeID) throws PMException;
+    Set<Long> getParents(long nodeID) throws PMException;
 
     /**
      * Assign the child node to the parent node. The child and parent nodes must both already exist in the graph,
@@ -127,7 +126,7 @@ public interface Graph {
      * @param operations A Set of operations to add to the association.
      * @throws PMException if there is an error associating the two nodes.
      */
-    void associate(NodeContext uaCtx, NodeContext targetCtx, HashSet<String> operations) throws PMException;
+    void associate(NodeContext uaCtx, NodeContext targetCtx, Set<String> operations) throws PMException;
 
     /**
      * Delete the Association between the user attribute and Target node.
@@ -145,7 +144,7 @@ public interface Graph {
      * @return a Map of the target node IDs and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the source node from the graph.
      */
-    HashMap<Long, HashSet<String>> getSourceAssociations(long sourceID) throws PMException;
+    Map<Long, Set<String>> getSourceAssociations(long sourceID) throws PMException;
 
     /**
      * Retrieve the associations the given node is the target of.  The target node can be an Object Attribute or a User
@@ -155,5 +154,5 @@ public interface Graph {
      * @return a Map of the source Ids and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the target node from the graph.
      */
-    HashMap<Long, HashSet<String>> getTargetAssociations(long targetID) throws PMException;
+    Map<Long, Set<String>> getTargetAssociations(long targetID) throws PMException;
 }

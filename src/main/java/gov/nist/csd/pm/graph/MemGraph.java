@@ -9,14 +9,15 @@ import gov.nist.csd.pm.graph.model.relationships.Relationship;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * MemGraph is an in-memory implementation of the graph interface.  It stores the IDs of the nodes in a DAG structure.
  * And stores all other node information in a map for easy/fast retrieval.
  */
-public class MemGraph implements Graph, Serializable {
+public class MemGraph implements Graph {
+
+    private static final String NODE_NOT_FOUND_MSG = "node %s does not exist in the graph";
 
     private DirectedGraph<Long, Relationship> graph;
     private HashSet<Long>                     pcs;
@@ -111,7 +112,6 @@ public class MemGraph implements Graph, Serializable {
      */
     @Override
     public void deleteNode(long nodeID) {
-        NodeContext node = nodes.get(nodeID);
         //remove the vertex from the graph
         graph.removeVertex(nodeID);
         //remove the node from the policies if it is a policy class
@@ -126,7 +126,7 @@ public class MemGraph implements Graph, Serializable {
     }
 
     @Override
-    public HashSet<Long> getPolicies() {
+    public Set<Long> getPolicies() {
         return pcs;
     }
 
@@ -161,7 +161,7 @@ public class MemGraph implements Graph, Serializable {
      * @return the set of nodes that match the given parameters.
      */
     @Override
-    public HashSet<NodeContext> search(String name, String type, Map<String, String> properties) {
+    public Set<NodeContext> search(String name, String type, Map<String, String> properties) {
         if(properties == null) {
             properties = new HashMap<>();
         }
@@ -170,12 +170,9 @@ public class MemGraph implements Graph, Serializable {
         // iterate over the nodes to find ones that match the search parameters
         for(NodeContext node : getNodes()) {
             // if the name parameter is not null and the current node name does not equal the name parameter, do not add
-            if (name != null && !node.getName().equals(name)) {
-                continue;
-            }
-
             // if the type parameter is not null and the current node type does not equal the type parameter, do not add
-            if (type != null && !node.getType().toString().equals(type)) {
+            if (name != null && !node.getName().equals(name) ||
+                    type != null && !node.getType().toString().equals(type)) {
                 continue;
             }
 
@@ -184,10 +181,8 @@ public class MemGraph implements Graph, Serializable {
                 String checkValue = properties.get(key);
                 String foundValue = node.getProperties().get(key);
                 // if the property provided in the search parameters is null or *, continue to the next property
-                if(checkValue == null || checkValue.equals("*")) {
-                    continue;
-                }
-                if(foundValue == null || !foundValue.equals(checkValue)) {
+                if(!(checkValue == null || checkValue.equals("*")) &&
+                        (foundValue == null || !foundValue.equals(checkValue))) {
                     add = false;
                     break;
                 }
@@ -208,9 +203,9 @@ public class MemGraph implements Graph, Serializable {
      * @throws PMException if the provided nodeID does not exist in the graph.
      */
     @Override
-    public HashSet<Long> getChildren(long nodeID) throws PMException {
+    public Set<Long> getChildren(long nodeID) throws PMException {
         if(!exists(nodeID)) {
-            throw new PMException(String.format("node %s does not exist in the graph", nodeID));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
         }
 
         HashSet<Long> children = new HashSet<>();
@@ -231,9 +226,9 @@ public class MemGraph implements Graph, Serializable {
      * @throws PMException if the provided nodeID does not exist in the graph.
      */
     @Override
-    public HashSet<Long> getParents(long nodeID) throws PMException {
+    public Set<Long> getParents(long nodeID) throws PMException {
         if(!exists(nodeID)) {
-            throw new PMException(String.format("node %s does not exist in the graph", nodeID));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
         }
 
         HashSet<Long> parents = new HashSet<>();
@@ -264,9 +259,9 @@ public class MemGraph implements Graph, Serializable {
         } else if (parentCtx == null) {
             throw new IllegalArgumentException("parent node context was null");
         } else if(!exists(childCtx.getID())) {
-            throw new IllegalArgumentException(String.format("node %s does not exist in the graph", childCtx));
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, childCtx));
         } else if(!exists(parentCtx.getID())) {
-            throw new IllegalArgumentException(String.format("node %s does not exist in the graph", parentCtx));
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentCtx));
         }
 
         graph.addEdge(childCtx.getID(), parentCtx.getID(), new Assignment(childCtx.getID(), parentCtx.getID()));
@@ -303,15 +298,15 @@ public class MemGraph implements Graph, Serializable {
      * @throws PMException if the target node does not exist in the graph.
      */
     @Override
-    public void associate(NodeContext uaCtx, NodeContext targetCtx, HashSet<String> operations) throws PMException {
+    public void associate(NodeContext uaCtx, NodeContext targetCtx, Set<String> operations) throws PMException {
         if(uaCtx == null) {
             throw new IllegalArgumentException("user attribute node context was null");
         } else if (targetCtx == null) {
             throw new IllegalArgumentException("target node context was null");
         } else if(!exists(uaCtx.getID())) {
-            throw new PMException(String.format("node %s does not exist in the graph", uaCtx.getID()));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, uaCtx.getID()));
         } else if(!exists(targetCtx.getID())) {
-            throw new PMException(String.format("node %s does not exist in the graph", targetCtx.getID()));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetCtx.getID()));
         }
 
         if(graph.containsEdge(uaCtx.getID(), targetCtx.getID())) {
@@ -341,12 +336,12 @@ public class MemGraph implements Graph, Serializable {
      * @throws PMException if the given ID does not exist in the graph.
      */
     @Override
-    public HashMap<Long, HashSet<String>> getSourceAssociations(long sourceID) throws PMException {
+    public Map<Long, Set<String>> getSourceAssociations(long sourceID) throws PMException {
         if(!exists(sourceID)) {
-            throw new PMException(String.format("node %s does not exist in the graph", sourceID));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, sourceID));
         }
 
-        HashMap<Long, HashSet<String>> assocs = new HashMap<>();
+        Map<Long, Set<String>> assocs = new HashMap<>();
         Set<Relationship> rels = graph.outgoingEdgesOf(sourceID);
         for(Relationship rel : rels){
             if(rel instanceof Association){
@@ -365,12 +360,12 @@ public class MemGraph implements Graph, Serializable {
      * @throws PMException if the given ID does not exist in the graph.
      */
     @Override
-    public HashMap<Long, HashSet<String>> getTargetAssociations(long targetID) throws PMException {
+    public Map<Long, Set<String>> getTargetAssociations(long targetID) throws PMException {
         if(!exists(targetID)) {
-            throw new PMException(String.format("node %s does not exist in the graph", targetID));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
         }
 
-        HashMap<Long, HashSet<String>> assocs = new HashMap<>();
+        Map<Long, Set<String>> assocs = new HashMap<>();
         Set<Relationship> rels = graph.incomingEdgesOf(targetID);
         for(Relationship rel : rels){
             if(rel instanceof Association){
