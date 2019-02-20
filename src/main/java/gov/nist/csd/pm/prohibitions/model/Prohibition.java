@@ -1,30 +1,25 @@
 package gov.nist.csd.pm.prohibitions.model;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.graph.model.nodes.NodeContext;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Object representing a Prohibition.
  */
-public class Prohibition implements Serializable {
+public class Prohibition {
 
-    private String            name;
-    private Subject           subject;
-    private List<NodeContext> nodes;
-    private HashSet<String>   operations;
-    private boolean           intersection;
+    private String          name;
+    private Subject         subject;
+    private List<Node>      nodes;
+    private Set<String> operations;
+    private boolean         intersection;
 
     public Prohibition() {
         this.nodes = new ArrayList<>();
     }
 
-    public Prohibition(String name, Subject subject, List<NodeContext> nodes, HashSet<String> operations, boolean intersection) {
+    public Prohibition(String name, Subject subject, List<Node> nodes, Set<String> operations, boolean intersection) {
         if (subject == null) {
             throw new IllegalArgumentException("Prohibition subject cannot be null");
         }
@@ -48,16 +43,16 @@ public class Prohibition implements Serializable {
         this.subject = subject;
     }
 
-    public List<NodeContext> getNodes() {
+    public List<Node> getNodes() {
         return nodes;
     }
 
-    public void addNode(NodeContext node) {
+    public void addNode(Node node) {
         nodes.add(node);
     }
 
     public void removeNode(long id) {
-        for (NodeContext n : nodes) {
+        for (Node n : nodes) {
             if (n.getID() == id) {
                 nodes.remove(n);
                 return;
@@ -73,11 +68,11 @@ public class Prohibition implements Serializable {
         this.name = name;
     }
 
-    public HashSet<String> getOperations() {
+    public Set<String> getOperations() {
         return operations;
     }
 
-    public void setOperations(HashSet<String> operations) {
+    public void setOperations(Set<String> operations) {
         this.operations = operations;
     }
 
@@ -103,18 +98,20 @@ public class Prohibition implements Serializable {
     }
 
     public static class Subject {
-        long        subjectID;
-        SubjectType subjectType;
+        long subjectID;
+        Type subjectType;
 
         /**
          * Prohibition Subject constructor.  The ID cannot be 0 and the type cannot be null.
+         *
          * @param subjectID
          * @param subjectType
          */
-        public Subject(long subjectID, SubjectType subjectType) {
-            if(subjectID == 0) {
+        public Subject(long subjectID, Type subjectType) {
+            if (subjectID == 0) {
                 throw new IllegalArgumentException("a prohibition subject cannot have an ID of 0");
-            } else if(subjectType == null) {
+            }
+            else if (subjectType == null) {
                 throw new IllegalArgumentException("a prohibition subject cannot have a null type");
             }
             this.subjectID = subjectID;
@@ -125,39 +122,58 @@ public class Prohibition implements Serializable {
             return subjectID;
         }
 
-        public SubjectType getSubjectType() {
+        public Type getSubjectType() {
             return subjectType;
+        }
+
+        public enum Type {
+            USER_ATTRIBUTE,
+            USER,
+            PROCESS;
+
+            /**
+             * Given a string, return the corresponding Type.  If the string is null, an IllegalArgumentException will
+             * be thrown, and if the string does not match any of (USER, USER_ATTRIBUTE, PROCESS) a PMProhbitionExceptino will
+             * be thrown because the provided string is not a valid subject type.
+             *
+             * @param subjectType the string to convert to a Type.
+             * @return the SUbjectType tht corresponds to the given string.
+             * @throws IllegalArgumentException if the given string is null.
+             * @throws PMException              if the given string is not a valid subject.
+             */
+            public static Type toType(String subjectType) throws PMException {
+                if (subjectType == null) {
+                    throw new IllegalArgumentException("null is an invalid Prohibition subject type");
+                }
+                switch (subjectType.toUpperCase()) {
+                    case "USER_ATTRIBUTE":
+                        return USER_ATTRIBUTE;
+                    case "USER":
+                        return USER;
+                    case "PROCESS":
+                        return PROCESS;
+                    default:
+                        throw new PMException(String.format("%s is an invalid Prohibition subject type", subjectType));
+                }
+            }
         }
     }
 
-    public enum SubjectType {
-        USER_ATTRIBUTE,
-        USER,
-        PROCESS;
+    public static class Node {
+        long id;
+        boolean complement;
 
-        /**
-         * Given a string, return the corresponding SubjectType.  If the string is null, an IllegalArgumentException will
-         * be thrown, and if the string does not match any of (USER, USER_ATTRIBUTE, PROCESS) a PMProhbitionExceptino will
-         * be thrown because the provided string is not a valid subject type.
-         * @param subjectType the string to convert to a SubjectType.
-         * @return the SUbjectType tht corresponds to the given string.
-         * @throws IllegalArgumentException if the given string is null.
-         * @throws PMException if the given string is not a valid subject.
-         */
-        public static SubjectType toType(String subjectType) throws PMException {
-            if (subjectType == null) {
-                throw new IllegalArgumentException("null is an invalid Prohibition subject type");
-            }
-            switch (subjectType.toUpperCase()) {
-                case "USER_ATTRIBUTE":
-                    return USER_ATTRIBUTE;
-                case "USER":
-                    return USER;
-                case "PROCESS":
-                    return PROCESS;
-                default:
-                    throw new PMException(String.format("%s is an invalid Prohibition subject type", subjectType));
-            }
+        public Node(long id, boolean complement) {
+            this.id = id;
+            this.complement = complement;
+        }
+
+        public long getID() {
+            return id;
+        }
+
+        public boolean isComplement() {
+            return complement;
         }
     }
 }

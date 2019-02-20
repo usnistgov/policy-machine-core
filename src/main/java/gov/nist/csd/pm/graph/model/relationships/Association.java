@@ -18,6 +18,7 @@ import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
 public class Association extends Relationship implements Serializable {
 
     private static Map<NodeType, NodeType[]> validAssociations = new EnumMap<>(NodeType.class);
+
     static {
         validAssociations.put(PC, new NodeType[]{});
         validAssociations.put(OA, new NodeType[]{});
@@ -43,15 +44,16 @@ public class Association extends Relationship implements Serializable {
 
     /**
      * Check if the provided types create a valid association.
-     * @param uaType the type of the source node in the association. This should always be a user Attribute,
-     *               so an InvalidAssociationException will be thrown if it's not.
+     *
+     * @param uaType     the type of the source node in the association. This should always be a user Attribute,
+     *                   so an InvalidAssociationException will be thrown if it's not.
      * @param targetType the type of the target node. This can be either an Object Attribute or a user attribute.
      * @throws PMException if the provided types do not make a valid Association under NGAC
      */
     public static void checkAssociation(NodeType uaType, NodeType targetType) throws PMException {
         NodeType[] check = validAssociations.get(uaType);
-        for(NodeType nt : check) {
-            if(nt.equals(targetType)) {
+        for (NodeType nt : check) {
+            if (nt.equals(targetType)) {
                 return;
             }
         }
@@ -61,11 +63,11 @@ public class Association extends Relationship implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof Association)) {
+        if (!(o instanceof Association)) {
             return false;
         }
 
-        Association association = (Association)o;
+        Association association = (Association) o;
         return this.sourceID == association.sourceID &&
                 this.targetID == association.targetID &&
                 this.operations.equals(association.operations);

@@ -17,8 +17,9 @@ public class Assignment extends Relationship implements Serializable {
     public Assignment(long childID, long parentID) {
         super(childID, parentID);
     }
-    
+
     private static HashMap<NodeType, NodeType[]> validAssignments = new HashMap<>();
+
     {
         validAssignments.put(PC, new NodeType[]{});
         validAssignments.put(OA, new NodeType[]{PC, OA});
@@ -26,16 +27,18 @@ public class Assignment extends Relationship implements Serializable {
         validAssignments.put(UA, new NodeType[]{UA, PC});
         validAssignments.put(U, new NodeType[]{UA});
     }
+
     /**
      * Check if the assignment provided, is valid under NGAC.
-     * @param childType The type of the child.
+     *
+     * @param childType  The type of the child.
      * @param parentType The type of the parent.
      * @throws PMException if the child type is not allowed to be assigned to the parent type.
      */
     public static void checkAssignment(NodeType childType, NodeType parentType) throws PMException {
         NodeType[] check = validAssignments.get(childType);
-        for(NodeType nt : check) {
-            if(nt.equals(parentType)) {
+        for (NodeType nt : check) {
+            if (nt.equals(parentType)) {
                 return;
             }
         }
@@ -45,11 +48,11 @@ public class Assignment extends Relationship implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof Assignment)) {
+        if (!(o instanceof Assignment)) {
             return false;
         }
 
-        Assignment assignment = (Assignment)o;
+        Assignment assignment = (Assignment) o;
         return this.sourceID == assignment.sourceID &&
                 this.targetID == assignment.targetID;
     }

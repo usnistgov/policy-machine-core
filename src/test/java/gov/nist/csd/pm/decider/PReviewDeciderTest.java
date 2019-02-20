@@ -2,7 +2,7 @@ package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.MemGraph;
-import gov.nist.csd.pm.graph.model.nodes.NodeContext;
+import gov.nist.csd.pm.graph.model.nodes.Node;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,32 +17,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PReviewDeciderTest {
 
     private static MemGraph graph;
-    private static long u1ID;
-    private static long o1ID;
-    private static long o2ID;
-    private static long o3ID;
-    private static long oa1ID;
+    private static long     u1ID;
+    private static long     o1ID;
+    private static long     o2ID;
+    private static long     o3ID;
+    private static long     oa1ID;
 
     @BeforeAll
     static void setUp() throws PMException {
         graph = new MemGraph();
 
-        u1ID = graph.createNode(new NodeContext(5, "u1", NodeType.U, null));
-        o1ID = graph.createNode(new NodeContext(31, "o1", O, null));
-        o2ID = graph.createNode(new NodeContext(32, "o2", O, null));
-        o3ID = graph.createNode(new NodeContext(33, "o3", O, null));
-        long ua1ID = graph.createNode(new NodeContext(4, "ua1", NodeType.UA, null));
-        oa1ID = graph.createNode(new NodeContext(2, "oa1", OA, null));
-        long pc1ID = graph.createNode(new NodeContext(1, "pc1", NodeType.PC, null));
+        u1ID = graph.createNode(new Node(5, "u1", NodeType.U, null));
+        o1ID = graph.createNode(new Node(31, "o1", O, null));
+        o2ID = graph.createNode(new Node(32, "o2", O, null));
+        o3ID = graph.createNode(new Node(33, "o3", O, null));
+        long ua1ID = graph.createNode(new Node(4, "ua1", NodeType.UA, null));
+        oa1ID = graph.createNode(new Node(2, "oa1", OA, null));
+        long pc1ID = graph.createNode(new Node(1, "pc1", NodeType.PC, null));
 
-        graph.assign(new NodeContext(u1ID, NodeType.U), new NodeContext(ua1ID, NodeType.UA));
-        graph.assign(new NodeContext(o1ID, O), new NodeContext(oa1ID, OA));
-        graph.assign(new NodeContext(o2ID, O), new NodeContext(oa1ID, OA));
-        graph.assign(new NodeContext(o3ID, O), new NodeContext(oa1ID, OA));
-        graph.assign(new NodeContext(ua1ID, NodeType.UA), new NodeContext(pc1ID, NodeType.PC));
-        graph.assign(new NodeContext(oa1ID, OA), new NodeContext(pc1ID, NodeType.PC));
+        graph.assign(new Node(u1ID, NodeType.U), new Node(ua1ID, NodeType.UA));
+        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
+        graph.assign(new Node(o2ID, O), new Node(oa1ID, OA));
+        graph.assign(new Node(o3ID, O), new Node(oa1ID, OA));
+        graph.assign(new Node(ua1ID, NodeType.UA), new Node(pc1ID, NodeType.PC));
+        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, NodeType.PC));
 
-        graph.associate(new NodeContext(ua1ID, NodeType.UA), new NodeContext(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(new Node(ua1ID, NodeType.UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
     }
 
     @Test
@@ -59,9 +59,9 @@ class PReviewDeciderTest {
 
     @Test
     void testFilter() {
-        Collection<NodeContext> nodes = graph.getNodes();
+        Collection<Node> nodes = graph.getNodes();
         List<Long> nodeIDs = new ArrayList<>();
-        for(NodeContext node : nodes) {
+        for (Node node : nodes) {
             nodeIDs.add(node.getID());
         }
         PReviewDecider decider = new PReviewDecider(graph);

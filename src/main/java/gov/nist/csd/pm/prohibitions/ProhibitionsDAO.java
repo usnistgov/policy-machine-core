@@ -12,6 +12,7 @@ import java.util.List;
 public interface ProhibitionsDAO {
     /**
      * Create a new prohibition.
+     *
      * @param prohibition The prohibition to be created.
      * @ if there is an error creating a prohibition.
      */
@@ -19,6 +20,7 @@ public interface ProhibitionsDAO {
 
     /**
      * Get a list of all prohibitions
+     *
      * @return a list of all prohibitions
      * @ if there is an error getting the prohibitions.
      */
@@ -26,6 +28,7 @@ public interface ProhibitionsDAO {
 
     /**
      * Retrieve a Prohibition and return the Object representing it.
+     *
      * @param prohibitionName The name of the Prohibition to retrieve.
      * @return the Prohibition with the given name.
      * @ if there is an error getting the prohibition with the given name.
@@ -34,6 +37,7 @@ public interface ProhibitionsDAO {
 
     /**
      * Update the given prohibition.  The name of the prohibition is provided in the parameter.
+     *
      * @param prohibition The prohibition to update.
      * @ if there is an error updating the prohibition.
      */
@@ -41,6 +45,7 @@ public interface ProhibitionsDAO {
 
     /**
      * Delete the prohibition, and remove it from the data structure.
+     *
      * @param prohibitionName The name of the prohibition to delete.
      * @ if there is an error deleting the prohibition.
      */

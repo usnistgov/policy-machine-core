@@ -6,10 +6,10 @@
 
     <groupId>gov.nist.csd.pm</groupId>
     <artifactId>policy-machine-core</artifactId>
+    <packaging>jar</packaging>
     <version>1.0.0</version>
 
     <build>
-        <finalName>pm-core</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -31,7 +31,6 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>pm-core-1.0.0</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>

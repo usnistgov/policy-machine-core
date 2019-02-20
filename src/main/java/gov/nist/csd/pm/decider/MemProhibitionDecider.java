@@ -2,7 +2,7 @@ package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
-import gov.nist.csd.pm.graph.model.nodes.NodeContext;
+import gov.nist.csd.pm.graph.model.nodes.Node;
 import gov.nist.csd.pm.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class MemProhibitionDecider implements ProhibitionDecider {
     private Collection<Prohibition> prohibitions;
 
     public MemProhibitionDecider(Graph graph, Collection<Prohibition> prohibitions) {
-        if(prohibitions == null) {
+        if (prohibitions == null) {
             this.prohibitions = new ArrayList<>();
         }
 
@@ -32,25 +32,25 @@ public class MemProhibitionDecider implements ProhibitionDecider {
         //if the subject ID or target ID are 0, return an empty set
         //if the IDs are 0, then the node doesn't exist in the graph
         //and therefore can't have prohibited ops (both subject and target)
-        if(subjectID == 0 || targetID == 0) {
+        if (subjectID == 0 || targetID == 0) {
             return prohibitedOps;
         }
 
         // iterate over all prohibitions
-        for(Prohibition prohibition : prohibitions){
+        for (Prohibition prohibition : prohibitions) {
             // check if the subject provided matches the current prohibition's subject
-            boolean matches = (prohibition.getSubject().getSubjectID()==subjectID) ||
+            boolean matches = (prohibition.getSubject().getSubjectID() == subjectID) ||
                     getSubGraph(prohibition.getSubject().getSubjectID()).contains(subjectID);
             // if the subjects do match, continue processing the current prohibition
-            if(matches){
+            if (matches) {
                 boolean inter = prohibition.isIntersection();
-                List<NodeContext> nodes = prohibition.getNodes();
+                List<Prohibition.Node> nodes = prohibition.getNodes();
 
-                Map<NodeContext, Set<Long>> drSubGraph = new HashMap<>();
+                Map<Prohibition.Node, Set<Long>> drSubGraph = new HashMap<>();
                 HashSet<Long> nodeIDs = new HashSet<>();
                 // iterate over all nodes that are part of this prohibition
                 // collect all of the nodes that are descendants of the node (entire subgraph with the current node as the root)
-                for (NodeContext dr : nodes) {
+                for (Prohibition.Node dr : nodes) {
                     Set<Long> subGraph = getSubGraph(dr.getID());
                     drSubGraph.put(dr, subGraph);
 
@@ -60,10 +60,10 @@ public class MemProhibitionDecider implements ProhibitionDecider {
 
                 // determine if the operations specified in this prohibition should be added to the set of prohibited ops
                 boolean addOps = false;
-                if(inter) {
+                if (inter) {
                     // if the prohibition's intersection property is true
                     // iterate over all the nodes in the prohibition
-                    for (NodeContext dr : drSubGraph.keySet()) {
+                    for (Prohibition.Node dr : drSubGraph.keySet()) {
                         // if the current node's complement property is true
                         // remove it and all of it's descendants from the list of IDs.
                         if (dr.isComplement()) {
@@ -76,25 +76,27 @@ public class MemProhibitionDecider implements ProhibitionDecider {
                     if (nodeIDs.contains(targetID)) {
                         addOps = true;
                     }
-                }else{
+                }
+                else {
                     // if the prohibition is not an intersection, the target node needs to be
                     // contained in each of the prohibition nodes.
                     addOps = true;
-                    for (NodeContext dr : drSubGraph.keySet()) {
+                    for (Prohibition.Node dr : drSubGraph.keySet()) {
                         Set<Long> subGraph = drSubGraph.get(dr);
                         if (dr.isComplement()) {
-                            if(subGraph.contains(targetID)){
+                            if (subGraph.contains(targetID)) {
                                 addOps = false;
                             }
-                        }else{
-                            if(!subGraph.contains(targetID)){
+                        }
+                        else {
+                            if (!subGraph.contains(targetID)) {
                                 addOps = false;
                             }
                         }
                     }
                 }
 
-                if(addOps){
+                if (addOps) {
                     prohibitedOps.addAll(prohibition.getOperations());
                 }
             }
@@ -106,7 +108,7 @@ public class MemProhibitionDecider implements ProhibitionDecider {
     private Set<Long> getSubGraph(long id) throws PMException {
         Set<Long> nodes = new HashSet<>();
         Set<Long> children = graph.getChildren(id);
-        if(children.isEmpty()){
+        if (children.isEmpty()) {
             return nodes;
         }
 
@@ -114,7 +116,7 @@ public class MemProhibitionDecider implements ProhibitionDecider {
         nodes.addAll(children);
 
         //for each child add it's subgraph
-        for(Long child : children){
+        for (Long child : children) {
             nodes.addAll(getSubGraph(child));
         }
 
