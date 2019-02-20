@@ -25,6 +25,6 @@ Then, add the maven dependency
 <dependency>
     <groupId>com.github.PM-Master</groupId>
     <artifactId>policy-machine-core</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
