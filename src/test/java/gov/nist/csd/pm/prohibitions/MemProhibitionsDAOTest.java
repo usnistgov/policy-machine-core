@@ -18,7 +18,7 @@ class MemProhibitionsDAOTest {
     ProhibitionsDAO dao;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws PMException {
         dao = new MemProhibitionsDAO();
 
         Prohibition prohibition = new Prohibition();
@@ -56,7 +56,7 @@ class MemProhibitionsDAOTest {
         Prohibition p123 = dao.getProhibition("p123");
         assertEquals("p123", p123.getName());
         assertFalse(p123.isIntersection());
-        assertEquals(p123.getOperations(), new HashSet<>(Arrays.asList("read")));
+        assertEquals(new HashSet<>(Arrays.asList("read")), p123.getOperations());
         assertEquals(new Prohibition.Node(1234, true), p123.getNodes().get(0));
     }
 

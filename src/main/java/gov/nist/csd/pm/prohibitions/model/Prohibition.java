@@ -175,5 +175,18 @@ public class Prohibition {
         public boolean isComplement() {
             return complement;
         }
+
+        public boolean equals(Object o) {
+            if(!(o instanceof Node)) {
+                return false;
+            }
+
+            Node node = (Node)o;
+            return this.getID() == node.getID();
+        }
+
+        public int hashCode() {
+            return Objects.hash(id);
+        }
     }
 }

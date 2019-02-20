@@ -17,18 +17,47 @@ public class GraphSerializer {
     }
 
     /**
-     * Given a Graph interface, serialize the graph to a json string. The format of the json will be:
+     * Given a Graph interface, serialize the graph to a json string.
      *
-     * @param graph
-     * @return
-     * @throws PMException
+     * Here is an example of the format:
+     * {
+     *   "nodes": [
+     *     {
+     *       "id": 1,
+     *       "name": "pc1",
+     *       "type": "PC",
+     *       "properties": {}
+     *     },
+     *     ...
+     *   ],
+     *   "assignments": [
+     *     {
+     *       "sourceID": 2,
+     *       "targetID": 1
+     *     },
+     *     ...
+     *   ],
+     *   "associations": [
+     *     {
+     *       "operations": [
+     *         "read",
+     *         "write"
+     *       ],
+     *       "sourceID": 4,
+     *       "targetID": 2
+     *     }
+     *   ]
+     * }
+     *
+     *
+     * @param graph the graph to serialize.
+     * @return a json string representation of the given graph.
+     * @throws PMException if there is an error accessing the graph.
      */
     public static String toJson(Graph graph) throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         Collection<Node> nodes = graph.getNodes();
-
-
         HashSet<Assignment> jsonAssignments = new HashSet<>();
         HashSet<Association> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
@@ -50,8 +79,15 @@ public class GraphSerializer {
         return gson.toJson(new JsonGraph(nodes, jsonAssignments, jsonAssociations));
     }
 
-    public static Graph fromJson(String json) throws PMException {
-        Graph graph = new MemGraph();
+    /**
+     * Given a json string, deserialize it into the provided Graph implementation.
+     *
+     * @param graph the graph to deserialize the json into.
+     * @param json the json string to deserialize.
+     * @return the provided Graph implementation with the data from the json string.
+     * @throws PMException if there is an error converting the string to a Graph.
+     */
+    public static Graph fromJson(Graph graph, String json) throws PMException {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
 
         Collection<Node> nodes = jsonGraph.getNodes();
@@ -74,7 +110,7 @@ public class GraphSerializer {
             long targetID = association.getTargetID();
             Node targetNode = nodesMap.get(targetID);
             graph.associate(
-                    new Node(nodesMap.get(uaID).getID(), UA),
+                    new Node(uaID, UA),
                     new Node(targetNode.getID(), targetNode.getType()),
                     association.getOperations()
             );
@@ -83,7 +119,7 @@ public class GraphSerializer {
         return graph;
     }
 
-    static class JsonGraph {
+    private static class JsonGraph {
         Collection<Node> nodes;
         Set<Assignment>  assignments;
         Set<Association> associations;

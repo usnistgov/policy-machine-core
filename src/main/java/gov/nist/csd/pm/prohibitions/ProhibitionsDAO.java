@@ -16,7 +16,7 @@ public interface ProhibitionsDAO {
      * @param prohibition The prohibition to be created.
      * @ if there is an error creating a prohibition.
      */
-    void createProhibition(Prohibition prohibition);
+    void createProhibition(Prohibition prohibition) throws PMException;
 
     /**
      * Get a list of all prohibitions
