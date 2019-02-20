@@ -18,7 +18,6 @@ import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
 public class Association extends Relationship implements Serializable {
 
     private static Map<NodeType, NodeType[]> validAssociations = new EnumMap<>(NodeType.class);
-
     static {
         validAssociations.put(PC, new NodeType[]{});
         validAssociations.put(OA, new NodeType[]{});

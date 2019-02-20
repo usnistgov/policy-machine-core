@@ -262,7 +262,7 @@ public class MemGraph implements Graph {
      * @throws IllegalArgumentException if the parent node does not exist in the graph.
      */
     @Override
-    public void assign(Node childCtx, Node parentCtx) {
+    public void assign(Node childCtx, Node parentCtx) throws PMException {
         if (childCtx == null) {
             throw new IllegalArgumentException("child node context was null");
         }
@@ -275,6 +275,8 @@ public class MemGraph implements Graph {
         else if (!exists(parentCtx.getID())) {
             throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentCtx));
         }
+
+        Assignment.checkAssignment(childCtx.getType(), parentCtx.getType());
 
         graph.addEdge(childCtx.getID(), parentCtx.getID(), new Assignment(childCtx.getID(), parentCtx.getID()));
     }
@@ -324,6 +326,8 @@ public class MemGraph implements Graph {
         else if (!exists(targetCtx.getID())) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetCtx.getID()));
         }
+
+        Association.checkAssociation(uaCtx.getType(), targetCtx.getType());
 
         if (graph.containsEdge(uaCtx.getID(), targetCtx.getID())) {
             // if the association exists update the operations

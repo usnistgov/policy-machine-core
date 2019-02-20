@@ -2,7 +2,6 @@ package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
-import gov.nist.csd.pm.graph.model.nodes.Node;
 import gov.nist.csd.pm.prohibitions.model.Prohibition;
 
 import java.util.*;

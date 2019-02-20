@@ -4,7 +4,8 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
@@ -18,9 +19,8 @@ public class Assignment extends Relationship implements Serializable {
         super(childID, parentID);
     }
 
-    private static HashMap<NodeType, NodeType[]> validAssignments = new HashMap<>();
-
-    {
+    private static Map<NodeType, NodeType[]> validAssignments = new EnumMap<>(NodeType.class);
+    static {
         validAssignments.put(PC, new NodeType[]{});
         validAssignments.put(OA, new NodeType[]{PC, OA});
         validAssignments.put(O, new NodeType[]{OA});

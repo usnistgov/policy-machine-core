@@ -9,7 +9,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import static gov.nist.csd.pm.prohibitions.model.Prohibition.Subject.Type.USER;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ProhibitionsSerializerTest {
 

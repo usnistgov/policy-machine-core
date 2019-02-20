@@ -2,7 +2,10 @@ package gov.nist.csd.pm.prohibitions.model;
 
 import gov.nist.csd.pm.exceptions.PMException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Object representing a Prohibition.
