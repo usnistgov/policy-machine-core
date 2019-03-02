@@ -14,7 +14,7 @@ public interface ProhibitionsDAO {
      * Create a new prohibition.
      *
      * @param prohibition The prohibition to be created.
-     * @ if there is an error creating a prohibition.
+     * @throws PMException if there is an error creating a prohibition.
      */
     void createProhibition(Prohibition prohibition) throws PMException;
 
@@ -22,7 +22,7 @@ public interface ProhibitionsDAO {
      * Get a list of all prohibitions
      *
      * @return a list of all prohibitions
-     * @ if there is an error getting the prohibitions.
+     * @throws PMException if there is an error getting the prohibitions.
      */
     List<Prohibition> getProhibitions() throws PMException;
 
@@ -31,7 +31,7 @@ public interface ProhibitionsDAO {
      *
      * @param prohibitionName The name of the Prohibition to retrieve.
      * @return the Prohibition with the given name.
-     * @ if there is an error getting the prohibition with the given name.
+     * @throws PMException if there is an error getting the prohibition with the given name.
      */
     Prohibition getProhibition(String prohibitionName) throws PMException;
 
@@ -39,15 +39,15 @@ public interface ProhibitionsDAO {
      * Update the given prohibition.  The name of the prohibition is provided in the parameter.
      *
      * @param prohibition The prohibition to update.
-     * @ if there is an error updating the prohibition.
+     * @throws PMException if there is an error updating the prohibition.
      */
-    void updateProhibition(Prohibition prohibition);
+    void updateProhibition(Prohibition prohibition) throws PMException;
 
     /**
      * Delete the prohibition, and remove it from the data structure.
      *
      * @param prohibitionName The name of the prohibition to delete.
-     * @ if there is an error deleting the prohibition.
+     * @throws PMException if there is an error deleting the prohibition.
      */
-    void deleteProhibition(String prohibitionName);
+    void deleteProhibition(String prohibitionName) throws PMException;
 }
