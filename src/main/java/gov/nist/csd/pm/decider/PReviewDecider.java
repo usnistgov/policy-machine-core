@@ -77,20 +77,32 @@ public class PReviewDecider implements Decider {
 
         //get the intersection of permissions the user has on the target in each policy class
         Map<Long, Set<String>> pcMap = visitedNodes.get(targetID);
-        boolean addOps = true;
+        boolean first = true;
         for (long pc : pcMap.keySet()) {
             Set<String> ops = pcMap.get(pc);
-            if (ops.isEmpty()) {// if the ops for the pc are empty then the user has no permissions on the target
-                perms.clear();
-                break;
-            }
-            else if (addOps) {// if this is the first time were adding ops just add to perms
+            if(first) {
                 perms.addAll(ops);
-                addOps = false;
+                first = false;
+            } else {
+                if (perms.contains(ALL_OPERATIONS)) {
+                    perms.remove(ALL_OPERATIONS);
+                    perms.addAll(ops);
+                } else {
+                    // if the ops for the pc are empty then the user has no permissions on the target
+                    if (ops.isEmpty()) {
+                        perms.clear();
+                        break;
+                    } else if (!ops.contains(ALL_OPERATIONS)) {
+                        perms.retainAll(ops);
+                    }
+                }
             }
-            else {// remove any ops that aren't in both sets
-                perms.retainAll(ops);
-            }
+        }
+
+        // if the permission set includes *, ignore all other permissions
+        if (perms.contains(ALL_OPERATIONS)) {
+            perms.clear();
+            perms.add(ALL_OPERATIONS);
         }
 
         return perms;

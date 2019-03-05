@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.model.nodes.Node;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
@@ -53,8 +54,12 @@ class PReviewDeciderTest {
 
     @Test
     void testListPermissions() throws PMException {
-        PReviewDecider decider = new PReviewDecider(graph);
-        assertEquals(new HashSet<>(Arrays.asList("read", "write")), decider.listPermissions(u1ID, 0, o1ID));
+        for(TestCases.TestCase tc : TestCases.getTests()) {
+            PReviewDecider decider = new PReviewDecider(tc.graph);
+            Set<String> result = decider.listPermissions(TestCases.u1ID, 0, TestCases.o1ID);
+
+            assertEquals(tc.getExpectedOps(), result, tc.name);
+        }
     }
 
     @Test
