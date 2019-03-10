@@ -39,8 +39,8 @@ class PathTest {
 
         Path uToO2 = new Path();
         uToO2.addEdge(new Path.Edge(u1, ua1));
-        uToO2.addEdge(new Path.Edge(ua1, oa1, new HashSet<>(Arrays.asList("read", "write", "create", "delete"))));
-        uToO.addEdge(new Path.Edge(o1, oa1));
+        uToO2.addEdge(new Path.Edge(ua1, oa1, new HashSet<>(Arrays.asList("read"))));
+        uToO2.addEdge(new Path.Edge(o1, oa1));
 
         Path oToPC = new Path();
         oToPC.addEdge(new Path.Edge(o1, oa1));
@@ -50,20 +50,20 @@ class PathTest {
         Path u2UasToO = new Path();
         u2UasToO.addEdge(new Path.Edge(u1, ua1));
         u2UasToO.addEdge(new Path.Edge(ua1, ua2));
-        u2UasToO.addEdge(new Path.Edge(ua2, oa1, new HashSet<>(Arrays.asList("read", "write"))));
+        u2UasToO.addEdge(new Path.Edge(ua2, oa1, new HashSet<>(Arrays.asList("read"))));
         u2UasToO.addEdge(new Path.Edge(o1, oa1));
 
         TestCase[] tests = new TestCase[] {
             new TestCase("u1 to pc1", uToPc, "u1-ua1-ua2-pc1"),
             new TestCase("u1 to ua1", uToUa2, "u1-ua1-ua2"),
             new TestCase("u1 to o1", uToO, "u1-ua1-[read]-oa1-o1"),
-            new TestCase("u1 to o12", uToO2, "u1-ua1-[read,write,create,delete]-oa1-o1"),
+            new TestCase("u1 to o12", uToO2, "u1-ua1-[read]-oa1-o1"),
             new TestCase("o1 to pc1", oToPC, "o1-oa1-oa2-pc1"),
-            new TestCase("u1 to o1, 2 uas", oToPC, "u1-ua1-ua2-[read,write]-oa1-o1"),
+            new TestCase("u1 to o1, 2 uas", u2UasToO, "u1-ua1-ua2-[read]-oa1-o1"),
         };
 
         for(TestCase tc : tests) {
-            assertEquals(tc.expected, tc.path.toString());
+            assertEquals(tc.expected, tc.path.toString(), tc.getName() + ": expected " + tc.expected + " got " + tc.path.toString());
         }
     }
 
