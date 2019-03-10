@@ -1,6 +1,10 @@
 # Policy Machine Core
 
-This project is comprised of the core components of the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard. This library provides APIs to manage NGAC graphs and query the access state of the graph.
+This project is comprised of the core components of the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard. Provided are APIs to do the following:
+
+- Manage NGAC Graphs in memory
+- Query the access state of a graph
+- Explain why a user has permissions on a particular resource
 
 ## Full Documentation
 Full documentation can be found [here](https://pm-master.github.io/pm-master/policy-machine-core/)
