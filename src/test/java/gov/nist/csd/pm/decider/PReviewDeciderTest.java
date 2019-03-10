@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.model.nodes.Node;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.utils.TestUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -50,14 +48,14 @@ class PReviewDeciderTest {
     @Test
     void testHasPermissions() throws PMException {
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.hasPermissions(u1ID, 0, o1ID, "read", "write"));
+        assertTrue(decider.hasPermissions(u1ID, o1ID, "read", "write"));
     }
 
     @Test
     void testListPermissions() throws PMException {
         for(TestCases.TestCase tc : TestCases.getTests()) {
             PReviewDecider decider = new PReviewDecider(tc.getGraph());
-            Set<String> result = decider.listPermissions(TestCases.u1ID, 0, TestCases.o1ID);
+            Set<String> result = decider.listPermissions(TestCases.u1ID, TestCases.o1ID);
 
             assertEquals(tc.getExpectedOps(), result, tc.getName());
         }
@@ -72,14 +70,14 @@ class PReviewDeciderTest {
         }
         PReviewDecider decider = new PReviewDecider(graph);
         assertEquals(new HashSet<>(Arrays.asList(o1ID, o2ID, o3ID, oa1ID)),
-                new HashSet<>(decider.filter(u1ID, 0, nodeIDs, "read"))
+                new HashSet<>(decider.filter(u1ID, nodeIDs, "read"))
         );
     }
 
     @Test
     void testGetChildren() throws PMException {
         PReviewDecider decider = new PReviewDecider(graph);
-        Collection<Long> children = decider.getChildren(u1ID, 0, oa1ID);
+        Collection<Long> children = decider.getChildren(u1ID, oa1ID);
         assertEquals(
                 new HashSet<>(Arrays.asList(o1ID, o2ID, o3ID)),
                 children

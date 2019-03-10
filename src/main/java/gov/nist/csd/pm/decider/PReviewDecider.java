@@ -31,9 +31,9 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public boolean hasPermissions(long userID, long processID, long targetID, String... perms) throws PMException {
+    public boolean hasPermissions(long userID, long targetID, String... perms) throws PMException {
         List<String> permsToCheck = Arrays.asList(perms);
-        Set<String> permissions = listPermissions(userID, processID, targetID);
+        Set<String> permissions = listPermissions(userID, targetID);
 
         //if just checking for any operations, return true if the resulting permissions set is not empty.
         //if the resulting permissions set contains * or all operations, return true.
@@ -54,7 +54,7 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Set<String> listPermissions(long userID, long processID, long targetID) throws PMException {
+    public Set<String> listPermissions(long userID, long targetID) throws PMException {
         Set<String> perms = new HashSet<>();
 
         //walk the user side and get all target nodes reachable by the user through associations
@@ -113,10 +113,10 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms) {
+    public Collection<Long> filter(long userID, Collection<Long> nodes, String... perms) {
         nodes.removeIf(n -> {
             try {
-                return !hasPermissions(userID, processID, n, perms);
+                return !hasPermissions(userID, n, perms);
             }
             catch (PMException e) {
                 return true;
@@ -126,9 +126,9 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Collection<Long> getChildren(long userID, long processID, long targetID, String... perms) throws PMException {
+    public Collection<Long> getChildren(long userID, long targetID, String... perms) throws PMException {
         Set<Long> children = graph.getChildren(targetID);
-        return filter(userID, processID, children, perms);
+        return filter(userID, children, perms);
     }
 
     /**
