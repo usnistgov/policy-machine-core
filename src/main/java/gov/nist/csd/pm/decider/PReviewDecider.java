@@ -75,8 +75,12 @@ public class PReviewDecider implements Decider {
         //start a depth first search on the target node.
         dfs(targetID, visitedNodes, dc);
 
-        //get the intersection of permissions the user has on the target in each policy class
-        Map<Long, Set<String>> pcMap = visitedNodes.get(targetID);
+        // resolve the permissions will get the common permissions available for each  policy class
+        return resolvePermissions(visitedNodes.get(targetID));
+    }
+
+    private HashSet<String> resolvePermissions(Map<Long, Set<String>> pcMap) {
+        HashSet<String> perms = new HashSet<>();
         boolean first = true;
         for (long pc : pcMap.keySet()) {
             Set<String> ops = pcMap.get(pc);

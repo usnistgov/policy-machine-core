@@ -5,6 +5,7 @@ import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.model.nodes.Node;
 import gov.nist.csd.pm.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.utils.TestUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -55,10 +56,10 @@ class PReviewDeciderTest {
     @Test
     void testListPermissions() throws PMException {
         for(TestCases.TestCase tc : TestCases.getTests()) {
-            PReviewDecider decider = new PReviewDecider(tc.graph);
+            PReviewDecider decider = new PReviewDecider(tc.getGraph());
             Set<String> result = decider.listPermissions(TestCases.u1ID, 0, TestCases.o1ID);
 
-            assertEquals(tc.getExpectedOps(), result, tc.name);
+            assertEquals(tc.getExpectedOps(), result, tc.getName());
         }
     }
 
