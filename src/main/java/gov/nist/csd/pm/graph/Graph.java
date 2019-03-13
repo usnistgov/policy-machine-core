@@ -2,6 +2,7 @@ package gov.nist.csd.pm.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.model.nodes.Node;
+import gov.nist.csd.pm.graph.model.nodes.NodeType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -15,11 +16,14 @@ public interface Graph {
     /**
      * Create a new node with the given name, type and properties and add it to the graph.
      *
-     * @param node the context of the node to create.  This includes the id, name, type, and properties.
-     * @return the ID of the newly created node.
+     * @param id the ID of the node.
+     * @param name the name of the node.
+     * @param type the type of node.
+     * @param properties any additional properties to store in the node.
+     * @return the Node representation of the newly created node.
      * @throws PMException if there is an error creating the node in the graph.
      */
-    long createNode(Node node) throws PMException;
+    Node createNode(long id, String name, NodeType type, Map<String, String> properties) throws PMException;
 
     /**
      * Update the name and properties of the node with the given ID. The node's existing properties will be overwritten
@@ -27,10 +31,11 @@ public interface Graph {
      * parameter will be ignored only if null.  If the map is empty, the node's properties will be overwritten
      * with the empty map.
      *
-     * @param node the node to update. This includes the id, name, and properties.
+     * @param id the ID of the node to update.
+     * @param name the new name to give the node
      * @throws PMException if there is an error updating the node in the graph.
      */
-    void updateNode(Node node) throws PMException;
+    void updateNode(long id, String name, Map<String, String> properties) throws PMException;
 
     /**
      * Delete the node with the given ID from the graph.
@@ -112,41 +117,41 @@ public interface Graph {
      * and the types must make a valid assignment. An example of a valid assignment is assigning o1, an object, to oa1,
      * an object attribute.  o1 is the child (objects can never be the parent in an assignment), and oa1 is the parent.
      *
-     * @param childCtx  the context information for the child in the assignment.  The ID and type are required.
-     * @param parentCtx the context information for the parent in the assignment The ID and type are required.
+     * @param childID  the ID of the child node.
+     * @param parentID the ID of the parent node.
      * @throws PMException if there is an error assigning the two nodes.
      */
-    void assign(Node childCtx, Node parentCtx) throws PMException;
+    void assign(long childID, long parentID) throws PMException;
 
     /**
      * Remove the Assignment between the child and parent nodes.
      *
-     * @param childCtx  the context information for the child of the assignment.
-     * @param parentCtx the context information for the parent of the assignment.
+     * @param childID  the ID of the child node.
+     * @param parentID the ID of the parent node.
      * @throws PMException if there is an error deassigning the two nodes.
      */
-    void deassign(Node childCtx, Node parentCtx) throws PMException;
+    void deassign(long childID, long parentID) throws PMException;
 
     /**
      * Create an Association between the user attribute and the Target node with the provided operations. If an association
      * already exists between these two nodes, overwrite the existing operations with the ones provided.  Associations
      * can only begin at a user attribute but can point to either an Object or user attribute
      *
-     * @param uaCtx      the information for the user attribute in the association.
-     * @param targetCtx  the context information for the target of the association.
+     * @param uaID The ID of the user attribute.
+     * @param targetID The ID of the target attribute.
      * @param operations A Set of operations to add to the association.
      * @throws PMException if there is an error associating the two nodes.
      */
-    void associate(Node uaCtx, Node targetCtx, Set<String> operations) throws PMException;
+    void associate(long uaID, long targetID, Set<String> operations) throws PMException;
 
     /**
      * Delete the Association between the user attribute and Target node.
      *
-     * @param uaCtx     the context information for the user attribute of the association.
-     * @param targetCtx the context information for the target of the association.
+     * @param uaID     the ID of the user attribute.
+     * @param targetID the ID of the target attribute.
      * @throws PMException if there is an error dissociating the two nodes.
      */
-    void dissociate(Node uaCtx, Node targetCtx) throws PMException;
+    void dissociate(long uaID, long targetID) throws PMException;
 
     /**
      * Retrieve the associations the given node is the source of.  The source node of an association is always a

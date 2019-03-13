@@ -17,32 +17,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PReviewDeciderTest {
 
     private static MemGraph graph;
-    private static long     u1ID;
-    private static long     o1ID;
-    private static long     o2ID;
-    private static long     o3ID;
-    private static long     oa1ID;
+    private static final long     u1ID = 1;
+    private static final long     o1ID = 2;
+    private static final long     o2ID = 3;
+    private static final long     o3ID = 4;
+    private static final long     oa1ID = 5;
 
     @BeforeAll
     static void setUp() throws PMException {
         graph = new MemGraph();
 
-        u1ID = graph.createNode(new Node(5, "u1", NodeType.U, null));
-        o1ID = graph.createNode(new Node(31, "o1", O, null));
-        o2ID = graph.createNode(new Node(32, "o2", O, null));
-        o3ID = graph.createNode(new Node(33, "o3", O, null));
-        long ua1ID = graph.createNode(new Node(4, "ua1", NodeType.UA, null));
-        oa1ID = graph.createNode(new Node(2, "oa1", OA, null));
-        long pc1ID = graph.createNode(new Node(1, "pc1", NodeType.PC, null));
+        graph.createNode(u1ID, "u1", NodeType.U, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(o2ID, "o2", O, null);
+        graph.createNode(o3ID, "o3", O, null);
+        Node ua1 = graph.createNode(6, "ua1", NodeType.UA, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        Node pc1 = graph.createNode(8, "pc1", NodeType.PC, null);
 
-        graph.assign(new Node(u1ID, NodeType.U), new Node(ua1ID, NodeType.UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o2ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o3ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(ua1ID, NodeType.UA), new Node(pc1ID, NodeType.PC));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, NodeType.PC));
+        graph.assign(u1ID, ua1.getID());
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o2ID, oa1ID);
+        graph.assign(o3ID, oa1ID);
+        graph.assign(ua1.getID(), pc1.getID());
+        graph.assign(oa1ID, pc1.getID());
 
-        graph.associate(new Node(ua1ID, NodeType.UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1.getID(), oa1ID, new HashSet<>(Arrays.asList("read", "write")));
     }
 
     @Test

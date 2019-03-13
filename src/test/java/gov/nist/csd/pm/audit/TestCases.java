@@ -1,11 +1,8 @@
 package gov.nist.csd.pm.audit;
 
-import gov.nist.csd.pm.audit.model.Path;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.MemGraph;
-import gov.nist.csd.pm.graph.model.nodes.Node;
-import gov.nist.csd.pm.utils.TestUtil;
 
 import java.util.*;
 
@@ -73,18 +70,18 @@ public class TestCases {
 
     public static TestCase graph1() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
@@ -93,22 +90,22 @@ public class TestCases {
 
     public static TestCase graph2() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(ua2ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(ua2ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("write")));
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1", "u1-ua2-[write]-oa1-o1"));
@@ -117,21 +114,21 @@ public class TestCases {
 
     public static TestCase graph3() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(ua2ID, UA));
-        graph.assign(new Node(ua2ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, ua2ID);
+        graph.assign(ua2ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("write")));
 
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
@@ -141,11 +138,11 @@ public class TestCases {
 
     public static TestCase graph4() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
@@ -155,17 +152,17 @@ public class TestCases {
 
     public static TestCase graph5() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
@@ -174,17 +171,17 @@ public class TestCases {
 
     public static TestCase graph6() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
 
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
@@ -194,26 +191,26 @@ public class TestCases {
 
     public static TestCase graph7() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(ua2ID, UA), new Node(pc2ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc2ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(ua2ID, pc2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa2ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
@@ -223,26 +220,26 @@ public class TestCases {
 
     public static TestCase graph8() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(ua2ID, UA), new Node(pc2ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc2ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(ua2ID, pc2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa2ID, OA), new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
@@ -252,19 +249,19 @@ public class TestCases {
 
     public static TestCase graph9() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
@@ -274,25 +271,25 @@ public class TestCases {
 
     public static TestCase graph10() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(ua2ID, UA), new Node(pc2ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc2ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(ua2ID, pc2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
@@ -302,17 +299,17 @@ public class TestCases {
 
     public static TestCase graph11() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
@@ -321,21 +318,21 @@ public class TestCases {
 
     public static TestCase graph12() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(ua2ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(ua2ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1", "u1-ua2-[write]-oa1-o1"));
@@ -344,25 +341,25 @@ public class TestCases {
 
     public static TestCase graph13() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(ua2ID, UA), new Node(pc2ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc2ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(ua2ID, pc2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa2ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
@@ -372,24 +369,24 @@ public class TestCases {
 
     public static TestCase graph14() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc2ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa2ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
@@ -399,22 +396,22 @@ public class TestCases {
 
     public static TestCase graph15() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
-        graph.createNode(new Node(pc2ID, "pc2", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createNode(pc2ID, "pc2", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc2ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
@@ -424,18 +421,18 @@ public class TestCases {
 
     public static TestCase graph16() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
@@ -444,17 +441,17 @@ public class TestCases {
 
     public static TestCase graph17() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
@@ -463,21 +460,21 @@ public class TestCases {
 
     public static TestCase graph18() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(ua2ID, UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(oa2ID, OA));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, ua2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, oa2ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa2ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
@@ -486,23 +483,23 @@ public class TestCases {
 
     public static TestCase graph19() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(ua1ID, UA), new Node(ua2ID, UA));
-        graph.assign(new Node(ua2ID, UA), new Node(pc1ID, PC));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(oa2ID, OA));
-        graph.assign(new Node(oa2ID, OA), new Node(pc1ID, OA));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(ua1ID, ua2ID);
+        graph.assign(ua2ID, pc1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, oa2ID);
+        graph.assign(oa2ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa2ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1", "u1-ua1-ua2-[read]-oa2-oa1-o1"));
@@ -511,23 +508,23 @@ public class TestCases {
 
     public static TestCase graph20() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(oa2ID, "oa2", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(oa2ID, "oa2", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(o1ID, O), new Node(oa2ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(oa2ID, OA), new Node(pc1ID, OA));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(o1ID, oa2ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(oa2ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("write")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua2-[read]-oa1-o1", "u1-ua1-[write]-oa1-o1"));
@@ -536,21 +533,21 @@ public class TestCases {
 
     public static TestCase graph21() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(new Node(u1ID, "u1", U, null));
-        graph.createNode(new Node(ua1ID, "ua1", UA, null));
-        graph.createNode(new Node(ua2ID, "ua2", UA, null));
-        graph.createNode(new Node(o1ID, "o1", O, null));
-        graph.createNode(new Node(oa1ID, "oa1", OA, null));
-        graph.createNode(new Node(pc1ID, "pc1", PC, null));
+        graph.createNode(u1ID, "u1", U, null);
+        graph.createNode(ua1ID, "ua1", UA, null);
+        graph.createNode(ua2ID, "ua2", UA, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(new Node(u1ID, U), new Node(ua1ID, UA));
-        graph.assign(new Node(u1ID, U), new Node(ua2ID, UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, PC));
-        graph.assign(new Node(ua1ID, UA), new Node(pc1ID, PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(u1ID, ua2ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(oa1ID, pc1ID);
+        graph.assign(ua1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("write")));
-        graph.associate(new Node(ua2ID, UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("read")));
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1-ua2-[read]-oa1-o1", "u1-ua1-[write]-oa1-o1"));

@@ -45,9 +45,10 @@ public class PReviewAuditor implements Auditor {
      */
     private Map<String, List<Path>> resolvePaths(List<Path> userPaths, List<Path> targetPaths) throws PMException {
         Map<String, List<Path>> results = new HashMap<>();
-        Set<Node> pcs = graph.search(null, PC.toString(), null);
-        for(Node pc : pcs) {
-            results.put(pc.getName(), new ArrayList<>());
+        Set<Long> pcs = graph.getPolicies();
+        for(Long pc : pcs) {
+            Node pcNode = graph.getNode(pc);
+            results.put(pcNode.getName(), new ArrayList<>());
         }
 
         for (Path userPath : userPaths) {

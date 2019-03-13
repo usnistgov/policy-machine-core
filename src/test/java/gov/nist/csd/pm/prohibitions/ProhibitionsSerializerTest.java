@@ -43,6 +43,5 @@ class ProhibitionsSerializerTest {
         assertFalse(prohibition.isIntersection());
         assertEquals(new HashSet<>(Arrays.asList("read")), prohibition.getOperations());
         assertEquals(new Prohibition.Node(1234, true), prohibition.getNodes().get(0));
-
     }
 }

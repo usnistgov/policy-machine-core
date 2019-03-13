@@ -18,22 +18,21 @@ class MemGraphTest {
     @Test
     void testCreateNode() throws PMException {
         MemGraph graph = new MemGraph();
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(null)),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(new Node())),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(new Node(123, null, OA, null))),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(new Node(123, "", OA, null))),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(new Node(123, "name", null, null)))
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(0, null, null, null)),
+                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(123, null, OA, null)),
+                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(123, "", OA, null)),
+                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(123, "name", null, null))
         );
 
         // add pc
-        long pc = graph.createNode(new Node(123, "pc", PC, null));
-        assertTrue(graph.getPolicies().contains(pc));
+        Node pc = graph.createNode(123, "pc", PC, null);
+        assertTrue(graph.getPolicies().contains(pc.getID()));
 
         // add non pc
-        long nodeID = graph.createNode(new Node(1234, "oa", OA, Node.toProperties("namespace", "test")));
+        Node node = graph.createNode(1234, "oa", OA, Node.toProperties("namespace", "test"));
 
         // check node is added
-        Node node = graph.getNode(nodeID);
+        node = graph.getNode(node.getID());
         assertEquals("oa", node.getName());
         assertEquals(OA, node.getType());
     }
@@ -41,42 +40,41 @@ class MemGraphTest {
     @Test
     void testUpdateNode() throws PMException {
         MemGraph graph = new MemGraph();
-        Node node = new Node(123, "node", OA, Node.toProperties("namespace", "test"));
-        long nodeID = graph.createNode(node);
+        Node node = graph.createNode( 123, "node", OA, Node.toProperties("namespace", "test"));
 
         // node not found
-        assertThrows(PMException.class, () -> graph.updateNode(new Node(9, "newNodeName", null, null)));
+        assertThrows(PMException.class, () -> graph.updateNode(9, "newNodeName", null));
 
         // update name
-        graph.updateNode(node.name("updated name"));
-        assertEquals(graph.getNode(nodeID).getName(), "updated name");
+        graph.updateNode(node.getID(), "updated name", null);
+        assertEquals(graph.getNode(node.getID()).getName(), "updated name");
 
         // update properties
-        graph.updateNode(node.property("newKey", "newValue"));
-        assertEquals(graph.getNode(nodeID).getProperties().get("newKey"), "newValue");
+        graph.updateNode(node.getID(), null, Node.toProperties("newKey", "newValue"));
+        assertEquals(graph.getNode(node.getID()).getProperties().get("newKey"), "newValue");
     }
 
     @Test
     void testDeleteNode() {
         MemGraph graph = new MemGraph();
-        long id = graph.createNode(new Node(123, "node", PC, Node.toProperties("namespace", "test")));
+        Node node = graph.createNode(123, "node", PC, Node.toProperties("namespace", "test"));
 
-        graph.deleteNode(id);
+        graph.deleteNode(node.getID());
 
         // deleted from the graph
-        assertFalse(graph.exists(id));
+        assertFalse(graph.exists(node.getID()));
 
-        assertThrows(PMException.class, () -> graph.getNode(id));
+        assertThrows(PMException.class, () -> graph.getNode(node.getID()));
 
         // deleted from list of policies
-        assertFalse(graph.getPolicies().contains(id));
+        assertFalse(graph.getPolicies().contains(node.getID()));
     }
 
     @Test
     void testExists() throws PMException {
         Graph graph = new MemGraph();
-        long id = graph.createNode(new Node(123, "node", OA, null));
-        assertTrue(graph.exists(id));
+        Node node = graph.createNode(123, "node", OA, null);
+        assertTrue(graph.exists(node.getID()));
         assertFalse(graph.exists(1234));
     }
 
@@ -86,9 +84,9 @@ class MemGraphTest {
 
         assertTrue(graph.getPolicies().isEmpty());
 
-        graph.createNode(new Node(123, "node1", PC, null));
-        graph.createNode(new Node(1234, "node2", PC, null));
-        graph.createNode(new Node(1235, "node3", PC, null));
+        graph.createNode(123, "node1", PC, null);
+        graph.createNode(1234, "node2", PC, null);
+        graph.createNode(1235, "node3", PC, null);
 
         assertEquals(3, graph.getPolicies().size());
     }
@@ -99,15 +97,15 @@ class MemGraphTest {
 
         assertThrows(PMException.class, () -> graph.getChildren(1));
 
-        long parentID = graph.createNode(new Node(1, "parent", OA, null));
-        long child1ID = graph.createNode(new Node(2, "child1", OA, null));
-        long child2ID = graph.createNode(new Node(3, "child2", OA, null));
+        Node parentNode = graph.createNode(1, "parent", OA, null);
+        Node child1Node = graph.createNode(2, "child1", OA, null);
+        Node child2Node = graph.createNode(3, "child2", OA, null);
 
-        graph.assign(new Node(child1ID, OA), new Node(parentID, OA));
-        graph.assign(new Node(child2ID, OA), new Node(parentID, OA));
+        graph.assign(child1Node.getID(), parentNode.getID());
+        graph.assign(child2Node.getID(), parentNode.getID());
 
-        Set<Long> children = graph.getChildren(parentID);
-        assertTrue(children.containsAll(Arrays.asList(child1ID, child2ID)));
+        Set<Long> children = graph.getChildren(parentNode.getID());
+        assertTrue(children.containsAll(Arrays.asList(child1Node.getID(), child2Node.getID())));
     }
 
     @Test
@@ -116,102 +114,99 @@ class MemGraphTest {
 
         assertThrows(PMException.class, () -> graph.getChildren(1));
 
-        long parent1ID = graph.createNode(new Node(1, "parent1", OA, null));
-        long parent2ID = graph.createNode(new Node(2, "parent2", OA, null));
-        long child1ID = graph.createNode(new Node(3, "child1", OA, null));
+        Node parent1Node = graph.createNode(1, "parent1", OA, null);
+        Node parent2Node = graph.createNode(2, "parent2", OA, null);
+        Node child1Node = graph.createNode(3, "child1", OA, null);
 
-        graph.assign(new Node(child1ID, OA), new Node(parent1ID, OA));
-        graph.assign(new Node(child1ID, OA), new Node(parent2ID, OA));
+        graph.assign(child1Node.getID(), parent1Node.getID());
+        graph.assign(child1Node.getID(), parent2Node.getID());
 
-        Set<Long> parents = graph.getParents(child1ID);
-        assertTrue(parents.contains(parent1ID));
-        assertTrue(parents.contains(parent2ID));
+        Set<Long> parents = graph.getParents(child1Node.getID());
+        assertTrue(parents.contains(parent1Node.getID()));
+        assertTrue(parents.contains(parent2Node.getID()));
     }
 
     @Test
     void testAssign() throws PMException {
         Graph graph = new MemGraph();
 
-        long parent1ID = graph.createNode(new Node(1, "parent1", OA, null));
-        long child1ID = graph.createNode(new Node(3, "child1", OA, null));
+        Node parent1Node = graph.createNode(1, "parent1", OA, null);
+        Node child1Node = graph.createNode(3, "child1", OA, null);
 
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.assign(null, null)),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign(new Node(), null)),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign(new Node().id(123), null)),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign(new Node().id(1), new Node().id(123)))
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.assign(1241124, 123442141)),
+                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign(1, 12341234))
         );
 
-        graph.assign(new Node(child1ID, OA), new Node(parent1ID, OA));
+        graph.assign(child1Node.getID(), parent1Node.getID());
 
-        assertTrue(graph.getChildren(parent1ID).contains(child1ID));
-        assertTrue(graph.getParents(child1ID).contains(parent1ID));
+        assertTrue(graph.getChildren(parent1Node.getID()).contains(child1Node.getID()));
+        assertTrue(graph.getParents(child1Node.getID()).contains(parent1Node.getID()));
     }
 
     @Test
     void testDeassign() throws PMException {
         Graph graph = new MemGraph();
 
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.assign(null, null)),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign(new Node(), null))
-        );
+        Node parent1Node = graph.createNode(1, "parent1", OA, null);
+        Node child1Node = graph.createNode(3, "child1", OA, null);
 
-        long parent1ID = graph.createNode(new Node(1, "parent1", OA, null));
-        long child1ID = graph.createNode(new Node(3, "child1", OA, null));
+        assertThrows(IllegalArgumentException.class, () -> graph.assign(0, 0));
+        assertThrows(IllegalArgumentException.class, () -> graph.assign(child1Node.getID(), 0));
 
-        graph.assign(new Node(child1ID, OA), new Node(parent1ID, OA));
-        graph.deassign(new Node(child1ID, OA), new Node(parent1ID, OA));
+        graph.assign(child1Node.getID(), parent1Node.getID());
+        graph.deassign(child1Node.getID(), parent1Node.getID());
 
-        assertFalse(graph.getChildren(parent1ID).contains(child1ID));
-        assertFalse(graph.getParents(child1ID).contains(parent1ID));
+        assertFalse(graph.getChildren(parent1Node.getID()).contains(child1Node.getID()));
+        assertFalse(graph.getParents(child1Node.getID()).contains(parent1Node.getID()));
     }
 
     @Test
     void testAssociate() throws PMException {
         Graph graph = new MemGraph();
 
-        long uaID = graph.createNode(new Node(1, "ua", UA, null));
-        long targetID = graph.createNode(new Node(3, "target", OA, null));
+        Node uaNode = graph.createNode(1, "ua", UA, null);
+        Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(new Node(uaID, UA), new Node(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
 
-        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaID);
-        assertTrue(associations.containsKey(targetID));
-        assertTrue(associations.get(targetID).containsAll(Arrays.asList("read", "write")));
+        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
+        assertTrue(associations.containsKey(targetNode.getID()));
+        assertTrue(associations.get(targetNode.getID()).containsAll(Arrays.asList("read", "write")));
 
-        associations = graph.getTargetAssociations(targetID);
-        assertTrue(associations.containsKey(uaID));
-        assertTrue(associations.get(uaID).containsAll(Arrays.asList("read", "write")));
+        associations = graph.getTargetAssociations(targetNode.getID());
+        assertTrue(associations.containsKey(uaNode.getID()));
+        assertTrue(associations.get(uaNode.getID()).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
     void testDissociate() throws PMException {
         Graph graph = new MemGraph();
 
-        long uaID = graph.createNode(new Node(1, "ua", UA, null));
-        long targetID = graph.createNode(new Node(3, "target", OA, null));
+        Node uaNode = graph.createNode(1, "ua", UA, null);
+        Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(new Node(uaID, UA), new Node(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
-        graph.dissociate(new Node(uaID, UA), new Node(targetID, OA));
+        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.dissociate(uaNode.getID(), targetNode.getID());
 
-        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaID);
-        assertFalse(associations.containsKey(targetID));
+        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
+        assertFalse(associations.containsKey(targetNode.getID()));
 
-        associations = graph.getTargetAssociations(targetID);
-        assertFalse(associations.containsKey(uaID));
+        associations = graph.getTargetAssociations(targetNode.getID());
+        assertFalse(associations.containsKey(uaNode.getID()));
     }
 
     @Test
     void testGetSourceAssociations() throws PMException {
         Graph graph = new MemGraph();
 
-        long uaID = graph.createNode(new Node(1, "ua", UA, null));
-        long targetID = graph.createNode(new Node(3, "target", OA, null));
+        Node uaNode = graph.createNode(1, "ua", UA, null);
+        Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(new Node(uaID, UA), new Node(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
 
-        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaID);
-        assertTrue(associations.containsKey(targetID));
-        assertTrue(associations.get(targetID).containsAll(Arrays.asList("read", "write")));
+        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
+        assertTrue(associations.containsKey(targetNode.getID()));
+        assertTrue(associations.get(targetNode.getID()).containsAll(Arrays.asList("read", "write")));
 
         assertThrows(PMException.class, () -> graph.getSourceAssociations(123));
     }
@@ -220,14 +215,14 @@ class MemGraphTest {
     void testGetTargetAssociations() throws PMException {
         Graph graph = new MemGraph();
 
-        long uaID = graph.createNode(new Node(1, "ua", UA, null));
-        long targetID = graph.createNode(new Node(3, "target", OA, null));
+        Node uaNode = graph.createNode(1, "ua", UA, null);
+        Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(new Node(uaID, UA), new Node(targetID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
 
-        Map<Long, Set<String>> associations = graph.getTargetAssociations(targetID);
-        assertTrue(associations.containsKey(uaID));
-        assertTrue(associations.get(uaID).containsAll(Arrays.asList("read", "write")));
+        Map<Long, Set<String>> associations = graph.getTargetAssociations(targetNode.getID());
+        assertTrue(associations.containsKey(uaNode.getID()));
+        assertTrue(associations.get(uaNode.getID()).containsAll(Arrays.asList("read", "write")));
 
         assertThrows(PMException.class, () -> graph.getTargetAssociations(123));
     }
@@ -236,9 +231,9 @@ class MemGraphTest {
     void testSearch() throws PMException {
         Graph graph = new MemGraph();
 
-        graph.createNode(new Node(1, "oa1", OA, Node.toProperties("namespace", "test")));
-        graph.createNode(new Node(2, "oa2", OA, Node.toProperties("key1", "value1")));
-        graph.createNode(new Node(3, "oa3", OA, Node.toProperties("key1", "value1", "key2", "value2")));
+        graph.createNode(1, "oa1", OA, Node.toProperties("namespace", "test"));
+        graph.createNode(2, "oa2", OA, Node.toProperties("key1", "value1"));
+        graph.createNode(3, "oa3", OA, Node.toProperties("key1", "value1", "key2", "value2"));
 
         // name and type no properties
         Set<Node> nodes = graph.search("oa1", OA.toString(), null);
@@ -272,9 +267,9 @@ class MemGraphTest {
 
         assertTrue(graph.getNodes().isEmpty());
 
-        graph.createNode(new Node(123, "node1", OA, null));
-        graph.createNode(new Node(1234, "node2", OA, null));
-        graph.createNode(new Node(1235, "node3", OA, null));
+        graph.createNode(123, "node1", OA, null);
+        graph.createNode(1234, "node2", OA, null);
+        graph.createNode(1235, "node3", OA, null);
 
         assertEquals(3, graph.getNodes().size());
     }
@@ -285,8 +280,8 @@ class MemGraphTest {
 
         assertThrows(PMException.class, () -> graph.getNode(123));
 
-        long id = graph.createNode(new Node(123, "oa1", OA, null));
-        Node node = graph.getNode(id);
+        Node node = graph.createNode(123, "oa1", OA, null);
+        node = graph.getNode(node.getID());
         assertEquals("oa1", node.getName());
         assertEquals(OA, node.getType());
     }

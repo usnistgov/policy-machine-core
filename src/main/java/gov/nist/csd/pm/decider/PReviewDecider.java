@@ -285,11 +285,10 @@ public class PReviewDecider implements Decider {
 
 
     private synchronized long createVNode(Map<Long, Set<String>> dc) throws PMException {
-        Node vNode = new Node(new Random().nextLong(), "VNODE", NodeType.OA, null);
-        long vNodeID = graph.createNode(vNode);
+        Node vNode = graph.createNode(new Random().nextLong(), "VNODE", NodeType.OA, null);
         for (long nodeID : dc.keySet()) {
-            graph.assign(new Node(nodeID, NodeType.OA), new Node(vNode.getID(), NodeType.OA));
+            graph.assign(nodeID, vNode.getID());
         }
-        return vNodeID;
+        return vNode.getID();
     }
 }

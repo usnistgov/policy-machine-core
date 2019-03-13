@@ -91,29 +91,20 @@ public class GraphSerializer {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
 
         Collection<Node> nodes = jsonGraph.getNodes();
-        HashMap<Long, Node> nodesMap = new HashMap<>();
         for (Node node : nodes) {
-            long newNodeID = graph.createNode(node);
-            nodesMap.put(node.getID(), node.id(newNodeID));
+            graph.createNode(node.getID(), node.getName(), node.getType(), node.getProperties());
         }
 
         Set<Assignment> assignments = jsonGraph.getAssignments();
         for (Assignment assignment : assignments) {
-            Node childCtx = nodesMap.get(assignment.getSourceID());
-            Node parentCtx = nodesMap.get(assignment.getTargetID());
-            graph.assign(childCtx, parentCtx);
+            graph.assign(assignment.getSourceID(), assignment.getTargetID());
         }
 
         Set<Association> associations = jsonGraph.getAssociations();
         for (Association association : associations) {
             long uaID = association.getSourceID();
             long targetID = association.getTargetID();
-            Node targetNode = nodesMap.get(targetID);
-            graph.associate(
-                    new Node(uaID, UA),
-                    new Node(targetNode.getID(), targetNode.getType()),
-                    association.getOperations()
-            );
+            graph.associate(uaID, targetID, association.getOperations());
         }
 
         return graph;

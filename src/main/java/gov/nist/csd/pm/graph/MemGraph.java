@@ -35,7 +35,6 @@ public class MemGraph implements Graph {
     /**
      * Create a node in the in-memory graph.  The ID field of the passed Node must not be 0.
      *
-     * @param node the context of the node to create.  This includes the id, name, type, and properties.
      * @return the ID that was passed as part of the node parameter.
      * @throws IllegalArgumentException When the provided node is null.
      * @throws IllegalArgumentException When the provided node has an ID of 0.
@@ -43,35 +42,32 @@ public class MemGraph implements Graph {
      * @throws IllegalArgumentException When the provided node has a null type.
      */
     @Override
-    public long createNode(Node node) {
+    public Node createNode(long id, String name, NodeType type, Map<String, String> properties) {
         //check for null values
-        if (node == null) {
-            throw new IllegalArgumentException("a null node was provided when creating a node in-memory");
-        }
-        else if (node.getID() == 0) {
+        if (id == 0) {
             throw new IllegalArgumentException("no ID was provided when creating a node in the in-memory graph");
         }
-        else if (node.getName() == null || node.getName().isEmpty()) {
+        else if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
         }
-        else if (node.getType() == null) {
+        else if (type == null) {
             throw new IllegalArgumentException("a null type was provided to the in memory graph when creating a node");
         }
 
-        //if the node being created is a PC, add it to the graph and list of policies
-        if (node.getType().equals(NodeType.PC)) {
-            pcs.add(node.getID());
-            graph.addVertex(node.getID());
+        //if the node being created is a PC, add it to the list of policies
+        if (type.equals(NodeType.PC)) {
+            pcs.add(id);
         }
-        else {
-            graph.addVertex(node.getID());
-        }
+
+        // add the vertex to the graph
+        graph.addVertex(id);
 
         //store the node in the map
-        nodes.put(node.getID(), new Node(node.getID(), node.getName(), node.getType(), node.getProperties()));
+        Node node = new Node(id, name, type, properties);
+        nodes.put(id, node);
 
-        //return the Node with the given info about the node
-        return node.getID();
+        //return the Node
+        return node;
     }
 
     /**
@@ -82,28 +78,23 @@ public class MemGraph implements Graph {
      * <p>
      * The ID must be present in order to identify which node to update.
      *
-     * @param node the node to update. This includes the id, name, and properties.
      * @throws PMException if the given node ID does not exist in the graph.
      */
     @Override
-    public void updateNode(Node node) throws PMException {
-        if (node == null) {
-            throw new IllegalArgumentException("the node to update was null");
-        }
-
-        Node existingNode = nodes.get(node.getID());
+    public void updateNode(long id, String name, Map<String, String> properties) throws PMException {
+        Node existingNode = nodes.get(id);
         if (existingNode == null) {
-            throw new PMException(String.format("node with the ID %d could not be found to update", node.getID()));
+            throw new PMException(String.format("node with the ID %d could not be found to update", id));
         }
 
         // update name if present
-        if (node.getName() != null && !node.getName().isEmpty()) {
-            existingNode.name(node.getName());
+        if (name != null && !name.isEmpty()) {
+            existingNode.name(name);
         }
 
         // update the properties
-        if (node.getProperties() != null) {
-            existingNode.properties(node.getProperties());
+        if (properties != null) {
+            existingNode.properties(properties);
         }
 
         // update the node information
@@ -252,102 +243,81 @@ public class MemGraph implements Graph {
     }
 
     /**
-     * Assign the child node to the parent node.
+     * Assign the child node to the parent node. Both nodes must exist and both types must make a valid assignment.
      *
-     * @param childCtx  the context information for the child in the assignment.  The ID and type are required.
-     * @param parentCtx the context information for the parent in the assignment The ID and type are required.
      * @throws IllegalArgumentException if the child node context is null.
      * @throws IllegalArgumentException if the parent node context is null.
      * @throws IllegalArgumentException if the child node does not exist in the graph.
      * @throws IllegalArgumentException if the parent node does not exist in the graph.
+     * @throws PMException if the two types do not make a valid assignment.
      */
     @Override
-    public void assign(Node childCtx, Node parentCtx) throws PMException {
-        if (childCtx == null) {
-            throw new IllegalArgumentException("child node context was null");
+    public void assign(long childID, long parentID) throws PMException {
+        if (!exists(childID)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, childID));
         }
-        else if (parentCtx == null) {
-            throw new IllegalArgumentException("parent node context was null");
-        }
-        else if (!exists(childCtx.getID())) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, childCtx));
-        }
-        else if (!exists(parentCtx.getID())) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentCtx));
+        else if (!exists(parentID)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentID));
         }
 
-        Assignment.checkAssignment(childCtx.getType(), parentCtx.getType());
+        Node child = getNode(childID);
+        Node parent = getNode(parentID);
 
-        graph.addEdge(childCtx.getID(), parentCtx.getID(), new Assignment(childCtx.getID(), parentCtx.getID()));
+        Assignment.checkAssignment(child.getType(), parent.getType());
+
+        graph.addEdge(childID, parentID, new Assignment(childID, parentID));
     }
 
     /**
      * Deassign the child node from the parent node.
      *
-     * @param childCtx  the context information for the child of the assignment.
-     * @param parentCtx the context information for the parent of the assignment.
      * @throws IllegalArgumentException if the child node context is null.
      * @throws IllegalArgumentException if the parent node context is null.
      */
     @Override
-    public void deassign(Node childCtx, Node parentCtx) {
-        if (childCtx == null) {
-            throw new IllegalArgumentException("child node context was null");
-        }
-        else if (parentCtx == null) {
-            throw new IllegalArgumentException("parent node context was null");
-        }
-
-        graph.removeEdge(childCtx.getID(), parentCtx.getID());
+    public void deassign(long childID, long parentID) {
+        graph.removeEdge(childID, parentID);
     }
 
     /**
      * Associate the user attribute node and the target node.
      *
-     * @param uaCtx      the information for the user attribute in the association.
-     * @param targetCtx  the context information for the target of the association.
-     * @param operations A Set of operations to add to the association.
      * @throws IllegalArgumentException if the user attribute node context is null.
      * @throws IllegalArgumentException if the target node context is null.
      * @throws PMException              if the user attribute node does not exist in the graph.
      * @throws PMException              if the target node does not exist in the graph.
      */
     @Override
-    public void associate(Node uaCtx, Node targetCtx, Set<String> operations) throws PMException {
-        if (uaCtx == null) {
-            throw new IllegalArgumentException("user attribute node context was null");
+    public void associate(long uaID, long targetID, Set<String> operations) throws PMException {
+        if (!exists(uaID)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, uaID));
         }
-        else if (targetCtx == null) {
-            throw new IllegalArgumentException("target node context was null");
-        }
-        else if (!exists(uaCtx.getID())) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, uaCtx.getID()));
-        }
-        else if (!exists(targetCtx.getID())) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetCtx.getID()));
+        else if (!exists(targetID)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
         }
 
-        Association.checkAssociation(uaCtx.getType(), targetCtx.getType());
+        Node ua = getNode(uaID);
+        Node target = getNode(targetID);
 
-        if (graph.containsEdge(uaCtx.getID(), targetCtx.getID())) {
+        // check that the assignment is valid
+        Association.checkAssociation(ua.getType(), target.getType());
+
+        if (graph.containsEdge(uaID, targetID)) {
             // if the association exists update the operations
-            Association assoc = (Association) graph.getEdge(uaCtx.getID(), targetCtx.getID());
+            Association assoc = (Association) graph.getEdge(uaID, targetID);
             assoc.setOperations(operations);
         }
         else {
-            graph.addEdge(uaCtx.getID(), targetCtx.getID(), new Association(uaCtx.getID(), targetCtx.getID(), operations));
+            graph.addEdge(uaID, targetID, new Association(uaID, targetID, operations));
         }
     }
 
     /**
      * Dissociate the user attribute node from the target node.  If an association does not exist, nothing happens.
-     *
-     * @param uaCtx     the context information for the user attribute of the association.
-     * @param targetCtx the context information for the target of the association.
      */
     @Override
-    public void dissociate(Node uaCtx, Node targetCtx) {
-        graph.removeEdge(uaCtx.getID(), targetCtx.getID());
+    public void dissociate(long uaID, long targetID) {
+        graph.removeEdge(uaID, targetID);
     }
 
     /**

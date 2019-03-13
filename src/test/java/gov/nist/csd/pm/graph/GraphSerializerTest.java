@@ -16,28 +16,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GraphSerializerTest {
 
     private static Graph graph;
-    private static long u1ID;
-    private static long o1ID;
-    private static long ua1ID;
-    private static long oa1ID;
-    private static long pc1ID;
+    private static long u1ID = 1;
+    private static long o1ID = 2;
+    private static long ua1ID = 3;
+    private static long oa1ID = 4;
+    private static long pc1ID = 5;
 
     @BeforeAll
     static void setUp() throws PMException {
         graph = new MemGraph();
 
-        u1ID = graph.createNode(new Node(5, "u1", NodeType.U, null));
-        o1ID = graph.createNode(new Node(4, "o1", O, null));
-        ua1ID = graph.createNode(new Node(3, "ua1", NodeType.UA, null));
-        oa1ID = graph.createNode(new Node(2, "oa1", OA, null));
-        pc1ID = graph.createNode(new Node(1, "pc1", NodeType.PC, null));
+        graph.createNode(u1ID, "u1", NodeType.U, null);
+        graph.createNode(o1ID, "o1", O, null);
+        graph.createNode(ua1ID, "ua1", NodeType.UA, null);
+        graph.createNode(oa1ID, "oa1", OA, null);
+        graph.createNode(pc1ID, "pc1", NodeType.PC, null);
 
-        graph.assign(new Node(u1ID, NodeType.U), new Node(ua1ID, NodeType.UA));
-        graph.assign(new Node(o1ID, O), new Node(oa1ID, OA));
-        graph.assign(new Node(ua1ID, NodeType.UA), new Node(pc1ID, NodeType.PC));
-        graph.assign(new Node(oa1ID, OA), new Node(pc1ID, NodeType.PC));
+        graph.assign(u1ID, ua1ID);
+        graph.assign(o1ID, oa1ID);
+        graph.assign(ua1ID, pc1ID);
+        graph.assign(oa1ID, pc1ID);
 
-        graph.associate(new Node(ua1ID, NodeType.UA), new Node(oa1ID, OA), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
     }
 
     @Test
