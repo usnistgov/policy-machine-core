@@ -1,0 +1,6 @@
+site_name: policy-machine-master
+nav:
+theme:
+  name: 'rtd-dropdown'
+extra_css:
+  - css/extra.css
