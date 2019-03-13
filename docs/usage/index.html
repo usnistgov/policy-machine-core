@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Usage - policy-machine-core</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../css/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Usage";
+    var mkdocs_page_input_path = "usage.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> policy-machine-core</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="..">Introduction</a>
+  </li>
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../installation/">Installation</a>
+  </li>
+    
+      
+
+
+  
+    
+    <li class="navtree toctree-l1 page current">
+      <a class="current" href="./">
+        Usage
+      </a>
+    </li>
+    
+      
+
+
+
+  <li class="toctree-l1 current">
+    <ul class="subnav-l1 current">
+    
+      
+        <li class="toctree-l2">
+          <a class="toctree-l3" href="#creating-a-graph">Creating a Graph</a>
+        </li>
+    
+      
+        <li class="toctree-l2">
+          <a class="toctree-l3" href="#access-decisions">Access Decisions</a>
+        </li>
+    
+      
+          
+
+  <li class="toctree-l2">
+    <a href="#audit">
+      Audit
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#explain">Explain</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+    
+    </ul>
+  </li>
+
+
+  
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../examples/">Examples</a>
+  </li>
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../contact/">Contact Us</a>
+  </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">policy-machine-core</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Usage</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="usage">Usage</h2>
+<h3 id="creating-a-graph">Creating a Graph</h3>
+<pre><code>Graph graph = new Graph();
+</code></pre>
+
+<p>This will create a new instance of the in memory implementation of the Graph interface. Now it can be populated with
+nodes, assignments, and associations.</p>
+<pre><code>graph.createNode(1234, &quot;newNode&quot;, NodeType.O, null));
+</code></pre>
+
+<p>This will add a node with the ID 1234, name "newNode", type object, and no properties to the graph.</p>
+<pre><code>graph.assign(1234, NodeType.O), 4321, NodeType.OA));
+</code></pre>
+
+<p>Assuming a node with the ID 4321 and type OA have been created in the graph, this will assign the node with ID 1234 to the 
+node with ID 4321.</p>
+<pre><code>graph.associate(2222, NodeType.UA), 4321, NodeType.OA), new HashSet&lt;&gt;(Arrays.asList(&quot;read&quot;, &quot;write&quot;)));
+</code></pre>
+
+<p>Assuming a user attribute node is created with the ID 2222, this will associate it with the object attribute that has the 
+ID 4321, and give the operations read and write.</p>
+<p><strong>Examples of creating graphs are provided <a href="#examples">below</a></strong></p>
+<h3 id="access-decisions">Access Decisions</h3>
+<p>To make an access decision, instantiate a <code>PReviewDecider</code> which implements the <code>Decider</code> interface. The interface provides
+several methods to query the current access state of the graph.</p>
+<pre><code>Decider decider = new PReviewDecider(graph);
+decider.listPermissions(userID, NO_PROCESS, targetID);
+</code></pre>
+
+<p>The <code>listPermissions</code> method returns the permissions a user has on a target node.</p>
+<h3 id="audit">Audit</h3>
+<h4 id="explain">Explain</h4>
+<p>Explain answers the question why does a user have access to a given target node? To perform this, instantiate a new 
+<code>PReviewAuditor</code> and call the <code>explain</code> method.</p>
+<pre><code>Auditor auditor = new PReviewAuditor(graph);
+Map&lt;String, List&lt;Path&gt;&gt; explain = auditor.explain(1234, 4321);
+</code></pre>
+
+<p>The result of the explain method is a map of policy classes to the paths from the user to the target under each policy class.
+The <code>Path</code> object contains a list of <code>Edge</code> objects and represents a series of paths from the user to the target. An <code>Edge</code> has
+a source node, a target node, and a set of operations. If the operations is null, the edge represents an assignment in the
+path. If it is not null then the edge is an association (the bridge from the user path to the target path).</p>
+<p>See an example <a href="#explain-example">below</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../examples/" class="btn btn-neutral float-right" title="Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../installation/" class="btn btn-neutral" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../installation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
