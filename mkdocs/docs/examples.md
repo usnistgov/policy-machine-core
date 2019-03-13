@@ -24,7 +24,6 @@ Deserialize a json string to a ProhibitionsDAO.
 ProhibitionsDAO deDao = ProhibitionsSerializer.fromJson(new MemProhibitionsDAO(), json);
 ```
 
-
 ### Bank Teller
 
 #### Graph configuration summary
@@ -53,72 +52,72 @@ ProhibitionsDAO deDao = ProhibitionsSerializer.fromJson(new MemProhibitionsDAO()
 Graph graph = new MemGraph();
 
 // 2. Create the user nodes `u1` and `u2`.
-long user1ID = graph.createNode(rand.nextLong(), "u1", U, null));
-long user2ID = graph.createNode(rand.nextLong(), "u2", U, null));
+long user1ID = graph.createNode(rand.nextLong(), "u1", U, null);
+long user2ID = graph.createNode(rand.nextLong(), "u2", U, null);
 
 
 // 3. Create the object, `o1` that will be the target of the access queries.
-long objectID = graph.createNode(rand.nextLong(), "o1", O, null));
+long objectID = graph.createNode(rand.nextLong(), "o1", O, null);
 
 
 // 4. Create the `RBAC` policy class node.
-long rbacID = graph.createNode(rand.nextLong(), "RBAC", PC, null));
+long rbacID = graph.createNode(rand.nextLong(), "RBAC", PC, null);
 
 
 // 5. Create an object attribute for the `Accounts`.
-long accountsID = graph.createNode(rand.nextLong(), "Accounts", OA, null));
+long accountsID = graph.createNode(rand.nextLong(), "Accounts", OA, null);
 
 
 // 6. Create the `Teller` and `Auditor` user attributes.
-long tellerID = graph.createNode(rand.nextLong(), "Teller", UA, null));
-long auditorID = graph.createNode(rand.nextLong(), "Auditor", UA, null));
+long tellerID = graph.createNode(rand.nextLong(), "Teller", UA, null);
+long auditorID = graph.createNode(rand.nextLong(), "Auditor", UA, null);
 
 
 // 7. Assign the `Accounts` object attribute to the `RBAC` policy class node.
-graph.assign(accountsID, OA), rbacID, PC));
+graph.assign(accountsID, rbacID);
 
 
 // 8. Assign the object, `o1`, to the `Accounts` object attribute.
-graph.assign(objectID, O), accountsID, OA));
+graph.assign(objectID, accountsID);
 
 
 // 9. Assign `u1` to the `Teller` user attribute and `u2` to the `Auditor` user attribute.
-graph.assign(user1ID, U), tellerID, UA));
-graph.assign(user2ID, U), auditorID, UA));
+graph.assign(user1ID, tellerID);
+graph.assign(user2ID, auditorID);
 
 
 // 10. Create the associations for `Teller` and `Auditor` on `Account` in RBAC. `Teller` has read and write permissions, while `Auditor` just has read permissions.
-graph.associate(tellerID, UA), accountsID, OA), new HashSet<>(Arrays.asList("r", "w")));
-graph.associate(auditorID, UA), accountsID, OA), new HashSet<>(Arrays.asList("r")));
+graph.associate(tellerID, accountsID, new HashSet<>(Arrays.asList("r", "w")));
+graph.associate(auditorID, accountsID, new HashSet<>(Arrays.asList("r")));
 
 
 // 11. Create the `Branches` policy class.
-long branchesID = graph.createNode(rand.nextLong(), "branches", PC, null));
+long branchesID = graph.createNode(rand.nextLong(), "branches", PC, null);
 
 
 // 12. Create an object attribute for `Branch 1`.
-long branch1OAID = graph.createNode(rand.nextLong(), "branch 1", OA, null));
+long branch1OAID = graph.createNode(rand.nextLong(), "branch 1", OA, null);
 
 // 13. Assign the branch 1 OA to the branches PC
-graph.assign(branch1OAID, OA), branchesID, PC));
+graph.assign(branch1OAID, branchesID);
 
 
 // 14. Create the `Branch 1` user attribute
-long branches1UAID = graph.createNode(rand.nextLong(), "branch 1", UA, null));
+long branches1UAID = graph.createNode(rand.nextLong(), "branch 1", UA, null);
 
 
 // 15. Assign the object, `o1`, to the `Branch 1` object attribute
-graph.assign(objectID, O), branch1OAID, OA));
+graph.assign(objectID, branch1OAID);
 
 
 // 16. Assign the users, `u1` and `u2`, to the branch 1 user attribute
-graph.assign(user1ID, U), branches1UAID, UA));
-graph.assign(user2ID, U), branches1UAID, UA));
+graph.assign(user1ID, branches1UAID);
+graph.assign(user2ID, branches1UAID);
 
 
 // 17. Create an association between the `branch 1` user attribute and the `branch 1` object attribute.
 //This will give both users read and write on `o1` under the `branches` policy class.
-graph.associate(branches1UAID, UA), branch1OAID, OA), new HashSet<>(Arrays.asList("r", "w")));
+graph.associate(branches1UAID, branch1OAID, new HashSet<>(Arrays.asList("r", "w")));
 
 
 // 18. Test the configuration using the `PReviewDecider` implementation of the `Decider` interface.
@@ -128,13 +127,13 @@ Decider decider = new PReviewDecider(graph);
 
 
 // 19. Check that `u1` has read and write permissions on `o1`.
-Set<String> permissions = decider.listPermissions(user1ID, 0, objectID);
+Set<String> permissions = decider.listPermissions(user1ID, objectID);
 assertTrue(permissions.contains("r"));
 assertTrue(permissions.contains("w"));
 
 
 // 20. Check that `u1` has read permissions on `o1`.
-permissions = decider.listPermissions(user2ID, 0, objectID);
+permissions = decider.listPermissions(user2ID, objectID);
 assertTrue(permissions.contains("r"));
 ```
 
@@ -169,123 +168,123 @@ Graph graph = new MemGraph();
 
 // create nodes
 // object attributes
-long salariesID = graph.createNode(rand.nextLong(), "Salaries", OA, null));
-long ssnsID = graph.createNode(rand.nextLong(), "SSNs", OA, null));
-long grp1SalariesID = graph.createNode(rand.nextLong(), "Grp1 Salaries", OA, null));
-long grp2SalariesID = graph.createNode(rand.nextLong(), "Grp2 Salaries", OA, null));
-long publicID = graph.createNode(rand.nextLong(), "Public Info", OA, null));
+long salariesID = graph.createNode(rand.nextLong(), "Salaries", OA, null);
+long ssnsID = graph.createNode(rand.nextLong(), "SSNs", OA, null);
+long grp1SalariesID = graph.createNode(rand.nextLong(), "Grp1 Salaries", OA, null);
+long grp2SalariesID = graph.createNode(rand.nextLong(), "Grp2 Salaries", OA, null);
+long publicID = graph.createNode(rand.nextLong(), "Public Info", OA, null);
 
-long bobRecID = graph.createNode(rand.nextLong(), "Bob Record", OA, null));
-long bobRID = graph.createNode(rand.nextLong(), "Bob r", OA, null));
-long bobRWID = graph.createNode(rand.nextLong(), "Bob r/w", OA, null));
+long bobRecID = graph.createNode(rand.nextLong(), "Bob Record", OA, null);
+long bobRID = graph.createNode(rand.nextLong(), "Bob r", OA, null);
+long bobRWID = graph.createNode(rand.nextLong(), "Bob r/w", OA, null);
 
-long aliceRecID = graph.createNode(rand.nextLong(), "Alice Record", OA, null));
-long aliceRID = graph.createNode(rand.nextLong(), "Alice r", OA, null));
-long aliceRWID = graph.createNode(rand.nextLong(), "Alice r/w", OA, null));
+long aliceRecID = graph.createNode(rand.nextLong(), "Alice Record", OA, null);
+long aliceRID = graph.createNode(rand.nextLong(), "Alice r", OA, null);
+long aliceRWID = graph.createNode(rand.nextLong(), "Alice r/w", OA, null);
 
 // objects for bob's name, salary, and ssn
-long bobNameID = graph.createNode(rand.nextLong(), "bob name", O, null));
-long bobSalaryID = graph.createNode(rand.nextLong(), "bob salary", O, null));
-long bobSSNID = graph.createNode(rand.nextLong(), "bob ssn", O, null));
+long bobNameID = graph.createNode(rand.nextLong(), "bob name", O, null);
+long bobSalaryID = graph.createNode(rand.nextLong(), "bob salary", O, null);
+long bobSSNID = graph.createNode(rand.nextLong(), "bob ssn", O, null);
 
 // objects for alice's name, salary, and ssn
-long aliceNameID = graph.createNode(rand.nextLong(), "alice name", O, null));
-long aliceSalaryID = graph.createNode(rand.nextLong(), "alice salary", O, null));
-long aliceSSNID = graph.createNode(rand.nextLong(), "alice ssn", O, null));
+long aliceNameID = graph.createNode(rand.nextLong(), "alice name", O, null);
+long aliceSalaryID = graph.createNode(rand.nextLong(), "alice salary", O, null);
+long aliceSSNID = graph.createNode(rand.nextLong(), "alice ssn", O, null);
 
 // user attributes
-long hrID = graph.createNode(rand.nextLong(), "HR", UA, null));
-long grp1MgrID = graph.createNode(rand.nextLong(), "Grp1Mgr", UA, null));
-long grp2MgrID = graph.createNode(rand.nextLong(), "Grp2Mgr", UA, null));
-long staffID = graph.createNode(rand.nextLong(), "Staff", UA, null));
-long bobUAID = graph.createNode(rand.nextLong(), "Bob", UA, null));
-long aliceUAID = graph.createNode(rand.nextLong(), "Alice", UA, null));
+long hrID = graph.createNode(rand.nextLong(), "HR", UA, null);
+long grp1MgrID = graph.createNode(rand.nextLong(), "Grp1Mgr", UA, null);
+long grp2MgrID = graph.createNode(rand.nextLong(), "Grp2Mgr", UA, null);
+long staffID = graph.createNode(rand.nextLong(), "Staff", UA, null);
+long bobUAID = graph.createNode(rand.nextLong(), "Bob", UA, null);
+long aliceUAID = graph.createNode(rand.nextLong(), "Alice", UA, null);
 
 // users
-long bobID = graph.createNode(rand.nextLong(), "bob", U, null));
-long aliceID = graph.createNode(rand.nextLong(), "alice", U, null));
-long charlieID = graph.createNode(rand.nextLong(), "charlie", U, null));
+long bobID = graph.createNode(rand.nextLong(), "bob", U, null);
+long aliceID = graph.createNode(rand.nextLong(), "alice", U, null);
+long charlieID = graph.createNode(rand.nextLong(), "charlie", U, null);
 
 // policy class
-long pcID = graph.createNode(rand.nextLong(), "Employee Records", PC, null));
+long pcID = graph.createNode(rand.nextLong(), "Employee Records", PC, null);
 
 
 // assignments
 // assign users to user attributes
-graph.assign(charlieID, U), hrID, UA));
-graph.assign(bobID, U), grp1MgrID, UA));
-graph.assign(aliceID, U), grp2MgrID, UA));
-graph.assign(charlieID, U), staffID, UA));
-graph.assign(bobID, U), staffID, UA));
-graph.assign(aliceID, U), staffID, UA));
-graph.assign(bobID, U), bobUAID, UA));
-graph.assign(aliceID, U), aliceUAID, UA));
+graph.assign(charlieID, hrID);
+graph.assign(bobID, grp1MgrID);
+graph.assign(aliceID, grp2MgrID);
+graph.assign(charlieID, staffID);
+graph.assign(bobID, staffID);
+graph.assign(aliceID, staffID);
+graph.assign(bobID, bobUAID);
+graph.assign(aliceID, aliceUAID);
 
 // assign objects to object attributes
 // salary objects
-graph.assign(bobSalaryID, O), salariesID, OA));
-graph.assign(bobSalaryID, O), grp1SalariesID, OA));
-graph.assign(bobSalaryID, O), bobRID, OA));
+graph.assign(bobSalaryID, salariesID);
+graph.assign(bobSalaryID, grp1SalariesID);
+graph.assign(bobSalaryID, bobRID);
 
-graph.assign(aliceSalaryID, O), salariesID, OA));
-graph.assign(aliceSalaryID, O), grp2SalariesID, OA));
-graph.assign(aliceSalaryID, O), aliceRID, OA));
+graph.assign(aliceSalaryID, salariesID);
+graph.assign(aliceSalaryID, grp2SalariesID);
+graph.assign(aliceSalaryID, aliceRID);
 
 // ssn objects
-graph.assign(bobSSNID, O), ssnsID, OA));
-graph.assign(bobSSNID, O), bobRWID, OA));
+graph.assign(bobSSNID, ssnsID);
+graph.assign(bobSSNID, bobRWID);
 
-graph.assign(aliceSSNID, O), aliceID, OA));
-graph.assign(aliceSSNID, O), aliceRWID, OA));
+graph.assign(aliceSSNID, aliceID);
+graph.assign(aliceSSNID, aliceRWID);
 
 // name objects
-graph.assign(bobNameID, O), publicID, OA));
-graph.assign(bobNameID, O), bobRWID, OA));
+graph.assign(bobNameID, publicID);
+graph.assign(bobNameID, bobRWID);
 
-graph.assign(aliceNameID, O), publicID, OA));
-graph.assign(aliceNameID, O), aliceRWID, OA));
+graph.assign(aliceNameID, publicID);
+graph.assign(aliceNameID, aliceRWID);
 
 // bob and alice r/w containers to their records
-graph.assign(bobRID, OA), bobRecID, OA));
-graph.assign(bobRWID, OA), bobRecID, OA));
+graph.assign(bobRID, bobRecID);
+graph.assign(bobRWID, bobRecID);
 
-graph.assign(aliceRID, OA), aliceRecID, OA));
-graph.assign(aliceRWID, OA), aliceRecID, OA));
+graph.assign(aliceRID, aliceRecID);
+graph.assign(aliceRWID, aliceRecID);
 
 
 // assign object attributes to policy classes
-graph.assign(salariesID, OA), pcID, PC));
-graph.assign(ssnsID, OA), pcID, PC));
-graph.assign(grp1SalariesID, OA), pcID, PC));
-graph.assign(grp2SalariesID, OA), pcID, PC));
-graph.assign(publicID, OA), pcID, PC));
-graph.assign(bobRecID, OA), pcID, PC));
-graph.assign(aliceRecID, OA), pcID, PC));
+graph.assign(salariesID, pcID);
+graph.assign(ssnsID, pcID);
+graph.assign(grp1SalariesID, pcID);
+graph.assign(grp2SalariesID, pcID);
+graph.assign(publicID, pcID);
+graph.assign(bobRecID, pcID);
+graph.assign(aliceRecID, pcID);
 
 // associations
 Set<String> rw = new HashSet<>(Arrays.asList("r", "w"));
 Set<String> r = new HashSet<>(Arrays.asList("r"));
 
-graph.associate(hrID, UA), salariesID, OA), rw);
-graph.associate(hrID, UA), ssnsID, OA), rw);
-graph.associate(grp1MgrID, UA), grp1SalariesID, OA), r);
-graph.associate(grp2MgrID, UA), grp2SalariesID, OA), r);
-graph.associate(staffID, UA), publicID, OA), r);
-graph.associate(bobUAID, UA), bobRWID, OA), rw);
-graph.associate(bobUAID, UA), bobRID, OA), r);
-graph.associate(aliceUAID, UA), aliceRWID, OA), rw);
-graph.associate(aliceUAID, UA), aliceRID, OA), r);
+graph.associate(hrID, salariesID, rw);
+graph.associate(hrID, ssnsID, rw);
+graph.associate(grp1MgrID, grp1SalariesID, r);
+graph.associate(grp2MgrID, grp2SalariesID, r);
+graph.associate(staffID, publicID, r);
+graph.associate(bobUAID, bobRWID, rw);
+graph.associate(bobUAID, bobRID, r);
+graph.associate(aliceUAID, aliceRWID, rw);
+graph.associate(aliceUAID, aliceRID, r);
 
 // test configuration
 // create a decider
 // not using prohibitions in this example, so null is passed
-Decider decider = new PReviewDecider(graph, null);
+Decider decider = new PReviewDecider(graph);
 
 // user: bob
 // target: 'bob ssn'
 // expected: [r, w]
 // actual: [r, w]
-Set<String> permissions = decider.listPermissions(bobID, 0, bobSSNID);
+Set<String> permissions = decider.listPermissions(bobID, bobSSNID);
 assertTrue(permissions.contains("r"));
 assertTrue(permissions.contains("w"));
 
@@ -293,28 +292,28 @@ assertTrue(permissions.contains("w"));
 // target: 'bob ssn'
 // expected: [r]
 // actual: [r]
-permissions = decider.listPermissions(bobID, 0, bobSalaryID);
+permissions = decider.listPermissions(bobID, bobSalaryID);
 assertTrue(permissions.contains("r"));
 
 // user: bob
 // target: 'alice ssn'
 // expected: []
 // actual: []
-permissions = decider.listPermissions(bobID, 0, aliceSSNID);
+permissions = decider.listPermissions(bobID, aliceSSNID);
 assertTrue(permissions.isEmpty());
 
 // user: bob
 // target: 'alice salary'
 // expected: []
 // actual: []
-permissions = decider.listPermissions(bobID, 0, aliceSalaryID);
+permissions = decider.listPermissions(bobID, aliceSalaryID);
 assertTrue(permissions.isEmpty());
 
 // user: bob
 // target: 'bob ssn'
 // expected: [r, w]
 // actual: [r, w]
-permissions = decider.listPermissions(aliceID, 0, aliceSSNID);
+permissions = decider.listPermissions(aliceID, aliceSSNID);
 assertTrue(permissions.contains("r"));
 assertTrue(permissions.contains("w"));
 
@@ -322,7 +321,7 @@ assertTrue(permissions.contains("w"));
 // target: 'alice salary'
 // expected: [r, w]
 // actual: [r, w]
-permissions = decider.listPermissions(charlieID, 0, aliceSalaryID);
+permissions = decider.listPermissions(charlieID, aliceSalaryID);
 assertTrue(permissions.contains("r"));
 assertTrue(permissions.contains("w"));
 ```
