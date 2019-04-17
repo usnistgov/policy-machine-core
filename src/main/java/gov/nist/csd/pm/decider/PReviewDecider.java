@@ -80,37 +80,38 @@ public class PReviewDecider implements Decider {
     }
 
     private HashSet<String> resolvePermissions(Map<Long, Set<String>> pcMap) {
-        HashSet<String> perms = new HashSet<>();
+        HashSet<String> inter = new HashSet<>();
         boolean first = true;
         for (long pc : pcMap.keySet()) {
             Set<String> ops = pcMap.get(pc);
             if(first) {
-                perms.addAll(ops);
+                inter.addAll(ops);
                 first = false;
             } else {
-                if (perms.contains(ALL_OPERATIONS)) {
+                if (inter.contains(ALL_OPERATIONS)) {
                     // clear all of the existing permissions because the intersection already had *
-                    perms.clear();
-                    perms.addAll(ops);
+                    // all permissions can be added
+                    inter.clear();
+                    inter.addAll(ops);
                 } else {
                     // if the ops for the pc are empty then the user has no permissions on the target
                     if (ops.isEmpty()) {
-                        perms.clear();
+                        inter.clear();
                         break;
                     } else if (!ops.contains(ALL_OPERATIONS)) {
-                        perms.retainAll(ops);
+                        inter.retainAll(ops);
                     }
                 }
             }
         }
 
         // if the permission set includes *, ignore all other permissions
-        if (perms.contains(ALL_OPERATIONS)) {
-            perms.clear();
-            perms.add(ALL_OPERATIONS);
+        if (inter.contains(ALL_OPERATIONS)) {
+            inter.clear();
+            inter.add(ALL_OPERATIONS);
         }
 
-        return perms;
+        return inter;
     }
 
     @Override
