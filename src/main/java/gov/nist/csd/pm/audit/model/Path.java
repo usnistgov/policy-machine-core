@@ -104,7 +104,7 @@ public class Path {
         }
 
         public boolean isAssociation() {
-            return operations == null;
+            return operations != null;
         }
 
         public String toString() {
