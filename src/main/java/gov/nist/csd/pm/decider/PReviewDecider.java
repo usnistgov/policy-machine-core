@@ -89,7 +89,8 @@ public class PReviewDecider implements Decider {
                 first = false;
             } else {
                 if (perms.contains(ALL_OPERATIONS)) {
-                    perms.remove(ALL_OPERATIONS);
+                    // clear all of the existing permissions because the intersection already had *
+                    perms.clear();
                     perms.addAll(ops);
                 } else {
                     // if the ops for the pc are empty then the user has no permissions on the target
