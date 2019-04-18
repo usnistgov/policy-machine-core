@@ -338,7 +338,7 @@ public class MemGraph implements Graph {
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 Association assoc = (Association) rel;
-                assocs.put(assoc.getTargetID(), assoc.getOperations());
+                assocs.put(assoc.getTargetID(), new HashSet<>(assoc.getOperations()));
             }
         }
         return assocs;
@@ -362,7 +362,7 @@ public class MemGraph implements Graph {
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 Association assoc = (Association) rel;
-                assocs.put(assoc.getSourceID(), assoc.getOperations());
+                assocs.put(assoc.getSourceID(), new HashSet<>(assoc.getOperations()));
             }
         }
         return assocs;
