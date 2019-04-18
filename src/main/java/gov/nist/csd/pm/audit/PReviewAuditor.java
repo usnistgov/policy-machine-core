@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.audit;
 
+import gov.nist.csd.pm.audit.model.Explain;
 import gov.nist.csd.pm.audit.model.Path;
+import gov.nist.csd.pm.audit.model.PolicyClass;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
 import gov.nist.csd.pm.graph.dag.propagator.Propagator;
@@ -14,6 +16,8 @@ import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
 
 public class PReviewAuditor implements Auditor {
 
+    private static final String ALL_OPERATIONS = "*";
+
     private Graph graph;
 
     public PReviewAuditor(Graph graph) {
@@ -21,14 +25,65 @@ public class PReviewAuditor implements Auditor {
     }
 
     @Override
-    public Map<String, List<Path>> explain(long userID, long targetID) throws PMException {
+    public Explain explain(long userID, long targetID) throws PMException {
         Node userNode = graph.getNode(userID);
         Node targetNode = graph.getNode(targetID);
 
-        List<Path> userPaths = dfs(userNode);
-        List<Path> targetPaths = dfs(targetNode);
+        List<EdgePath> userPaths = dfs(userNode);
+        List<EdgePath> targetPaths = dfs(targetNode);
 
-        return resolvePaths(userPaths, targetPaths);
+        Map<String, PolicyClass> resolvedPaths = resolvePaths(userPaths, targetPaths);
+        Set<String> perms = resolvePermissions(resolvedPaths);
+
+        return new Explain(perms, resolvedPaths);
+    }
+
+    private Set<String> resolvePermissions(Map<String, PolicyClass> paths) {
+        Map<String, Set<String>> pcPerms = new HashMap<>();
+        for (String pc : paths.keySet()) {
+            PolicyClass pcPaths = paths.get(pc);
+            for(Path p : pcPaths.getPaths()) {
+                Set<String> ops = p.getOperations();
+                Set<String> exOps = pcPerms.getOrDefault(pc, new HashSet<>());
+                exOps.addAll(ops);
+                pcPerms.put(pc, exOps);
+            }
+        }
+
+        Set<String> perms = new HashSet<>();
+        boolean first = true;
+
+        for(String pc : pcPerms.keySet()) {
+            Set<String> ops = pcPerms.get(pc);
+            if (first) {
+                perms.addAll(ops);
+                first = false;
+            }
+            else {
+                if (perms.contains(ALL_OPERATIONS)) {
+                    perms.remove(ALL_OPERATIONS);
+                    perms.addAll(ops);
+                }
+                else {
+                    // if the ops for the pc are empty then the user has no permissions on the target
+                    if (ops.isEmpty()) {
+                        perms.clear();
+                        break;
+                    }
+                    else if (!ops.contains(ALL_OPERATIONS)) {
+                        perms.retainAll(ops);
+                    }
+                }
+            }
+        }
+
+        // if the permission set includes *, ignore all other permissions
+        if (perms.contains(ALL_OPERATIONS)) {
+            perms.clear();
+            perms.add(ALL_OPERATIONS);
+        }
+
+        return perms;
     }
 
     /**
@@ -43,88 +98,122 @@ public class PReviewAuditor implements Auditor {
      * @return the set of paths from a user to a target node (through an association) for each policy class in the system.
      * @throws PMException if there is an exception traversing the graph
      */
-    private Map<String, List<Path>> resolvePaths(List<Path> userPaths, List<Path> targetPaths) throws PMException {
-        Map<String, List<Path>> results = new HashMap<>();
-        Set<Long> pcs = graph.getPolicies();
-        for(Long pc : pcs) {
-            Node pcNode = graph.getNode(pc);
-            results.put(pcNode.getName(), new ArrayList<>());
-        }
+    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths) throws PMException {
+        Map<String, PolicyClass> results = new HashMap<>();
 
-        for (Path userPath : userPaths) {
-            Path.Edge lastEdge = userPath.getEdges().get(userPath.getEdges().size()-1);
+        for (EdgePath targetPath : targetPaths) {
+            EdgePath.Edge lastTargetEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
 
-            if (lastEdge.getOperations() == null) {
+            // if the last element in the target path is a pc, the target belongs to that pc, add the pc to the results
+            // skip to the next target path if it is not a policy class
+            if (lastTargetEdge.getTarget().getType() == PC) {
+                if(!results.containsKey(lastTargetEdge.getTarget().getName())) {
+                    results.put(lastTargetEdge.getTarget().getName(), new PolicyClass());
+                }
+            } else {
                 continue;
             }
 
-            for(Path targetPath : targetPaths) {
-                for(int i = 0; i < targetPath.getEdges().size(); i++) {
-                    Path.Edge edge = targetPath.getEdges().get(i);
+            for(EdgePath userPath : userPaths) {
+                EdgePath.Edge lastUserEdge = userPath.getEdges().get(userPath.getEdges().size()-1);
 
-                    if(lastEdge.getTarget().getID() != edge.getTarget().getID()) {
+                // if the last edge does not have any ops, it is not an association, so ignore it
+                if (lastUserEdge.getOps() == null) {
+                    continue;
+                }
+
+                for(int i = 0; i < targetPath.getEdges().size(); i++) {
+                    EdgePath.Edge e = targetPath.getEdges().get(i);
+
+                    // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
+                    // resolvedPath, continue to the next target edge
+                    if(lastUserEdge.getTarget().getID() != e.getTarget().getID()) {
                         continue;
                     }
 
-                    List<Path.Edge> pathToTarget = new ArrayList<>();
+                    List<EdgePath.Edge> pathToTarget = new ArrayList<>();
                     for(int j = 0; j <= i; j++) {
                         pathToTarget.add(targetPath.getEdges().get(j));
                     }
 
-                    Path.Edge pcEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
-                    Path path = resolvePath(userPath, pathToTarget, pcEdge);
-                    if (path == null) {
+                    ResolvedPath resolvedPath = resolvePath(userPath, pathToTarget, lastTargetEdge);
+                    if (resolvedPath == null) {
                         continue;
                     }
 
-                    List<Path> paths = results.get(pcEdge.getTarget().getName());
-                    paths.add(path);
-                    results.put(pcEdge.getTarget().getName(), paths);
-                }
+                    // check that the resolved resolvedPath does not already exist in the results
+                    // this can happen if there is more than one resolvedPath to a UA/OA from a U/O
+                    PolicyClass exPC = results.get(resolvedPath.getPc().getName());
+                    boolean found = false;
+                    for(Path p : exPC.getPaths()) {
+                        if(p.equals(resolvedPath.toNodePath())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(found) {
+                        continue;
+                    }
+
+                    // add resolvedPath to policy class' paths
+                    exPC.getPaths().add(resolvedPath.toNodePath());
+                    exPC.getOperations().addAll(resolvedPath.getOps());
+               }
             }
         }
         return results;
     }
 
-    private Path resolvePath(Path userPath, List<Path.Edge> pathToTarget, Path.Edge pcEdge) {
+    private ResolvedPath resolvePath(EdgePath userPath, List<EdgePath.Edge> pathToTarget, EdgePath.Edge pcEdge) {
         if (pcEdge.getTarget().getType() != PC) {
             return null;
         }
 
-        Path path = new Path();
+        // get the operations in this path
+        // the operations are the ops of the association in the user path
+        Set<String> ops = new HashSet<>();
+        for(EdgePath.Edge edge : userPath.getEdges()) {
+            if(edge.getOps() != null) {
+                ops = edge.getOps();
+                break;
+            }
+        }
+
+        EdgePath path = new EdgePath();
         Collections.reverse(pathToTarget);
-        for(Path.Edge edge : userPath.getEdges()) {
+        for(EdgePath.Edge edge : userPath.getEdges()) {
             path.addEdge(edge);
         }
-        for(Path.Edge edge : pathToTarget) {
+        for(EdgePath.Edge edge : pathToTarget) {
             path.addEdge(edge);
         }
-        return path;
+
+        return new ResolvedPath(pcEdge.getTarget(), path, ops);
     }
 
-    private List<Path> dfs(Node start) throws PMException {
+    private List<EdgePath> dfs(Node start) throws PMException {
         DepthFirstSearcher searcher = new DepthFirstSearcher(graph);
 
-        final List<Path> paths = new ArrayList<>();
-        final Map<Long, List<Path>> propPaths = new HashMap<>();
+        final List<EdgePath> paths = new ArrayList<>();
+        final Map<Long, List<EdgePath>> propPaths = new HashMap<>();
 
         Visitor visitor = node -> {
             if (node.getID() == start.getID()) {
                 return;
             }
 
-            List<Path> nodePaths = new ArrayList<>();
+            List<EdgePath> nodePaths = new ArrayList<>();
 
             for(Long parentID : graph.getParents(node.getID())) {
-                Path.Edge edge = new Path.Edge(node, graph.getNode(parentID));
-                List<Path> parentPaths = propPaths.get(parentID);
+                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parentID), null);
+                List<EdgePath> parentPaths = propPaths.get(parentID);
                 if(parentPaths.isEmpty()) {
-                    Path path = new Path();
+                    EdgePath path = new EdgePath();
                     path.addEdge(edge);
                     nodePaths.add(0, path);
                 } else {
-                    for(Path parentPath : parentPaths) {
-                        parentPath.insertEdge(edge);
+                    for(EdgePath parentPath : parentPaths) {
+                        parentPath.getEdges().add(0, edge);
                         nodePaths.add(parentPath);
                     }
                 }
@@ -134,8 +223,8 @@ public class PReviewAuditor implements Auditor {
             for(Long targetID : assocs.keySet()) {
                 Set<String> ops = assocs.get(targetID);
                 Node targetNode = graph.getNode(targetID);
-                Path path = new Path();
-                path.addEdge(new Path.Edge(node, targetNode, ops));
+                EdgePath path = new EdgePath();
+                path.addEdge(new EdgePath.Edge(node, targetNode, ops));
                 nodePaths.add(path);
             }
 
@@ -143,13 +232,13 @@ public class PReviewAuditor implements Auditor {
         };
 
         Propagator propagator = (parentNode, childNode) -> {
-            List<Path> childPaths = propPaths.computeIfAbsent(childNode.getID(), k -> new ArrayList<>());
-            List<Path> parentPaths = propPaths.get(parentNode.getID());
-            for(Path path : parentPaths) {
-                Path newPath = new Path();
-                newPath.addAll(path.getEdges());
-                Path.Edge edge = new Path.Edge(childNode, parentNode);
-                newPath.insertEdge(edge);
+            List<EdgePath> childPaths = propPaths.computeIfAbsent(childNode.getID(), k -> new ArrayList<>());
+            List<EdgePath> parentPaths = propPaths.get(parentNode.getID());
+            for(EdgePath path : parentPaths) {
+                EdgePath newPath = new EdgePath();
+                newPath.getEdges().addAll(path.getEdges());
+                EdgePath.Edge edge = new EdgePath.Edge(childNode, parentNode, null);
+                newPath.getEdges().add(0, edge);
                 childPaths.add(newPath);
                 propPaths.put(childNode.getID(), childPaths);
             }
@@ -162,5 +251,118 @@ public class PReviewAuditor implements Auditor {
 
         searcher.traverse(start, propagator, visitor);
         return paths;
+    }
+
+    private static class ResolvedPath {
+        private Node pc;
+        private EdgePath path;
+        private Set<String> ops;
+
+        public ResolvedPath() {
+
+        }
+
+        public ResolvedPath(Node pc, EdgePath path, Set<String> ops) {
+            this.pc = pc;
+            this.path = path;
+            this.ops = ops;
+        }
+
+        public Node getPc() {
+            return pc;
+        }
+
+        public EdgePath getPath() {
+            return path;
+        }
+
+        public Set<String> getOps() {
+            return ops;
+        }
+
+        public Path toNodePath() {
+            Path nodePath = new Path();
+            nodePath.setOperations(this.ops);
+
+            if(this.path.getEdges().isEmpty()) {
+                return nodePath;
+            }
+
+            boolean foundAssoc = false;
+            for(EdgePath.Edge edge : this.path.getEdges()) {
+                Node node;
+                if(!foundAssoc) {
+                    node = edge.target;
+                } else {
+                    node = edge.source;
+                }
+
+                if(nodePath.getNodes().isEmpty()) {
+                    nodePath.getNodes().add(edge.getSource());
+                }
+
+                if(edge.getOps() != null) {
+                    foundAssoc = true;
+                }
+
+                nodePath.getNodes().add(node);
+            }
+
+            return nodePath;
+        }
+    }
+
+    private static class EdgePath {
+        private List<Edge> edges;
+
+        public EdgePath() {
+            this.edges = new ArrayList<>();
+        }
+
+        public List<Edge> getEdges() {
+            return edges;
+        }
+
+        public void addEdge(Edge e) {
+            this.edges.add(e);
+        }
+
+
+
+        private static class Edge {
+            private Node source;
+            private Node target;
+            private Set<String> ops;
+
+            public Edge(Node source, Node target, Set<String> ops) {
+                this.source = source;
+                this.target = target;
+                this.ops = ops;
+            }
+
+            public Node getSource() {
+                return source;
+            }
+
+            public void setSource(Node source) {
+                this.source = source;
+            }
+
+            public Node getTarget() {
+                return target;
+            }
+
+            public void setTarget(Node target) {
+                this.target = target;
+            }
+
+            public Set<String> getOps() {
+                return ops;
+            }
+
+            public void setOps(Set<String> ops) {
+                this.ops = ops;
+            }
+        }
     }
 }

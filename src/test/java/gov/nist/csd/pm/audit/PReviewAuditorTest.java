@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.audit;
 
+import gov.nist.csd.pm.audit.model.Explain;
 import gov.nist.csd.pm.audit.model.Path;
+import gov.nist.csd.pm.audit.model.PolicyClass;
 import gov.nist.csd.pm.exceptions.PMException;
 import org.junit.jupiter.api.Test;
 
@@ -14,22 +16,25 @@ class PReviewAuditorTest {
     void testExplain() throws PMException {
         for(TestCases.TestCase tc : TestCases.getTests()) {
             PReviewAuditor auditor = new PReviewAuditor(tc.graph);
-            Map<String, List<Path>> explain = auditor.explain(TestCases.u1ID, TestCases.o1ID);
+            Explain explain = auditor.explain(TestCases.u1ID, TestCases.o1ID);
 
-            for (String pc : tc.expectedPaths.keySet()) {
-                List<String> paths = tc.expectedPaths.get(pc);
+            assertTrue(explain.getOperations().containsAll(tc.getExpectedOps()),
+                    tc.name + " expected ops " + tc.getExpectedOps() + " but got " + explain.getOperations());
+
+            for (String pcName : tc.expectedPaths.keySet()) {
+                List<String> paths = tc.expectedPaths.get(pcName);
                 assertNotNull(paths, tc.name);
 
-                List<Path> resPaths = explain.get(pc);
+                PolicyClass pc = explain.getPolicyClasses().get(pcName);
                 for (String exPathStr : paths) {
                     boolean match = false;
-                    for (Path resPath : resPaths) {
+                    for (Path resPath : pc.getPaths()) {
                         if(pathsMatch(exPathStr, resPath.toString())) {
                             match = true;
                             break;
                         }
                     }
-                    assertTrue(match, tc.name + " expected path \"" + exPathStr + "\" but it was not in the results \"" + resPaths + "\"");
+                    assertTrue(match, tc.name + " expected path \"" + exPathStr + "\" but it was not in the results \"" + pc.getPaths() + "\"");
                 }
             }
         }
