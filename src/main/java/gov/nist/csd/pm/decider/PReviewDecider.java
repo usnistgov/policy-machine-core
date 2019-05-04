@@ -227,10 +227,6 @@ public class PReviewDecider implements Decider {
             return results;
         }
 
-        // create a virtual node
-        // all children/grand children of the virtual node will be al the nodes accessible by the user
-        long vNode = createVNode(borderTargets);
-
         Map<Long, Map<Long, Set<String>>> visitedNodes = new HashMap<>();
         for (long pc : graph.getPolicies()) {
             Map<Long, Set<String>> pcMap = new HashMap<>();
@@ -238,38 +234,43 @@ public class PReviewDecider implements Decider {
             visitedNodes.put(pc, pcMap);
         }
 
-        Set<Long> objects = getAscendants(vNode);
-
-        for (Long objectID : objects) {
-            // run dfs on the object
-            dfs(objectID, visitedNodes, borderTargets);
-
-            //for every pc the object reaches check to see if they have a common access1 right.
-            Set<String> finalOps = new HashSet<>();
-            Map<Long, Set<String>> pcMap = visitedNodes.get(objectID);
-            boolean addOps = true;
-            for (long pc : pcMap.keySet()) {
-                if (addOps) {
-                    finalOps.addAll(pcMap.get(pc));
-                    addOps = false;
+        Set<Long> visited = new HashSet<>();
+        for(Long borderTargetID : borderTargets.keySet()) {
+            Set<Long> objects = getAscendants(borderTargetID);
+            for (Long objectID : objects) {
+                if(visited.contains(objectID)) {
+                    continue;
                 }
-                else {
-                    finalOps.retainAll(pcMap.get(pc));
+                // run dfs on the object
+                dfs(objectID, visitedNodes, borderTargets);
+
+                //for every pc the object reaches check to see if they have a common access right.
+                Set<String> finalOps = new HashSet<>();
+                Map<Long, Set<String>> pcMap = visitedNodes.get(objectID);
+                boolean addOps = true;
+                for (long pc : pcMap.keySet()) {
+                    if (addOps) {
+                        finalOps.addAll(pcMap.get(pc));
+                        addOps = false;
+                    }
+                    else {
+                        finalOps.retainAll(pcMap.get(pc));
+                    }
                 }
-            }
-            if (!finalOps.isEmpty()) {
-                results.put(objectID, finalOps);
+                if (!finalOps.isEmpty()) {
+                    results.put(objectID, finalOps);
+                }
+                visited.add(objectID);
             }
         }
-
-        // delete the virtual node
-        graph.deleteNode(vNode);
 
         return results;
     }
 
     private Set<Long> getAscendants(Long vNode) throws PMException {
         Set<Long> ascendants = new HashSet<>();
+        ascendants.add(vNode);
+
         Set<Long> children = graph.getChildren(vNode);
         if (children.isEmpty()) {
             return ascendants;
@@ -281,14 +282,5 @@ public class PReviewDecider implements Decider {
         }
 
         return ascendants;
-    }
-
-
-    private synchronized long createVNode(Map<Long, Set<String>> dc) throws PMException {
-        Node vNode = graph.createNode(new Random().nextLong(), "VNODE", NodeType.OA, null);
-        for (long nodeID : dc.keySet()) {
-            graph.assign(nodeID, vNode.getID());
-        }
-        return vNode.getID();
     }
 }
