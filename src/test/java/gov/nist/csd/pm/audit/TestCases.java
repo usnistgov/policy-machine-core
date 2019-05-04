@@ -13,11 +13,13 @@ public class TestCases {
         String          name;
         Graph           graph;
         Map<String, List<String>> expectedPaths;
+        Set<String> expectedOps;
 
-        public TestCase(String name, Graph graph, Map<String, List<String>> expectedPaths) {
+        public TestCase(String name, Graph graph, Map<String, List<String>> expectedPaths, Set<String> expectedOps) {
             this.name = name;
             this.graph = graph;
             this.expectedPaths = expectedPaths;
+            this.expectedOps = expectedOps;
         }
 
         public String getName() {
@@ -30,6 +32,10 @@ public class TestCases {
 
         public Map<String, List<String>> getExpectedPaths() {
             return expectedPaths;
+        }
+
+        public Set<String> getExpectedOps() {
+            return expectedOps;
         }
     }
 
@@ -68,6 +74,11 @@ public class TestCases {
     private static long ua2ID = 7;
     private static long oa2ID = 8;
 
+    private static final Set<String> RW = new HashSet<>(Arrays.asList("read", "write"));
+    private static final Set<String> R = new HashSet<>(Arrays.asList("read"));
+    private static final Set<String> W = new HashSet<>(Arrays.asList("write"));
+    private static final Set<String> NOOPS = new HashSet<>();
+
     public static TestCase graph1() throws PMException {
         Graph graph = new MemGraph();
         graph.createNode(u1ID, "u1", U, null);
@@ -81,11 +92,11 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
-        return new TestCase("graph1", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        return new TestCase("graph1", graph, expectedPaths, RW);
     }
 
     public static TestCase graph2() throws PMException {
@@ -104,12 +115,12 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
-        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, R);
+        graph.associate(ua2ID, oa1ID, W);
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1", "u1-ua2-[write]-oa1-o1"));
-        return new TestCase("graph2", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]", "u1-ua2-oa1-o1 ops=[write]"));
+        return new TestCase("graph2", graph, expectedPaths, RW);
     }
 
     public static TestCase graph3() throws PMException {
@@ -127,13 +138,13 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
-        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, R);
+        graph.associate(ua2ID, oa1ID, W);
 
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1", "u1-ua1-ua2-[write]-oa1-o1"));
-        return new TestCase("graph3", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]", "u1-ua1-ua2-oa1-o1 ops=[write]"));
+        return new TestCase("graph3", graph, expectedPaths, RW);
     }
 
     public static TestCase graph4() throws PMException {
@@ -147,7 +158,7 @@ public class TestCases {
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
-        return new TestCase("graph4", graph, expectedPaths);
+        return new TestCase("graph4", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph5() throws PMException {
@@ -162,11 +173,11 @@ public class TestCases {
         graph.assign(ua1ID, pc1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
-        return new TestCase("graph5", graph, expectedPaths);
+        return new TestCase("graph5", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph6() throws PMException {
@@ -181,12 +192,12 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, R);
 
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
-        return new TestCase("graph6", graph, expectedPaths);
+        return new TestCase("graph6", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph7() throws PMException {
@@ -209,13 +220,13 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
-        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, R);
+        graph.associate(ua2ID, oa2ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-[read,write]-oa2-o1"));
-        return new TestCase("graph7", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[read, write]"));
+        return new TestCase("graph7", graph, expectedPaths, R);
     }
 
     public static TestCase graph8() throws PMException {
@@ -238,13 +249,13 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
-        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, R);
+        graph.associate(ua2ID, oa2ID, W);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-[write]-oa2-o1"));
-        return new TestCase("graph8", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[write]"));
+        return new TestCase("graph8", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph9() throws PMException {
@@ -261,12 +272,12 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
         expectedPaths.put("pc2", Arrays.asList());
-        return new TestCase("graph9", graph, expectedPaths);
+        return new TestCase("graph9", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph10() throws PMException {
@@ -289,12 +300,12 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
         expectedPaths.put("pc2", Arrays.asList());
-        return new TestCase("graph10", graph, expectedPaths);
+        return new TestCase("graph10", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph11() throws PMException {
@@ -309,11 +320,11 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
-        return new TestCase("graph11", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        return new TestCase("graph11", graph, expectedPaths, RW);
     }
 
     public static TestCase graph12() throws PMException {
@@ -331,12 +342,12 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
-        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("write")));
+        graph.associate(ua1ID, oa1ID, R);
+        graph.associate(ua2ID, oa1ID, W);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1", "u1-ua2-[write]-oa1-o1"));
-        return new TestCase("graph12", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]", "u1-ua2-oa1-o1 ops=[write]"));
+        return new TestCase("graph12", graph, expectedPaths, RW);
     }
 
     public static TestCase graph13() throws PMException {
@@ -358,13 +369,13 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
-        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, R);
+        graph.associate(ua2ID, oa2ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-[read,write]-oa2-o1"));
-        return new TestCase("graph13", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[read, write]"));
+        return new TestCase("graph13", graph, expectedPaths, R);
     }
 
     public static TestCase graph14() throws PMException {
@@ -385,13 +396,13 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
-        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate(ua2ID, oa2ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-[read]-oa2-o1"));
-        return new TestCase("graph14", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[read]"));
+        return new TestCase("graph14", graph, expectedPaths, R);
     }
 
     public static TestCase graph15() throws PMException {
@@ -411,12 +422,12 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1"));
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
         expectedPaths.put("pc2", Arrays.asList());
-        return new TestCase("graph15", graph, expectedPaths);
+        return new TestCase("graph15", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph16() throws PMException {
@@ -432,11 +443,11 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
-        return new TestCase("graph16", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        return new TestCase("graph16", graph, expectedPaths, R);
     }
 
     public static TestCase graph17() throws PMException {
@@ -451,11 +462,11 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read]-oa1-o1"));
-        return new TestCase("graph17", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        return new TestCase("graph17", graph, expectedPaths, R);
     }
 
     public static TestCase graph18() throws PMException {
@@ -473,12 +484,12 @@ public class TestCases {
         graph.assign(o1ID, oa1ID);
         graph.assign(oa1ID, oa2ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
-        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate(ua2ID, oa2ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
-        return new TestCase("graph18", graph, expectedPaths);
+        return new TestCase("graph18", graph, expectedPaths, NOOPS);
     }
 
     public static TestCase graph19() throws PMException {
@@ -498,12 +509,12 @@ public class TestCases {
         graph.assign(oa1ID, oa2ID);
         graph.assign(oa2ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
-        graph.associate(ua2ID, oa2ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate(ua2ID, oa2ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-[read,write]-oa1-o1", "u1-ua1-ua2-[read]-oa2-oa1-o1"));
-        return new TestCase("graph19", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]", "u1-ua1-ua2-oa2-oa1-o1 ops=[read]"));
+        return new TestCase("graph19", graph, expectedPaths, RW);
     }
 
     public static TestCase graph20() throws PMException {
@@ -523,12 +534,12 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(oa2ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("write")));
-        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, W);
+        graph.associate(ua2ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua2-[read]-oa1-o1", "u1-ua1-[write]-oa1-o1"));
-        return new TestCase("graph20", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua2-oa1-o1 ops=[read]", "u1-ua1-oa1-o1 ops=[write]"));
+        return new TestCase("graph20", graph, expectedPaths, RW);
     }
 
     public static TestCase graph21() throws PMException {
@@ -546,11 +557,11 @@ public class TestCases {
         graph.assign(oa1ID, pc1ID);
         graph.assign(ua1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("write")));
-        graph.associate(ua2ID, oa1ID, new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua1ID, oa1ID, W);
+        graph.associate(ua2ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua2-[read]-oa1-o1", "u1-ua1-[write]-oa1-o1"));
-        return new TestCase("graph21", graph, expectedPaths);
+        expectedPaths.put("pc1", Arrays.asList("u1-ua2-oa1-o1 ops=[read]", "u1-ua1-oa1-o1 ops=[write]"));
+        return new TestCase("graph21", graph, expectedPaths, RW);
     }
 }
