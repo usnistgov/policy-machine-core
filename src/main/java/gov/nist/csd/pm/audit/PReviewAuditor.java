@@ -5,6 +5,7 @@ import gov.nist.csd.pm.audit.model.Path;
 import gov.nist.csd.pm.audit.model.PolicyClass;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
+import gov.nist.csd.pm.graph.GraphSerializer;
 import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.graph.dag.searcher.DepthFirstSearcher;
@@ -33,7 +34,7 @@ public class PReviewAuditor implements Auditor {
         List<EdgePath> userPaths = dfs(userNode);
         List<EdgePath> targetPaths = dfs(targetNode);
 
-        Map<String, PolicyClass> resolvedPaths = resolvePaths(userPaths, targetPaths);
+        Map<String, PolicyClass> resolvedPaths = resolvePaths(userPaths, targetPaths, targetID);
         Set<String> perms = resolvePermissions(resolvedPaths);
 
         return new Explain(perms, resolvedPaths);
@@ -95,11 +96,12 @@ public class PReviewAuditor implements Auditor {
      * class the target path is ignored.
      *
      * @param userPaths the set of paths starting with a user.
-     * @param targetPaths the set of paths starting with a target ndoe.
+     * @param targetPaths the set of paths starting with a target node.
+     * @param targetID the ID of the target node.
      * @return the set of paths from a user to a target node (through an association) for each policy class in the system.
      * @throws PMException if there is an exception traversing the graph
      */
-    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths) throws PMException {
+    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, long targetID) throws PMException {
         Map<String, PolicyClass> results = new HashMap<>();
 
         for (EdgePath targetPath : targetPaths) {
@@ -128,8 +130,8 @@ public class PReviewAuditor implements Auditor {
 
                     // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
                     // resolvedPath, continue to the next target edge
-                    if(lastUserEdge.getTarget().getID() != e.getTarget().getID() &&
-                            !(targetPath.getEdges().size() == 1 && lastUserEdge.getTarget().getID() == e.getSource().getID())) {
+                    if((lastUserEdge.getTarget().getID() != e.getTarget().getID())
+                            && (lastUserEdge.getTarget().getID() != e.getSource().getID())) {
                         continue;
                     }
 
@@ -143,12 +145,14 @@ public class PReviewAuditor implements Auditor {
                         continue;
                     }
 
+                    Path nodePath = resolvedPath.toNodePath(targetID);
+
                     // check that the resolved resolvedPath does not already exist in the results
                     // this can happen if there is more than one resolvedPath to a UA/OA from a U/O
                     PolicyClass exPC = results.get(resolvedPath.getPc().getName());
                     boolean found = false;
                     for(Path p : exPC.getPaths()) {
-                        if(p.equals(resolvedPath.toNodePath())) {
+                        if(p.equals(nodePath)) {
                             found = true;
                             break;
                         }
@@ -158,7 +162,7 @@ public class PReviewAuditor implements Auditor {
                     }
 
                     // add resolvedPath to policy class' paths
-                    exPC.getPaths().add(resolvedPath.toNodePath());
+                    exPC.getPaths().add(nodePath);
                     exPC.getOperations().addAll(resolvedPath.getOps());
                }
             }
@@ -286,7 +290,7 @@ public class PReviewAuditor implements Auditor {
             return ops;
         }
 
-        public Path toNodePath() {
+        public Path toNodePath(long targetID) {
             Path nodePath = new Path();
             nodePath.setOperations(this.ops);
 
@@ -298,20 +302,23 @@ public class PReviewAuditor implements Auditor {
             for(EdgePath.Edge edge : this.path.getEdges()) {
                 Node node;
                 if(!foundAssoc) {
-                    node = edge.target;
+                    node = edge.getTarget();
                 } else {
-                    node = edge.source;
+                    node = edge.getSource();
                 }
 
                 if(nodePath.getNodes().isEmpty()) {
                     nodePath.getNodes().add(edge.getSource());
                 }
 
+                nodePath.getNodes().add(node);
+
                 if(edge.getOps() != null) {
                     foundAssoc = true;
+                    if(edge.getTarget().getID() == targetID) {
+                        return nodePath;
+                    }
                 }
-
-                nodePath.getNodes().add(node);
             }
 
             return nodePath;
