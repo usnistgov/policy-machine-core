@@ -5,6 +5,7 @@ import gov.nist.csd.pm.audit.model.Path;
 import gov.nist.csd.pm.audit.model.PolicyClass;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.graph.Graph;
+import gov.nist.csd.pm.graph.MemGraph;
 import gov.nist.csd.pm.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.graph.dag.searcher.DepthFirstSearcher;
 import gov.nist.csd.pm.graph.dag.visitor.Visitor;
@@ -127,7 +128,8 @@ public class PReviewAuditor implements Auditor {
 
                     // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
                     // resolvedPath, continue to the next target edge
-                    if(lastUserEdge.getTarget().getID() != e.getTarget().getID()) {
+                    if(lastUserEdge.getTarget().getID() != e.getTarget().getID() &&
+                            !(targetPath.getEdges().size() == 1 && lastUserEdge.getTarget().getID() == e.getSource().getID())) {
                         continue;
                     }
 
@@ -198,10 +200,6 @@ public class PReviewAuditor implements Auditor {
         final Map<Long, List<EdgePath>> propPaths = new HashMap<>();
 
         Visitor visitor = node -> {
-            if (node.getID() == start.getID()) {
-                return;
-            }
-
             List<EdgePath> nodePaths = new ArrayList<>();
 
             for(Long parentID : graph.getParents(node.getID())) {
@@ -234,13 +232,21 @@ public class PReviewAuditor implements Auditor {
         Propagator propagator = (parentNode, childNode) -> {
             List<EdgePath> childPaths = propPaths.computeIfAbsent(childNode.getID(), k -> new ArrayList<>());
             List<EdgePath> parentPaths = propPaths.get(parentNode.getID());
-            for(EdgePath path : parentPaths) {
+            if(parentPaths.isEmpty() && parentNode.getType() == PC) {
                 EdgePath newPath = new EdgePath();
-                newPath.getEdges().addAll(path.getEdges());
                 EdgePath.Edge edge = new EdgePath.Edge(childNode, parentNode, null);
                 newPath.getEdges().add(0, edge);
                 childPaths.add(newPath);
                 propPaths.put(childNode.getID(), childPaths);
+            } else {
+                for (EdgePath path : parentPaths) {
+                    EdgePath newPath = new EdgePath();
+                    newPath.getEdges().addAll(path.getEdges());
+                    EdgePath.Edge edge = new EdgePath.Edge(childNode, parentNode, null);
+                    newPath.getEdges().add(0, edge);
+                    childPaths.add(newPath);
+                    propPaths.put(childNode.getID(), childPaths);
+                }
             }
 
             if (childNode.getID() == start.getID()) {
