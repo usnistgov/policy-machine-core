@@ -103,7 +103,6 @@ public class PReviewAuditor implements Auditor {
      */
     private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, long targetID) throws PMException {
         Map<String, PolicyClass> results = new HashMap<>();
-
         for (EdgePath targetPath : targetPaths) {
             EdgePath.Edge lastTargetEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
 
@@ -131,7 +130,7 @@ public class PReviewAuditor implements Auditor {
                     // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
                     // resolvedPath, continue to the next target edge
                     if((lastUserEdge.getTarget().getID() != e.getTarget().getID())
-                            && (lastUserEdge.getTarget().getID() != e.getSource().getID())) {
+                            && (lastUserEdge.getTarget().getID() != e.getSource().getID() || lastUserEdge.getTarget().getID() != targetID)) {
                         continue;
                     }
 
@@ -214,7 +213,12 @@ public class PReviewAuditor implements Auditor {
                     path.addEdge(edge);
                     nodePaths.add(0, path);
                 } else {
-                    for(EdgePath parentPath : parentPaths) {
+                    for(EdgePath p : parentPaths) {
+                        EdgePath parentPath = new EdgePath();
+                        for(EdgePath.Edge e : p.getEdges()) {
+                            parentPath.addEdge(new EdgePath.Edge(e.getSource(), e.getTarget(), e.getOps()));
+                        }
+
                         parentPath.getEdges().add(0, edge);
                         nodePaths.add(parentPath);
                     }
@@ -236,21 +240,19 @@ public class PReviewAuditor implements Auditor {
         Propagator propagator = (parentNode, childNode) -> {
             List<EdgePath> childPaths = propPaths.computeIfAbsent(childNode.getID(), k -> new ArrayList<>());
             List<EdgePath> parentPaths = propPaths.get(parentNode.getID());
-            if(parentPaths.isEmpty() && parentNode.getType() == PC) {
+
+            for(EdgePath p : parentPaths) {
+                EdgePath path = new EdgePath();
+                for(EdgePath.Edge edge : p.getEdges()) {
+                    path.addEdge(new EdgePath.Edge(edge.getSource(), edge.getTarget(), edge.getOps()));
+                }
+
                 EdgePath newPath = new EdgePath();
+                newPath.getEdges().addAll(path.getEdges());
                 EdgePath.Edge edge = new EdgePath.Edge(childNode, parentNode, null);
                 newPath.getEdges().add(0, edge);
                 childPaths.add(newPath);
                 propPaths.put(childNode.getID(), childPaths);
-            } else {
-                for (EdgePath path : parentPaths) {
-                    EdgePath newPath = new EdgePath();
-                    newPath.getEdges().addAll(path.getEdges());
-                    EdgePath.Edge edge = new EdgePath.Edge(childNode, parentNode, null);
-                    newPath.getEdges().add(0, edge);
-                    childPaths.add(newPath);
-                    propPaths.put(childNode.getID(), childPaths);
-                }
             }
 
             if (childNode.getID() == start.getID()) {
@@ -332,6 +334,10 @@ public class PReviewAuditor implements Auditor {
             this.edges = new ArrayList<>();
         }
 
+        public EdgePath(List<Edge> edges) {
+            this.edges = edges;
+        }
+
         public List<Edge> getEdges() {
             return edges;
         }
@@ -340,7 +346,9 @@ public class PReviewAuditor implements Auditor {
             this.edges.add(e);
         }
 
-
+        public String toString() {
+            return edges.toString();
+        }
 
         private static class Edge {
             private Node source;
@@ -375,6 +383,10 @@ public class PReviewAuditor implements Auditor {
 
             public void setOps(Set<String> ops) {
                 this.ops = ops;
+            }
+
+            public String toString() {
+                return source.getName() + "(" + source.getType() + ")" + "-->" + (ops != null ? ops + "-->" : "") + target.getName() + "(" + target.getType() + ")";
             }
         }
     }
