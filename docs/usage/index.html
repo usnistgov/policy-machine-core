@@ -189,7 +189,7 @@ node with ID 4321.</p>
 </code></pre>
 
 <p>Assuming a user attribute node is created with the ID 2222, this will associate it with the object attribute that has the 
-ID 4321, and give the operations read and write.</p>
+ID 4321, and give the permissions read and write.</p>
 <p><strong>Examples of creating graphs are provided <a href="#examples">below</a></strong></p>
 <h3 id="access-decisions">Access Decisions</h3>
 <p>To make an access decision, instantiate a <code>PReviewDecider</code> which implements the <code>Decider</code> interface. The interface provides
@@ -209,7 +209,7 @@ Map&lt;String, List&lt;Path&gt;&gt; explain = auditor.explain(1234, 4321);
 
 <p>The result of the explain method is a map of policy classes to the paths from the user to the target under each policy class.
 The <code>Path</code> object contains a list of <code>Edge</code> objects and represents a series of paths from the user to the target. An <code>Edge</code> has
-a source node, a target node, and a set of operations. If the operations is null, the edge represents an assignment in the
+a source node, a target node, and a set of permissions. If the permissions is null, the edge represents an assignment in the
 path. If it is not null then the edge is an association (the bridge from the user path to the target path).</p>
 <p>See an example <a href="#explain-example">below</a></p>
               
