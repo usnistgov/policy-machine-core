@@ -1,6 +1,4 @@
-## Usage
-
-### Creating a Graph
+## Creating a Graph
 ```
 Graph graph = new Graph();
 ```
@@ -26,7 +24,7 @@ ID 4321, and give the operations read and write.
 
 **Examples of creating graphs are provided [here](/examples/#examples)**
 
-### Access Decisions
+## Access Decisions
 To make an access decision, instantiate a `PReviewDecider` which implements the `Decider` interface. The interface provides
 several methods to query the current access state of the graph.
 ```
@@ -35,8 +33,8 @@ decider.listPermissions(userID, NO_PROCESS, targetID);
 ```
 The `listPermissions` method returns the permissions a user has on a target node.
 
-### Audit
-#### Explain
+## Audit
+### Explain
 Explain answers the question why does a user have access to a given target node? To perform this, instantiate a new
 `PReviewAuditor` and call the `explain` method.
 ```

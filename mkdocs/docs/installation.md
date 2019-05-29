@@ -1,6 +1,4 @@
-## Installation
-
-### Install using Maven
+## Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import into projects.
 First, add jitpack as a repository
 ```xml

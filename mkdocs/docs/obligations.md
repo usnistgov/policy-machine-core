@@ -1,4 +1,5 @@
 # Obligations
+Obligations are defined using a yaml syntax described below.
 
 ## Common Elements
 ### Nodes
