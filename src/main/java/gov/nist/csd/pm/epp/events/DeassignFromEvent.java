@@ -2,12 +2,12 @@ package gov.nist.csd.pm.epp.events;
 
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
-public class AssignToEventContext extends EventContext {
+public class DeassignFromEvent extends EventContext {
 
     private Node childNode;
 
-    public AssignToEventContext(String event, Node target, Node childNode) {
-        super(event, target);
+    public DeassignFromEvent(Node target, Node childNode) {
+        super(DEASSIGN_FROM_EVENT, target);
         this.childNode = childNode;
     }
 

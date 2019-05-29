@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.epp.events.AssignToEventContext;
+import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
@@ -26,10 +26,10 @@ class FunctionEvaluator {
                 ret = eval_current_process(processID);
                 break;
             case "child_of_assign":
-                ret = eval_child_of_assign((AssignToEventContext) eventCtx);
+                ret = eval_child_of_assign((AssignToEvent) eventCtx);
                 break;
             case "child_of_assign_name":
-                ret = eval_child_of_assign_name((AssignToEventContext) eventCtx);
+                ret = eval_child_of_assign_name((AssignToEvent) eventCtx);
                 break;
             case "current_user":
                 ret = eval_current_user(pdp, userID);
@@ -209,11 +209,11 @@ class FunctionEvaluator {
         return pdp.getPAP().getGraphPAP().getNode(userID).getName();
     }
 
-    private static List<Node> eval_child_of_assign(AssignToEventContext eventCtx) {
+    private static List<Node> eval_child_of_assign(AssignToEvent eventCtx) {
         return Arrays.asList(eventCtx.getChildNode());
     }
 
-    private static String eval_child_of_assign_name(AssignToEventContext eventCtx) {
+    private static String eval_child_of_assign_name(AssignToEvent eventCtx) {
         return eventCtx.getChildNode().getName();
     }
 }

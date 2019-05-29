@@ -1,7 +1,10 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.epp.events.AssignToEventContext;
+import gov.nist.csd.pm.epp.events.AssignEvent;
+import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.EPP;
+import gov.nist.csd.pm.epp.events.DeassignEvent;
+import gov.nist.csd.pm.epp.events.DeassignFromEvent;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -51,6 +54,10 @@ public class GraphService extends Service {
      * @throws IllegalArgumentException if the type is null.
      */
     public Node createNode(UserContext userCtx, long parentID, String name, NodeType type, Map<String, String> properties) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("a node cannot have a null or empty name");
         } else if (type == null) {
@@ -99,14 +106,8 @@ public class GraphService extends Service {
         //get the parent node to make the assignment
         Node parentNodeCtx = getNode(userCtx, parentID);
 
-        // check if the parent is a PC and get the rep if it is
-        long targetID = parentID;
-        if(parentNodeCtx.getType().equals(PC)) {
-            targetID = Long.parseLong(parentNodeCtx.getProperties().get(REP_PROPERTY));
-        }
-
         // check that the user has the permission to assign to the parent node
-        if (!hasPermissions(userCtx, targetID, ASSIGN_TO)) {
+        if (!hasPermissions(userCtx, parentID, ASSIGN_TO)) {
             // if the user cannot assign to the parent node, delete the newly created node
             throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %d", ASSIGN_TO, parentID));
         }
@@ -117,7 +118,7 @@ public class GraphService extends Service {
         // assign the node to the specified parent node
         getGraphPAP().assign(id, parentID);
 
-        getEPP().processEvent(new AssignToEventContext(ASSIGN_TO, parentNodeCtx, node), userCtx.getUserID(), userCtx.getProcessID());
+        getEPP().processEvent(new AssignToEvent(parentNodeCtx, node), userCtx.getUserID(), userCtx.getProcessID());
 
         return node;
     }
@@ -184,6 +185,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException if the user is not authorized to update the node.
      */
     public void updateNode(UserContext userCtx, long id, String name, Map<String, String> properties) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(id == 0) {
             throw new IllegalArgumentException("no ID was provided when updating the node");
         } else if (!exists(userCtx, id)) {
@@ -208,6 +213,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException if the user is not authorized to delete the node.
      */
     public void deleteNode(UserContext userCtx, long nodeID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         Node node = getGraphPAP().getNode(nodeID);
 
         // check the user can deassign the node
@@ -218,18 +227,17 @@ public class GraphService extends Service {
         // check that the user can deassign from the node's parents
         Set<Long> parents = getGraphPAP().getParents(nodeID);
         for(long parentID : parents) {
-            Node parent = getNode(userCtx, parentID);
-            // check the user can deassign from parent
-            // if the parent is a policy class, get the rep oa
-            if(parent.getType().equals(PC)) {
-                nodeID = Long.parseLong(parent.getProperties().get(REP_PROPERTY));
-            } else {
-                nodeID = parent.getID();
+            if(!hasPermissions(userCtx, parentID, DEASSIGN_FROM)) {
+                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parentID, DEASSIGN_FROM));
             }
-            if(!hasPermissions(userCtx, nodeID, DEASSIGN_FROM)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", nodeID, DEASSIGN_FROM));
-            }
+
+            Node parentNode = getGraphPAP().getNode(parentID);
+
+            getEPP().processEvent(new DeassignEvent(node, parentNode), userCtx.getUserID(), userCtx.getProcessID());
+            getEPP().processEvent(new DeassignFromEvent(parentNode, node), userCtx.getUserID(), userCtx.getProcessID());
         }
+
+        getGraphPAP().deleteNode(nodeID);
     }
 
     /**
@@ -239,6 +247,15 @@ public class GraphService extends Service {
      * @throws PMException if there is an error checking if the node exists in the graph through the PAP.
      */
     public boolean exists(UserContext userCtx, long nodeID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
+        if(!hasPermissions(userCtx, nodeID, ANY_OPERATIONS)) {
+            // return false if the user does not have access to it.
+            return false;
+        }
+
         return getGraphPAP().exists(nodeID);
     }
 
@@ -249,6 +266,10 @@ public class GraphService extends Service {
      * @throws PMException if there is an error getting the nodes from the PAP.
      */
     public Set<Node> getNodes(UserContext userCtx) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         Set<Node> nodes = new HashSet<>(getGraphPAP().getNodes());
         nodes.removeIf((node) -> {
             try {
@@ -269,6 +290,10 @@ public class GraphService extends Service {
      * @throws PMException if there is an error getting the policy classes from the PAP.
      */
     public Set<Long> getPolicies(UserContext userCtx) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         return getGraphPAP().getPolicies();
     }
 
@@ -282,6 +307,10 @@ public class GraphService extends Service {
 
      */
     public Set<Node> getChildren(UserContext userCtx, long nodeID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(!exists(userCtx, nodeID)) {
             throw new PMException(String.format("node with ID %d could not be found", nodeID));
         }
@@ -313,6 +342,10 @@ public class GraphService extends Service {
      * @throws PMException if there is an error getting the parents from the PAP.
      */
     public Set<Node> getParents(UserContext userCtx, long nodeID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(!exists(userCtx, nodeID)) {
             throw new PMException(String.format("node with ID %d could not be found", nodeID));
         }
@@ -347,6 +380,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException if the current user does not have permission to create the assignment.
      */
     public void assign(UserContext userCtx, long childID, long parentID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         // check that the nodes are not null
         if(childID == 0) {
             throw new IllegalArgumentException("the child node ID cannot be 0 when creating an assignment");
@@ -376,7 +413,8 @@ public class GraphService extends Service {
         // assign in the PAP
         getGraphPAP().assign(childID, parentID);
 
-        getEPP().processEvent(new AssignToEventContext(ASSIGN_TO, parent, child), userCtx.getUserID(), userCtx.getProcessID());
+        getEPP().processEvent(new AssignEvent(child, parent), userCtx.getUserID(), userCtx.getProcessID());
+        getEPP().processEvent(new AssignToEvent(parent, child), userCtx.getUserID(), userCtx.getProcessID());
     }
 
     /**
@@ -390,6 +428,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException if the current user does not have permission to delete the assignment.
      */
     public void deassign(UserContext userCtx, long childID, long parentID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         // check that the parameters are correct
         if(childID == 0) {
             throw new IllegalArgumentException("the child node ID cannot be 0 when deassigning");
@@ -406,8 +448,6 @@ public class GraphService extends Service {
             throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", childID, DEASSIGN));
         }
 
-        Node parent = getNode(userCtx, parentID);
-
         //check that the user can deassign from the parent
         if (!hasPermissions(userCtx, parentID, DEASSIGN_FROM)) {
             throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parentID, DEASSIGN_FROM));
@@ -415,6 +455,12 @@ public class GraphService extends Service {
 
         //delete assignment in PAP
         getGraphPAP().deassign(childID, parentID);
+
+        Node parentNode = getNode(userCtx, parentID);
+        Node childNode = getNode(userCtx, childID);
+
+        getEPP().processEvent(new DeassignEvent(childNode, parentNode), userCtx.getUserID(), userCtx.getProcessID());
+        getEPP().processEvent(new DeassignFromEvent(parentNode, childNode), userCtx.getUserID(), userCtx.getProcessID());
     }
 
     /**
@@ -432,6 +478,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException if the current user does not have permission to create the association.
      */
     public void associate(UserContext userCtx, long uaID, long targetID, Set<String> operations) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(uaID == 0) {
             throw new IllegalArgumentException("the user attribute ID cannot be 0 when creating an association");
         } else if(targetID == 0) {
@@ -471,6 +521,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException If the current user does not have permission to delete the association.
      */
     public void dissociate(UserContext userCtx, long uaID, long targetID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(uaID == 0) {
             throw new IllegalArgumentException("the user attribute ID cannot be 0 when creating an association");
         } else if(targetID == 0) {
@@ -502,6 +556,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
     public Map<Long, Set<String>> getSourceAssociations(UserContext userCtx, long sourceID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(!exists(userCtx, sourceID)) {
             throw new PMException(String.format("node with ID %d could not be found", sourceID));
         }
@@ -523,6 +581,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
     public Map<Long, Set<String>> getTargetAssociations(UserContext userCtx, long targetID) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(!exists(userCtx, targetID)) {
             throw new PMException(String.format("node with ID %d could not be found", targetID));
         }
@@ -549,6 +611,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
     public Set<Node> search(UserContext userCtx, String name, String type, Map<String, String> properties) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         // user the PAP searcher to search for the intended nodes
         Set<Node> nodes = getGraphPAP().search(name, type, properties);
         nodes.removeIf(x -> {
@@ -571,6 +637,10 @@ public class GraphService extends Service {
      * @throws PMAuthorizationException if the current user is not authorized to access this node.
      */
     public Node getNode(UserContext userCtx, long id) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
         if(!exists(userCtx, id)) {
             throw new PMException(String.format("node with ID %d could not be found", id));
         }
