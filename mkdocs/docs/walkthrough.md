@@ -44,7 +44,7 @@ The **Policy Decision Point** provides the access control logic to requests on t
 #### Creating a Non Policy Class
 #### Permissions required for each method
 #### Events
-##### Assign, deassign, assign to deassign from
+- Assign, deassign, assign to deassign from
 
 ## EPP
 The **Event Processing Point** is responsible for reacting to events that occur in the NGAC system. The events can be
