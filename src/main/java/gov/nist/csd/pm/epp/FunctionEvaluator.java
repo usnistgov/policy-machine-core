@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.epp.events.AssignToEvent;
-import gov.nist.csd.pm.epp.events.EventContext;
+import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.obligations.evr.EVRException;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
@@ -26,10 +26,13 @@ class FunctionEvaluator {
                 ret = eval_current_process(processID);
                 break;
             case "child_of_assign":
-                ret = eval_child_of_assign((AssignToEvent) eventCtx);
+                ret = eval_child_of_assign(eventCtx);
+                break;
+            case "parent_of_assign":
+                ret = eval_parent_of_assign(eventCtx);
                 break;
             case "child_of_assign_name":
-                ret = eval_child_of_assign_name((AssignToEvent) eventCtx);
+                ret = eval_child_of_assign_name(eventCtx);
                 break;
             case "current_user":
                 ret = eval_current_user(pdp, userID);
@@ -209,11 +212,44 @@ class FunctionEvaluator {
         return pdp.getPAP().getGraphPAP().getNode(userID).getName();
     }
 
-    private static List<Node> eval_child_of_assign(AssignToEvent eventCtx) {
-        return Arrays.asList(eventCtx.getChildNode());
+    private static List<Node> eval_child_of_assign(EventContext eventCtx) throws EVRException {
+        Node child;
+        if(eventCtx instanceof AssignToEvent) {
+            child = ((AssignToEvent) eventCtx).getChildNode();
+        } else if (eventCtx instanceof AssignEvent) {
+            child = eventCtx.getTarget();
+        } else if (eventCtx instanceof DeassignFromEvent) {
+            child = ((DeassignFromEvent) eventCtx).getChildNode();
+        } else if (eventCtx instanceof DeassignEvent) {
+            child = eventCtx.getTarget();
+        } else {
+            throw new EVRException("invalid event context for function child_of_assign. Valid event contexts are AssignTo, " +
+                    "Assign, DeassignFrom, and Deassign");
+        }
+
+        return Arrays.asList(child);
     }
 
-    private static String eval_child_of_assign_name(AssignToEvent eventCtx) {
-        return eventCtx.getChildNode().getName();
+    private static List<Node> eval_parent_of_assign(EventContext eventCtx) throws EVRException {
+        Node parent;
+        if(eventCtx instanceof AssignToEvent) {
+            parent = ((AssignToEvent) eventCtx).getChildNode();
+        } else if (eventCtx instanceof AssignEvent) {
+            parent = eventCtx.getTarget();
+        } else if (eventCtx instanceof DeassignFromEvent) {
+            parent = ((DeassignFromEvent) eventCtx).getChildNode();
+        } else if (eventCtx instanceof DeassignEvent) {
+            parent = eventCtx.getTarget();
+        } else {
+            throw new EVRException("invalid event context for function parent_of_assign. Valid event contexts are AssignTo, " +
+                    "Assign, DeassignFrom, and Deassign");
+        }
+
+        return Arrays.asList(parent);
+    }
+
+    private static String eval_child_of_assign_name(EventContext eventCtx) throws EVRException {
+        List<Node> result = eval_child_of_assign(eventCtx);
+        return result.get(0).getName();
     }
 }
