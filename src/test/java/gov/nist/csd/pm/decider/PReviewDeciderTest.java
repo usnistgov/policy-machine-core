@@ -1,16 +1,17 @@
 package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.graph.MemGraph;
-import gov.nist.csd.pm.graph.model.nodes.Node;
-import gov.nist.csd.pm.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pdp.decider.PReviewDecider;
+import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.graph.model.nodes.NodeType.O;
-import static gov.nist.csd.pm.graph.model.nodes.NodeType.OA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.O;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

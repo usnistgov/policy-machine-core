@@ -155,7 +155,7 @@ Below is a visual representation of the graph created in the bank teller example
 - HR has read and write permissions on Salaries and SSNs
 - Bob and Alice have the Grp1Mgr and Grp2Mgr attributes, respectively
 - Grp1Mgr and Grp2Mgr have read permissions on Grp1Salaries and Grp2Salaries, respectively
-- Bob and Alice have read and write permissions on their name and ssn, and read permissions on their salaries. 
+- Bob and Alice have read and write permissions on their name and ssn, and read permissions on their salaries.
 
 #### Access control state
 
@@ -334,12 +334,15 @@ Below is a visual representation of the graph created in the employee record exa
 #### Explain
 Using the bank teller example described [above](#bank-teller), `auditor.explain(user1Node.getID(), objectNode.getID())` will result in:
 ```
-RBAC
-	u1-Teller-[r,w]-Accounts-o1
-branches
-	u1-branch 1-[r,w]-branch 1-o1
-```
-1. `u1` to `o1` via an association `Teller --[r, w]--> Accounts` under `RBAC`
-2. `u1` to `o1` via an association `branch 1 --[r, w]--> branch 1` under `branches`
+operations: [r, w]
+policyClasses:
+  RBAC
+    operations: [r, w]
+    paths:
+      - u1-Teller-Accounts-o1 ops=[r, w]
+  branches
+    operations: [r, w]
+    paths:
+      - u1-branch 1-branch 1-o1 ops=[r, w]
 
-From the returned paths we can deduce that `u1` has `r, w` on `o1`.
+```

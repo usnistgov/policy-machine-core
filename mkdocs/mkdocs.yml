@@ -2,10 +2,11 @@ site_name: policy-machine-core
 nav:
   - Introduction: index.md
   - Installation: installation.md
-  - Usage: usage.md
+  - Code Walkthrough: walkthrough.md
+  - Obligations: obligations.md
   - Examples: examples.md
   - Contact Us: contact.md
 theme:
-  name: 'rtd-dropdown'
+  name: 'material'
 extra_css:
   - css/extra.css

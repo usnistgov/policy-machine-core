@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.graph.Graph;
-import gov.nist.csd.pm.graph.MemGraph;
-import gov.nist.csd.pm.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static gov.nist.csd.pm.graph.model.nodes.NodeType.*;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 public class TestCases {
 
