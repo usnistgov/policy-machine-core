@@ -11,7 +11,7 @@ public class ProhibitionsPAP implements Prohibitions {
 
     private Prohibitions prohibitions;
 
-    public ProhibitionsPAP(MemProhibitions prohibitionsDAO) throws PMException {
+    public ProhibitionsPAP(Prohibitions prohibitionsDAO) {
         this.prohibitions = prohibitionsDAO;
     }
 
