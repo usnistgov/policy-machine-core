@@ -1,0 +1,78 @@
+<!doctype html><html lang="en" class="no-js"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="lang:clipboard.copy" content="Copy to clipboard"><meta name="lang:clipboard.copied" content="Copied to clipboard"><meta name="lang:search.language" content="en"><meta name="lang:search.pipeline.stopwords" content="True"><meta name="lang:search.pipeline.trimmer" content="True"><meta name="lang:search.result.none" content="No matching documents"><meta name="lang:search.result.one" content="1 matching document"><meta name="lang:search.result.other" content="# matching documents"><meta name="lang:search.tokenizer" content="[\s\-]+"><link rel="shortcut icon" href="../assets/images/favicon.png"><meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.3.1"><title>Functional Components - policy-machine-core</title><link rel="stylesheet" href="../assets/stylesheets/application.4031d38b.css"><script src="../assets/javascripts/modernizr.74668098.js"></script><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=swap"><style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style><link rel="stylesheet" href="../assets/fonts/material-icons.css"><link rel="stylesheet" href="../css/extra.css"></head><body dir="ltr"><svg class="md-svg"><defs></defs></svg> <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off"> <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off"> <label class="md-overlay" data-md-component="overlay" for="__drawer"></label><a href="#pip" tabindex="1" class="md-skip">Skip to content </a><header class="md-header" data-md-component="header"><nav class="md-header-nav md-grid"><div class="md-flex"><div class="md-flex__cell md-flex__cell--shrink"><a href=".." title="policy-machine-core" class="md-header-nav__button md-logo"><i class="md-icon"></i></a></div><div class="md-flex__cell md-flex__cell--shrink"><label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label></div><div class="md-flex__cell md-flex__cell--stretch"><div class="md-flex__ellipsis md-header-nav__title" data-md-component="title"><span class="md-header-nav__topic">policy-machine-core</span><span class="md-header-nav__topic">Functional Components</span></div></div><div class="md-flex__cell md-flex__cell--shrink"><label class="md-icon md-icon--search md-header-nav__button" for="__search"></label><div class="md-search" data-md-component="search" role="dialog"><label class="md-search__overlay" for="__search"></label><div class="md-search__inner" role="search"><form class="md-search__form" name="search"><input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active"> <label class="md-icon md-search__icon" for="__search"></label> <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button></form><div class="md-search__output"><div class="md-search__scrollwrap" data-md-scrollfix><div class="md-search-result" data-md-component="result"><div class="md-search-result__meta">Type to start searching</div><ol class="md-search-result__list"></ol></div></div></div></div></div></div></div></nav></header><div class="md-container"><main class="md-main"><div class="md-main__inner md-grid" data-md-component="container"><div class="md-sidebar md-sidebar--primary" data-md-component="navigation"><div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner"><nav class="md-nav md-nav--primary" data-md-level="0"><label class="md-nav__title md-nav__title--site" for="__drawer"><a href=".." title="policy-machine-core" class="md-nav__button md-logo"><i class="md-icon"></i></a>policy-machine-core</label><ul class="md-nav__list" data-md-scrollfix><li class="md-nav__item"><a href=".." title="Introduction" class="md-nav__link">Introduction</a></li><li class="md-nav__item"><a href="../installation/" title="Installation" class="md-nav__link">Installation</a></li><li class="md-nav__item md-nav__item--active"><input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc"><label class="md-nav__link md-nav__link--active" for="__toc">Functional Components</label><a href="./" title="Functional Components" class="md-nav__link md-nav__link--active">Functional Components</a><nav class="md-nav md-nav--secondary"><label class="md-nav__title" for="__toc">Table of contents</label><ul class="md-nav__list" data-md-scrollfix><li class="md-nav__item"><a href="#pip" title="PIP" class="md-nav__link">PIP</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#graph" title="Graph" class="md-nav__link">Graph</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#memgraph" title="MemGraph" class="md-nav__link">MemGraph</a></li></ul></nav></li><li class="md-nav__item"><a href="#prohibitions" title="Prohibitions" class="md-nav__link">Prohibitions</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#memprohibitions" title="MemProhibitions" class="md-nav__link">MemProhibitions</a></li></ul></nav></li><li class="md-nav__item"><a href="#obligations" title="Obligations" class="md-nav__link">Obligations</a></li></ul></nav></li><li class="md-nav__item"><a href="#pap" title="PAP" class="md-nav__link">PAP</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#pap-functional-entity" title="PAP Functional Entity" class="md-nav__link">PAP Functional Entity</a></li></ul></nav></li><li class="md-nav__item"><a href="#pdp" title="PDP" class="md-nav__link">PDP</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#decider" title="Decider" class="md-nav__link">Decider</a></li><li class="md-nav__item"><a href="#auditor" title="Auditor" class="md-nav__link">Auditor</a></li><li class="md-nav__item"><a href="#pdp-functional-entity" title="PDP Functional Entity" class="md-nav__link">PDP Functional Entity</a></li></ul></nav></li><li class="md-nav__item"><a href="#epp" title="EPP" class="md-nav__link">EPP</a></li></ul></nav></li><li class="md-nav__item"><a href="../getting-started/" title="Getting Started" class="md-nav__link">Getting Started</a></li><li class="md-nav__item"><a href="../obligations/" title="Obligations" class="md-nav__link">Obligations</a></li><li class="md-nav__item"><a href="../examples/" title="Examples" class="md-nav__link">Examples</a></li><li class="md-nav__item"><a href="../contact/" title="Contact Us" class="md-nav__link">Contact Us</a></li></ul></nav></div></div></div><div class="md-sidebar md-sidebar--secondary" data-md-component="toc"><div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner"><nav class="md-nav md-nav--secondary"><label class="md-nav__title" for="__toc">Table of contents</label><ul class="md-nav__list" data-md-scrollfix><li class="md-nav__item"><a href="#pip" title="PIP" class="md-nav__link">PIP</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#graph" title="Graph" class="md-nav__link">Graph</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#memgraph" title="MemGraph" class="md-nav__link">MemGraph</a></li></ul></nav></li><li class="md-nav__item"><a href="#prohibitions" title="Prohibitions" class="md-nav__link">Prohibitions</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#memprohibitions" title="MemProhibitions" class="md-nav__link">MemProhibitions</a></li></ul></nav></li><li class="md-nav__item"><a href="#obligations" title="Obligations" class="md-nav__link">Obligations</a></li></ul></nav></li><li class="md-nav__item"><a href="#pap" title="PAP" class="md-nav__link">PAP</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#pap-functional-entity" title="PAP Functional Entity" class="md-nav__link">PAP Functional Entity</a></li></ul></nav></li><li class="md-nav__item"><a href="#pdp" title="PDP" class="md-nav__link">PDP</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#decider" title="Decider" class="md-nav__link">Decider</a></li><li class="md-nav__item"><a href="#auditor" title="Auditor" class="md-nav__link">Auditor</a></li><li class="md-nav__item"><a href="#pdp-functional-entity" title="PDP Functional Entity" class="md-nav__link">PDP Functional Entity</a></li></ul></nav></li><li class="md-nav__item"><a href="#epp" title="EPP" class="md-nav__link">EPP</a></li></ul></nav></div></div></div><div class="md-content"><article class="md-content__inner md-typeset"><h1>Functional Components</h1><h2 id="pip">PIP</h2>
+<p>The Policy Enforcement Point (PIP) package provides a set of interfaces for storing NGAC policy data and in memory implementations of each interface. The three interfaces <strong>Graph</strong>, <strong>Prohibitions</strong>, <strong>Obligations</strong> are explained below.</p>
+<h3 id="graph">Graph</h3>
+<p>The <code>Graph</code> interface provides the set of functions necessary for maintaining and traversing an NGAC graph.</p>
+<h4 id="memgraph">MemGraph</h4>
+<p>MemGraph is an in memory implementation of the <code>Graph</code> interface called. The underlying structure is a directed acyclic graph which stores the node IDs as nodes in the graph.  Edges represent assignments and associations.</p>
+<pre><code>Graph graph = new MemGraph();
+</code></pre>
+
+<p>This will create a new instance of the in memory implementation of the Graph interface. Now it can be populated with
+nodes, assignments, and associations.</p>
+<pre><code>Node node = graph.createNode(1234, &quot;newNode&quot;, NodeType.O, null));
+</code></pre>
+
+<p>This will add a node with the ID 1234, name "newNode", type object, and no properties to the graph.</p>
+<pre><code>graph.assign(1234, NodeType.O), 4321, NodeType.OA));
+</code></pre>
+
+<p>Assuming a node with the ID 4321 and type OA have been created in the graph, this will assign the node with ID 1234 to the
+node with ID 4321.</p>
+<pre><code>graph.associate(2222, NodeType.UA), 4321, NodeType.OA), new HashSet&lt;&gt;(Arrays.asList(&quot;read&quot;, &quot;write&quot;)));
+</code></pre>
+
+<p>Assuming a user attribute node is created with the ID 2222, this will associate it with the object attribute that has the
+ID 4321, and give the operations read and write.</p>
+<h3 id="prohibitions">Prohibitions</h3>
+<p>The <code>Prohibitions</code> interface provides functions to maintain a list of prohibition relations.</p>
+<h4 id="memprohibitions">MemProhibitions</h4>
+<p><code>MemProhibitions</code> is an in memory implementation of the <code>Prohibitions</code> interface. The <code>Prohibition</code>
+model object is stored in a <code>List</code>. The following is an example of creating a <code>Prohibition</code> and adding it to a <code>MemProhibitions</code> instance:</p>
+<pre><code>Prohibitions prohibitions = new MemProhibitions();
+
+Prohibition prohibition = new Prohibition();
+prohibition.setName(&quot;denyName&quot;);
+prohibition.setIntersection(true);
+prohibition.setOperations(new HashSet&lt;&gt;(Arrays.asList(&quot;read&quot;, &quot;write&quot;)));
+prohibition.setSubject(new Prohibition.Subject(1234, Prohibition.Subject.Type.USER));
+prohibition.addNode(new Prohibition.Node(4321, false));
+
+prohibitions.add(prohibition);
+</code></pre>
+
+<h3 id="obligations">Obligations</h3>
+<p>The <code>Obligations</code> interface provides functions to maintain a list of obligation relations. The obligation implementation is a little more complex than the prohibitions and will be explained in the <a href="/obligations">obligations</a> section.</p>
+<h2 id="pap">PAP</h2>
+<p>The Policy Administration Point (PAP) provides a means for administering policies to the underlying data in the PIP.  This package is very simple as it only sets up a middle man between the PDP/EPP and the PIP.</p>
+<h3 id="pap-functional-entity">PAP Functional Entity</h3>
+<p>The PAP object is made up of a <code>Graph</code>, <code>Prohibitions</code>, and <code>Obligations</code>. It provides and single
+administration point for an NGAC system. When a <code>PAP</code> is initialized a call to <code>SuperGraph.check()</code> is called on the <code>Graph</code> parameter. This call ensures that the super configuration is complete in the provided graph.</p>
+<h2 id="pdp">PDP</h2>
+<p>The Policy Decision Point (PDP) provides three main functionalities:</p>
+<ol>
+<li>Interfaces for querying the access state of an NGAC graph.</li>
+<li>An interface for auditing an NGAC graph.</li>
+<li>A PDP as a functional entity.</li>
+</ol>
+<h3 id="decider">Decider</h3>
+<p>The <code>decider</code> package contains two interfaces <code>Decider</code> and <code>ProhibitionDecider</code>.</p>
+<ul>
+<li><code>Decider</code> - methods to make access decisions.</li>
+<li><code>ProhibitionDecider</code> - methods to determine any prohibited permissions.</li>
+</ul>
+<p>Implementations of both of these interfaces are provided as <code>PReviewDecider</code> and <code>MemProhibtionDecider</code>.</p>
+<h3 id="auditor">Auditor</h3>
+<p>The <code>auditor</code> package contains an interface that can be used to audit an NGAC graph. The interface has one method called <code>explain</code> which can explain <strong>why</strong> a user has permissions on a target node. An implementation called <code>PReviewAuditor</code> is provided.</p>
+<h3 id="pdp-functional-entity">PDP Functional Entity</h3>
+<p>The PDP functional entity leverages the interfaces described above to control access to an underlying PAP.</p>
+<pre><code>PDP pdp = new PDP(
+  new PAP(
+    new MemGraph(),
+    new MemProhibitions(),
+    new MemObligations(),
+  )
+);
+</code></pre>
+
+<h2 id="epp">EPP</h2>
+<p>Coming soon...</p></article></div></div></main><footer class="md-footer"><div class="md-footer-nav"><nav class="md-footer-nav__inner md-grid"><a href="../installation/" title="Installation" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev"><div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-back md-footer-nav__button"></i></div><div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class="md-flex__ellipsis"><span class="md-footer-nav__direction">Previous</span>Installation</span></div></a><a href="../getting-started/" title="Getting Started" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next"><div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class="md-flex__ellipsis"><span class="md-footer-nav__direction">Next</span>Getting Started</span></div><div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i></div></a></nav></div><div class="md-footer-meta md-typeset"><div class="md-footer-meta__inner md-grid"><div class="md-footer-copyright">powered by <a href="https://www.mkdocs.org">MkDocs</a> and <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a></div></div></div></footer></div><script src="../assets/javascripts/application.b260a35d.js"></script><script>app.initialize({version:"1.0.4",url:{base:".."}})</script></body></html>

@@ -1,0 +1,143 @@
+<!doctype html><html lang="en" class="no-js"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="lang:clipboard.copy" content="Copy to clipboard"><meta name="lang:clipboard.copied" content="Copied to clipboard"><meta name="lang:search.language" content="en"><meta name="lang:search.pipeline.stopwords" content="True"><meta name="lang:search.pipeline.trimmer" content="True"><meta name="lang:search.result.none" content="No matching documents"><meta name="lang:search.result.one" content="1 matching document"><meta name="lang:search.result.other" content="# matching documents"><meta name="lang:search.tokenizer" content="[\s\-]+"><link rel="shortcut icon" href="../assets/images/favicon.png"><meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.3.1"><title>Getting Started - policy-machine-core</title><link rel="stylesheet" href="../assets/stylesheets/application.4031d38b.css"><script src="../assets/javascripts/modernizr.74668098.js"></script><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=swap"><style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style><link rel="stylesheet" href="../assets/fonts/material-icons.css"><link rel="stylesheet" href="../css/extra.css"></head><body dir="ltr"><svg class="md-svg"><defs></defs></svg> <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off"> <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off"> <label class="md-overlay" data-md-component="overlay" for="__drawer"></label><a href="#bank-teller" tabindex="1" class="md-skip">Skip to content </a><header class="md-header" data-md-component="header"><nav class="md-header-nav md-grid"><div class="md-flex"><div class="md-flex__cell md-flex__cell--shrink"><a href=".." title="policy-machine-core" class="md-header-nav__button md-logo"><i class="md-icon"></i></a></div><div class="md-flex__cell md-flex__cell--shrink"><label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label></div><div class="md-flex__cell md-flex__cell--stretch"><div class="md-flex__ellipsis md-header-nav__title" data-md-component="title"><span class="md-header-nav__topic">policy-machine-core</span><span class="md-header-nav__topic">Getting Started</span></div></div><div class="md-flex__cell md-flex__cell--shrink"><label class="md-icon md-icon--search md-header-nav__button" for="__search"></label><div class="md-search" data-md-component="search" role="dialog"><label class="md-search__overlay" for="__search"></label><div class="md-search__inner" role="search"><form class="md-search__form" name="search"><input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active"> <label class="md-icon md-search__icon" for="__search"></label> <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button></form><div class="md-search__output"><div class="md-search__scrollwrap" data-md-scrollfix><div class="md-search-result" data-md-component="result"><div class="md-search-result__meta">Type to start searching</div><ol class="md-search-result__list"></ol></div></div></div></div></div></div></div></nav></header><div class="md-container"><main class="md-main"><div class="md-main__inner md-grid" data-md-component="container"><div class="md-sidebar md-sidebar--primary" data-md-component="navigation"><div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner"><nav class="md-nav md-nav--primary" data-md-level="0"><label class="md-nav__title md-nav__title--site" for="__drawer"><a href=".." title="policy-machine-core" class="md-nav__button md-logo"><i class="md-icon"></i></a>policy-machine-core</label><ul class="md-nav__list" data-md-scrollfix><li class="md-nav__item"><a href=".." title="Introduction" class="md-nav__link">Introduction</a></li><li class="md-nav__item"><a href="../installation/" title="Installation" class="md-nav__link">Installation</a></li><li class="md-nav__item"><a href="../functional-components/" title="Functional Components" class="md-nav__link">Functional Components</a></li><li class="md-nav__item md-nav__item--active"><input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc"><label class="md-nav__link md-nav__link--active" for="__toc">Getting Started</label><a href="./" title="Getting Started" class="md-nav__link md-nav__link--active">Getting Started</a><nav class="md-nav md-nav--secondary"><label class="md-nav__title" for="__toc">Table of contents</label><ul class="md-nav__list" data-md-scrollfix><li class="md-nav__item"><a href="#bank-teller" title="Bank Teller" class="md-nav__link">Bank Teller</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#access-control-state" title="Access Control State" class="md-nav__link">Access Control State</a></li><li class="md-nav__item"><a href="#graph-configuration-summary" title="Graph Configuration Summary" class="md-nav__link">Graph Configuration Summary</a></li><li class="md-nav__item"><a href="#building-the-graph" title="Building the Graph" class="md-nav__link">Building the Graph</a></li><li class="md-nav__item"><a href="#making-access-decisions" title="Making Access Decisions" class="md-nav__link">Making Access Decisions</a></li><li class="md-nav__item"><a href="#auditing-the-graph" title="Auditing the Graph" class="md-nav__link">Auditing the Graph</a></li><li class="md-nav__item"><a href="#visualization" title="Visualization" class="md-nav__link">Visualization</a></li></ul></nav></li></ul></nav></li><li class="md-nav__item"><a href="../obligations/" title="Obligations" class="md-nav__link">Obligations</a></li><li class="md-nav__item"><a href="../examples/" title="Examples" class="md-nav__link">Examples</a></li><li class="md-nav__item"><a href="../contact/" title="Contact Us" class="md-nav__link">Contact Us</a></li></ul></nav></div></div></div><div class="md-sidebar md-sidebar--secondary" data-md-component="toc"><div class="md-sidebar__scrollwrap"><div class="md-sidebar__inner"><nav class="md-nav md-nav--secondary"><label class="md-nav__title" for="__toc">Table of contents</label><ul class="md-nav__list" data-md-scrollfix><li class="md-nav__item"><a href="#bank-teller" title="Bank Teller" class="md-nav__link">Bank Teller</a><nav class="md-nav"><ul class="md-nav__list"><li class="md-nav__item"><a href="#access-control-state" title="Access Control State" class="md-nav__link">Access Control State</a></li><li class="md-nav__item"><a href="#graph-configuration-summary" title="Graph Configuration Summary" class="md-nav__link">Graph Configuration Summary</a></li><li class="md-nav__item"><a href="#building-the-graph" title="Building the Graph" class="md-nav__link">Building the Graph</a></li><li class="md-nav__item"><a href="#making-access-decisions" title="Making Access Decisions" class="md-nav__link">Making Access Decisions</a></li><li class="md-nav__item"><a href="#auditing-the-graph" title="Auditing the Graph" class="md-nav__link">Auditing the Graph</a></li><li class="md-nav__item"><a href="#visualization" title="Visualization" class="md-nav__link">Visualization</a></li></ul></nav></li></ul></nav></div></div></div><div class="md-content"><article class="md-content__inner md-typeset"><h1>Getting Started</h1><h3 id="bank-teller">Bank Teller</h3>
+<p>To introduce you to the Policy Machine Core library we'll walk through a simple bank teller example. We'll create a graph, query the access state of the graph and audit the graph.</p>
+<h4 id="access-control-state">Access Control State</h4>
+<ul>
+<li><code>u1</code> can read and write <code>o1</code></li>
+<li><code>u2</code> can read <code>o1</code></li>
+</ul>
+<h4 id="graph-configuration-summary">Graph Configuration Summary</h4>
+<ul>
+<li>Users: <code>u1</code>, <code>u2</code></li>
+<li>An object, <code>o1</code></li>
+<li>Two policy classes: <code>RBAC</code> and <code>Branches</code><ul>
+<li>RBAC<ul>
+<li>o1 is assigned to accounts</li>
+<li>u1 is a Teller that has read and write permissions on accounts</li>
+<li>u2 is an Auditor that has read permissions on accounts</li>
+</ul>
+</li>
+<li>Branches<ul>
+<li>u1 and u2 are both assigned to the Branch 1 user attribute</li>
+<li>o1 is assigned to the Branch 1 object attribute</li>
+<li>the Branch 1 user attribute has read and write permissions on the Branch 1 object attribute</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h4 id="building-the-graph">Building the Graph</h4>
+<pre><code>// 1. Create a new Graph instance.  For this example, we'll use the `MemGraph` which is an in memory implementation of the Graph interface.
+Graph graph = new MemGraph();
+
+// 2. Create the user nodes `u1` and `u2`.
+Node user1Node = graph.createNode(rand.nextLong(), &quot;u1&quot;, U, null);
+Node user2Node = graph.createNode(rand.nextLong(), &quot;u2&quot;, U, null);
+
+
+// 3. Create the object, `o1` that will be the target of the access queries.
+Node objectNode = graph.createNode(rand.nextLong(), &quot;o1&quot;, O, null);
+
+
+// 4. Create the `RBAC` policy class node.
+Node rbacNode = graph.createNode(rand.nextLong(), &quot;RBAC&quot;, PC, null);
+
+
+// 5. Create an object attribute for the `Accounts`.
+Node accountsNode = graph.createNode(rand.nextLong(), &quot;Accounts&quot;, OA, null);
+
+
+// 6. Create the `Teller` and `Auditor` user attributes.
+Node tellerNode = graph.createNode(rand.nextLong(), &quot;Teller&quot;, UA, null);
+Node auditorNode = graph.createNode(rand.nextLong(), &quot;Auditor&quot;, UA, null);
+
+
+// 7. Assign the `Accounts` object attribute to the `RBAC` policy class node.
+graph.assign(accountsNode.getID(), rbacNode.getID());
+
+
+// 8. Assign the object, `o1`, to the `Accounts` object attribute.
+graph.assign(objectNode.getID(), accountsNode.getID());
+
+
+// 9. Assign `u1` to the `Teller` user attribute and `u2` to the `Auditor` user attribute.
+graph.assign(user1Node.getID(), tellerNode.getID());
+graph.assign(user2Node.getID(), auditorNode.getID());
+
+
+// 10. Create the associations for `Teller` and `Auditor` on `Account` in RBAC. `Teller` has read and write permissions, while `Auditor` just has read permissions.
+Set rw = new HashSet&lt;&gt;(Arrays.asList(&quot;r&quot;, &quot;w&quot;));
+Set r = new HashSet&lt;&gt;(Arrays.asList(&quot;r&quot;));
+graph.associate(tellerNode.getID(), accountsNode.getID(), rw);
+graph.associate(auditorNode.getID(), accountsNode.getID(), r);
+
+
+// 11. Create the `Branches` policy class.
+Node branchesNode = graph.createNode(rand.nextLong(), &quot;branches&quot;, PC, null);
+
+
+// 12. Create an object attribute for `Branch 1`.
+Node branch1OANode = graph.createNode(rand.nextLong(), &quot;branch 1&quot;, OA, null);
+
+// 13. Assign the branch 1 OA to the branches PC
+graph.assign(branch1OANode.getID(), branchesNode.getID());
+
+
+// 14. Create the `Branch 1` user attribute
+Node branches1UANode = graph.createNode(rand.nextLong(), &quot;branch 1&quot;, UA, null);
+
+
+// 15. Assign the object, `o1`, to the `Branch 1` object attribute
+graph.assign(objectNode.getID(), branch1OANode.getID());
+
+
+// 16. Assign the users, `u1` and `u2`, to the branch 1 user attribute
+graph.assign(user1Node.getID(), branches1UANode.getID());
+graph.assign(user2Node.getID(), branches1UANode.getID());
+
+
+// 17. Create an association between the `branch 1` user attribute and the `branch 1` object attribute.
+//This will give both users read and write on `o1` under the `branches` policy class.
+graph.associate(branches1UANode.getID(), branch1OANode.getID(), rw);
+</code></pre>
+
+<h4 id="making-access-decisions">Making Access Decisions</h4>
+<pre><code>// 18. Test the configuration using the `PReviewDecider` implementation of the `Decider` interface.
+// The constructor for a `PReviewDecider` receives the graph we created and a list of prohibitions.
+// Since no prohibitions are used in this example, we'll pass null.
+Decider decider = new PReviewDecider(graph);
+
+
+// 19. Check that `u1` has read and write permissions on `o1`.
+Set&lt;String&gt; permissions = decider.listPermissions(user1Node.getID(), objectNode.getID());
+assertTrue(permissions.contains(&quot;r&quot;));
+assertTrue(permissions.contains(&quot;w&quot;));
+
+
+// 20. Check that `u1` has read permissions on `o1`.
+permissions = decider.listPermissions(user2Node.getID(), objectNode.getID());
+assertTrue(permissions.contains(&quot;r&quot;));
+</code></pre>
+
+<h4 id="auditing-the-graph">Auditing the Graph</h4>
+<p>Let's audit the graph to see why <code>u1</code> has permissions on <code>o1</code>.</p>
+<pre><code>Auditor auditor = new PReviewAuditor(graph);
+Explain explain = auditor.explain(user1Node.getID(), objectNode.getID())
+</code></pre>
+
+<p>The result of the explain method will be structured as:</p>
+<pre><code>operations: [r, w]
+policyClasses:
+  RBAC
+    operations: [r, w]
+    paths:
+      - u1-Teller-Accounts-o1 ops=[r, w]
+  branches
+    operations: [r, w]
+    paths:
+      - u1-branch 1-branch 1-o1 ops=[r, w]
+</code></pre>
+
+<h4 id="visualization">Visualization</h4>
+<p>Below is a visual representation of the graph created in the bank teller example.
+<a href="../images/bankteller.png"><img alt="alt text" src="../images/bankteller.png" title="bank teller example" /></a></p></article></div></div></main><footer class="md-footer"><div class="md-footer-nav"><nav class="md-footer-nav__inner md-grid"><a href="../functional-components/" title="Functional Components" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev"><div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-back md-footer-nav__button"></i></div><div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class="md-flex__ellipsis"><span class="md-footer-nav__direction">Previous</span>Functional Components</span></div></a><a href="../obligations/" title="Obligations" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next"><div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class="md-flex__ellipsis"><span class="md-footer-nav__direction">Next</span>Obligations</span></div><div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i></div></a></nav></div><div class="md-footer-meta md-typeset"><div class="md-footer-meta__inner md-grid"><div class="md-footer-copyright">powered by <a href="https://www.mkdocs.org">MkDocs</a> and <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a></div></div></div></footer></div><script src="../assets/javascripts/application.b260a35d.js"></script><script>app.initialize({version:"1.0.4",url:{base:".."}})</script></body></html>
