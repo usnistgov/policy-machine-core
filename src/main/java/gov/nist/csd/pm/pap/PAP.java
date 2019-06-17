@@ -13,9 +13,9 @@ import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
  */
 public class PAP {
 
-    private Graph           graphPAP;
+    private Graph        graphPAP;
     private Prohibitions prohibitionsPAP;
-    private Obligations     obligationsPAP;
+    private Obligations  obligationsPAP;
 
     public PAP(Graph graphPAP, Prohibitions prohibitionsPAP, Obligations obligationsPAP) throws PMException {
         this.graphPAP = graphPAP;

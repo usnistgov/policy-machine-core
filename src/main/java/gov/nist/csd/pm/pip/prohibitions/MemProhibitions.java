@@ -4,6 +4,8 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -96,5 +98,14 @@ public class MemProhibitions implements Prohibitions {
     @Override
     public void delete(String prohibitionName) {
         prohibitions.removeIf((prohibition) -> prohibition.getName().equals(prohibitionName));
+    }
+
+    public static void main(String[] args) {
+        Prohibition prohibition = new Prohibition();
+        prohibition.setName("denyName");
+        prohibition.setIntersection(true);
+        prohibition.setOperations(new HashSet<>(Arrays.asList("read", "write")));
+        prohibition.setSubject(new Prohibition.Subject(1234, Prohibition.Subject.Type.USER));
+        prohibition.addNode(new Prohibition.Node(4321, false));
     }
 }
