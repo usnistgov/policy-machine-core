@@ -651,4 +651,24 @@ public class GraphService extends Service {
 
         return getGraphPAP().getNode(id);
     }
+
+    /**
+     * Deletes all nodes in the graph
+     *
+     * @throws PMException if something goes wrong in the deletion process
+     */
+    public void reset(UserContext userCtx) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
+        Set<Node> nodes = getNodes(userCtx);
+        Set<Long> ids = new HashSet<>();
+        for (Node node: nodes) {
+            ids.add(node.getID());
+        }
+        for (long id: ids) {
+            deleteNode(userCtx, id);
+        }
+    }
 }
