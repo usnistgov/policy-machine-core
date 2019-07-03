@@ -662,6 +662,11 @@ public class GraphService extends Service {
             throw new PMException("no user context provided to the PDP");
         }
 
+        // check that the user can reset the graph
+        if (!hasPermissions(userCtx, SuperGraph.getSuperO().getID(), RESET)) {
+            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+        }
+
         Set<Node> nodes = getNodes(userCtx);
         Set<Long> ids = new HashSet<>();
         for (Node node: nodes) {
