@@ -5,7 +5,9 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ObligationsService extends Service {
 
@@ -39,5 +41,16 @@ public class ObligationsService extends Service {
 
     public List<Obligation> getEnabled(UserContext userCtx) {
         return getPAP().getObligationsPAP().getEnabled();
+    }
+
+    public void reset(UserContext userCtx) {
+        List<Obligation> obligations = getAll(userCtx);
+        Set<String> labels = new HashSet<String>();
+        for (Obligation obli: obligations) {
+            labels.add(obli.getLabel());
+        }
+        for (String label: labels) {
+            delete(userCtx, label);
+        }
     }
 }

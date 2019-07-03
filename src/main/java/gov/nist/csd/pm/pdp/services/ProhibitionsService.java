@@ -8,7 +8,9 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static gov.nist.csd.pm.common.Operations.CREATE_PROHIBITION;
 import static gov.nist.csd.pm.common.Operations.PROHIBIT_SUBJECT;
@@ -110,5 +112,16 @@ public class ProhibitionsService extends Service {
 
         //delete prohibition in PAP
         getProhibitionsPAP().delete(prohibitionName);
+    }
+
+    public void reset() throws PMException {
+        List<Prohibition> prohibitions = getProhibitions();
+        Set<String> names = new HashSet<>();
+        for (Prohibition prohib: prohibitions) {
+            names.add(prohib.getName());
+        }
+        for (String name: names) {
+            deleteProhibition(name);
+        }
     }
 }

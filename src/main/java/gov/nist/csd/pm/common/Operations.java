@@ -36,6 +36,7 @@ public class Operations {
     public static final String GET_ASSOCIATIONS           = "get associations";
     public static final String ALL_OPERATIONS             = "*";
     public static final String ANY_OPERATIONS             = "any";
+    public static final String RESET                      = "reset";
     public static final String GET_PERMISSIONS            = "get permissions";
     public static final String CREATE_PROHIBITION         = "create prohibition";
     public static final String GET_ACCESSIBLE_CHILDREN    = "get accessible children";
@@ -74,7 +75,8 @@ public class Operations {
             GET_PROHIBITED_OPS,
             GET_ACCESSIBLE_NODES,
             PROHIBIT_SUBJECT,
-            PROHIBIT_RESOURCE
+            PROHIBIT_RESOURCE,
+            RESET
     ));
 
     private static final Set<String> resource = new HashSet<>(Arrays.asList(
