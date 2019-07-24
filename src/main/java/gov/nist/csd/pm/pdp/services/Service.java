@@ -4,7 +4,9 @@ import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.pdp.decider.MemProhibitionDecider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
+import gov.nist.csd.pm.pdp.decider.ProhibitionDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
@@ -59,7 +61,7 @@ public class Service {
     }
 
     protected boolean hasPermissions(UserContext userCtx, long targetID, String ... permissions) throws PMException {
-        /*Decider decider = new PReviewDecider(pap.getGraphPAP());
+        Decider decider = new PReviewDecider(pap.getGraphPAP());
         ProhibitionDecider prohibitionDecider = new MemProhibitionDecider(pap.getGraphPAP(), pap.getProhibitionsPAP().getAll());
 
         Set<String> perms = decider.listPermissions(userCtx.getUserID(), targetID);
@@ -78,7 +80,6 @@ public class Service {
             return true;
         } else {
             return !perms.isEmpty() && perms.containsAll(Arrays.asList(permissions));
-        }*/
-        return true;
+        }
     }
 }

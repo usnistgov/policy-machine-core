@@ -12,17 +12,11 @@ import java.util.Set;
  */
 public class Prohibition {
 
-    private String      name;
-    private Subject     subject;
-    private List<Node>  nodes;
+    private String          name;
+    private Subject         subject;
+    private List<Node>      nodes;
     private Set<String> operations;
-    private boolean     intersection;
-
-    public Prohibition(String name, Subject subject) {
-        this.name = name;
-        this.subject = subject;
-        this.nodes = new ArrayList<>();
-    }
+    private boolean         intersection;
 
     public Prohibition() {
         this.nodes = new ArrayList<>();
@@ -169,7 +163,7 @@ public class Prohibition {
     }
 
     public static class Node {
-        long    id;
+        long id;
         boolean complement;
 
         public Node(long id, boolean complement) {
@@ -186,11 +180,11 @@ public class Prohibition {
         }
 
         public boolean equals(Object o) {
-            if (!(o instanceof Node)) {
+            if(!(o instanceof Node)) {
                 return false;
             }
 
-            Node node = (Node) o;
+            Node node = (Node)o;
             return this.getID() == node.getID();
         }
 
