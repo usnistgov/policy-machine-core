@@ -10,6 +10,7 @@ import java.util.List;
  * Prohibition service in the PDP will also implement this interface as well as any implementations in the PAP.
  */
 public interface Prohibitions {
+
     /**
      * Create a new prohibition.
      *
@@ -34,6 +35,14 @@ public interface Prohibitions {
      * @throws PMException if there is an error getting the prohibition with the given name.
      */
     Prohibition get(String prohibitionName) throws PMException;
+
+    /**
+     * Get all of the prohibitions a given entity is the direct subject of.  The subject can be a user, user attribute,
+     * or process.
+     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @return The list of prohibitions the given entity is the subject of.
+     */
+    List<Prohibition> getProhibitionsFor(long subjectID) throws PMException;
 
     /**
      * Update the given prohibition.  The name of the prohibition is provided in the parameter.

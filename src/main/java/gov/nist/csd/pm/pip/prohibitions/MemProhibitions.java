@@ -4,22 +4,19 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An in memory implementation of the Prohibitions interface, that stores prohibitions in a list.
  */
 public class MemProhibitions implements Prohibitions {
 
-    /**
-     * Data structure to store prohibitions.
-     */
-    public List<Prohibition> prohibitions;
+    private Map<Long, List<Prohibition>> prohibitions;
 
     public MemProhibitions() {
-        this.prohibitions = new ArrayList<>();
+        this.prohibitions = new HashMap<>();
     }
 
     /**
@@ -43,7 +40,10 @@ public class MemProhibitions implements Prohibitions {
             throw new IllegalArgumentException("a null subject was provided when creating a prohibition");
         }
 
-        prohibitions.add(prohibition);
+        long subjectID = prohibition.getSubject().getSubjectID();
+        List<Prohibition> exPros = this.prohibitions.getOrDefault(subjectID, new ArrayList<>());
+        exPros.add(prohibition);
+        this.prohibitions.put(subjectID, exPros);
     }
 
     /**
@@ -51,7 +51,11 @@ public class MemProhibitions implements Prohibitions {
      */
     @Override
     public List<Prohibition> getAll() {
-        return prohibitions;
+        List<Prohibition> pros = new ArrayList<>();
+        for(List<Prohibition> p : prohibitions.values()) {
+            pros.addAll(p);
+        }
+        return pros;
     }
 
     /**
@@ -60,12 +64,24 @@ public class MemProhibitions implements Prohibitions {
      */
     @Override
     public Prohibition get(String prohibitionName) throws PMException {
-        for (Prohibition prohibition : prohibitions) {
-            if (prohibition.getName().equals(prohibitionName)) {
-                return prohibition;
+        for (List<Prohibition> ps : prohibitions.values()) {
+            for(Prohibition p : ps) {
+                if(p.getName().equalsIgnoreCase(prohibitionName)) {
+                    return p;
+                }
             }
         }
         throw new PMException(String.format("a prohibition does not exist with the name %s", prohibitionName));
+    }
+
+    /**
+     * Get the Prohibitions the given subject is the direct subject of.
+     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @return a list of Prohibitions the given entity is the subject of.
+     */
+    @Override
+    public List<Prohibition> getProhibitionsFor(long subjectID) {
+        return prohibitions.getOrDefault(subjectID, new ArrayList<>());
     }
 
     /**
@@ -97,15 +113,14 @@ public class MemProhibitions implements Prohibitions {
      */
     @Override
     public void delete(String prohibitionName) {
-        prohibitions.removeIf((prohibition) -> prohibition.getName().equals(prohibitionName));
-    }
-
-    public static void main(String[] args) {
-        Prohibition prohibition = new Prohibition();
-        prohibition.setName("denyName");
-        prohibition.setIntersection(true);
-        prohibition.setOperations(new HashSet<>(Arrays.asList("read", "write")));
-        prohibition.setSubject(new Prohibition.Subject(1234, Prohibition.Subject.Type.USER));
-        prohibition.addNode(new Prohibition.Node(4321, false));
+        for(Long subjectID : prohibitions.keySet()) {
+            List<Prohibition> ps = prohibitions.get(subjectID);
+            for(Prohibition p : ps) {
+                if(p.getName().equals(prohibitionName)) {
+                    ps.remove(p);
+                    prohibitions.put(subjectID, ps);
+                }
+            }
+        }
     }
 }
