@@ -13,10 +13,7 @@ import java.util.Map;
  */
 public class MemProhibitions implements Prohibitions {
 
-    /**
-     * Data structure to store prohibitions.
-     */
-    public Map<Long, List<Prohibition>> prohibitions;
+    private Map<Long, List<Prohibition>> prohibitions;
 
     public MemProhibitions() {
         this.prohibitions = new HashMap<>();
@@ -77,8 +74,13 @@ public class MemProhibitions implements Prohibitions {
         throw new PMException(String.format("a prohibition does not exist with the name %s", prohibitionName));
     }
 
+    /**
+     * Get the Prohibitions the given subject is the direct subject of.
+     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @return a list of Prohibitions the given entity is the subject of.
+     */
     @Override
-    public List<Prohibition> getProhibitionsFor(long subjectID) throws PMException {
+    public List<Prohibition> getProhibitionsFor(long subjectID) {
         return prohibitions.getOrDefault(subjectID, new ArrayList<>());
     }
 
