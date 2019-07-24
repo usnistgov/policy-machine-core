@@ -121,4 +121,13 @@ public class MemProhibitions implements Prohibitions {
             }
         }
     }
+
+    public static void main(String[] args) {
+        Prohibition prohibition = new Prohibition();
+        prohibition.setName("denyName");
+        prohibition.setIntersection(true);
+        prohibition.setOperations(new HashSet<>(Arrays.asList("read", "write")));
+        prohibition.setSubject(new Prohibition.Subject(1234, Prohibition.Subject.Type.USER));
+        prohibition.addNode(new Prohibition.Node(4321, false));
+    }
 }

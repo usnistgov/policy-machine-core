@@ -37,6 +37,12 @@ class FunctionEvaluator {
             case "current_user":
                 ret = eval_current_user(pdp, userID);
                 break;
+            case "current_user_to_deny_subject":
+                ret = eval_current_user_to_deny_subject(userID);
+                break;
+            case "current_process_to_deny_subject":
+                ret = eval_current_process_to_deny_subject(userID);
+                break;
             case "current_user_name":
                 ret = eval_current_user_name(pdp, userID);
                 break;
@@ -206,6 +212,14 @@ class FunctionEvaluator {
 
     private static List<Node> eval_current_user(PDP pdp, long userID) throws PMException {
         return Arrays.asList(pdp.getPAP().getGraphPAP().getNode(userID));
+    }
+
+    private static Prohibition.Subject eval_current_user_to_deny_subject(long userID) throws PMException {
+        return new Prohibition.Subject(userID, Prohibition.Subject.Type.USER);
+    }
+
+    private static Prohibition.Subject eval_current_process_to_deny_subject(long processID) throws PMException {
+        return new Prohibition.Subject(processID, Prohibition.Subject.Type.PROCESS);
     }
 
     private static String eval_current_user_name(PDP pdp, long userID) throws PMException {

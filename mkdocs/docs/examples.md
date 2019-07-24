@@ -1,5 +1,3 @@
-## Examples
-
 ### Serialization
 #### Graph
 Serialize a graph into a json string.
@@ -118,8 +116,10 @@ graph.assign(user2Node.getID(), branches1UANode.getID());
 // 17. Create an association between the `branch 1` user attribute and the `branch 1` object attribute.
 //This will give both users read and write on `o1` under the `branches` policy class.
 graph.associate(branches1UANode.getID(), branch1OANode.getID(), new HashSet<>(Arrays.asList("r", "w")));
+```
 
-
+To make access decisions:
+```
 // 18. Test the configuration using the `PReviewDecider` implementation of the `Decider` interface.
 //The constructor for a `PReviewDecider` receives the graph we created and a list of prohibitions.
 //Since no prohibitions are used in this example, we'll pass null.

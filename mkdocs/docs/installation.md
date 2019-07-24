@@ -22,3 +22,6 @@ Then, add the maven dependency
 </dependency>
 ```
 That's it, now the policy-machine-core library will be available for use!
+
+## Releases
+View the policy-machine-core releases on [github](https://github.com/PM-Master/policy-machine-core/releases)
