@@ -3,10 +3,7 @@ package gov.nist.csd.pm.pip.prohibitions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An in memory implementation of the Prohibitions interface, that stores prohibitions in a list.
@@ -115,9 +112,11 @@ public class MemProhibitions implements Prohibitions {
     public void delete(String prohibitionName) {
         for(Long subjectID : prohibitions.keySet()) {
             List<Prohibition> ps = prohibitions.get(subjectID);
-            for(Prohibition p : ps) {
+            Iterator<Prohibition> iterator = ps.iterator();
+            while (iterator.hasNext()) {
+                Prohibition p = iterator.next();
                 if(p.getName().equals(prohibitionName)) {
-                    ps.remove(p);
+                    iterator.remove();
                     prohibitions.put(subjectID, ps);
                 }
             }
