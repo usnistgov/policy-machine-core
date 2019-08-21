@@ -143,6 +143,8 @@ public class GraphService extends Service {
         getPAP().getGraphPAP().assign(pcUANode.getID(), pcNode.getID());
         // assign PC OA to PC
         getPAP().getGraphPAP().assign(pcOANode.getID(), pcNode.getID());
+        // assign Super U to PC UA
+        getPAP().getGraphPAP().assign(SuperGraph.getSuperU().getID(), pcUANode.getID());
         // assign super UA to PC
         getPAP().getGraphPAP().assign(SuperGraph.getSuperUA1().getID(), pcNode.getID());
         // associate Super UA and PC UA
