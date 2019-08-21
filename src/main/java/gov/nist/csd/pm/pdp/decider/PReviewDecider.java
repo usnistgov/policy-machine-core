@@ -137,6 +137,36 @@ public class PReviewDecider implements Decider {
         return results;
     }
 
+    @Override
+    public Map<Long, Set<String>> generateACL(long oaID, long processID) {
+        Map<Long, Set<String>> currNodes = new HashMap<>();
+        try {
+            Map<Long, Set<String>> targetAssociations = graph.getTargetAssociations(oaID);
+            for (long id: targetAssociations.keySet()) {
+                generateACLRecursiveHelper(id, targetAssociations.get(id), targetAssociations, currNodes);
+            }
+        } catch (PMException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return currNodes;
+    }
+
+    private void generateACLRecursiveHelper (long id, Set<String> perms, Map<Long, Set<String>> targetAssociations, Map<Long, Set<String>> nodesWPerms) throws PMException {
+        if (nodesWPerms.get(id) == null) {
+            nodesWPerms.put(id, perms);
+            for (Long childID: graph.getChildren(id)) {
+                HashSet<String> childPerms = new HashSet<>(perms);
+                Set<String> fromAssoc = targetAssociations.get(childID);
+                if (fromAssoc != null) {
+                    childPerms.addAll(fromAssoc);
+                }
+                System.out.println(childPerms);
+                generateACLRecursiveHelper(childID, childPerms, targetAssociations, nodesWPerms);
+            }
+        }
+    }
+
     private HashSet<String> resolvePermissions(UserContext userContext, TargetContext targetCtx) throws PMException {
         Map<Long, Set<String>> pcMap = targetCtx.getPcSet();
 

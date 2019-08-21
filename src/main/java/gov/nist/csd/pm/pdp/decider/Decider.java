@@ -68,6 +68,15 @@ public interface Decider {
      * @throws PMException if there is an error traversing the graph.
      */
     Map<Long, Set<String>> getAccessibleNodes(long userID, long processID) throws PMException;
+
+    /**
+     * Given an Object Attribute ID, returns the id of every user id (long), and what permissions(Set<String>) it has on it
+     *
+     * @param oaID
+     * @param processID
+     * @return
+     */
+    Map<Long, Set<String>> generateACL(long oaID, long processID);
 }
 
 
