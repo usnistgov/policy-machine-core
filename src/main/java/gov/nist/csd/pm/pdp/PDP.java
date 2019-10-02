@@ -18,7 +18,7 @@ public class PDP {
     private AnalyticsService    analyticsService;
     private ObligationsService  obligationsService;
 
-    public PDP(PAP pap) {
+    public PDP(PAP pap) throws PMException {
         this.pap = pap;
         this.epp = new EPP(this);
 

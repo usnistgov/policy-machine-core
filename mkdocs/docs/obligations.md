@@ -1,5 +1,5 @@
 # Obligations
-Obligations are defined using a yaml syntax described below.
+Obligations are defined using a yaml syntax described below. Examples can be found [here](#examples).
 
 ## Common Elements
 ### Nodes
@@ -102,7 +102,7 @@ The policy class specification can specify a particular policy class with a give
 _Example_
 ```yaml
 ###
-policyClass: # a;; policy class
+policyClass: # any policy class
 ###
 policyClass: # PC1 or PC2
   anyOf:
@@ -182,8 +182,9 @@ condition:
 
 ### Create Action
 Create
-1. A rule
-2. A set of nodes and assign them to a set of containers
+
+  - A rule
+  - A set of nodes and assignments to containers
 #### rule
 ```yaml
 create:
@@ -233,7 +234,7 @@ The operations are an array of string.  The target of the deny can be the inters
 
 ```yaml
 deny:
-  subject: priority goes 1. function, 2. process, 3. node
+  subject: # priority goes 1. function, 2. process, 3. node
    function:
    ---
    process:
@@ -245,14 +246,14 @@ deny:
    - ""
    - ""
  target:
-   complement: true|false, default false
-   intersection: true|false, default false
+   complement: # true|false, default false
+   intersection: # true|false, default false
    containers:
      - name:
        type:
-       complement: true|false, default false
+       complement: # true|false, default false
      - function:
-       complement: true|false
+       complement: # true|false
 ```
 
 ### Delete Action
@@ -270,13 +271,11 @@ delete:
   assign:
   grant:
   deny:
-``` s
-
-
+```
 
 ## Functions
 ### Predefined Functions
 1. current_user
 2. current_process
-### How to add a function
-## How to Extend the Event Pattern
+
+## Examples

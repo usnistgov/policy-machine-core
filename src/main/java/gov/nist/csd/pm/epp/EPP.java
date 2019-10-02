@@ -1,16 +1,18 @@
 package gov.nist.csd.pm.epp;
 
-
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.obligations.MemObligations;
 import gov.nist.csd.pm.pip.obligations.model.*;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -19,12 +21,18 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
 
 public class EPP {
 
+    public static void main(String[] args) throws PMException {
+        EPP epp = new EPP(new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations())));
+    }
+
     private PAP pap;
     private PDP pdp;
+    private FunctionEvaluator functionEvaluator;
 
-    public EPP(PDP pdp) {
+    public EPP(PDP pdp) throws PMException {
         this.pap = pdp.getPAP();
         this.pdp = pdp;
+        this.functionEvaluator = new FunctionEvaluator();
     }
 
     public PAP getPAP() {
@@ -82,7 +90,7 @@ public class EPP {
 
         List<Function> functions = condition.getCondition();
         for(Function f : functions) {
-            boolean result = (boolean) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, f);
+            boolean result = functionEvaluator.evalBool(eventCtx, userID, processID, pdp, f);
             if(!result) {
                 return false;
             }
@@ -238,8 +246,8 @@ public class EPP {
         Set<Node> subjectNodes = new HashSet<>();
         for(EvrNode subject : subjects) {
             if(subject.getFunction() != null) {
-                List<Node> nodes = (List<Node>) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, subject.getFunction());
-                subjectNodes.addAll(nodes);
+                Node node = (Node) functionEvaluator.evalNodeList(eventCtx, userID, processID, pdp, subject.getFunction());
+                subjectNodes.add(node);
             } else {
                 subjectNodes.addAll(getNodes(subject.getName(), subject.getType(), subject.getProperties()));
             }
@@ -248,8 +256,8 @@ public class EPP {
         Set<Node> targetNodes = new HashSet<>();
         for(EvrNode target : targets) {
             if(target.getFunction() != null) {
-                List<Node> nodes = (List<Node>) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, target.getFunction());
-                targetNodes.addAll(nodes);
+                Node node = (Node) functionEvaluator.evalNodeList(eventCtx, userID, processID, pdp, target.getFunction());
+                targetNodes.add(node);
             } else {
                 targetNodes.addAll(getNodes(target.getName(), target.getType(), target.getProperties()));
             }
@@ -292,7 +300,7 @@ public class EPP {
         for(DenyAction.Target.Container container : containers) {
             if(container.getFunction() != null) {
                 Function function = container.getFunction();
-                Object result = FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
+                Object result = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
 
                 if(!(result instanceof Prohibition.Node)) {
                     throw new PMException("expected function to return a Prohibition.Node but got " + result.getClass().getName());
@@ -321,7 +329,7 @@ public class EPP {
 
         if(subject.getFunction() != null) {
             Function function = subject.getFunction();
-            denySubject = (Prohibition.Subject) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
+            denySubject = functionEvaluator.evalProhibitionSubject(eventCtx, userID, processID, pdp, function);
         } else if(subject.getProcess() != null) {
             denySubject = new Prohibition.Subject(subject.getProcess().getValue(), Prohibition.Subject.Type.PROCESS);
         } else {
@@ -422,8 +430,12 @@ public class EPP {
         for(EvrNode evrNode : subjects) {
             Function function = evrNode.getFunction();
             if(function != null) {
-                List list = (List) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
-                subjectNodes.addAll(list);
+                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
+                if (o instanceof List) {
+                    subjectNodes.addAll((List)o);
+                } else if (o instanceof Node) {
+                    subjectNodes.add((Node)o);
+                }
             } else {
                 Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
                 subjectNodes.addAll(nodes);
@@ -435,7 +447,7 @@ public class EPP {
         for(EvrNode evrNode : targets) {
             Function function = evrNode.getFunction();
             if(function != null) {
-                List list = (List) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
+                List list = (List) functionEvaluator.evalNodeList(eventCtx, userID, processID, pdp, function);
                 targetNodes.addAll(list);
             } else {
                 Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
@@ -464,11 +476,7 @@ public class EPP {
             Node childNode;
             if (evrNode.getFunction() != null) {
                 Function function = evrNode.getFunction();
-                List list = (List) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
-            /*if(!(o instanceof Node)) {
-                throw new PMException("expected a Node for the \"what\" of the assignment to delete");
-            }*/
-                childNode = (Node) list.iterator().next();
+                childNode = (Node) functionEvaluator.evalNode(eventCtx, userID, processID, pdp, function);
             }
             else {
                 // get the child node
@@ -486,8 +494,12 @@ public class EPP {
         for(EvrNode evrNode : where) {
             if(evrNode.getFunction() != null) {
                 Function function = evrNode.getFunction();
-                List list = (List)FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
-                parents.addAll(list);
+                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
+                if (o instanceof List) {
+                    parents.addAll((List)o);
+                } else if (o instanceof Node) {
+                    parents.add((Node)o);
+                }
             } else {
                 Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
                 parents.addAll(nodes);
@@ -518,7 +530,7 @@ public class EPP {
         for(EvrNode evrNode : what) {
             if (evrNode.getFunction() != null) {
                 Function function = evrNode.getFunction();
-                FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
+                functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
             }
             else if (action.getRule() != null) {
             /*List<Obligation> obligations = pap.getObligationsPAP().getAll();
@@ -547,10 +559,8 @@ public class EPP {
             List<Node> whatNodes = new ArrayList<>();
             for(EvrNode evrNode : what) {
                 if (evrNode.getFunction() != null) {
-                    Node node = (Node) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, evrNode.getFunction());
-                    Node n = pap.getGraphPAP()
-                            .createNode(new Random().nextLong(), node.getName(), node.getType(), node.getProperties());
-                    whatNodes.add(n);
+                    Node node = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, evrNode.getFunction());
+                    whatNodes.add(node);
                 }
                 else {
                     Node n = pap.getGraphPAP().createNode(new Random().nextLong(), evrNode.getName(), NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
@@ -562,8 +572,12 @@ public class EPP {
             for(EvrNode evrNode : where) {
                 if(evrNode.getFunction() != null) {
                     Function function = evrNode.getFunction();
-                    List list = (List)FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
-                    whereNodes.addAll(list);
+                    Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
+                    if (o instanceof List) {
+                        whatNodes.addAll((List)o);
+                    } else if (o instanceof Node) {
+                        whatNodes.add((Node)o);
+                    }
                 } else {
                     Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
                     whereNodes.addAll(nodes);
@@ -593,9 +607,11 @@ public class EPP {
         List<Node> whatNodes = new ArrayList<>();
         for(EvrNode evrNode : what) {
             if (evrNode.getFunction() != null) {
-                List list = (List) FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, evrNode.getFunction());
-                if(!list.isEmpty()) {
-                    whatNodes.add((Node) list.get(0));
+                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, evrNode.getFunction());
+                if (o instanceof List) {
+                    whatNodes.addAll((List)o);
+                } else if (o instanceof Node) {
+                    whatNodes.add((Node)o);
                 }
             }
             else {
@@ -608,8 +624,12 @@ public class EPP {
         for(EvrNode evrNode : where) {
             if(evrNode.getFunction() != null) {
                 Function function = evrNode.getFunction();
-                List list = (List)FunctionEvaluator.evalFunc(eventCtx, userID, processID, pdp, function);
-                whereNodes.addAll(list);
+                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
+                if (o instanceof List) {
+                    whatNodes.addAll((List)o);
+                } else if (o instanceof Node) {
+                    whatNodes.add((Node)o);
+                }
             } else {
                 Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
                 whereNodes.addAll(nodes);
