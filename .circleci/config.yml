@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+
+    working_directory: ~/policy-machine-core
+
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+
+    steps:
+      - checkout # check out source code to working directory
+      - run: mvn dependency:go-offline # gets the project dependencies
+      - run: mvn package # run the actual tests
