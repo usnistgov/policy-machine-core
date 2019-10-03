@@ -27,18 +27,18 @@ public class Service {
      * @param pap the Policy Administration Point
      * @param epp the Event Processing Point
      */
-    public Service(PAP pap, EPP epp) {
+    Service(PAP pap, EPP epp) {
         this.pap = pap;
         this.epp = epp;
     }
 
     private Service() {}
 
-    protected EPP getEPP() {
+    EPP getEPP() {
         return this.epp;
     }
 
-    protected PAP getPAP() {
+    PAP getPAP() {
         return this.pap;
     }
 
@@ -58,15 +58,9 @@ public class Service {
         return new PReviewDecider(getGraphPAP());
     }
 
-    protected boolean hasPermissions(UserContext userCtx, long targetID, String ... permissions) throws PMException {
-        /*Decider decider = new PReviewDecider(pap.getGraphPAP());
-        ProhibitionDecider prohibitionDecider = new MemProhibitionDecider(pap.getGraphPAP(), pap.getProhibitionsPAP().getAll());
-
-        Set<String> perms = decider.listPermissions(userCtx.getUserID(), targetID);
-        Set<String> deniedPerms = prohibitionDecider.listProhibitedPermissions(userCtx.getUserID(), targetID);
-        perms.removeAll(deniedPerms);
-        deniedPerms = prohibitionDecider.listProhibitedPermissions(userCtx.getProcessID(), targetID);
-        perms.removeAll(deniedPerms);
+    boolean hasPermissions(UserContext userCtx, long targetID, String... permissions) throws PMException {
+        Decider decider = new PReviewDecider(pap.getGraphPAP(), pap.getProhibitionsPAP());
+        Set<String> perms = decider.list(userCtx.getUserID(), userCtx.getProcessID(), targetID);
 
         for(String p : permissions) {
             if(p.equals(ANY_OPERATIONS)) {
@@ -78,7 +72,6 @@ public class Service {
             return true;
         } else {
             return !perms.isEmpty() && perms.containsAll(Arrays.asList(permissions));
-        }*/
-        return true;
+        }
     }
 }

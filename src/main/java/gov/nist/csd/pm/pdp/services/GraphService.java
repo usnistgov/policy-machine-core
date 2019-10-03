@@ -666,16 +666,16 @@ public class GraphService extends Service {
 
         // check that the user can reset the graph
         if (!hasPermissions(userCtx, SuperGraph.getSuperO().getID(), RESET)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+            throw new PMAuthorizationException("unauthorized permissions to reset the graph");
         }
 
-        Set<Node> nodes = getNodes(userCtx);
+        Collection<Node> nodes = getGraphPAP().getNodes();
         Set<Long> ids = new HashSet<>();
         for (Node node: nodes) {
             ids.add(node.getID());
         }
         for (long id: ids) {
-            deleteNode(userCtx, id);
+            getGraphPAP().deleteNode(id);
         }
     }
 }
