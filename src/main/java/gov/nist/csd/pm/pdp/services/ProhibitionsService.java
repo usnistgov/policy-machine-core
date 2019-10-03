@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.SuperGraph;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -12,8 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static gov.nist.csd.pm.common.Operations.CREATE_PROHIBITION;
-import static gov.nist.csd.pm.common.Operations.PROHIBIT_SUBJECT;
+import static gov.nist.csd.pm.common.Operations.*;
 
 public class ProhibitionsService extends Service {
 
@@ -114,13 +114,22 @@ public class ProhibitionsService extends Service {
         getProhibitionsPAP().delete(prohibitionName);
     }
 
-    public void reset() throws PMException {
+    public void reset(UserContext userCtx) throws PMException {
+        if(userCtx == null) {
+            throw new PMException("no user context provided to the PDP");
+        }
+
+        // check that the user can reset the graph
+        if (!hasPermissions(userCtx, SuperGraph.getSuperO().getID(), RESET)) {
+            throw new PMAuthorizationException("unauthorized permissions to reset the graph");
+        }
+
         List<Prohibition> prohibitions = getProhibitions();
         Set<String> names = new HashSet<>();
-        for (Prohibition prohib: prohibitions) {
+        for (Prohibition prohib : prohibitions) {
             names.add(prohib.getName());
         }
-        for (String name: names) {
+        for (String name : names) {
             deleteProhibition(name);
         }
     }
