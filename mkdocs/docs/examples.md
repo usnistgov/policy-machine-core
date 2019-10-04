@@ -346,3 +346,64 @@ policyClasses:
       - u1-branch 1-branch 1-o1 ops=[r, w]
 
 ```
+
+### Obligations
+
+#### Obligation YAML
+The below obligation yaml creates a rule that when any user assigns anything to oa1, create a new node called "new OA"
+and assign it to oa1 **if** the node o1 is assigned to oa1.
+
+```yaml
+label: test
+rules:
+  - label: rule1
+    event:
+      subject:
+      operations:
+        - assign to
+      target:
+        policyElements:
+          - name: oa1
+            type: OA
+    response:
+      condition:
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - o1
+                    - O
+              - function:
+                  name: get_node
+                  args:
+                    - oa1
+                    - OA
+      actions:
+        - create:
+            what:
+              - name: new OA
+                type: OA
+                properties:
+                  k: v
+            where:
+              - name: oa1
+                type: OA
+```
+
+#### Loading Obligation
+
+```java
+InputStream is = getClass().getClassLoader().getResourceAsStream("obligation.yml");
+Obligation obligation = EVRParser.parse(is);
+
+Obligations obligations = new MemObligations();
+// add the obligation and enable it
+pdp.getPAP().getObligationsPAP().add(obligation, true);
+```
+
+#### Processing Event
+```java
+pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), userID, processID);
+```

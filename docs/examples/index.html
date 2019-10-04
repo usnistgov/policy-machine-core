@@ -376,6 +376,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#obligations" class="md-nav__link">
+    Obligations
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obligation-yaml" class="md-nav__link">
+    Obligation YAML
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loading-obligation" class="md-nav__link">
+    Loading Obligation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processing-event" class="md-nav__link">
+    Processing Event
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
       
       
       
@@ -530,6 +564,40 @@
           <li class="md-nav__item">
   <a href="#explain" class="md-nav__link">
     Explain
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#obligations" class="md-nav__link">
+    Obligations
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obligation-yaml" class="md-nav__link">
+    Obligation YAML
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loading-obligation" class="md-nav__link">
+    Loading Obligation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processing-event" class="md-nav__link">
+    Processing Event
   </a>
   
 </li>
@@ -901,6 +969,61 @@ policyClasses:
     paths:
       - u1-branch 1-branch 1-o1 ops=[r, w]
 
+</code></pre>
+
+<h3 id="obligations">Obligations</h3>
+<h4 id="obligation-yaml">Obligation YAML</h4>
+<p>The below obligation yaml creates a rule that when any user assigns anything to oa1, create a new node called "new OA"
+and assign it to oa1 <strong>if</strong> the node o1 is assigned to oa1.</p>
+<pre><code class="yaml">label: test
+rules:
+  - label: rule1
+    event:
+      subject:
+      operations:
+        - assign to
+      target:
+        policyElements:
+          - name: oa1
+            type: OA
+    response:
+      condition:
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - o1
+                    - O
+              - function:
+                  name: get_node
+                  args:
+                    - oa1
+                    - OA
+      actions:
+        - create:
+            what:
+              - name: new OA
+                type: OA
+                properties:
+                  k: v
+            where:
+              - name: oa1
+                type: OA
+</code></pre>
+
+<h4 id="loading-obligation">Loading Obligation</h4>
+<pre><code class="java">InputStream is = getClass().getClassLoader().getResourceAsStream(&quot;obligation.yml&quot;);
+Obligation obligation = EVRParser.parse(is);
+
+Obligations obligations = new MemObligations();
+// add the obligation and enable it
+pdp.getPAP().getObligationsPAP().add(obligation, true);
+</code></pre>
+
+<h4 id="processing-event">Processing Event</h4>
+<pre><code class="java">pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), userID, processID);
 </code></pre>
                 
                   
