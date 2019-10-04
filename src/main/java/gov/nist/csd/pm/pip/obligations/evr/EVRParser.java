@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pip.obligations.evr;
 
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.obligations.model.*;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
@@ -24,6 +25,13 @@ public class EVRParser {
         return type.cast(o);
     }
 
+    public static Obligation parse(String yml) throws EVRException {
+        Yaml yaml = new Yaml();
+        Map<Object, Object> map = yaml.load(yml);
+
+        return parse(map);
+    }
+
     /**
      * label: string required
      * rules: array
@@ -32,6 +40,10 @@ public class EVRParser {
         Yaml yaml = new Yaml();
         Map<Object, Object> map = yaml.load(is);
 
+        return parse(map);
+    }
+
+    public static Obligation parse(Map<Object, Object> map) throws EVRException {
         Obligation obligation = new Obligation();
 
         String label = getObject(map.get("label"), String.class);
@@ -76,14 +88,14 @@ public class EVRParser {
         if(!map.containsKey("event")) {
             throw new EVRException("no event provided at " + o);
         }
-        Event event = parseEvent(map.get("event"));
-        rule.setEvent(event);
+        EventPattern eventPattern = parseEvent(map.get("event"));
+        rule.setEventPattern(eventPattern);
 
         if(!map.containsKey("response")) {
             throw new EVRException("no response provided at " + o);
         }
-        Response response = parseResponse(map.get("response"));
-        rule.setResponse(response);
+        ResponsePattern responsePattern = parseResponse(map.get("response"));
+        rule.setResponsePattern(responsePattern);
 
         return rule;
     }
@@ -94,34 +106,34 @@ public class EVRParser {
      * operations: array if omitted any operation matches
      * target: object if omitted any target matches
      */
-    protected static Event parseEvent(Object o) throws EVRException {
+    protected static EventPattern parseEvent(Object o) throws EVRException {
         if(!(o instanceof Map)) {
             throw new EVRException("event should be a Map, got " + o.getClass() + " in " + o);
         }
 
         Map map = (Map)o;
-        Event event = new Event();
+        EventPattern eventPattern = new EventPattern();
         if(map.containsKey("subject")) {
             Subject subject = parseSubject(map.get("subject"));
-            event.setSubject(subject);
+            eventPattern.setSubject(subject);
         }
 
         if(map.containsKey("policyClass")) {
             PolicyClass policyClass = parsePolicyClass(map.get("policyClass"));
-            event.setPolicyClass(policyClass);
+            eventPattern.setPolicyClass(policyClass);
         }
 
         if(map.containsKey("operations")) {
             List<String> operations = parseOperations(map.get("operations"));
-            event.setOperations(operations);
+            eventPattern.setOperations(operations);
         }
 
         if(map.containsKey("target")) {
             Target target = parseTarget(map.get("target"));
-            event.setTarget(target);
+            eventPattern.setTarget(target);
         }
 
-        return event;
+        return eventPattern;
     }
 
     /**
@@ -151,7 +163,7 @@ public class EVRParser {
             return parseProcess(map.get("process"));
         }
 
-        throw new EVRException("invalid subject specification");
+        throw new EVRException("invalid subject specification " + map);
     }
 
     /**
@@ -310,13 +322,18 @@ public class EVRParser {
     }
 
     private static Subject parseSubjectAnyUser(Object o) throws EVRException {
-        List list = getObject(o, List.class);
         List<String> anyUser = new ArrayList<>();
+        Subject subject = new Subject(anyUser);
+        if (o == null) {
+            return subject;
+        }
+
+        List list = getObject(o, List.class);
         for(Object obj : list) {
             anyUser.add(getObject(obj, String.class));
         }
 
-        return new Subject(anyUser);
+        return subject;
     }
 
     private static Subject parseSubjectUser(Object o) throws EVRException {
@@ -326,26 +343,26 @@ public class EVRParser {
     /**
      * actions:
      */
-    protected static Response parseResponse(Object o) throws EVRException {
-        Response response = new Response();
+    protected static ResponsePattern parseResponse(Object o) throws EVRException {
+        ResponsePattern responsePattern = new ResponsePattern();
         if(o == null) {
-            return response;
+            return responsePattern;
         }
 
         Map responseMap = getObject(o, Map.class);
         if(responseMap.containsKey("condition")) {
-            response.setCondition(parseCondition(responseMap.get("condition")));
+            responsePattern.setCondition(parseCondition(responseMap.get("condition")));
         }
         if(responseMap.containsKey("actions")) {
             List actionsList = getObject(responseMap.get("actions"), List.class);
 
             for(Object a : actionsList) {
                 Map actionMap = getObject(a, Map.class);
-                response.addAction(parseAction(actionMap));
+                responsePattern.addAction(parseAction(actionMap));
             }
         }
 
-        return response;
+        return responsePattern;
     }
 
     /**
@@ -411,12 +428,12 @@ public class EVRParser {
         } else {
             String name = (String) map.get("name");
             if (name == null || name.isEmpty()) {
-                throw new EVRException("name cannot be null in create action at " + map);
+                throw new EVRException("name cannot be null at " + map);
             }
 
             String type = (String) map.get("type");
             if (type == null || type.isEmpty()) {
-                throw new EVRException("type cannot be null in create action at " + map);
+                throw new EVRException("type cannot be null at " + map);
             }
 
             Object propsObj = map.get("properties");
@@ -620,7 +637,9 @@ public class EVRParser {
         }
 
         Map denyActionMap = getObject(o, Map.class);
-        if(!denyActionMap.containsKey("subject")) {
+        if(!denyActionMap.containsKey("label")) {
+            throw new EVRException("deny action does not contain a \"label\" field in " + denyActionMap);
+        } else if(!denyActionMap.containsKey("subject")) {
             throw new EVRException("deny action does not contain a \"subject\" field in " + denyActionMap);
         } else if(!denyActionMap.containsKey("operations")) {
             throw new EVRException("deny action does not contain a \"operations\" field in " + denyActionMap);
@@ -629,6 +648,11 @@ public class EVRParser {
         }
 
         DenyAction action = new DenyAction();
+        Object label = denyActionMap.get("label");
+        if (label == null) {
+            label = UUID.randomUUID().toString();
+        }
+        action.setLabel((String) label);
 
         Map subjectMap = getObject(denyActionMap.get("subject"), Map.class);
         EvrNode evrNode = parseEvrNode(subjectMap);
@@ -735,13 +759,71 @@ public class EVRParser {
         DeleteAction action = new DeleteAction();
         Map deleteMap = getObject(o, Map.class);
         if(deleteMap.containsKey("create")) {
-            action.setAction(parseCreateAction(deleteMap.get("create")));
+            action.setAction(parseDeleteCreateAction(deleteMap.get("create")));
         } else if(deleteMap.containsKey("assign")) {
             action.setAction(parseAssignAction(deleteMap.get("assign")));
         } else if(deleteMap.containsKey("grant")) {
             action.setAction(parseGrantAction(deleteMap.get("grant")));
         } else if(deleteMap.containsKey("deny")) {
-            action.setAction(parseDenyAction(deleteMap.get("deny")));
+            action.setAction(parseDeleteDenyAction(deleteMap.get("deny")));
+        }
+
+        return action;
+    }
+
+    private static Action parseDeleteDenyAction(Object o) throws EVRException {
+        if (o == null) {
+            throw new EVRException("delete deny action was null");
+        }
+
+        Map denyActionMap = getObject(o, Map.class);
+        DenyAction denyAction = new DenyAction();
+        Object label = denyActionMap.get("label");
+        if (label == null) {
+            label = UUID.randomUUID().toString();
+        }
+        denyAction.setLabel((String) label);
+
+        return denyAction;
+    }
+
+    /**
+     * delete:
+     *   rule:
+     *     label: label to delete
+     * --
+     * delete:
+     *   create:
+     *     what:
+     */
+    private static Action parseDeleteCreateAction(Object o) throws EVRException {
+        if (o == null) {
+            throw new EVRException("delete create action was null");
+        }
+
+        CreateAction action = new CreateAction();
+        Map createActionMap = getObject(o, Map.class);
+        if(createActionMap.containsKey("rule")) {
+            Map ruleMap = getObject(createActionMap.get("rule"), Map.class);
+            if (!ruleMap.containsKey("label")) {
+                throw new EVRException("need a label to delete a rule: " + createActionMap);
+            }
+
+            Rule rule = new Rule();
+            rule.setLabel(getObject(ruleMap.get("label"), String.class));
+            action.setRule(new Rule());
+        } else {
+            if (!createActionMap.containsKey("what")) {
+                throw new EVRException("delete create action does not have a \"what\" field in " + createActionMap);
+            }
+
+            List whatList = getObject(createActionMap.get("what"), List.class);
+            List<EvrNode> whatNodes = new ArrayList<>();
+            for(Object whatObj : whatList) {
+                EvrNode node = parseEvrNode(getObject(whatObj, Map.class));
+                whatNodes.add(node);
+            }
+            action.setWhat(whatNodes);
         }
 
         return action;

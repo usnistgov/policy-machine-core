@@ -5,12 +5,12 @@ import gov.nist.csd.pm.pip.obligations.model.actions.Action;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Response {
+public class ResponsePattern {
 
     private Condition    condition;
     private List<Action> actions;
 
-    public Response() {
+    public ResponsePattern() {
         this.actions = new ArrayList<>();
     }
 

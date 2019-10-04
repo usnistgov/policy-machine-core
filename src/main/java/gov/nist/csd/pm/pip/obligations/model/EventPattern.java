@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pip.obligations.model;
 
 import java.util.List;
 
-public class Event {
+public class EventPattern {
     private Subject      subject;
     private PolicyClass  policyClass;
     private List<String> operations;

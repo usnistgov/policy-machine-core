@@ -2,13 +2,13 @@ package gov.nist.csd.pm.pip.obligations.model;
 
 public class Rule {
     private String label;
-    private Event event;
-    private Response response;
+    private EventPattern eventPattern;
+    private ResponsePattern responsePattern;
 
     public Rule() {
         this.label = "";
-        this.event = new Event();
-        this.response = new Response();
+        this.eventPattern = new EventPattern();
+        this.responsePattern = new ResponsePattern();
     }
 
     public String getLabel() {
@@ -19,19 +19,19 @@ public class Rule {
         this.label = label;
     }
 
-    public Event getEvent() {
-        return event;
+    public EventPattern getEventPattern() {
+        return eventPattern;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEventPattern(EventPattern eventPattern) {
+        this.eventPattern = eventPattern;
     }
 
-    public Response getResponse() {
-        return response;
+    public ResponsePattern getResponsePattern() {
+        return responsePattern;
     }
 
-    public void setResponse(Response response) {
-        this.response = response;
+    public void setResponsePattern(ResponsePattern responsePattern) {
+        this.responsePattern = responsePattern;
     }
 }

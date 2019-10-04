@@ -16,7 +16,8 @@ public class MemObligations implements Obligations {
     }
 
     @Override
-    public void add(Obligation obligation) {
+    public void add(Obligation obligation, boolean enable) {
+        obligation.setEnabled(true);
         obligations.put(obligation.getLabel(), obligation);
     }
 
