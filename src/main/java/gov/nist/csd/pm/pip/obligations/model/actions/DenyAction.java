@@ -7,9 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 public class DenyAction extends Action {
+    private String label;
     private EvrNode      subject;
     private List<String> operations;
     private Target       target;
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
     public EvrNode getSubject() {
         return subject;

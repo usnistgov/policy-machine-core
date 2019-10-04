@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import java.util.List;
 
 public interface Obligations {
-    void add(Obligation obligation) throws PMException;
+    void add(Obligation obligation, boolean enable) throws PMException;
 
     Obligation get(String label);
 

@@ -1,0 +1,70 @@
+label: event test
+rules:
+  - label: u1 assign to
+    event:
+      subject:
+        user: u1
+      operations:
+        - assign to
+      target:
+        policyElements:
+          - name: oa1
+            type: OA
+    response:
+      actions:
+        - create:
+            what:
+              - function:
+                  name: create_node
+                  args:
+                    - u1 assign to success
+                    - OA
+            where:
+              - name: pc1
+                type: PC
+  - label: anyUser assign
+    event:
+      subject:
+        anyUser:
+      operations:
+        - assign
+      target:
+        policyElements:
+          - name: o1
+            type: O
+    response:
+      actions:
+        - create:
+            what:
+              - function:
+                  name: create_node
+                  args:
+                    - anyUser assign success
+                    - OA
+            where:
+              - name: pc1
+                type: PC
+  - label: anyUser in list deassign
+    event:
+      subject:
+        anyUser:
+          - u1
+      operations:
+        - deassign
+      target:
+        policyElements:
+        containers:
+          - name: oa1
+            type: OA
+    response:
+      actions:
+        - create:
+            what:
+              - function:
+                  name: create_node
+                  args:
+                    - anyUser in list deassign success
+                    - OA
+            where:
+              - name: pc1
+                type: PC

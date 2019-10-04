@@ -19,8 +19,8 @@ public class ObligationsService extends Service {
         super(pap, epp);
     }
 
-    public void add(UserContext userCtx, Obligation obligation) throws PMException {
-        getPAP().getObligationsPAP().add(obligation);
+    public void add(UserContext userCtx, Obligation obligation, boolean enable) throws PMException {
+        getPAP().getObligationsPAP().add(obligation, enable);
     }
 
     public Obligation get(UserContext userCtx, String label) {

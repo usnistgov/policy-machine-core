@@ -1,5 +1,5 @@
 # Obligations
-Obligations are defined using a yaml syntax described below.
+Obligations are defined using a yaml syntax described below. Examples can be found [here](#examples).
 
 ## Common Elements
 ### Nodes
@@ -60,7 +60,7 @@ While the Policy Machine focuses on access events, it is possible to extend the 
 ```yaml
 subject:
   user:
-  any_user:
+  anyUser:
   process:
 ```
 The subject specification can be a user, any user, any user from a set of users and/or user attributes, or a process.  If the subject is omitted than all events will match this component of an access event.
@@ -70,7 +70,7 @@ A user is identified by it's name.
 
 #### any_user
 ```yaml
-any_user:
+anyUser:
 ```
 The `any_user` element accepts an array of strings representing user names.  If the element is empty then any user will match.
 
@@ -82,9 +82,9 @@ The `process` element accepts a number as a process ID.
 
 _Example:_
 ```yaml
-any_user: # any user
+anyUser: # any user
 ###
-any_user: # u1 or u2
+anyUser: # u1 or u2
   - "u1"
   - "u2"
 process: 12345
@@ -92,7 +92,7 @@ process: 12345
 
 ### Policy Class
 ```yaml
-policy_class:
+policyClass:
   anyOf:
   ---
   eachOf:
@@ -102,7 +102,7 @@ The policy class specification can specify a particular policy class with a give
 _Example_
 ```yaml
 ###
-policyClass: # a;; policy class
+policyClass: # any policy class
 ###
 policyClass: # PC1 or PC2
   anyOf:
@@ -118,7 +118,7 @@ policyClass: # PC1 and PC2
 ### Operations
 ```yaml
 operations:
-  - "operation_name"
+  - "op"
 ```
 The operations specification is a string array of operation names. Any event that matches an element of the array will match the operations event pattern.
 
@@ -182,8 +182,9 @@ condition:
 
 ### Create Action
 Create
-1. A rule
-2. A set of nodes and assign them to a set of containers
+
+  - A rule
+  - A set of nodes and assignments to containers
 #### rule
 ```yaml
 create:
@@ -233,7 +234,7 @@ The operations are an array of string.  The target of the deny can be the inters
 
 ```yaml
 deny:
-  subject: priority goes 1. function, 2. process, 3. node
+  subject: # priority goes 1. function, 2. process, 3. node
    function:
    ---
    process:
@@ -245,14 +246,14 @@ deny:
    - ""
    - ""
  target:
-   complement: true|false, default false
-   intersection: true|false, default false
+   complement: # true|false, default false
+   intersection: # true|false, default false
    containers:
      - name:
        type:
-       complement: true|false, default false
+       complement: # true|false, default false
      - function:
-       complement: true|false
+       complement: # true|false
 ```
 
 ### Delete Action
@@ -270,13 +271,11 @@ delete:
   assign:
   grant:
   deny:
-``` s
-
-
+```
 
 ## Functions
 ### Predefined Functions
 1. current_user
 2. current_process
-### How to add a function
-## How to Extend the Event Pattern
+
+## Examples
