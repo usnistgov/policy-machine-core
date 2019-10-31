@@ -51,9 +51,9 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public boolean check(long userID, long processID, long targetID, String... perms) throws PMException {
+    public boolean check(long subjectID, long processID, long targetID, String... perms) throws PMException {
         List<String> permsToCheck = Arrays.asList(perms);
-        Set<String> permissions = list(userID, processID, targetID);
+        Set<String> permissions = list(subjectID, processID, targetID);
 
         //if just checking for any operations, return true if the resulting permissions set is not empty.
         //if the resulting permissions set contains * or all operations, return true.
@@ -74,11 +74,11 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Set<String> list(long userID, long processID, long targetID) throws PMException {
+    public Set<String> list(long subjectID, long processID, long targetID) throws PMException {
         Set<String> perms = new HashSet<>();
 
         // traverse the user side of the graph to get the associations
-        UserContext userCtx = processUserDAG(userID, processID);
+        UserContext userCtx = processUserDAG(subjectID, processID);
         if (userCtx.getBorderTargets().isEmpty()) {
             return perms;
         }
@@ -91,10 +91,10 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Collection<Long> filter(long userID, long processID, Collection<Long> nodes, String... perms) {
+    public Collection<Long> filter(long subjectID, long processID, Collection<Long> nodes, String... perms) {
         nodes.removeIf(n -> {
             try {
-                return !check(userID, processID, n, perms);
+                return !check(subjectID, processID, n, perms);
             }
             catch (PMException e) {
                 return true;
@@ -104,28 +104,24 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Collection<Long> getChildren(long userID, long processID, long targetID, String... perms) throws PMException {
+    public Collection<Long> getChildren(long subjectID, long processID, long targetID, String... perms) throws PMException {
         Set<Long> children = graph.getChildren(targetID);
-        return filter(userID, processID, children, perms);
+        return filter(subjectID, processID, children, perms);
     }
 
     @Override
-    public synchronized Map<Long, Set<String>> getAccessibleNodes(long userID, long processID) throws PMException {
+    public synchronized Map<Long, Set<String>> getAccessibleNodes(long subjectID, long processID) throws PMException {
         Map<Long, Set<String>> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no OAs are reachable
-        UserContext userCtx = processUserDAG(userID, processID);
+        UserContext userCtx = processUserDAG(subjectID, processID);
         if (userCtx.getBorderTargets().isEmpty()) {
             return results;
         }
 
-        Set<Long> visited = new HashSet<>();
         for(Long borderTargetID : userCtx.getBorderTargets().keySet()) {
             Set<Long> objects = getAscendants(borderTargetID);
             for (Long objectID : objects) {
-                if(visited.contains(objectID)) {
-                    continue;
-                }
                 // run dfs on the object
                 TargetContext targetCtx = processTargetDAG(objectID, userCtx);
 
@@ -310,24 +306,30 @@ public class PReviewDecider implements Decider {
     }
 
     /**
-     * Find the target nodes that are reachable by the user via an Association. This is done by a breadth first search
-     * starting at the user node and walking up the user side of the graph until all user attributes the user is assigned
+     * Find the target nodes that are reachable by the subject via an association. This is done by a breadth first search
+     * starting at the subject node and walking up the user side of the graph until all user attributes the subject is assigned
      * to have been visited.  For each user attribute visited, get the associations it is the source of and store the
      * target of that association as well as the operations in a map. If a target node is reached multiple times, add any
      * new operations to the already existing ones.
      *
-     * @return a Map of target nodes that the user can reach via associations and the operations the user has on each.
+     * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
      */
-    private UserContext processUserDAG(long userID, long processID) throws PMException {
+    private UserContext processUserDAG(long subjectID, long processID) throws PMException {
         BreadthFirstSearcher searcher = new BreadthFirstSearcher(graph);
 
-        Node start = graph.getNode(userID);
+        Node start = graph.getNode(subjectID);
 
         final Map<Long, Set<String>> borderTargets = new HashMap<>();
         final Set<Prohibition> prohibitions = new HashSet<>();
         final Map<Long, List<Prohibition>> prohibitedTargets = getProhibitionTargets(processID);
         for(Long l : prohibitedTargets.keySet()) {
             prohibitions.addAll(prohibitedTargets.get(l));
+        }
+
+        // if the start node is an UA, get it's associations
+        if (start.getType() == UA) {
+            Map<Long, Set<String>> assocs = graph.getSourceAssociations(start.getID());
+            collectAssociations(assocs, borderTargets);
         }
 
         Visitor visitor = node -> {
@@ -344,7 +346,7 @@ public class PReviewDecider implements Decider {
                 prohibitions.addAll(pts.get(l));
             }
 
-            //get the parents of the user to start bfs on user side
+            //get the parents of the subject to start bfs on user side
             Set<Long> parents = graph.getParents(node.getID());
             while (!parents.isEmpty()) {
                 Long parentNode = parents.iterator().next();
@@ -353,19 +355,7 @@ public class PReviewDecider implements Decider {
                 Map<Long, Set<String>> assocs = graph.getSourceAssociations(parentNode);
 
                 //collect the target and operation information for each association
-                for (long targetID : assocs.keySet()) {
-                    Set<String> ops = assocs.get(targetID);
-                    Set<String> exOps = borderTargets.get(targetID);
-                    //if the target is not in the map already, put it
-                    //else add the found operations to the existing ones.
-                    if (exOps == null) {
-                        borderTargets.put(targetID, ops);
-                    }
-                    else {
-                        ops.addAll(exOps);
-                        borderTargets.put(targetID, ops);
-                    }
-                }
+                collectAssociations(assocs, borderTargets);
 
                 //add all of the current parent node's parents to the queue
                 parents.addAll(graph.getParents(parentNode));
@@ -382,6 +372,21 @@ public class PReviewDecider implements Decider {
         searcher.traverse(start, propagator, visitor);
 
         return new UserContext(borderTargets, prohibitedTargets, prohibitions);
+    }
+
+    private void collectAssociations(Map<Long, Set<String>> assocs, Map<Long, Set<String>> borderTargets) {
+        for (long targetID : assocs.keySet()) {
+            Set<String> ops = assocs.get(targetID);
+            Set<String> exOps = borderTargets.get(targetID);
+            //if the target is not in the map already, put it
+            //else add the found operations to the existing ones.
+            if (exOps == null) {
+                borderTargets.put(targetID, ops);
+            } else {
+                ops.addAll(exOps);
+                borderTargets.put(targetID, ops);
+            }
+        }
     }
 
     private Map<Long, List<Prohibition>> getProhibitionTargets(long subjectID) throws PMException {
