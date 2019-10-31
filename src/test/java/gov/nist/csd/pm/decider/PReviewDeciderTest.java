@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
@@ -50,16 +51,6 @@ class PReviewDeciderTest {
         PReviewDecider decider = new PReviewDecider(graph);
         assertTrue(decider.check(u1.getID(), 0, o1.getID(), "read", "write"));
     }
-
-    /*@Test
-    void testListPermissions() throws PMException {
-        for(TestCases.TestCase tc : TestCases.getTests()) {
-            PReviewDecider decider = new PReviewDecider(tc.getGraph(), tc.getProhibitions());
-            Set<String> result = decider.list(TestCases.u1.getID(), 0, TestCases.o1.getID());
-
-            assertEquals(tc.getExpectedOps(), result, tc.getName());
-        }
-    }*/
 
     @Test
     void testFilter() throws PMException {
@@ -726,5 +717,34 @@ class PReviewDeciderTest {
         prohibitions.add(prohibition);
 
         assertTrue(decider.list(u1.getID(), 1234, o1.getID()).isEmpty());
+    }
+
+    @Test
+    void testDeciderWithUA() throws PMException {
+        Graph graph = new MemGraph();
+
+        Node u1 = graph.createNode(getID(), "u1", U, null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
+        Node ua2 = graph.createNode(getID(), "ua2", UA, null);
+        Node o1 = graph.createNode(getID(), "o1", O, null);
+        Node o2 = graph.createNode(getID(), "o2", O, null);
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
+        Node oa2 = graph.createNode(getID(), "oa2", OA, null);
+        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+
+        graph.assign(u1.getID(), ua1.getID());
+        graph.assign(ua1.getID(), ua2.getID());
+        graph.assign(o1.getID(), oa1.getID());
+        graph.assign(o1.getID(), oa2.getID());
+        graph.assign(o2.getID(), oa2.getID());
+        graph.assign(oa2.getID(), pc1.getID());
+        graph.assign(oa1.getID(), pc1.getID());
+
+        graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read")));
+        graph.associate(ua2.getID(), oa1.getID(), new HashSet<>(Arrays.asList("write")));
+
+        Decider decider = new PReviewDecider(graph);
+        Set<String> permissions = decider.list(ua1.getID(), 0, oa1.getID());
+        assertTrue(permissions.containsAll(Arrays.asList("read", "write")));
     }
 }
