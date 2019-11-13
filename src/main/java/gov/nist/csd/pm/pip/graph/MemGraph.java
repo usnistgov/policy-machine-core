@@ -299,16 +299,19 @@ public class MemGraph implements Graph {
         Node ua = getNode(uaID);
         Node target = getNode(targetID);
 
-        // check that the assignment is valid
+        // check that the association is valid
         Association.checkAssociation(ua.getType(), target.getType());
 
-        if (graph.containsEdge(uaID, targetID)) {
-            // if the association exists update the operations
+        // if no edge exists create an association
+        // if an assignment exists create a new edge for the association
+        // if an association exists update it
+        Relationship edge = graph.getEdge(uaID, targetID);
+        if (edge == null || edge instanceof Assignment) {
+            graph.addEdge(uaID, targetID, new Association(uaID, targetID, operations));
+        }
+        else if (edge instanceof Association) {
             Association assoc = (Association) graph.getEdge(uaID, targetID);
             assoc.setOperations(operations);
-        }
-        else {
-            graph.addEdge(uaID, targetID, new Association(uaID, targetID, operations));
         }
     }
 
