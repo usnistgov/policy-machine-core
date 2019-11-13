@@ -57,7 +57,7 @@ public class Association extends Relationship implements Serializable {
             }
         }
 
-        throw new PMException(String.format("cannot assign a node of type %s to a node of type %s", uaType, targetType));
+        throw new PMException(String.format("cannot associate a node of type %s to a node of type %s", uaType, targetType));
     }
 
     @Override
