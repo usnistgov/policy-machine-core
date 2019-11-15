@@ -334,12 +334,11 @@ public class PReviewDecider implements Decider {
 
         Visitor visitor = node -> {
             Map<Long, List<Prohibition>> pts = getProhibitionTargets(node.getID());
-            prohibitedTargets.forEach(
-                    (k, v) -> pts.merge(k, v, (v1, v2) -> {
-                        v1.addAll(v2);
-                        return v1;
-                    })
-            );
+            for (Long ptsID : pts.keySet()) {
+                List<Prohibition> pros = prohibitedTargets.getOrDefault(ptsID, new ArrayList<>());
+                pros.addAll(pts.get(ptsID));
+                prohibitedTargets.put(ptsID, pros);
+            }
 
             // add any new prohibitions that were reached
             for(Long l : pts.keySet()) {

@@ -673,7 +673,9 @@ class PReviewDeciderTest {
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("execute")));
+        Set<String> list = decider.list(u1.getID(), 0, o1.getID());
+        assertEquals(1, list.size());
+        assertTrue(list.contains("execute"));
     }
 
     @Test
