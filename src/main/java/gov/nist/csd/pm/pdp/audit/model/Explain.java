@@ -31,4 +31,18 @@ public class Explain {
     public void setPolicyClasses(Map<String, PolicyClass> policyClasses) {
         this.policyClasses = policyClasses;
     }
+
+    public String toString() {
+        StringBuilder str = new StringBuilder(permissions.toString());
+        for (String pc : policyClasses.keySet()) {
+            PolicyClass policyClass = policyClasses.get(pc);
+            str.append("\n\t\t").append(pc).append(": ").append(policyClass.getOperations());
+            List<Path> paths = policyClass.getPaths();
+            for (Path path : paths) {
+                str.append("\n\t\t\t- ").append(path);
+            }
+        }
+
+        return str.toString();
+    }
 }
