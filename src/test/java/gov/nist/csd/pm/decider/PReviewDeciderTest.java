@@ -722,6 +722,43 @@ class PReviewDeciderTest {
     }
 
     @Test
+    void testGraph25WithProhibitions() throws PMException {
+        Graph graph = new MemGraph();
+
+        Node u1 = graph.createNode(getID(), "u1", U, null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
+        Node oa2 = graph.createNode(getID(), "oa2", OA, null);
+        Node oa3 = graph.createNode(getID(), "oa3", OA, null);
+        Node oa4 = graph.createNode(getID(), "oa4", OA, null);
+        Node oa5 = graph.createNode(getID(), "oa5", OA, null);
+        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+
+        graph.assign(u1.getID(), ua1.getID());
+        graph.assign(o1.getID(), oa4.getID());
+        graph.assign(oa4.getID(), oa3.getID());
+        graph.assign(oa3.getID(), oa1.getID());
+        graph.assign(oa2.getID(), oa1.getID());
+        graph.assign(oa5.getID(), oa2.getID());
+        graph.assign(oa1.getID(), pc1.getID());
+
+        graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
+
+        Prohibitions prohibitions = new MemProhibitions();
+        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(u1.getID(), Prohibition.Subject.Type.USER));
+        prohibition.setOperations(new HashSet<>(Arrays.asList("read", "write")));
+        prohibition.addNode(new Prohibition.Node(oa4.getID(), true));
+        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
+        prohibition.setIntersection(true);
+        prohibitions.add(prohibition);
+
+        PReviewDecider decider = new PReviewDecider(graph, prohibitions);
+        assertTrue(decider.list(u1.getID(), 0, oa5.getID()).isEmpty());
+        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
     void testDeciderWithUA() throws PMException {
         Graph graph = new MemGraph();
 

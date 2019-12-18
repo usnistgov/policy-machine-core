@@ -261,9 +261,7 @@ public class PReviewDecider implements Decider {
                 List<Prohibition> pros = prohibitedTargets.get(node.getID());
                 for(Prohibition p : pros) {
                     Set<Long> r = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
-                    for(Prohibition.Node n : p.getNodes()) {
-                        r.add(n.getID());
-                    }
+                    r.add(node.getID());
 
                     reachedProhibitedTargets.put(p, r);
                 }
