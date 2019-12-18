@@ -32,12 +32,14 @@ public class EPP {
         this.functionEvaluator = new FunctionEvaluator();
     }
 
-    public EPP(PDP pdp, FunctionExecutor ... executors) throws PMException {
+    public EPP(PDP pdp, EPPOptions eppOptions) throws PMException {
         this.pap = pdp.getPAP();
         this.pdp = pdp;
         this.functionEvaluator = new FunctionEvaluator();
-        for (FunctionExecutor executor : executors) {
-            this.functionEvaluator.addFunctionExecutor(executor);
+        if (eppOptions != null) {
+            for (FunctionExecutor executor : eppOptions.getExecutors()) {
+                this.functionEvaluator.addFunctionExecutor(executor);
+            }
         }
     }
 

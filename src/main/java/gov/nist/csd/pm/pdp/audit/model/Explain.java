@@ -33,7 +33,13 @@ public class Explain {
     }
 
     public String toString() {
-        StringBuilder str = new StringBuilder(permissions.toString());
+        StringBuilder str = new StringBuilder("Permissions: " + permissions.toString());
+        for (String pc : policyClasses.keySet()) {
+            PolicyClass policyClass = policyClasses.get(pc);
+            str.append("\n\t\t").append(pc).append(": ").append(policyClass.getOperations());
+        }
+
+        str.append("\nPaths:");
         for (String pc : policyClasses.keySet()) {
             PolicyClass policyClass = policyClasses.get(pc);
             str.append("\n\t\t").append(pc).append(": ").append(policyClass.getOperations());

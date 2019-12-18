@@ -50,7 +50,7 @@ class EPPTest {
 
         graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
 
-        pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()));
+        pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null);
     }
 
     @Test

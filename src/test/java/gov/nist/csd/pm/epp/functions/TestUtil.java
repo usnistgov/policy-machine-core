@@ -30,7 +30,7 @@ class TestUtil {
 
         graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
 
-        return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations())),
+        return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null),
                 u1, ua1, o1, oa1, pc1);
     }
 

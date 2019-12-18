@@ -17,6 +17,7 @@ class PReviewAuditorTest {
         for(TestCases.TestCase tc : TestCases.getTests()) {
             PReviewAuditor auditor = new PReviewAuditor(tc.graph);
             Explain explain = auditor.explain(TestCases.u1ID, TestCases.o1ID);
+            System.out.println(explain);
 
             assertTrue(explain.getPermissions().containsAll(tc.getExpectedOps()),
                     tc.name + " expected ops " + tc.getExpectedOps() + " but got " + explain.getPermissions());

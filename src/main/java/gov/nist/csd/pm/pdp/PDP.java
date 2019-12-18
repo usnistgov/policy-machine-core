@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EPP;
+import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -23,12 +24,12 @@ public class PDP {
      * Create a new PDP instance given a Policy Administration Point and an optional set of FunctionExecutors to be
      * used by the EPP.
      * @param pap the Policy Administration Point that the PDP will use to change the graph.
-     * @param functionExecutors an optional list of external functions to be used by the PDP's EPP at runtime.
+     * @param eppOptions an optional list of external functions to be used by the PDP's EPP at runtime.
      * @throws PMException if there is an error initializing the EPP.
      */
-    public PDP(PAP pap, FunctionExecutor ... functionExecutors) throws PMException {
+    public PDP(PAP pap, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
-        this.epp = new EPP(this, functionExecutors);
+        this.epp = new EPP(this, eppOptions);
 
         // initialize services
         this.graphService = new GraphService(this.pap, this.epp);
