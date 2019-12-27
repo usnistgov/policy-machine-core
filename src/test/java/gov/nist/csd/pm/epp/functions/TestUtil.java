@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.epp.functions;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -28,7 +29,7 @@ class TestUtil {
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), pc1.getID());
 
-        graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
         return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null),
                 u1, ua1, o1, oa1, pc1);

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.common.Operations;
+import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static gov.nist.csd.pm.common.Operations.*;
+import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsService extends Service {
 

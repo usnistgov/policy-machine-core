@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
@@ -288,7 +289,7 @@ public class MemGraph implements Graph {
      * @throws PMException              if the target node does not exist in the graph.
      */
     @Override
-    public void associate(long uaID, long targetID, Set<String> operations) throws PMException {
+    public void associate(long uaID, long targetID, OperationSet operations) throws PMException {
         if (!exists(uaID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, uaID));
         }

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import org.junit.jupiter.api.Test;
 
@@ -167,7 +168,7 @@ class MemGraphTest {
         Node uaNode = graph.createNode(1, "ua", UA, null);
         Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
 
         Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
         assertTrue(associations.containsKey(targetNode.getID()));
@@ -185,7 +186,7 @@ class MemGraphTest {
         Node uaNode = graph.createNode(1, "ua", UA, null);
         Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
         graph.dissociate(uaNode.getID(), targetNode.getID());
 
         Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
@@ -202,7 +203,7 @@ class MemGraphTest {
         Node uaNode = graph.createNode(1, "ua", UA, null);
         Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
 
         Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
         assertTrue(associations.containsKey(targetNode.getID()));
@@ -218,7 +219,7 @@ class MemGraphTest {
         Node uaNode = graph.createNode(1, "ua", UA, null);
         Node targetNode = graph.createNode(3, "target", OA, null);
 
-        graph.associate(uaNode.getID(), targetNode.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
 
         Map<Long, Set<String>> associations = graph.getTargetAssociations(targetNode.getID());
         assertTrue(associations.containsKey(uaNode.getID()));

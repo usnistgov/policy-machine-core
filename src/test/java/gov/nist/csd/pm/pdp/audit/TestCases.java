@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.audit;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 
@@ -74,10 +75,10 @@ public class TestCases {
     private static long ua2ID = 7;
     private static long oa2ID = 8;
 
-    private static final Set<String> RW = new HashSet<>(Arrays.asList("read", "write"));
-    private static final Set<String> R = new HashSet<>(Arrays.asList("read"));
-    private static final Set<String> W = new HashSet<>(Arrays.asList("write"));
-    private static final Set<String> NOOPS = new HashSet<>();
+    private static final OperationSet RW = new OperationSet("read", "write");
+    private static final OperationSet R = new OperationSet("read");
+    private static final OperationSet W = new OperationSet("write");
+    private static final OperationSet NOOPS = new OperationSet();
 
     public static TestCase graph1() throws PMException {
         Graph graph = new MemGraph();

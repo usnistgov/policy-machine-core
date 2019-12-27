@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,7 +38,7 @@ class GraphSerializerTest {
         graph.assign(ua1ID, pc1ID);
         graph.assign(oa1ID, pc1ID);
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1ID, oa1ID, new OperationSet("read", "write"));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.prohibitions;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class MemProhibitionsTest {
         Prohibition prohibition = new Prohibition();
         prohibition.setName("prohibition1");
         prohibition.setSubject(new Prohibition.Subject(123, USER));
-        prohibition.setOperations(new HashSet<>(Arrays.asList("read")));
+        prohibition.setOperations(new OperationSet("read"));
         prohibition.setIntersection(false);
         prohibition.addNode(new Prohibition.Node(1234, true));
 
@@ -48,7 +49,7 @@ class MemProhibitionsTest {
         prohibition.setSubject(new Prohibition.Subject(123, USER));
 
         prohibition.setIntersection(false);
-        prohibition.setOperations(new HashSet<>(Arrays.asList("read")));
+        prohibition.setOperations(new OperationSet("read"));
         prohibition.addNode(new Prohibition.Node(1234, true));
 
         dao.add(prohibition);
@@ -56,7 +57,7 @@ class MemProhibitionsTest {
         Prohibition p123 = dao.get("p123");
         assertEquals("p123", p123.getName());
         assertFalse(p123.isIntersection());
-        assertEquals(new HashSet<>(Arrays.asList("read")), p123.getOperations());
+        assertEquals(new OperationSet("read"), p123.getOperations());
         assertEquals(new Prohibition.Node(1234, true), p123.getNodes().get(0));
     }
 
@@ -75,7 +76,7 @@ class MemProhibitionsTest {
         assertEquals(123, prohibition.getSubject().getSubjectID());
         assertEquals(USER, prohibition.getSubject().getSubjectType());
         assertFalse(prohibition.isIntersection());
-        assertEquals(prohibition.getOperations(), new HashSet<>(Arrays.asList("read")));
+        assertEquals(prohibition.getOperations(), new OperationSet("read"));
         assertEquals(new Prohibition.Node(1234, true), prohibition.getNodes().get(0));
     }
 
@@ -88,7 +89,7 @@ class MemProhibitionsTest {
         Prohibition prohibition = dao.get("prohibition1");
         prohibition.setName("prohibition123");
         prohibition.setSubject(new Prohibition.Subject(12345, USER_ATTRIBUTE));
-        prohibition.setOperations(new HashSet<>(Arrays.asList("read", "write")));
+        prohibition.setOperations(new OperationSet("read", "write"));
         prohibition.setIntersection(true);
         prohibition.removeNode(1234);
         prohibition.addNode(new Prohibition.Node(4321, false));
@@ -100,7 +101,7 @@ class MemProhibitionsTest {
         assertEquals("prohibition123", prohibition.getName());
         assertEquals(12345, prohibition.getSubject().getSubjectID());
         assertEquals(USER_ATTRIBUTE, prohibition.getSubject().getSubjectType());
-        assertEquals(new HashSet<>(Arrays.asList("read", "write")), prohibition.getOperations());
+        assertEquals(new OperationSet("read", "write"), prohibition.getOperations());
         assertEquals(new Prohibition.Node(4321, false), prohibition.getNodes().get(0));
     }
 

@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static gov.nist.csd.pm.common.Operations.RESET;
+import static gov.nist.csd.pm.operations.Operations.RESET;
 
 public class ObligationsService extends Service {
 

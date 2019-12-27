@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -92,8 +93,8 @@ public class SuperGraph {
         }
 
         // associate super ua to super oa
-        graph.associate(superUA1.getID(), superOA.getID(), new HashSet<>(Arrays.asList(ALL_OPERATIONS)));
-        graph.associate(superUA1.getID(), superUA2.getID(), new HashSet<>(Arrays.asList(ALL_OPERATIONS)));
+        graph.associate(superUA1.getID(), superOA.getID(), new OperationSet(ALL_OPERATIONS));
+        graph.associate(superUA1.getID(), superUA2.getID(), new OperationSet(ALL_OPERATIONS));
     }
 
     public static Node getSuperPC() {

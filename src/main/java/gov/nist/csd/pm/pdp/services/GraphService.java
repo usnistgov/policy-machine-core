@@ -7,6 +7,7 @@ import gov.nist.csd.pm.epp.events.DeassignEvent;
 import gov.nist.csd.pm.epp.events.DeassignFromEvent;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -16,7 +17,7 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.common.Operations.*;
+import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ALL_OPERATIONS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
@@ -148,9 +149,9 @@ public class GraphService extends Service {
         // assign super UA to PC
         getPAP().getGraphPAP().assign(SuperGraph.getSuperUA1().getID(), pcNode.getID());
         // associate Super UA and PC UA
-        getPAP().getGraphPAP().associate(SuperGraph.getSuperUA1().getID(), pcUANode.getID(), new HashSet<>(Arrays.asList(ALL_OPERATIONS)));
+        getPAP().getGraphPAP().associate(SuperGraph.getSuperUA1().getID(), pcUANode.getID(), new OperationSet(ALL_OPERATIONS));
         // associate Super UA and PC OA
-        getPAP().getGraphPAP().associate(SuperGraph.getSuperUA1().getID(), pcOANode.getID(), new HashSet<>(Arrays.asList(ALL_OPERATIONS)));
+        getPAP().getGraphPAP().associate(SuperGraph.getSuperUA1().getID(), pcOANode.getID(), new OperationSet(ALL_OPERATIONS));
 
         return pcNode;
     }
@@ -508,7 +509,7 @@ public class GraphService extends Service {
         }
 
         //create association in PAP
-        getGraphPAP().associate(uaID, targetID, operations);
+        getGraphPAP().associate(uaID, targetID, new OperationSet(operations));
     }
 
     /**

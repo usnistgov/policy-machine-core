@@ -3,9 +3,10 @@ package gov.nist.csd.pm.pip.graph;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
-import gov.nist.csd.pm.pip.graph.model.relationships.Association;
+import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.graph.model.relationships.*;
 
 import java.util.*;
 
@@ -104,7 +105,7 @@ public class GraphSerializer {
         for (Association association : associations) {
             long uaID = association.getSourceID();
             long targetID = association.getTargetID();
-            graph.associate(uaID, targetID, association.getOperations());
+            graph.associate(uaID, targetID, new OperationSet(association.getOperations()));
         }
 
         return graph;
@@ -132,5 +133,150 @@ public class GraphSerializer {
         Set<Association> getAssociations() {
             return associations;
         }
+    }
+
+    public static String serialize(Graph graph) throws PMException {
+        String s = "# nodes\n";
+        Collection<Node> nodes = graph.getNodes();
+        for (Node node : nodes) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+        }
+
+        s += "\n# assignments\n";
+        for (Node node : nodes) {
+            Set<Long> parents = graph.getParents(node.getID());
+            for (Long parentID : parents) {
+                Node parentNode = graph.getNode(parentID);
+                s += "assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n";
+            }
+        }
+
+        s += "\n# associations\n";
+        for (Node node : nodes) {
+            Map<Long, Set<String>> assocs = graph.getSourceAssociations(node.getID());
+            for (Long targetID : assocs.keySet()) {
+                Node targetNode = graph.getNode(targetID);
+                s += "assoc " +
+                        node.getType() + ":" + node.getName() + " " +
+                        targetNode.getType() + ":" + targetNode.getName() + " " +
+                        assocs.get(targetID).toString() + "\n";
+            }
+        }
+
+        return s;
+    }
+
+    public static Graph deserialize(Graph graph, String str) throws PMException {
+        Scanner sc = new Scanner(str);
+        Random rand = new Random();
+        Map<String, Long> ids = new HashMap<>();
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            if (line.startsWith("#") || line.isEmpty()) {
+                continue;
+            }
+
+            String[] pieces = line.split(" ");
+            switch (pieces[0]) {
+                case "node":
+                    if (pieces.length < 3) {
+                        throw new PMException("invalid node command: " + line);
+                    }
+                    // node <type> <name> <props>
+                    String type = pieces[1];
+
+                    String name = pieces[2];
+                    int i;
+                    for (i = 3; i < pieces.length; i++) {
+                        String piece = pieces[i];
+                        if (piece.startsWith("{")) {
+                            break;
+                        }
+
+                        name += " " + piece;
+                    }
+
+                    String props = "";
+                    Map<String, String> propsMap = new HashMap<>();
+                    if (i == pieces.length-1) {
+                        props = pieces[i];
+                        props = props.replaceAll("\\{", "").replaceAll("}", "");
+                        String[] propsPieces = props.split(",");
+                        for (String prop : propsPieces) {
+                            String[] propPieces = prop.split("=");
+                            if (propPieces.length != 2) {
+                                throw new PMException("invalid property format: " + line);
+                            }
+                            propsMap.put(propPieces[0], propPieces[1]);
+                        }
+                    }
+
+                    Node node = graph.createNode(rand.nextLong(), name, NodeType.toNodeType(type), propsMap);
+                    ids.put(node.getType() + ":" + node.getName(), node.getID());
+                    break;
+                case "assign":
+                    if (pieces.length < 3) {
+                        throw new PMException("invalid assign command: " + line);
+                    }
+
+                    name = pieces[1];
+                    for (i = 2; i < pieces.length; i++) {
+                        String piece = pieces[i];
+                        if (piece.contains(":")) {
+                            break;
+                        }
+
+                        name += " " + piece;
+                    }
+                    long childID = ids.get(name);
+
+                    name = pieces[i];
+                    i++;
+                    for (int j = i; j < pieces.length; j++) {
+                        String piece = pieces[j];
+                        name += " " + piece;
+                    }
+                    long parentID = ids.get(name);
+
+                    graph.assign(childID, parentID);
+
+                    break;
+                case "assoc":
+                    if (pieces.length < 4) {
+                        throw new PMException("invalid assoc command: " + line);
+                    }
+
+                    name = pieces[1];
+                    for (i = 2; i < pieces.length; i++) {
+                        String piece = pieces[i];
+                        if (piece.contains(":")) {
+                            break;
+                        }
+
+                        name += " " + piece;
+                    }
+                    long uaID = ids.get(name);
+
+                    name = pieces[i];
+                    i++;
+                    for (int j = i; j < pieces.length; j++) {
+                        String piece = pieces[j];
+                        if (piece.contains("[")) {
+                            break;
+                        }
+
+                        name += " " + piece;
+                    }
+                    long targetID = ids.get(name);
+
+                    String opsStr = line.substring(line.indexOf("[")+1, line.lastIndexOf("]"));
+                    String[] ops = opsStr.split("(,\\s+)");
+                    graph.associate(uaID, targetID, new OperationSet(Arrays.asList(ops)));
+                    break;
+            }
+        }
+
+        return graph;
     }
 }

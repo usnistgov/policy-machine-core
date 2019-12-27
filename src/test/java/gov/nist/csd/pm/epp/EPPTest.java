@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.events.AssignEvent;
 import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.DeassignEvent;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -48,7 +49,7 @@ class EPPTest {
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), pc1.getID());
 
-        graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
+        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
         pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null);
     }

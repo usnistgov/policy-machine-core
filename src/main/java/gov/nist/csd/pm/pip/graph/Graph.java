@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
@@ -142,7 +143,7 @@ public interface Graph {
      * @param operations A Set of operations to add to the association.
      * @throws PMException if there is an error associating the two nodes.
      */
-    void associate(long uaID, long targetID, Set<String> operations) throws PMException;
+    void associate(long uaID, long targetID, OperationSet operations) throws PMException;
 
     /**
      * Delete the Association between the user attribute and Target node.
