@@ -257,7 +257,7 @@ public class PReviewDecider implements Decider {
 
         Visitor visitor = node -> {
             // add this node to reached prohibited targets if it has any prohibitions
-            if(prohibitedTargets.containsKey(node.getID())) {
+            if(prohibitedTargets.containsKey(node.getID()) && node.getID() != targetID) {
                 List<Prohibition> pros = prohibitedTargets.get(node.getID());
                 for(Prohibition p : pros) {
                     Set<Long> r = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
