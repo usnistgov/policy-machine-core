@@ -55,7 +55,7 @@ public class Service {
     }
 
     public Decider getDecider() throws PMException {
-        return new PReviewDecider(getGraphPAP());
+        return new PReviewDecider(getGraphPAP(), getProhibitionsPAP());
     }
 
     boolean hasPermissions(UserContext userCtx, long targetID, String... permissions) throws PMException {
