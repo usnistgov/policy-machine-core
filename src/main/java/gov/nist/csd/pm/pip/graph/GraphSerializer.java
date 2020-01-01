@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pip.graph.model.relationships.*;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 public class GraphSerializer {
 
@@ -137,12 +137,42 @@ public class GraphSerializer {
 
     public static String serialize(Graph graph) throws PMException {
         String s = "# nodes\n";
-        Collection<Node> nodes = graph.getNodes();
-        for (Node node : nodes) {
+
+        Set<Node> search = graph.search(null, PC.toString(), null);
+        for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
         }
 
+        s += "\n";
+        search = graph.search(null, U.toString(), null);
+        for (Node node : search) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+        }
+
+        s += "\n";
+        search = graph.search(null, UA.toString(), null);
+        for (Node node : search) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+        }
+
+        s += "\n";
+        search = graph.search(null, OA.toString(), null);
+        for (Node node : search) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+        }
+
+        s += "\n";
+        search = graph.search(null, O.toString(), null);
+        for (Node node : search) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+        }
+
+        Collection<Node> nodes = graph.getNodes();
         s += "\n# assignments\n";
         for (Node node : nodes) {
             Set<Long> parents = graph.getParents(node.getID());
@@ -150,6 +180,7 @@ public class GraphSerializer {
                 Node parentNode = graph.getNode(parentID);
                 s += "assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n";
             }
+            s += "\n";
         }
 
         s += "\n# associations\n";
@@ -162,9 +193,18 @@ public class GraphSerializer {
                         targetNode.getType() + ":" + targetNode.getName() + " " +
                         assocs.get(targetID).toString() + "\n";
             }
+            s += "\n";
         }
 
         return s;
+    }
+
+    static class NodeComparator implements Comparator<Node> {
+
+        @Override
+        public int compare(Node o, Node t1) {
+            return o.getType().compareTo(t1.getType());
+        }
     }
 
     public static Graph deserialize(Graph graph, String str) throws PMException {
