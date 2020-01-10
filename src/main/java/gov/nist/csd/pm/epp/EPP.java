@@ -7,14 +7,11 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.obligations.MemObligations;
 import gov.nist.csd.pm.pip.obligations.model.*;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -225,10 +222,10 @@ public class EPP {
 
     private Set<Node> getContainersOf(long id) throws PMException {
         Set<Node> nodes = new HashSet<>();
-        Set<Long> parents = pap.getGraphPAP().getParents(id);
-        for (long parentID : parents) {
-            nodes.add(pap.getGraphPAP().getNode(parentID));
-            nodes.addAll(getContainersOf(parentID));
+        Set<Node> parents = pap.getGraphPAP().getParents(id);
+        for (Node parent : parents) {
+            nodes.add(pap.getGraphPAP().getNode(parent.getID()));
+            nodes.addAll(getContainersOf(parent.getID()));
         }
         return nodes;
     }
@@ -539,8 +536,8 @@ public class EPP {
                     whatNodes.add(node);
                 }
                 else {
-                    Node n = pap.getGraphPAP().createNode(new Random().nextLong(), evrNode.getName(), NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
-                    whatNodes.add(n);
+                    /* TODO Node n = pap.getGraphPAP().createNode(new Random().nextLong(), evrNode.getName(), NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
+                    whatNodes.add(n);*/
                 }
             }
 
@@ -550,9 +547,9 @@ public class EPP {
                     Function function = evrNode.getFunction();
                     Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
                     if (o instanceof List) {
-                        whatNodes.addAll((List)o);
+                        whereNodes.addAll((List)o);
                     } else if (o instanceof Node) {
-                        whatNodes.add((Node)o);
+                        whereNodes.add((Node)o);
                     }
                 } else {
                     Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());

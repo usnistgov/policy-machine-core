@@ -203,9 +203,9 @@ public class PReviewAuditor implements Auditor {
         Visitor visitor = node -> {
             List<EdgePath> nodePaths = new ArrayList<>();
 
-            for(Long parentID : graph.getParents(node.getID())) {
-                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parentID), null);
-                List<EdgePath> parentPaths = propPaths.get(parentID);
+            for(Node parent : graph.getParents(node.getID())) {
+                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parent.getID()), null);
+                List<EdgePath> parentPaths = propPaths.get(parent.getID());
                 if(parentPaths.isEmpty()) {
                     EdgePath path = new EdgePath();
                     path.addEdge(edge);

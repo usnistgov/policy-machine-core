@@ -21,13 +21,12 @@ public class BreadthFirstSearcher implements Searcher{
         // visit the start node
         visitor.visit(start);
 
-        Set<Long> parents = graph.getParents(start.getID());
+        Set<Node> parents = graph.getParents(start.getID());
         while(!parents.isEmpty()) {
-            long parentID = parents.iterator().next();
-            Node parentNode = graph.getNode(parentID);
-            propagator.propagate(parentNode, start);
-            visitor.visit(parentNode);
-            parents.remove(parentID);
+            Node parent = parents.iterator().next();
+            propagator.propagate(parent, start);
+            visitor.visit(parent);
+            parents.remove(parent.getID());
         }
     }
 }

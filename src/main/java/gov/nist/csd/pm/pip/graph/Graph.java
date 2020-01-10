@@ -15,16 +15,29 @@ import java.util.Set;
 public interface Graph {
 
     /**
+     * Create a policy class in the graph.
+     *
+     * @param name the name of the policy class.
+     * @param properties the properties of the policy class.
+     * @return the node representing the new policy class.
+     * @throws PMException if there is an error creating the policy class node in the graph.
+     */
+    Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException;
+
+    /**
      * Create a new node with the given name, type and properties and add it to the graph.
      *
      * @param id the ID of the node.
      * @param name the name of the node.
      * @param type the type of node.
      * @param properties any additional properties to store in the node.
+     * @param initialParent is the parent to initially assign the new node to.  A node needs to be connected to the
+     *                      graph when created.
+     * @param additionalParents is a list of 0 or more additional parents to assign the new node to.
      * @return the Node representation of the newly created node.
      * @throws PMException if there is an error creating the node in the graph.
      */
-    Node createNode(long id, String name, NodeType type, Map<String, String> properties) throws PMException;
+    Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long ... additionalParents) throws PMException;
 
     /**
      * Update the name and properties of the node with the given ID. The node's existing properties will be overwritten
@@ -62,7 +75,7 @@ public interface Graph {
      * @return the set of policy class IDs.
      * @throws PMException if there is an error retrieving the IDs of the policy classes.
      */
-    Set<Long> getPolicies() throws PMException;
+    Set<Long> getPolicyClasses() throws PMException;
 
     /**
      * Retrieve the set of all nodes in the graph.
@@ -70,7 +83,7 @@ public interface Graph {
      * @return a Set of all the nodes in the graph.
      * @throws PMException if there is an error retrieving all nodes in the graph.
      */
-    Collection<Node> getNodes() throws PMException;
+    Set<Node> getNodes() throws PMException;
 
     /**
      * Retrieve the node with the given ID.
@@ -102,7 +115,7 @@ public interface Graph {
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the children of the node.
      */
-    Set<Long> getChildren(long nodeID) throws PMException;
+    Set<Node> getChildren(long nodeID) throws PMException;
 
     /**
      * Get the set of nodes that the node with the given ID is assigned to.
@@ -111,7 +124,7 @@ public interface Graph {
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the parents of the node.
      */
-    Set<Long> getParents(long nodeID) throws PMException;
+    Set<Node> getParents(long nodeID) throws PMException;
 
     /**
      * Assign the child node to the parent node. The child and parent nodes must both already exist in the graph,
@@ -133,14 +146,25 @@ public interface Graph {
      */
     void deassign(long childID, long parentID) throws PMException;
 
+
+    /**
+     * Returns true if the child is assigned to the parent.
+     *
+     * @param childID the ID of the child node
+     * @param parentID the ID of the parent node
+     * @return true if the child is assigned to the parent, false otherwise
+     * @throws PMException if there is an error checking if the child is assigned to the parent
+     */
+    boolean isAssigned(long childID, long parentID) throws PMException;
+
     /**
      * Create an Association between the user attribute and the Target node with the provided operations. If an association
      * already exists between these two nodes, overwrite the existing operations with the ones provided.  Associations
      * can only begin at a user attribute but can point to either an Object or user attribute
      *
-     * @param uaID The ID of the user attribute.
-     * @param targetID The ID of the target attribute.
-     * @param operations A Set of operations to add to the association.
+     * @param uaID the ID of the user attribute.
+     * @param targetID the ID of the target attribute.
+     * @param operations a set of operations to add to the association.
      * @throws PMException if there is an error associating the two nodes.
      */
     void associate(long uaID, long targetID, OperationSet operations) throws PMException;

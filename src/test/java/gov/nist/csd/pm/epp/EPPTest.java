@@ -12,12 +12,10 @@ import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
-import gov.nist.csd.pm.pip.obligations.evr.EVRException;
 import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.obligations.model.Rule;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
-import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,16 +36,11 @@ class EPPTest {
     @BeforeEach
     void setup() throws PMException {
         Graph graph = new MemGraph();
-        o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null);
-        oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null);
-        u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null);
-        ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null);
-        pc1 = graph.createNode(new Random().nextLong(), "pc1", NodeType.PC, null);
-
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
+        pc1 = graph.createNode(0, new Random().nextLong(), "pc1", NodeType.PC, null);
+        ua1 = graph.createNode(pc1.getID(), new Random().nextLong(), "ua1", NodeType.UA, null);
+        oa1 = graph.createNode(pc1.getID(), new Random().nextLong(), "oa1", NodeType.OA, null);
+        o1 = graph.createNode(oa1.getID(), new Random().nextLong(), "o1", NodeType.O, null);
+        u1 = graph.createNode(ua1.getID(), new Random().nextLong(), "u1", NodeType.U, null);
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
@@ -102,9 +95,9 @@ class EPPTest {
         Node newOA = search.iterator().next();
 
         // check that the new OA was assigned to the oa1
-        Set<Long> parents = pdp.getPAP().getGraphPAP().getParents(newOA.getID());
+        Set<Node> parents = pdp.getPAP().getGraphPAP().getParents(newOA.getID());
         assertFalse(parents.isEmpty());
-        assertTrue(parents.iterator().next() == oa1.getID());
+        assertTrue(parents.iterator().next().getID() == oa1.getID());
 
         // check ua1 was associated with new OA
         Map<Long, Set<String>> sourceAssociations = pdp.getPAP().getGraphPAP().getSourceAssociations(ua1.getID());

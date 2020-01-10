@@ -11,23 +11,16 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
 
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
         Graph graph = new MemGraph();
-        Node o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null);
-        Node u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null);
-        Node ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null);
-        Node pc1 = graph.createNode(new Random().nextLong(), "pc1", NodeType.PC, null);
-
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
+        Node pc1 = graph.createNode(0, new Random().nextLong(), "pc1", NodeType.PC, null);
+        Node oa1 = graph.createNode(pc1.getID(), new Random().nextLong(), "oa1", NodeType.OA, null);
+        Node o1 = graph.createNode(oa1.getID(), new Random().nextLong(), "o1", NodeType.O, null);
+        Node ua1 = graph.createNode(pc1.getID(), new Random().nextLong(), "ua1", NodeType.UA, null);
+        Node u1 = graph.createNode(ua1.getID(), new Random().nextLong(), "u1", NodeType.U, null);
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 

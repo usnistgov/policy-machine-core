@@ -12,6 +12,8 @@ import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
+
 /**
  * MemGraph is an in-memory implementation of the graph interface.  It stores the IDs of the nodes in a DAG structure.
  * And stores all other node information in a map for easy/fast retrieval.
@@ -33,6 +35,19 @@ public class MemGraph implements Graph {
         pcs = new HashSet<>();
     }
 
+    @Override
+    public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
+        // add the pc's ID to the pc set and to the graph
+        pcs.add(id);
+        graph.addVertex(id);
+
+        // create the node
+        Node node = new Node(id, name, PC, properties);
+        nodes.put(id, node);
+
+        return node;
+    }
+
     /**
      * Create a node in the in-memory graph.  The ID field of the passed Node must not be 0.
      *
@@ -42,9 +57,13 @@ public class MemGraph implements Graph {
      * @throws IllegalArgumentException When the provided node has a null or empty name.
      * @throws IllegalArgumentException When the provided node has a null type.
      */
+
     @Override
-    public Node createNode(long id, String name, NodeType type, Map<String, String> properties) {
+    public Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long... additionalParents) throws PMException {
         //check for null values
+        if (type == PC) {
+            throw new PMException("use createPolicyClass to create a policy class node");
+        }
         if (id == 0) {
             throw new IllegalArgumentException("no ID was provided when creating a node in the in-memory graph");
         }
@@ -54,11 +73,11 @@ public class MemGraph implements Graph {
         else if (type == null) {
             throw new IllegalArgumentException("a null type was provided to the in memory graph when creating a node");
         }
-
-        //if the node being created is a PC, add it to the list of policies
-        if (type.equals(NodeType.PC)) {
-            pcs.add(id);
+        else if (initialParent == 0) {
+            throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
         }
+
+
 
         // add the vertex to the graph
         graph.addVertex(id);
@@ -66,6 +85,12 @@ public class MemGraph implements Graph {
         //store the node in the map
         Node node = new Node(id, name, type, properties);
         nodes.put(id, node);
+
+        // assign the new node the to given parent nodes
+        assign(id, initialParent);
+        for (long parentID : additionalParents) {
+            assign(id, parentID);
+        }
 
         //return the Node
         return node;
@@ -124,13 +149,13 @@ public class MemGraph implements Graph {
     }
 
     @Override
-    public Set<Long> getPolicies() {
+    public Set<Long> getPolicyClasses() {
         return pcs;
     }
 
     @Override
-    public Collection<Node> getNodes() {
-        return nodes.values();
+    public Set<Node> getNodes() {
+        return new HashSet<>(nodes.values());
     }
 
     /**
@@ -203,18 +228,18 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided nodeID does not exist in the graph.
      */
     @Override
-    public Set<Long> getChildren(long nodeID) throws PMException {
+    public Set<Node> getChildren(long nodeID) throws PMException {
         if (!exists(nodeID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
         }
 
-        HashSet<Long> children = new HashSet<>();
+        HashSet<Node> children = new HashSet<>();
         Set<Relationship> rels = graph.incomingEdgesOf(nodeID);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 continue;
             }
-            children.add(rel.getSourceID());
+            children.add(getNode(rel.getSourceID()));
         }
         return children;
     }
@@ -227,18 +252,18 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided nodeID does not exist in the graph.
      */
     @Override
-    public Set<Long> getParents(long nodeID) throws PMException {
+    public Set<Node> getParents(long nodeID) throws PMException {
         if (!exists(nodeID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
         }
 
-        HashSet<Long> parents = new HashSet<>();
+        HashSet<Node> parents = new HashSet<>();
         Set<Relationship> rels = graph.outgoingEdgesOf(nodeID);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 continue;
             }
-            parents.add(rel.getTargetID());
+            parents.add(getNode(rel.getTargetID()));
         }
         return parents;
     }
@@ -261,6 +286,10 @@ public class MemGraph implements Graph {
             throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentID));
         }
 
+        if (graph.containsEdge(childID, parentID)) {
+            throw new PMException(childID + " is already assigned to" + parentID);
+        }
+
         Node child = getNode(childID);
         Node parent = getNode(parentID);
 
@@ -278,6 +307,11 @@ public class MemGraph implements Graph {
     @Override
     public void deassign(long childID, long parentID) {
         graph.removeEdge(childID, parentID);
+    }
+
+    @Override
+    public boolean isAssigned(long childID, long parentID) throws PMException {
+        return graph.containsEdge(childID, parentID);
     }
 
     /**

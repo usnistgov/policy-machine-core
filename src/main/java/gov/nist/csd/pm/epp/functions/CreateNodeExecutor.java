@@ -55,6 +55,6 @@ public class CreateNodeExecutor implements FunctionExecutor {
 
         long id = new Random().nextLong();
         Graph graph = pdp.getPAP().getGraphPAP();
-        return graph.createNode(id, name, NodeType.toNodeType(type), props);
+        return graph.createNode(0, id, name, NodeType.toNodeType(type), props);
     }
 }

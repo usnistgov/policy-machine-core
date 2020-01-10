@@ -27,11 +27,7 @@ public class GetChildrenExecutor implements FunctionExecutor {
     public List<Node> exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         FunctionExecutor getNodeExecutor = functionEvaluator.getFunctionExecutor("get_node");
         Node node = (Node)getNodeExecutor.exec(eventCtx, userID, processID, pdp, function, functionEvaluator);
-        Set<Long> children = pdp.getPAP().getGraphPAP().getChildren(node.getID());
-        List<Node> nodes = new ArrayList<>();
-        for(Long l : children) {
-            nodes.add(pdp.getPAP().getGraphPAP().getNode(l));
-        }
-        return nodes;
+        Set<Node> children = pdp.getPAP().getGraphPAP().getChildren(node.getID());
+        return new ArrayList<>(children);
     }
 }

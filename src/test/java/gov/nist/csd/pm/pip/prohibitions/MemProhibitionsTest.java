@@ -6,8 +6,6 @@ import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import static gov.nist.csd.pm.pip.prohibitions.model.Prohibition.Subject.Type.USER;

@@ -62,10 +62,10 @@ public class GraphSerializer {
         HashSet<Assignment> jsonAssignments = new HashSet<>();
         HashSet<Association> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
-            Set<Long> parents = graph.getParents(node.getID());
+            Set<Node> parents = graph.getParents(node.getID());
 
-            for (Long parent : parents) {
-                jsonAssignments.add(new Assignment(node.getID(), parent));
+            for (Node parent : parents) {
+                jsonAssignments.add(new Assignment(node.getID(), parent.getID()));
             }
 
             Map<Long, Set<String>> associations = graph.getSourceAssociations(node.getID());
@@ -73,7 +73,7 @@ public class GraphSerializer {
                 Set<String> ops = associations.get(targetID);
                 Node targetNode = graph.getNode(targetID);
 
-                jsonAssociations.add(new Association(node.getID(), targetNode.getID(), ops));
+                jsonAssociations.add(new Association(node.getID(), targetNode.getID(), new OperationSet(ops)));
             }
         }
 
@@ -92,12 +92,20 @@ public class GraphSerializer {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
 
         Collection<Node> nodes = jsonGraph.getNodes();
+        Map<Long, Node> nodesMap = new HashMap<>();
         for (Node node : nodes) {
-            graph.createNode(node.getID(), node.getName(), node.getType(), node.getProperties());
+            nodesMap.put(node.getID(), node);
         }
 
         Set<Assignment> assignments = jsonGraph.getAssignments();
         for (Assignment assignment : assignments) {
+            long sourceID = assignment.getSourceID();
+            long targetID = assignment.getTargetID();
+            if (!graph.exists(sourceID)) {
+                Node node = nodesMap.get(sourceID);
+                graph.createNode(targetID, node.getID(), node.getName(), node.getType(), node.getProperties());
+            }
+
             graph.assign(assignment.getSourceID(), assignment.getTargetID());
         }
 
@@ -105,7 +113,7 @@ public class GraphSerializer {
         for (Association association : associations) {
             long uaID = association.getSourceID();
             long targetID = association.getTargetID();
-            graph.associate(uaID, targetID, new OperationSet(association.getOperations()));
+            graph.associate(uaID, targetID, association.getOperations());
         }
 
         return graph;
@@ -175,9 +183,8 @@ public class GraphSerializer {
         Collection<Node> nodes = graph.getNodes();
         s += "\n# assignments\n";
         for (Node node : nodes) {
-            Set<Long> parents = graph.getParents(node.getID());
-            for (Long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
+            Set<Node> parents = graph.getParents(node.getID());
+            for (Node parentNode : parents) {
                 s += "assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n";
             }
             s += "\n";
@@ -210,7 +217,11 @@ public class GraphSerializer {
     public static Graph deserialize(Graph graph, String str) throws PMException {
         Scanner sc = new Scanner(str);
         Random rand = new Random();
+
         Map<String, Long> ids = new HashMap<>();
+        Map<Long, Node> nodesMap = new HashMap<>();
+        Map<Long, List<Long>> assignments = new HashMap<>();
+        List<Association> associations = new ArrayList<>();
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             if (line.startsWith("#") || line.isEmpty()) {
@@ -252,7 +263,9 @@ public class GraphSerializer {
                         }
                     }
 
-                    Node node = graph.createNode(rand.nextLong(), name, NodeType.toNodeType(type), propsMap);
+                    long id = rand.nextLong();
+                    Node node = new Node(id, name, NodeType.valueOf(type), propsMap);
+                    nodesMap.put(id, new Node(id, name, NodeType.valueOf(type), propsMap));
                     ids.put(node.getType() + ":" + node.getName(), node.getID());
                     break;
                 case "assign":
@@ -279,7 +292,9 @@ public class GraphSerializer {
                     }
                     long parentID = ids.get(name);
 
-                    graph.assign(childID, parentID);
+                    List<Long> parents = assignments.getOrDefault(childID, new ArrayList<>());
+                    parents.add(parentID);
+                    assignments.put(childID, parents);
 
                     break;
                 case "assoc":
@@ -312,11 +327,46 @@ public class GraphSerializer {
 
                     String opsStr = line.substring(line.indexOf("[")+1, line.lastIndexOf("]"));
                     String[] ops = opsStr.split("(,\\s+)");
-                    graph.associate(uaID, targetID, new OperationSet(Arrays.asList(ops)));
+
+                    associations.add(new Association(uaID, targetID, new OperationSet(ops)));
+
                     break;
             }
         }
 
+        while (!assignments.isEmpty()) {
+            Long childID = assignments.keySet().iterator().next();
+            List<Long> parents = assignments.get(childID);
+            boolean remove = false;
+            for (long parentID : parents) {
+                if (graph.exists(parentID)) {
+                    continue;
+                }
+
+                if (!graph.exists(childID)) {
+                    Node node = nodesMap.get(childID);
+                    graph.createNode(parentID, childID, node.getName(), node.getType(), node.getProperties());
+                    parents.remove(parentID);
+                }
+
+
+
+                graph.assign(childID, parentID);
+            }
+
+            if (parents.isEmpty()) {
+                assignments.remove(childID);
+            }
+        }
+
+        for (Association association : associations) {
+            graph.associate(association.getSourceID(), association.getTargetID(), association.getOperations());
+        }
+
         return graph;
+    }
+
+    private void node() {
+
     }
 }

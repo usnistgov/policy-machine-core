@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.O;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
@@ -27,11 +26,11 @@ class GraphSerializerTest {
     static void setUp() throws PMException {
         graph = new MemGraph();
 
-        graph.createNode(u1ID, "u1", NodeType.U, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(ua1ID, "ua1", NodeType.UA, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", NodeType.PC, null);
+        graph.createNode(0, pc1ID, "pc1", NodeType.PC, null);
+        graph.createNode(pc1ID, ua1ID, "ua1", NodeType.UA, null);
+        graph.createNode(pc1ID, oa1ID, "oa1", OA, null);
+        graph.createNode(ua1ID, u1ID, "u1", NodeType.U, null);
+        graph.createNode(oa1ID, o1ID, "o1", O, null);
 
         graph.assign(u1ID, ua1ID);
         graph.assign(o1ID, oa1ID);
@@ -60,5 +59,23 @@ class GraphSerializerTest {
 
         assertTrue(deGraph.getSourceAssociations(ua1ID).containsKey(oa1ID));
         assertTrue(deGraph.getSourceAssociations(ua1ID).get(oa1ID).containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testDeserialize() throws PMException {
+        String str =
+                "node PC pc1" +
+                "node OA oa1" +
+                "node UA ua1" +
+                "node U u1" +
+                "node O o1" +
+
+                "assign U:u1 UA:ua1" +
+                "assign O:o1 OA:oa1" +
+                "assign OA:oa1 PC:pc1" +
+
+                "assoc UA:ua1 OA:oa1 [read, write]";
+
+        GraphSerializer.deserialize(new MemGraph(), str);
     }
 }

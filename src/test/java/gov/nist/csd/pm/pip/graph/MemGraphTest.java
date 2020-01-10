@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 

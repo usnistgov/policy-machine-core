@@ -11,7 +11,6 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -32,20 +31,13 @@ class PReviewDeciderTest {
     void testHasPermissions() throws PMException {
         Graph graph = new MemGraph();
 
-        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null);
-        Node o1 = graph.createNode(getID(), "o1", O, null);
-        Node o2 = graph.createNode(getID(), "o2", O, null);
-        Node o3 = graph.createNode(getID(), "o3", O, null);
-        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", NodeType.PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o2.getID(), oa1.getID());
-        graph.assign(o3.getID(), oa1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null, pc1.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null, ua1.getID());
+        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
+        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
@@ -57,30 +49,20 @@ class PReviewDeciderTest {
     void testFilter() throws PMException {
         Graph graph = new MemGraph();
 
-        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null);
-        Node o1 = graph.createNode(getID(), "o1", O, null);
-        Node o2 = graph.createNode(getID(), "o2", O, null);
-        Node o3 = graph.createNode(getID(), "o3", O, null);
-        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", NodeType.PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o2.getID(), oa1.getID());
-        graph.assign(o3.getID(), oa1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null, pc1.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null, ua1.getID());
+        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
+        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
-        Collection<Node> nodes = graph.getNodes();
-        List<Long> nodeIDs = new ArrayList<>();
-        for (Node node : nodes) {
-            nodeIDs.add(node.getID());
-        }
+        Set<Node> nodes = graph.getNodes();
+
         PReviewDecider decider = new PReviewDecider(graph);
-        assertEquals(new HashSet<>(Arrays.asList(o1.getID(), o2.getID(), o3.getID(), oa1.getID())),
-                new HashSet<>(decider.filter(u1.getID(), 0, nodeIDs, "read"))
+        assertEquals(new HashSet<>(Arrays.asList(o1, o2, o3, oa1)),
+                new HashSet<>(decider.filter(u1.getID(), 0, nodes, "read"))
         );
     }
 
@@ -88,27 +70,20 @@ class PReviewDeciderTest {
     void testGetChildren() throws PMException {
         Graph graph = new MemGraph();
 
-        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null);
-        Node o1 = graph.createNode(getID(), "o1", O, null);
-        Node o2 = graph.createNode(getID(), "o2", O, null);
-        Node o3 = graph.createNode(getID(), "o3", O, null);
-        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", NodeType.PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o2.getID(), oa1.getID());
-        graph.assign(o3.getID(), oa1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null, pc1.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null, ua1.getID());
+        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
+        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        Collection<Long> children = decider.getChildren(u1.getID(), 0, oa1.getID());
+        Set<Node> children = decider.getChildren(u1.getID(), 0, oa1.getID());
         assertEquals(
-                new HashSet<>(Arrays.asList(o1.getID(), o2.getID(), o3.getID())),
+                new HashSet<>(Arrays.asList(o1, o2, o3)),
                 children
         );
     }
@@ -117,20 +92,13 @@ class PReviewDeciderTest {
     void testGetAccessibleNodes() throws PMException {
         Graph graph = new MemGraph();
 
-        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null);
-        Node o1 = graph.createNode(getID(), "o1", O, null);
-        Node o2 = graph.createNode(getID(), "o2", O, null);
-        Node o3 = graph.createNode(getID(), "o3", O, null);
-        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", NodeType.PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o2.getID(), oa1.getID());
-        graph.assign(o3.getID(), oa1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", NodeType.UA, null, pc1.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", NodeType.U, null, ua1.getID());
+        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
+        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
@@ -151,16 +119,12 @@ class PReviewDeciderTest {
     @Test
     void testGraph1() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
 
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
@@ -170,23 +134,16 @@ class PReviewDeciderTest {
     @Test
     void testGraph2() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
 
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(u1.getID(), ua2.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(ua1.getID(), pc2.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o1.getID(), oa2.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(oa2.getID(), pc2.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID(), pc2.getID());
+        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
+
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null, oa1.getID(), oa2.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
 
@@ -196,15 +153,11 @@ class PReviewDeciderTest {
     @Test
     void testGraph3() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
@@ -214,18 +167,12 @@ class PReviewDeciderTest {
     @Test
     void testGraph4() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(u1.getID(), ua2.getID());
-        graph.assign(ua2.getID(), pc1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
+        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
+        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null, oa1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
         graph.associate(ua2.getID(), oa1.getID(), new OperationSet("write"));
@@ -236,22 +183,15 @@ class PReviewDeciderTest {
     @Test
     void testGraph5() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
 
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(u1.getID(), ua2.getID());
-        graph.assign(ua1.getID(), pc2.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o1.getID(), oa2.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(oa2.getID(), pc2.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
+        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc2.getID());
+        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null, oa1.getID(), oa2.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
         graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read", "write"));
@@ -262,22 +202,14 @@ class PReviewDeciderTest {
     @Test
     void testGraph6() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
-
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(u1.getID(), ua2.getID());
-        graph.assign(ua1.getID(), pc1.getID());
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(o1.getID(), oa2.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(oa2.getID(), pc2.getID());
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
+        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc2.getID());
+        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
+        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null, oa1.getID(), oa2.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
         graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read"));
@@ -288,13 +220,14 @@ class PReviewDeciderTest {
     @Test
     void testGraph7() throws PMException {
         Graph graph = new MemGraph();
-        Node u1 = graph.createNode(getID(), "u1", U, null);
+
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
         Node ua1 = graph.createNode(getID(), "ua1", UA, null);
-        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
+        Node u1 = graph.createNode(getID(), "u1", U, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), pc1.getID());
@@ -315,7 +248,7 @@ class PReviewDeciderTest {
         Node ua1 = graph.createNode(getID(), "ua1", UA, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(o1.getID(), oa1.getID());
@@ -334,7 +267,7 @@ class PReviewDeciderTest {
         Node ua2 = graph.createNode(getID(), "ua2", UA, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(o1.getID(), oa1.getID());
@@ -356,8 +289,8 @@ class PReviewDeciderTest {
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(u1.getID(), ua2.getID());
@@ -381,8 +314,8 @@ class PReviewDeciderTest {
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(o1.getID(), oa1.getID());
@@ -404,7 +337,7 @@ class PReviewDeciderTest {
         Node ua2 = graph.createNode(getID(), "ua2", UA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(u1.getID(), ua2.getID());
@@ -428,7 +361,7 @@ class PReviewDeciderTest {
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), ua2.getID());
@@ -451,8 +384,8 @@ class PReviewDeciderTest {
         Node ua2 = graph.createNode(getID(), "ua2", UA, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(u1.getID(), ua2.getID());
@@ -476,7 +409,7 @@ class PReviewDeciderTest {
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), ua2.getID());
@@ -499,7 +432,7 @@ class PReviewDeciderTest {
         Node ua2 = graph.createNode(getID(), "ua2", UA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), ua2.getID());
@@ -520,7 +453,7 @@ class PReviewDeciderTest {
         Node ua1 = graph.createNode(getID(), "ua1", UA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
 
         PReviewDecider decider = new PReviewDecider(graph);
@@ -533,7 +466,7 @@ class PReviewDeciderTest {
         Node ua1 = graph.createNode(getID(), "ua1", UA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), pc1.getID());
@@ -551,7 +484,7 @@ class PReviewDeciderTest {
         Node ua1 = graph.createNode(getID(), "ua1", UA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(ua1.getID(), pc1.getID());
         graph.assign(o1.getID(), oa1.getID());
@@ -571,8 +504,8 @@ class PReviewDeciderTest {
         Node o1 = graph.createNode(getID(), "o1", O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(u1.getID(), ua2.getID());
@@ -598,8 +531,8 @@ class PReviewDeciderTest {
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(u1.getID(), ua2.getID());
@@ -623,8 +556,8 @@ class PReviewDeciderTest {
         Node ua1 = graph.createNode(getID(), "ua1", UA, null);
         Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
-        Node pc2 = graph.createNode(getID(), "pc2", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), pc1.getID());
@@ -647,7 +580,7 @@ class PReviewDeciderTest {
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
         Node oa3 = graph.createNode(getID(), "oa3", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(oa2.getID(), oa3.getID());
@@ -689,7 +622,7 @@ class PReviewDeciderTest {
         Node o2 = graph.createNode(getID(), "o2", NodeType.O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(o1.getID(), oa1.getID());
@@ -734,7 +667,7 @@ class PReviewDeciderTest {
         Node oa3 = graph.createNode(getID(), "oa3", OA, null);
         Node oa4 = graph.createNode(getID(), "oa4", OA, null);
         Node oa5 = graph.createNode(getID(), "oa5", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(o1.getID(), oa4.getID());
@@ -760,6 +693,36 @@ class PReviewDeciderTest {
     }
 
     @Test
+    void testGraph25WithProhibitions2() throws PMException {
+        Graph graph = new MemGraph();
+
+        Node u1 = graph.createNode(getID(), "u1", U, null);
+        Node ua1 = graph.createNode(getID(), "ua1", UA, null);
+        Node o1 = graph.createNode(getID(), "o1", NodeType.O, null);
+        Node oa1 = graph.createNode(getID(), "oa1", OA, null);
+        Node oa2 = graph.createNode(getID(), "oa2", OA, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
+
+        graph.assign(u1.getID(), ua1.getID());
+        graph.assign(o1.getID(), oa1.getID());
+        graph.assign(o1.getID(), oa2.getID());
+        graph.assign(oa1.getID(), pc1.getID());
+
+        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+
+        Prohibitions prohibitions = new MemProhibitions();
+        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(u1.getID(), Prohibition.Subject.Type.USER));
+        prohibition.setOperations(new OperationSet("read", "write"));
+        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
+        prohibition.addNode(new Prohibition.Node(oa2.getID(), false));
+        prohibition.setIntersection(true);
+        prohibitions.add(prohibition);
+
+        PReviewDecider decider = new PReviewDecider(graph, prohibitions);
+        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+    }
+
+    @Test
     void testDeciderWithUA() throws PMException {
         Graph graph = new MemGraph();
 
@@ -770,7 +733,7 @@ class PReviewDeciderTest {
         Node o2 = graph.createNode(getID(), "o2", O, null);
         Node oa1 = graph.createNode(getID(), "oa1", OA, null);
         Node oa2 = graph.createNode(getID(), "oa2", OA, null);
-        Node pc1 = graph.createNode(getID(), "pc1", PC, null);
+        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
 
         graph.assign(u1.getID(), ua1.getID());
         graph.assign(ua1.getID(), ua2.getID());

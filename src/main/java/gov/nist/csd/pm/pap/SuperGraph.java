@@ -21,74 +21,74 @@ public class SuperGraph {
 
         Map<String, String> filter = Node.toProperties(NAMESPACE_PROPERTY, "super");
 
-        Set<Node> nodes = graph.search("super_ua1", UA.toString(), filter);
+        Set<Node> nodes = graph.search("super", NodeType.PC.toString(), filter);
         if(nodes.isEmpty()) {
-            superUA1 = graph.createNode(rand.nextLong(), "super_ua1", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"));
+            // add the rep oa ID to the properties
+            Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super");
+            superPC = graph.createNode(0, rand.nextLong(), "super", NodeType.PC, props);
+        } else {
+            superPC = nodes.iterator().next();
+        }
+
+        nodes = graph.search("super_ua1", UA.toString(), filter);
+        if(nodes.isEmpty()) {
+            superUA1 = graph.createNode(superPC.getID(), rand.nextLong(), "super_ua1", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"));
         } else {
             superUA1 = nodes.iterator().next();
         }
         nodes = graph.search("super_ua2", UA.toString(), filter);
         if(nodes.isEmpty()) {
-            superUA2 = graph.createNode(rand.nextLong(), "super_ua2", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"));
+            superUA2 = graph.createNode(superPC.getID(), rand.nextLong(), "super_ua2", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"));
         } else {
             superUA2 = nodes.iterator().next();
         }
         nodes = graph.search("super", NodeType.U.toString(), filter);
         if(nodes.isEmpty()) {
-            superU = graph.createNode(rand.nextLong(), "super", NodeType.U, Node.toProperties(NAMESPACE_PROPERTY, "super"));
+            superU = graph.createNode(superUA1.getID(), rand.nextLong(), "super", NodeType.U, Node.toProperties(NAMESPACE_PROPERTY, "super"));
         } else {
             superU = nodes.iterator().next();
         }
 
         nodes = graph.search("super", NodeType.OA.toString(), filter);
         if(nodes.isEmpty()) {
-            superOA = graph.createNode(rand.nextLong(), "super", NodeType.OA, Node.toProperties(NAMESPACE_PROPERTY, "super"));
+            superOA = graph.createNode(superPC.getID(), rand.nextLong(), "super", NodeType.OA, Node.toProperties(NAMESPACE_PROPERTY, "super"));
         } else {
             superOA = nodes.iterator().next();
         }
         nodes = graph.search("super", NodeType.O.toString(), filter);
         if(nodes.isEmpty()) {
-            superO = graph.createNode(rand.nextLong(), "super", NodeType.O, Node.toProperties(NAMESPACE_PROPERTY, "super"));
+            superO = graph.createNode(superOA.getID(), rand.nextLong(), "super", NodeType.O, Node.toProperties(NAMESPACE_PROPERTY, "super"));
         } else {
             superO = nodes.iterator().next();
         }
 
-        nodes = graph.search("super", NodeType.PC.toString(), filter);
-        if(nodes.isEmpty()) {
-            // add the rep oa ID to the properties
-            Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super");
-            superPC = graph.createNode(rand.nextLong(), "super", NodeType.PC, props);
-        } else {
-            superPC = nodes.iterator().next();
-        }
-
         // check super ua1 is assigned to super pc
-        Set<Long> children = graph.getChildren(superPC.getID());
-        if(!children.contains(superUA1.getID())) {
+        Set<Node> children = graph.getChildren(superPC.getID());
+        if(!children.contains(superUA1)) {
             graph.assign(superUA1.getID(), superPC.getID());
         }
         // check super ua2 is assigned to super pc
         children = graph.getChildren(superPC.getID());
-        if(!children.contains(superUA2.getID())) {
+        if(!children.contains(superUA2)) {
             graph.assign(superUA2.getID(), superPC.getID());
         }
         // check super user is assigned to super ua1
         children = graph.getChildren(superUA1.getID());
-        if(!children.contains(superU.getID())) {
+        if(!children.contains(superU)) {
             graph.assign(superU.getID(), superUA1.getID());
         }
         // check super user is assigned to super ua2
         children = graph.getChildren(superUA2.getID());
-        if(!children.contains(superU.getID())) {
+        if(!children.contains(superU)) {
             graph.assign(superU.getID(),superUA2.getID());
         }
         // check super oa is assigned to super pc
         children = graph.getChildren(superPC.getID());
-        if(!children.contains(superOA.getID())) {
+        if(!children.contains(superOA)) {
             graph.assign(superOA.getID(), superPC.getID());
         }
         // check super o is assigned to super oa
-        if(!children.contains(superO.getID())) {
+        if(!children.contains(superO)) {
             graph.assign(superO.getID(), superOA.getID());
         }
 

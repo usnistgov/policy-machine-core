@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.BreadthFirstSearcher;
 import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
@@ -91,10 +90,10 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Collection<Long> filter(long subjectID, long processID, Collection<Long> nodes, String... perms) {
+    public Set<Node> filter(long subjectID, long processID, Set<Node> nodes, String... perms) {
         nodes.removeIf(n -> {
             try {
-                return !check(subjectID, processID, n, perms);
+                return !check(subjectID, processID, n.getID(), perms);
             }
             catch (PMException e) {
                 return true;
@@ -104,8 +103,8 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Collection<Long> getChildren(long subjectID, long processID, long targetID, String... perms) throws PMException {
-        Set<Long> children = graph.getChildren(targetID);
+    public Set<Node> getChildren(long subjectID, long processID, long targetID, String... perms) throws PMException {
+        Set<Node> children = graph.getChildren(targetID);
         return filter(subjectID, processID, children, perms);
     }
 
@@ -120,13 +119,13 @@ public class PReviewDecider implements Decider {
         }
 
         for(Long borderTargetID : userCtx.getBorderTargets().keySet()) {
-            Set<Long> objects = getAscendants(borderTargetID);
-            for (Long objectID : objects) {
+            Set<Node> objects = getAscendants(graph.getNode(borderTargetID));
+            for (Node object : objects) {
                 // run dfs on the object
-                TargetContext targetCtx = processTargetDAG(objectID, userCtx);
+                TargetContext targetCtx = processTargetDAG(object.getID(), userCtx);
 
                 HashSet<String> permissions = resolvePermissions(userCtx, targetCtx);
-                results.put(objectID, permissions);
+                results.put(object.getID(), permissions);
             }
         }
 
@@ -151,14 +150,14 @@ public class PReviewDecider implements Decider {
     private void generateACLRecursiveHelper (long id, Set<String> perms, Map<Long, Set<String>> targetAssociations, Map<Long, Set<String>> nodesWPerms) throws PMException {
         if (nodesWPerms.get(id) == null) {
             nodesWPerms.put(id, perms);
-            for (Long childID: graph.getChildren(id)) {
+            for (Node child: graph.getChildren(id)) {
                 HashSet<String> childPerms = new HashSet<>(perms);
-                Set<String> fromAssoc = targetAssociations.get(childID);
+                Set<String> fromAssoc = targetAssociations.get(child.getID());
                 if (fromAssoc != null) {
                     childPerms.addAll(fromAssoc);
                 }
 //                System.out.println(childPerms);
-                generateACLRecursiveHelper(childID, childPerms, targetAssociations, nodesWPerms);
+                generateACLRecursiveHelper(child.getID(), childPerms, targetAssociations, nodesWPerms);
             }
         }
     }
@@ -344,18 +343,18 @@ public class PReviewDecider implements Decider {
             }
 
             //get the parents of the subject to start bfs on user side
-            Set<Long> parents = graph.getParents(node.getID());
+            Set<Node> parents = graph.getParents(node.getID());
             while (!parents.isEmpty()) {
-                Long parentNode = parents.iterator().next();
+                Node parentNode = parents.iterator().next();
 
                 //get the associations the current parent node is the source of
-                Map<Long, Set<String>> assocs = graph.getSourceAssociations(parentNode);
+                Map<Long, Set<String>> assocs = graph.getSourceAssociations(parentNode.getID());
 
                 //collect the target and operation information for each association
                 collectAssociations(assocs, borderTargets);
 
                 //add all of the current parent node's parents to the queue
-                parents.addAll(graph.getParents(parentNode));
+                parents.addAll(graph.getParents(parentNode.getID()));
 
                 //remove the current parent from the queue
                 parents.remove(parentNode);
@@ -400,17 +399,17 @@ public class PReviewDecider implements Decider {
         return prohibitionTargets;
     }
 
-    private Set<Long> getAscendants(Long vNode) throws PMException {
-        Set<Long> ascendants = new HashSet<>();
+    private Set<Node> getAscendants(Node vNode) throws PMException {
+        Set<Node> ascendants = new HashSet<>();
         ascendants.add(vNode);
 
-        Set<Long> children = graph.getChildren(vNode);
+        Set<Node> children = graph.getChildren(vNode.getID());
         if (children.isEmpty()) {
             return ascendants;
         }
 
         ascendants.addAll(children);
-        for (Long child : children) {
+        for (Node child : children) {
             ascendants.addAll(getAscendants(child));
         }
 
