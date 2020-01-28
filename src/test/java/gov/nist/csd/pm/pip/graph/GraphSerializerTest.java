@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.O;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GraphSerializerTest {
@@ -26,11 +25,11 @@ class GraphSerializerTest {
     static void setUp() throws PMException {
         graph = new MemGraph();
 
-        graph.createNode(0, pc1ID, "pc1", NodeType.PC, null);
-        graph.createNode(pc1ID, ua1ID, "ua1", NodeType.UA, null);
-        graph.createNode(pc1ID, oa1ID, "oa1", OA, null);
-        graph.createNode(ua1ID, u1ID, "u1", NodeType.U, null);
-        graph.createNode(oa1ID, o1ID, "o1", O, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.assign(u1ID, ua1ID);
         graph.assign(o1ID, oa1ID);

@@ -9,7 +9,7 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.SuperGraph;
+import gov.nist.csd.pm.pdp.SuperPolicy;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -31,8 +31,45 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
  */
 public class GraphService extends Service implements Graph {
 
-    public GraphService(PAP pap, EPP epp) {
-        super(pap, epp);
+    private Graph graph;
+
+    public GraphService(PAP pap, EPP epp, SuperPolicy superPolicy) {
+        super(pap, epp, superPolicy);
+
+        this.graph = pap.getGraphPAP();
+    }
+
+    @Override
+    public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
+        // check that the user can create a policy class
+        if (!hasPermissions(userCtx, superPolicy.getSuperObject().getID(), CREATE_POLICY_CLASS)) {
+            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+        }
+
+        // create the PC node
+        Random rand = new Random();
+        long defaultUA = rand.nextLong();
+        long defaultOA = rand.nextLong();
+        properties.putAll(Node.toProperties("default_ua", String.valueOf(defaultUA), "default_oa", String.valueOf(defaultOA)));
+        Node pcNode = getPAP().getGraphPAP().createPolicyClass(rand.nextLong(), name, properties);
+        // create the PC UA node
+        Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, name, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
+        // create the PC OA node
+        Node pcOANode = getPAP().getGraphPAP().createNode(defaultOA, name, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
+        // assign PC UA to PC
+        getPAP().getGraphPAP().assign(pcUANode.getID(), pcNode.getID());
+        // assign PC OA to PC
+        getPAP().getGraphPAP().assign(pcOANode.getID(), pcNode.getID());
+        // assign Super U to PC UA
+        // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
+        // assign super UA to PC
+        getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute().getID(), pcNode.getID());
+        // associate Super UA and PC UA
+        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getID(), pcUANode.getID(), new OperationSet(ALL_OPERATIONS));
+        // associate Super UA and PC OA
+        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getID(), pcOANode.getID(), new OperationSet(ALL_OPERATIONS));
+
+        return pcNode;
     }
 
     /**
@@ -47,22 +84,18 @@ public class GraphService extends Service implements Graph {
      * that grants the user permissions on the policy class' default UA and OA, which will allow the user to delegate admin
      * permissions to other users.
      *
-     * @param parentID the ID of the parent node if creating a non policy class node.
+     * @param id the ID of the node to create.
      * @param name the name of the node to create.
      * @param type the type of the node.
      * @param properties properties to add to the node.
-     * @return the new node created with it's ID.
+     * @param initialParent the ID of the node to assign the new node to.
+     * @param additionalParents 0 or more node IDs to assign the new node to.
+     * @return the new node.
      * @throws IllegalArgumentException if the name is null or empty.
      * @throws IllegalArgumentException if the type is null.
      */
-    private UserContext userCtx;
-
-    public void setUserCtx(UserContext userCtx) {
-        this.userCtx = userCtx;
-    }
-
     @Override
-    public Node createNode(long parentID, long id, String name, NodeType type, Map<String, String> properties) throws PMException {
+    public Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long... additionalParents) throws PMException {
         if(userCtx == null) {
             throw new PMException("no user context provided to the PDP");
         }
@@ -81,12 +114,33 @@ public class GraphService extends Service implements Graph {
 
         checkNamespace(name, type, properties);
 
-        // create the node
-        if(type.equals(PC)) {
-            return createPolicyClass(id, name, properties);
-        } else {
-            return createNonPolicyClass(parentID, id, name, type, properties);
+        // check that the user has the permission to assign to the parent node
+        if (!hasPermissions(userCtx, initialParent, ASSIGN_TO)) {
+            // if the user cannot assign to the parent node, delete the newly created node
+            throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %d", ASSIGN_TO, initialParent));
         }
+
+        // check any additional parents before assigning
+        for (long parentID : additionalParents) {
+            if (!hasPermissions(userCtx, parentID, ASSIGN_TO)) {
+                // if the user cannot assign to the parent node, delete the newly created node
+                throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %d", ASSIGN_TO, parentID));
+            }
+        }
+
+        //create the node
+        Node node = getGraphPAP().createNode(id, name, type, properties, initialParent, additionalParents);
+        Node parentNode = graph.getNode(initialParent);
+
+        // process event for initial parent
+        getEPP().processEvent(new AssignToEvent(parentNode, node), userCtx.getUserID(), userCtx.getProcessID());
+        // process event for any additional parents
+        for (long parentID : additionalParents) {
+            parentNode = graph.getNode(parentID);
+            getEPP().processEvent(new AssignToEvent(parentNode, node), userCtx.getUserID(), userCtx.getProcessID());
+        }
+
+        return node;
     }
 
     private void checkNamespace(String name, NodeType type, Map<String, String> properties) throws PMException {
@@ -103,61 +157,6 @@ public class GraphService extends Service implements Graph {
             throw new PMException(String.format("a node with the name \"%s\" and type %s already exists in the namespace \"%s\"",
                     name, type, namespace));
         }
-    }
-
-    private Node createNonPolicyClass(long parentID, long id, String name, NodeType type, Map<String, String> properties) throws PMException {
-        //check that the parent node exists
-        if(!exists(parentID)) {
-            throw new PMException(String.format("the specified parent node with ID %d does not exist", parentID));
-        }
-
-        //get the parent node to make the assignment
-        Node parentNodeCtx = getNode(parentID);
-
-        // check that the user has the permission to assign to the parent node
-        if (!hasPermissions(userCtx, parentID, ASSIGN_TO)) {
-            // if the user cannot assign to the parent node, delete the newly created node
-            throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %d", ASSIGN_TO, parentID));
-        }
-
-        //create the node
-        Node node = getGraphPAP().createNode(parentID, id, name, type, properties);
-
-        getEPP().processEvent(new AssignToEvent(parentNodeCtx, node), userCtx.getUserID(), userCtx.getProcessID());
-
-        return node;
-    }
-
-    private Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
-        // check that the user can create a policy class
-        if (!hasPermissions(userCtx, SuperGraph.getSuperO().getID(), CREATE_POLICY_CLASS)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
-        }
-
-        // create the PC node
-        Random rand = new Random();
-        long defaultUA = rand.nextLong();
-        long defaultOA = rand.nextLong();
-        properties.putAll(Node.toProperties("default_ua", String.valueOf(defaultUA), "default_oa", String.valueOf(defaultOA)));
-        Node pcNode = getPAP().getGraphPAP().createNode(0, rand.nextLong(), name, PC, properties);
-        // create the PC UA node
-        Node pcUANode = getPAP().getGraphPAP().createNode(pcNode.getID(), defaultUA, name, UA, Node.toProperties(NAMESPACE_PROPERTY, name));
-        // create the PC OA node
-        Node pcOANode = getPAP().getGraphPAP().createNode(pcNode.getID(), defaultOA, name, OA, Node.toProperties(NAMESPACE_PROPERTY, name));
-        // assign PC UA to PC
-        getPAP().getGraphPAP().assign(pcUANode.getID(), pcNode.getID());
-        // assign PC OA to PC
-        getPAP().getGraphPAP().assign(pcOANode.getID(), pcNode.getID());
-        // assign Super U to PC UA
-        getPAP().getGraphPAP().assign(SuperGraph.getSuperU().getID(), pcUANode.getID());
-        // assign super UA to PC
-        getPAP().getGraphPAP().assign(SuperGraph.getSuperUA1().getID(), pcNode.getID());
-        // associate Super UA and PC UA
-        getPAP().getGraphPAP().associate(SuperGraph.getSuperUA1().getID(), pcUANode.getID(), new OperationSet(ALL_OPERATIONS));
-        // associate Super UA and PC OA
-        getPAP().getGraphPAP().associate(SuperGraph.getSuperUA1().getID(), pcOANode.getID(), new OperationSet(ALL_OPERATIONS));
-
-        return pcNode;
     }
 
     public long getPolicyClassDefault(long pcID, NodeType type) throws PMException {
@@ -683,7 +682,7 @@ public class GraphService extends Service implements Graph {
         }
 
         // check that the user can reset the graph
-        if (!hasPermissions(userCtx, SuperGraph.getSuperO().getID(), RESET)) {
+        if (!hasPermissions(userCtx, superPolicy.getSuperObject().getID(), RESET)) {
             throw new PMAuthorizationException("unauthorized permissions to reset the graph");
         }
 

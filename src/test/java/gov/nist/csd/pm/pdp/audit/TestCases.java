@@ -47,7 +47,6 @@ public class TestCases {
                 graph3(),
                 graph4(),
                 graph5(),
-                graph6(),
                 graph7(),
                 graph8(),
                 graph9(),
@@ -82,16 +81,11 @@ public class TestCases {
 
     public static TestCase graph1() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, RW);
 
@@ -102,12 +96,12 @@ public class TestCases {
 
     public static TestCase graph2() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.assign(u1ID, ua1ID);
         graph.assign(u1ID, ua2ID);
@@ -126,18 +120,13 @@ public class TestCases {
 
     public static TestCase graph3() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, ua2ID);
-        graph.assign(ua2ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, ua2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, R);
         graph.associate(ua2ID, oa1ID, W);
@@ -150,12 +139,11 @@ public class TestCases {
 
     public static TestCase graph4() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
@@ -164,15 +152,12 @@ public class TestCases {
 
     public static TestCase graph5() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, RW);
 
@@ -181,45 +166,20 @@ public class TestCases {
         return new TestCase("graph5", graph, expectedPaths, NOOPS);
     }
 
-    public static TestCase graph6() throws PMException {
-        Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
-
-        graph.associate(ua1ID, oa1ID, R);
-
-
-        Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList());
-        return new TestCase("graph6", graph, expectedPaths, NOOPS);
-    }
+    // removed graph 6 because of change to Graph interface -- requiring parent nodes on creation prevents floating nodes
 
     public static TestCase graph7() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(ua2ID, pc2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc2ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
 
         graph.associate(ua1ID, oa1ID, R);
         graph.associate(ua2ID, oa2ID, RW);
@@ -232,23 +192,16 @@ public class TestCases {
 
     public static TestCase graph8() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(ua2ID, pc2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc2ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
 
         graph.associate(ua1ID, oa1ID, R);
         graph.associate(ua2ID, oa2ID, W);
@@ -261,17 +214,12 @@ public class TestCases {
 
     public static TestCase graph9() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
-
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);   
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, RW);
 
@@ -283,23 +231,16 @@ public class TestCases {
 
     public static TestCase graph10() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(ua2ID, pc2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc2ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
 
         graph.associate(ua1ID, oa1ID, R);
 
@@ -311,15 +252,13 @@ public class TestCases {
 
     public static TestCase graph11() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, RW);
 
@@ -330,18 +269,15 @@ public class TestCases {
 
     public static TestCase graph12() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(ua2ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc2ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, u1ID, ua2ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, R);
         graph.associate(ua2ID, oa1ID, W);
@@ -353,22 +289,16 @@ public class TestCases {
 
     public static TestCase graph13() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(ua2ID, pc2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc2ID);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
 
         graph.associate(ua1ID, oa1ID, R);
         graph.associate(ua2ID, oa2ID, RW);
@@ -381,21 +311,16 @@ public class TestCases {
 
     public static TestCase graph14() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc2ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
 
         graph.associate(ua1ID, oa1ID, RW);
         graph.associate(ua2ID, oa2ID, R);
@@ -408,20 +333,15 @@ public class TestCases {
 
     public static TestCase graph15() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
-        graph.createNode(pc2ID, "pc2", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc2ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
 
         graph.associate(ua1ID, oa1ID, RW);
 
@@ -433,16 +353,13 @@ public class TestCases {
 
     public static TestCase graph16() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, R);
 
@@ -453,15 +370,13 @@ public class TestCases {
 
     public static TestCase graph17() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, R);
 
@@ -472,13 +387,16 @@ public class TestCases {
 
     public static TestCase graph18() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass(pc2ID, "pc2", null);
+
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, ua2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+
+        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
+        graph.createNode(oa1ID, "oa1", OA, null, oa2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.assign(u1ID, ua1ID);
         graph.assign(ua1ID, ua2ID);
@@ -495,20 +413,15 @@ public class TestCases {
 
     public static TestCase graph19() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, ua2ID);
-        graph.assign(ua2ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, oa2ID);
-        graph.assign(oa2ID, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, ua2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+
+        graph.createNode(oa2ID, "oa2", OA, null, pc1ID);
+        graph.createNode(oa1ID, "oa1", OA, null, oa2ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.associate(ua1ID, oa1ID, RW);
         graph.associate(ua2ID, oa2ID, R);
@@ -520,20 +433,15 @@ public class TestCases {
 
     public static TestCase graph20() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(oa2ID, "oa2", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(o1ID, oa2ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(oa2ID, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua2ID, ua1ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(oa2ID, "oa2", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
 
         graph.associate(ua1ID, oa1ID, W);
         graph.associate(ua2ID, oa1ID, R);
@@ -545,12 +453,14 @@ public class TestCases {
 
     public static TestCase graph21() throws PMException {
         Graph graph = new MemGraph();
-        graph.createNode(u1ID, "u1", U, null);
-        graph.createNode(ua1ID, "ua1", UA, null);
-        graph.createNode(ua2ID, "ua2", UA, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
         graph.assign(u1ID, ua1ID);
         graph.assign(u1ID, ua2ID);

@@ -64,8 +64,8 @@ public class MemGraph implements Graph {
         if (type == PC) {
             throw new PMException("use createPolicyClass to create a policy class node");
         }
-        if (id == 0) {
-            throw new IllegalArgumentException("no ID was provided when creating a node in the in-memory graph");
+        if (exists(id)) {
+            throw new IllegalArgumentException("the ID already exists in the graph");
         }
         else if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
@@ -76,8 +76,6 @@ public class MemGraph implements Graph {
         else if (initialParent == 0) {
             throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
         }
-
-
 
         // add the vertex to the graph
         graph.addVertex(id);

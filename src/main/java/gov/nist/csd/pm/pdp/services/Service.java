@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pdp.services;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.SuperPolicy;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -21,18 +22,29 @@ public class Service {
 
     private PAP pap;
     private EPP epp;
+    protected SuperPolicy superPolicy;
+    protected UserContext userCtx;
 
     /**
      * Create a new Service with a sessionID and processID from the request context.
      * @param pap the Policy Administration Point
      * @param epp the Event Processing Point
+     * @param superPolicy the Object containing information on the super policy configuration.
      */
-    Service(PAP pap, EPP epp) {
+    Service(PAP pap, EPP epp, SuperPolicy superPolicy) {
         this.pap = pap;
         this.epp = epp;
     }
 
     private Service() {}
+
+    public void setUserCtx(UserContext userCtx) {
+        this.userCtx = userCtx;
+    }
+
+    public UserContext getUserCtx() {
+        return userCtx;
+    }
 
     EPP getEPP() {
         return this.epp;

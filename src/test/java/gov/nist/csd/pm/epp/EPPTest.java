@@ -36,11 +36,11 @@ class EPPTest {
     @BeforeEach
     void setup() throws PMException {
         Graph graph = new MemGraph();
-        pc1 = graph.createNode(0, new Random().nextLong(), "pc1", NodeType.PC, null);
-        ua1 = graph.createNode(pc1.getID(), new Random().nextLong(), "ua1", NodeType.UA, null);
-        oa1 = graph.createNode(pc1.getID(), new Random().nextLong(), "oa1", NodeType.OA, null);
-        o1 = graph.createNode(oa1.getID(), new Random().nextLong(), "o1", NodeType.O, null);
-        u1 = graph.createNode(ua1.getID(), new Random().nextLong(), "u1", NodeType.U, null);
+        pc1 = graph.createPolicyClass(new Random().nextLong(), "pc1", null);
+        ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null, pc1.getID());
+        oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null, pc1.getID());
+        o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null, oa1.getID());
+        u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null, ua1.getID());
 
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
@@ -57,6 +57,9 @@ class EPPTest {
         pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), u1.getID(), 123);
         Set<Node> search = pdp.getPAP().getGraphPAP().search("u1 assign to success", null, null);
         assertFalse(search.isEmpty());
+        Node node = search.iterator().next();
+        assertTrue(node.getProperties().containsKey("prop1"));
+        assertTrue(node.getProperties().get("prop1").equalsIgnoreCase("val1"));
 
         // test anyUser assign
         pdp.getEPP().processEvent(new AssignEvent(o1, oa1), u1.getID(), 123);

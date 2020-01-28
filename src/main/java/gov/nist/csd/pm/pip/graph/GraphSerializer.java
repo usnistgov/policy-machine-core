@@ -103,7 +103,7 @@ public class GraphSerializer {
             long targetID = assignment.getTargetID();
             if (!graph.exists(sourceID)) {
                 Node node = nodesMap.get(sourceID);
-                graph.createNode(targetID, node.getID(), node.getName(), node.getType(), node.getProperties());
+                graph.createNode(node.getID(), node.getName(), node.getType(), node.getProperties(), targetID);
             }
 
             graph.assign(assignment.getSourceID(), assignment.getTargetID());
@@ -345,7 +345,7 @@ public class GraphSerializer {
 
                 if (!graph.exists(childID)) {
                     Node node = nodesMap.get(childID);
-                    graph.createNode(parentID, childID, node.getName(), node.getType(), node.getProperties());
+                    graph.createNode(childID, node.getName(), node.getType(), node.getProperties(), parentID);
                     parents.remove(parentID);
                 }
 

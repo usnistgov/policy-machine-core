@@ -28,13 +28,12 @@ public class DepthFirstSearcher implements Searcher{
         visited.add(start.getID());
 
         for(Node parent : graph.getParents(start.getID())) {
-            Node parentNode = graph.getNode(parent.getID());
 
             // traverse from the parent node
-            traverse(parentNode, propagator, visitor);
+            traverse(parent, propagator, visitor);
 
             // propagate from the parent to the start node
-            propagator.propagate(parentNode, start);
+            propagator.propagate(parent, start);
         }
 
         // after processing the parents, visit the start node

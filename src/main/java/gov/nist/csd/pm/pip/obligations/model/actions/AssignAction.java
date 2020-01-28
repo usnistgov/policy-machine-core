@@ -6,30 +6,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssignAction extends Action {
-    private List<EvrNode> what;
-    private List<EvrNode> where;
+
+    private List<Assignment> assignments;
 
     public AssignAction() {
-        where = new ArrayList<>();
+        assignments = new ArrayList<>();
     }
 
-    public List<EvrNode> getWhat() {
-        return what;
+    public List<Assignment> getAssignments() {
+        return assignments;
     }
 
-    public void setWhat(List<EvrNode> what) {
-        this.what = what;
+    public void setAssignments(List<Assignment> assignments) {
+        this.assignments = assignments;
     }
 
-    public List<EvrNode> getWhere() {
-        return where;
+    public void addAssignment(Assignment assignment) {
+        this.assignments.add(assignment);
     }
 
-    public void setWhere(List<EvrNode> where) {
-        this.where = where;
-    }
+    public static class Assignment {
+        private EvrNode what;
+        private EvrNode where;
 
-    public void addWhere(EvrNode evrNode) {
-        this.where.add(evrNode);
+        public Assignment(EvrNode what, EvrNode where) {
+            this.what = what;
+            this.where = where;
+        }
+
+        public EvrNode getWhat() {
+            return what;
+        }
+
+        public void setWhat(EvrNode what) {
+            this.what = what;
+        }
+
+        public EvrNode getWhere() {
+            return where;
+        }
+
+        public void setWhere(EvrNode where) {
+            this.where = where;
+        }
     }
 }

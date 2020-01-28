@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pdp.services;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.SuperPolicy;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
@@ -17,8 +18,8 @@ import java.util.*;
  */
 public class AnalyticsService extends Service {
 
-    public AnalyticsService(PAP pap, EPP epp) {
-        super(pap, epp);
+    public AnalyticsService(PAP pap, EPP epp, SuperPolicy superPolicy) {
+        super(pap, epp, superPolicy);
     }
 
     /**

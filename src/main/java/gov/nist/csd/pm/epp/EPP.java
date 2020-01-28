@@ -241,39 +241,20 @@ public class EPP {
             applyDenyAction(eventCtx, userID, processID, (DenyAction) action);
         } else if(action instanceof GrantAction) {
             applyGrantAction(eventCtx, userID, processID, (GrantAction) action);
+        } else if(action instanceof FunctionAction) {
+            functionEvaluator.evalNode(eventCtx, userID, processID, pdp, ((FunctionAction) action).getFunction());
         }
     }
 
     private void applyGrantAction(EventContext eventCtx, long userID, long processID, GrantAction action) throws PMException {
-        List<EvrNode> subjects = action.getSubjects();
+        EvrNode subject = action.getSubject();
         List<String> operations = action.getOperations();
-        List<EvrNode> targets = action.getTargets();
+        EvrNode target = action.getTarget();
 
-        Set<Node> subjectNodes = new HashSet<>();
-        for(EvrNode subject : subjects) {
-            if(subject.getFunction() != null) {
-                Node node = (Node) functionEvaluator.evalNodeList(eventCtx, userID, processID, pdp, subject.getFunction());
-                subjectNodes.add(node);
-            } else {
-                subjectNodes.addAll(getNodes(subject.getName(), subject.getType(), subject.getProperties()));
-            }
-        }
+        Node subjectNode = toNode(eventCtx, userID, processID, subject);
+        Node targetNode = toNode(eventCtx, userID, processID, target);
 
-        Set<Node> targetNodes = new HashSet<>();
-        for(EvrNode target : targets) {
-            if(target.getFunction() != null) {
-                Node node = (Node) functionEvaluator.evalNodeList(eventCtx, userID, processID, pdp, target.getFunction());
-                targetNodes.add(node);
-            } else {
-                targetNodes.addAll(getNodes(target.getName(), target.getType(), target.getProperties()));
-            }
-        }
-
-        for(Node subject : subjectNodes) {
-            for(Node target : targetNodes) {
-                pap.getGraphPAP().associate(subject.getID(), target.getID(), new OperationSet(operations));
-            }
-        }
+        pap.getGraphPAP().associate(subjectNode.getID(), targetNode.getID(), new OperationSet(operations));
     }
 
     private void applyDenyAction(EventContext eventCtx, long userID, long processID, DenyAction action) throws PMException {
@@ -373,247 +354,102 @@ public class EPP {
         return search;
     }
 
+    private Node getNode(String name, String type, Map<String, String> properties) throws PMException {
+        Graph graph = pap.getGraphPAP();
+
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
+
+        Set<Node> search = graph.search(name, type, properties);
+        if (search.isEmpty()) {
+            throw new PMException(String.format("no subject node could be found with name %s, type %s, and properties %s",
+                    name, type, properties));
+        }
+
+        return search.iterator().next();
+    }
+
     private void applyDeleteAction(EventContext eventCtx, long userID, long processID, DeleteAction action) throws PMException {
-        Action actionToDelete = action.getAction();
-        if(action.getAction() == null) {
-            return;
+        List<EvrNode> nodes = action.getNodes();
+        for (EvrNode evrNode : nodes) {
+            Node node = toNode(eventCtx, userID, processID, evrNode);
+            pdp.getPAP().getGraphPAP().deleteNode(node.getID());
         }
 
-        if(actionToDelete instanceof CreateAction) {
-            deleteCreateAction(eventCtx, userID, processID, (CreateAction) actionToDelete);
-        } else if(actionToDelete instanceof AssignAction) {
-            deleteAssignAction(eventCtx, userID, processID, (AssignAction) actionToDelete);
-        } else if(actionToDelete instanceof GrantAction) {
-            deleteGrantAction(eventCtx, userID, processID, (GrantAction) actionToDelete);
-        } else if(actionToDelete instanceof DenyAction) {
-            deleteDenyAction(eventCtx, userID, processID, (DenyAction) actionToDelete);
+        AssignAction assignAction = action.getAssignments();
+        for (AssignAction.Assignment assignment : assignAction.getAssignments()) {
+            Node what = toNode(eventCtx, userID, processID, assignment.getWhat());
+            Node where = toNode(eventCtx, userID, processID, assignment.getWhere());
+            pdp.getPAP().getGraphPAP().deassign(what.getID(), where.getID());
         }
-    }
 
-    private void deleteDenyAction(EventContext eventCtx, long userID, long processID, DenyAction action) throws PMException {
-        pap.getProhibitionsPAP().delete(action.getLabel());
-    }
+        List<GrantAction> associations = action.getAssociations();
+        for (GrantAction grantAction : associations) {
+            Node subject = toNode(eventCtx, userID, processID, grantAction.getSubject());
+            Node target = toNode(eventCtx, userID, processID, grantAction.getTarget());
+            pdp.getPAP().getGraphPAP().dissociate(subject.getID(), target.getID());
+        }
 
-    private void deleteGrantAction(EventContext eventCtx, long userID, long processID, GrantAction action) throws PMException {
-        List<EvrNode> subjects = action.getSubjects();
-        List<EvrNode> targets = action.getTargets();
+        List<String> prohibitions = action.getProhibitions();
+        for (String label : prohibitions) {
+            pdp.getPAP().getProhibitionsPAP().delete(label);
+        }
 
-        // get the subject nodes
-        Set<Node> subjectNodes = new HashSet<>();
-        for(EvrNode evrNode : subjects) {
-            Function function = evrNode.getFunction();
-            if(function != null) {
-                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
-                if (o instanceof List) {
-                    subjectNodes.addAll((List)o);
-                } else if (o instanceof Node) {
-                    subjectNodes.add((Node)o);
+        List<String> rules = action.getRules();
+        for (String label : rules) {
+            List<Obligation> obligations = pdp.getPAP().getObligationsPAP().getAll();
+            for (Obligation obligation : obligations) {
+                List<Rule> oblRules = obligation.getRules();
+                for (Rule rule : oblRules) {
+                    if (rule.getLabel().equals(label)) {
+                        oblRules.remove(rule);
+                    }
                 }
-            } else {
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                subjectNodes.addAll(nodes);
-            }
-        }
-
-        // get the subject nodes
-        Set<Node> targetNodes = new HashSet<>();
-        for(EvrNode evrNode : targets) {
-            Function function = evrNode.getFunction();
-            if(function != null) {
-                List list = (List) functionEvaluator.evalNodeList(eventCtx, userID, processID, pdp, function);
-                targetNodes.addAll(list);
-            } else {
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                targetNodes.addAll(nodes);
-            }
-        }
-
-        Graph graph = pap.getGraphPAP();
-
-        // delete the associations
-        for(Node subject : subjectNodes) {
-            for(Node target : targetNodes) {
-                graph.dissociate(subject.getID(), target.getID());
             }
         }
     }
 
-    private void deleteAssignAction(EventContext eventCtx, long userID, long processID, AssignAction action) throws PMException {
-        List<EvrNode> what = action.getWhat();
-        List<EvrNode> where = action.getWhere();
-
-        Graph graph = pap.getGraphPAP();
-
-        List<Node> childNodes = new ArrayList<>();
-        for(EvrNode evrNode : what) {
-            Node childNode;
-            if (evrNode.getFunction() != null) {
-                Function function = evrNode.getFunction();
-                childNode = (Node) functionEvaluator.evalNode(eventCtx, userID, processID, pdp, function);
-            }
-            else {
-                // get the child node
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                if (nodes.isEmpty()) {
-                    return;
-                }
-                childNode = nodes.iterator().next();
-            }
-            childNodes.add(childNode);
+    private Node toNode(EventContext eventCtx, long userID, long processID, EvrNode evrNode) throws PMException {
+        Node node;
+        if(evrNode.getFunction() != null) {
+            node = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, evrNode.getFunction());
+        } else {
+            node = getNode(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
         }
-
-        // get the parents
-        List<Node> parents = new ArrayList<>();
-        for(EvrNode evrNode : where) {
-            if(evrNode.getFunction() != null) {
-                Function function = evrNode.getFunction();
-                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
-                if (o instanceof List) {
-                    parents.addAll((List)o);
-                } else if (o instanceof Node) {
-                    parents.add((Node)o);
-                }
-            } else {
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                parents.addAll(nodes);
-            }
-        }
-
-        // delete the assignments
-        for(Node child : childNodes) {
-            for (Node parent : parents) {
-                System.out.println("deassigning " + child.getName() + " from " + parent.getName());
-                graph.deassign(child.getID(), parent.getID());
-            }
-        }
-    }
-
-    /**
-     * Delete the creation of a node or a rule
-     * @param eventCtx
-     * @param userID
-     * @param processID
-     * @param action
-     * @throws PMException
-     */
-    private void deleteCreateAction(EventContext eventCtx, long userID, long processID, CreateAction action) throws PMException {
-        List<EvrNode> what = action.getWhat();
-        Graph graph = pap.getGraphPAP();
-
-        for(EvrNode evrNode : what) {
-            if (evrNode.getFunction() != null) {
-                Function function = evrNode.getFunction();
-                functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
-            }
-            else if (action.getRule() != null) {
-            /*List<Obligation> obligations = pap.getObligationsPAP().getAll();
-            for(Obligation obligation : obligations) {
-                List<Rule> rules = obligation.getRules();
-                rules.removeIf((rule) -> rule.getLabel().equals(action.getRule().getLabel()));
-            }*/
-                //TODO delete rule
-            }
-            else {
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                for (Node node : nodes) {
-                    graph.deleteNode(node.getID());
-                }
-            }
-        }
+        return node;
     }
 
     private void applyCreateAction(String label, EventContext eventCtx, long userID, long processID, CreateAction action) throws PMException {
-        if(action.getRule() != null) {
-            createRule(label, eventCtx, action);
-        } else {
-            List<EvrNode> what = action.getWhat();
-            List<EvrNode> where = action.getWhere();
+        for (Rule rule : action.getRules()) {
+            createRule(label, eventCtx, rule);
+        }
 
-            List<Node> whatNodes = new ArrayList<>();
-            for(EvrNode evrNode : what) {
-                if (evrNode.getFunction() != null) {
-                    Node node = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, evrNode.getFunction());
-                    whatNodes.add(node);
-                }
-                else {
-                    /* TODO Node n = pap.getGraphPAP().createNode(new Random().nextLong(), evrNode.getName(), NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
-                    whatNodes.add(n);*/
-                }
-            }
-
-            List<Node> whereNodes = new ArrayList<>();
-            for(EvrNode evrNode : where) {
-                if(evrNode.getFunction() != null) {
-                    Function function = evrNode.getFunction();
-                    Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
-                    if (o instanceof List) {
-                        whereNodes.addAll((List)o);
-                    } else if (o instanceof Node) {
-                        whereNodes.add((Node)o);
-                    }
-                } else {
-                    Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                    whereNodes.addAll(nodes);
-                }
-            }
-
-            for(Node whatNode : whatNodes) {
-                for (Node whereNode : whereNodes) {
-                    pap.getGraphPAP().assign(whatNode.getID(), whereNode.getID());
-                }
-            }
+        for (CreateAction.CreateNode createNode : action.getCreateNodesList()) {
+            EvrNode what = createNode.getWhat();
+            EvrNode where = createNode.getWhere();
+            Node whereNode = toNode(eventCtx, userID, processID, where);
+            pap.getGraphPAP().createNode(new Random().nextLong(), what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getID());
         }
     }
 
-    private void createRule(String label, EventContext eventCtx, CreateAction action) {
+    private void createRule(String obligationLabel, EventContext eventCtx, Rule rule) {
         // add the rule to the obligation
-        Obligation obligation = pap.getObligationsPAP().get(label);
+        Obligation obligation = pap.getObligationsPAP().get(obligationLabel);
         List<Rule> rules = obligation.getRules();
-        rules.add(action.getRule());
+        rules.add(rule);
         obligation.setRules(rules);
     }
 
     private void applyAssignAction(EventContext eventCtx, long userID, long processID, AssignAction action) throws PMException {
-        List<EvrNode> what = action.getWhat();
-        List<EvrNode> where = action.getWhere();
+        for (AssignAction.Assignment assignment : action.getAssignments()) {
+            EvrNode what = assignment.getWhat();
+            EvrNode where = assignment.getWhere();
 
-        List<Node> whatNodes = new ArrayList<>();
-        for(EvrNode evrNode : what) {
-            if (evrNode.getFunction() != null) {
-                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, evrNode.getFunction());
-                if (o instanceof List) {
-                    whatNodes.addAll((List)o);
-                } else if (o instanceof Node) {
-                    whatNodes.add((Node)o);
-                }
-            }
-            else {
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                whatNodes.add(nodes.iterator().next());
-            }
-        }
+            Node whatNode = toNode(eventCtx, userID, processID, what);
+            Node whereNode = toNode(eventCtx, userID, processID, where);
 
-        List<Node> whereNodes = new ArrayList<>();
-        for(EvrNode evrNode : where) {
-            if(evrNode.getFunction() != null) {
-                Function function = evrNode.getFunction();
-                Object o = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
-                if (o instanceof List) {
-                    whatNodes.addAll((List)o);
-                } else if (o instanceof Node) {
-                    whatNodes.add((Node)o);
-                }
-            } else {
-                Set<Node> nodes = getNodes(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
-                whereNodes.addAll(nodes);
-            }
-        }
-
-        for(Node whatNode : whatNodes) {
-            for (Node whereNode : whereNodes) {
-                System.out.println("assigning " + whatNode.getName() + " to " + whereNode.getName());
-                pap.getGraphPAP().assign(whatNode.getID(), whereNode.getID());
-            }
+            pap.getGraphPAP().assign(whatNode.getID(), whereNode.getID());
         }
     }
 }

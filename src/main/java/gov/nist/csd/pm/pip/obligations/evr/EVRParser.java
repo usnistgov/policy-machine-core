@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pip.obligations.evr;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.*;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
@@ -403,6 +405,8 @@ public class EVRParser {
             action = parseDenyAction(map.get("deny"));
         } else if(map.containsKey("delete")) {
             action = parseDeleteAction(map.get("delete"));
+        } else if(map.containsKey("function")) {
+            action = parseFunctionAction(map.get("function"));
         }
 
         if(action == null) {
@@ -414,6 +418,11 @@ public class EVRParser {
         }
 
         return action;
+    }
+
+    private static Action parseFunctionAction(Object o) throws EVRException {
+        Map map = getObject(o, Map.class);
+        return new FunctionAction(parseFunction(map));
     }
 
     private static EvrNode parseEvrNode(Map map) throws EVRException {
@@ -451,18 +460,18 @@ public class EVRParser {
 
     /**
      * create:
-     *   what: a list of nodes instead of just one
-     *     - name:
+     *   - what:
+     *       name:
      *       type:
      *       properties:
-     *     --
-     *     - function:
-     *   where:
-     *     - name:
+     *       --
+     *       - function:
+     *     where:
+     *       name:
      *       type:
-     *     - function:
+     *       function:
      *   ---
-     *   rule:
+     *   - rule:
      */
     private static Action parseCreateAction(Object o) throws EVRException {
         if(o == null) {
@@ -470,28 +479,19 @@ public class EVRParser {
         }
 
         CreateAction action = new CreateAction();
-        Map createActionMap = getObject(o, Map.class);
-        if(createActionMap.containsKey("rule")) {
-            action.setRule(parseRule(createActionMap.get("rule")));
-        } else {
-            if (!createActionMap.containsKey("what")) {
-                throw new EVRException("create action does not have a \"what\" field in " + createActionMap);
-            }
-
-            List whatList = getObject(createActionMap.get("what"), List.class);
-            List<EvrNode> whatNodes = new ArrayList<>();
-            for(Object whatObj : whatList) {
-                EvrNode node = parseEvrNode(getObject(whatObj, Map.class));
-                whatNodes.add(node);
-            }
-            action.setWhat(whatNodes);
-
-            if (createActionMap.containsKey("where")) {
-                List whereList = getObject(createActionMap.get("where"), List.class);
-                for (Object whereObj : whereList) {
-                    Map contMap = getObject(whereObj, Map.class);
-                    action.addWhere(parseEvrNode(contMap));
-                }
+        List createActionList = getObject(o, List.class);
+        for (Object obj : createActionList) {
+            Map map = getObject(obj, Map.class);
+            if (map.containsKey("label") &&
+                    map.containsKey("event") &&
+                    map.containsKey("response")) {
+                action.addRule(parseRule(map));
+            } else if (map.containsKey("what") &&
+                    map.containsKey("where")) {
+                action.addCreateNode(new CreateAction.CreateNode(
+                        parseEvrNode(getObject(map.get("what"), Map.class)),
+                        parseEvrNode(getObject(map.get("where"), Map.class))
+                ));
             }
         }
 
@@ -499,11 +499,11 @@ public class EVRParser {
     }
 
     /**
-     * The assign action behaves the same as the create action
+     * The assign action creates a set of assignments in the graph.
      *
      * assign:
-     *   what: a list of nodes instead of just one
-     *   where:
+     *   - what:
+     *     where:
      *
      *
      * the "like" element described in the standard is not implemented
@@ -513,27 +513,21 @@ public class EVRParser {
             throw new EVRException("assign action cannot be null or empty");
         }
 
-        Map assignActionMap = getObject(o, Map.class);
-        if(!assignActionMap.containsKey("what")) {
-            throw new EVRException("create action does not have a \"what\" field in " + assignActionMap);
-        } else if(!assignActionMap.containsKey("where")) {
-            throw new EVRException("create action does not have a \"where\" field in " + assignActionMap);
-        }
-
         AssignAction action = new AssignAction();
 
-        List whatList = getObject(assignActionMap.get("what"), List.class);
-        List<EvrNode> whatNodes = new ArrayList<>();
-        for(Object whatObj : whatList) {
-            EvrNode node = parseEvrNode(getObject(whatObj, Map.class));
-            whatNodes.add(node);
-        }
-        action.setWhat(whatNodes);
+        List assignActionList = getObject(o, List.class);
+        for (Object assignObj : assignActionList) {
+            Map map = getObject(assignObj, Map.class);
+            if(!map.containsKey("what")) {
+                throw new EVRException("assign action does not have a \"what\" field in " + map);
+            } else if(!map.containsKey("where")) {
+                throw new EVRException("assign action does not have a \"where\" field in " + map);
+            }
 
-        List whereList = getObject(assignActionMap.get("where"), List.class);
-        for(Object whereObj : whereList) {
-            Map contMap = getObject(whereObj, Map.class);
-            action.addWhere(parseEvrNode(contMap));
+            EvrNode what = parseEvrNode(getObject(map.get("what"), Map.class));
+            EvrNode where = parseEvrNode(getObject(map.get("where"), Map.class));
+
+            action.addAssignment(new AssignAction.Assignment(what, where));
         }
 
         return action;
@@ -541,19 +535,20 @@ public class EVRParser {
 
     /**
      * grant:
-     *   subjects:
-     *     - name:
-     *       type:
-     *     - function:
+     *   subject:
+     *     name:
+     *     type:
+     *     --
+     *     function:
      *   operations:
      *     - ""
      *     - ""
-     *   targets:
-     *     - name:
-     *       type:
-     *     - function:
+     *   target:
+     *     name:
+     *     type:
+     *     --
+     *     function:
      *
-     *     operations can be ommitted if deleting a grant
      */
     private static Action parseGrantAction(Object o) throws EVRException {
         if(o == null) {
@@ -561,17 +556,17 @@ public class EVRParser {
         }
 
         Map grantActionMap = getObject(o, Map.class);
-        if(!grantActionMap.containsKey("subjects")) {
-            throw new EVRException("grant action does not contain a \"subjects\" field in " + grantActionMap);
-        } else if(!grantActionMap.containsKey("targets")) {
-            throw new EVRException("grant action does not contain a \"targets\" field in " + grantActionMap);
+        if(!grantActionMap.containsKey("subject")) {
+            throw new EVRException("grant action does not contain a \"subject\" field in " + grantActionMap);
+        } else if(!grantActionMap.containsKey("target")) {
+            throw new EVRException("grant action does not contain a \"target\" field in " + grantActionMap);
         }
 
         GrantAction action = new GrantAction();
 
-        List subjectsList = getObject(grantActionMap.get("subjects"), List.class);
-        List<EvrNode> subjects = parseSubjects(subjectsList);
-        action.setSubjects(subjects);
+        Map subjectMap = getObject(grantActionMap.get("subject"), Map.class);
+        EvrNode subject = parseSubject(subjectMap);
+        action.setSubject(subject);
 
         if(grantActionMap.containsKey("operations")) {
             List opsList = getObject(grantActionMap.get("operations"), List.class);
@@ -582,33 +577,24 @@ public class EVRParser {
             action.setOperations(operations);
         }
 
-        List targetsList = getObject(grantActionMap.get("targets"), List.class);
-        List<EvrNode> targets = parseTargets(targetsList);
-        action.setTargets(targets);
+        Map targetMap = getObject(grantActionMap.get("target"), Map.class);
+        EvrNode target = parseTarget(targetMap);
+        action.setTarget(target);
 
         return action;
     }
 
-    private static List<EvrNode> parseSubjects(List list) throws EVRException {
-        List<EvrNode> subjects = new ArrayList<>();
-        for(Object o : list) {
-            Map oMap = getObject(o, Map.class);
-            subjects.add(parseEvrNode(oMap));
-        }
-        return subjects;
+    private static EvrNode parseSubject(Map map) throws EVRException {
+        return parseEvrNode(map);
     }
 
-    private static List<EvrNode> parseTargets(List list) throws EVRException {
-        List<EvrNode> targets = new ArrayList<>();
-        for(Object o : list) {
-            Map oMap = getObject(o, Map.class);
-            targets.add(parseEvrNode(oMap));
-        }
-        return targets;
+    private static EvrNode parseTarget(Map map) throws EVRException {
+        return parseEvrNode(map);
     }
 
     /**
      * deny:
+     *   label:
      *   subject: priority goes 1. function, 2. process, 3. node
      *     function:
      *     ---
@@ -649,9 +635,6 @@ public class EVRParser {
 
         DenyAction action = new DenyAction();
         Object label = denyActionMap.get("label");
-        if (label == null) {
-            label = UUID.randomUUID().toString();
-        }
         action.setLabel((String) label);
 
         Map subjectMap = getObject(denyActionMap.get("subject"), Map.class);
@@ -742,14 +725,25 @@ public class EVRParser {
         return containers;
     }
 
-
-
     /**
      * delete:
-     *   create:
-     *   assign:
-     *   grant:
-     *   deny:
+     *   nodes:
+     *     - name:
+     *       type:
+     *   assignments:
+     *     - what:
+     *         name:
+     *         type:
+     *       where:
+     *         name:
+     *         type:
+     *   associations:
+     *     - subject:
+     *       target:
+     *   prohibitions:
+     *     - ""
+     *   rules:
+     *     - ""
      */
     private static Action parseDeleteAction(Object o) throws EVRException {
         if(o == null) {
@@ -758,84 +752,69 @@ public class EVRParser {
 
         DeleteAction action = new DeleteAction();
         Map deleteMap = getObject(o, Map.class);
-        if(deleteMap.containsKey("create")) {
-            action.setAction(parseDeleteCreateAction(deleteMap.get("create")));
-        } else if(deleteMap.containsKey("assign")) {
-            action.setAction(parseAssignAction(deleteMap.get("assign")));
-        } else if(deleteMap.containsKey("grant")) {
-            action.setAction(parseGrantAction(deleteMap.get("grant")));
-        } else if(deleteMap.containsKey("deny")) {
-            action.setAction(parseDeleteDenyAction(deleteMap.get("deny")));
+        if (deleteMap.containsKey("nodes")) {
+            action.setNodes(parseDeleteNodes(deleteMap.get("nodes")));
+        }
+        if (deleteMap.containsKey("assignments")) {
+            action.setAssignments((AssignAction) parseAssignAction(deleteMap.get("assignments")));
+        }
+        if (deleteMap.containsKey("associations")) {
+            action.setAssociations(parseDeleteAssociations(deleteMap.get("associations")));
+        }
+        if (deleteMap.containsKey("prohibitions")) {
+            action.setProhibitions(parseDeleteLabelList(deleteMap.get("prohibitions")));
+        }
+        if (deleteMap.containsKey("rules")) {
+            action.setRules(parseDeleteLabelList(deleteMap.get("rules")));
         }
 
         return action;
     }
 
-    private static Action parseDeleteDenyAction(Object o) throws EVRException {
+    private static List<String> parseDeleteLabelList(Object o) throws EVRException {
+        List<String> labels = new ArrayList<>();
         if (o == null) {
-            throw new EVRException("delete deny action was null");
+            return labels;
         }
 
-        Map denyActionMap = getObject(o, Map.class);
-        DenyAction denyAction = new DenyAction();
-        Object label = denyActionMap.get("label");
-        if (label == null) {
-            label = UUID.randomUUID().toString();
-        }
-        denyAction.setLabel((String) label);
-
-        return denyAction;
-    }
-
-    /**
-     * delete:
-     *   rule:
-     *     label: label to delete
-     * --
-     * delete:
-     *   create:
-     *     what:
-     */
-    private static Action parseDeleteCreateAction(Object o) throws EVRException {
-        if (o == null) {
-            throw new EVRException("delete create action was null");
-        }
-
-        CreateAction action = new CreateAction();
-        Map createActionMap = getObject(o, Map.class);
-        if(createActionMap.containsKey("rule")) {
-            Map ruleMap = getObject(createActionMap.get("rule"), Map.class);
-            if (!ruleMap.containsKey("label")) {
-                throw new EVRException("need a label to delete a rule: " + createActionMap);
-            }
-
-            Rule rule = new Rule();
-            rule.setLabel(getObject(ruleMap.get("label"), String.class));
-            action.setRule(new Rule());
-        } else {
-            if (!createActionMap.containsKey("what")) {
-                throw new EVRException("delete create action does not have a \"what\" field in " + createActionMap);
-            }
-
-            List whatList = getObject(createActionMap.get("what"), List.class);
-            List<EvrNode> whatNodes = new ArrayList<>();
-            for(Object whatObj : whatList) {
-                EvrNode node = parseEvrNode(getObject(whatObj, Map.class));
-                whatNodes.add(node);
-            }
-            action.setWhat(whatNodes);
-        }
-
-        return action;
-    }
-
-    private static List<String> parseRules(Object o) throws EVRException {
         List list = getObject(o, List.class);
-        List<String> rules = new ArrayList<>();
-        for(Object obj : list) {
-            rules.add(getObject(obj, String.class));
+        for (Object listObj : list) {
+            String label = getObject(listObj, String.class);
+            labels.add(label);
         }
-        return rules;
+
+        return labels;
+    }
+
+    private static List<GrantAction> parseDeleteAssociations(Object o) throws EVRException {
+        List<GrantAction> associations = new ArrayList<>();
+        if (o == null) {
+            return associations;
+        }
+
+        List list = getObject(o, List.class);
+        for (Object listObj : list) {
+            GrantAction action = (GrantAction) parseGrantAction(listObj);
+            associations.add(action);
+        }
+
+        return associations;
+    }
+
+    private static List<EvrNode> parseDeleteNodes(Object o) throws EVRException {
+        List<EvrNode> nodes = new ArrayList<>();
+        if (o == null) {
+            return nodes;
+        }
+
+        List list = getObject(o, List.class);
+        for (Object listObj : list) {
+            Map listObjMap = getObject(listObj, Map.class);
+            EvrNode evrNode = parseEvrNode(listObjMap);
+            nodes.add(evrNode);
+        }
+
+        return nodes;
     }
 
     private static Function parseFunction(Map funcMap) throws EVRException {

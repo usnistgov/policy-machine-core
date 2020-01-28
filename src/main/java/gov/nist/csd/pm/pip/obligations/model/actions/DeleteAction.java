@@ -1,17 +1,48 @@
 package gov.nist.csd.pm.pip.obligations.model.actions;
 
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.obligations.model.EvrNode;
+
 import java.util.List;
 
 public class DeleteAction extends Action {
-    private Action       action;
-    private List<String> rules;
 
-    public Action getAction() {
-        return action;
+    List<EvrNode> nodes;
+    AssignAction assignments;
+    List<GrantAction> associations;
+    List<String> prohibitions;
+    List<String> rules;
+
+    public List<EvrNode> getNodes() {
+        return nodes;
     }
 
-    public void setAction(Action action) {
-        this.action = action;
+    public void setNodes(List<EvrNode> nodes) {
+        this.nodes = nodes;
+    }
+
+    public AssignAction getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(AssignAction assignments) {
+        this.assignments = assignments;
+    }
+
+    public List<GrantAction> getAssociations() {
+        return associations;
+    }
+
+    public void setAssociations(List<GrantAction> associations) {
+        this.associations = associations;
+    }
+
+    public List<String> getProhibitions() {
+        return prohibitions;
+    }
+
+    public void setProhibitions(List<String> prohibitions) {
+        this.prohibitions = prohibitions;
     }
 
     public List<String> getRules() {

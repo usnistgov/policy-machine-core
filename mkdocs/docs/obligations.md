@@ -181,28 +181,28 @@ condition:
 ```
 
 ### Create Action
-Create
+You can create
 
-  - A rule
-  - A set of nodes and assignments to containers
+- a set of rules
+- a set of nodes
 #### rule
 ```yaml
 create:
-  rule:
-    label:
+  - label:
     event:
     response:
 ```
 
 #### nodes
-Creating nodes requires the name and type of the nodes to create and the containers in which to assign them. A node can be specified with a set of properties if applicable.
+Create a single node and assign it to an already existing node in the graph. An array of commands is accepted to create
+more than one node. **Functions are not allowed here**.
 ```yaml
 create:
-  what:
-    - name: node1
+  - what:
+      name: node1
       type: UA
-  where:
-    - name: container1
+    where:
+      name: container1
       type: UA
 ```
 
@@ -212,28 +212,32 @@ assign:
   what:
   where:
 ```
-The `what` and `where` elements are arrays of nodes.  The nodes in `what` will be assigned to the nodes in `where`.
+The `what` and `where` nodes.  The node in `what` will be assigned to the node in `where`.
 
 ### Grant Action
-Associate each node in `subjects` with each node in `targets`.
+Associate the node in `subject` with the node in `target`.
 
 ```yaml
 grant:
-  subjects:
+  subject:
   operations:
-  targets:
+  target:
 ```
 
-- `subjects` is an array of nodes that will be the subject of the associations created.
-- `operations` is an array of operations to add to the associations.
-- `targets` is an array of nodes that will be the targets of the associations.
+- `subject` a node that will be the subject of the association.
+- `operations` is an array of operations to add to the association.
+- `target` a node that will be the target of the association.
 
-### Deny Action
+### Deny Action (Prohibition)
 Deny a subject a set of operations on a set of target attributes. The subject can be a function, a process, or a node.
-The operations are an array of string.  The target of the deny can be the intersection of a set of containers. It can also be the complement of the logical evaluation of the containers. Each container is identified by a name and type (properties are optional).  If more than one node matches the provided name and type all will be taken into account. It is possible to take the complement of an individual container using the `complement` element.
+The operations are an array of string.  The target of the deny can be the intersection of a set of containers. 
+It can also be the complement of the logical evaluation of the containers. Each container is identified by a name and type (properties are optional).  
+If more than one node matches the provided name and type all will be taken into account. It is possible to take the complement 
+of an individual container using the `complement` element. A deny also has a label that can be used to reference it later (i.e. to delete).
 
 ```yaml
 deny:
+  label: # string
   subject: # priority goes 1. function, 2. process, 3. node
    function:
    ---
@@ -257,21 +261,44 @@ deny:
 ```
 
 ### Delete Action
-Delete
+The delete action can delete:
 
-- assignment relations
-- deny relations
-- grant relations
-- created policy elements
-- created rules
+- nodes
+- assignments
+- associations
+- prohibitions (denies)
+- rules
 
 ```yaml
 delete:
-  create:
-  assign:
-  grant:
-  deny:
+  nodes:
+    - name:
+      type:
+  assignments:
+    - what:
+        name:
+        type:
+      where:
+        name:
+        type:
+  associations:
+    - subject:
+      target:
+  prohibitions:
+    - label:
+  rules:
+    - label:
 ```
+
+### Fuction as Action
+You can define a function as a direct action in the response.
+```yaml
+function:
+  name:
+  args:
+```
+
+
 
 ## Functions
 There are two main types of functions: utility and administrative.  Utility functions are functions which aid in writing 
@@ -315,9 +342,11 @@ function:
 ##### Description
 Create a new node and return it.
 ##### Parameters
-1. name: string
-2. type: string
-3. properties: function ([to_props](#to_props))
+1. parentName:
+2. parentType:
+3. name: string
+4. type: string
+5. properties: function ([to_props](#to_props))
 ##### Return
 `Node`
 ##### Event Requirements
@@ -327,6 +356,8 @@ None
 function:
   name: create_node
   args:
+    - "parentNode"
+    - "OA"
     - "newNode"
     - "OA"
     - function:

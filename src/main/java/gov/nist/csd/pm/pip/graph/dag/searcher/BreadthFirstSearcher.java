@@ -26,7 +26,7 @@ public class BreadthFirstSearcher implements Searcher{
             Node parent = parents.iterator().next();
             propagator.propagate(parent, start);
             visitor.visit(parent);
-            parents.remove(parent.getID());
+            parents.remove(parent);
         }
     }
 }
