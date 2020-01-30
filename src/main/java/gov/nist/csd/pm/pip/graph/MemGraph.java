@@ -37,6 +37,13 @@ public class MemGraph implements Graph {
 
     @Override
     public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
+        if (exists(id)) {
+            throw new IllegalArgumentException("the ID already exists in the graph");
+        }
+        else if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
+        }
+
         // add the pc's ID to the pc set and to the graph
         pcs.add(id);
         graph.addVertex(id);
