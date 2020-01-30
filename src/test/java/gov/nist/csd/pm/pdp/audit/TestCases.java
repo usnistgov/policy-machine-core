@@ -103,13 +103,6 @@ public class TestCases {
         graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
         graph.createNode(o1ID, "o1", O, null, oa1ID);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(ua2ID, pc1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
-
         graph.associate(ua1ID, oa1ID, R);
         graph.associate(ua2ID, oa1ID, W);
         
@@ -274,7 +267,7 @@ public class TestCases {
 
         graph.createNode(ua1ID, "ua1", UA, null, pc2ID);
         graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, u1ID, ua2ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
 
         graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
         graph.createNode(o1ID, "o1", O, null, oa1ID);
@@ -398,11 +391,6 @@ public class TestCases {
         graph.createNode(oa1ID, "oa1", OA, null, oa2ID);
         graph.createNode(o1ID, "o1", O, null, oa1ID);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(ua1ID, ua2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, oa2ID);
-
         graph.associate(ua1ID, oa1ID, RW);
         graph.associate(ua2ID, oa2ID, R);
 
@@ -461,12 +449,6 @@ public class TestCases {
 
         graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
         graph.createNode(o1ID, "o1", O, null, oa1ID);
-
-        graph.assign(u1ID, ua1ID);
-        graph.assign(u1ID, ua2ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(oa1ID, pc1ID);
-        graph.assign(ua1ID, pc1ID);
 
         graph.associate(ua1ID, oa1ID, W);
         graph.associate(ua2ID, oa1ID, R);

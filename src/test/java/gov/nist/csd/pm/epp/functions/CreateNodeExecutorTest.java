@@ -36,6 +36,8 @@ class CreateNodeExecutorTest {
                 new Function(
                         executor.getFunctionName(),
                         Arrays.asList(
+                                new Arg("oa1"),
+                                new Arg("OA"),
                                 new Arg("testNode"),
                                 new Arg("OA"),
                                 new Arg(new Function("to_props", Arrays.asList(new Arg("k=v"))))));
