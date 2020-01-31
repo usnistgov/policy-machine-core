@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp.services;
 
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.SuperPolicy;
 import gov.nist.csd.pm.pdp.audit.Auditor;
@@ -9,7 +10,6 @@ import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public class AnalyticsService extends Service {
             Node oa = (Node)oas.nextElement();
 
             // Compute oa's required PCs by calling find_pc_set(sOaID).
-            HashSet<Node> hsReqPcs = inMemFindPcSet(oa);
+            HashSet<Long> hsReqPcs = inMemFindPcSet(oa.getID());
             // Extract oa's label.
             Hashtable htOaLabel = (Hashtable)htOa.get(oa);
 
@@ -83,12 +83,12 @@ public class AnalyticsService extends Service {
         Hashtable htReachableOas = new Hashtable();
 
         // BFS from u (the base node). Prepare a queue.
-        Set<Node> visited = new HashSet<>();
-        Node crtNode;
+        Set<Long> visited = new HashSet<>();
+        Long crtNode;
 
         // Get u's directly assigned attributes and put them into the queue.
-        Set<Node> hsAttrs = getGraphPAP().getParents(userCtx.getUserID());
-        List<Node> queue = new ArrayList<>(hsAttrs);
+        Set<Long> hsAttrs = getGraphPAP().getParents(userCtx.getUserID());
+        List<Long> queue = new ArrayList<>(hsAttrs);
 
         // While the queue has elements, extract an element from the queue
         // and visit it.
@@ -99,13 +99,13 @@ public class AnalyticsService extends Service {
                 // If the ua has ua -> oa edges
                 if (inMemUattrHasOpsets(crtNode)) {
                     // Find the set of PCs reachable from ua.
-                    HashSet<Node> hsUaPcs = inMemFindPcSet(crtNode);
+                    HashSet<Long> hsUaPcs = inMemFindPcSet(crtNode);
 
                     // From each discovered ua traverse the edges ua -> oa.
 
                     // Find the opsets of this user attribute. Note that the set of containers for this
                     // node (user attribute) may contain not only opsets.
-                    Map<Long, Set<String>> assocs = getGraphPAP().getSourceAssociations(crtNode.getID());
+                    Map<Long, OperationSet> assocs = getGraphPAP().getSourceAssociations(crtNode);
 
                     // Go through the containers and only for opsets do the following.
                     // For each opset ops of ua:
@@ -158,7 +158,7 @@ public class AnalyticsService extends Service {
                 }
                 visited.add(crtNode);
 
-                Set<Node> hsDescs = getGraphPAP().getParents(crtNode.getID());
+                Set<Long> hsDescs = getGraphPAP().getParents(crtNode);
                 queue.addAll(hsDescs);
             }
         }
@@ -168,7 +168,7 @@ public class AnalyticsService extends Service {
         for (Enumeration keys = htReachableOas.keys(); keys.hasMoreElements() ;) {
             Node oa = (Node)keys.nextElement();
             // Compute {pc | oa ->+ pc}
-            HashSet hsOaPcs = inMemFindPcSet(oa);
+            HashSet hsOaPcs = inMemFindPcSet(oa.getID());
             // Extract oa's label.
             Hashtable htOaLabel = (Hashtable)htReachableOas.get(oa);
             // The label contains op1 -> pcs1, op2 -> pcs2,...
@@ -186,15 +186,15 @@ public class AnalyticsService extends Service {
         return htReachableOas;
     }
 
-    private HashSet<Node> inMemFindPcSet(Node node) throws PMException {
-        HashSet<Node> reachable = new HashSet<>();
+    private HashSet<Long> inMemFindPcSet(Long node) throws PMException {
+        HashSet<Long> reachable = new HashSet<>();
 
         // Init the queue, visited
-        ArrayList<Node> queue = new ArrayList<>();
-        HashSet<Node> visited = new HashSet<>();
+        ArrayList<Long> queue = new ArrayList<>();
+        HashSet<Long> visited = new HashSet<>();
 
         // The current element
-        Node crtNode;
+        Long crtNode;
 
         // Insert the start node into the queue
         queue.add(node);
@@ -210,11 +210,11 @@ public class AnalyticsService extends Service {
                 // Extract its direct descendants. If a descendant is an attribute,
                 // insert it into the queue. If it is a pc, add it to reachable,
                 // if not already there
-                Set<Node> hsContainers = getGraphPAP().getParents(crtNode.getID());
-                Iterator<Node> hsiter = hsContainers.iterator();
+                Set<Long> hsContainers = getGraphPAP().getParents(crtNode);
+                Iterator<Long> hsiter = hsContainers.iterator();
                 while (hsiter.hasNext()) {
-                    Node n = hsiter.next();
-                    if(getGraphPAP().getPolicyClasses().contains(n.getID())) {
+                    Long n = hsiter.next();
+                    if(getGraphPAP().getPolicyClasses().contains(n)) {
                         reachable.add(n);
                     } else {
                         queue.add(n);
@@ -225,8 +225,8 @@ public class AnalyticsService extends Service {
         return reachable;
     }
 
-    private boolean inMemUattrHasOpsets(Node uaNode) throws PMException {
-        return !getGraphPAP().getSourceAssociations(uaNode.getID()).isEmpty();
+    private boolean inMemUattrHasOpsets(Long uaNode) throws PMException {
+        return !getGraphPAP().getSourceAssociations(uaNode).isEmpty();
     }
 
     public Explain explain(long userID, long targetID) throws PMException {

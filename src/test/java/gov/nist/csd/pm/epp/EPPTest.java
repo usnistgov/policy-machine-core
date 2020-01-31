@@ -98,12 +98,12 @@ class EPPTest {
         Node newOA = search.iterator().next();
 
         // check that the new OA was assigned to the oa1
-        Set<Node> parents = pdp.getPAP().getGraphPAP().getParents(newOA.getID());
+        Set<Long> parents = pdp.getPAP().getGraphPAP().getParents(newOA.getID());
         assertFalse(parents.isEmpty());
-        assertTrue(parents.iterator().next().getID() == oa1.getID());
+        assertTrue(parents.iterator().next() == oa1.getID());
 
         // check ua1 was associated with new OA
-        Map<Long, Set<String>> sourceAssociations = pdp.getPAP().getGraphPAP().getSourceAssociations(ua1.getID());
+        Map<Long, OperationSet> sourceAssociations = pdp.getPAP().getGraphPAP().getSourceAssociations(ua1.getID());
         assertTrue(sourceAssociations.containsKey(newOA.getID()));
 
         // check that the deny was created

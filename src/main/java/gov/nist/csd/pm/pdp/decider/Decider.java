@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.pdp.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +44,7 @@ public interface Decider {
      * @param perms     the permissions to check for.
      * @return a subset of the given nodes that the subject has the given permissions on.
      */
-    Set<Node> filter(long subjectID, long processID, Set<Node> nodes, String... perms) throws PMException;
+    Set<Long> filter(long subjectID, long processID, Set<Long> nodes, String... perms) throws PMException;
 
     /**
      * Get the children of the target node that the subject has the given permissions on.
@@ -58,7 +56,7 @@ public interface Decider {
      * @return the set of NGACNodes that are children of the target node and the subject has the given permissions on.
      * @throws PMException if there is an exception traversing the graph.
      */
-    Set<Node> getChildren(long subjectID, long processID, long targetID, String... perms) throws PMException;
+    Set<Long> getChildren(long subjectID, long processID, long targetID, String... perms) throws PMException;
 
     /**
      * Given a subject ID, return every node the subject has access to and the permissions they have on each.

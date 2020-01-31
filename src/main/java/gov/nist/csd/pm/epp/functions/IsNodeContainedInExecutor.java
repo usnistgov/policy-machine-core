@@ -50,6 +50,6 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             return false;
         }
 
-        return pdp.getPAP().getGraphPAP().getChildren(parentNode.getID()).contains(childNode);
+        return pdp.getPAP().getGraphPAP().getChildren(parentNode.getID()).contains(childNode.getID());
     }
 }

@@ -222,10 +222,10 @@ public class EPP {
 
     private Set<Node> getContainersOf(long id) throws PMException {
         Set<Node> nodes = new HashSet<>();
-        Set<Node> parents = pap.getGraphPAP().getParents(id);
-        for (Node parent : parents) {
-            nodes.add(pap.getGraphPAP().getNode(parent.getID()));
-            nodes.addAll(getContainersOf(parent.getID()));
+        Set<Long> parents = pap.getGraphPAP().getParents(id);
+        for (long parent : parents) {
+            nodes.add(pap.getGraphPAP().getNode(parent));
+            nodes.addAll(getContainersOf(parent));
         }
         return nodes;
     }

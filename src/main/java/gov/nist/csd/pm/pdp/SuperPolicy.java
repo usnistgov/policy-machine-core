@@ -86,33 +86,33 @@ public class SuperPolicy {
         }
 
         // check super ua1 is assigned to super pc
-        Set<Node> children = graph.getChildren(superPC.getID());
-        if(!children.contains(superUA)) {
+        Set<Long> children = graph.getChildren(superPC.getID());
+        if(!children.contains(superUA.getID())) {
             graph.assign(superUA.getID(), superPC.getID());
         }
         // check super ua2 is assigned to super pc
         children = graph.getChildren(superPC.getID());
-        if(!children.contains(superUA2)) {
+        if(!children.contains(superUA2.getID())) {
             graph.assign(superUA2.getID(), superPC.getID());
         }
         // check super user is assigned to super ua1
         children = graph.getChildren(superUA.getID());
-        if(!children.contains(superUser)) {
+        if(!children.contains(superUser.getID())) {
             graph.assign(superUser.getID(), superUA.getID());
         }
         // check super user is assigned to super ua2
         children = graph.getChildren(superUA2.getID());
-        if(!children.contains(superUser)) {
+        if(!children.contains(superUser.getID())) {
             graph.assign(superUser.getID(), superUA2.getID());
         }
         // check super oa is assigned to super pc
         children = graph.getChildren(superPC.getID());
-        if(!children.contains(superOA)) {
+        if(!children.contains(superOA.getID())) {
             graph.assign(superOA.getID(), superPC.getID());
         }
         // check super o is assigned to super oa
         children = graph.getChildren(superOA.getID());
-        if(!children.contains(superO)) {
+        if(!children.contains(superO.getID())) {
             graph.assign(superO.getID(), superOA.getID());
         }
 

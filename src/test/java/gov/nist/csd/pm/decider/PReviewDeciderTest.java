@@ -60,9 +60,10 @@ class PReviewDeciderTest {
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
         Set<Node> nodes = graph.getNodes();
 
+        Set<Long> nodeIDs = new HashSet<>(Arrays.asList(o1.getID(), o2.getID(), o3.getID(), oa1.getID()));
+
         PReviewDecider decider = new PReviewDecider(graph);
-        assertEquals(new HashSet<>(Arrays.asList(o1, o2, o3, oa1)),
-                new HashSet<>(decider.filter(u1.getID(), 0, nodes, "read"))
+        assertEquals(nodeIDs, new HashSet<>(decider.filter(u1.getID(), 0, nodeIDs, "read"))
         );
     }
 
@@ -81,9 +82,9 @@ class PReviewDeciderTest {
         graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        Set<Node> children = decider.getChildren(u1.getID(), 0, oa1.getID());
+        Set<Long> children = decider.getChildren(u1.getID(), 0, oa1.getID());
         assertEquals(
-                new HashSet<>(Arrays.asList(o1, o2, o3)),
+                new HashSet<>(Arrays.asList(o1.getID(), o2.getID(), o3.getID())),
                 children
         );
     }

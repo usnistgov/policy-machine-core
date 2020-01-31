@@ -102,8 +102,8 @@ class MemGraphTest {
         Node child1Node = graph.createNode(2, "child1", OA, null, 1);
         Node child2Node = graph.createNode(3, "child2", OA, null, 1);
 
-        Set<Node> children = graph.getChildren(parentNode.getID());
-        assertTrue(children.containsAll(Arrays.asList(child1Node, child2Node)));
+        Set<Long> children = graph.getChildren(parentNode.getID());
+        assertTrue(children.containsAll(Arrays.asList(child1Node.getID(), child2Node.getID())));
     }
 
     @Test
@@ -116,9 +116,9 @@ class MemGraphTest {
         Node parent2Node = graph.createNode(2, "parent2", OA, null, 1);
         Node child1Node = graph.createNode(3, "child1", OA, null, 1, 2);
 
-        Set<Node> parents = graph.getParents(child1Node.getID());
-        assertTrue(parents.contains(parent1Node));
-        assertTrue(parents.contains(parent2Node));
+        Set<Long> parents = graph.getParents(child1Node.getID());
+        assertTrue(parents.contains(parent1Node.getID()));
+        assertTrue(parents.contains(parent2Node.getID()));
     }
 
     @Test
@@ -135,8 +135,8 @@ class MemGraphTest {
 
         graph.assign(child1Node.getID(), child2Node.getID());
 
-        assertTrue(graph.getChildren(parent1Node.getID()).contains(child1Node));
-        assertTrue(graph.getParents(child1Node.getID()).contains(parent1Node));
+        assertTrue(graph.getChildren(parent1Node.getID()).contains(child1Node.getID()));
+        assertTrue(graph.getParents(child1Node.getID()).contains(parent1Node.getID()));
     }
 
     @Test
@@ -151,8 +151,8 @@ class MemGraphTest {
 
         graph.deassign(child1Node.getID(), parent1Node.getID());
 
-        assertFalse(graph.getChildren(parent1Node.getID()).contains(child1Node));
-        assertFalse(graph.getParents(child1Node.getID()).contains(parent1Node));
+        assertFalse(graph.getChildren(parent1Node.getID()).contains(child1Node.getID()));
+        assertFalse(graph.getParents(child1Node.getID()).contains(parent1Node.getID()));
     }
 
     @Test
@@ -165,7 +165,7 @@ class MemGraphTest {
 
         graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
 
-        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
+        Map<Long, OperationSet> associations = graph.getSourceAssociations(uaNode.getID());
         assertTrue(associations.containsKey(targetNode.getID()));
         assertTrue(associations.get(targetNode.getID()).containsAll(Arrays.asList("read", "write")));
 
@@ -185,7 +185,7 @@ class MemGraphTest {
         graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
         graph.dissociate(uaNode.getID(), targetNode.getID());
 
-        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
+        Map<Long, OperationSet> associations = graph.getSourceAssociations(uaNode.getID());
         assertFalse(associations.containsKey(targetNode.getID()));
 
         associations = graph.getTargetAssociations(targetNode.getID());
@@ -202,7 +202,7 @@ class MemGraphTest {
 
         graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
 
-        Map<Long, Set<String>> associations = graph.getSourceAssociations(uaNode.getID());
+        Map<Long, OperationSet> associations = graph.getSourceAssociations(uaNode.getID());
         assertTrue(associations.containsKey(targetNode.getID()));
         assertTrue(associations.get(targetNode.getID()).containsAll(Arrays.asList("read", "write")));
 
@@ -219,7 +219,7 @@ class MemGraphTest {
 
         graph.associate(uaNode.getID(), targetNode.getID(), new OperationSet("read", "write"));
 
-        Map<Long, Set<String>> associations = graph.getTargetAssociations(targetNode.getID());
+        Map<Long, OperationSet> associations = graph.getTargetAssociations(targetNode.getID());
         assertTrue(associations.containsKey(uaNode.getID()));
         assertTrue(associations.get(uaNode.getID()).containsAll(Arrays.asList("read", "write")));
 

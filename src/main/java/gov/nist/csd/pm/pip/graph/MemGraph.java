@@ -233,18 +233,18 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided nodeID does not exist in the graph.
      */
     @Override
-    public Set<Node> getChildren(long nodeID) throws PMException {
+    public Set<Long> getChildren(long nodeID) throws PMException {
         if (!exists(nodeID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
         }
 
-        HashSet<Node> children = new HashSet<>();
+        HashSet<Long> children = new HashSet<>();
         Set<Relationship> rels = graph.incomingEdgesOf(nodeID);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 continue;
             }
-            children.add(getNode(rel.getSourceID()));
+            children.add(rel.getSourceID());
         }
         return children;
     }
@@ -257,18 +257,18 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided nodeID does not exist in the graph.
      */
     @Override
-    public Set<Node> getParents(long nodeID) throws PMException {
+    public Set<Long> getParents(long nodeID) throws PMException {
         if (!exists(nodeID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
         }
 
-        HashSet<Node> parents = new HashSet<>();
+        HashSet<Long> parents = new HashSet<>();
         Set<Relationship> rels = graph.outgoingEdgesOf(nodeID);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 continue;
             }
-            parents.add(getNode(rel.getTargetID()));
+            parents.add(rel.getTargetID());
         }
         return parents;
     }
@@ -371,17 +371,17 @@ public class MemGraph implements Graph {
      * @throws PMException if the given ID does not exist in the graph.
      */
     @Override
-    public Map<Long, Set<String>> getSourceAssociations(long sourceID) throws PMException {
+    public Map<Long, OperationSet> getSourceAssociations(long sourceID) throws PMException {
         if (!exists(sourceID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, sourceID));
         }
 
-        Map<Long, Set<String>> assocs = new HashMap<>();
+        Map<Long, OperationSet> assocs = new HashMap<>();
         Set<Relationship> rels = graph.outgoingEdgesOf(sourceID);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 Association assoc = (Association) rel;
-                assocs.put(assoc.getTargetID(), new HashSet<>(assoc.getOperations()));
+                assocs.put(assoc.getTargetID(), new OperationSet(assoc.getOperations()));
             }
         }
         return assocs;
@@ -395,17 +395,17 @@ public class MemGraph implements Graph {
      * @throws PMException if the given ID does not exist in the graph.
      */
     @Override
-    public Map<Long, Set<String>> getTargetAssociations(long targetID) throws PMException {
+    public Map<Long, OperationSet> getTargetAssociations(long targetID) throws PMException {
         if (!exists(targetID)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
         }
 
-        Map<Long, Set<String>> assocs = new HashMap<>();
+        Map<Long, OperationSet> assocs = new HashMap<>();
         Set<Relationship> rels = graph.incomingEdgesOf(targetID);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 Association assoc = (Association) rel;
-                assocs.put(assoc.getSourceID(), new HashSet<>(assoc.getOperations()));
+                assocs.put(assoc.getSourceID(), new OperationSet(assoc.getOperations()));
             }
         }
         return assocs;

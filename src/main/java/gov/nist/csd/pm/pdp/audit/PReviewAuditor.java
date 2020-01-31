@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp.audit;
 
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.audit.model.Path;
 import gov.nist.csd.pm.pdp.audit.model.PolicyClass;
@@ -203,9 +204,9 @@ public class PReviewAuditor implements Auditor {
         Visitor visitor = node -> {
             List<EdgePath> nodePaths = new ArrayList<>();
 
-            for(Node parent : graph.getParents(node.getID())) {
-                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parent.getID()), null);
-                List<EdgePath> parentPaths = propPaths.get(parent.getID());
+            for(long parent : graph.getParents(node.getID())) {
+                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parent), null);
+                List<EdgePath> parentPaths = propPaths.get(parent);
                 if(parentPaths.isEmpty()) {
                     EdgePath path = new EdgePath();
                     path.addEdge(edge);
@@ -223,7 +224,7 @@ public class PReviewAuditor implements Auditor {
                 }
             }
 
-            Map<Long, Set<String>> assocs = graph.getSourceAssociations(node.getID());
+            Map<Long, OperationSet> assocs = graph.getSourceAssociations(node.getID());
             for(Long targetID : assocs.keySet()) {
                 Set<String> ops = assocs.get(targetID);
                 Node targetNode = graph.getNode(targetID);

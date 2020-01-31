@@ -115,7 +115,7 @@ public interface Graph {
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the children of the node.
      */
-    Set<Node> getChildren(long nodeID) throws PMException;
+    Set<Long> getChildren(long nodeID) throws PMException;
 
     /**
      * Get the set of nodes that the node with the given ID is assigned to.
@@ -124,7 +124,7 @@ public interface Graph {
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the parents of the node.
      */
-    Set<Node> getParents(long nodeID) throws PMException;
+    Set<Long> getParents(long nodeID) throws PMException;
 
     /**
      * Assign the child node to the parent node. The child and parent nodes must both already exist in the graph,
@@ -187,7 +187,7 @@ public interface Graph {
      * @return a Map of the target node IDs and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the source node from the graph.
      */
-    Map<Long, Set<String>> getSourceAssociations(long sourceID) throws PMException;
+    Map<Long, OperationSet> getSourceAssociations(long sourceID) throws PMException;
 
     /**
      * Retrieve the associations the given node is the target of.  The target node can be an Object Attribute or a User
@@ -198,5 +198,5 @@ public interface Graph {
      * @return a Map of the source Ids and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the target node from the graph.
      */
-    Map<Long, Set<String>> getTargetAssociations(long targetID) throws PMException;
+    Map<Long, OperationSet> getTargetAssociations(long targetID) throws PMException;
 }
