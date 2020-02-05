@@ -11,7 +11,7 @@ import java.util.HashSet;
 public class DepthFirstSearcher implements Searcher{
 
     private Graph graph;
-    private HashSet<Node> visited;
+    private HashSet<Long> visited;
 
     public DepthFirstSearcher(Graph graph) {
         this.graph = graph;
@@ -20,12 +20,12 @@ public class DepthFirstSearcher implements Searcher{
 
     @Override
     public void traverse(Node start, Propagator propagator, Visitor visitor) throws PMException {
-        if(visited.contains(start)) {
+        if(visited.contains(start.getID())) {
             return;
         }
 
         // mark the node as visited
-        visited.add(start);
+        visited.add(start.getID());
 
         for(Long parent : graph.getParents(start.getID())) {
             Node parentNode = graph.getNode(parent);

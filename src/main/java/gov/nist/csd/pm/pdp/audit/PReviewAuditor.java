@@ -233,7 +233,12 @@ public class PReviewAuditor implements Auditor {
                 nodePaths.add(path);
             }
 
-            propPaths.put(node.getID(), nodePaths);
+            if (node.getID() == start.getID()) {
+                paths.clear();
+                paths.addAll(nodePaths);
+            } else {
+                propPaths.put(node.getID(), nodePaths);
+            }
         };
 
         Propagator propagator = (parentNode, childNode) -> {

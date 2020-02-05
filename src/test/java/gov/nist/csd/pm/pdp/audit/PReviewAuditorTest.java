@@ -1,13 +1,18 @@
 package gov.nist.csd.pm.pdp.audit;
 
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.audit.model.Path;
 import gov.nist.csd.pm.pdp.audit.model.PolicyClass;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PReviewAuditorTest {
@@ -79,5 +84,29 @@ class PReviewAuditorTest {
         }
 
         return true;
+    }
+
+    @Test
+    void test() throws PMException {
+        Random random = new Random();
+        Graph graph =new MemGraph();
+        Node rbac = graph.createPolicyClass(random.nextLong(), "RBAC", null);
+        Node records = graph.createNode(random.nextLong(), "records", OA, null, rbac.getID());
+
+        graph.createNode(random.nextLong(), "recA1", OA, null, records.getID());
+        graph.createNode(random.nextLong(), "recA2", OA, null, records.getID());
+        graph.createNode(random.nextLong(), "recA3", OA, null, records.getID());
+        graph.createNode(random.nextLong(), "recA4", OA, null, records.getID());
+
+        Node nurse = graph.createNode(random.nextLong(), "Nurse", UA, null, rbac.getID());
+        Node doctor = graph.createNode(random.nextLong(), "Doctor", UA, null, nurse.getID());
+
+        Node u1 = graph.createNode(random.nextLong(), "u1", U, null, doctor.getID());
+
+        graph.associate(nurse.getID(), records.getID(), new OperationSet("read"));
+        graph.associate(doctor.getID(), records.getID(), new OperationSet("write"));
+
+        System.out.println(new PReviewAuditor(graph).explain(u1.getID(), records.getID()));
+
     }
 }
