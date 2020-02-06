@@ -20,8 +20,7 @@ import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ALL_OPERATIONS;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 
 /**
@@ -258,7 +257,12 @@ public class GraphService extends Service implements Graph {
             return false;
         }
 
-        // node exists return false if the user does not have access to it.
+        Node node = getGraphPAP().getNode(nodeID);
+        if (node.getType().equals(PC)) {
+            return hasPermissions(userCtx, superPolicy.getSuperObject().getID(), ANY_OPERATIONS);
+        }
+
+        // node exists, return false if the user does not have access to it.
         return hasPermissions(userCtx, nodeID, ANY_OPERATIONS);
     }
 
