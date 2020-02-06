@@ -253,12 +253,17 @@ public class GraphService extends Service implements Graph {
             throw new PMException("no user context provided to the PDP");
         }
 
+        boolean exists = getGraphPAP().exists(nodeID);
+        if (!exists) {
+            return false;
+        }
+
         if(!hasPermissions(userCtx, nodeID, ANY_OPERATIONS)) {
             // return false if the user does not have access to it.
             return false;
         }
 
-        return getGraphPAP().exists(nodeID);
+        return true;
     }
 
     /**
