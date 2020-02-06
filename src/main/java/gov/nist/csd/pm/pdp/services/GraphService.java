@@ -258,12 +258,8 @@ public class GraphService extends Service implements Graph {
             return false;
         }
 
-        if(!hasPermissions(userCtx, nodeID, ANY_OPERATIONS)) {
-            // return false if the user does not have access to it.
-            return false;
-        }
-
-        return true;
+        // node exists return false if the user does not have access to it.
+        return hasPermissions(userCtx, nodeID, ANY_OPERATIONS);
     }
 
     /**
