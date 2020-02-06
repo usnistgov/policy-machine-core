@@ -95,6 +95,21 @@ public interface Graph {
     Node getNode(long id) throws PMException;
 
     /**
+     * Search the graph for a node that matches the given parameters. A node must
+     * contain all properties provided to be returned.
+     * To get a node that has a specific property key with any value use "*" as the value in the parameter.
+     * (i.e. {key=*})
+     * If more than one node matches the criteria, only one will be returned.
+     *
+     * @param name       the name of the nodes to search for.
+     * @param type       the type of the nodes to search for.
+     * @param properties the properties of the nodes to search for.
+     * @return the node that matches the given search criteria.
+     * @throws PMException if there is an error searching the graph.
+     */
+    Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException;
+
+    /**
      * Search the graph for nodes matching the given parameters. A node must
      * contain all properties provided to be returned.
      * To get all the nodes that have a specific property key with any value use "*" as the value in the parameter.
@@ -106,7 +121,7 @@ public interface Graph {
      * @return a set of nodes that match the given search criteria.
      * @throws PMException if there is an error searching the graph.
      */
-    Set<Node> search(String name, String type, Map<String, String> properties) throws PMException;
+    Set<Node> search(String name, NodeType type, Map<String, String> properties) throws PMException;
 
     /**
      * Get the set of nodes that are assigned to the node with the given ID.

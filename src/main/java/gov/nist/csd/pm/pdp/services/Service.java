@@ -34,6 +34,7 @@ public class Service {
     Service(PAP pap, EPP epp, SuperPolicy superPolicy) {
         this.pap = pap;
         this.epp = epp;
+        this.superPolicy = superPolicy;
     }
 
     private Service() {}

@@ -180,6 +180,15 @@ public class MemGraph implements Graph {
         return node;
     }
 
+    @Override
+    public Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException {
+        Set<Node> search = search(name, type, properties);
+        if (search.isEmpty()) {
+            throw new PMException(String.format("a node matching the criteria (%s, %s, %s) does not exist", name, type, properties));
+        }
+        return search.iterator().next();
+    }
+
     /**
      * Search for nodes in the in-memory graph that match the given parameters. A node must match all parameters provided
      * including every property, to be included in the returned set.
@@ -190,7 +199,7 @@ public class MemGraph implements Graph {
      * @return the set of nodes that match the given parameters.
      */
     @Override
-    public Set<Node> search(String name, String type, Map<String, String> properties) {
+    public Set<Node> search(String name, NodeType type, Map<String, String> properties) {
         if (properties == null) {
             properties = new HashMap<>();
         }
@@ -201,7 +210,7 @@ public class MemGraph implements Graph {
             // if the name parameter is not null and the current node name does not equal the name parameter, do not add
             // if the type parameter is not null and the current node type does not equal the type parameter, do not add
             if (name != null && !node.getName().equals(name) ||
-                    type != null && !node.getType().toString().equals(type)) {
+                    type != null && !node.getType().equals(type)) {
                 continue;
             }
 

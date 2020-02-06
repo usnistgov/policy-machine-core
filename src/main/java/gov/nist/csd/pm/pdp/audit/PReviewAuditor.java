@@ -233,6 +233,10 @@ public class PReviewAuditor implements Auditor {
                 nodePaths.add(path);
             }
 
+            // if the node being visited is the start node, add all the found nodePaths
+            // TODO there might be a more efficient way of doing this
+            // we don't need the if for users, only when the target is an OA, so it might have something to do with
+            // leafs vs non leafs
             if (node.getID() == start.getID()) {
                 paths.clear();
                 paths.addAll(nodePaths);
