@@ -409,6 +409,22 @@ public class GraphService extends Service implements Graph {
             throw new PMAuthorizationException(String.format("unauthorized permission %s on node with ID %d", ASSIGN_TO, parentID));
         }
 
+        if (parent.getType().equals(PC)) {
+            if (child.getType().equals(UA)) {
+                if (parent.getProperties().containsKey("default_ua")) {
+                    throw new PMException("default_ua property not set for " + parent.getName());
+                }
+
+                parentID = Long.parseLong(parent.getProperties().get("default_ua"));
+            } else if (child.getType().equals(OA)) {
+                if (parent.getProperties().containsKey("default_oa")) {
+                    throw new PMException("default_oa property not set for " + parent.getName());
+                }
+
+                parentID = Long.parseLong(parent.getProperties().get("default_oa"));
+            }
+        }
+
         // assign in the PAP
         getGraphPAP().assign(childID, parentID);
 
