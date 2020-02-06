@@ -236,7 +236,7 @@ class MemGraphTest {
         graph.createNode(3, "oa3", OA, Node.toProperties("key1", "value1", "key2", "value2"), 4);
 
         // name and type no properties
-        Set<Node> nodes = graph.search("oa1", OA.toString(), null);
+        Set<Node> nodes = graph.search("oa1", OA, null);
         assertEquals(1, nodes.size());
 
         // one property
@@ -248,14 +248,14 @@ class MemGraphTest {
         assertEquals(1, nodes.size());
 
         // name, type, namespace
-        nodes = graph.search("oa1", OA.toString(), Node.toProperties("namespace", "test"));
+        nodes = graph.search("oa1", OA, Node.toProperties("namespace", "test"));
         assertEquals(1, nodes.size());
 
-        nodes = graph.search(null, OA.toString(), Node.toProperties("namespace", "test"));
+        nodes = graph.search(null, OA, Node.toProperties("namespace", "test"));
         assertEquals(1, nodes.size());
-        nodes = graph.search(null, OA.toString(), null);
+        nodes = graph.search(null, OA, null);
         assertEquals(3, nodes.size());
-        nodes = graph.search(null, OA.toString(), Node.toProperties("key1", "value1"));
+        nodes = graph.search(null, OA, Node.toProperties("key1", "value1"));
         assertEquals(2, nodes.size());
         nodes = graph.search(null, null, null);
         assertEquals(4, nodes.size());

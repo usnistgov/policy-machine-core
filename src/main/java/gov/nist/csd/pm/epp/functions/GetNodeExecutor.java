@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
@@ -53,7 +54,7 @@ public class GetNodeExecutor implements FunctionExecutor {
             }
         }
 
-        Set<Node> search = pdp.getPAP().getGraphPAP().search(name, type, props);
+        Set<Node> search = pdp.getPAP().getGraphPAP().search(name, NodeType.toNodeType(type), props);
         return search.iterator().next();
     }
 }

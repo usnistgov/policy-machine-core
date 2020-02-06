@@ -80,7 +80,7 @@ public class CreateNodeExecutor implements FunctionExecutor {
         long id = new Random().nextLong();
         Graph graph = pdp.getPAP().getGraphPAP();
 
-        Set<Node> search = graph.search(parentName, parentType, new HashMap<>());
+        Set<Node> search = graph.search(parentName, NodeType.toNodeType(parentType), new HashMap<>());
         if (search.isEmpty()) {
             throw new PMException(String.format("parent node %s with type %s and properties %s does not exist", parentName, parentType, new HashMap<>()));
         }

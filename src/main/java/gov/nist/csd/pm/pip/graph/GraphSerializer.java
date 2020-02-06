@@ -186,39 +186,14 @@ public class GraphSerializer {
 
         List<String> assignmentCmds = new ArrayList<>();
 
-        Set<Node> search = graph.search(null, PC.toString(), null);
+        Set<Node> search = graph.search(null, PC, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
         }
 
         s += "\n";
-        search = graph.search(null, U.toString(), null);
-        for (Node node : search) {
-            s += "node " + node.getType() + " " + node.getName() + " " +
-                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
-
-            Set<Long> parents = graph.getParents(node.getID());
-            for (long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
-                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
-            }
-        }
-
-        s += "\n";
-        search = graph.search(null, UA.toString(), null);
-        for (Node node : search) {
-            s += "node " + node.getType() + " " + node.getName() + " " +
-                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
-            Set<Long> parents = graph.getParents(node.getID());
-            for (long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
-                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
-            }
-        }
-
-        s += "\n";
-        search = graph.search(null, O.toString(), null);
+        search = graph.search(null, U, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
@@ -231,7 +206,32 @@ public class GraphSerializer {
         }
 
         s += "\n";
-        search = graph.search(null, OA.toString(), null);
+        search = graph.search(null, UA, null);
+        for (Node node : search) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+            Set<Long> parents = graph.getParents(node.getID());
+            for (long parentID : parents) {
+                Node parentNode = graph.getNode(parentID);
+                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
+            }
+        }
+
+        s += "\n";
+        search = graph.search(null, O, null);
+        for (Node node : search) {
+            s += "node " + node.getType() + " " + node.getName() + " " +
+                    (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
+
+            Set<Long> parents = graph.getParents(node.getID());
+            for (long parentID : parents) {
+                Node parentNode = graph.getNode(parentID);
+                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
+            }
+        }
+
+        s += "\n";
+        search = graph.search(null, OA, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";

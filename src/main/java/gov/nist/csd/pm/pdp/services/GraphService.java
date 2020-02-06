@@ -150,7 +150,7 @@ public class GraphService extends Service implements Graph {
         }
 
         // search the graph for any node with the same name, type, and namespace
-        Set<Node> search = getGraphPAP().search(name, type.toString(),
+        Set<Node> search = getGraphPAP().search(name, type,
                 Node.toProperties(NAMESPACE_PROPERTY, namespace));
         if(!search.isEmpty()) {
             throw new PMException(String.format("a node with the name \"%s\" and type %s already exists in the namespace \"%s\"",
@@ -620,7 +620,7 @@ public class GraphService extends Service implements Graph {
      * @throws PMException If the PAP encounters an error with the graph.
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
-    public Set<Node> search(String name, String type, Map<String, String> properties) throws PMException {
+    public Set<Node> search(String name, NodeType type, Map<String, String> properties) throws PMException {
         if(userCtx == null) {
             throw new PMException("no user context provided to the PDP");
         }
@@ -660,6 +660,11 @@ public class GraphService extends Service implements Graph {
         }
 
         return getGraphPAP().getNode(id);
+    }
+
+    @Override
+    public Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException {
+        return null;
     }
 
     /**

@@ -140,12 +140,8 @@ public class EPP {
             return true;
         }
 
-        if(matchSubject.getProcess() != null &&
-                matchSubject.getProcess().getValue() == processID) {
-            return true;
-        }
-
-        return false;
+        return matchSubject.getProcess() != null &&
+                matchSubject.getProcess().getValue() == processID;
     }
 
     private boolean pcMatches(long userID, PolicyClass matchPolicyClass) {
@@ -298,7 +294,7 @@ public class EPP {
                 Graph graph = pap.getGraphPAP();
 
                 // get the subject node
-                Set<Node> search = graph.search(container.getName(), container.getType(), null);
+                Set<Node> search = graph.search(container.getName(), NodeType.toNodeType(container.getType()), null);
                 if(search.isEmpty()) {
                     throw new PMException("no nodes matched subject with name '" + container.getName() + "' and type '" + container.getType() + "'");
                 }
@@ -337,7 +333,7 @@ public class EPP {
     private Set<Node> getNodes(String name, String type, Map<String, String> properties) throws PMException {
         Graph graph = pap.getGraphPAP();
 
-        Set<Node> search = graph.search(name, type, null);
+        Set<Node> search = graph.search(name, NodeType.toNodeType(type), null);
         if(properties != null) {
             search.removeIf((n) -> {
                 for (String k : properties.keySet()) {
@@ -352,22 +348,6 @@ public class EPP {
         }
 
         return search;
-    }
-
-    private Node getNode(String name, String type, Map<String, String> properties) throws PMException {
-        Graph graph = pap.getGraphPAP();
-
-        if (properties == null) {
-            properties = new HashMap<>();
-        }
-
-        Set<Node> search = graph.search(name, type, properties);
-        if (search.isEmpty()) {
-            throw new PMException(String.format("no subject node could be found with name %s, type %s, and properties %s",
-                    name, type, properties));
-        }
-
-        return search.iterator().next();
     }
 
     private void applyDeleteAction(EventContext eventCtx, long userID, long processID, DeleteAction action) throws PMException {
@@ -415,7 +395,7 @@ public class EPP {
         if(evrNode.getFunction() != null) {
             node = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, evrNode.getFunction());
         } else {
-            node = getNode(evrNode.getName(), evrNode.getType(), evrNode.getProperties());
+            node = pap.getGraphPAP().getNode(evrNode.getName(), NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
         }
         return node;
     }

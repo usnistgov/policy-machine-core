@@ -44,7 +44,7 @@ public class SuperPolicy {
 
         Map<String, String> filter = Node.toProperties(NAMESPACE_PROPERTY, "super");
 
-        Set<Node> nodes = graph.search("super", NodeType.PC.toString(), filter);
+        Set<Node> nodes = graph.search("super", NodeType.PC, filter);
         Node superPC;
         if(nodes.isEmpty()) {
             // add the rep oa ID to the properties
@@ -54,31 +54,31 @@ public class SuperPolicy {
             superPC = nodes.iterator().next();
         }
 
-        nodes = graph.search("super_ua1", UA.toString(), filter);
+        nodes = graph.search("super_ua1", UA, filter);
         if(nodes.isEmpty()) {
             superUA = graph.createNode(rand.nextLong(), "super_ua1", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getID());
         } else {
             superUA = nodes.iterator().next();
         }
-        nodes = graph.search("super_ua2", UA.toString(), filter);
+        nodes = graph.search("super_ua2", UA, filter);
         Node superUA2;
         if(nodes.isEmpty()) {
             superUA2 = graph.createNode(rand.nextLong(), "super_ua2", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getID());
         } else {
             superUA2 = nodes.iterator().next();
         }
-        nodes = graph.search("super", U.toString(), filter);
+        nodes = graph.search("super", U, filter);
         if(nodes.isEmpty()) {
             graph.createNode(0, "super", U, Node.toProperties(NAMESPACE_PROPERTY, "super"), superUA.getID(), superUA2.getID());
         }
 
-        nodes = graph.search("super", NodeType.OA.toString(), filter);
+        nodes = graph.search("super", NodeType.OA, filter);
         if(nodes.isEmpty()) {
             superOA = graph.createNode(rand.nextLong(), "super", NodeType.OA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getID());
         } else {
             superOA = nodes.iterator().next();
         }
-        nodes = graph.search("super", NodeType.O.toString(), filter);
+        nodes = graph.search("super", NodeType.O, filter);
         if(nodes.isEmpty()) {
             superO = graph.createNode(rand.nextLong(), "super", NodeType.O, Node.toProperties(NAMESPACE_PROPERTY, "super"), superOA.getID());
         } else {
