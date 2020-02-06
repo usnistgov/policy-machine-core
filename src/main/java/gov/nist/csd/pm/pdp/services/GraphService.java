@@ -49,7 +49,7 @@ public class GraphService extends Service implements Graph {
         long defaultUA = rand.nextLong();
         long defaultOA = rand.nextLong();
         properties.putAll(Node.toProperties("default_ua", String.valueOf(defaultUA), "default_oa", String.valueOf(defaultOA)));
-        Node pcNode = getPAP().getGraphPAP().createPolicyClass(rand.nextLong(), name, properties);
+        Node pcNode = getPAP().getGraphPAP().createPolicyClass(id, name, properties);
         // create the PC UA node
         Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, name, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
         // create the PC OA node
