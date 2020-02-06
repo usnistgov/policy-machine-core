@@ -55,10 +55,7 @@ public class GraphService extends Service implements Graph {
         Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, name, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
         // create the PC OA node
         Node pcOANode = getPAP().getGraphPAP().createNode(defaultOA, name, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
-        // assign PC UA to PC
-        getPAP().getGraphPAP().assign(pcUANode.getID(), pcNode.getID());
-        // assign PC OA to PC
-        getPAP().getGraphPAP().assign(pcOANode.getID(), pcNode.getID());
+
         // assign Super U to PC UA
         // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
         // assign super UA to PC
