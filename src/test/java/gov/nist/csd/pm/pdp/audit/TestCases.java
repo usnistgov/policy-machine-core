@@ -90,7 +90,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
         return new TestCase("graph1", graph, expectedPaths, RW);
     }
 
@@ -107,7 +107,7 @@ public class TestCases {
         graph.associate(ua2ID, oa1ID, W);
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]", "u1-ua2-oa1-o1 ops=[write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[write]"));
         return new TestCase("graph2", graph, expectedPaths, RW);
     }
 
@@ -126,7 +126,7 @@ public class TestCases {
 
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]", "u1-ua1-ua2-oa1-o1 ops=[write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-ua2(UA)-oa1(OA)-o1(O) ops=[write]"));
         return new TestCase("graph3", graph, expectedPaths, RW);
     }
 
@@ -178,8 +178,8 @@ public class TestCases {
         graph.associate(ua2ID, oa2ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[read, write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
+        expectedPaths.put("pc2", Arrays.asList("u1(U)-ua2(UA)-oa2(OA)-o1(O) ops=[read, write]"));
         return new TestCase("graph7", graph, expectedPaths, R);
     }
 
@@ -200,8 +200,8 @@ public class TestCases {
         graph.associate(ua2ID, oa2ID, W);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
+        expectedPaths.put("pc2", Arrays.asList("u1(U)-ua2(UA)-oa2(OA)-o1(O) ops=[write]"));
         return new TestCase("graph8", graph, expectedPaths, NOOPS);
     }
 
@@ -217,7 +217,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
         expectedPaths.put("pc2", Arrays.asList());
         return new TestCase("graph9", graph, expectedPaths, NOOPS);
     }
@@ -238,7 +238,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
         expectedPaths.put("pc2", Arrays.asList());
         return new TestCase("graph10", graph, expectedPaths, NOOPS);
     }
@@ -256,7 +256,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
         return new TestCase("graph11", graph, expectedPaths, RW);
     }
 
@@ -276,7 +276,7 @@ public class TestCases {
         graph.associate(ua2ID, oa1ID, W);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]", "u1-ua2-oa1-o1 ops=[write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[write]"));
         return new TestCase("graph12", graph, expectedPaths, RW);
     }
 
@@ -297,8 +297,8 @@ public class TestCases {
         graph.associate(ua2ID, oa2ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[read, write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
+        expectedPaths.put("pc2", Arrays.asList("u1(U)-ua2(UA)-oa2(OA)-o1(O) ops=[read, write]"));
         return new TestCase("graph13", graph, expectedPaths, R);
     }
 
@@ -319,8 +319,8 @@ public class TestCases {
         graph.associate(ua2ID, oa2ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
-        expectedPaths.put("pc2", Arrays.asList("u1-ua2-oa2-o1 ops=[read]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
+        expectedPaths.put("pc2", Arrays.asList("u1(U)-ua2(UA)-oa2(OA)-o1(O) ops=[read]"));
         return new TestCase("graph14", graph, expectedPaths, R);
     }
 
@@ -339,7 +339,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
         expectedPaths.put("pc2", Arrays.asList());
         return new TestCase("graph15", graph, expectedPaths, NOOPS);
     }
@@ -357,7 +357,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
         return new TestCase("graph16", graph, expectedPaths, R);
     }
 
@@ -374,7 +374,7 @@ public class TestCases {
         graph.associate(ua1ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
         return new TestCase("graph17", graph, expectedPaths, R);
     }
 
@@ -415,7 +415,7 @@ public class TestCases {
         graph.associate(ua2ID, oa2ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua1-oa1-o1 ops=[read, write]", "u1-ua1-ua2-oa2-oa1-o1 ops=[read]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]", "u1(U)-ua1(UA)-ua2(UA)-oa2(OA)-oa1(OA)-o1(O) ops=[read]"));
         return new TestCase("graph19", graph, expectedPaths, RW);
     }
 
@@ -435,7 +435,7 @@ public class TestCases {
         graph.associate(ua2ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua2-oa1-o1 ops=[read]", "u1-ua1-oa1-o1 ops=[write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[write]"));
         return new TestCase("graph20", graph, expectedPaths, RW);
     }
 
@@ -454,7 +454,7 @@ public class TestCases {
         graph.associate(ua2ID, oa1ID, R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList("u1-ua2-oa1-o1 ops=[read]", "u1-ua1-oa1-o1 ops=[write]"));
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[write]"));
         return new TestCase("graph21", graph, expectedPaths, RW);
     }
 }
