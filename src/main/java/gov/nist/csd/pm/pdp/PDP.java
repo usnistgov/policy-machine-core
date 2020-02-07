@@ -58,15 +58,18 @@ public class PDP {
         return graphService;
     }
 
-    public Prohibitions getProhibitionsService() throws PMException {
+    public Prohibitions getProhibitionsService(UserContext userCtx) throws PMException {
+        prohibitionsService.setUserCtx(userCtx);
         return prohibitionsService;
     }
 
-    public AnalyticsService getAnalyticsService() throws PMException {
+    public AnalyticsService getAnalyticsService(UserContext userCtx) throws PMException {
+        analyticsService.setUserCtx(userCtx);
         return analyticsService;
     }
 
-    public Obligations getObligationsService() throws PMException {
+    public Obligations getObligationsService(UserContext userCtx) throws PMException {
+        obligationsService.setUserCtx(userCtx);
         return obligationsService;
     }
 }
