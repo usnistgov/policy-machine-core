@@ -274,6 +274,19 @@ public class GraphSerializer {
         List<Assignment> assignments = new ArrayList<>();
         List<Association> associations = new ArrayList<>();
         List<Node> pcs = new ArrayList<>();
+
+        // load any existing nodes
+        Set<Long> policyClasses = graph.getPolicyClasses();
+        for (Long id : policyClasses) {
+            pcs.add(graph.getNode(id));
+        }
+
+        Set<Node> nodes = graph.getNodes();
+        for (Node node : nodes) {
+            ids.put(node.getType() + ":" + node.getName(), node.getID());
+            nodesMap.put(node.getID(), node);
+        }
+
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             if (line.startsWith("#") || line.isEmpty()) {
@@ -389,6 +402,10 @@ public class GraphSerializer {
 
         // create policy class nodes
         for (Node node : pcs) {
+            if (graph.getPolicyClasses().contains(node.getID())) {
+                continue;
+            }
+
             graph.createPolicyClass(node.getID(), node.getName(), node.getProperties());
         }
 
