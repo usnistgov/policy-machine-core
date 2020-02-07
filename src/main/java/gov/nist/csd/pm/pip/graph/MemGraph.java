@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import gov.nist.csd.pm.pip.graph.model.relationships.Relationship;
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class MemGraph implements Graph {
      * Default constructor to create an empty graph in memory.
      */
     public MemGraph() {
-        graph = new DirectedMultigraph<>(Relationship.class);
+        graph = new DirectedAcyclicGraph<>(Relationship.class);
         nodes = new HashMap<>();
         pcs = new HashSet<>();
     }

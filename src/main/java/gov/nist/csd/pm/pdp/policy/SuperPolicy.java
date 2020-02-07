@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.policy;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -18,8 +18,10 @@ public class SuperPolicy {
     private static final int SUPER_ID = 0;
     private static final Node superUser = new Node(SUPER_ID, "super", U, Node.toProperties(NAMESPACE_PROPERTY, "super"));
     private Node superUA;
-    private Node superO;
+    private Node superUA2;
+    private Node superPolicyClassRep;
     private Node superOA;
+    private Node superPC;
 
     public SuperPolicy() { }
 
@@ -31,12 +33,20 @@ public class SuperPolicy {
         return superUA;
     }
 
-    public Node getSuperObject() {
-        return superO;
+    public Node getSuperUserAttribute2() {
+        return superUA2;
+    }
+
+    public Node getSuperPolicyClassRep() {
+        return superPolicyClassRep;
     }
 
     public Node getSuperObjectAttribute() {
         return superOA;
+    }
+
+    public Node getSuperPolicyClass() {
+        return superPC;
     }
 
     public void configure(Graph graph) throws PMException {
@@ -46,12 +56,18 @@ public class SuperPolicy {
 
         Set<Node> nodes = graph.search("super", NodeType.PC, filter);
         Node superPC;
+        long superPCRepID = rand.nextLong();
         if(nodes.isEmpty()) {
-            // add the rep oa ID to the properties
-            Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super");
+            Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", "rep_id", String.valueOf(superPCRepID));
             superPC = graph.createPolicyClass(rand.nextLong(), "super", props);
         } else {
             superPC = nodes.iterator().next();
+            if (superPC.getProperties().containsKey("rep_id")) {
+                superPCRepID = Long.parseLong(superPC.getProperties().get("rep_id"));
+            } else {
+                superPC.getProperties().put("rep_id", String.valueOf(superPCRepID));
+                graph.updateNode(superPC.getID(), null, superPC.getProperties());
+            }
         }
 
         nodes = graph.search("super_ua1", UA, filter);
@@ -61,7 +77,6 @@ public class SuperPolicy {
             superUA = nodes.iterator().next();
         }
         nodes = graph.search("super_ua2", UA, filter);
-        Node superUA2;
         if(nodes.isEmpty()) {
             superUA2 = graph.createNode(rand.nextLong(), "super_ua2", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getID());
         } else {
@@ -78,17 +93,26 @@ public class SuperPolicy {
         } else {
             superOA = nodes.iterator().next();
         }
-        nodes = graph.search("super", NodeType.O, filter);
+        nodes = graph.search("super rep", NodeType.OA, filter);
         if(nodes.isEmpty()) {
-            superO = graph.createNode(rand.nextLong(), "super", NodeType.O, Node.toProperties(NAMESPACE_PROPERTY, "super"), superOA.getID());
+            superPolicyClassRep = graph.createNode(superPCRepID, "super rep", NodeType.OA,
+                    Node.toProperties(NAMESPACE_PROPERTY, "super", "pc", String.valueOf(superPC.getID())), superOA.getID());
         } else {
-            superO = nodes.iterator().next();
+            superPolicyClassRep = nodes.iterator().next();
+            if (!superPC.getProperties().containsKey("pc")) {
+                superPC.getProperties().put("pc", String.valueOf(superPC.getID()));
+                graph.updateNode(superPolicyClassRep.getID(), null, superPolicyClassRep.getProperties());
+            }
         }
 
         // check super ua1 is assigned to super pc
         Set<Long> children = graph.getChildren(superPC.getID());
         if(!children.contains(superUA.getID())) {
             graph.assign(superUA.getID(), superPC.getID());
+        }
+        // check super ua2 is assigned to super pc
+        if(!children.contains(superUA2.getID())) {
+            graph.assign(superUA2.getID(), superPC.getID());
         }
         // check super ua2 is assigned to super pc
         children = graph.getChildren(superPC.getID());
@@ -112,12 +136,12 @@ public class SuperPolicy {
         }
         // check super o is assigned to super oa
         children = graph.getChildren(superOA.getID());
-        if(!children.contains(superO.getID())) {
-            graph.assign(superO.getID(), superOA.getID());
+        if(!children.contains(superPolicyClassRep.getID())) {
+            graph.assign(superPolicyClassRep.getID(), superOA.getID());
         }
 
         // associate super ua to super oa
         graph.associate(superUA.getID(), superOA.getID(), new OperationSet(ALL_OPERATIONS));
-        graph.associate(superUA.getID(), superUA2.getID(), new OperationSet(ALL_OPERATIONS));
+        graph.associate(superUA2.getID(), superUA.getID(), new OperationSet(ALL_OPERATIONS));
     }
 }

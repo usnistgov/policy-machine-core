@@ -5,7 +5,6 @@ import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.SuperPolicy;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
@@ -18,8 +17,8 @@ import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsService extends Service implements Prohibitions {
 
-    public ProhibitionsService(PAP pap, EPP epp, SuperPolicy superPolicy) {
-        super(pap, epp, superPolicy);
+    public ProhibitionsService(PAP pap, EPP epp) {
+        super(pap, epp);
     }
 
     public List<Prohibition> getProhibitions() throws PMException {
@@ -107,7 +106,7 @@ public class ProhibitionsService extends Service implements Prohibitions {
         }
 
         // check that the user can reset the graph
-        if (!hasPermissions(userCtx, superPolicy.getSuperObject().getID(), RESET)) {
+        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getID(), RESET)) {
             throw new PMAuthorizationException("unauthorized permissions to reset the graph");
         }
 

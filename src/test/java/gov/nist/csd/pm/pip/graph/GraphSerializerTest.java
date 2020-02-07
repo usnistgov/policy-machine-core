@@ -2,9 +2,7 @@ package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pdp.SuperPolicy;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -112,25 +110,5 @@ class GraphSerializerTest {
 
         assertTrue(graph.getSourceAssociations(uaNode.getID()).containsKey(oaNode.getID()));
         assertTrue(graph.getSourceAssociations(uaNode.getID()).get(oaNode.getID()).containsAll(Arrays.asList("read", "write")));
-    }
-
-    @Test
-    void testDeserializeWithExistingGraph() throws PMException {
-        Graph graph = new MemGraph();
-        SuperPolicy superPolicy = new SuperPolicy();
-        superPolicy.configure(graph);
-
-        String s = "" +
-                "node OA test\n" +
-                "assign OA:test OA:super";
-        GraphSerializer.deserialize(graph, s);
-
-        Node testNode = graph.getNode("test", OA, null);
-        Set<Long> parents = graph.getParents(testNode.getID());
-        assertFalse(parents.isEmpty());
-
-        Long l = parents.iterator().next();
-        Node node = graph.getNode(l);
-        assertEquals("super", node.getName());
     }
 }

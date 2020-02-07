@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.policy.SuperPolicy;
 import gov.nist.csd.pm.pdp.services.*;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.GraphSerializer;
@@ -31,17 +32,17 @@ public class PDP {
      */
     public PDP(PAP pap, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
-        // configure the super policy
-        this.superPolicy = new SuperPolicy();
-        this.superPolicy.configure(this.pap.getGraphPAP());
 
         this.epp = new EPP(this, eppOptions);
 
         // initialize services
-        this.graphService = new GraphService(this.pap, this.epp, superPolicy);
-        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp, superPolicy);
-        this.analyticsService = new AnalyticsService(this.pap, this.epp, superPolicy);
-        this.obligationsService = new ObligationsService(this.pap, this.epp, superPolicy);
+        this.graphService = new GraphService(this.pap, this.epp);
+        // configure the super policy
+        superPolicy = this.graphService.configureSuperPolicy();
+
+        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp);
+        this.analyticsService = new AnalyticsService(this.pap, this.epp);
+        this.obligationsService = new ObligationsService(this.pap, this.epp);
     }
 
     public EPP getEPP() {

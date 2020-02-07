@@ -9,7 +9,7 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.SuperPolicy;
+import gov.nist.csd.pm.pdp.policy.SuperPolicy;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -30,17 +30,24 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 public class GraphService extends Service implements Graph {
 
     private Graph graph;
+    private SuperPolicy superPolicy;
 
-    public GraphService(PAP pap, EPP epp, SuperPolicy superPolicy) {
-        super(pap, epp, superPolicy);
+    public GraphService(PAP pap, EPP epp) throws PMException {
+        super(pap, epp);
 
         this.graph = pap.getGraphPAP();
+    }
+
+    public SuperPolicy configureSuperPolicy() throws PMException {
+        superPolicy = new SuperPolicy();
+        superPolicy.configure(graph);
+        return superPolicy;
     }
 
     @Override
     public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
         // check that the user can create a policy class
-        if (!hasPermissions(userCtx, superPolicy.getSuperObject().getID(), CREATE_POLICY_CLASS)) {
+        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getID(), CREATE_POLICY_CLASS)) {
             throw new PMAuthorizationException("unauthorized permissions to create a policy class");
         }
 
@@ -48,7 +55,9 @@ public class GraphService extends Service implements Graph {
         Random rand = new Random();
         long defaultUA = rand.nextLong();
         long defaultOA = rand.nextLong();
-        properties.putAll(Node.toProperties("default_ua", String.valueOf(defaultUA), "default_oa", String.valueOf(defaultOA)));
+        long repID = rand.nextLong();
+        properties.putAll(Node.toProperties("default_ua", String.valueOf(defaultUA), "default_oa", String.valueOf(defaultOA),
+                "rep_id", String.valueOf(repID)));
         Node pcNode = getPAP().getGraphPAP().createPolicyClass(id, name, properties);
         // create the PC UA node
         Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, name, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
@@ -57,12 +66,17 @@ public class GraphService extends Service implements Graph {
 
         // assign Super U to PC UA
         // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
-        // assign super UA to PC
+        // assign superUA and superUA2 to PC
         getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute().getID(), pcNode.getID());
+        getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute2().getID(), pcNode.getID());
         // associate Super UA and PC UA
         getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getID(), pcUANode.getID(), new OperationSet(ALL_OPERATIONS));
         // associate Super UA and PC OA
         getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getID(), pcOANode.getID(), new OperationSet(ALL_OPERATIONS));
+
+        // create an OA that will represent the pc
+        getPAP().getGraphPAP().createNode(repID, name + " policy rep", OA,
+                Node.toProperties("pc", String.valueOf(id)), superPolicy.getSuperObjectAttribute().getID());
 
         return pcNode;
     }
@@ -90,7 +104,7 @@ public class GraphService extends Service implements Graph {
      * @throws IllegalArgumentException if the type is null.
      */
     @Override
-    public Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long... additionalParents) throws PMException {
+    public Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long ... additionalParents) throws PMException {
         if(userCtx == null) {
             throw new PMException("no user context provided to the PDP");
         }
@@ -114,18 +128,31 @@ public class GraphService extends Service implements Graph {
             // if the user cannot assign to the parent node, delete the newly created node
             throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %d", ASSIGN_TO, initialParent));
         }
+        // if the parent is a PC get the PC default
+        Node parentNode = graph.getNode(initialParent);
+        if (parentNode.getType().equals(PC)) {
+            initialParent = getPolicyClassDefault(parentNode.getID(), type);
+            parentNode = getNode(initialParent);
+        }
 
         // check any additional parents before assigning
-        for (long parentID : additionalParents) {
+        for (int i = 0; i < additionalParents.length; i++) {
+            long parentID = additionalParents[i];
+
             if (!hasPermissions(userCtx, parentID, ASSIGN_TO)) {
                 // if the user cannot assign to the parent node, delete the newly created node
                 throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %d", ASSIGN_TO, parentID));
+            }
+
+            // if the parent is a PC get the PC default
+            Node additionalParentNode = graph.getNode(parentID);
+            if (additionalParentNode.getType().equals(PC)) {
+               additionalParents[i] = getPolicyClassDefault(additionalParentNode.getID(), type);
             }
         }
 
         //create the node
         Node node = getGraphPAP().createNode(id, name, type, properties, initialParent, additionalParents);
-        Node parentNode = graph.getNode(initialParent);
 
         // process event for initial parent
         getEPP().processEvent(new AssignToEvent(parentNode, node), userCtx.getUserID(), userCtx.getProcessID());
@@ -238,6 +265,13 @@ public class GraphService extends Service implements Graph {
             getEPP().processEvent(new DeassignFromEvent(parentNode, node), userCtx.getUserID(), userCtx.getProcessID());
         }
 
+        // if it's a PC, delete the rep
+        if (node.getType().equals(PC)) {
+            if (node.getProperties().containsKey("rep_id")) {
+                getGraphPAP().deleteNode(Long.parseLong(node.getProperties().get("rep_id")));
+            }
+        }
+
         getGraphPAP().deleteNode(nodeID);
     }
 
@@ -259,7 +293,7 @@ public class GraphService extends Service implements Graph {
 
         Node node = getGraphPAP().getNode(nodeID);
         if (node.getType().equals(PC)) {
-            return hasPermissions(userCtx, superPolicy.getSuperObject().getID(), ANY_OPERATIONS);
+            return hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getID(), ANY_OPERATIONS);
         }
 
         // node exists, return false if the user does not have access to it.
@@ -410,19 +444,7 @@ public class GraphService extends Service implements Graph {
         }
 
         if (parent.getType().equals(PC)) {
-            if (child.getType().equals(UA)) {
-                if (parent.getProperties().containsKey("default_ua")) {
-                    throw new PMException("default_ua property not set for " + parent.getName());
-                }
-
-                parentID = Long.parseLong(parent.getProperties().get("default_ua"));
-            } else if (child.getType().equals(OA)) {
-                if (parent.getProperties().containsKey("default_oa")) {
-                    throw new PMException("default_oa property not set for " + parent.getName());
-                }
-
-                parentID = Long.parseLong(parent.getProperties().get("default_oa"));
-            }
+            parentID = getPolicyClassDefault(parent.getID(), child.getType());
         }
 
         // assign in the PAP
@@ -696,7 +718,7 @@ public class GraphService extends Service implements Graph {
         }
 
         // check that the user can reset the graph
-        if (!hasPermissions(userCtx, superPolicy.getSuperObject().getID(), RESET)) {
+        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getID(), RESET)) {
             throw new PMAuthorizationException("unauthorized permissions to reset the graph");
         }
 
