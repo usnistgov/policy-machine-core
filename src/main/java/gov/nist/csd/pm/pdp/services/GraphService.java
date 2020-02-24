@@ -60,9 +60,9 @@ public class GraphService extends Service implements Graph {
                 "rep_id", String.valueOf(repID)));
         Node pcNode = getPAP().getGraphPAP().createPolicyClass(id, name, properties);
         // create the PC UA node
-        Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, name, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
+        Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, name + "_UA", UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
         // create the PC OA node
-        Node pcOANode = getPAP().getGraphPAP().createNode(defaultOA, name, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
+        Node pcOANode = getPAP().getGraphPAP().createNode(defaultOA, name + "_OA", OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getID());
 
         // assign Super U to PC UA
         // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());

@@ -106,7 +106,7 @@ public class Node implements Serializable {
     public boolean equals(Object o) {
         if (o instanceof Node) {
             Node n = (Node) o;
-            return this.name == n.name;
+            return this.name.equals(n.name);
         }
         return false;
     }

@@ -60,16 +60,16 @@ class GraphServiceTest {
                 "# DAC\n" +
                 "node PC DAC\n" +
                 "node UA users\n" +
-                "node UA doctorA1\n" +
-                "node UA nurseA1\n" +
-                "node UA patient1\n" +
+                "node UA doctorA1_UA\n" +
+                "node UA nurseA1_UA\n" +
+                "node UA patient1_UA\n" +
                 "assign UA:users PC:DAC\n" +
-                "assign UA:nurseA1 UA:users\n" +
-                "assign UA:doctorA1 UA:users\n" +
-                "assign UA:patient1 UA:users\n" +
-                "assign U:nurseA1 UA:nurseA1\n" +
-                "assign U:doctorA1 UA:doctorA1\n" +
-                "assign U:patient1 UA:patient1\n" +
+                "assign UA:nurseA1_UA UA:users\n" +
+                "assign UA:doctorA1_UA UA:users\n" +
+                "assign UA:patient1_UA UA:users\n" +
+                "assign U:nurseA1 UA:nurseA1_UA\n" +
+                "assign U:doctorA1 UA:doctorA1_UA\n" +
+                "assign U:patient1 UA:patient1_UA\n" +
                 "\n" +
                 "node OA homes\n" +
                 "node OA doctorA1_home\n" +
@@ -84,9 +84,9 @@ class GraphServiceTest {
                 "assign OA:records OA:patient1_home\n" +
                 "\n" +
                 "assoc UA:users OA:homes [assign to]\n" +
-                "assoc UA:doctorA1 OA:doctorA1_home [read,write]\n" +
-                "assoc UA:nurseA1 OA:nurseA1_home [read,write]\n" +
-                "assoc UA:patient1 OA:patient1_home [read,write,assign]\n" +
+                "assoc UA:doctorA1_UA OA:doctorA1_home [read,write]\n" +
+                "assoc UA:nurseA1_UA OA:nurseA1_home [read,write]\n" +
+                "assoc UA:patient1_UA OA:patient1_home [read,write,assign]\n" +
                 "\n" +
                 "# LogIn\n" +
                 "node PC LogIn\n" +

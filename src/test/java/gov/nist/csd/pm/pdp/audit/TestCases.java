@@ -148,7 +148,7 @@ public class TestCases {
         graph.createPolicyClass(pc1ID, "pc1", null);
         graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
         graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua1", UA, null, pc1ID);
+        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
         graph.createNode(u1ID, "u1", U, null, ua2ID);
         graph.createNode(o1ID, "o1", O, null, oa1ID);
 
