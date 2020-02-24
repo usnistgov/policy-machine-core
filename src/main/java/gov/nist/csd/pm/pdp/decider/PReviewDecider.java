@@ -386,6 +386,10 @@ public class PReviewDecider implements Decider {
         }
     }
 
+    /**
+     * Get the prohibitions that the subject is apart of.  Return all of the targets of those prohibitions
+     * and which prohibitions pertain to which target.
+     */
     private Map<Long, List<Prohibition>> getProhibitionTargets(long subjectID) throws PMException {
         List<Prohibition> pros = prohibitions.getProhibitionsFor(subjectID);
         Map<Long, List<Prohibition>> prohibitionTargets = new HashMap<>();
