@@ -18,7 +18,7 @@ Then, add the maven dependency
 <dependency>
     <groupId>com.github.PM-Master</groupId>
     <artifactId>policy-machine-core</artifactId>
-    <version>1.3.1</version>
+    <version>LATEST</version>
 </dependency>
 ```
 That's it, now the policy-machine-core library will be available for use!

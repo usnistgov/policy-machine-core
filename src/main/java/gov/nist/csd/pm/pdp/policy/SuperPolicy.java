@@ -54,12 +54,12 @@ public class SuperPolicy {
 
         Map<String, String> filter = Node.toProperties(NAMESPACE_PROPERTY, "super");
 
-        Set<Node> nodes = graph.search("super", NodeType.PC, filter);
+        Set<Node> nodes = graph.search("super_pc", NodeType.PC, filter);
         Node superPC;
         long superPCRepID = rand.nextLong();
         if(nodes.isEmpty()) {
             Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", "rep_id", String.valueOf(superPCRepID));
-            superPC = graph.createPolicyClass(rand.nextLong(), "super", props);
+            superPC = graph.createPolicyClass(rand.nextLong(), "super_pc", props);
         } else {
             superPC = nodes.iterator().next();
             if (superPC.getProperties().containsKey("rep_id")) {
@@ -82,14 +82,14 @@ public class SuperPolicy {
         } else {
             superUA2 = nodes.iterator().next();
         }
-        nodes = graph.search("super", U, filter);
+        nodes = graph.search("super_u", U, filter);
         if(nodes.isEmpty()) {
             graph.createNode(0, "super", U, Node.toProperties(NAMESPACE_PROPERTY, "super"), superUA.getID(), superUA2.getID());
         }
 
-        nodes = graph.search("super", NodeType.OA, filter);
+        nodes = graph.search("super_oa", NodeType.OA, filter);
         if(nodes.isEmpty()) {
-            superOA = graph.createNode(rand.nextLong(), "super", NodeType.OA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getID());
+            superOA = graph.createNode(rand.nextLong(), "super_oa", NodeType.OA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getID());
         } else {
             superOA = nodes.iterator().next();
         }

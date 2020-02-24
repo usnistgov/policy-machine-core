@@ -25,10 +25,10 @@ public interface Graph {
     Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException;
 
     /**
-     * Create a new node with the given name, type and properties and add it to the graph.
+     * Create a new node with the given name, type and properties and add it to the graph. Node names should be unique.
      *
      * @param id the ID of the node.
-     * @param name the name of the node.
+     * @param name the unique name of the node.
      * @param type the type of node.
      * @param properties any additional properties to store in the node.
      * @param initialParent is the parent to initially assign the new node to.  A node needs to be connected to the

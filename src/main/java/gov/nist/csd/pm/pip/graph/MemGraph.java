@@ -1,19 +1,29 @@
 package gov.nist.csd.pm.pip.graph;
 
+import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.pdp.decider.PReviewDecider;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import gov.nist.csd.pm.pip.graph.model.relationships.Relationship;
+import gov.nist.csd.pm.pip.obligations.MemObligations;
+import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
+import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 /**
  * MemGraph is an in-memory implementation of the graph interface.  It stores the IDs of the nodes in a DAG structure.
@@ -26,6 +36,7 @@ public class MemGraph implements Graph {
     private DirectedGraph<Long, Relationship> graph;
     private HashSet<Long>                     pcs;
     private HashMap<Long, Node>               nodes;
+    private HashMap<String, Long>             names;
 
     /**
      * Default constructor to create an empty graph in memory.
@@ -33,6 +44,7 @@ public class MemGraph implements Graph {
     public MemGraph() {
         graph = new DirectedAcyclicGraph<>(Relationship.class);
         nodes = new HashMap<>();
+        names = new HashMap<>();
         pcs = new HashSet<>();
     }
 
@@ -48,6 +60,7 @@ public class MemGraph implements Graph {
         // add the pc's ID to the pc set and to the graph
         pcs.add(id);
         graph.addVertex(id);
+        names.put(name, id);
 
         // create the node
         Node node = new Node(id, name, PC, properties);
@@ -72,7 +85,7 @@ public class MemGraph implements Graph {
         if (type == PC) {
             throw new PMException("use createPolicyClass to create a policy class node");
         }
-        if (exists(id)) {
+        else if (exists(id)) {
             throw new IllegalArgumentException("the ID already exists in the graph");
         }
         else if (name == null || name.isEmpty()) {
@@ -84,9 +97,13 @@ public class MemGraph implements Graph {
         else if (initialParent == 0) {
             throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
         }
+        else if (names.containsKey(name)) {
+            throw new PMException("a node with the name " + name + " already exists");
+        }
 
         // add the vertex to the graph
         graph.addVertex(id);
+        names.put(name, id);
 
         //store the node in the map
         Node node = new Node(id, name, type, properties);
@@ -121,7 +138,9 @@ public class MemGraph implements Graph {
 
         // update name if present
         if (name != null && !name.isEmpty()) {
+            names.remove(existingNode.getName());
             existingNode.name(name);
+            names.put(name, existingNode.getID());
         }
 
         // update the properties
@@ -140,13 +159,15 @@ public class MemGraph implements Graph {
      * @param nodeID the ID of the node to delete.
      */
     @Override
-    public void deleteNode(long nodeID) {
+    public void deleteNode(long nodeID) throws PMException {
+        Node node = getNode(nodeID);
         //remove the vertex from the graph
         graph.removeVertex(nodeID);
         //remove the node from the policies if it is a policy class
         pcs.remove(nodeID);
         //remove the node from the map
         nodes.remove(nodeID);
+        names.remove(node.getName());
     }
 
     @Override
