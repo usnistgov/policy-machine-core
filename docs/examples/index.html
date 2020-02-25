@@ -196,18 +196,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
-      Getting Started
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
     <a href="../functional-components/" title="Functional Components" class="md-nav__link">
       Functional Components
     </a>
@@ -266,6 +254,26 @@
   <a href="#graph" class="md-nav__link">
     Graph
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json" class="md-nav__link">
+    JSON
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#readable-format" class="md-nav__link">
+    Readable Format
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -464,6 +472,26 @@
     Graph
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json" class="md-nav__link">
+    JSON
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#readable-format" class="md-nav__link">
+    Readable Format
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -628,7 +656,9 @@
                 
                 <h3 id="serialization">Serialization</h3>
 <h4 id="graph">Graph</h4>
-<p>Serialize a graph into a json string.</p>
+<p>There are two ways to serialize a graph. This first is to serialize it into json.  The second is a command like structure
+that is easier to read than json.</p>
+<h5 id="json">JSON</h5>
 <pre><code>Graph graph = new MemGraph();
 ---
 String json = GraphSerializer.toJson(graph);
@@ -636,6 +666,26 @@ String json = GraphSerializer.toJson(graph);
 
 <p>Deserialize a json string to a graph.</p>
 <pre><code>Graph graph = GraphSerializer.fromJson(new MemGraph(), json);
+</code></pre>
+
+<h5 id="readable-format">Readable Format</h5>
+<p>There are three primary commands for the readable format: <strong>node</strong>, <strong>assign</strong>, and <strong>assoc</strong>.</p>
+<pre><code>node PC pc1
+node OA oa1
+node UA ua1
+node O o1
+node U u1
+
+assign OA:oa1 PC:pc1
+assign UA:ua1 PC:pc1
+assign O:o1 OA:oa1
+assign U:u1 UA:ua1
+
+assoc UA:ua1 OA:oa1 [read,write]
+</code></pre>
+
+<pre><code class="java">String serialize = GraphSerializer.serialize(graph);
+Graph deSerialize = GraphSerializer.deserialize(graph);
 </code></pre>
 
 <h4 id="prohibitions">Prohibitions</h4>

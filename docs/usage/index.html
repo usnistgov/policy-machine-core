@@ -77,10 +77,6 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#creating-a-graph" tabindex="1" class="md-skip">
-        Skip to content
-      </a>
-    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -196,18 +192,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
-      Getting Started
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
     <a href="../functional-components/" title="Functional Components" class="md-nav__link">
       Functional Components
     </a>
@@ -257,62 +241,6 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-graph" class="md-nav__link">
-    Creating a Graph
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#access-decisions" class="md-nav__link">
-    Access Decisions
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#audit" class="md-nav__link">
-    Audit
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#explain" class="md-nav__link">
-    Explain
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
@@ -321,84 +249,7 @@
                 
                   <h1>Usage</h1>
                 
-                <h2 id="creating-a-graph">Creating a Graph</h2>
-<pre><code>Graph graph = new Graph();
-</code></pre>
-
-<p>This will create a new instance of the in memory implementation of the Graph interface. Now it can be populated with
-nodes, assignments, and associations.</p>
-<pre><code>graph.createNode(1234, &quot;newNode&quot;, NodeType.O, null));
-</code></pre>
-
-<p>This will add a node with the ID 1234, name "newNode", type object, and no properties to the graph.</p>
-<pre><code>graph.assign(1234, NodeType.O), 4321, NodeType.OA));
-</code></pre>
-
-<p>Assuming a node with the ID 4321 and type OA have been created in the graph, this will assign the node with ID 1234 to the
-node with ID 4321.</p>
-<pre><code>graph.associate(2222, NodeType.UA), 4321, NodeType.OA), new HashSet&lt;&gt;(Arrays.asList(&quot;read&quot;, &quot;write&quot;)));
-</code></pre>
-
-<p>Assuming a user attribute node is created with the ID 2222, this will associate it with the object attribute that has the
-ID 4321, and give the operations read and write.</p>
-<p><strong>Examples of creating graphs are provided <a href="/examples/#examples">here</a></strong></p>
-<h2 id="access-decisions">Access Decisions</h2>
-<p>To make an access decision, instantiate a <code>PReviewDecider</code> which implements the <code>Decider</code> interface. The interface provides
-several methods to query the current access state of the graph.</p>
-<pre><code>Decider decider = new PReviewDecider(graph);
-decider.listPermissions(userID, NO_PROCESS, targetID);
-</code></pre>
-
-<p>The <code>listPermissions</code> method returns the permissions a user has on a target node.</p>
-<h2 id="audit">Audit</h2>
-<h3 id="explain">Explain</h3>
-<p>Explain answers the question why does a user have access to a given target node? To perform this, instantiate a new
-<code>PReviewAuditor</code> and call the <code>explain</code> method.</p>
-<pre><code>Auditor auditor = new PReviewAuditor(graph);
-Explain explain = auditor.explain(1234, 4321);
-</code></pre>
-
-<p>The result of the explain method is as follows.</p>
-<pre><code>public class Explain {
-    private Set&lt;String&gt;              permissions;
-    private Map&lt;String, PolicyClass&gt; policyClasses;
-    ...
-}
-</code></pre>
-
-<p>Provided in the result are the permissions the user has on the target node and a map containing the paths from the user to the target under each policy class.
-A PolicyClass object looks like:</p>
-<pre><code>public class PolicyClass {
-    private Set&lt;String&gt; operations;
-    private List&lt;Path&gt; paths;
-    ...
-}
-</code></pre>
-
-<p>The PolicyClass object stores the operations granted to the user under a policy class and the paths that provide those operations.
-A Path is just a sequence of nodes, starting at the user and ending at the target node:</p>
-<pre><code>public class Path {
-    private Set&lt;String&gt; operations;
-    private List&lt;Node&gt; nodes;
-    ...
-}
-</code></pre>
-
-<p>Also provided is the set of operations that the specific path contributes to the overall set for the policy class.</p>
-<p>Here is the output of an <code>explain</code> example.</p>
-<pre><code>operations: [read]
-policyClasses:
-  - pc2:
-      operations: [read]
-      paths:
-        - u1-ua2-oa2-o1 ops=[read]
-  - pc1:
-      operations: [read, write]
-      paths:
-        - u1-ua1-oa1-o1 ops=[read, write]
-</code></pre>
-
-<p><strong>See an example <a href="/examples/#explain">here</a></strong></p>
+                
                 
                   
                 

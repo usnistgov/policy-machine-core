@@ -196,18 +196,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
-      Getting Started
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
     <a href="../functional-components/" title="Functional Components" class="md-nav__link">
       Functional Components
     </a>
@@ -412,8 +400,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#deny-action" class="md-nav__link">
-    Deny Action
+  <a href="#deny-action-prohibition" class="md-nav__link">
+    Deny Action (Prohibition)
   </a>
   
 </li>
@@ -421,6 +409,13 @@
           <li class="md-nav__item">
   <a href="#delete-action" class="md-nav__link">
     Delete Action
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fuction-as-action" class="md-nav__link">
+    Fuction as Action
   </a>
   
 </li>
@@ -1287,8 +1282,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#deny-action" class="md-nav__link">
-    Deny Action
+  <a href="#deny-action-prohibition" class="md-nav__link">
+    Deny Action (Prohibition)
   </a>
   
 </li>
@@ -1296,6 +1291,13 @@
           <li class="md-nav__item">
   <a href="#delete-action" class="md-nav__link">
     Delete Action
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fuction-as-action" class="md-nav__link">
+    Fuction as Action
   </a>
   
 </li>
@@ -2127,27 +2129,27 @@ policyClass: # PC1 and PC2
 </code></pre>
 
 <h3 id="create-action">Create Action</h3>
-<p>Create</p>
+<p>You can create</p>
 <ul>
-<li>A rule</li>
-<li>A set of nodes and assignments to containers</li>
+<li>a set of rules</li>
+<li>a set of nodes</li>
 </ul>
 <h4 id="rule_1">rule</h4>
 <pre><code class="yaml">create:
-  rule:
-    label:
+  - label:
     event:
     response:
 </code></pre>
 
 <h4 id="nodes_1">nodes</h4>
-<p>Creating nodes requires the name and type of the nodes to create and the containers in which to assign them. A node can be specified with a set of properties if applicable.</p>
+<p>Create a single node and assign it to an already existing node in the graph. An array of commands is accepted to create
+more than one node. <strong>Functions are not allowed here</strong>.</p>
 <pre><code class="yaml">create:
-  what:
-    - name: node1
+  - what:
+      name: node1
       type: UA
-  where:
-    - name: container1
+    where:
+      name: container1
       type: UA
 </code></pre>
 
@@ -2157,24 +2159,28 @@ policyClass: # PC1 and PC2
   where:
 </code></pre>
 
-<p>The <code>what</code> and <code>where</code> elements are arrays of nodes.  The nodes in <code>what</code> will be assigned to the nodes in <code>where</code>.</p>
+<p>The <code>what</code> and <code>where</code> nodes.  The node in <code>what</code> will be assigned to the node in <code>where</code>.</p>
 <h3 id="grant-action">Grant Action</h3>
-<p>Associate each node in <code>subjects</code> with each node in <code>targets</code>.</p>
+<p>Associate the node in <code>subject</code> with the node in <code>target</code>.</p>
 <pre><code class="yaml">grant:
-  subjects:
+  subject:
   operations:
-  targets:
+  target:
 </code></pre>
 
 <ul>
-<li><code>subjects</code> is an array of nodes that will be the subject of the associations created.</li>
-<li><code>operations</code> is an array of operations to add to the associations.</li>
-<li><code>targets</code> is an array of nodes that will be the targets of the associations.</li>
+<li><code>subject</code> a node that will be the subject of the association.</li>
+<li><code>operations</code> is an array of operations to add to the association.</li>
+<li><code>target</code> a node that will be the target of the association.</li>
 </ul>
-<h3 id="deny-action">Deny Action</h3>
+<h3 id="deny-action-prohibition">Deny Action (Prohibition)</h3>
 <p>Deny a subject a set of operations on a set of target attributes. The subject can be a function, a process, or a node.
-The operations are an array of string.  The target of the deny can be the intersection of a set of containers. It can also be the complement of the logical evaluation of the containers. Each container is identified by a name and type (properties are optional).  If more than one node matches the provided name and type all will be taken into account. It is possible to take the complement of an individual container using the <code>complement</code> element.</p>
+The operations are an array of string.  The target of the deny can be the intersection of a set of containers. 
+It can also be the complement of the logical evaluation of the containers. Each container is identified by a name and type (properties are optional).<br />
+If more than one node matches the provided name and type all will be taken into account. It is possible to take the complement 
+of an individual container using the <code>complement</code> element. A deny also has a label that can be used to reference it later (i.e. to delete).</p>
 <pre><code class="yaml">deny:
+  label: # string
   subject: # priority goes 1. function, 2. process, 3. node
    function:
    ---
@@ -2198,19 +2204,39 @@ The operations are an array of string.  The target of the deny can be the inters
 </code></pre>
 
 <h3 id="delete-action">Delete Action</h3>
-<p>Delete</p>
+<p>The delete action can delete:</p>
 <ul>
-<li>assignment relations</li>
-<li>deny relations</li>
-<li>grant relations</li>
-<li>created policy elements</li>
-<li>created rules</li>
+<li>nodes</li>
+<li>assignments</li>
+<li>associations</li>
+<li>prohibitions (denies)</li>
+<li>rules</li>
 </ul>
 <pre><code class="yaml">delete:
-  create:
-  assign:
-  grant:
-  deny:
+  nodes:
+    - name:
+      type:
+  assignments:
+    - what:
+        name:
+        type:
+      where:
+        name:
+        type:
+  associations:
+    - subject:
+      target:
+  prohibitions:
+    - label:
+  rules:
+    - label:
+</code></pre>
+
+<h3 id="fuction-as-action">Fuction as Action</h3>
+<p>You can define a function as a direct action in the response.</p>
+<pre><code class="yaml">function:
+  name:
+  args:
 </code></pre>
 
 <h2 id="functions">Functions</h2>
@@ -2252,6 +2278,8 @@ together.</p>
 <p>Create a new node and return it.</p>
 <h5 id="parameters_2">Parameters</h5>
 <ol>
+<li>parentName:</li>
+<li>parentType:</li>
 <li>name: string</li>
 <li>type: string</li>
 <li>properties: function (<a href="#to_props">to_props</a>)</li>
@@ -2264,6 +2292,8 @@ together.</p>
 <pre><code class="yaml">function:
   name: create_node
   args:
+    - &quot;parentNode&quot;
+    - &quot;OA&quot;
     - &quot;newNode&quot;
     - &quot;OA&quot;
     - function:
