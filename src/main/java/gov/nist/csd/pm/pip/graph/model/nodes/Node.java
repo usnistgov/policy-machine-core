@@ -36,11 +36,6 @@ public class Node implements Serializable {
         this.type = type;
     }
 
-    public Node(String name, NodeType type) {
-        this.name = name;
-        this.type = type;
-    }
-
     public Node id(long id) {
         if (id == 0) {
             throw new IllegalArgumentException("a node cannot have an ID of 0");
@@ -50,7 +45,7 @@ public class Node implements Serializable {
         return this;
     }
 
-    public Node setName(String name) {
+    public Node name(String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("a node can not have a null or empty name");
         }
@@ -59,7 +54,7 @@ public class Node implements Serializable {
         return this;
     }
 
-    public Node setType(NodeType type) {
+    public Node type(NodeType type) {
         if (type == null) {
             throw new IllegalArgumentException("a type cannot be null");
         }
@@ -67,7 +62,7 @@ public class Node implements Serializable {
         return this;
     }
 
-    public Node setProperties(Map<String, String> properties) {
+    public Node properties(Map<String, String> properties) {
         if (properties == null) {
             properties = new HashMap<>();
         }
@@ -76,7 +71,7 @@ public class Node implements Serializable {
         return this;
     }
 
-    public Node addProperty(String key, String value) {
+    public Node property(String key, String value) {
         if (key == null || value == null) {
             throw new IllegalArgumentException("a node cannot have a property with a null key or value");
         }

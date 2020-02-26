@@ -36,7 +36,7 @@ public class MemGraph implements Graph {
     private DirectedGraph<Long, Relationship> graph;
     private HashSet<Long>                     pcs;
     private HashMap<Long, Node>               nodes;
-    private HashMap<Integer, Long>             names;
+    private HashMap<String, Long>             names;
 
     /**
      * Default constructor to create an empty graph in memory.
@@ -57,14 +57,13 @@ public class MemGraph implements Graph {
             throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
         }
 
-        Node node = new Node(id, name, PC, properties);
-
         // add the pc's ID to the pc set and to the graph
         pcs.add(id);
         graph.addVertex(id);
-        names.put(node.hashCode(), id);
+        names.put(name, id);
 
         // create the node
+        Node node = new Node(id, name, PC, properties);
         nodes.put(id, node);
 
         return node;
@@ -98,19 +97,16 @@ public class MemGraph implements Graph {
         else if (initialParent == 0) {
             throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
         }
-
-        Node node = new Node(id, name, type, properties);
-
-        // check that the name type pairing doesnt already exist
-        if (names.containsKey(node.hashCode())) {
+        else if (names.containsKey(name)) {
             throw new PMException("a node with the name " + name + " already exists");
         }
 
         // add the vertex to the graph
         graph.addVertex(id);
-        names.put(node.hashCode(), id);
+        names.put(name, id);
 
         //store the node in the map
+        Node node = new Node(id, name, type, properties);
         nodes.put(id, node);
 
         // assign the new node the to given parent nodes
@@ -142,14 +138,14 @@ public class MemGraph implements Graph {
 
         // update name if present
         if (name != null && !name.isEmpty()) {
-            names.remove(existingNode.hashCode());
-            existingNode.setName(name);
-            names.put(existingNode.hashCode(), existingNode.getID());
+            names.remove(existingNode.getName());
+            existingNode.name(name);
+            names.put(name, existingNode.getID());
         }
 
         // update the properties
         if (properties != null) {
-            existingNode.setProperties(properties);
+            existingNode.properties(properties);
         }
 
         // update the node information
