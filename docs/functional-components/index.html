@@ -194,18 +194,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
-      Getting Started
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -322,6 +310,19 @@
   <a href="#decider" class="md-nav__link">
     Decider
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -509,6 +510,19 @@
     Decider
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -561,31 +575,42 @@
 <h3 id="graph">Graph</h3>
 <p>The <code>Graph</code> interface provides the set of functions necessary for maintaining and traversing an NGAC graph.</p>
 <h4 id="memgraph">MemGraph</h4>
-<p>MemGraph is an in memory implementation of the <code>Graph</code> interface called. The underlying structure is a directed acyclic graph which stores the node IDs as nodes in the graph.  Edges represent assignments and associations.</p>
+<p>MemGraph is an in memory implementation of the <code>Graph</code> interface. The underlying structure is a directed acyclic graph which stores the node IDs as nodes in the graph.  Edges represent assignments and associations.</p>
 <pre><code>Graph graph = new MemGraph();
 </code></pre>
 
 <p>This will create a new instance of the in memory implementation of the Graph interface. Now it can be populated with
 nodes, assignments, and associations.</p>
-<pre><code>Node node = graph.createNode(1234, &quot;newNode&quot;, NodeType.O, null));
+<p>A characteristic of NGAC graphs is that all nodes must be connected.  You can start building a graph with Policy Classes by calling</p>
+<pre><code>Node pc1 = graph.createPolicyClass(id, &quot;PC1&quot;, null)
 </code></pre>
 
-<p>This will add a node with the ID 1234, name "newNode", type object, and no properties to the graph.</p>
-<pre><code>graph.assign(1234, NodeType.O), 4321, NodeType.OA));
+<p>Once a policy class is created, Object and User Attributes can then be created and assigned to the policy class</p>
+<pre><code>Node ua = graph.createNode(id, &quot;UA1&quot;, NodeType.UA, null, pc1.getID());
+Node oa = graph.createNode(id, &quot;OA1&quot;, NodeType.OA, null, pc1.getID());
 </code></pre>
 
-<p>Assuming a node with the ID 4321 and type OA have been created in the graph, this will assign the node with ID 1234 to the
-node with ID 4321.</p>
-<pre><code>graph.associate(2222, NodeType.UA), 4321, NodeType.OA), new HashSet&lt;&gt;(Arrays.asList(&quot;read&quot;, &quot;write&quot;)));
+<p>It is possible to create a node and assign it to more than one parent</p>
+<pre><code>Node oa1 = graph.createNode(id, &quot;OA1&quot;, NodeType.OA, null, pc1.getID());
+Node oa2 = graph.createNode(id, &quot;OA2&quot;, NodeType.OA, null, pc1.getID());
+
+Node o = graph.createNode(id, &quot;O1&quot;, NodeType.O, null, oa1.getID(), oa2.getID());
 </code></pre>
 
-<p>Assuming a user attribute node is created with the ID 2222, this will associate it with the object attribute that has the
-ID 4321, and give the operations read and write.</p>
+<p>The <code>createNode</code> method only requires one initial parent node, but assignments can still be made later on</p>
+<pre><code>graph.assign(o1.getID(), oa3.getID());
+</code></pre>
+
+<p>To associate two nodes</p>
+<pre><code>graph.associate(ua1.getID(), oa1.getID(), new OperationSet(&quot;read&quot;, &quot;write&quot;)));
+</code></pre>
+
+<p>This will associate the ua1 and oa1 nodes with read and write operations.</p>
 <h3 id="prohibitions">Prohibitions</h3>
 <p>The <code>Prohibitions</code> interface provides functions to maintain a list of prohibition relations.</p>
 <h4 id="memprohibitions">MemProhibitions</h4>
-<p><code>MemProhibitions</code> is an in memory implementation of the <code>Prohibitions</code> interface. The <code>Prohibition</code>
-model object is stored in a <code>List</code>. The following is an example of creating a <code>Prohibition</code> and adding it to a <code>MemProhibitions</code> instance:</p>
+<p><code>MemProhibitions</code> is an in memory implementation of the <code>Prohibitions</code> interface. Prohibitions are stored with respect to the subject of the prohibition.
+ This allows for efficient look up later on. The following is an example of creating a <code>Prohibition</code> and adding it to a <code>MemProhibitions</code> instance:</p>
 <pre><code>Prohibitions prohibitions = new MemProhibitions();
 
 Prohibition prohibition = new Prohibition();
@@ -603,8 +628,7 @@ prohibitions.add(prohibition);
 <h2 id="pap">PAP</h2>
 <p>The Policy Administration Point (PAP) provides a means for administering policies to the underlying data in the PIP.  This package is very simple as it only sets up a middle man between the PDP/EPP and the PIP.</p>
 <h3 id="pap-functional-entity">PAP Functional Entity</h3>
-<p>The PAP object is made up of a <code>Graph</code>, <code>Prohibitions</code>, and <code>Obligations</code>. It provides and single
-administration point for an NGAC system. When a <code>PAP</code> is initialized a call to <code>SuperGraph.check()</code> is called on the <code>Graph</code> parameter. This call ensures that the super configuration is complete in the provided graph.</p>
+<p>The PAP object is made up of a <code>Graph</code>, <code>Prohibitions</code>, and <code>Obligations</code>. It provides and single administration point for an NGAC system.</p>
 <h2 id="pdp">PDP</h2>
 <p>The Policy Decision Point (PDP) provides three main functionalities:</p>
 <ol>
@@ -613,12 +637,16 @@ administration point for an NGAC system. When a <code>PAP</code> is initialized 
 <li>A PDP as a functional entity.</li>
 </ol>
 <h3 id="decider">Decider</h3>
-<p>The <code>decider</code> package contains two interfaces <code>Decider</code> and <code>ProhibitionDecider</code>.</p>
-<ul>
-<li><code>Decider</code> - methods to make access decisions.</li>
-<li><code>ProhibitionDecider</code> - methods to determine any prohibited permissions.</li>
-</ul>
-<p>Implementations of both of these interfaces are provided as <code>PReviewDecider</code> and <code>MemProhibtionDecider</code>.</p>
+<p>The <code>decider</code> package contains the <code>Decider</code> interface which provides methods to query the access state of an NGAC graph, and an implementation of this interface called <code>PReviewDecider</code> (short for Policy Review Decider).</p>
+<h4 id="usage">Usage</h4>
+<p>The <code>PReviewDecider</code> receives a graph and prohibitions</p>
+<pre><code class="java">Decider decider = new PReviewDecider(graph, prohibitions);
+</code></pre>
+
+<p>Access decisions can then be made using one of the several available methods</p>
+<pre><code class="java">Set&lt;String&gt; permissions = decder.list(userID, processID, targetID)
+</code></pre>
+
 <h3 id="auditor">Auditor</h3>
 <p>The <code>auditor</code> package contains an interface that can be used to audit an NGAC graph. The interface has one method called <code>explain</code> which can explain <strong>why</strong> a user has permissions on a target node. An implementation called <code>PReviewAuditor</code> is provided.</p>
 <h3 id="pdp-functional-entity">PDP Functional Entity</h3>
@@ -654,7 +682,7 @@ administration point for an NGAC system. When a <code>PAP</code> is initialized 
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../getting-started/" title="Getting Started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../installation/" title="Installation" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -663,7 +691,7 @@ administration point for an NGAC system. When a <code>PAP</code> is initialized 
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Getting Started
+                Installation
               </span>
             </div>
           </a>

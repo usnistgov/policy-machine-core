@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
@@ -14,16 +15,29 @@ import java.util.Set;
 public interface Graph {
 
     /**
-     * Create a new node with the given name, type and properties and add it to the graph.
+     * Create a policy class in the graph.
+     *
+     * @param name the name of the policy class.
+     * @param properties the properties of the policy class.
+     * @return the node representing the new policy class.
+     * @throws PMException if there is an error creating the policy class node in the graph.
+     */
+    Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException;
+
+    /**
+     * Create a new node with the given name, type and properties and add it to the graph. Node names should be unique.
      *
      * @param id the ID of the node.
-     * @param name the name of the node.
+     * @param name the unique name of the node.
      * @param type the type of node.
      * @param properties any additional properties to store in the node.
+     * @param initialParent is the parent to initially assign the new node to.  A node needs to be connected to the
+     *                      graph when created.
+     * @param additionalParents is a list of 0 or more additional parents to assign the new node to.
      * @return the Node representation of the newly created node.
      * @throws PMException if there is an error creating the node in the graph.
      */
-    Node createNode(long id, String name, NodeType type, Map<String, String> properties) throws PMException;
+    Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long ... additionalParents) throws PMException;
 
     /**
      * Update the name and properties of the node with the given ID. The node's existing properties will be overwritten
@@ -61,7 +75,7 @@ public interface Graph {
      * @return the set of policy class IDs.
      * @throws PMException if there is an error retrieving the IDs of the policy classes.
      */
-    Set<Long> getPolicies() throws PMException;
+    Set<Long> getPolicyClasses() throws PMException;
 
     /**
      * Retrieve the set of all nodes in the graph.
@@ -69,7 +83,7 @@ public interface Graph {
      * @return a Set of all the nodes in the graph.
      * @throws PMException if there is an error retrieving all nodes in the graph.
      */
-    Collection<Node> getNodes() throws PMException;
+    Set<Node> getNodes() throws PMException;
 
     /**
      * Retrieve the node with the given ID.
@@ -79,6 +93,21 @@ public interface Graph {
      * @throws PMException if there is an error retrieving the node from the graph.
      */
     Node getNode(long id) throws PMException;
+
+    /**
+     * Search the graph for a node that matches the given parameters. A node must
+     * contain all properties provided to be returned.
+     * To get a node that has a specific property key with any value use "*" as the value in the parameter.
+     * (i.e. {key=*})
+     * If more than one node matches the criteria, only one will be returned.
+     *
+     * @param name       the name of the nodes to search for.
+     * @param type       the type of the nodes to search for.
+     * @param properties the properties of the nodes to search for.
+     * @return the node that matches the given search criteria.
+     * @throws PMException if there is an error searching the graph.
+     */
+    Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException;
 
     /**
      * Search the graph for nodes matching the given parameters. A node must
@@ -92,7 +121,7 @@ public interface Graph {
      * @return a set of nodes that match the given search criteria.
      * @throws PMException if there is an error searching the graph.
      */
-    Set<Node> search(String name, String type, Map<String, String> properties) throws PMException;
+    Set<Node> search(String name, NodeType type, Map<String, String> properties) throws PMException;
 
     /**
      * Get the set of nodes that are assigned to the node with the given ID.
@@ -132,17 +161,28 @@ public interface Graph {
      */
     void deassign(long childID, long parentID) throws PMException;
 
+
+    /**
+     * Returns true if the child is assigned to the parent.
+     *
+     * @param childID the ID of the child node
+     * @param parentID the ID of the parent node
+     * @return true if the child is assigned to the parent, false otherwise
+     * @throws PMException if there is an error checking if the child is assigned to the parent
+     */
+    boolean isAssigned(long childID, long parentID) throws PMException;
+
     /**
      * Create an Association between the user attribute and the Target node with the provided operations. If an association
      * already exists between these two nodes, overwrite the existing operations with the ones provided.  Associations
      * can only begin at a user attribute but can point to either an Object or user attribute
      *
-     * @param uaID The ID of the user attribute.
-     * @param targetID The ID of the target attribute.
-     * @param operations A Set of operations to add to the association.
+     * @param uaID the ID of the user attribute.
+     * @param targetID the ID of the target attribute.
+     * @param operations a set of operations to add to the association.
      * @throws PMException if there is an error associating the two nodes.
      */
-    void associate(long uaID, long targetID, Set<String> operations) throws PMException;
+    void associate(long uaID, long targetID, OperationSet operations) throws PMException;
 
     /**
      * Delete the Association between the user attribute and Target node.
@@ -162,7 +202,7 @@ public interface Graph {
      * @return a Map of the target node IDs and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the source node from the graph.
      */
-    Map<Long, Set<String>> getSourceAssociations(long sourceID) throws PMException;
+    Map<Long, OperationSet> getSourceAssociations(long sourceID) throws PMException;
 
     /**
      * Retrieve the associations the given node is the target of.  The target node can be an Object Attribute or a User
@@ -173,5 +213,5 @@ public interface Graph {
      * @return a Map of the source Ids and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the target node from the graph.
      */
-    Map<Long, Set<String>> getTargetAssociations(long targetID) throws PMException;
+    Map<Long, OperationSet> getTargetAssociations(long targetID) throws PMException;
 }

@@ -5,12 +5,6 @@ import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
-/**
- * PAP is the Policy Information Point. The purpose of the PAP is to expose the underlying policy data to the PDP and EPP.
- * It initializes the backend using the connection properties in /resource/db.config.  This servlet can
- * be access via ../index.jsp upon starting the server.The PAP also stores the in memory graph that will be used for
- * decision making.
- */
 public class PAP {
 
     private Graph        graphPAP;
@@ -19,8 +13,6 @@ public class PAP {
 
     public PAP(Graph graphPAP, Prohibitions prohibitionsPAP, Obligations obligationsPAP) throws PMException {
         this.graphPAP = graphPAP;
-        SuperGraph.check(this.graphPAP);
-
         this.prohibitionsPAP = prohibitionsPAP;
         this.obligationsPAP = obligationsPAP;
     }

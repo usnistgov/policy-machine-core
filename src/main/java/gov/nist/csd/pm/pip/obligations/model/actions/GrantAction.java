@@ -7,22 +7,20 @@ import java.util.List;
 
 public class GrantAction extends Action {
 
-    private List<EvrNode> subjects;
+    private EvrNode subject;
     private List<String> operations;
-    private List<EvrNode> targets;
+    private EvrNode target;
 
     public GrantAction() {
-        subjects = new ArrayList<>();
         operations = new ArrayList<>();
-        targets = new ArrayList<>();
     }
 
-    public List<EvrNode> getSubjects() {
-        return subjects;
+    public EvrNode getSubject() {
+        return subject;
     }
 
-    public void setSubjects(List<EvrNode> subjects) {
-        this.subjects = subjects;
+    public void setSubject(EvrNode subject) {
+        this.subject = subject;
     }
 
     public List<String> getOperations() {
@@ -33,11 +31,11 @@ public class GrantAction extends Action {
         this.operations = operations;
     }
 
-    public List<EvrNode> getTargets() {
-        return targets;
+    public EvrNode getTarget() {
+        return target;
     }
 
-    public void setTargets(List<EvrNode> targets) {
-        this.targets = targets;
+    public void setTarget(EvrNode target) {
+        this.target = target;
     }
 }

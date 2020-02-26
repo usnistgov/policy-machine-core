@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.common;
+package gov.nist.csd.pm.operations;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,7 +45,7 @@ public class Operations {
     public static final String PROHIBIT_SUBJECT           = "prohibit subject";
     public static final String PROHIBIT_RESOURCE          = "prohibit resource";
 
-    private static final Set<String> admin = new HashSet<>(Arrays.asList(
+    private static final Set<String> admin = new OperationSet(
             CREATE_POLICY_CLASS,
             ASSIGN_OBJECT_ATTRIBUTE,
             ASSIGN_OBJECT_ATTRIBUTE_TO,
@@ -77,14 +77,14 @@ public class Operations {
             PROHIBIT_SUBJECT,
             PROHIBIT_RESOURCE,
             RESET
-    ));
+    );
 
-    private static final Set<String> resource = new HashSet<>(Arrays.asList(
+    private static final Set<String> resource = new OperationSet(
             FILE_WRITE,
             FILE_READ,
             WRITE,
             READ
-    ));
+    );
 
     public static boolean isAdmin(String op) {
         return admin.contains(op);

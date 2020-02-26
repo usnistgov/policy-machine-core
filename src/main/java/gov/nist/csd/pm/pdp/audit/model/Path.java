@@ -41,7 +41,7 @@ public class Path {
 
         StringBuilder sb = new StringBuilder();
         for(Node node : nodes) {
-            sb.append(node.getName()).append("-");
+            sb.append(node.getName()).append("(").append(node.getType()).append(")").append("-");
         }
 
         return sb.deleteCharAt(sb.length()-1).append(" ops=").append(operations).toString();

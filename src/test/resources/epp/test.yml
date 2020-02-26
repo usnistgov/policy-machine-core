@@ -1,0 +1,680 @@
+label: create PDS obligation
+rules:
+  - label: assign to pdss
+    event:
+      subject:
+      operations:
+        - "assign to"
+      target:
+        policyElements:
+          - name: "RBAC_PDSs"
+            type: "OA"
+    response:
+      actions:
+        - create:
+            what:
+              - name: InvestigatorInfo
+                type: OA
+            where:
+              - function:
+                  name: child_of_assign
+        - create:
+            what:
+              - name: PI
+                type: OA
+            where:
+              - name: InvestigatorInfo
+                type: OA
+        - create:
+            what:
+              - function:
+                  name: create_node
+                  args:
+                    - function:
+                        name: current_user_name
+                    - O
+            where:
+              - name: PI
+                type: OA
+        - create:
+            what:
+              - name: CoPI
+                type: OA
+            where:
+              - name: InvestigatorInfo
+                type: OA
+        - create:
+            what:
+              - name: SP
+                type: OA
+            where:
+              - name: InvestigatorInfo
+                type: OA
+        - create:
+            what:
+              - name: ProjectInfo
+                type: OA
+            where:
+              - function:
+                  name: child_of_assign
+        - create:
+            what:
+              - name: BudgetInfo
+                type: OA
+            where:
+              - function:
+                  name: child_of_assign
+        - assign:
+            what:
+              - function:
+                  name: child_of_assign
+            where:
+              - name: PDSs
+                type: OA
+        - create:
+            what:
+              - name: PDSi
+                type: UA
+            where:
+              - name: PDS
+                type: UA
+        - create:
+            what:
+              - name: PI
+                type: UA
+            where:
+              - name: PDSi
+                type: UA
+        - create:
+            what:
+              - name: CoPI
+                type: UA
+            where:
+              - name: PDSi
+                type: UA
+        - create:
+            what:
+              - name: SP
+                type: UA
+            where:
+              - name: PDSi
+                type: UA
+        - assign:
+            what:
+              - function:
+                  name: current_user
+            where:
+              - name: PI
+                type: UA
+        - grant:
+            subjects:
+              - name: PI
+                type: UA
+            operations:
+              - write
+              - read
+              - assign to
+            targets:
+              - name: CoPI
+                type: OA
+              - name: ProjectInfo
+                type: OA
+              - name: BudgetInfo
+                type: OA
+        - grant:
+            subjects:
+              - name: PI
+                type: UA
+            operations:
+              - assign
+            targets:
+              - function:
+                  name: child_of_assign
+        - grant:
+            subjects:
+              - name: PI
+                type: UA
+            operations:
+              - read
+            targets:
+              - name: PI
+                type: OA
+        - grant:
+            subjects:
+              - name: CoPI
+                type: UA
+            operations:
+              - write
+              - read
+              - assign to
+            targets:
+              - name: SP
+                type: OA
+              - name: ProjectInfo
+                type: OA
+              - name: BudgetInfo
+                type: OA
+        - grant:
+            subjects:
+              - name: SP
+                type: UA
+            operations:
+              - read
+            targets:
+              - name: InvestigatorInfo
+                type: OA
+              - name: ProjectInfo
+                type: OA
+              - name: BudgetInfo
+                type: OA
+        - create:
+            rule:
+              label: copi
+              event:
+                subject:
+                operations:
+                  - "assign to"
+                target:
+                  policyElements:
+                    - name: CoPI
+                      type: OA
+              response:
+                actions:
+                  - assign:
+                      what:
+                        - function:
+                            name: get_node
+                            args:
+                              - function:
+                                  name: child_of_assign_name
+                              - U
+                      where:
+                        - name: CoPI
+                          type: UA
+        - create:
+            rule:
+              label: copi
+              event:
+                subject:
+                operations:
+                  - "assign to"
+                target:
+                  policyElements:
+                    - name: SP
+                      type: OA
+              response:
+                actions:
+                  - assign:
+                      what:
+                        - function:
+                            name: get_node
+                            args:
+                              - function:
+                                  name: child_of_assign_name
+                              - U
+                      where:
+                        - name: SP
+                          type: UA
+
+  - label: setting up approvals
+    event:
+      subject:
+      operations:
+        - "assign to"
+      target:
+        policyElements:
+          - name: submitted_pdss
+            type: OA
+    response:
+      actions:
+        - delete:
+            assign:
+              what:
+                - function:
+                    name: child_of_assign
+              where:
+                - name: RBAC_PDSs
+                  type: OA
+                - name: PDSs
+                  type: OA
+        - delete:
+            grant:
+              subjects:
+                - name: PI
+                  type: UA
+              targets:
+                - name: CoPI
+                  type: OA
+                - name: ProjectInfo
+                  type: OA
+                - name: BudgetInfo
+                  type: OA
+                - name: PDSi
+                  type: OA
+                - name: PI
+                  type: OA
+        - delete:
+            grant:
+              subjects:
+                - name: CoPI
+                  type: UA
+              targets:
+                - name: SP
+                  type: OA
+                - name: ProjectInfo
+                  type: OA
+                - name: BudgetInfo
+                  type: OA
+        - delete:
+            grant:
+              subjects:
+                - name: SP
+                  type: UA
+              targets:
+                - name: InvestigatorInfo
+                  type: OA
+                - name: ProjectInfo
+                  type: OA
+                - name: BudgetInfo
+                  type: OA
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: submitted_pdss
+                  type: OA
+        - create:
+            what:
+              - name: PDSi approval
+                type: OA
+            where:
+              - name: approval
+                type: OA
+        - create:
+            what:
+              - name: pending
+                type: OA
+            where:
+              - name: PDSi approval
+                type: OA
+        - create:
+            what:
+              - name: approved
+                type: OA
+            where:
+              - name: PDSi approval
+                type: OA
+        - create:
+            what:
+              - name: chair approval
+                type: OA
+            where:
+              - name: pending
+                type: OA
+        - create:
+            what:
+              - name: dean approval
+                type: OA
+            where:
+              - name: pending
+                type: OA
+        - assign:
+            what:
+              - name: PDSi
+                type: OA
+            where:
+              - name: chair approval
+                type: OA
+        - create:
+            what:
+              - name: cs_chair_approval
+                type: OA
+            where:
+              - name: approved
+                type: OA
+        - create:
+            what:
+              - name: math_chair_approval
+                type: OA
+            where:
+              - name: approved
+                type: OA
+        - create:
+            what:
+              - name: coen_dean_approval
+                type: OA
+            where:
+              - name: approved
+                type: OA
+        - create:
+            what:
+              - name: coas_dean_approval
+                type: OA
+            where:
+              - name: approved
+                type: OA
+
+
+
+        - create:
+            what:
+              - name: PDSi approval
+                type: UA
+            where:
+              - name: approval
+                type: UA
+        - create:
+            what:
+              - name: PDSi committee
+                type: UA
+            where:
+              - name: PDSi approval
+                type: UA
+        - grant:
+            subjects:
+              - name: PDSi committee
+                type: UA
+            operations:
+              - read
+            targets:
+              - name: PDSi approval
+                type: OA
+        - assign:
+            what:
+              - function:
+                  name: get_children_of
+                  args:
+                    - PI
+                    - UA
+              - function:
+                  name: get_children_of
+                  args:
+                    - CoPI
+                    - UA
+              - function:
+                  name: get_children_of
+                  args:
+                    - SP
+                    - UA
+            where:
+              - name: PDSi committee
+                type: UA
+        - grant:
+            subjects:
+              - name: PDSi committee
+                type: UA
+            operations:
+              - read
+            targets:
+              - name: PDSi approval
+                type: OA
+        - create:
+            what:
+              - name: approval committee
+                type: UA
+            where:
+              - name: PDSi approval
+                type: UA
+        - create:
+            what:
+              - name: chairs
+                type: UA
+            where:
+              - name: approval committee
+                type: UA
+        - create:
+            what:
+              - name: deans
+                type: UA
+            where:
+              - name: approval committee
+                type: UA
+        - grant:
+            subjects:
+              - name: chairs
+                type: UA
+            operations:
+              - assign
+              - read
+            targets:
+              - name: chair approval
+                type: OA
+        - grant:
+            subjects:
+              - name: deans
+                type: UA
+            operations:
+              - assign
+              - read
+            targets:
+              - name: dean approval
+                type: OA
+        - grant:
+            subjects:
+              - name: CS_Chair
+                type: UA
+            operations:
+              - assign to
+            targets:
+              - name: cs_chair_approval
+                type: OA
+        - grant:
+            subjects:
+              - name: Math_Chair
+                type: UA
+            operations:
+              - assign to
+            targets:
+              - name: math_chair_approval
+                type: OA
+        - grant:
+            subjects:
+              - name: COEN_Dean
+                type: UA
+            operations:
+              - assign to
+            targets:
+              - name: coen_dean_approval
+                type: OA
+        - grant:
+            subjects:
+              - name: COAS_Dean
+                type: UA
+            operations:
+              - assign to
+            targets:
+              - name: coas_dean_approval
+                type: OA
+
+        - assign:
+            what:
+              - name: CS_Chair
+                type: U
+            where:
+              - name: chairs
+                type: UA
+        - assign:
+            what:
+              - name: Math_Chair
+                type: U
+            where:
+              - name: chairs
+                type: UA
+        - assign:
+            what:
+              - name: COEN_Dean
+                type: U
+            where:
+              - name: deans
+                type: UA
+        - assign:
+            what:
+              - name: COAS_Dean
+                type: U
+            where:
+              - name: deans
+                type: UA
+
+  - label: chair approval
+    event:
+      subject:
+      operations:
+        - assign to
+      targets:
+        policyElements:
+          - name: cs_chair_approval
+            type: OA
+          - name: math_chair_approval
+            type: OA
+    response:
+      condition:
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - PDSi
+                    - OA
+              - function:
+                  name: get_node
+                  args:
+                    - cs_chair_approval
+                    - OA
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - PDSi
+                    - OA
+              - function:
+                  name: get_node
+                  args:
+                    - math_chair_approval
+                    - OA
+      actions:
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: chair approval
+                  type: OA
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: cs_chair_approval
+                  type: OA
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: math_chair_approval
+                  type: OA
+        - assign:
+            what:
+              - name: PDSi
+                type: OA
+            where:
+              - name: dean approval
+                type: OA
+        - grant:
+            subjects:
+              - name: chairs
+                type: UA
+            operations:
+              - read
+            targets:
+              - name: PDSi
+                type: OA
+
+  - label: dean approval
+    event:
+      subject:
+      operations:
+        - assign to
+      targets:
+        policyElements:
+          - name: coen_dean_approval
+            type: OA
+          - name: coas_dean_approval
+            type: OA
+    response:
+      condition:
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - PDSi
+                    - OA
+              - function:
+                  name: get_node
+                  args:
+                    - coas_dean_approval
+                    - OA
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - PDSi
+                    - OA
+              - function:
+                  name: get_node
+                  args:
+                    - coen_dean_approval
+                    - OA
+      actions:
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: dean approval
+                  type: OA
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: coen_dean_approval
+                  type: OA
+        - delete:
+            assign:
+              what:
+                - name: PDSi
+                  type: OA
+              where:
+                - name: coas_dean_approval
+                  type: OA
+        - assign:
+            what:
+              - name: PDSi
+                type: OA
+            where:
+              - name: PDSi approval
+                type: OA
+        - grant:
+            subjects:
+              - name: deans
+                type: UA
+            operations:
+              - read
+            targets:
+              - name: PDSi
+                type: OA

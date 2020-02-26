@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.events.AssignEvent;
 import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.DeassignEvent;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -11,12 +12,10 @@ import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
-import gov.nist.csd.pm.pip.obligations.evr.EVRException;
 import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.obligations.model.Rule;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
-import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,20 +36,15 @@ class EPPTest {
     @BeforeEach
     void setup() throws PMException {
         Graph graph = new MemGraph();
-        o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null);
-        oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null);
-        u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null);
-        ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null);
-        pc1 = graph.createNode(new Random().nextLong(), "pc1", NodeType.PC, null);
+        pc1 = graph.createPolicyClass(new Random().nextLong(), "pc1", null);
+        ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null, pc1.getID());
+        oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null, pc1.getID());
+        o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null, oa1.getID());
+        u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null, ua1.getID());
 
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
+        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
-        graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
-
-        pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()));
+        pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null);
     }
 
     @Test
@@ -63,6 +57,9 @@ class EPPTest {
         pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), u1.getID(), 123);
         Set<Node> search = pdp.getPAP().getGraphPAP().search("u1 assign to success", null, null);
         assertFalse(search.isEmpty());
+        Node node = search.iterator().next();
+        assertTrue(node.getProperties().containsKey("prop1"));
+        assertTrue(node.getProperties().get("prop1").equalsIgnoreCase("val1"));
 
         // test anyUser assign
         pdp.getEPP().processEvent(new AssignEvent(o1, oa1), u1.getID(), 123);
@@ -106,7 +103,7 @@ class EPPTest {
         assertTrue(parents.iterator().next() == oa1.getID());
 
         // check ua1 was associated with new OA
-        Map<Long, Set<String>> sourceAssociations = pdp.getPAP().getGraphPAP().getSourceAssociations(ua1.getID());
+        Map<Long, OperationSet> sourceAssociations = pdp.getPAP().getGraphPAP().getSourceAssociations(ua1.getID());
         assertTrue(sourceAssociations.containsKey(newOA.getID()));
 
         // check that the deny was created

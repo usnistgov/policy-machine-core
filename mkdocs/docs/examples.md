@@ -1,6 +1,9 @@
 ### Serialization
 #### Graph
-Serialize a graph into a json string.
+There are two ways to serialize a graph. This first is to serialize it into json.  The second is a command like structure
+that is easier to read than json.
+
+##### JSON
 ```
 Graph graph = new MemGraph();
 ---
@@ -10,6 +13,29 @@ Deserialize a json string to a graph.
 ```
 Graph graph = GraphSerializer.fromJson(new MemGraph(), json);
 ```
+
+##### Readable Format
+There are three primary commands for the readable format: **node**, **assign**, and **assoc**.
+```
+node PC pc1
+node OA oa1
+node UA ua1
+node O o1
+node U u1
+
+assign OA:oa1 PC:pc1
+assign UA:ua1 PC:pc1
+assign O:o1 OA:oa1
+assign U:u1 UA:ua1
+
+assoc UA:ua1 OA:oa1 [read,write]
+```
+
+```java
+String serialize = GraphSerializer.serialize(graph);
+Graph deSerialize = GraphSerializer.deserialize(graph);
+```
+
 #### Prohibitions
 Serialize a ProhibitionDAO into a json string.
 ```

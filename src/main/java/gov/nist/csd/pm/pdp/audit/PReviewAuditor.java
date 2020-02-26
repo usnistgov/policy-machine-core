@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp.audit;
 
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.audit.model.Path;
 import gov.nist.csd.pm.pdp.audit.model.PolicyClass;
@@ -203,9 +204,9 @@ public class PReviewAuditor implements Auditor {
         Visitor visitor = node -> {
             List<EdgePath> nodePaths = new ArrayList<>();
 
-            for(Long parentID : graph.getParents(node.getID())) {
-                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parentID), null);
-                List<EdgePath> parentPaths = propPaths.get(parentID);
+            for(long parent : graph.getParents(node.getID())) {
+                EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parent), null);
+                List<EdgePath> parentPaths = propPaths.get(parent);
                 if(parentPaths.isEmpty()) {
                     EdgePath path = new EdgePath();
                     path.addEdge(edge);
@@ -223,7 +224,7 @@ public class PReviewAuditor implements Auditor {
                 }
             }
 
-            Map<Long, Set<String>> assocs = graph.getSourceAssociations(node.getID());
+            Map<Long, OperationSet> assocs = graph.getSourceAssociations(node.getID());
             for(Long targetID : assocs.keySet()) {
                 Set<String> ops = assocs.get(targetID);
                 Node targetNode = graph.getNode(targetID);
@@ -232,7 +233,16 @@ public class PReviewAuditor implements Auditor {
                 nodePaths.add(path);
             }
 
-            propPaths.put(node.getID(), nodePaths);
+            // if the node being visited is the start node, add all the found nodePaths
+            // TODO there might be a more efficient way of doing this
+            // we don't need the if for users, only when the target is an OA, so it might have something to do with
+            // leafs vs non leafs
+            if (node.getID() == start.getID()) {
+                paths.clear();
+                paths.addAll(nodePaths);
+            } else {
+                propPaths.put(node.getID(), nodePaths);
+            }
         };
 
         Propagator propagator = (parentNode, childNode) -> {

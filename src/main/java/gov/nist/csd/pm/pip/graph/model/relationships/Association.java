@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pip.graph.model.relationships;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
 import java.io.Serializable;
@@ -26,18 +27,18 @@ public class Association extends Relationship implements Serializable {
         validAssociations.put(U, new NodeType[]{});
     }
 
-    private Set<String> operations;
+    private OperationSet operations;
 
-    public Association(long uaID, long targetID, Set<String> operations) {
+    public Association(long uaID, long targetID, OperationSet operations) {
         super(uaID, targetID);
         this.operations = operations;
     }
 
-    public Set<String> getOperations() {
+    public OperationSet getOperations() {
         return operations;
     }
 
-    public void setOperations(Set<String> operations) {
+    public void setOperations(OperationSet operations) {
         this.operations = operations;
     }
 

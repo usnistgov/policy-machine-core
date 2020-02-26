@@ -1,27 +1,32 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.common.Operations;
+import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.SuperGraph;
 import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static gov.nist.csd.pm.common.Operations.*;
+import static gov.nist.csd.pm.operations.Operations.*;
 
-public class ProhibitionsService extends Service {
+public class ProhibitionsService extends Service implements Prohibitions {
 
     public ProhibitionsService(PAP pap, EPP epp) {
         super(pap, epp);
     }
 
-    public void createProhibition(UserContext userCtx, Prohibition prohibition) throws PMException {
+    public List<Prohibition> getProhibitions() throws PMException {
+        return getProhibitionsPAP().getAll();
+    }
+
+    @Override
+    public void add(Prohibition prohibition) throws PMException {
         String name = prohibition.getName();
         Prohibition.Subject subject = prohibition.getSubject();
         List<Prohibition.Node> nodes = prohibition.getNodes();
@@ -60,39 +65,23 @@ public class ProhibitionsService extends Service {
         getProhibitionsPAP().add(prohibition);
     }
 
-    public List<Prohibition> getProhibitions() throws PMException {
+    @Override
+    public List<Prohibition> getAll() throws PMException {
         return getProhibitionsPAP().getAll();
     }
 
-    /**
-     * Get the prohibition with the given node from the PAP. An exception will be thrown if one does not exist.
-     *
-     * @param prohibitionName The name of the Prohibition to retrieve.
-     * @return the prohibition with the given node.
-     * @throws PMAuthorizationException if the current user is not authorized to carry out the action.
-     * @throws PMException if there is an error with the graph.
-     * @throws PMException if a prohibition with the given name does not exist.
-     */
-    public Prohibition getProhibition(String prohibitionName) throws PMException {
-        Prohibition prohibition = getProhibitionsPAP().get(prohibitionName);
-        if(prohibition == null) {
-            throw new PMException(String.format("prohibition with the name %s does not exist", prohibitionName));
-        }
-
-        return prohibition;
+    @Override
+    public Prohibition get(String prohibitionName) throws PMException {
+        return getPAP().getProhibitionsPAP().get(prohibitionName);
     }
 
-    /**
-     * Update the prohibition.  The prohibition is identified by the name.
-     *
-     * @param prohibition The prohibition to update.
-     * @throws IllegalArgumentException if the given prohibition is null.
-     * @throws IllegalArgumentException if the given prohibition's name is null.
-     * @throws PMAuthorizationException if the current user is not authorized to carry out the action.
-     * @throws PMException if there is an error with the graph.
-     * @throws PMException if a prohibition with the given name does not exist.
-     */
-    public void updateProhibition(UserContext userCtx, Prohibition prohibition) throws PMException {
+    @Override
+    public List<Prohibition> getProhibitionsFor(long subjectID) throws PMException {
+        return getPAP().getProhibitionsPAP().getProhibitionsFor(subjectID);
+    }
+
+    @Override
+    public void update(Prohibition prohibition) throws PMException {
         if(prohibition == null) {
             throw new IllegalArgumentException("the prohibition to update was null");
         } else if(prohibition.getName() == null || prohibition.getName().isEmpty()) {
@@ -100,18 +89,15 @@ public class ProhibitionsService extends Service {
         }
 
         // delete the prohibition
-        deleteProhibition(prohibition.getName());
+        delete(prohibition.getName());
 
         //create prohibition in PAP
-        createProhibition(userCtx, prohibition);
+        add(prohibition);
     }
 
-    public void deleteProhibition(String prohibitionName) throws PMException {
-        //check that the prohibition exists
-        getProhibition(prohibitionName);
-
-        //delete prohibition in PAP
-        getProhibitionsPAP().delete(prohibitionName);
+    @Override
+    public void delete(String prohibitionName) throws PMException {
+        getPAP().getProhibitionsPAP().delete(prohibitionName);
     }
 
     public void reset(UserContext userCtx) throws PMException {
@@ -120,7 +106,7 @@ public class ProhibitionsService extends Service {
         }
 
         // check that the user can reset the graph
-        if (!hasPermissions(userCtx, SuperGraph.getSuperO().getID(), RESET)) {
+        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getID(), RESET)) {
             throw new PMAuthorizationException("unauthorized permissions to reset the graph");
         }
 
@@ -130,7 +116,7 @@ public class ProhibitionsService extends Service {
             names.add(prohib.getName());
         }
         for (String name : names) {
-            deleteProhibition(name);
+            delete(name);
         }
     }
 }

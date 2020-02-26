@@ -12,16 +12,17 @@ rules:
             type: OA
     response:
       actions:
-        - create:
-            what:
+        - function:
+            name: create_node
+            args:
+              - pc1
+              - PC
+              - u1 assign to success
+              - OA
               - function:
-                  name: create_node
+                  name: to_props
                   args:
-                    - u1 assign to success
-                    - OA
-            where:
-              - name: pc1
-                type: PC
+                    - "prop1=val1"
   - label: anyUser assign
     event:
       subject:
@@ -35,14 +36,11 @@ rules:
     response:
       actions:
         - create:
-            what:
-              - function:
-                  name: create_node
-                  args:
-                    - anyUser assign success
-                    - OA
-            where:
-              - name: pc1
+            - what:
+                name: anyUser assign success
+                type:  OA
+              where:
+                name: pc1
                 type: PC
   - label: anyUser in list deassign
     event:
@@ -59,12 +57,9 @@ rules:
     response:
       actions:
         - create:
-            what:
-              - function:
-                  name: create_node
-                  args:
-                    - anyUser in list deassign success
-                    - OA
-            where:
-              - name: pc1
+            - what:
+                name: anyUser in list deassign success
+                type: OA
+              where:
+                name: pc1
                 type: PC

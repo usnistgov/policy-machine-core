@@ -27,8 +27,8 @@ public class DepthFirstSearcher implements Searcher{
         // mark the node as visited
         visited.add(start.getID());
 
-        for(long parentID : graph.getParents(start.getID())) {
-            Node parentNode = graph.getNode(parentID);
+        for(Long parent : graph.getParents(start.getID())) {
+            Node parentNode = graph.getNode(parent);
 
             // traverse from the parent node
             traverse(parentNode, propagator, visitor);

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.epp.functions;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -10,27 +11,20 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
 
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
         Graph graph = new MemGraph();
-        Node o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null);
-        Node oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null);
-        Node u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null);
-        Node ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null);
-        Node pc1 = graph.createNode(new Random().nextLong(), "pc1", NodeType.PC, null);
+        Node pc1 = graph.createPolicyClass(new Random().nextLong(), "pc1", null);
+        Node oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null, pc1.getID());
+        Node o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null, oa1.getID());
+        Node ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null, pc1.getID());
+        Node u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null, ua1.getID());
 
-        graph.assign(o1.getID(), oa1.getID());
-        graph.assign(oa1.getID(), pc1.getID());
-        graph.assign(u1.getID(), ua1.getID());
-        graph.assign(ua1.getID(), pc1.getID());
+        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
 
-        graph.associate(ua1.getID(), oa1.getID(), new HashSet<>(Arrays.asList("read", "write")));
-
-        return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations())),
+        return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null),
                 u1, ua1, o1, oa1, pc1);
     }
 

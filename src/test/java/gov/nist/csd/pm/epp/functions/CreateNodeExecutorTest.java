@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreateNodeExecutorTest {
@@ -36,6 +37,8 @@ class CreateNodeExecutorTest {
                 new Function(
                         executor.getFunctionName(),
                         Arrays.asList(
+                                new Arg("oa1"),
+                                new Arg("OA"),
                                 new Arg("testNode"),
                                 new Arg("OA"),
                                 new Arg(new Function("to_props", Arrays.asList(new Arg("k=v"))))));
@@ -44,7 +47,7 @@ class CreateNodeExecutorTest {
 
         assertNotNull(n);
         assertEquals("testNode", n.getName());
-        assertEquals("OA", n.getType().toString());
+        assertEquals(OA, n.getType());
         assertNotNull(n.getProperties());
         assertEquals("v", n.getProperties().get("k"));
     }

@@ -1,17 +1,16 @@
 package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.O;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GraphSerializerTest {
 
@@ -26,38 +25,90 @@ class GraphSerializerTest {
     static void setUp() throws PMException {
         graph = new MemGraph();
 
-        graph.createNode(u1ID, "u1", NodeType.U, null);
-        graph.createNode(o1ID, "o1", O, null);
-        graph.createNode(ua1ID, "ua1", NodeType.UA, null);
-        graph.createNode(oa1ID, "oa1", OA, null);
-        graph.createNode(pc1ID, "pc1", NodeType.PC, null);
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
 
-        graph.assign(u1ID, ua1ID);
-        graph.assign(o1ID, oa1ID);
-        graph.assign(ua1ID, pc1ID);
-        graph.assign(oa1ID, pc1ID);
+        graph.associate(ua1ID, oa1ID, new OperationSet("read", "write"));
+    }
 
-        graph.associate(ua1ID, oa1ID, new HashSet<>(Arrays.asList("read", "write")));
+    @Test
+    void testJson() throws PMException {
+        graph = new MemGraph();
+
+        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
+        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
+        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode(o1ID, "o1", O, null, oa1ID);
+
+        graph.associate(ua1ID, oa1ID, new OperationSet("read", "write"));
+
+        String json = GraphSerializer.toJson(graph);
+        Graph graph = new MemGraph();
+        GraphSerializer.fromJson(graph, json);
+
+        assertTrue(graph.getNodes().containsAll(Arrays.asList(
+                new Node().name("u1"),
+                new Node().name("o1"),
+                new Node().name("ua1"),
+                new Node().name("oa1"),
+                new Node().name("pc1")
+        )));
+
+        assertTrue(graph.getChildren(pc1ID).containsAll(Arrays.asList(ua1ID, oa1ID)));
+        assertTrue(graph.getChildren(oa1ID).contains(o1ID));
+        assertTrue(graph.getChildren(ua1ID).contains(u1ID));
+
+        assertTrue(graph.getSourceAssociations(ua1ID).containsKey(oa1ID));
+        assertTrue(graph.getSourceAssociations(ua1ID).get(oa1ID).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
     void testSerialize() throws PMException {
-        String json = GraphSerializer.toJson(graph);
-        Graph deGraph = GraphSerializer.fromJson(new MemGraph(), json);
+        /*String str =
+                "node PC pc1" +
+                "node OA oa1" +
+                "node UA ua1" +
+                "node U u1" +
+                "node O o1" +
 
-        assertTrue(deGraph.getNodes().containsAll(Arrays.asList(
-                new Node().id(u1ID),
-                new Node().id(o1ID),
-                new Node().id(ua1ID),
-                new Node().id(oa1ID),
-                new Node().id(pc1ID)
-        )));
+                "assign U:u1 UA:ua1" +
+                "assign O:o1 OA:oa1" +
+                "assign OA:oa1 PC:pc1" +
 
-        assertTrue(deGraph.getChildren(pc1ID).containsAll(Arrays.asList(ua1ID, oa1ID)));
-        assertTrue(deGraph.getChildren(oa1ID).contains(o1ID));
-        assertTrue(deGraph.getChildren(ua1ID).contains(u1ID));
+                "assoc UA:ua1 OA:oa1 [read, write]";*/
+        String serialize = GraphSerializer.serialize(graph);
+        Graph graph = new MemGraph();
+        GraphSerializer.deserialize(graph, serialize);
 
-        assertTrue(deGraph.getSourceAssociations(ua1ID).containsKey(oa1ID));
-        assertTrue(deGraph.getSourceAssociations(ua1ID).get(oa1ID).containsAll(Arrays.asList("read", "write")));
+        Set<Node> search = graph.search("u1", null, null);
+        assertFalse(search.isEmpty());
+        Node uNode = search.iterator().next();
+
+        search = graph.search("ua1", null, null);
+        assertFalse(search.isEmpty());
+        Node uaNode = search.iterator().next();
+
+        search = graph.search("o1", null, null);
+        assertFalse(search.isEmpty());
+        Node oNode = search.iterator().next();
+
+        search = graph.search("oa1", null, null);
+        assertFalse(search.isEmpty());
+        Node oaNode = search.iterator().next();
+
+        search = graph.search("pc1", null, null);
+        assertFalse(search.isEmpty());
+        Node pcNode = search.iterator().next();
+
+        assertTrue(graph.getChildren(pcNode.getID()).containsAll(Arrays.asList(uaNode.getID(), oaNode.getID())));
+        assertTrue(graph.getChildren(oaNode.getID()).contains(oNode.getID()));
+        assertTrue(graph.getChildren(uaNode.getID()).contains(uNode.getID()));
+
+        assertTrue(graph.getSourceAssociations(uaNode.getID()).containsKey(oaNode.getID()));
+        assertTrue(graph.getSourceAssociations(uaNode.getID()).get(oaNode.getID()).containsAll(Arrays.asList("read", "write")));
     }
 }

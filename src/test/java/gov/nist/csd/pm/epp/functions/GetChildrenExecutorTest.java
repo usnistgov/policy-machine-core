@@ -39,9 +39,9 @@ class GetChildrenExecutorTest {
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
-        List<Node> children = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        List<Long> children = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
 
         assertNotNull(children);
-        assertEquals(Arrays.asList(testCtx.getO1()), children);
+        assertEquals(Arrays.asList(testCtx.getO1().getID()), children);
     }
 }
