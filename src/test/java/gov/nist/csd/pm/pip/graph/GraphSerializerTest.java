@@ -51,11 +51,11 @@ class GraphSerializerTest {
         GraphSerializer.fromJson(graph, json);
 
         assertTrue(graph.getNodes().containsAll(Arrays.asList(
-                new Node("u1", U),
-                new Node("o1", O),
-                new Node("ua1", UA),
-                new Node("oa1", OA),
-                new Node("pc1", PC)
+                new Node().name("u1"),
+                new Node().name("o1"),
+                new Node().name("ua1"),
+                new Node().name("oa1"),
+                new Node().name("pc1")
         )));
 
         assertTrue(graph.getChildren(pc1ID).containsAll(Arrays.asList(ua1ID, oa1ID)));

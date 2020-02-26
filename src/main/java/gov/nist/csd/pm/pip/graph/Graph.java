@@ -25,7 +25,7 @@ public interface Graph {
     Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException;
 
     /**
-     * Create a new node with the given name, type and properties and add it to the graph. Node names should be unique in each type domain.
+     * Create a new node with the given name, type and properties and add it to the graph. Node names should be unique.
      *
      * @param id the ID of the node.
      * @param name the unique name of the node.
