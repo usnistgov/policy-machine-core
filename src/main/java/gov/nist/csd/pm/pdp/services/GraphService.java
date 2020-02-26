@@ -704,7 +704,11 @@ public class GraphService extends Service implements Graph {
 
     @Override
     public Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException {
-        return null;
+        Node node = getGraphPAP().getNode(name, type, properties);
+        if (!hasPermissions(userCtx, node.getID(), ANY_OPERATIONS)) {
+            throw new PMException(String.format("node (%s, %s, %s) could not be found", name, type, properties.toString()));
+        }
+        return node;
     }
 
     /**
