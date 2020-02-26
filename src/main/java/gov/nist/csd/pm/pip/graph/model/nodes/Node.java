@@ -106,14 +106,14 @@ public class Node implements Serializable {
     public boolean equals(Object o) {
         if (o instanceof Node) {
             Node n = (Node) o;
-            return this.name.equals(n.name) && this.type.equals(n.type);
+            return this.name.equals(n.name);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (name + type).hashCode();
+        return name.hashCode();
     }
 
     @Override
