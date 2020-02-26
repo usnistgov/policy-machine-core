@@ -51,6 +51,10 @@ public class GraphService extends Service implements Graph {
             throw new PMAuthorizationException("unauthorized permissions to create a policy class");
         }
 
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
+
         // create the PC node
         Random rand = new Random();
         long defaultUA = rand.nextLong();
