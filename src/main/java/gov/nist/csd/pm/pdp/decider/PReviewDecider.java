@@ -220,6 +220,12 @@ public class PReviewDecider implements Decider {
                 if (!n.isComplement() && reachedTargets.contains(n.getID()) ||
                         n.isComplement() && !reachedTargets.contains(n.getID())) {
                     addOps = true;
+
+                    // if the prohibition is not intersection, one satisfied container condition means
+                    // the prohibition is satisfied
+                    if (!inter) {
+                        break;
+                    }
                 } else {
                     // since the intersection requires the target to satisfy each node condition in the prohibition
                     // if one is not satisfied then the whole is not satisfied
