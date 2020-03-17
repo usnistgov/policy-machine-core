@@ -21,9 +21,9 @@ public class BreadthFirstSearcher implements Searcher{
         // visit the start node
         visitor.visit(start);
 
-        Set<Long> parents = graph.getParents(start.getID());
+        Set<String> parents = graph.getParents(start.getName());
         while(!parents.isEmpty()) {
-            Long parent = parents.iterator().next();
+            String parent = parents.iterator().next();
             Node parentNode = graph.getNode(parent);
 
             propagator.propagate(parentNode, start);

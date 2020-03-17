@@ -47,17 +47,17 @@ public class ProhibitionsService extends Service implements Prohibitions {
         Decider decider = getDecider();
         if(subject.getSubjectType().equals(Prohibition.Subject.Type.USER) || subject.getSubjectType().equals(Prohibition.Subject.Type.USER_ATTRIBUTE)) {
             // first check that the subject exists
-            if(!getGraphPAP().exists(subject.getSubjectID())) {
-                throw new PMException(String.format("node with ID %d and type %s does not exist", subject.getSubjectID(), subject.getSubjectType()));
+            if(!getGraphPAP().exists(subject.getSubject())) {
+                throw new PMException(String.format("node with ID %s and type %s does not exist", subject.getSubject(), subject.getSubjectType()));
             }
-            if(!decider.check(userCtx.getUserID(), userCtx.getProcessID(), subject.getSubjectID(), CREATE_PROHIBITION)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", subject.getSubjectID(), PROHIBIT_SUBJECT));
+            if(!decider.check(userCtx.getUser(), userCtx.getProcess(), subject.getSubject(), CREATE_PROHIBITION)) {
+                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", subject.getSubject(), PROHIBIT_SUBJECT));
             }
         }
 
         for(Prohibition.Node node : nodes) {
-            if(!decider.check(userCtx.getUserID(), userCtx.getProcessID(), node.getID(), CREATE_PROHIBITION)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", node.getID(), Operations.PROHIBIT_RESOURCE));
+            if(!decider.check(userCtx.getUser(), userCtx.getProcess(), node.getName(), CREATE_PROHIBITION)) {
+                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", node.getName(), Operations.PROHIBIT_RESOURCE));
             }
         }
 
@@ -76,7 +76,7 @@ public class ProhibitionsService extends Service implements Prohibitions {
     }
 
     @Override
-    public List<Prohibition> getProhibitionsFor(long subjectID) throws PMException {
+    public List<Prohibition> getProhibitionsFor(String subjectID) throws PMException {
         return getPAP().getProhibitionsPAP().getProhibitionsFor(subjectID);
     }
 
@@ -106,7 +106,7 @@ public class ProhibitionsService extends Service implements Prohibitions {
         }
 
         // check that the user can reset the graph
-        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getID(), RESET)) {
+        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getName(), RESET)) {
             throw new PMAuthorizationException("unauthorized permissions to reset the graph");
         }
 

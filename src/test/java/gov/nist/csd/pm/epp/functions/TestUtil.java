@@ -16,13 +16,13 @@ import java.util.Random;
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(new Random().nextLong(), "pc1", null);
-        Node oa1 = graph.createNode(new Random().nextLong(), "oa1", NodeType.OA, null, pc1.getID());
-        Node o1 = graph.createNode(new Random().nextLong(), "o1", NodeType.O, null, oa1.getID());
-        Node ua1 = graph.createNode(new Random().nextLong(), "ua1", NodeType.UA, null, pc1.getID());
-        Node u1 = graph.createNode(new Random().nextLong(), "u1", NodeType.U, null, ua1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());
+        Node ua1 = graph.createNode("ua1", NodeType.UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", NodeType.U, null, ua1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null),
                 u1, ua1, o1, oa1, pc1);

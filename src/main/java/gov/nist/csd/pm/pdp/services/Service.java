@@ -71,19 +71,19 @@ public class Service {
         return new PReviewDecider(getGraphPAP(), getProhibitionsPAP());
     }
 
-    boolean hasPermissions(UserContext userCtx, long targetID, String... permissions) throws PMException {
+    boolean hasPermissions(UserContext userCtx, String target, String... permissions) throws PMException {
         Decider decider = new PReviewDecider(pap.getGraphPAP(), pap.getProhibitionsPAP());
 
-        Node node = pap.getGraphPAP().getNode(targetID);
+        Node node = pap.getGraphPAP().getNode(target);
         if (node.getType().equals(PC)) {
-            if (!node.getProperties().containsKey("rep_id")) {
+            if (!node.getProperties().containsKey("rep")) {
                 throw new PMException("unable to check permissions for policy class " + node.getName() + ", rep_id property not set");
             }
 
-            targetID = Long.parseLong(node.getProperties().get("rep_id"));
+            target = node.getProperties().get("rep");
         }
 
-        Set<String> perms = decider.list(userCtx.getUserID(), userCtx.getProcessID(), targetID);
+        Set<String> perms = decider.list(userCtx.getUser(), userCtx.getProcess(), target);
         if(permissions.length == 0 || Arrays.asList(permissions).contains(ANY_OPERATIONS)) {
             return !perms.isEmpty();
         } else if (perms.contains("*")) {

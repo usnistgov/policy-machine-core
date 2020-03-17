@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class MemProhibitions implements Prohibitions {
 
-    private Map<Long, List<Prohibition>> prohibitions;
+    private Map<String, List<Prohibition>> prohibitions;
 
     public MemProhibitions() {
         this.prohibitions = new HashMap<>();
@@ -37,10 +37,10 @@ public class MemProhibitions implements Prohibitions {
             throw new IllegalArgumentException("a null subject was provided when creating a prohibition");
         }
 
-        long subjectID = prohibition.getSubject().getSubjectID();
-        List<Prohibition> exPros = this.prohibitions.getOrDefault(subjectID, new ArrayList<>());
+        String subject = prohibition.getSubject().getSubject();
+        List<Prohibition> exPros = this.prohibitions.getOrDefault(subject, new ArrayList<>());
         exPros.add(prohibition);
-        this.prohibitions.put(subjectID, exPros);
+        this.prohibitions.put(subject, exPros);
     }
 
     /**
@@ -73,12 +73,12 @@ public class MemProhibitions implements Prohibitions {
 
     /**
      * Get the Prohibitions the given subject is the direct subject of.
-     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @param subject the ID of the subject to get the prohibitions for.
      * @return a list of Prohibitions the given entity is the subject of.
      */
     @Override
-    public List<Prohibition> getProhibitionsFor(long subjectID) {
-        return prohibitions.getOrDefault(subjectID, new ArrayList<>());
+    public List<Prohibition> getProhibitionsFor(String subject) {
+        return prohibitions.getOrDefault(subject, new ArrayList<>());
     }
 
     /**
@@ -110,14 +110,14 @@ public class MemProhibitions implements Prohibitions {
      */
     @Override
     public void delete(String prohibitionName) {
-        for(Long subjectID : prohibitions.keySet()) {
-            List<Prohibition> ps = prohibitions.get(subjectID);
+        for(String subject : prohibitions.keySet()) {
+            List<Prohibition> ps = prohibitions.get(subject);
             Iterator<Prohibition> iterator = ps.iterator();
             while (iterator.hasNext()) {
                 Prohibition p = iterator.next();
                 if(p.getName().equals(prohibitionName)) {
                     iterator.remove();
-                    prohibitions.put(subjectID, ps);
+                    prohibitions.put(subject, ps);
                 }
             }
         }

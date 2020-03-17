@@ -60,9 +60,9 @@ public class Prohibition {
         nodes.add(node);
     }
 
-    public void removeNode(long id) {
+    public void removeNode(String name) {
         for (Node n : nodes) {
-            if (n.getID() == id) {
+            if (n.getName().equals(name)) {
                 nodes.remove(n);
                 return;
             }
@@ -107,28 +107,28 @@ public class Prohibition {
     }
 
     public static class Subject {
-        long subjectID;
+        String subject;
         Type subjectType;
 
         /**
-         * Prohibition Subject constructor.  The ID cannot be 0 and the type cannot be null.
+         * Prohibition Subject constructor.  The name cannot be empty and the type cannot be null.
          *
-         * @param subjectID
+         * @param subject
          * @param subjectType
          */
-        public Subject(long subjectID, Type subjectType) {
-            if (subjectID == 0) {
+        public Subject(String subject, Type subjectType) {
+            if (subject == null || subject.isEmpty()) {
                 throw new IllegalArgumentException("a prohibition subject cannot have an ID of 0");
             }
             else if (subjectType == null) {
                 throw new IllegalArgumentException("a prohibition subject cannot have a null type");
             }
-            this.subjectID = subjectID;
+            this.subject = subject;
             this.subjectType = subjectType;
         }
 
-        public long getSubjectID() {
-            return subjectID;
+        public String getSubject() {
+            return subject;
         }
 
         public Type getSubjectType() {
@@ -169,16 +169,16 @@ public class Prohibition {
     }
 
     public static class Node {
-        long    id;
+        String    name;
         boolean complement;
 
-        public Node(long id, boolean complement) {
-            this.id = id;
+        public Node(String name, boolean complement) {
+            this.name = name;
             this.complement = complement;
         }
 
-        public long getID() {
-            return id;
+        public String getName() {
+            return name;
         }
 
         public boolean isComplement() {
@@ -191,11 +191,11 @@ public class Prohibition {
             }
 
             Node node = (Node) o;
-            return this.getID() == node.getID();
+            return this.getName().equals(node.getName());
         }
 
         public int hashCode() {
-            return Objects.hash(id);
+            return name.hashCode();
         }
     }
 }

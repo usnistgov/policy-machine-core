@@ -20,7 +20,7 @@ public class ParentOfAssignExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         Node parent;
         if(eventCtx instanceof AssignToEvent) {
             parent = eventCtx.getTarget();

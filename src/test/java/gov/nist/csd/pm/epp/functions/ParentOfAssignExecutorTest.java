@@ -27,8 +27,8 @@ class ParentOfAssignExecutorTest {
         ParentOfAssignExecutor executor = new ParentOfAssignExecutor();
 
         EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        long user = testCtx.getU1().getID();
-        long process = 0;
+        String user = testCtx.getU1().getName();
+        String process = "";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 

@@ -24,7 +24,7 @@ class GraphServiceTest {
                 "node PC RBAC\n" +
                 "node OA records\n" +
                 "\n" +
-                "assign OA:records PC:RBAC\n" +
+                "assign records RBAC\n" +
                 "\n" +
                 "node OA patient_1_records\n" +
                 "node OA patient1_rec_1\n" +
@@ -32,11 +32,11 @@ class GraphServiceTest {
                 "node OA patient1_rec_3\n" +
                 "node OA patient1_rec_4\n" +
                 "\n" +
-                "assign OA:patient_1_records OA:records\n" +
-                "assign OA:patient1_rec_1 OA:patient_1_records\n" +
-                "assign OA:patient1_rec_2 OA:patient_1_records\n" +
-                "assign OA:patient1_rec_3 OA:patient_1_records\n" +
-                "assign OA:patient1_rec_4 OA:patient_1_records\n" +
+                "assign patient_1_records records\n" +
+                "assign patient1_rec_1 patient_1_records\n" +
+                "assign patient1_rec_2 patient_1_records\n" +
+                "assign patient1_rec_3 patient_1_records\n" +
+                "assign patient1_rec_4 patient_1_records\n" +
                 "\n" +
                 "node UA Doctor\n" +
                 "node UA Nurse\n" +
@@ -46,16 +46,16 @@ class GraphServiceTest {
                 "node U nurseA1\n" +
                 "node U patient1\n" +
                 "\n" +
-                "assign UA:Nurse PC:RBAC\n" +
-                "assign UA:Doctor UA:Nurse\n" +
-                "assign U:doctorA1 UA:Doctor\n" +
-                "assign U:nurseA1 UA:Nurse\n" +
-                "assign UA:Patient PC:RBAC\n" +
-                "assign U:patient1 UA:Patient\n" +
+                "assign Nurse RBAC\n" +
+                "assign Doctor Nurse\n" +
+                "assign doctorA1 Doctor\n" +
+                "assign nurseA1 Nurse\n" +
+                "assign Patient RBAC\n" +
+                "assign patient1 Patient\n" +
                 "\n" +
-                "assoc UA:Nurse OA:records [read]\n" +
-                "assoc UA:Doctor OA:records [write]\n" +
-                "assoc UA:Patient OA:patient_1_records [read, assign]\n" +
+                "assoc Nurse records [read]\n" +
+                "assoc Doctor records [write]\n" +
+                "assoc Patient patient_1_records [read, assign]\n" +
                 "\n" +
                 "# DAC\n" +
                 "node PC DAC\n" +
@@ -63,48 +63,48 @@ class GraphServiceTest {
                 "node UA doctorA1_UA\n" +
                 "node UA nurseA1_UA\n" +
                 "node UA patient1_UA\n" +
-                "assign UA:users PC:DAC\n" +
-                "assign UA:nurseA1_UA UA:users\n" +
-                "assign UA:doctorA1_UA UA:users\n" +
-                "assign UA:patient1_UA UA:users\n" +
-                "assign U:nurseA1 UA:nurseA1_UA\n" +
-                "assign U:doctorA1 UA:doctorA1_UA\n" +
-                "assign U:patient1 UA:patient1_UA\n" +
+                "assign users DAC\n" +
+                "assign nurseA1_UA users\n" +
+                "assign doctorA1_UA users\n" +
+                "assign patient1_UA users\n" +
+                "assign nurseA1 nurseA1_UA\n" +
+                "assign doctorA1 doctorA1_UA\n" +
+                "assign patient1 patient1_UA\n" +
                 "\n" +
                 "node OA homes\n" +
                 "node OA doctorA1_home\n" +
                 "node OA nurseA1_home\n" +
                 "node OA patient1_home\n" +
-                "assign OA:homes PC:DAC\n" +
-                "assign OA:doctorA1_home OA:homes\n" +
-                "assign OA:nurseA1_home OA:homes\n" +
-                "assign OA:patient1_home OA:homes\n" +
-                "assign OA:records OA:doctorA1_home\n" +
-                "assign OA:records OA:nurseA1_home\n" +
-                "assign OA:records OA:patient1_home\n" +
+                "assign homes DAC\n" +
+                "assign doctorA1_home homes\n" +
+                "assign nurseA1_home homes\n" +
+                "assign patient1_home homes\n" +
+                "assign records doctorA1_home\n" +
+                "assign records nurseA1_home\n" +
+                "assign records patient1_home\n" +
                 "\n" +
-                "assoc UA:users OA:homes [assign to]\n" +
-                "assoc UA:doctorA1_UA OA:doctorA1_home [read,write]\n" +
-                "assoc UA:nurseA1_UA OA:nurseA1_home [read,write]\n" +
-                "assoc UA:patient1_UA OA:patient1_home [read,write,assign]\n" +
+                "assoc users homes [assign to]\n" +
+                "assoc doctorA1_UA doctorA1_home [read,write]\n" +
+                "assoc nurseA1_UA nurseA1_home [read,write]\n" +
+                "assoc patient1_UA patient1_home [read,write,assign]\n" +
                 "\n" +
                 "# LogIn\n" +
                 "node PC LogIn\n" +
                 "node UA okta_users\n" +
                 "node UA local_users\n" +
-                "assign UA:okta_users PC:LogIn\n" +
-                "assign UA:local_users PC:LogIn\n" +
+                "assign okta_users LogIn\n" +
+                "assign local_users LogIn\n" +
                 "\n" +
-                "assign OA:records PC:LogIn\n" +
+                "assign records LogIn\n" +
                 "\n" +
-                "assoc UA:okta_users OA:records [read]\n" +
-                "assoc UA:local_users OA:records [read,write]";
+                "assoc okta_users records [read]\n" +
+                "assoc local_users records [read,write]";
 
         PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), null);
-        GraphSerializer.deserialize(pdp.getGraphService(new UserContext(0, 0)), s);
+        GraphSerializer.deserialize(pdp.getGraphService(new UserContext("super", "")), s);
 
         Set<Node> papNodes = pdp.getPAP().getGraphPAP().getNodes();
-        UserContext userContext = new UserContext(0, 0);
+        UserContext userContext = new UserContext("super", "");
         Graph graphService = pdp.getGraphService(userContext);
         Set<Node> pdpNodes = graphService.getNodes();
 

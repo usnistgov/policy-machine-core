@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
@@ -29,8 +28,8 @@ public class Association extends Relationship implements Serializable {
 
     private OperationSet operations;
 
-    public Association(long uaID, long targetID, OperationSet operations) {
-        super(uaID, targetID);
+    public Association(String ua, String target, OperationSet operations) {
+        super(ua, target);
         this.operations = operations;
     }
 
@@ -68,13 +67,13 @@ public class Association extends Relationship implements Serializable {
         }
 
         Association association = (Association) o;
-        return this.sourceID == association.sourceID &&
-                this.targetID == association.targetID &&
+        return this.source.equals(association.source) &&
+                this.target.equals(association.target) &&
                 this.operations.equals(association.operations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceID, targetID, operations);
+        return Objects.hash(source, target, operations);
     }
 }

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ProhibitionsSerializerTest {
 
-    Prohibitions dao;
+    private Prohibitions dao;
 
     @BeforeEach
     void setUp() throws PMException {
@@ -20,10 +20,10 @@ class ProhibitionsSerializerTest {
 
         Prohibition prohibition = new Prohibition();
         prohibition.setName("prohibition1");
-        prohibition.setSubject(new Prohibition.Subject(123, USER));
+        prohibition.setSubject(new Prohibition.Subject("123", USER));
         prohibition.setOperations(new OperationSet("read"));
         prohibition.setIntersection(false);
-        prohibition.addNode(new Prohibition.Node(1234, true));
+        prohibition.addNode(new Prohibition.Node("1234", true));
 
         dao.add(prohibition);
     }
@@ -40,6 +40,6 @@ class ProhibitionsSerializerTest {
         assertEquals("prohibition1", prohibition.getName());
         assertFalse(prohibition.isIntersection());
         assertEquals(new OperationSet("read"), prohibition.getOperations());
-        assertEquals(new Prohibition.Node(1234, true), prohibition.getNodes().get(0));
+        assertEquals(new Prohibition.Node("1234", true), prohibition.getNodes().get(0));
     }
 }

@@ -22,8 +22,7 @@ class PReviewAuditorTest {
     void testExplain() throws PMException {
         for(TestCases.TestCase tc : TestCases.getTests()) {
             PReviewAuditor auditor = new PReviewAuditor(tc.graph);
-            Explain explain = auditor.explain(TestCases.u1ID, TestCases.o1ID);
-            System.out.println(explain);
+            Explain explain = auditor.explain("u1", "o1");
 
             assertTrue(explain.getPermissions().containsAll(tc.getExpectedOps()),
                     tc.name + " expected ops " + tc.getExpectedOps() + " but got " + explain.getPermissions());
@@ -85,29 +84,5 @@ class PReviewAuditorTest {
         }
 
         return true;
-    }
-
-    @Test
-    void test1() throws PMException {
-        Random random = new Random();
-        Graph graph =new MemGraph();
-        Node rbac = graph.createPolicyClass(random.nextLong(), "RBAC", null);
-        Node records = graph.createNode(random.nextLong(), "records", OA, null, rbac.getID());
-
-        graph.createNode(random.nextLong(), "recA1", OA, null, records.getID());
-        graph.createNode(random.nextLong(), "recA2", OA, null, records.getID());
-        graph.createNode(random.nextLong(), "recA3", OA, null, records.getID());
-        graph.createNode(random.nextLong(), "recA4", OA, null, records.getID());
-
-        Node nurse = graph.createNode(random.nextLong(), "Nurse", UA, null, rbac.getID());
-        Node doctor = graph.createNode(random.nextLong(), "Doctor", UA, null, nurse.getID());
-
-        Node u1 = graph.createNode(random.nextLong(), "u1", U, null, doctor.getID());
-
-        graph.associate(nurse.getID(), records.getID(), new OperationSet("read"));
-        graph.associate(doctor.getID(), records.getID(), new OperationSet("write"));
-
-        System.out.println(new PReviewAuditor(graph).explain(u1.getID(), records.getID()));
-
     }
 }

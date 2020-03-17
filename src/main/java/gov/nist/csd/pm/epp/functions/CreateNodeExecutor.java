@@ -28,7 +28,7 @@ public class CreateNodeExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(EventContext eventCtx, String userID, String processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
 
         // first arg is the name, can be function that returns a string
@@ -77,15 +77,15 @@ public class CreateNodeExecutor implements FunctionExecutor {
             }
         }
 
-        long id = new Random().nextLong();
         Graph graph = pdp.getPAP().getGraphPAP();
 
-        Set<Node> search = graph.search(parentName, NodeType.toNodeType(parentType), new HashMap<>());
-        if (search.isEmpty()) {
-            throw new PMException(String.format("parent node %s with type %s and properties %s does not exist", parentName, parentType, new HashMap<>()));
+        Node parentNode;
+        if (parentName != null) {
+            parentNode = graph.getNode(parentName);
+        } else {
+            parentNode = graph.getNode(NodeType.toNodeType(parentType), new HashMap<>());
         }
-        Node parentNode = search.iterator().next();
 
-        return graph.createNode(id, name, NodeType.toNodeType(type), props, parentNode.getID());
+        return graph.createNode(name, NodeType.toNodeType(type), props, parentNode.getName());
     }
 }

@@ -31,8 +31,8 @@ class ToPropertiesExecutorTest {
         ToPropertiesExecutor executor = new ToPropertiesExecutor();
 
         EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        long user = testCtx.getU1().getID();
-        long process = 0;
+        String user = testCtx.getU1().getName();
+        String process = "";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), Arrays.asList(new Arg("k=v"), new Arg("k1=v1"), new Arg("k2=v2")));
 

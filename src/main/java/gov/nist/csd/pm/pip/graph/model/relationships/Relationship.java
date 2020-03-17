@@ -8,32 +8,32 @@ import java.util.Objects;
  * and a target node.
  */
 public class Relationship implements Serializable {
-    long sourceID;
-    long targetID;
+    String source;
+    String target;
 
     public Relationship() {
 
     }
 
-    public Relationship(long sourceID, long targetID) {
-        this.sourceID = sourceID;
-        this.targetID = targetID;
+    public Relationship(String source, String target) {
+        this.source = source;
+        this.target = target;
     }
 
-    public long getSourceID() {
-        return sourceID;
+    public String getSource() {
+        return source;
     }
 
-    public void setSourceID(long sourceID) {
-        this.sourceID = sourceID;
+    public void setSource(String source) {
+        this.source = source;
     }
 
-    public long getTargetID() {
-        return targetID;
+    public String getTarget() {
+        return target;
     }
 
-    public void setTargetID(long targetID) {
-        this.targetID = targetID;
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     @Override
@@ -43,12 +43,12 @@ public class Relationship implements Serializable {
         }
 
         Relationship r = (Relationship) o;
-        return this.sourceID == r.sourceID
-                && this.targetID == r.targetID;
+        return this.source.equals(r.source)
+                && this.target.equals(r.target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceID, targetID);
+        return Objects.hash(source, target);
     }
 }

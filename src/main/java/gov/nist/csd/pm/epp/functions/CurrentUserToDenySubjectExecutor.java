@@ -19,7 +19,7 @@ public class CurrentUserToDenySubjectExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Prohibition.Subject exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Prohibition.Subject exec(EventContext eventCtx, String userID, String processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         return new Prohibition.Subject(userID, Prohibition.Subject.Type.USER);
     }
 }

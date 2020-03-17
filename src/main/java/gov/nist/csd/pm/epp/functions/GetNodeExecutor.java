@@ -26,7 +26,7 @@ public class GetNodeExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
         if (args == null || args.size() < numParams() || args.size() > numParams()) {
             throw new PMException(getFunctionName() + " expected at least two arguments (name and type) but found none");
@@ -36,25 +36,29 @@ public class GetNodeExecutor implements FunctionExecutor {
         Arg arg = args.get(0);
         String name = arg.getValue();
         if(arg.getFunction() != null) {
-            name = functionEvaluator.evalString(eventCtx, userID, processID, pdp, arg.getFunction());
+            name = functionEvaluator.evalString(eventCtx, user, process, pdp, arg.getFunction());
         }
 
         // second arg should be the type of the node to search for
         arg = args.get(1);
         String type = arg.getValue();
         if(arg.getFunction() != null) {
-            type = functionEvaluator.evalString(eventCtx, userID, processID, pdp, arg.getFunction());
+            type = functionEvaluator.evalString(eventCtx, user, process, pdp, arg.getFunction());
         }
 
         Map<String, String> props = new HashMap<>();
         if(args.size() > 2) {
             arg = args.get(2);
             if (arg.getFunction() != null) {
-                props = (Map) functionEvaluator.evalMap(eventCtx, userID, processID, pdp, arg.getFunction());
+                props = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, arg.getFunction());
             }
         }
 
-        Set<Node> search = pdp.getPAP().getGraphPAP().search(name, NodeType.toNodeType(type), props);
+        if (name != null) {
+            return pdp.getPAP().getGraphPAP().getNode(name);
+        }
+
+        Set<Node> search = pdp.getPAP().getGraphPAP().search(NodeType.toNodeType(type), props);
         return search.iterator().next();
     }
 }

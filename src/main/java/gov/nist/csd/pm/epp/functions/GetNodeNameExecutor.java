@@ -26,7 +26,7 @@ public class GetNodeNameExecutor implements FunctionExecutor {
      * @return the name of the node returned from this function.
      */
     @Override
-    public String exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public String exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
         if (args.size() != numParams()) {
             throw new PMException(getFunctionName() + " expected " + numParams() + " arg but got " + args.size());
@@ -38,7 +38,7 @@ public class GetNodeNameExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expected the first argument to be a function but it was null");
         }
 
-        Node node = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, argFunction);
+        Node node = functionEvaluator.evalNode(eventCtx, user, process, pdp, argFunction);
         return node.getName();
     }
 }
