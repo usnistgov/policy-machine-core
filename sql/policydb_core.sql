@@ -43,7 +43,7 @@ INSERT INTO `assignment` (`assignment_id`, `start_node_id`, `end_node_id`) VALUE
 
 -- Dumping structure for table policydb_core.association
 CREATE TABLE IF NOT EXISTS `association` (
-  `association_id` int(11) NOT NULL,
+  `association_id` int(11) NOT NULL AUTO_INCREMENT,
   `start_node_id` int(11) NOT NULL,
   `end_node_id` int(11) NOT NULL,
   `operation_set` json NOT NULL,
