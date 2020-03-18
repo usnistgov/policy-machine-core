@@ -15,6 +15,8 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import java.sql.*;
 import java.util.*;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
+
 public class MySQLGraph implements Graph {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -33,6 +35,70 @@ public class MySQLGraph implements Graph {
 
     @Override
     public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
+        //check for null values
+        if (id == 0) {
+            throw new IllegalArgumentException("no ID was provided when creating a policy class in the mysql graph");
+        }
+        else if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no name was provided when creating a policy class in the mysql graph");
+        }
+        else if (exists(id)) {
+            throw new PMException("You cannot create a policy class with that ID, another node with that ID already exists.");
+        }
+
+        MySQLConnection conn = new MySQLConnection();
+        ResultSet rs = null;
+        ResultSet rs_type = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement ps = null;
+        int nodeId = 0;
+        try {
+            Connection con = conn.getConnection();
+            //====================  NodeType parser : Retrieve node_type_id ====================
+            String query = "SELECT * from node_type where name =" + "PC";
+            pstmt = con.prepareStatement(query);
+            rs_type = pstmt.executeQuery();
+            int node_type_id = 0;
+            while (rs_type.next()){
+                node_type_id = rs_type.getInt("node_type_id");
+            }
+            //==================== create the node from (id, node_type_id, name, properties) ====================
+            ps = con.prepareStatement("INSERT INTO node(node_id, node_type_id, name, node_property)" +
+                    " VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+            ps.setLong(1, id);
+            ps.setInt(2, node_type_id);
+            ps.setString(3,name);
+            //Json serialization using Jackson
+            if ( properties == null) {
+                ps.setString(4, null);
+            } else {
+                try {
+                    ps.setString(4, toJSON(properties));
+                } catch (JsonProcessingException j) {
+                    j.printStackTrace();
+                }
+            }
+
+            ps.executeUpdate();
+
+            Node node = new Node(nodeId, name, NodeType.PC, properties);
+            con.close();
+            return node;
+        } catch (SQLException s) {
+            s.printStackTrace();
+        }
+        finally {
+            try {
+                //We can also use DbUtils to clean up: DbUtils.closeQuietly(rs);
+                if(rs != null) {rs.close();}
+                if(rs_type != null) {rs_type.close();}
+                if(ps != null) {ps.close();}
+                if(pstmt != null) {pstmt.close();}
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
         return null;
     }
 
@@ -52,13 +118,18 @@ public class MySQLGraph implements Graph {
         if (id == 0) {
             throw new IllegalArgumentException("no ID was provided when creating a node in the mysql graph");
         }
+        if (type == PC) {
+            throw new PMException("use createPolicyClass to create a policy class node");
+        }
         else if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a node in the mysql graph");
         }
         else if (type == null) {
             throw new IllegalArgumentException("a null type was provided to the mysql graph when creating a node");
         }
-
+        else if (initialParent == 0) {
+            throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
+        }
         else if (exists(id)) {
             throw new PMException("You cannot create a node with that ID, another node with that ID already exists.");
         }
@@ -98,7 +169,7 @@ public class MySQLGraph implements Graph {
                 }
             }
 
-            int rowAffected = ps.executeUpdate();
+            ps.executeUpdate();
 
             Node node = new Node(nodeId, name, type, properties);
             con.close();
@@ -796,8 +867,9 @@ public class MySQLGraph implements Graph {
         }
 
         Node ua = getNode(targetID);
+
         if (ua.getType() != NodeType.UA && ua.getType() != NodeType.OA) {
-            throw new PMException("The source node must be an user attribute or an object attribute.");
+            throw new PMException("The target node must be an user attribute or an object attribute.");
         }
 
         MySQLConnection mySQLConnection = new MySQLConnection();
