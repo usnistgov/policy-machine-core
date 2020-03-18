@@ -1,3 +1,4 @@
 .idea
 policy-machine-core.iml
 /target
+.DS_Store

@@ -96,6 +96,22 @@ public class Node implements Serializable {
         return properties;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(NodeType type) {
+        this.type = type;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
     /**
      * Two nodes are equal if their IDs are the same.
      *
