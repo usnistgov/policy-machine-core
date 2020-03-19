@@ -118,7 +118,7 @@ public class Prohibition {
          */
         public Subject(String subject, Type subjectType) {
             if (subject == null || subject.isEmpty()) {
-                throw new IllegalArgumentException("a prohibition subject cannot have an ID of 0");
+                throw new IllegalArgumentException("a prohibition subject cannot be null");
             }
             else if (subjectType == null) {
                 throw new IllegalArgumentException("a prohibition subject cannot have a null type");

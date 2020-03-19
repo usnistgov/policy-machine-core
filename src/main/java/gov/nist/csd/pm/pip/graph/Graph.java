@@ -58,17 +58,17 @@ public interface Graph {
      * Check that a node with the given name exists in the graph.
      *
      * @param name the name of the node to check for.
-     * @return true or False if a node with the given ID exists or not.
+     * @return true or false if a node with the given name exists or not.
      * @throws PMException if there is an error checking if the node exists in the graph.
      */
     boolean exists(String name) throws PMException;
 
     /**
      * Get the set of policy classes.  This operation is run every time a decision is made, so a separate
-     * method is needed to improve efficiency. The returned set is just the IDs of each policy class.
+     * method is needed to improve efficiency. The returned set is just the names of each policy class.
      *
-     * @return the set of policy class IDs.
-     * @throws PMException if there is an error retrieving the IDs of the policy classes.
+     * @return the set of policy classes.
+     * @throws PMException if there is an error retrieving the policy classes.
      */
     Set<String> getPolicyClasses() throws PMException;
 
@@ -126,10 +126,10 @@ public interface Graph {
     Set<String> getChildren(String name) throws PMException;
 
     /**
-     * Get the set of nodes that the node with the given ID is assigned to.
+     * Get the set of nodes that the node with the given name is assigned to.
      *
      * @param name the name of the node to get the parents of.
-     * @return the Set of NGACNodes that are assigned to the node with the given ID.
+     * @return the set of node names that are assigned to the node with the given name.
      * @throws PMException if there is an error retrieving the parents of the node.
      */
     Set<String> getParents(String name) throws PMException;
@@ -192,7 +192,7 @@ public interface Graph {
      * contain the target and operations of each association.
      *
      * @param source the name of the source node.
-     * @return a Map of the target node IDs and the operations for each association.
+     * @return a map of the target node names and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the source node from the graph.
      */
     Map<String, OperationSet> getSourceAssociations(String source) throws PMException;
@@ -200,7 +200,7 @@ public interface Graph {
     /**
      * Retrieve the associations the given node is the target of.  The target node can be an Object Attribute or a User
      * Attribute. This method will throw an exception if a node of any other type is provided.  The returned Map will
-     * contain the source node IDs and the operations of each association.
+     * contain the source node names and the operations of each association.
      *
      * @param target the name of the target node.
      * @return a Map of the source Ids and the operations for each association.

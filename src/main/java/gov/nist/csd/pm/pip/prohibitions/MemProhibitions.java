@@ -18,7 +18,7 @@ public class MemProhibitions implements Prohibitions {
 
     /**
      * Add the provided prohibition to the list of prohibitions. The prohibition name cannot be null or empty.
-     * The prohibition subject cannot be null, have an ID of 0, or have a null type.
+     * The prohibition subject cannot be null or have a null type.
      *
      * @param prohibition the prohibition to be created.
      * @throws IllegalArgumentException if the prohibition is null.
@@ -73,7 +73,7 @@ public class MemProhibitions implements Prohibitions {
 
     /**
      * Get the Prohibitions the given subject is the direct subject of.
-     * @param subject the ID of the subject to get the prohibitions for.
+     * @param subject the subject to get the prohibitions for.
      * @return a list of Prohibitions the given entity is the subject of.
      */
     @Override

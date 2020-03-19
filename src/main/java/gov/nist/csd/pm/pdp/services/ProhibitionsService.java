@@ -48,7 +48,7 @@ public class ProhibitionsService extends Service implements Prohibitions {
         if(subject.getSubjectType().equals(Prohibition.Subject.Type.USER) || subject.getSubjectType().equals(Prohibition.Subject.Type.USER_ATTRIBUTE)) {
             // first check that the subject exists
             if(!getGraphPAP().exists(subject.getSubject())) {
-                throw new PMException(String.format("node with ID %s and type %s does not exist", subject.getSubject(), subject.getSubjectType()));
+                throw new PMException(String.format("node with name %s and type %s does not exist", subject.getSubject(), subject.getSubjectType()));
             }
             if(!decider.check(userCtx.getUser(), userCtx.getProcess(), subject.getSubject(), CREATE_PROHIBITION)) {
                 throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", subject.getSubject(), PROHIBIT_SUBJECT));
@@ -76,8 +76,8 @@ public class ProhibitionsService extends Service implements Prohibitions {
     }
 
     @Override
-    public List<Prohibition> getProhibitionsFor(String subjectID) throws PMException {
-        return getPAP().getProhibitionsPAP().getProhibitionsFor(subjectID);
+    public List<Prohibition> getProhibitionsFor(String subject) throws PMException {
+        return getPAP().getProhibitionsPAP().getProhibitionsFor(subject);
     }
 
     @Override

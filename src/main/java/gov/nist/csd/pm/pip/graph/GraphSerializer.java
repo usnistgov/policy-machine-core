@@ -25,7 +25,6 @@ public class GraphSerializer {
      * {
      *   "nodes": [
      *     {
-     *       "id": 1,
      *       "name": "pc1",
      *       "type": "PC",
      *       "properties": {}
@@ -34,8 +33,8 @@ public class GraphSerializer {
      *   ],
      *   "assignments": [
      *     {
-     *       "sourceID": 2,
-     *       "targetID": 1
+     *       "source": "ua",
+     *       "target": "pc"
      *     },
      *     ...
      *   ],
@@ -45,8 +44,8 @@ public class GraphSerializer {
      *         "read",
      *         "write"
      *       ],
-     *       "sourceID": 4,
-     *       "targetID": 2
+     *       "source": "ua",
+     *       "target": "oa"
      *     }
      *   ]
      * }

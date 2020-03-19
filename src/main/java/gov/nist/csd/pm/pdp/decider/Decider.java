@@ -59,7 +59,7 @@ public interface Decider {
     Set<String> getChildren(String subject, String process, String target, String... perms) throws PMException;
 
     /**
-     * Given a subject ID, return every node the subject has access to and the permissions they have on each.
+     * Given a subject, return every node the subject has access to and the permissions they have on each.
      *
      * @param subject the name of the subject.
      * @param process    the name of the process if applicable.
@@ -69,13 +69,13 @@ public interface Decider {
     Map<String, Set<String>> getCapabilityList(String subject, String process) throws PMException;
 
     /**
-     * Given an Object Attribute ID, returns the id of every user (String), and what permissions(Set<String>) it has on it
+     * Given an Object Attribute, returns the name of every user (String), and what permissions(Set<String>) they have on it.
      *
-     * @param oaID
-     * @param process
-     * @return
+     * @param target the name of the target node to generate the ACL for.
+     * @param process the process requesting the ACL, can be null or empty
+     * @return a map of the users that have access to the target node and the permissions each have on it
      */
-    Map<String, Set<String>> generateACL(String oaID, String process) throws PMException;
+    Map<String, Set<String>> generateACL(String target, String process) throws PMException;
 }
 
 

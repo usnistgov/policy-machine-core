@@ -22,14 +22,14 @@ public class AnalyticsService extends Service {
     }
 
     /**
-     * Given the ID of a target node, return the permissions the current user has on it.
-     * @param targetID the ID of the target node.
+     * Given the name of a target node, return the permissions the current user has on it.
+     * @param target the name of the target node.
      * @return the set of operations the current user has on the target node.
      * @throws PMException if there is an error getting the permissions for the current user on the target
      */
-    public Set<String> getPermissions(UserContext userCtx, String targetID) throws PMException {
+    public Set<String> getPermissions(UserContext userCtx, String target) throws PMException {
         Decider decider = getDecider();
-        return decider.list(userCtx.getUser(), userCtx.getProcess(), targetID);
+        return decider.list(userCtx.getUser(), userCtx.getProcess(), target);
     }
 
 
@@ -50,7 +50,7 @@ public class AnalyticsService extends Service {
         for (Enumeration oas = htOa.keys(); oas.hasMoreElements(); ) {
             Node oa = (Node)oas.nextElement();
 
-            // Compute oa's required PCs by calling find_pc_set(sOaID).
+            // Compute oa's required PCs by calling find_pc_set(oa).
             HashSet<String> hsReqPcs = inMemFindPcSet(oa.getName());
             // Extract oa's label.
             Hashtable htOaLabel = (Hashtable)htOa.get(oa);
@@ -108,15 +108,15 @@ public class AnalyticsService extends Service {
 
                     // Go through the containers and only for opsets do the following.
                     // For each opset ops of ua:
-                    for (String targetID : assocs.keySet()) {
+                    for (String target : assocs.keySet()) {
                         // If oa is in htReachableOas
-                        if (htReachableOas.containsKey(targetID)) {
+                        if (htReachableOas.containsKey(target)) {
                             // Then oa has a label op1 -> hsPcs1, op2 -> hsPcs2,...
                             // Extract its label:
-                            Hashtable htOaLabel = (Hashtable)htReachableOas.get(targetID);
+                            Hashtable htOaLabel = (Hashtable)htReachableOas.get(target);
 
                             // Get the operations from the opset:
-                            Set opers = assocs.get(targetID);
+                            Set opers = assocs.get(target);
                             // For each operation in the opset
                             Iterator opersIter = opers.iterator();
                             while (opersIter.hasNext()) {
@@ -140,7 +140,7 @@ public class AnalyticsService extends Service {
                             Hashtable htOaLabel = new Hashtable();
 
                             // Get the operations from the opset:
-                            Set opers = assocs.get(targetID);
+                            Set opers = assocs.get(target);
                             // For each operation in the opset
                             Iterator opersIter = opers.iterator();
                             while (opersIter.hasNext()) {
@@ -151,7 +151,7 @@ public class AnalyticsService extends Service {
                             }
 
                             // Add oa -> {op -> pcs}
-                            htReachableOas.put(targetID,  htOaLabel);
+                            htReachableOas.put(target,  htOaLabel);
                         }
                     }
                 }

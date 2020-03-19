@@ -134,11 +134,11 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Map<String, Set<String>> generateACL(String targetID, String process) throws PMException {
+    public Map<String, Set<String>> generateACL(String target, String process) throws PMException {
         Map<String, Set<String>> acl = new HashMap<>();
         Set<Node> search = graph.search(U, null);
         for (Node user : search) {
-            Set<String> list = list(user.getName(), process, targetID);
+            Set<String> list = list(user.getName(), process, target);
             acl.put(user.getName(), list);
         }
 
@@ -234,7 +234,7 @@ public class PReviewDecider implements Decider {
      * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
      * each policy class.
      *
-     * @param target      the ID of the current target node.
+     * @param target      the name of the current target node.
      */
     private TargetContext processTargetDAG(String target, UserContext userCtx) throws PMException {
         Map<String, Set<String>> borderTargets = userCtx.getBorderTargets();

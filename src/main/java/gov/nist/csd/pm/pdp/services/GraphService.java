@@ -100,8 +100,8 @@ public class GraphService extends Service implements Graph {
      * @param name the name of the node to create.
      * @param type the type of the node.
      * @param properties properties to add to the node.
-     * @param initialParent the ID of the node to assign the new node to.
-     * @param additionalParents 0 or more node IDs to assign the new node to.
+     * @param initialParent the name of the node to assign the new node to.
+     * @param additionalParents 0 or more node names to assign the new node to.
      * @return the new node.
      * @throws IllegalArgumentException if the name is null or empty.
      * @throws IllegalArgumentException if the type is null.
@@ -142,7 +142,7 @@ public class GraphService extends Service implements Graph {
 
             if (!hasPermissions(userCtx, parent, ASSIGN_TO)) {
                 // if the user cannot assign to the parent node, delete the newly created node
-                throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node with ID %s", ASSIGN_TO, parent));
+                throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on %s", ASSIGN_TO, parent));
             }
 
             // if the parent is a PC get the PC default
@@ -176,7 +176,6 @@ public class GraphService extends Service implements Graph {
      *
      * @param name the name to give the node.
      * @param properties the properties of the node.
-     * @throws IllegalArgumentException if the given node id is 0.
      * @throws PMException if the given node does not exist in the graph.
      * @throws PMAuthorizationException if the user is not authorized to update the node.
      */
@@ -229,8 +228,8 @@ public class GraphService extends Service implements Graph {
 
         // if it's a PC, delete the rep
         if (node.getType().equals(PC)) {
-            if (node.getProperties().containsKey("rep_id")) {
-                getGraphPAP().deleteNode(node.getProperties().get("rep_id"));
+            if (node.getProperties().containsKey("rep")) {
+                getGraphPAP().deleteNode(node.getProperties().get("rep"));
             }
         }
 
@@ -238,9 +237,9 @@ public class GraphService extends Service implements Graph {
     }
 
     /**
-     * Check that a node with the given ID exists.  Just checking the in-memory graph is faster.
+     * Check that a node with the given name exists.  Just checking the in-memory graph is faster.
      * @param name the name of the node to check for.
-     * @return true if a node with the given ID exists, false otherwise.
+     * @return true if a node with the given name exists, false otherwise.
      * @throws PMException if there is an error checking if the node exists in the graph through the PAP.
      */
     public boolean exists(String name) throws PMException {
@@ -288,8 +287,8 @@ public class GraphService extends Service implements Graph {
     }
 
     /**
-     * Get the set of policy class IDs. This can be performed by the in-memory graph.
-     * @return the set of IDs for the policy classes in the graph.
+     * Get the set of policy classes. This can be performed by the in-memory graph.
+     * @return the set of names for the policy classes in the graph.
      * @throws PMException if there is an error getting the policy classes from the PAP.
      */
     public Set<String> getPolicyClasses() throws PMException {
@@ -366,11 +365,11 @@ public class GraphService extends Service implements Graph {
 
     /**
      * Create the assignment in both the db and in-memory graphs. First check that the user is allowed to assign the child,
-     * and allowed to assign something to the parent. Both child and parent contexts must include the ID and type of the node.
+     * and allowed to assign something to the parent.
      * @param child the name of the child node.
      * @param parent the name of the parent node.
-     * @throws IllegalArgumentException if the child ID is 0.
-     * @throws IllegalArgumentException if the parent ID is 0.
+     * @throws IllegalArgumentException if the child name is null.
+     * @throws IllegalArgumentException if the parent name is null.
      * @throws PMException if the child or parent node does not exist.
      * @throws PMException if the assignment is invalid.
      * @throws PMAuthorizationException if the current user does not have permission to create the assignment.
@@ -422,8 +421,8 @@ public class GraphService extends Service implements Graph {
      * and allowed to assign something to the parent.
      * @param child the name of the child of the assignment to delete.
      * @param parent the name of the parent of the assignment to delete.
-     * @throws IllegalArgumentException if the child ID is 0.
-     * @throws IllegalArgumentException if the parent ID is 0.
+     * @throws IllegalArgumentException if the child name is null.
+     * @throws IllegalArgumentException if the parent name is null.
      * @throws PMException if the child or parent node does not exist.
      * @throws PMAuthorizationException if the current user does not have permission to delete the assignment.
      */
@@ -484,8 +483,8 @@ public class GraphService extends Service implements Graph {
      * @param ua the name of the user attribute.
      * @param target the name of the target node.
      * @param operations a Set of operations to add to the Association.
-     * @throws IllegalArgumentException if the user attribute ID is 0.
-     * @throws IllegalArgumentException if the target node ID is 0.
+     * @throws IllegalArgumentException if the user attribute is null.
+     * @throws IllegalArgumentException if the target is null.
      * @throws PMException if the user attribute node does not exist.
      * @throws PMException if the target node does not exist.
      * @throws PMException if the association is invalid.
@@ -537,9 +536,9 @@ public class GraphService extends Service implements Graph {
         }
 
         if(ua == null) {
-            throw new IllegalArgumentException("the user attribute ID cannot be 0 when creating an association");
+            throw new IllegalArgumentException("the user attribute cannot be null when creating an association");
         } else if(target == null) {
-            throw new IllegalArgumentException("the target node ID cannot be 0 when creating an association");
+            throw new IllegalArgumentException("the target cannot be null when creating an association");
         } else if(!exists(ua)) {
             throw new PMException(String.format("node %s could not be found when creating an association", ua));
         } else if(!exists(target)) {
@@ -563,7 +562,7 @@ public class GraphService extends Service implements Graph {
      * information.
      *
      * @param source The name of the source node.
-     * @return a map of the target ID and operations for each association the given node is the source of.
+     * @return a map of the target and operations for each association the given node is the source of.
      * @throws PMException If the given node does not exist.
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
