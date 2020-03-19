@@ -11,7 +11,6 @@ public class Properties {
     public static final String DESCRIPTION_PROPERTY        = "description";
     public static final String NAMESPACE_PROPERTY          = "namespace";
     public static final String DEFAULT_NAMESPACE           = "default";
-    public static final String REP_PROPERTY                = "repID";
     public static final String SOURCE_PROPERTY             = "source";
     public static final String STORAGE_PROPERTY            = "storage";
     public static final String GCS_STORAGE                 = "google";
@@ -35,4 +34,5 @@ public class Properties {
     public static final String COLUMN_CONTAINER_NAME       = "Columns";
     public static final String ROW_CONTAINER_NAME          = "Rows";
     public static final String COLUMN_PROPERTY             = "column";
+    public static final String REP_PROPERTY                = "rep";
 }

@@ -11,6 +11,7 @@ import java.util.*;
 import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ALL_OPERATIONS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.NAMESPACE_PROPERTY;
+import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class SuperPolicy {
 
@@ -52,11 +53,11 @@ public class SuperPolicy {
 
         String superPCRep = "super_pc_rep";
         if (!graph.exists("super_pc")) {
-            Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", "rep", "super_pc_rep");
+            Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", REP_PROPERTY, "super_pc_rep");
             superPC = graph.createPolicyClass("super_pc", props);
         } else {
             superPC = graph.getNode("super_pc");
-            superPC.getProperties().put("rep", superPCRep);
+            superPC.getProperties().put(REP_PROPERTY, superPCRep);
             graph.updateNode(superPC.getName(), superPC.getProperties());
         }
 

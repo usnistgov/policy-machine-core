@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ANY_OPERATIONS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
+import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 /**
  * Class to provide common methods to all services.
@@ -76,11 +77,11 @@ public class Service {
 
         Node node = pap.getGraphPAP().getNode(target);
         if (node.getType().equals(PC)) {
-            if (!node.getProperties().containsKey("rep")) {
+            if (!node.getProperties().containsKey(REP_PROPERTY)) {
                 throw new PMException("unable to check permissions for policy class " + node.getName() + ", rep_id property not set");
             }
 
-            target = node.getProperties().get("rep");
+            target = node.getProperties().get(REP_PROPERTY);
         }
 
         Set<String> perms = decider.list(userCtx.getUser(), userCtx.getProcess(), target);

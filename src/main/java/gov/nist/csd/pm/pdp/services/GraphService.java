@@ -61,7 +61,7 @@ public class GraphService extends Service implements Graph {
         String defaultOA = name + "_default_OA";
 
         properties.putAll(Node.toProperties("default_ua", defaultUA, "default_oa", defaultOA,
-                "rep", rep));
+                REP_PROPERTY, rep));
         Node pcNode = getPAP().getGraphPAP().createPolicyClass(name, properties);
         // create the PC UA node
         Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
@@ -228,8 +228,8 @@ public class GraphService extends Service implements Graph {
 
         // if it's a PC, delete the rep
         if (node.getType().equals(PC)) {
-            if (node.getProperties().containsKey("rep")) {
-                getGraphPAP().deleteNode(node.getProperties().get("rep"));
+            if (node.getProperties().containsKey(REP_PROPERTY)) {
+                getGraphPAP().deleteNode(node.getProperties().get(REP_PROPERTY));
             }
         }
 
