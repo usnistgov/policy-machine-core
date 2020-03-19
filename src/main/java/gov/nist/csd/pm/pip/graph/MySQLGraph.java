@@ -45,9 +45,8 @@ public class MySQLGraph implements Graph {
         else if (exists(id)) {
             throw new PMException("You cannot create a policy class with that ID, another node with that ID already exists.");
         }
-
+        //TODO : check names on duplicate entry for db
         MySQLConnection conn = new MySQLConnection();
-        ResultSet rs = null;
         ResultSet rs_type = null;
         PreparedStatement pstmt = null;
         PreparedStatement ps = null;
@@ -55,8 +54,9 @@ public class MySQLGraph implements Graph {
         try {
             Connection con = conn.getConnection();
             //====================  NodeType parser : Retrieve node_type_id ====================
-            String query = "SELECT * from node_type where name =" + "PC";
+            String query = "SELECT * from node_type where name =?";
             pstmt = con.prepareStatement(query);
+            pstmt.setString(1, "PC");
             rs_type = pstmt.executeQuery();
             int node_type_id = 0;
             while (rs_type.next()){
@@ -91,7 +91,6 @@ public class MySQLGraph implements Graph {
         finally {
             try {
                 //We can also use DbUtils to clean up: DbUtils.closeQuietly(rs);
-                if(rs != null) {rs.close();}
                 if(rs_type != null) {rs_type.close();}
                 if(ps != null) {ps.close();}
                 if(pstmt != null) {pstmt.close();}
@@ -133,13 +132,13 @@ public class MySQLGraph implements Graph {
         else if (exists(id)) {
             throw new PMException("You cannot create a node with that ID, another node with that ID already exists.");
         }
+        //TODO : check names on duplicate entry for db
+
 
         MySQLConnection conn = new MySQLConnection();
-        ResultSet rs = null;
         ResultSet rs_type = null;
         PreparedStatement pstmt = null;
         PreparedStatement ps = null;
-        int nodeId = 0;
         try {
             Connection con = conn.getConnection();
             //====================  NodeType parser : Retrieve node_type_id ====================
@@ -147,31 +146,35 @@ public class MySQLGraph implements Graph {
             pstmt = con.prepareStatement(query);
             pstmt.setString(1, type.toString());
             rs_type = pstmt.executeQuery();
-            int node_type_id = 0;
-            while (rs_type.next()){
+            int node_type_id;
+            while (rs_type.next()) {
                 node_type_id = rs_type.getInt("node_type_id");
-            }
-            //==================== create the node from (id, node_type_id, name, properties) ====================
-            ps = con.prepareStatement("INSERT INTO node(node_id, node_type_id, name, node_property)" +
-                    " VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                //==================== create the node from (id, node_type_id, name, properties) ====================
+                ps = con.prepareStatement("INSERT INTO node(node_id, node_type_id, name, node_property)" +
+                        " VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
-            ps.setLong(1, id);
-            ps.setInt(2, node_type_id);
-            ps.setString(3,name);
-            //Json serialization using Jackson
-            if ( properties == null) {
-                ps.setString(4, null);
-            } else {
-                try {
-                    ps.setString(4, toJSON(properties));
-                } catch (JsonProcessingException j) {
-                    j.printStackTrace();
+                ps.setLong(1, id);
+                ps.setInt(2, node_type_id);
+                ps.setString(3, name);
+                //Json serialization using Jackson
+                if (properties == null) {
+                    ps.setString(4, null);
+                } else {
+                    try {
+                        ps.setString(4, toJSON(properties));
+                    } catch (JsonProcessingException j) {
+                        j.printStackTrace();
+                    }
                 }
             }
-
             ps.executeUpdate();
 
-            Node node = new Node(nodeId, name, type, properties);
+            Node node = new Node(id, name, type, properties);
+            //assign the new nodes to given parent nodes
+            assign(id, initialParent);
+            for (long parentID : additionalParents) {
+                assign(id, parentID);
+            }
             con.close();
             return node;
         } catch (SQLException s) {
@@ -179,8 +182,6 @@ public class MySQLGraph implements Graph {
         }
         finally {
             try {
-                //We can also use DbUtils to clean up: DbUtils.closeQuietly(rs);
-                if(rs != null) {rs.close();}
                 if(rs_type != null) {rs_type.close();}
                 if(ps != null) {ps.close();}
                 if(pstmt != null) {pstmt.close();}
@@ -210,12 +211,11 @@ public class MySQLGraph implements Graph {
         }
 
         MySQLConnection connection = new MySQLConnection();
-        PreparedStatement ps = null;
 
-        try {
-            Connection con = connection.getConnection();
-            String query = "UPDATE node SET name = ?, node_property = ? WHERE node_id = ?";
-            ps = con.prepareStatement(query);
+        try (
+                Connection con = connection.getConnection();
+                PreparedStatement ps = con.prepareStatement("UPDATE node SET name = ?, node_property = ? WHERE node_id = ?")
+        ){
             ps.setString(1, name);
             try {
                 ps.setString(2, toJSON(properties));
@@ -223,59 +223,41 @@ public class MySQLGraph implements Graph {
                 j.printStackTrace();
             }
             ps.setLong(3, id);
-            ps.executeUpdate();
-            if (ps.executeUpdate() == 0) {
-                con.close();
+            int i = ps.executeUpdate();
+            if (i == 0) {
                 throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, id));
             }
+
             System.out.println("The following node has been updated : " + id);
-            con.close();
         } catch (SQLException s) {
             s.printStackTrace();
             throw new PMException("Cannot connect to the database");
         }
-        finally {
-            try {
-                if(ps != null) {ps.close();}
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
     }
 
     /**
-     * Delete the node with the given ID from the graph.
+     * Delete the node with the given ID from the graph. No error handled if nothing happens while deleting a node that does not exists.
      *
      * @param nodeID the ID of the node to delete.
-     * @throws IllegalArgumentException When the provided node does not exist in the mysql graph
      * @throws PMException If there was an error deleting the node
      */
     @Override
     public void deleteNode(long nodeID) throws PMException {
         MySQLConnection mySQLConnection = new MySQLConnection();
-        PreparedStatement ps = null;
+        try (
+                Connection con = mySQLConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement("DELETE from node where node_id=?")
+        ){
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            ps = con.prepareStatement("DELETE from node where node_id=?");
             ps.setLong(1, nodeID);
-            if (ps.executeUpdate() == 0) {
-                con.close();
-                throw new IllegalArgumentException("The node you want to delete does not exist");
-            }
             ps.executeUpdate();
-            con.close();
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PMException("Cannot connect to the Database" + ex);
-
-        } finally {
-            try {
-                if (ps != null) {ps.close();}
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
+            //TODO : Handle the case if no node got deleted
+ /*         int i = ps.executeUpdate();
+            if (i == 0) {
+                throw new PMException("The node you want to delete does not exist");
+            }*/
+        } catch (SQLException e) {
+            throw new PMException(e.getMessage());
         }
     }
 
@@ -289,40 +271,22 @@ public class MySQLGraph implements Graph {
     @Override
     public boolean exists(long nodeID) throws PMException {
         MySQLConnection mySQLConnection = new MySQLConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            Connection con = mySQLConnection.getConnection();
-            stmt = con.createStatement();
-            String query = "SELECT * from node where node_id=" + nodeID;
-            rs = stmt.executeQuery(query);
-            List<Node> node = new ArrayList<>();
+        try (            Connection con = mySQLConnection.getConnection();
+                         PreparedStatement ps = con.prepareStatement("SELECT * from node where node_id=?");
+        ){
+            ps.setLong(1, nodeID);
+            ResultSet rs = ps.executeQuery();
+            List<Node> nodes = new ArrayList<>();
             while (rs.next()) {
                 long                id = rs.getInt("node_id");
                 String              name = rs.getString("name");
                 Node cur_node = new Node(id, name, null, null);
-                node.add(cur_node);
-
+                nodes.add(cur_node);
             }
-            if (!node.isEmpty()) {
-                con.close();
-                return true;
-            }
-            con.close();
-            return false;
-
+            return nodes.size() != 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
-
-        } finally {
-            try {
-                if (rs != null) {rs.close();}
-                if (stmt != null) {stmt.close();}
-
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -357,19 +321,18 @@ public class MySQLGraph implements Graph {
     @Override
     public Set<Node> getNodes() throws PMException {
         MySQLConnection mySQLConnection = new MySQLConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
         ResultSet rs_type = null;
         PreparedStatement pstmt = null;
         Node node = null;
         Set<Node> nodes = new HashSet<>();
         List<Long> node_types = new ArrayList<>();
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            stmt = con.createStatement();
-            rs = stmt.executeQuery("SELECT * from node");
+        try (
+                Connection con = mySQLConnection.getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * from node")
 
+        ){
             // return node_type_id instead of numeric value of the node
             long node_type =  0;
             while (rs.next()) {
@@ -416,8 +379,7 @@ public class MySQLGraph implements Graph {
         }
         finally {
             try {
-                if(rs != null) {rs.close();}
-                if (stmt != null) { stmt.close();}
+
                 if(pstmt != null) {pstmt.close();}
                 if(rs_type != null) {rs_type.close();}
 
@@ -431,7 +393,11 @@ public class MySQLGraph implements Graph {
 
     @Override
     public Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException {
-        return null;
+        Set<Node> search = search(name, type, properties);
+        if (search.isEmpty()) {
+            throw new PMException(String.format("a node matching the criteria (%s, %s, %s) does not exist", name, type, properties));
+        }
+        return search.iterator().next();
     }
 
     @Override
@@ -512,34 +478,25 @@ public class MySQLGraph implements Graph {
         }
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
         Set<Long> sources = new HashSet<>();
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            stmt = con.createStatement();
-            String query = "SELECT * from assignment where start_node_id=" + nodeID;
-            rs = stmt.executeQuery(query);
+        try (
+                Connection con = mySQLConnection.getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * from assignment where start_node_id=" + nodeID)
+
+        ){
+
             while (rs.next()) {
                 long              end_node_id = rs.getInt("end_node_id");
                 sources.add(end_node_id);
 
             }
-            con.close();
             return sources;
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
 
-        } finally {
-            try {
-                if (rs != null) {rs.close();}
-                if (stmt != null) {stmt.close();}
-
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -557,34 +514,24 @@ public class MySQLGraph implements Graph {
         }
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
         Set<Long> targets = new HashSet<>();
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            stmt = con.createStatement();
-            String query = "SELECT * from assignment where end_node_id=" + nodeID;
-            rs = stmt.executeQuery(query);
+        try (
+                Connection con = mySQLConnection.getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * from assignment where end_node_id=" + nodeID)
+        ) {
+
             while (rs.next()) {
                 long              start_node_id = rs.getInt("start_node_id");
                 targets.add(start_node_id);
-
             }
-            con.close();
             return targets;
+
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
 
-        } finally {
-            try {
-                if (rs != null) {rs.close();}
-                if (stmt != null) {stmt.close();}
-
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -608,24 +555,18 @@ public class MySQLGraph implements Graph {
         Assignment.checkAssignment(childNode.getType(), parentNode.getType());
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        PreparedStatement ps = null;
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            ps = con.prepareStatement("INSERT into assignment( start_node_id, end_node_id)" +
-                    "VALUES (?, ?)");
+        try (
+                Connection con = mySQLConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement("INSERT into assignment( start_node_id, end_node_id)" +
+                        "VALUES (?, ?)")
+        ) {
             ps.setLong(1, childID);
             ps.setLong(2, parentID);
             ps.executeUpdate();
 
         } catch (SQLException s) {
             s.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) { ps.close();}
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -647,30 +588,21 @@ public class MySQLGraph implements Graph {
         }
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        PreparedStatement ps = null;
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            ps = con.prepareStatement("DELETE from assignment where start_node_id=? AND end_node_id = ?");
+        try (
+                Connection con = mySQLConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement("DELETE from assignment where start_node_id=? AND end_node_id = ?")
+        ) {
+
             ps.setLong(1, childID);
             ps.setLong(2, parentID);
-            if (ps.executeUpdate() == 0) {
-                con.close();
+            int i = ps.executeUpdate();
+            if (i == 0) {
                 throw new IllegalArgumentException("The assignment you want to delete does not exist");
             }
-            ps.executeUpdate();
-            con.close();
-
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
-
-        } finally {
-            try {
-                if (ps != null) {ps.close();}
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -714,11 +646,12 @@ public class MySQLGraph implements Graph {
         Association.checkAssociation(ua.getType(), target.getType());
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        PreparedStatement ps = null;
-        try {
-            Connection con = mySQLConnection.getConnection();
-            ps = con.prepareStatement("INSERT into association( start_node_id, end_node_id, operation_set)" +
-                    "VALUES (?, ?, ?)");
+        try (
+                Connection con = mySQLConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement("INSERT into association( start_node_id, end_node_id, operation_set)" +
+                        "VALUES (?, ?, ?)")
+        ) {
+
             ps.setLong(1, uaID);
             ps.setLong(2, targetID);
 
@@ -733,23 +666,13 @@ public class MySQLGraph implements Graph {
                 }
             }
             int i = ps.executeUpdate();
-            if (i > 0) {
-                con.close();
-            } else {
-                con.close();
+            if (i == 0) {
                 throw new IllegalArgumentException("Something went wrong associating the two nodes.");
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
-
-        } finally {
-            try {
-                if (ps != null) {ps.close();}
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -763,31 +686,21 @@ public class MySQLGraph implements Graph {
     @Override
     public void dissociate(long uaID, long targetID) throws PMException {
         MySQLConnection mySQLConnection = new MySQLConnection();
-        PreparedStatement ps = null;
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            ps = con.prepareStatement("DELETE from association where start_node_id=? AND end_node_id = ?");
+        try (
+                Connection con = mySQLConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement("DELETE from association where start_node_id=? AND end_node_id = ?")
+
+        ) {
             ps.setLong(1, uaID);
             ps.setLong(2, targetID);
             int i = ps.executeUpdate();
-            if (i > 0) {
-                con.close();
-            } else {
-                con.close();
+            if (i == 0) {
                 throw new IllegalArgumentException("The association you want to delete does not exist");
             }
-
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
-
-        } finally {
-            try {
-                if (ps != null) {ps.close();}
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -812,15 +725,14 @@ public class MySQLGraph implements Graph {
         }
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
         Map<Long, OperationSet> sourcesAssoc = new HashMap<>();
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            stmt = con.createStatement();
-            String query = "SELECT * from association where start_node_id=" + sourceID;
-            rs = stmt.executeQuery(query);
+        try (
+                Connection con = mySQLConnection.getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * from association where start_node_id=" + sourceID)
+        ) {
+
             while (rs.next()) {
                 long              end_node_id = rs.getInt("end_node_id");
                 String            operations = rs.getString("operation_set");
@@ -833,20 +745,11 @@ public class MySQLGraph implements Graph {
                 sourcesAssoc.put(end_node_id, operations_set);
 
             }
-            con.close();
             return sourcesAssoc;
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
 
-        } finally {
-            try {
-                if (stmt != null) {stmt.close();}
-                if (rs != null) {rs.close();}
-
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -873,15 +776,13 @@ public class MySQLGraph implements Graph {
         }
 
         MySQLConnection mySQLConnection = new MySQLConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
         Map<Long, OperationSet> targetsAssoc = new HashMap<>();
 
-        try {
-            Connection con = mySQLConnection.getConnection();
-            stmt = con.createStatement();
-            String query = "SELECT * from association where end_node_id=" + targetID;
-            rs = stmt.executeQuery(query);
+        try (
+                Connection con = mySQLConnection.getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * from association where end_node_id=" + targetID)
+        ) {
             while (rs.next()) {
                 long              start_node_id = rs.getInt("start_node_id");
                 String            operations = rs.getString("operation_set");
@@ -893,20 +794,10 @@ public class MySQLGraph implements Graph {
                 operations_set.add(operations);
                 targetsAssoc.put(start_node_id, operations_set);
             }
-            con.close();
             return targetsAssoc;
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
-
-        } finally {
-            try {
-                if (stmt != null) {stmt.close();}
-                if (rs != null) {rs.close();}
-
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 }
