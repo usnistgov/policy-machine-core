@@ -78,7 +78,7 @@ public class Service {
         Node node = pap.getGraphPAP().getNode(target);
         if (node.getType().equals(PC)) {
             if (!node.getProperties().containsKey(REP_PROPERTY)) {
-                throw new PMException("unable to check permissions for policy class " + node.getName() + ", rep_id property not set");
+                throw new PMException("unable to check permissions for policy class " + node.getName() + ", rep property not set");
             }
 
             target = node.getProperties().get(REP_PROPERTY);
