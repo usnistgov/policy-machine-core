@@ -33,8 +33,6 @@ class SuperPolicyTest {
         assertTrue(graph.getParents("super_oa").containsAll(Arrays.asList("super_pc")));
         assertTrue(graph.getParents("super_pc_rep").containsAll(Arrays.asList("super_oa")));
 
-        System.out.println(graph.getSourceAssociations("super_ua1"));
-
         assertTrue(graph.getSourceAssociations("super_ua1").containsKey("super_oa"));
         assertTrue(graph.getSourceAssociations("super_ua2").containsKey("super_ua1"));
     }
