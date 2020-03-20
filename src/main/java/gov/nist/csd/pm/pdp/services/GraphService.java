@@ -253,8 +253,12 @@ public class GraphService extends Service implements Graph {
         }
 
         Node node = getGraphPAP().getNode(name);
+
+        // if the node is a pc the user must have permission on the rep OA of the PC
         if (node.getType().equals(PC)) {
-            return hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getName(), ANY_OPERATIONS);
+            String pcRep = node.getProperties().get(REP_PROPERTY);
+            node = getGraphPAP().getNode(pcRep);
+            return hasPermissions(userCtx, node.getName(), ANY_OPERATIONS);
         }
 
         // node exists, return false if the user does not have access to it.

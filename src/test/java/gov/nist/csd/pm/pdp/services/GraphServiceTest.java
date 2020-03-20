@@ -14,9 +14,25 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GraphServiceTest {
+
+    @Test
+    void testPolicyClassReps() throws PMException {
+        PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), null);
+        Graph graph = pdp.getGraphService(new UserContext("super", ""));
+
+        Node test = graph.createPolicyClass("test", null);
+        String defUA = test.getProperties().get("default_ua");
+        String defOA = test.getProperties().get("default_oa");
+        String repProp = test.getProperties().get(REP_PROPERTY);
+
+        assertTrue(graph.exists(defUA));
+        assertTrue(graph.exists(defOA));
+        assertTrue(graph.exists(repProp));
+    }
 
     @Test
     void test() throws PMException {

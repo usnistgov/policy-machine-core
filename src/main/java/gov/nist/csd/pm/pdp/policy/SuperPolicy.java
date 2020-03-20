@@ -49,8 +49,6 @@ public class SuperPolicy {
     }
 
     public void configure(Graph graph) throws PMException {
-        Map<String, String> filter = Node.toProperties(NAMESPACE_PROPERTY, "super");
-
         String superPCRep = "super_pc_rep";
         if (!graph.exists("super_pc")) {
             Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", REP_PROPERTY, "super_pc_rep");
