@@ -14,6 +14,7 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
@@ -33,6 +34,24 @@ public class MySQLGraph implements Graph {
         return objectMapper.writeValueAsString(set);
     }
 
+    public boolean isNameExists(String name) throws PMException{
+        Collection<Node> all_nodes = getNodes();
+        List<Node> nodes;
+        try {
+            nodes = all_nodes.stream()
+                    .filter(node_k -> node_k.getName().equals(name))
+                    .collect(Collectors.toList());
+            nodes.forEach(System.out::println);
+            if (nodes.size() >= 1) {
+                return true;
+            }
+        } catch (Exception p) {
+            throw new PMException("No nodes in the mysql graph");
+        }
+        return false;
+    }
+
+
     @Override
     public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
         //check for null values
@@ -45,12 +64,14 @@ public class MySQLGraph implements Graph {
         else if (exists(id)) {
             throw new PMException("You cannot create a policy class with that ID, another node with that ID already exists.");
         }
-        //TODO : check names on duplicate entry for db
+        else if (isNameExists(name)){
+            throw new PMException("a node with the name '" + name + "' already exists");
+        }
+
         MySQLConnection conn = new MySQLConnection();
         ResultSet rs_type = null;
         PreparedStatement pstmt = null;
         PreparedStatement ps = null;
-        int nodeId = 0;
         try {
             Connection con = conn.getConnection();
             //====================  NodeType parser : Retrieve node_type_id ====================
@@ -82,7 +103,7 @@ public class MySQLGraph implements Graph {
 
             ps.executeUpdate();
 
-            Node node = new Node(nodeId, name, NodeType.PC, properties);
+            Node node = new Node(id, name, NodeType.PC, properties);
             con.close();
             return node;
         } catch (SQLException s) {
@@ -132,8 +153,9 @@ public class MySQLGraph implements Graph {
         else if (exists(id)) {
             throw new PMException("You cannot create a node with that ID, another node with that ID already exists.");
         }
-        //TODO : check names on duplicate entry for db
-
+        else if (isNameExists(name)){
+            throw new PMException("a node with the name '" + name + "' already exists");
+        }
 
         MySQLConnection conn = new MySQLConnection();
         ResultSet rs_type = null;
