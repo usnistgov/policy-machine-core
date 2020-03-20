@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import java.util.Map;
 
 public class EvrNode {
-    private long                id;
     private String              name;
     private String              type;
     private Map<String, String> properties;
@@ -24,14 +23,6 @@ public class EvrNode {
 
     public EvrNode(EvrProcess process) {
         this.process = process;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -80,12 +71,7 @@ public class EvrNode {
         }
 
         EvrNode n = (EvrNode)o;
-        if(this.id != 0 && n.getId() != 0) {
-            return this.id == n.getId();
-        }
 
-        return this.name.equals(n.getName()) &&
-                this.type.equals(n.getType()) &&
-                this.properties.equals(n.getProperties());
+        return this.name.equals(n.getName());
     }
 }

@@ -30,8 +30,8 @@ class CreateNodeExecutorTest {
         CreateNodeExecutor executor = new CreateNodeExecutor();
 
         EventContext eventContext = null;
-        long user = testCtx.getU1().getID();
-        long process = 0;
+        String user = testCtx.getU1().getName();
+        String process = "";
         PDP pdp = testCtx.getPdp();
         Function function =
                 new Function(

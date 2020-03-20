@@ -28,14 +28,14 @@ class CurrentUserExecutorTest {
         CurrentUserExecutor executor = new CurrentUserExecutor();
 
         EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        long user = testCtx.getU1().getID();
-        long process = 1234;
+        String user = testCtx.getU1().getName();
+        String process = "1234";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
         Node userNode = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
 
         assertNotNull(userNode);
-        assertEquals(user, userNode.getID());
+        assertEquals(user, userNode.getName());
     }
 }

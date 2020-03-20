@@ -51,9 +51,9 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public boolean check(long subjectID, long processID, long targetID, String... perms) throws PMException {
+    public boolean check(String subject, String process, String target, String... perms) throws PMException {
         List<String> permsToCheck = Arrays.asList(perms);
-        Set<String> permissions = list(subjectID, processID, targetID);
+        Set<String> permissions = list(subject, process, target);
 
         //if just checking for any operations, return true if the resulting permissions set is not empty.
         //if the resulting permissions set contains * or all operations, return true.
@@ -74,27 +74,27 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Set<String> list(long subjectID, long processID, long targetID) throws PMException {
+    public Set<String> list(String subject, String process, String target) throws PMException {
         Set<String> perms = new HashSet<>();
 
         // traverse the user side of the graph to get the associations
-        UserContext userCtx = processUserDAG(subjectID, processID);
+        UserContext userCtx = processUserDAG(subject, process);
         if (userCtx.getBorderTargets().isEmpty()) {
             return perms;
         }
 
         // traverse the target side of the graph to get permissions per policy class
-        TargetContext targetCtx = processTargetDAG(targetID, userCtx);
+        TargetContext targetCtx = processTargetDAG(target, userCtx);
 
         // resolve the permissions
         return resolvePermissions(userCtx, targetCtx);
     }
 
     @Override
-    public Set<Long> filter(long subjectID, long processID, Set<Long> nodes, String... perms) {
+    public Set<String> filter(String subject, String process, Set<String> nodes, String... perms) {
         nodes.removeIf(n -> {
             try {
-                return !check(subjectID, processID, n, perms);
+                return !check(subject, process, n, perms);
             }
             catch (PMException e) {
                 return true;
@@ -104,24 +104,24 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Set<Long> getChildren(long subjectID, long processID, long targetID, String... perms) throws PMException {
-        Set<Long> children = graph.getChildren(targetID);
-        return filter(subjectID, processID, children, perms);
+    public Set<String> getChildren(String subject, String process, String target, String... perms) throws PMException {
+        Set<String> children = graph.getChildren(target);
+        return filter(subject, process, children, perms);
     }
 
     @Override
-    public synchronized Map<Long, Set<String>> getAccessibleNodes(long subjectID, long processID) throws PMException {
-        Map<Long, Set<String>> results = new HashMap<>();
+    public synchronized Map<String, Set<String>> getCapabilityList(String subject, String process) throws PMException {
+        Map<String, Set<String>> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no OAs are reachable
-        UserContext userCtx = processUserDAG(subjectID, processID);
+        UserContext userCtx = processUserDAG(subject, process);
         if (userCtx.getBorderTargets().isEmpty()) {
             return results;
         }
 
-        for(Long borderTargetID : userCtx.getBorderTargets().keySet()) {
-            Set<Long> objects = getAscendants(graph.getNode(borderTargetID).getID());
-            for (long object : objects) {
+        for(String borderTarget : userCtx.getBorderTargets().keySet()) {
+            Set<String> objects = getAscendants(graph.getNode(borderTarget).getName());
+            for (String object : objects) {
                 // run dfs on the object
                 TargetContext targetCtx = processTargetDAG(object, userCtx);
 
@@ -134,41 +134,23 @@ public class PReviewDecider implements Decider {
     }
 
     @Override
-    public Map<Long, Set<String>> generateACL(long oaID, long processID) {
-        Map<Long, Set<String>> currNodes = new HashMap<>();
-        try {
-            Map<Long, OperationSet> targetAssociations = graph.getTargetAssociations(oaID);
-            for (long id: targetAssociations.keySet()) {
-                generateACLRecursiveHelper(id, targetAssociations.get(id), targetAssociations, currNodes);
-            }
-        } catch (PMException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+    public Map<String, Set<String>> generateACL(String target, String process) throws PMException {
+        Map<String, Set<String>> acl = new HashMap<>();
+        Set<Node> search = graph.search(U, null);
+        for (Node user : search) {
+            Set<String> list = list(user.getName(), process, target);
+            acl.put(user.getName(), list);
         }
-        return currNodes;
-    }
 
-    private void generateACLRecursiveHelper (long id, Set<String> perms, Map<Long, OperationSet> targetAssociations, Map<Long, Set<String>> nodesWPerms) throws PMException {
-        if (nodesWPerms.get(id) == null) {
-            nodesWPerms.put(id, perms);
-            for (long child : graph.getChildren(id)) {
-                HashSet<String> childPerms = new HashSet<>(perms);
-                Set<String> fromAssoc = targetAssociations.get(child);
-                if (fromAssoc != null) {
-                    childPerms.addAll(fromAssoc);
-                }
-//                System.out.println(childPerms);
-                generateACLRecursiveHelper(child, childPerms, targetAssociations, nodesWPerms);
-            }
-        }
+        return acl;
     }
 
     private HashSet<String> resolvePermissions(UserContext userContext, TargetContext targetCtx) {
-        Map<Long, Set<String>> pcMap = targetCtx.getPcSet();
+        Map<String, Set<String>> pcMap = targetCtx.getPcSet();
 
         HashSet<String> inter = new HashSet<>();
         boolean first = true;
-        for (long pc : pcMap.keySet()) {
+        for (String pc : pcMap.keySet()) {
             Set<String> ops = pcMap.get(pc);
             if(first) {
                 inter.addAll(ops);
@@ -208,17 +190,17 @@ public class PReviewDecider implements Decider {
         Set<String> denied = new HashSet<>();
 
         Set<Prohibition> prohibitions = userCtx.getProhibitions();
-        Map<Prohibition, Set<Long>> reachedProhibitedTargets = targetCtx.getReachedProhibitedTargets();
+        Map<Prohibition, Set<String>> reachedProhibitedTargets = targetCtx.getReachedProhibitedTargets();
 
         for(Prohibition p : prohibitions) {
             boolean inter = p.isIntersection();
             List<Prohibition.Node> nodes = p.getNodes();
-            Set<Long> reachedTargets = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
+            Set<String> reachedTargets = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
 
             boolean addOps = false;
             for (Prohibition.Node n : nodes) {
-                if (!n.isComplement() && reachedTargets.contains(n.getID()) ||
-                        n.isComplement() && !reachedTargets.contains(n.getID())) {
+                if (!n.isComplement() && reachedTargets.contains(n.getName()) ||
+                        n.isComplement() && !reachedTargets.contains(n.getName())) {
                     addOps = true;
 
                     // if the prohibition is not intersection, one satisfied container condition means
@@ -252,38 +234,38 @@ public class PReviewDecider implements Decider {
      * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
      * each policy class.
      *
-     * @param targetID      the ID of the current target node.
+     * @param target      the name of the current target node.
      */
-    private TargetContext processTargetDAG(long targetID, UserContext userCtx) throws PMException {
-        Map<Long, Set<String>> borderTargets = userCtx.getBorderTargets();
-        Map<Long, List<Prohibition>> prohibitedTargets = userCtx.getProhibitedTargets();
+    private TargetContext processTargetDAG(String target, UserContext userCtx) throws PMException {
+        Map<String, Set<String>> borderTargets = userCtx.getBorderTargets();
+        Map<String, List<Prohibition>> prohibitedTargets = userCtx.getProhibitedTargets();
 
-        Map<Long, Map<Long, Set<String>>> visitedNodes = new HashMap<>();
-        Map<Prohibition, Set<Long>> reachedProhibitedTargets = new HashMap<>();
+        Map<String, Map<String, Set<String>>> visitedNodes = new HashMap<>();
+        Map<Prohibition, Set<String>> reachedProhibitedTargets = new HashMap<>();
 
         Visitor visitor = node -> {
             // add this node to reached prohibited targets if it has any prohibitions
-            if(prohibitedTargets.containsKey(node.getID()) && node.getID() != targetID) {
-                List<Prohibition> pros = prohibitedTargets.get(node.getID());
+            if(prohibitedTargets.containsKey(node.getName()) && !node.getName().equals(target)) {
+                List<Prohibition> pros = prohibitedTargets.get(node.getName());
                 for(Prohibition p : pros) {
-                    Set<Long> r = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
-                    r.add(node.getID());
+                    Set<String> r = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
+                    r.add(node.getName());
 
                     reachedProhibitedTargets.put(p, r);
                 }
             }
 
-            Map<Long, Set<String>> nodeCtx = visitedNodes.getOrDefault(node.getID(), new HashMap<>());
+            Map<String, Set<String>> nodeCtx = visitedNodes.getOrDefault(node.getName(), new HashMap<>());
             if (nodeCtx.isEmpty()) {
-                visitedNodes.put(node.getID(), nodeCtx);
+                visitedNodes.put(node.getName(), nodeCtx);
             }
 
             if (node.getType().equals(NodeType.PC)) {
-                nodeCtx.put(node.getID(), new HashSet<>());
+                nodeCtx.put(node.getName(), new HashSet<>());
             } else {
-                if (borderTargets.containsKey(node.getID())) {
-                    Set<String> uaOps = borderTargets.get(node.getID());
-                    for (Long pc : nodeCtx.keySet()) {
+                if (borderTargets.containsKey(node.getName())) {
+                    Set<String> uaOps = borderTargets.get(node.getName());
+                    for (String pc : nodeCtx.keySet()) {
                         Set<String> pcOps = nodeCtx.getOrDefault(pc, new HashSet<>());
                         pcOps.addAll(uaOps);
                         nodeCtx.put(pc, pcOps);
@@ -293,20 +275,20 @@ public class PReviewDecider implements Decider {
         };
 
         Propagator propagator = (parent, child) -> {
-            Map<Long, Set<String>> parentCtx = visitedNodes.get(parent.getID());
-            Map<Long, Set<String>> nodeCtx = visitedNodes.getOrDefault(child.getID(), new HashMap<>());
-            for (Long id : parentCtx.keySet()) {
-                Set<String> ops = nodeCtx.getOrDefault(id, new HashSet<>());
-                ops.addAll(parentCtx.get(id));
-                nodeCtx.put(id, ops);
+            Map<String, Set<String>> parentCtx = visitedNodes.get(parent.getName());
+            Map<String, Set<String>> nodeCtx = visitedNodes.getOrDefault(child.getName(), new HashMap<>());
+            for (String name : parentCtx.keySet()) {
+                Set<String> ops = nodeCtx.getOrDefault(name, new HashSet<>());
+                ops.addAll(parentCtx.get(name));
+                nodeCtx.put(name, ops);
             }
-            visitedNodes.put(child.getID(), nodeCtx);
+            visitedNodes.put(child.getName(), nodeCtx);
         };
 
         DepthFirstSearcher searcher = new DepthFirstSearcher(graph);
-        searcher.traverse(graph.getNode(targetID), propagator, visitor);
+        searcher.traverse(graph.getNode(target), propagator, visitor);
 
-        return new TargetContext(visitedNodes.get(targetID), reachedProhibitedTargets);
+        return new TargetContext(visitedNodes.get(target), reachedProhibitedTargets);
     }
 
     /**
@@ -318,44 +300,44 @@ public class PReviewDecider implements Decider {
      *
      * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
      */
-    private UserContext processUserDAG(long subjectID, long processID) throws PMException {
+    private UserContext processUserDAG(String subject, String process) throws PMException {
         BreadthFirstSearcher searcher = new BreadthFirstSearcher(graph);
 
-        Node start = graph.getNode(subjectID);
+        Node start = graph.getNode(subject);
 
-        final Map<Long, Set<String>> borderTargets = new HashMap<>();
+        final Map<String, Set<String>> borderTargets = new HashMap<>();
         final Set<Prohibition> prohibitions = new HashSet<>();
-        final Map<Long, List<Prohibition>> prohibitedTargets = getProhibitionTargets(processID);
-        for(Long l : prohibitedTargets.keySet()) {
+        final Map<String, List<Prohibition>> prohibitedTargets = getProhibitionTargets(process);
+        for(String l : prohibitedTargets.keySet()) {
             prohibitions.addAll(prohibitedTargets.get(l));
         }
 
         // if the start node is an UA, get it's associations
         if (start.getType() == UA) {
-            Map<Long, OperationSet> assocs = graph.getSourceAssociations(start.getID());
+            Map<String, OperationSet> assocs = graph.getSourceAssociations(start.getName());
             collectAssociations(assocs, borderTargets);
         }
 
         Visitor visitor = node -> {
-            Map<Long, List<Prohibition>> pts = getProhibitionTargets(node.getID());
-            for (Long ptsID : pts.keySet()) {
-                List<Prohibition> pros = prohibitedTargets.getOrDefault(ptsID, new ArrayList<>());
-                pros.addAll(pts.get(ptsID));
-                prohibitedTargets.put(ptsID, pros);
+            Map<String, List<Prohibition>> pts = getProhibitionTargets(node.getName());
+            for (String ptsName : pts.keySet()) {
+                List<Prohibition> pros = prohibitedTargets.getOrDefault(ptsName, new ArrayList<>());
+                pros.addAll(pts.get(ptsName));
+                prohibitedTargets.put(ptsName, pros);
             }
 
             // add any new prohibitions that were reached
-            for(Long l : pts.keySet()) {
+            for(String l : pts.keySet()) {
                 prohibitions.addAll(pts.get(l));
             }
 
             //get the parents of the subject to start bfs on user side
-            Set<Long> parents = graph.getParents(node.getID());
+            Set<String> parents = graph.getParents(node.getName());
             while (!parents.isEmpty()) {
-                Long parentNode = parents.iterator().next();
+                String parentNode = parents.iterator().next();
 
                 //get the associations the current parent node is the source of
-                Map<Long, OperationSet> assocs = graph.getSourceAssociations(parentNode);
+                Map<String, OperationSet> assocs = graph.getSourceAssociations(parentNode);
 
                 //collect the target and operation information for each association
                 collectAssociations(assocs, borderTargets);
@@ -377,17 +359,17 @@ public class PReviewDecider implements Decider {
         return new UserContext(borderTargets, prohibitedTargets, prohibitions);
     }
 
-    private void collectAssociations(Map<Long, OperationSet> assocs, Map<Long, Set<String>> borderTargets) {
-        for (long targetID : assocs.keySet()) {
-            Set<String> ops = assocs.get(targetID);
-            Set<String> exOps = borderTargets.get(targetID);
+    private void collectAssociations(Map<String, OperationSet> assocs, Map<String, Set<String>> borderTargets) {
+        for (String target : assocs.keySet()) {
+            Set<String> ops = assocs.get(target);
+            Set<String> exOps = borderTargets.get(target);
             //if the target is not in the map already, put it
             //else add the found operations to the existing ones.
             if (exOps == null) {
-                borderTargets.put(targetID, ops);
+                borderTargets.put(target, ops);
             } else {
                 ops.addAll(exOps);
-                borderTargets.put(targetID, ops);
+                borderTargets.put(target, ops);
             }
         }
     }
@@ -396,31 +378,31 @@ public class PReviewDecider implements Decider {
      * Get the prohibitions that the subject is apart of.  Return all of the targets of those prohibitions
      * and which prohibitions pertain to which target.
      */
-    private Map<Long, List<Prohibition>> getProhibitionTargets(long subjectID) throws PMException {
-        List<Prohibition> pros = prohibitions.getProhibitionsFor(subjectID);
-        Map<Long, List<Prohibition>> prohibitionTargets = new HashMap<>();
+    private Map<String, List<Prohibition>> getProhibitionTargets(String subject) throws PMException {
+        List<Prohibition> pros = prohibitions.getProhibitionsFor(subject);
+        Map<String, List<Prohibition>> prohibitionTargets = new HashMap<>();
         for(Prohibition p : pros) {
             for(Prohibition.Node n : p.getNodes()) {
-                List<Prohibition> exPs = prohibitionTargets.getOrDefault(n.getID(), new ArrayList<>());
+                List<Prohibition> exPs = prohibitionTargets.getOrDefault(n.getName(), new ArrayList<>());
                 exPs.add(p);
-                prohibitionTargets.put(n.getID(), exPs);
+                prohibitionTargets.put(n.getName(), exPs);
             }
         }
 
         return prohibitionTargets;
     }
 
-    private Set<Long> getAscendants(Long vNode) throws PMException {
-        Set<Long> ascendants = new HashSet<>();
+    private Set<String> getAscendants(String vNode) throws PMException {
+        Set<String> ascendants = new HashSet<>();
         ascendants.add(vNode);
 
-        Set<Long> children = graph.getChildren(vNode);
+        Set<String> children = graph.getChildren(vNode);
         if (children.isEmpty()) {
             return ascendants;
         }
 
         ascendants.addAll(children);
-        for (Long child : children) {
+        for (String child : children) {
             ascendants.addAll(getAscendants(child));
         }
 
@@ -428,21 +410,21 @@ public class PReviewDecider implements Decider {
     }
 
     private static class UserContext {
-        private Map<Long, Set<String>> borderTargets;
-        private Map<Long, List<Prohibition>> prohibitedTargets;
+        private Map<String, Set<String>> borderTargets;
+        private Map<String, List<Prohibition>> prohibitedTargets;
         private Set<Prohibition> prohibitions;
 
-        UserContext(Map<Long, Set<String>> borderTargets, Map<Long, List<Prohibition>> prohibitedTargets, Set<Prohibition> prohibitions) {
+        UserContext(Map<String, Set<String>> borderTargets, Map<String, List<Prohibition>> prohibitedTargets, Set<Prohibition> prohibitions) {
             this.borderTargets = borderTargets;
             this.prohibitedTargets = prohibitedTargets;
             this.prohibitions = prohibitions;
         }
 
-        Map<Long, Set<String>> getBorderTargets() {
+        Map<String, Set<String>> getBorderTargets() {
             return borderTargets;
         }
 
-        Map<Long, List<Prohibition>> getProhibitedTargets() {
+        Map<String, List<Prohibition>> getProhibitedTargets() {
             return prohibitedTargets;
         }
 
@@ -452,19 +434,19 @@ public class PReviewDecider implements Decider {
     }
 
     private static class TargetContext {
-        Map<Long, Set<String>> pcSet;
-        Map<Prohibition, Set<Long>> reachedProhibitedTargets;
+        Map<String, Set<String>> pcSet;
+        Map<Prohibition, Set<String>> reachedProhibitedTargets;
 
-        TargetContext(Map<Long, Set<String>> pcSet, Map<Prohibition, Set<Long>> reachedProhibitedTargets) {
+        TargetContext(Map<String, Set<String>> pcSet, Map<Prohibition, Set<String>> reachedProhibitedTargets) {
             this.pcSet = pcSet;
             this.reachedProhibitedTargets = reachedProhibitedTargets;
         }
 
-        Map<Long, Set<String>> getPcSet() {
+        Map<String, Set<String>> getPcSet() {
             return pcSet;
         }
 
-        Map<Prohibition, Set<Long>> getReachedProhibitedTargets() {
+        Map<Prohibition, Set<String>> getReachedProhibitedTargets() {
             return reachedProhibitedTargets;
         }
     }

@@ -39,10 +39,10 @@ public interface Prohibitions {
     /**
      * Get all of the prohibitions a given entity is the direct subject of.  The subject can be a user, user attribute,
      * or process.
-     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @param subject the name of the subject to get the prohibitions for.
      * @return The list of prohibitions the given entity is the subject of.
      */
-    List<Prohibition> getProhibitionsFor(long subjectID) throws PMException;
+    List<Prohibition> getProhibitionsFor(String subject) throws PMException;
 
     /**
      * Update the given prohibition.  The name of the prohibition is provided in the parameter.

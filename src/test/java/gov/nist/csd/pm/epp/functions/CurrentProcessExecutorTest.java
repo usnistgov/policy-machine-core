@@ -5,10 +5,8 @@ import gov.nist.csd.pm.epp.events.AssignEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,15 +26,15 @@ class CurrentProcessExecutorTest {
         CurrentProcessExecutor executor = new CurrentProcessExecutor();
 
         EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        long user = testCtx.getU1().getID();
-        long process = 1234;
+        String user = testCtx.getU1().getName();
+        String process = "1234";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
         Prohibition.Subject result = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
 
         assertNotNull(result);
-        assertEquals(1234, result.getSubjectID());
+        assertEquals("1234", result.getSubject());
         assertEquals(Prohibition.Subject.Type.PROCESS, result.getSubjectType());
     }
 }

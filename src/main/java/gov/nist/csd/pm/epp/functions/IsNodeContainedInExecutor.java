@@ -22,7 +22,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Boolean exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Boolean exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List< Arg > args = function.getArgs();
         if (args.size() != numParams()) {
             throw new PMException(getFunctionName() + " expected " + numParams() + " parameters but got " + args.size());
@@ -34,7 +34,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node childNode = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, f);
+        Node childNode = functionEvaluator.evalNode(eventCtx, user, process, pdp, f);
         if(childNode == null) {
             return false;
         }
@@ -45,11 +45,11 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node parentNode = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, f);
+        Node parentNode = functionEvaluator.evalNode(eventCtx, user, process, pdp, f);
         if(parentNode == null) {
             return false;
         }
 
-        return pdp.getPAP().getGraphPAP().getChildren(parentNode.getID()).contains(childNode.getID());
+        return pdp.getPAP().getGraphPAP().getChildren(parentNode.getName()).contains(childNode.getName());
     }
 }

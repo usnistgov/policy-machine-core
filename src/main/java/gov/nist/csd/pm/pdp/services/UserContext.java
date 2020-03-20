@@ -1,19 +1,19 @@
 package gov.nist.csd.pm.pdp.services;
 
 public class UserContext {
-    private long userID;
-    private long processID;
+    private String user;
+    private String process;
 
-    public UserContext(long userID, long processID) {
-        this.userID = userID;
-        this.processID = processID;
+    public UserContext(String user, String process) {
+        this.user = user;
+        this.process = process;
     }
 
-    public long getUserID() {
-        return userID;
+    public String getUser() {
+        return user;
     }
 
-    public long getProcessID() {
-        return processID;
+    public String getProcess() {
+        return process;
     }
 }

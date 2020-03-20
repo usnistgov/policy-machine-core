@@ -25,7 +25,6 @@ public class GraphSerializer {
      * {
      *   "nodes": [
      *     {
-     *       "id": 1,
      *       "name": "pc1",
      *       "type": "PC",
      *       "properties": {}
@@ -34,8 +33,8 @@ public class GraphSerializer {
      *   ],
      *   "assignments": [
      *     {
-     *       "sourceID": 2,
-     *       "targetID": 1
+     *       "source": "ua",
+     *       "target": "pc"
      *     },
      *     ...
      *   ],
@@ -45,8 +44,8 @@ public class GraphSerializer {
      *         "read",
      *         "write"
      *       ],
-     *       "sourceID": 4,
-     *       "targetID": 2
+     *       "source": "ua",
+     *       "target": "oa"
      *     }
      *   ]
      * }
@@ -63,18 +62,18 @@ public class GraphSerializer {
         HashSet<Assignment> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
-            Set<Long> parents = graph.getParents(node.getID());
+            Set<String> parents = graph.getParents(node.getName());
 
-            for (Long parent : parents) {
-                jsonAssignments.add(new Assignment(node.getID(), parent));
+            for (String parent : parents) {
+                jsonAssignments.add(new Assignment(node.getName(), parent));
             }
 
-            Map<Long, OperationSet> associations = graph.getSourceAssociations(node.getID());
-            for (long targetID : associations.keySet()) {
-                OperationSet ops = associations.get(targetID);
-                Node targetNode = graph.getNode(targetID);
+            Map<String, OperationSet> associations = graph.getSourceAssociations(node.getName());
+            for (String target : associations.keySet()) {
+                OperationSet ops = associations.get(target);
+                Node targetNode = graph.getNode(target);
 
-                jsonAssociations.add(new JsonAssociation(node.getID(), targetNode.getID(), ops));
+                jsonAssociations.add(new JsonAssociation(node.getName(), targetNode.getName(), ops));
             }
         }
 
@@ -93,29 +92,29 @@ public class GraphSerializer {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
 
         Collection<Node> nodes = jsonGraph.getNodes();
-        Map<Long, Node> nodesMap = new HashMap<>();
+        Map<String, Node> nodesMap = new HashMap<>();
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
-                graph.createPolicyClass(node.getID(), node.getName(), node.getProperties());
+                graph.createPolicyClass(node.getName(), node.getProperties());
             } else {
-                nodesMap.put(node.getID(), node);
+                nodesMap.put(node.getName(), node);
             }
         }
 
         List<Assignment> assignments = new ArrayList<>(jsonGraph.getAssignments());
         while (!assignments.isEmpty()) {
             Assignment assignment = assignments.get(0);
-            long sourceID = assignment.getSourceID();
-            long targetID = assignment.getTargetID();
+            String source = assignment.getSource();
+            String target = assignment.getTarget();
 
-            if (graph.exists(targetID)) {
+            if (graph.exists(target)) {
                 // create the source if it does not exist
-                if (!graph.exists(sourceID)) {
-                    Node node = nodesMap.get(sourceID);
-                    graph.createNode(node.getID(), node.getName(), node.getType(), node.getProperties(), targetID);
+                if (!graph.exists(source)) {
+                    Node node = nodesMap.get(source);
+                    graph.createNode(node.getName(), node.getType(), node.getProperties(), target);
                     assignments.remove(assignment);
                 } else {
-                    graph.assign(sourceID, targetID);
+                    graph.assign(source, target);
                     assignments.remove(assignment);
                 }
                 continue;
@@ -127,9 +126,9 @@ public class GraphSerializer {
 
         Set<JsonAssociation> associations = jsonGraph.getAssociations();
         for (JsonAssociation association : associations) {
-            long uaID = association.getSourceID();
-            long targetID = association.getTargetID();
-            graph.associate(uaID, targetID, new OperationSet(association.getOperations()));
+            String ua = association.getSource();
+            String target = association.getTarget();
+            graph.associate(ua, target, new OperationSet(association.getOperations()));
         }
     }
 
@@ -158,22 +157,22 @@ public class GraphSerializer {
     }
 
     private static class JsonAssociation {
-        long sourceID;
-        long targetID;
+        String source;
+        String target;
         Set<String> operations;
 
-        public JsonAssociation(long sourceID, long targetID, Set<String> operations) {
-            this.sourceID = sourceID;
-            this.targetID = targetID;
+        public JsonAssociation(String source, String target, Set<String> operations) {
+            this.source = source;
+            this.target = target;
             this.operations = operations;
         }
 
-        public long getSourceID() {
-            return sourceID;
+        public String getSource() {
+            return source;
         }
 
-        public long getTargetID() {
-            return targetID;
+        public String getTarget() {
+            return target;
         }
 
         public Set<String> getOperations() {
@@ -186,60 +185,60 @@ public class GraphSerializer {
 
         List<String> assignmentCmds = new ArrayList<>();
 
-        Set<Node> search = graph.search(null, PC, null);
+        Set<Node> search = graph.search(PC, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
         }
 
         s += "\n";
-        search = graph.search(null, U, null);
+        search = graph.search(U, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
 
-            Set<Long> parents = graph.getParents(node.getID());
-            for (long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
-                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
+            Set<String> parents = graph.getParents(node.getName());
+            for (String parent : parents) {
+                Node parentNode = graph.getNode(parent);
+                assignmentCmds.add("assign " + node.getName() + " " + parentNode.getName() + "\n");
             }
         }
 
         s += "\n";
-        search = graph.search(null, UA, null);
+        search = graph.search(UA, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
-            Set<Long> parents = graph.getParents(node.getID());
-            for (long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
-                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
+            Set<String> parents = graph.getParents(node.getName());
+            for (String parent : parents) {
+                Node parentNode = graph.getNode(parent);
+                assignmentCmds.add("assign " + node.getName() + " " + parentNode.getName() + "\n");
             }
         }
 
         s += "\n";
-        search = graph.search(null, O, null);
+        search = graph.search(O, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
 
-            Set<Long> parents = graph.getParents(node.getID());
-            for (long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
-                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
+            Set<String> parents = graph.getParents(node.getName());
+            for (String parent : parents) {
+                Node parentNode = graph.getNode(parent);
+                assignmentCmds.add("assign " + node.getName() + " " + parentNode.getName() + "\n");
             }
         }
 
         s += "\n";
-        search = graph.search(null, OA, null);
+        search = graph.search(OA, null);
         for (Node node : search) {
             s += "node " + node.getType() + " " + node.getName() + " " +
                     (node.getProperties().isEmpty() ? "" : node.getProperties().toString().replaceAll(", ", ",")) + "\n";
 
-            Set<Long> parents = graph.getParents(node.getID());
-            for (long parentID : parents) {
-                Node parentNode = graph.getNode(parentID);
-                assignmentCmds.add("assign " + node.getType() + ":" + node.getName() + " " + parentNode.getType() + ":" + parentNode.getName() + "\n");
+            Set<String> parents = graph.getParents(node.getName());
+            for (String parent : parents) {
+                Node parentNode = graph.getNode(parent);
+                assignmentCmds.add("assign " + node.getName() + " " + parentNode.getName() + "\n");
             }
         }
 
@@ -251,13 +250,11 @@ public class GraphSerializer {
 
         s += "\n# associations\n";
         for (Node node : nodes) {
-            Map<Long, OperationSet> assocs = graph.getSourceAssociations(node.getID());
-            for (Long targetID : assocs.keySet()) {
-                Node targetNode = graph.getNode(targetID);
-                s += "assoc " +
-                        node.getType() + ":" + node.getName() + " " +
-                        targetNode.getType() + ":" + targetNode.getName() + " " +
-                        assocs.get(targetID).toString() + "\n";
+            Map<String, OperationSet> assocs = graph.getSourceAssociations(node.getName());
+            for (String target : assocs.keySet()) {
+                Node targetNode = graph.getNode(target);
+                s += "assoc " + node.getName() + " " + targetNode.getName() + " " +
+                        assocs.get(target).toString() + "\n";
             }
             s += "\n";
         }
@@ -265,26 +262,30 @@ public class GraphSerializer {
         return s;
     }
 
+    /**
+     * Convert a string with the more readable configuration format generated by serialize above to a Graph. All names
+     * must be unique and given the nature of the data format there must be no spaces.
+     * @param graph the graph to load the configuration into.
+     * @param str the configuration.
+     * @return The graph with the loaded configuration.
+     */
     public static Graph deserialize(Graph graph, String str) throws PMException {
         Scanner sc = new Scanner(str);
-        Random rand = new Random();
 
-        Map<String, Long> ids = new HashMap<>();
-        Map<Long, Node> nodesMap = new HashMap<>();
+        Map<String, Node> nodesMap = new HashMap<>();
         List<Assignment> assignments = new ArrayList<>();
         List<Association> associations = new ArrayList<>();
         List<Node> pcs = new ArrayList<>();
 
         // load any existing nodes
-        Set<Long> policyClasses = graph.getPolicyClasses();
-        for (Long id : policyClasses) {
-            pcs.add(graph.getNode(id));
+        Set<String> policyClasses = graph.getPolicyClasses();
+        for (String name : policyClasses) {
+            pcs.add(graph.getNode(name));
         }
 
         Set<Node> nodes = graph.getNodes();
         for (Node node : nodes) {
-            ids.put(node.getType() + ":" + node.getName(), node.getID());
-            nodesMap.put(node.getID(), node);
+            nodesMap.put(node.getName(), node);
         }
 
         while (sc.hasNextLine()) {
@@ -328,100 +329,60 @@ public class GraphSerializer {
                         }
                     }
 
-                    long id = rand.nextLong();
-                    Node node = new Node(id, name, NodeType.valueOf(type), propsMap);
-                    nodesMap.put(id, new Node(id, name, NodeType.valueOf(type), propsMap));
-                    ids.put(node.getType() + ":" + node.getName(), node.getID());
+                    Node node = new Node(name, NodeType.valueOf(type), propsMap);
+                    nodesMap.put(name, new Node(name, NodeType.valueOf(type), propsMap));
                     if (node.getType().equals(PC)) {
                         pcs.add(node);
                     }
                     break;
                 case "assign":
-                    if (pieces.length < 3) {
-                        throw new PMException("invalid assign command: " + line);
+                    if (pieces.length != 3) {
+                        throw new PMException("invalid assign command (expected only 3 tokens got " + pieces.length + ": " + line);
                     }
 
-                    name = pieces[1];
-                    for (i = 2; i < pieces.length; i++) {
-                        String piece = pieces[i];
-                        if (piece.contains(":")) {
-                            break;
-                        }
+                    String child = pieces[1];
+                    String parent = pieces[2];
 
-                        name += " " + piece;
-                    }
-                    long childID = ids.get(name);
-
-                    name = pieces[i];
-                    i++;
-                    for (int j = i; j < pieces.length; j++) {
-                        String piece = pieces[j];
-                        name += " " + piece;
-                    }
-                    long parentID = ids.get(name);
-
-                    assignments.add(new Assignment(childID, parentID));
-
+                    assignments.add(new Assignment(child, parent));
                     break;
                 case "assoc":
                     if (pieces.length < 4) {
                         throw new PMException("invalid assoc command: " + line);
                     }
 
-                    name = pieces[1];
-                    for (i = 2; i < pieces.length; i++) {
-                        String piece = pieces[i];
-                        if (piece.contains(":")) {
-                            break;
-                        }
-
-                        name += " " + piece;
-                    }
-                    long uaID = ids.get(name);
-
-                    name = pieces[i];
-                    i++;
-                    for (int j = i; j < pieces.length; j++) {
-                        String piece = pieces[j];
-                        if (piece.contains("[")) {
-                            break;
-                        }
-
-                        name += " " + piece;
-                    }
-                    long targetID = ids.get(name);
+                    String ua = pieces[1];
+                    String target = pieces[2];
 
                     String opsStr = line.substring(line.indexOf("[")+1, line.lastIndexOf("]"));
                     String[] ops = opsStr.split("(,\\s+)");
 
-                    associations.add(new Association(uaID, targetID, new OperationSet(ops)));
-
+                    associations.add(new Association(ua, target, new OperationSet(ops)));
                     break;
             }
         }
 
         // create policy class nodes
         for (Node node : pcs) {
-            if (graph.getPolicyClasses().contains(node.getID())) {
+            if (graph.getPolicyClasses().contains(node.getName())) {
                 continue;
             }
 
-            graph.createPolicyClass(node.getID(), node.getName(), node.getProperties());
+            graph.createPolicyClass(node.getName(), node.getProperties());
         }
 
         while (!assignments.isEmpty()) {
             Assignment assignment = assignments.get(0);
-            long sourceID = assignment.getSourceID();
-            long targetID = assignment.getTargetID();
+            String source = assignment.getSource();
+            String target = assignment.getTarget();
 
-            if (graph.exists(targetID)) {
+            if (graph.exists(target)) {
                 // create the source if it does not exist
-                if (!graph.exists(sourceID)) {
-                    Node node = nodesMap.get(sourceID);
-                    graph.createNode(node.getID(), node.getName(), node.getType(), node.getProperties(), targetID);
+                if (!graph.exists(source)) {
+                    Node node = nodesMap.get(source);
+                    graph.createNode(node.getName(), node.getType(), node.getProperties(), target);
                     assignments.remove(assignment);
                 } else {
-                    graph.assign(sourceID, targetID);
+                    graph.assign(source, target);
                     assignments.remove(assignment);
                 }
                 continue;
@@ -432,7 +393,7 @@ public class GraphSerializer {
         }
 
         for (Association association : associations) {
-            graph.associate(association.getSourceID(), association.getTargetID(), association.getOperations());
+            graph.associate(association.getSource(), association.getTarget(), association.getOperations());
         }
 
         return graph;

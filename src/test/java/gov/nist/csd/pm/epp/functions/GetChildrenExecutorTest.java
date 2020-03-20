@@ -33,15 +33,15 @@ class GetChildrenExecutorTest {
         GetChildrenExecutor executor = new GetChildrenExecutor();
 
         EventContext eventContext = new AssignToEvent(testCtx.getOa1(), testCtx.getO1());
-        long user = testCtx.getU1().getID();
-        long process = 1234;
+        String user = testCtx.getU1().getName();
+        String process = "1234";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
-        List<Long> children = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        List<String> children = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
 
         assertNotNull(children);
-        assertEquals(Arrays.asList(testCtx.getO1().getID()), children);
+        assertEquals(Arrays.asList(testCtx.getO1().getName()), children);
     }
 }
