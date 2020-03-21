@@ -11,6 +11,7 @@ import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -194,13 +195,14 @@ public class PReviewDecider implements Decider {
 
         for(Prohibition p : prohibitions) {
             boolean inter = p.isIntersection();
-            List<Prohibition.Node> nodes = p.getNodes();
+            Map<String, Boolean> containers = p.getContainers();
             Set<String> reachedTargets = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
 
             boolean addOps = false;
-            for (Prohibition.Node n : nodes) {
-                if (!n.isComplement() && reachedTargets.contains(n.getName()) ||
-                        n.isComplement() && !reachedTargets.contains(n.getName())) {
+            for (String contName : containers.keySet()) {
+                boolean isComplement = containers.get(contName);
+                if (!isComplement && reachedTargets.contains(contName) ||
+                        isComplement && !reachedTargets.contains(contName)) {
                     addOps = true;
 
                     // if the prohibition is not intersection, one satisfied container condition means
@@ -382,10 +384,10 @@ public class PReviewDecider implements Decider {
         List<Prohibition> pros = prohibitions.getProhibitionsFor(subject);
         Map<String, List<Prohibition>> prohibitionTargets = new HashMap<>();
         for(Prohibition p : pros) {
-            for(Prohibition.Node n : p.getNodes()) {
-                List<Prohibition> exPs = prohibitionTargets.getOrDefault(n.getName(), new ArrayList<>());
+            for(String contName : p.getContainers().keySet()) {
+                List<Prohibition> exPs = prohibitionTargets.getOrDefault(contName, new ArrayList<>());
                 exPs.add(p);
-                prohibitionTargets.put(n.getName(), exPs);
+                prohibitionTargets.put(contName, exPs);
             }
         }
 

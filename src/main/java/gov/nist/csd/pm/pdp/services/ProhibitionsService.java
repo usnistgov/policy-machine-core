@@ -7,11 +7,10 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
 
@@ -28,8 +27,6 @@ public class ProhibitionsService extends Service implements Prohibitions {
     @Override
     public void add(Prohibition prohibition) throws PMException {
         String name = prohibition.getName();
-        Prohibition.Subject subject = prohibition.getSubject();
-        List<Prohibition.Node> nodes = prohibition.getNodes();
 
         //check that the prohibition name is not null or empty
         if(name == null || name.isEmpty()) {
@@ -43,22 +40,9 @@ public class ProhibitionsService extends Service implements Prohibitions {
             }
         }
 
-        //check the user can create a prohibition on the subject and the nodes
-        Decider decider = getDecider();
-        if(subject.getSubjectType().equals(Prohibition.Subject.Type.USER) || subject.getSubjectType().equals(Prohibition.Subject.Type.USER_ATTRIBUTE)) {
-            // first check that the subject exists
-            if(!getGraphPAP().exists(subject.getSubject())) {
-                throw new PMException(String.format("node with name %s and type %s does not exist", subject.getSubject(), subject.getSubjectType()));
-            }
-            if(!decider.check(userCtx.getUser(), userCtx.getProcess(), subject.getSubject(), CREATE_PROHIBITION)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", subject.getSubject(), PROHIBIT_SUBJECT));
-            }
-        }
-
-        for(Prohibition.Node node : nodes) {
-            if(!decider.check(userCtx.getUser(), userCtx.getProcess(), node.getName(), CREATE_PROHIBITION)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", node.getName(), Operations.PROHIBIT_RESOURCE));
-            }
+        // check that the user has permission to create a prohibition on the super policy object
+        if(!getDecider().check(userCtx.getUser(), userCtx.getProcess(), superPolicy.getSuperObject().getName(), CREATE_PROHIBITION)) {
+            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", superPolicy.getSuperObject().getName(), CREATE_PROHIBITION));
         }
 
         //create prohibition in PAP
@@ -81,18 +65,8 @@ public class ProhibitionsService extends Service implements Prohibitions {
     }
 
     @Override
-    public void update(Prohibition prohibition) throws PMException {
-        if(prohibition == null) {
-            throw new IllegalArgumentException("the prohibition to update was null");
-        } else if(prohibition.getName() == null || prohibition.getName().isEmpty()) {
-            throw new IllegalArgumentException("cannot update a prohibition with a null name");
-        }
-
-        // delete the prohibition
-        delete(prohibition.getName());
-
-        //create prohibition in PAP
-        add(prohibition);
+    public void update(String prohibitionName, Prohibition prohibition) throws PMException {
+        getPAP().getProhibitionsPAP().update(prohibitionName, prohibition);
     }
 
     @Override

@@ -31,10 +31,9 @@ class CurrentProcessExecutorTest {
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
-        Prohibition.Subject result = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        String result = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
 
         assertNotNull(result);
-        assertEquals("1234", result.getSubject());
-        assertEquals(Prohibition.Subject.Type.PROCESS, result.getSubjectType());
+        assertEquals("1234", result);
     }
 }

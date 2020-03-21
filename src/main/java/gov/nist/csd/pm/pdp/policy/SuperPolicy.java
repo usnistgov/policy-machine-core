@@ -20,6 +20,7 @@ public class SuperPolicy {
     private Node superUA2;
     private Node superPolicyClassRep;
     private Node superOA;
+    private Node superO;
     private Node superPC;
 
     public SuperPolicy() { }
@@ -42,6 +43,9 @@ public class SuperPolicy {
 
     public Node getSuperObjectAttribute() {
         return superOA;
+    }
+    public Node getSuperObject() {
+        return superO;
     }
 
     public Node getSuperPolicyClass() {

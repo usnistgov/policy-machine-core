@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.model.*;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -258,95 +259,66 @@ public class EPP {
         List<String> operations = action.getOperations();
         DenyAction.Target target = action.getTarget();
 
-        Prohibition.Subject denySubject = toDenySubject(eventCtx, user, process, subject);
-        List<Prohibition.Node> denyNodes = toDenyNodes(eventCtx, user, process, target);
+        String denySubject = toDenySubject(eventCtx, user, process, subject);
+        Map<String, Boolean> denyNodes = toDenyNodes(eventCtx, user, process, target);
 
-        Prohibition prohibition = new Prohibition();
-        prohibition.setSubject(denySubject);
-        prohibition.setName(action.getLabel());
-        prohibition.setOperations(new HashSet<>(operations));
-        prohibition.setIntersection(target.isIntersection());
-        for(Prohibition.Node node : denyNodes) {
-            prohibition.addNode(node);
+        Prohibition.Builder builder = new Prohibition.Builder(action.getLabel(), denySubject, new OperationSet(operations))
+                .setIntersection(target.isIntersection());
+
+        for(String contName : denyNodes.keySet()) {
+            builder.addContainer(contName, denyNodes.get(contName));
         }
 
         // add the prohibition to the PAP
-        pap.getProhibitionsPAP().add(prohibition);
+        pap.getProhibitionsPAP().add(builder.build());
 
         // TODO this complement is ignored in the current Prohibition object
         boolean complement = target.isComplement();
     }
 
-    private List<Prohibition.Node> toDenyNodes(EventContext eventCtx, String user, String process, DenyAction.Target target) throws PMException {
-        List<Prohibition.Node> nodes = new ArrayList<>();
+    private Map<String, Boolean> toDenyNodes(EventContext eventCtx, String user, String process, DenyAction.Target target) throws PMException {
+        Map<String, Boolean> nodes = new HashMap<>();
         List<DenyAction.Target.Container> containers = target.getContainers();
         for(DenyAction.Target.Container container : containers) {
             if(container.getFunction() != null) {
                 Function function = container.getFunction();
                 Object result = functionEvaluator.evalObject(eventCtx, user, process, pdp, function);
 
-                if(!(result instanceof Prohibition.Node)) {
-                    throw new PMException("expected function to return a Prohibition.Node but got " + result.getClass().getName());
+                if(!(result instanceof ContainerCondition)) {
+                    throw new PMException("expected function to return a ContainerCondition but got " + result.getClass().getName());
                 }
 
-                nodes.add((Prohibition.Node) result);
+                ContainerCondition cc = (ContainerCondition) result;
+                nodes.put(cc.getName(), cc.isComplement());
             } else {
                 Graph graph = pap.getGraphPAP();
 
-                // get the subject node
+                // get the node
                 Node node = graph.getNode(container.getName());
-                nodes.add(new Prohibition.Node(node.getName(), container.isComplement()));
+                nodes.put(node.getName(), container.isComplement());
             }
         }
 
         return nodes;
     }
 
-    private Prohibition.Subject toDenySubject(EventContext eventCtx, String user, String process, EvrNode subject) throws PMException {
-        Prohibition.Subject denySubject;
+    private String toDenySubject(EventContext eventCtx, String user, String process, EvrNode subject) throws PMException {
+        String denySubject;
 
         if(subject.getFunction() != null) {
             Function function = subject.getFunction();
-            denySubject = functionEvaluator.evalProhibitionSubject(eventCtx, user, process, pdp, function);
+            denySubject = functionEvaluator.evalString(eventCtx, user, process, pdp, function);
         } else if(subject.getProcess() != null) {
-            denySubject = new Prohibition.Subject(subject.getProcess().getValue(), Prohibition.Subject.Type.PROCESS);
+            denySubject = subject.getProcess().getValue();
         } else {
-            Set<Node> nodes = getNodes(subject.getName(), subject.getType(), subject.getProperties());
-            if(nodes.isEmpty()) {
-                throw new PMException("non existing subject for deny " + subject.getName());
+            if (subject.getName() != null) {
+                denySubject = pap.getGraphPAP().getNode(subject.getName()).getName();
+            } else {
+                denySubject = pap.getGraphPAP().getNode(NodeType.toNodeType(subject.getType()), subject.getProperties()).getName();
             }
-
-            // only one object is used, so grab the first one
-            Node node = nodes.iterator().next();
-            denySubject = new Prohibition.Subject(node.getName(),
-                    node.getType() == UA ? Prohibition.Subject.Type.USER_ATTRIBUTE : Prohibition.Subject.Type.USER);
         }
 
         return denySubject;
-    }
-
-    private Set<Node> getNodes(String name, String type, Map<String, String> properties) throws PMException {
-        Graph graph = pap.getGraphPAP();
-        Set<Node> search = new HashSet<>();
-        if (name != null) {
-            search.add(graph.getNode(name));
-        } else {
-            search = graph.search(NodeType.toNodeType(type), null);
-            if (properties != null) {
-                search.removeIf((n) -> {
-                    for (String k : properties.keySet()) {
-                        if (n.getProperties() == null ||
-                                !n.getProperties().containsKey(k) ||
-                                !n.getProperties().get(k).equals(properties.get(k))) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-            }
-        }
-
-        return search;
     }
 
     private void applyDeleteAction(EventContext eventCtx, String user, String process, DeleteAction action) throws PMException {

@@ -22,7 +22,7 @@ public class CurrentUserExecutor implements FunctionExecutor {
      * @return the Node with the given userID
      */
     @Override
-    public Node exec(EventContext eventCtx, String userID, String processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
-        return pdp.getPAP().getGraphPAP().getNode(userID);
+    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+        return pdp.getPAP().getGraphPAP().getNode(user);
     }
 }

@@ -369,7 +369,7 @@ function:
    
 #### current_process
 ##### Description
-Return the current process ID
+Return the current process
 ##### Parameters
 None
 ##### Return
@@ -410,21 +410,6 @@ None
 ```yaml
 function:
   name: current_user 
-```  
-
-#### current_user_to_deny_subject
-##### Description
-Return a `Prohibition.Subject` with the current user.
-##### Parameters
-None
-##### Return
-`Prohibition.Subject`
-##### Event Requirements
-None
-##### Example
-```yaml
-function:
-  name: current_user_to_deny_subject 
 ```  
 
 #### get_children

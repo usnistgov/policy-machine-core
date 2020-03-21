@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PReviewDeciderTest {
-    
+
     @Test
     void testHasPermissions() throws PMException {
         Graph graph = new MemGraph();
@@ -477,19 +477,17 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa3.getName(), new OperationSet("read", "write", "execute"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition();
-        prohibition.setName("deny");
-        prohibition.setSubject(new Prohibition.Subject(ua1.getName(), Prohibition.Subject.Type.USER_ATTRIBUTE));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(oa1.getName(), false));
-        prohibition.addNode(new Prohibition.Node(oa2.getName(), false));
-        prohibition.setIntersection(true);
+        Prohibition prohibition = new Prohibition.Builder("deny", ua1.getName(), new OperationSet("read"))
+                .addContainer(oa1.getName(), false)
+                .addContainer(oa2.getName(), false)
+                .setIntersection(true)
+                .build();
         prohibitions.add(prohibition);
 
-        prohibition = new Prohibition("deny2", new Prohibition.Subject(u1.getName(), Prohibition.Subject.Type.USER));
-        prohibition.setOperations(new OperationSet("write"));
-        prohibition.addNode(new Prohibition.Node(oa3.getName(), false));
-        prohibition.setIntersection(true);
+        prohibition = new Prohibition.Builder("deny2", u1.getName(), new OperationSet("write"))
+                .setIntersection(true)
+                .addContainer(oa3.getName(), false)
+                .build();
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
@@ -513,11 +511,11 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(ua1.getName(), Prohibition.Subject.Type.USER_ATTRIBUTE));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(oa1.getName(), false));
-        prohibition.addNode(new Prohibition.Node(oa2.getName(), true));
-        prohibition.setIntersection(true);
+        Prohibition prohibition = new Prohibition.Builder("deny", ua1.getName(), new OperationSet("read"))
+                .setIntersection(true)
+                .addContainer(oa1.getName(), false)
+                .addContainer(oa2.getName(), true)
+                .build();
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
@@ -526,9 +524,10 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa2.getName(), new OperationSet("read"));
 
-        prohibition = new Prohibition("deny-process", new Prohibition.Subject("1234", Prohibition.Subject.Type.PROCESS));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(oa1.getName(), false));
+        prohibition = new Prohibition.Builder("deny-process", "1234", new OperationSet("read"))
+                .setIntersection(false)
+                .addContainer(oa1.getName(), false)
+                .build();
         prohibitions.add(prohibition);
 
         assertTrue(decider.list(u1.getName(), "1234", o1.getName()).isEmpty());
@@ -551,11 +550,12 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(u1.getName(), Prohibition.Subject.Type.USER));
+        Prohibition prohibition = new Prohibition.Builder("deny", u1.getName(), new OperationSet("read", "write"))
+                .setIntersection(true)
+                .addContainer(oa4.getName(), true)
+                .addContainer(oa1.getName(), false)
+                .build();
         prohibition.setOperations(new OperationSet("read", "write"));
-        prohibition.addNode(new Prohibition.Node(oa4.getName(), true));
-        prohibition.addNode(new Prohibition.Node(oa1.getName(), false));
-        prohibition.setIntersection(true);
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
@@ -577,11 +577,11 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(u1.getName(), Prohibition.Subject.Type.USER));
-        prohibition.setOperations(new OperationSet("read", "write"));
-        prohibition.addNode(new Prohibition.Node(oa1.getName(), false));
-        prohibition.addNode(new Prohibition.Node(oa2.getName(), false));
-        prohibition.setIntersection(true);
+        Prohibition prohibition = new Prohibition.Builder("deny", u1.getName(), new OperationSet("read", "write"))
+                .setIntersection(true)
+                .addContainer(oa1.getName(), false)
+                .addContainer(oa2.getName(), false)
+                .build();
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
