@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pip.graph;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -23,7 +22,6 @@ public class MySQLGraph implements Graph {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final ObjectReader reader = new ObjectMapper().readerFor(HashMap.class);
     private static final String NODE_NOT_FOUND_MSG = "node %s does not exist";
-
 
 
     public static String toJSON(Map<String, String> map) throws JsonProcessingException {
@@ -638,7 +636,25 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public boolean isAssigned(long childID, long parentID) throws PMException {
-        return true;
+        MySQLConnection mySQLConnection = new MySQLConnection();
+
+        try (
+                Connection con = mySQLConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement("Select * from assignment where start_node_id=? AND end_node_id = ?")
+        ) {
+
+            ps.setLong(1, childID);
+            ps.setLong(2, parentID);
+            ResultSet rs = ps.executeQuery();
+            List<Integer> ids = new ArrayList<>();
+            while (rs.next()){
+                ids.add(rs.getInt("assignment_id"));
+            }
+            return ids.size() != 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new PMException("Cannot connect to the Database" + ex);
+        }
     }
 
     /**
