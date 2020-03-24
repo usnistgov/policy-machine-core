@@ -12,6 +12,7 @@ This project is comprised of the core components of the NIST Policy Machine, a r
 3. [Implementation Caveats](#imp)
 3. [Interface Usage](#interface-usage)
 4. [Functional Component Usage](#functional-component-usage)
+5. [Event Response Grammar (Obligations)](https://github.com/PM-Master/policy-machine-core/tree/remove-id-parameter/src/main/java/gov/nist/csd/pm/pip/obligations)
 
 ## Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import into projects.
