@@ -6,6 +6,7 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.pdp.policy.SuperPolicy;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
@@ -16,8 +17,10 @@ import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsService extends Service implements Prohibitions {
 
-    public ProhibitionsService(PAP pap, EPP epp) {
+    public ProhibitionsService(PAP pap, EPP epp, SuperPolicy superPolicy) {
         super(pap, epp);
+
+        this.superPolicy = superPolicy;
     }
 
     public List<Prohibition> getProhibitions() throws PMException {
@@ -41,8 +44,8 @@ public class ProhibitionsService extends Service implements Prohibitions {
         }
 
         // check that the user has permission to create a prohibition on the super policy object
-        if(!getDecider().check(userCtx.getUser(), userCtx.getProcess(), superPolicy.getSuperObject().getName(), CREATE_PROHIBITION)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", superPolicy.getSuperObject().getName(), CREATE_PROHIBITION));
+        if(!getDecider().check(userCtx.getUser(), userCtx.getProcess(), superPolicy.getSuperObjectAttribute().getName(), CREATE_PROHIBITION)) {
+            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", superPolicy.getSuperObjectAttribute().getName(), CREATE_PROHIBITION));
         }
 
         //create prohibition in PAP

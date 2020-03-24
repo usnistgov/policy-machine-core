@@ -30,7 +30,6 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 public class GraphService extends Service implements Graph {
 
     private Graph graph;
-    private SuperPolicy superPolicy;
 
     public GraphService(PAP pap, EPP epp) throws PMException {
         super(pap, epp);
