@@ -40,9 +40,9 @@ public class PDP {
         // configure the super policy
         superPolicy = this.graphService.configureSuperPolicy();
 
-        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp);
+        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp, this.superPolicy);
         this.analyticsService = new AnalyticsService(this.pap, this.epp);
-        this.obligationsService = new ObligationsService(this.pap, this.epp);
+        this.obligationsService = new ObligationsService(this.pap, this.epp, this.superPolicy);
     }
 
     public EPP getEPP() {

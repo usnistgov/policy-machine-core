@@ -6,8 +6,11 @@ This project is comprised of the core components of the NIST Policy Machine, a r
 - Query the access state of a graph
 - Explain why a user has permissions on a particular resource
 
-## Full Documentation
-Full documentation can be found [here](https://pm-master.github.io/policy-machine-core/)
+## Table of Contents
+1. [Installation](#install-using-maven)
+2. [Code Walkthrough](#code-walkthrough)
+3. [Interface Usage](#interface-usage)
+4. [Functional Component Usage](#functional-component-usage)
 
 ## Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import into projects.
@@ -31,4 +34,119 @@ Then, add the maven dependency
     <artifactId>policy-machine-core</artifactId>
     <version>LATEST</version>
 </dependency>
+```
+
+## Code Walkthrough
+
+## Interface Usage
+The following are examples of using the interfaces and implementations provided in the PIP and PDP packages. These classes
+provide the basic functionality of an NAGC system.
+
+### Graph
+```java
+Graph graph = new MemGraph();
+
+Node pc1 = graph.createPolicyClass("pc1", Node.toProperties("k", "v"));
+Node oa1 = graph.createNode("oa1", NodeType.OA, Node.toProperties("k1", "v1"), pc1.getName());
+Node oa2 = graph.createNode("oa2", NodeType.OA, Node.toProperties("k1", "v1"), pc1.getName());
+Node ua1 = graph.createNode("ua1", NodeType.UA, Node.toProperties("k1", "v1"), pc1.getName());
+Node o1 = graph.createNode("o1", O, Node.toProperties("k", "v"), oa1.getName(), oa2.getName());
+Node u1 = graph.createNode("u1", NodeType.U, Node.toProperties("k", "v"), ua1.getName());
+
+graph.associate(ua1.getName(), oa1.getName(), new OperationSet(READ, WRITE));
+```
+
+### Prohibitions
+The `Prohibitions` interface provides methods for storing prohibitions.
+```java
+Prohibitions prohibitions = new MemProhibitions();
+Prohibition prohibition = new Prohibition.Builder("test-prohibition", ua1.getName(), new OperationSet(WRITE))
+        .addContainer(oa1.getName(), false)
+        .addContainer(oa2.getName(), true)
+        .build();
+prohibitions.add(prohibition);
+```
+    
+### Decider and Auditor
+The `Decider` interface provides functions for making access decisions on a graph.    
+```java 
+Decider decider = new PReviewDecider(graph, prohibitions);
+Set<String> permissions = decider.list(u1.getName(), "", o1.getName());
+System.out.println(permissions);
+```
+
+The `Auditor` interface provides a function to explain why a user has access to a node. Currently, prohibitions are not
+taken into account in the explanation.
+```java
+Auditor auditor = new PReviewAuditor(graph);
+Explain explain = auditor.explain(u1.getName(), o1.getName());
+System.out.println(explain);
+```
+
+## Functional Component Usage
+### Policy Information Point (PIP)
+The PIP package provides the necessary interfaces (and in memory implementations) for managing an NGAC graph,
+prohibitions, and obligations.
+
+```java
+Graph graph = new MemGraph();
+Prohibitions prohibitions = new MemProhibitions();
+Obligations obligations = new MemObligations();
+
+// add some nodes, assignments, and associations to the graph
+// create a policy class
+Node pc1 = graph.createPolicyClass("pc1", Node.toProperties("k", "v"));
+// create an object and user attribute and assign to pc1
+Node oa1 = graph.createNode("oa1", NodeType.OA, Node.toProperties("k1", "v1"), pc1.getName());
+Node ua1 = graph.createNode("ua1", NodeType.UA, Node.toProperties("k1", "v1"), pc1.getName());
+// create and object and user
+Node o1 = graph.createNode("o1", O, Node.toProperties("k", "v"), oa1.getName());
+Node u1 = graph.createNode("u1", NodeType.U, Node.toProperties("k", "v"), ua1.getName());
+// associate ua1 and oa1
+graph.associate(ua1.getName(), oa1.getName(), new OperationSet(READ, WRITE, ASSIGN, ASSIGN_TO));
+
+// add a prohibition
+Prohibition prohibition = new Prohibition.Builder("test-prohibition", "ua1", new OperationSet(WRITE))
+        .addContainer("oa1", false)
+        .build();
+prohibitions.add(prohibition);
+
+// *note: obligations will be demonstrated in another tutorial
+```
+
+### Policy Administration Point (PAP)
+The PAP provides a single class that holds a graph, prohibitions, and obligations, to be used by the PDP
+
+```java
+PAP pap = new PAP(graph, prohibitions, obligations);
+```
+
+### Policy Decision Point (PDP)
+The PDP implements the same interfaces in the PIP but provides a layer of access control to restrict access to the administrative commands of the PAP.
+
+```java
+PDP pdp = new PDP(pap, new EPPOptions());
+
+// access the PDP's GraphService (which sits in front of the Graph made earlier) as u1
+// we'll provide an empty process identifier for this example
+UserContext userCtx = new UserContext(u1.getName(), "");
+Graph graphService = pdp.getGraphService(userCtx);
+
+// create a new node through the PDP with the UserContext
+Node newNode = graphService.createNode("newNode", O, null, oa1.getName());
+
+// access the PDP as the super user and create a new prohibition
+userCtx = new UserContext("super", "");
+Prohibitions prohibitionsService = pdp.getProhibitionsService(userCtx);
+prohibition = new Prohibition.Builder("new-prohibition", "ua1", new OperationSet(ASSIGN_TO))
+        .addContainer("oa1", false)
+        .build();
+prohibitionsService.add(prohibition);
+
+// get the permissions for u1 on newNode
+userCtx = new UserContext(u1.getName(), "");
+AnalyticsService analyticsService = pdp.getAnalyticsService(userCtx);
+
+// permissions should be [read, assign]
+Set<String> permissions = analyticsService.getPermissions(newNode.getName());
 ```

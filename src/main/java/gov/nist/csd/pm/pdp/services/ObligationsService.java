@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.policy.SuperPolicy;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 
@@ -15,8 +16,10 @@ import static gov.nist.csd.pm.operations.Operations.RESET;
 
 public class ObligationsService extends Service implements Obligations {
 
-    public ObligationsService(PAP pap, EPP epp) {
+    public ObligationsService(PAP pap, EPP epp, SuperPolicy superPolicy) {
         super(pap, epp);
+
+        this.superPolicy = superPolicy;
     }
 
     @Override
