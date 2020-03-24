@@ -3,7 +3,7 @@ nav:
   - Introduction: index.md
   - Installation: installation.md
   - Functional Components: functional-components.md
-  - Obligations: obligations.md
+  - Obligations: README.md
   - Examples: examples.md
   - Contact Us: contact.md
 theme:
