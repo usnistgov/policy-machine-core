@@ -9,6 +9,7 @@ This project is comprised of the core components of the NIST Policy Machine, a r
 ## Table of Contents
 1. [Installation](#install-using-maven)
 2. [Code Walkthrough](#code-walkthrough)
+3. [Implementation Caveats](#imp)
 3. [Interface Usage](#interface-usage)
 4. [Functional Component Usage](#functional-component-usage)
 
@@ -36,7 +37,58 @@ Then, add the maven dependency
 </dependency>
 ```
 
-## Code Walkthrough
+## Packages
+There are 4 main packages in the core library, each representing a functional component in the NGAC architecture. There is 
+the Policy Information Point (PIP), the Policy Administration Point(PAP), the Event Processing Point (EPP), and the Policy
+Decision Point (PDP). The Policy Enforcement Point is not represented in this library because a PEP is anything that calls
+a PDP.
+
+### PIP
+The PIP package provides 3 interfaces: `Graph`, `Prohibitions`, and `Obligations` and implementations of each. The obligations 
+sub package also includes methods to parse [Event Response](obligations.md) grammar.
+### PAP
+The PAP provides a single class that aggregates the elements in the PIP.
+### EPP
+The EPP processes events in the PDP and exposes functions for processing events in PEPs.
+### PDP
+The PDP package provides two things:
+
+1. The functional component class `PDP` which is an administrative decision point for an underlying `PAP`.  The goal of this 
+class is to provide access control to the Graph, Prohibitions, and Obligations of the PAP.
+2. The `Decider` and `Auditor` interfaces and implementations for query the access state of a graph and explaining *why* a user has
+access to a node, respectively.
+
+## Implementation Caveats
+The `PIP` package provides a bare bones implementation of an NGAC system, without any extra "fluff".  The `PDP` package however, 
+has a little more "fluff" that we decided were important to our reference implementation but are not required.
+
+### No Authentication
+The PDP does not have an authentication layer on top of it, users are not forced to use a specific authentication scheme. 
+Instead the goal of this library is to provide all the functional pieces of an NGAC system, which should be put together in a secure manner based on individual use cases and needs.
+
+### Super Policy
+What came first the graph or the access control?
+
+In other words who has permission to create the first policy class or the first user? We ran into this question during development of the PDP.  If we put a layer of access control above the PAP,
+assuming every method is protected, how do we allow a user to make administrative changes to the graph that doesn't exist yet?
+
+Our solution was to incorporate a "super" user, and a policy surrounding this user. The super policy is created in the PAP that is supplied to the PDP during PDP creation.
+It contains a single policy class called "super_pc", with attributes "super_ua1", "super_ua2", and "super_oa1".  The reason for two "super" user attributes is to provide the super user
+permissions on itself, so it can assign itself to other attributes.  The super user is given "*" or All Ops on everything in the graph.
+There is also a super policy class rep that is assigned to "super_oa1" that will be explained in the following sections.
+
+**Note: the super user has a hard coded name "super" an the PDP does not have authentication as explained above.**
+
+### Policy Class Creation
+While using the PDP, in order to create a policy class, the requesting user must have the CREATE_POLICY_CLASS permission on the 
+representative of the super policy class.  This is an object attribute created with the super policy explained above. This allows
+the super user to create policy classes as well as delegate policy class creation given the nature of the super policy. 
+
+### Policy Class Representatives
+Policy class representative attributes provide a means of controlling access to policy class nodes, since policy classes 
+themselves cannot be the target of an access decision, these rep attributes provide a means to do so. 
+When a policy class is created a representative attribute is also created and assigned to super_oa1. Any time a policy 
+class is the target of an access decision, this rep attribute will be used instead.
 
 ## Interface Usage
 The following are examples of using the interfaces and implementations provided in the PIP and PDP packages. These classes
