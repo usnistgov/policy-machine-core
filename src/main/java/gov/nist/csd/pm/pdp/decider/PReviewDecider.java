@@ -296,7 +296,8 @@ public class PReviewDecider implements Decider {
         Node start = graph.getNode(subject);
 
         final Map<String, Set<String>> borderTargets = new HashMap<>();
-        final Set<Prohibition> reachedProhibitions = new HashSet<>();
+        // initialize with the prohibitions or the provided process
+        final Set<Prohibition> reachedProhibitions = new HashSet<>(prohibitions.getProhibitionsFor(process));
 
         // if the start node is an UA, get it's associations
         if (start.getType() == UA) {
