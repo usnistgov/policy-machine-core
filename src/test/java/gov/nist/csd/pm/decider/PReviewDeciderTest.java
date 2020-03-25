@@ -14,10 +14,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.operations.Operations.READ;
+import static gov.nist.csd.pm.operations.Operations.WRITE;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PReviewDeciderTest {
 
@@ -607,5 +608,78 @@ class PReviewDeciderTest {
         Decider decider = new PReviewDecider(graph);
         Set<String> permissions = decider.list(ua1.getName(), "", oa1.getName());
         assertTrue(permissions.containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testProhibitionsAllCombinations() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("oa3", OA, null, "pc1");
+        graph.createNode("oa4", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1", "oa2", "oa3");
+        graph.createNode("o2", O, null, "oa1", "oa4");
+
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
+        graph.createNode("u2", U, null, "ua1");
+        graph.createNode("u3", U, null, "ua1");
+        graph.createNode("u4", U, null, "ua1");
+
+        graph.associate("ua1", "oa1", new OperationSet(WRITE, READ));
+
+        Prohibitions prohibitions = new MemProhibitions();
+        Prohibition prohibition = new Prohibition.Builder("p1", "u1", new OperationSet(WRITE))
+                .setIntersection(true)
+                .addContainer("oa1", false)
+                .addContainer("oa2", false)
+                .addContainer("oa3", false)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u2", new OperationSet(WRITE))
+                .setIntersection(false)
+                .addContainer("oa1", false)
+                .addContainer("oa2", false)
+                .addContainer("oa3", false)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u3", new OperationSet(WRITE))
+                .setIntersection(true)
+                .addContainer("oa1", false)
+                .addContainer("oa2", true)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u4", new OperationSet(WRITE))
+                .setIntersection(false)
+                .addContainer("oa1", false)
+                .addContainer("oa2", true)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u4", new OperationSet(WRITE))
+                .setIntersection(false)
+                .addContainer("oa2", true)
+                .build();
+        prohibitions.add(prohibition);
+
+        Decider decider = new PReviewDecider(graph, prohibitions);
+
+        Set<String> list = decider.list("u1", "", "o1");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u1", "", "o2");
+        assertTrue(list.contains(READ) && list.contains(WRITE));
+
+        list = decider.list("u2", "", "o2");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u3", "", "o2");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u4", "", "o1");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u4", "", "o2");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
     }
 }
