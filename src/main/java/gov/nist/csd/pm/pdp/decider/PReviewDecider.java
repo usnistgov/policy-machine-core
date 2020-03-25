@@ -11,7 +11,6 @@ import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -191,18 +190,16 @@ public class PReviewDecider implements Decider {
         Set<String> denied = new HashSet<>();
 
         Set<Prohibition> prohibitions = userCtx.getProhibitions();
-        Map<Prohibition, Set<String>> reachedProhibitedTargets = targetCtx.getReachedProhibitedTargets();
+        Set<String> reachedTargets = targetCtx.getReachedTargets();
 
         for(Prohibition p : prohibitions) {
             boolean inter = p.isIntersection();
             Map<String, Boolean> containers = p.getContainers();
-            Set<String> reachedTargets = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
 
             boolean addOps = false;
             for (String contName : containers.keySet()) {
                 boolean isComplement = containers.get(contName);
-                if (!isComplement && reachedTargets.contains(contName) ||
-                        isComplement && !reachedTargets.contains(contName)) {
+                if (!isComplement && reachedTargets.contains(contName) || isComplement && !reachedTargets.contains(contName)) {
                     addOps = true;
 
                     // if the prohibition is not intersection, one satisfied container condition means
@@ -240,22 +237,13 @@ public class PReviewDecider implements Decider {
      */
     private TargetContext processTargetDAG(String target, UserContext userCtx) throws PMException {
         Map<String, Set<String>> borderTargets = userCtx.getBorderTargets();
-        Map<String, List<Prohibition>> prohibitedTargets = userCtx.getProhibitedTargets();
 
         Map<String, Map<String, Set<String>>> visitedNodes = new HashMap<>();
-        Map<Prohibition, Set<String>> reachedProhibitedTargets = new HashMap<>();
+        Set<String> reachedTargets = new HashSet<>();
 
         Visitor visitor = node -> {
-            // add this node to reached prohibited targets if it has any prohibitions
-            if(prohibitedTargets.containsKey(node.getName()) && !node.getName().equals(target)) {
-                List<Prohibition> pros = prohibitedTargets.get(node.getName());
-                for(Prohibition p : pros) {
-                    Set<String> r = reachedProhibitedTargets.getOrDefault(p, new HashSet<>());
-                    r.add(node.getName());
-
-                    reachedProhibitedTargets.put(p, r);
-                }
-            }
+            // mark the node as reached, to be used for resolving prohibitions
+            reachedTargets.add(node.getName());
 
             Map<String, Set<String>> nodeCtx = visitedNodes.getOrDefault(node.getName(), new HashMap<>());
             if (nodeCtx.isEmpty()) {
@@ -290,7 +278,7 @@ public class PReviewDecider implements Decider {
         DepthFirstSearcher searcher = new DepthFirstSearcher(graph);
         searcher.traverse(graph.getNode(target), propagator, visitor);
 
-        return new TargetContext(visitedNodes.get(target), reachedProhibitedTargets);
+        return new TargetContext(visitedNodes.get(target), reachedTargets);
     }
 
     /**
@@ -308,11 +296,8 @@ public class PReviewDecider implements Decider {
         Node start = graph.getNode(subject);
 
         final Map<String, Set<String>> borderTargets = new HashMap<>();
-        final Set<Prohibition> prohibitions = new HashSet<>();
-        final Map<String, List<Prohibition>> prohibitedTargets = getProhibitionTargets(process);
-        for(String l : prohibitedTargets.keySet()) {
-            prohibitions.addAll(prohibitedTargets.get(l));
-        }
+        // initialize with the prohibitions or the provided process
+        final Set<Prohibition> reachedProhibitions = new HashSet<>(prohibitions.getProhibitionsFor(process));
 
         // if the start node is an UA, get it's associations
         if (start.getType() == UA) {
@@ -321,17 +306,8 @@ public class PReviewDecider implements Decider {
         }
 
         Visitor visitor = node -> {
-            Map<String, List<Prohibition>> pts = getProhibitionTargets(node.getName());
-            for (String ptsName : pts.keySet()) {
-                List<Prohibition> pros = prohibitedTargets.getOrDefault(ptsName, new ArrayList<>());
-                pros.addAll(pts.get(ptsName));
-                prohibitedTargets.put(ptsName, pros);
-            }
-
-            // add any new prohibitions that were reached
-            for(String l : pts.keySet()) {
-                prohibitions.addAll(pts.get(l));
-            }
+            List<Prohibition> subjectProhibitions = prohibitions.getProhibitionsFor(node.getName());
+            reachedProhibitions.addAll(subjectProhibitions);
 
             //get the parents of the subject to start bfs on user side
             Set<String> parents = graph.getParents(node.getName());
@@ -358,7 +334,7 @@ public class PReviewDecider implements Decider {
         // start the bfs
         searcher.traverse(start, propagator, visitor);
 
-        return new UserContext(borderTargets, prohibitedTargets, prohibitions);
+        return new UserContext(borderTargets, reachedProhibitions);
     }
 
     private void collectAssociations(Map<String, OperationSet> assocs, Map<String, Set<String>> borderTargets) {
@@ -374,24 +350,6 @@ public class PReviewDecider implements Decider {
                 borderTargets.put(target, ops);
             }
         }
-    }
-
-    /**
-     * Get the prohibitions that the subject is apart of.  Return all of the targets of those prohibitions
-     * and which prohibitions pertain to which target.
-     */
-    private Map<String, List<Prohibition>> getProhibitionTargets(String subject) throws PMException {
-        List<Prohibition> pros = prohibitions.getProhibitionsFor(subject);
-        Map<String, List<Prohibition>> prohibitionTargets = new HashMap<>();
-        for(Prohibition p : pros) {
-            for(String contName : p.getContainers().keySet()) {
-                List<Prohibition> exPs = prohibitionTargets.getOrDefault(contName, new ArrayList<>());
-                exPs.add(p);
-                prohibitionTargets.put(contName, exPs);
-            }
-        }
-
-        return prohibitionTargets;
     }
 
     private Set<String> getAscendants(String vNode) throws PMException {
@@ -413,21 +371,15 @@ public class PReviewDecider implements Decider {
 
     private static class UserContext {
         private Map<String, Set<String>> borderTargets;
-        private Map<String, List<Prohibition>> prohibitedTargets;
         private Set<Prohibition> prohibitions;
 
-        UserContext(Map<String, Set<String>> borderTargets, Map<String, List<Prohibition>> prohibitedTargets, Set<Prohibition> prohibitions) {
+        UserContext(Map<String, Set<String>> borderTargets, Set<Prohibition> prohibitions) {
             this.borderTargets = borderTargets;
-            this.prohibitedTargets = prohibitedTargets;
             this.prohibitions = prohibitions;
         }
 
         Map<String, Set<String>> getBorderTargets() {
             return borderTargets;
-        }
-
-        Map<String, List<Prohibition>> getProhibitedTargets() {
-            return prohibitedTargets;
         }
 
         Set<Prohibition> getProhibitions() {
@@ -437,19 +389,19 @@ public class PReviewDecider implements Decider {
 
     private static class TargetContext {
         Map<String, Set<String>> pcSet;
-        Map<Prohibition, Set<String>> reachedProhibitedTargets;
+        Set<String> reachedTargets;
 
-        TargetContext(Map<String, Set<String>> pcSet, Map<Prohibition, Set<String>> reachedProhibitedTargets) {
+        TargetContext(Map<String, Set<String>> pcSet, Set<String> reachedTargets) {
             this.pcSet = pcSet;
-            this.reachedProhibitedTargets = reachedProhibitedTargets;
+            this.reachedTargets = reachedTargets;
         }
 
         Map<String, Set<String>> getPcSet() {
             return pcSet;
         }
 
-        Map<Prohibition, Set<String>> getReachedProhibitedTargets() {
-            return reachedProhibitedTargets;
+        Set<String> getReachedTargets() {
+            return reachedTargets;
         }
     }
 }
