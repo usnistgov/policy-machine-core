@@ -400,7 +400,7 @@ public class PReviewDecider implements Decider {
             return pcSet;
         }
 
-        public Set<String> getReachedTargets() {
+        Set<String> getReachedTargets() {
             return reachedTargets;
         }
     }
