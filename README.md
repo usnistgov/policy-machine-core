@@ -46,7 +46,7 @@ a PDP.
 
 ### PIP
 The PIP package provides 3 interfaces: `Graph`, `Prohibitions`, and `Obligations` and implementations of each. The obligations 
-sub package also includes methods to parse [Event Response](obligations.md) grammar.
+sub package also includes methods to parse [Event Response](https://github.com/PM-Master/policy-machine-core/tree/master/src/main/java/gov/nist/csd/pm/pip/obligationsd) grammar.
 ### PAP
 The PAP provides a single class that aggregates the elements in the PIP.
 ### EPP
