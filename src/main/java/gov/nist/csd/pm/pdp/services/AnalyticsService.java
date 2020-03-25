@@ -27,7 +27,7 @@ public class AnalyticsService extends Service {
      * @return the set of operations the current user has on the target node.
      * @throws PMException if there is an error getting the permissions for the current user on the target
      */
-    public Set<String> getPermissions(UserContext userCtx, String target) throws PMException {
+    public Set<String> getPermissions(String target) throws PMException {
         Decider decider = getDecider();
         return decider.list(userCtx.getUser(), userCtx.getProcess(), target);
     }

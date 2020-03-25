@@ -37,7 +37,7 @@ public class MemProhibitions implements Prohibitions {
             throw new IllegalArgumentException("a null subject was provided when creating a prohibition");
         }
 
-        String subject = prohibition.getSubject().getSubject();
+        String subject = prohibition.getSubject();
         List<Prohibition> exPros = this.prohibitions.getOrDefault(subject, new ArrayList<>());
         exPros.add(prohibition);
         this.prohibitions.put(subject, exPros);
@@ -82,21 +82,22 @@ public class MemProhibitions implements Prohibitions {
     }
 
     /**
-     * Update an existing prohibition with the same name as the provided prohibition.  The provided prohibition cannot
-     * be null and the name of the prohibition cannot be null.
+     * Update an existing prohibition with the given prohibition object.
      *
      * @param prohibition the prohibition to update.
      * @throws IllegalArgumentException if the provided prohibition is null.
      * @throws IllegalArgumentException if the provided prohibition name is null or empty.
      */
     @Override
-    public void update(Prohibition prohibition) {
+    public void update(String prohibitionName, Prohibition prohibition) {
         if (prohibition == null) {
             throw new IllegalArgumentException("a null prohibition was provided when updating a prohibition");
+        } else if (prohibitionName == null) {
+            throw new IllegalArgumentException("cannot update a prohibition with a null name");
         }
-        else if (prohibition.getName() == null || prohibition.getName().isEmpty()) {
-            throw new IllegalArgumentException("a null name was provided when updating a prohibition");
-        }
+
+        // set the name of the object to the provided prohibition name
+        prohibition.setName(prohibitionName);
         // delete the prohibition
         delete(prohibition.getName());
         // add the updated prohibition

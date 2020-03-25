@@ -273,7 +273,7 @@ public class GraphSerializer {
         Scanner sc = new Scanner(str);
 
         Map<String, Node> nodesMap = new HashMap<>();
-        List<Assignment> assignments = new ArrayList<>();
+        Map<String, List<String>> assignments = new HashMap<>();
         List<Association> associations = new ArrayList<>();
         List<Node> pcs = new ArrayList<>();
 
@@ -343,7 +343,9 @@ public class GraphSerializer {
                     String child = pieces[1];
                     String parent = pieces[2];
 
-                    assignments.add(new Assignment(child, parent));
+                    List<String> children = assignments.getOrDefault(parent, new ArrayList<>());
+                    children.add(child);
+                    assignments.put(parent, children);
                     break;
                 case "assoc":
                     if (pieces.length < 4) {
@@ -370,26 +372,8 @@ public class GraphSerializer {
             graph.createPolicyClass(node.getName(), node.getProperties());
         }
 
-        while (!assignments.isEmpty()) {
-            Assignment assignment = assignments.get(0);
-            String source = assignment.getSource();
-            String target = assignment.getTarget();
-
-            if (graph.exists(target)) {
-                // create the source if it does not exist
-                if (!graph.exists(source)) {
-                    Node node = nodesMap.get(source);
-                    graph.createNode(node.getName(), node.getType(), node.getProperties(), target);
-                    assignments.remove(assignment);
-                } else {
-                    graph.assign(source, target);
-                    assignments.remove(assignment);
-                }
-                continue;
-            }
-            // remove the current assignment and add it to the end to be processed later
-            assignments.remove(0);
-            assignments.add(assignment);
+        for (Node node : pcs) {
+            createPolicyGraph(graph, nodesMap, node.getName(), assignments);
         }
 
         for (Association association : associations) {
@@ -398,4 +382,35 @@ public class GraphSerializer {
 
         return graph;
     }
+
+
+
+    // 1 create all policy classes
+    // 2 get all assignments where a pc is the parent
+    // 3 create all those nodes with pc as the initial parent
+    // 4 get all the children of the newly created node and create them with the new node as a parent
+    // repeat until all assignments are done
+    // remove a parent entry after each iteration
+    private static void createPolicyGraph(Graph graph, Map<String, Node> nodes, String parent, Map<String, List<String>> assignments) throws PMException {
+        List<String> children = assignments.getOrDefault(parent, new ArrayList<>());
+        if (assignments.isEmpty() || children.isEmpty()) {
+            return;
+        }
+
+        for (String child : children) {
+            if (!graph.exists(child)) {
+                Node childNode = nodes.get(child);
+                graph.createNode(childNode.getName(), childNode.getType(), childNode.getProperties(), parent);
+            }
+
+            // do the same with the child as the parent
+            createPolicyGraph(graph, nodes, child, assignments);
+
+            assignments.remove(child);
+        }
+
+        assignments.remove(parent);
+    }
+
+
 }

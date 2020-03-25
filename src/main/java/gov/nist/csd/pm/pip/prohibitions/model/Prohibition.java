@@ -1,72 +1,62 @@
 package gov.nist.csd.pm.pip.prohibitions.model;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Object representing a Prohibition.
  */
 public class Prohibition {
 
-    private String      name;
-    private Subject     subject;
-    private List<Node>  nodes;
-    private Set<String> operations;
-    private boolean     intersection;
+    private String       name;
+    private String      subject;
+    private Map<String, Boolean>   containers;
+    private OperationSet operations;
+    private boolean      intersection;
 
-    public Prohibition(String name, Subject subject) {
-        this.name = name;
-        this.subject = subject;
-        this.nodes = new ArrayList<>();
-    }
-
-    public Prohibition() {
-        this.nodes = new ArrayList<>();
-    }
-
-    public Prohibition(String name, Subject subject, List<Node> nodes, Set<String> operations, boolean intersection) {
+    private Prohibition(String name, String subject, Map<String, Boolean> containers, OperationSet operations, boolean intersection) {
         if (subject == null) {
             throw new IllegalArgumentException("Prohibition subject cannot be null");
         }
-        this.subject = subject;
-        if (nodes == null) {
-            this.nodes = new ArrayList<>();
-        }
-        else {
-            this.nodes = nodes;
-        }
+
         this.name = name;
-        this.operations = operations;
+        this.subject = subject;
+
+        if (containers == null) {
+            this.containers = new HashMap<>();
+        } else {
+            this.containers = containers;
+        }
+
+        if (operations == null) {
+            this.operations = new OperationSet();
+        } else {
+            this.operations = operations;
+        }
+
         this.intersection = intersection;
     }
 
-    public Subject getSubject() {
+    public String getSubject() {
         return subject;
     }
 
-    public void setSubject(Subject subject) {
+    public void setSubject(String subject) {
         this.subject = subject;
     }
 
-    public List<Node> getNodes() {
-        return nodes;
+    public Map<String, Boolean> getContainers() {
+        return containers;
     }
 
-    public void addNode(Node node) {
-        nodes.add(node);
+    public void addContainer(String name, boolean complement) {
+        containers.put(name, complement);
     }
 
-    public void removeNode(String name) {
-        for (Node n : nodes) {
-            if (n.getName().equals(name)) {
-                nodes.remove(n);
-                return;
-            }
-        }
+    public void removeContainerCondition(String name) {
+        containers.remove(name);
     }
 
     public String getName() {
@@ -81,7 +71,7 @@ public class Prohibition {
         return operations;
     }
 
-    public void setOperations(Set<String> operations) {
+    public void setOperations(OperationSet operations) {
         this.operations = operations;
     }
 
@@ -106,96 +96,34 @@ public class Prohibition {
         return Objects.hash(name);
     }
 
-    public static class Subject {
-        String subject;
-        Type subjectType;
+    public static class Builder {
 
-        /**
-         * Prohibition Subject constructor.  The name cannot be empty and the type cannot be null.
-         *
-         * @param subject
-         * @param subjectType
-         */
-        public Subject(String subject, Type subjectType) {
-            if (subject == null || subject.isEmpty()) {
-                throw new IllegalArgumentException("a prohibition subject cannot be null");
-            }
-            else if (subjectType == null) {
-                throw new IllegalArgumentException("a prohibition subject cannot have a null type");
-            }
-            this.subject = subject;
-            this.subjectType = subjectType;
-        }
+        private String       name;
+        private String      subject;
+        private Map<String, Boolean>   containers;
+        private OperationSet operations;
+        private boolean      intersection;
 
-        public String getSubject() {
-            return subject;
-        }
-
-        public Type getSubjectType() {
-            return subjectType;
-        }
-
-        public enum Type {
-            USER_ATTRIBUTE,
-            USER,
-            PROCESS;
-
-            /**
-             * Given a string, return the corresponding Type.  If the string is null, an IllegalArgumentException will
-             * be thrown, and if the string does not match any of (USER, USER_ATTRIBUTE, PROCESS) a PMProhbitionExceptino will
-             * be thrown because the provided string is not a valid subject type.
-             *
-             * @param subjectType the string to convert to a Type.
-             * @return the SUbjectType tht corresponds to the given string.
-             * @throws IllegalArgumentException if the given string is null.
-             * @throws PMException              if the given string is not a valid subject.
-             */
-            public static Type toType(String subjectType) throws PMException {
-                if (subjectType == null) {
-                    throw new IllegalArgumentException("null is an invalid Prohibition subject type");
-                }
-                switch (subjectType.toUpperCase()) {
-                    case "USER_ATTRIBUTE":
-                        return USER_ATTRIBUTE;
-                    case "USER":
-                        return USER;
-                    case "PROCESS":
-                        return PROCESS;
-                    default:
-                        throw new PMException(String.format("%s is an invalid Prohibition subject type", subjectType));
-                }
-            }
-        }
-    }
-
-    public static class Node {
-        String    name;
-        boolean complement;
-
-        public Node(String name, boolean complement) {
+        public Builder(String name, String subject, OperationSet operations) {
             this.name = name;
-            this.complement = complement;
+            this.subject = subject;
+            this.containers = new HashMap<>();
+            this.operations = operations;
+            this.intersection = false;
         }
 
-        public String getName() {
-            return name;
+        public Builder addContainer(String container, boolean complement) {
+            containers.put(container, complement);
+            return this;
         }
 
-        public boolean isComplement() {
-            return complement;
+        public Builder setIntersection(boolean intersection) {
+            this.intersection = intersection;
+            return this;
         }
 
-        public boolean equals(Object o) {
-            if (!(o instanceof Node)) {
-                return false;
-            }
-
-            Node node = (Node) o;
-            return this.getName().equals(node.getName());
-        }
-
-        public int hashCode() {
-            return name.hashCode();
+        public Prohibition build() {
+            return new Prohibition(name, subject, containers, operations, intersection);
         }
     }
 }

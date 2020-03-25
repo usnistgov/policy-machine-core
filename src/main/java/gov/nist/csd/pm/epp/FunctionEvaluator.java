@@ -23,7 +23,6 @@ public class FunctionEvaluator {
         addFunctionExecutor(new CurrentProcessExecutor());
         addFunctionExecutor(new CurrentTargetExecutor());
         addFunctionExecutor(new CurrentUserExecutor());
-        addFunctionExecutor(new CurrentUserToDenySubjectExecutor());
         addFunctionExecutor(new GetChildrenExecutor());
         addFunctionExecutor(new GetNodeExecutor());
         addFunctionExecutor(new GetNodeNameExecutor());
@@ -72,12 +71,6 @@ public class FunctionEvaluator {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
         return (String)functionExecutor.exec(eventCtx, user, process, pdp, function, this);
-    }
-
-    public Prohibition.Subject evalProhibitionSubject(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
-        String functionName = function.getName();
-        FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return (Prohibition.Subject) functionExecutor.exec(eventCtx, user, process, pdp, function, this);
     }
 
     public Map evalMap(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
