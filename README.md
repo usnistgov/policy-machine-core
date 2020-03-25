@@ -103,8 +103,10 @@ Node pc1 = graph.createPolicyClass("pc1", Node.toProperties("k", "v"));
 Node oa1 = graph.createNode("oa1", NodeType.OA, Node.toProperties("k1", "v1"), pc1.getName());
 Node oa2 = graph.createNode("oa2", NodeType.OA, Node.toProperties("k1", "v1"), pc1.getName());
 Node ua1 = graph.createNode("ua1", NodeType.UA, Node.toProperties("k1", "v1"), pc1.getName());
-Node o1 = graph.createNode("o1", O, Node.toProperties("k", "v"), oa1.getName(), oa2.getName());
+Node o1 = graph.createNode("o1", O, Node.toProperties("k", "v"), oa1.getName());
 Node u1 = graph.createNode("u1", NodeType.U, Node.toProperties("k", "v"), ua1.getName());
+
+graph.assign(o1.getName(), oa2.getName());
 
 graph.associate(ua1.getName(), oa1.getName(), new OperationSet(READ, WRITE));
 ```
@@ -188,7 +190,7 @@ Graph graphService = pdp.getGraphService(userCtx);
 // create a new node through the PDP with the UserContext
 Node newNode = graphService.createNode("newNode", O, null, oa1.getName());
 
-// access the PDP as the super user and create a new prohibition
+// access the PDP as the super user and create a new prohibition to prohibit any user in ua1 the permission ASSIGN_TO on oa1
 userCtx = new UserContext("super", "");
 Prohibitions prohibitionsService = pdp.getProhibitionsService(userCtx);
 prohibition = new Prohibition.Builder("new-prohibition", "ua1", new OperationSet(ASSIGN_TO))
