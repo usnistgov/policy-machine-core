@@ -58,7 +58,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
         DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
         Set<String> nodes = new HashSet<>();
         Visitor visitor = node -> {
-            if (node.getName().equals(childNode.getName())) {
+            if (node.getName().equals(parentNode.getName())) {
                 nodes.add(node.getName());
             }
         };
