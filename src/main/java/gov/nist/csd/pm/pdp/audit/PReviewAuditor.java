@@ -8,6 +8,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
@@ -269,7 +270,7 @@ public class PReviewAuditor implements Auditor {
             }
         };
 
-        searcher.traverse(start, propagator, visitor);
+        searcher.traverse(start, propagator, visitor, Direction.PARENTS);
         return paths;
     }
 

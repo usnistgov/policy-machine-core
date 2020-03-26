@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class DepthFirstSearcher implements Searcher{
 
@@ -19,7 +20,7 @@ public class DepthFirstSearcher implements Searcher{
     }
 
     @Override
-    public void traverse(Node start, Propagator propagator, Visitor visitor) throws PMException {
+    public void traverse(Node start, Propagator propagator, Visitor visitor, Direction direction) throws PMException {
         if(visited.contains(start.getName())) {
             return;
         }
@@ -27,14 +28,21 @@ public class DepthFirstSearcher implements Searcher{
         // mark the node as visited
         visited.add(start.getName());
 
-        for(String parent : graph.getParents(start.getName())) {
-            Node parentNode = graph.getNode(parent);
+        Set<String> nodes;
+        if (direction == Direction.PARENTS) {
+            nodes = graph.getParents(start.getName());
+        } else {
+            nodes = graph.getChildren(start.getName());
+        }
+
+        for(String n : nodes) {
+            Node node = graph.getNode(n);
 
             // traverse from the parent node
-            traverse(parentNode, propagator, visitor);
+            traverse(node, propagator, visitor, direction);
 
-            // propagate from the parent to the start node
-            propagator.propagate(parentNode, start);
+            // propagate from the node to the start node
+            propagator.propagate(node, start);
         }
 
         // after processing the parents, visit the start node
