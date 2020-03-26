@@ -7,6 +7,9 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
+import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.model.*;
@@ -17,7 +20,7 @@ import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 public class EPP {
 
@@ -132,12 +135,24 @@ public class EPP {
             return true;
         }
 
-        Node node = pap.getGraphPAP().getNode(user);
-        if(matchSubject.getAnyUser() != null && matchSubject.getAnyUser().contains(node.getName())) {
+        // get the current user node
+        Node userNode = pap.getGraphPAP().getNode(user);
+
+        // check if any element in any user is actually a UA and check if the current user is contained in it
+        boolean uInUa = false;
+        for (String u : matchSubject.getAnyUser()) {
+            Node node = pap.getGraphPAP().getNode(u);
+            if (node.getType().equals(UA) && isNodeContainedIn(userNode, node)) {
+                uInUa = true;
+                break;
+            }
+        }
+
+        if(matchSubject.getAnyUser() != null && (matchSubject.getAnyUser().contains(userNode.getName()) || uInUa)) {
             return true;
         }
 
-        if(matchSubject.getUser() != null && matchSubject.getUser().equals(node.getName())) {
+        if(matchSubject.getUser() != null && matchSubject.getUser().equals(userNode.getName())) {
             return true;
         }
 
@@ -145,8 +160,21 @@ public class EPP {
                 matchSubject.getProcess().getValue().equals(process);
     }
 
+    private boolean isNodeContainedIn(Node childNode, Node parentNode) throws PMException {
+        DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
+        Set<String> nodes = new HashSet<>();
+        Visitor visitor = node -> {
+            if (node.getName().equals(childNode.getName())) {
+                nodes.add(node.getName());
+            }
+        };
+        dfs.traverse(childNode, (c, p) -> {}, visitor, Direction.PARENTS);
+
+        return nodes.contains(parentNode.getName());
+    }
+
     private boolean pcMatches(String user, PolicyClass matchPolicyClass) {
-        // TODO ignoring this for now as it will be inefficient to find all the PCs a user is under
+        // not yet implemented
         return true;
     }
 

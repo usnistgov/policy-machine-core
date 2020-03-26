@@ -21,7 +21,6 @@ public class PDP {
     private ProhibitionsService prohibitionsService;
     private AnalyticsService    analyticsService;
     private ObligationsService obligationsService;
-    private SuperPolicy superPolicy;
 
     /**
      * Create a new PDP instance given a Policy Administration Point and an optional set of FunctionExecutors to be
@@ -38,11 +37,11 @@ public class PDP {
         // initialize services
         this.graphService = new GraphService(this.pap, this.epp);
         // configure the super policy
-        superPolicy = this.graphService.configureSuperPolicy();
+        SuperPolicy superPolicy = this.graphService.configureSuperPolicy();
 
-        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp, this.superPolicy);
+        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp, superPolicy);
         this.analyticsService = new AnalyticsService(this.pap, this.epp);
-        this.obligationsService = new ObligationsService(this.pap, this.epp, this.superPolicy);
+        this.obligationsService = new ObligationsService(this.pap, this.epp, superPolicy);
     }
 
     public EPP getEPP() {
@@ -53,22 +52,22 @@ public class PDP {
         return pap;
     }
 
-    public Graph getGraphService(UserContext userCtx) throws PMException {
+    public Graph getGraphService(UserContext userCtx) {
         graphService.setUserCtx(userCtx);
         return graphService;
     }
 
-    public Prohibitions getProhibitionsService(UserContext userCtx) throws PMException {
+    public Prohibitions getProhibitionsService(UserContext userCtx) {
         prohibitionsService.setUserCtx(userCtx);
         return prohibitionsService;
     }
 
-    public AnalyticsService getAnalyticsService(UserContext userCtx) throws PMException {
+    public AnalyticsService getAnalyticsService(UserContext userCtx) {
         analyticsService.setUserCtx(userCtx);
         return analyticsService;
     }
 
-    public Obligations getObligationsService(UserContext userCtx) throws PMException {
+    public Obligations getObligationsService(UserContext userCtx) {
         obligationsService.setUserCtx(userCtx);
         return obligationsService;
     }
