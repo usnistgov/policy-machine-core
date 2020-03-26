@@ -4,11 +4,16 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
+import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class IsNodeContainedInExecutor implements FunctionExecutor {
     @Override
@@ -50,6 +55,15 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             return false;
         }
 
-        return pdp.getPAP().getGraphPAP().getChildren(parentNode.getName()).contains(childNode.getName());
+        DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
+        Set<String> nodes = new HashSet<>();
+        Visitor visitor = node -> {
+            if (node.getName().equals(parentNode.getName())) {
+                nodes.add(node.getName());
+            }
+        };
+        dfs.traverse(childNode, (c, p) -> {}, visitor, Direction.PARENTS);
+
+        return nodes.contains(parentNode.getName());
     }
 }

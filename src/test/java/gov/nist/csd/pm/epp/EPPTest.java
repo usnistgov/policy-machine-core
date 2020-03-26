@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
+import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.obligations.model.Rule;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.util.*;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EPPTest {
@@ -37,10 +39,10 @@ class EPPTest {
     void setup() throws PMException {
         Graph graph = new MemGraph();
         pc1 = graph.createPolicyClass("pc1", null);
-        ua1 = graph.createNode("ua1", NodeType.UA, null, pc1.getName());
-        oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
+        ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        oa1 = graph.createNode("oa1", OA, null, pc1.getName());
         o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());
-        u1 = graph.createNode("u1", NodeType.U, null, ua1.getName());
+        u1 = graph.createNode("u1", U, null, ua1.getName());
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
@@ -103,5 +105,30 @@ class EPPTest {
         // check that the deny was created
         // an exception is thrown if one doesnt exist
         pdp.getPAP().getProhibitionsPAP().get("deny");
+    }
+
+    @Test
+    void testUserContainedIn() throws PMException {
+        Graph graph = new MemGraph();
+
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        Node oa2 = graph.createNode("oa2", OA, null, "pc1");
+        Node o1 = graph.createNode("o1", OA, null, "oa1");
+
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua1-1", UA, null, "ua1");
+        graph.createNode("u1", U, null, "ua1-1");
+
+        InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
+        Obligation obligation = EVRParser.parse(is);
+
+        Obligations obligations = new MemObligations();
+        obligations.add(obligation, true);
+
+        PDP pdp = new PDP(new PAP(graph, new MemProhibitions(), obligations), new EPPOptions());
+        pdp.getEPP().processEvent(new AssignToEvent(oa2, o1), "u1", "");
+
+        assertTrue(graph.exists("new OA"));
     }
 }

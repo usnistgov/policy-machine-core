@@ -7,6 +7,9 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
+import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.model.*;
@@ -17,7 +20,7 @@ import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 public class EPP {
 
@@ -132,12 +135,14 @@ public class EPP {
             return true;
         }
 
-        Node node = pap.getGraphPAP().getNode(user);
-        if(matchSubject.getAnyUser() != null && matchSubject.getAnyUser().contains(node.getName())) {
+        // get the current user node
+        Node userNode = pap.getGraphPAP().getNode(user);
+
+        if (checkAnyUser(userNode, matchSubject.getAnyUser())) {
             return true;
         }
 
-        if(matchSubject.getUser() != null && matchSubject.getUser().equals(node.getName())) {
+        if(matchSubject.getUser() != null && matchSubject.getUser().equals(userNode.getName())) {
             return true;
         }
 
@@ -145,8 +150,46 @@ public class EPP {
                 matchSubject.getProcess().getValue().equals(process);
     }
 
+    private boolean checkAnyUser(Node userNode, List<String> anyUser) throws PMException {
+        if (anyUser == null || anyUser.isEmpty()) {
+            return true;
+        }
+
+        DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
+
+        // check each user in the anyUser list
+        // there can be users and user attributes
+        for (String u : anyUser) {
+            Node anyUserNode = pdp.getPAP().getGraphPAP().getNode(u);
+
+            // if the node in anyUser == the user than return true
+            if (anyUserNode.getName().equals(userNode.getName())) {
+                return true;
+            }
+
+            // if the anyUser is not an UA, move to the next one
+            if (anyUserNode.getType() != UA) {
+                continue;
+            }
+
+            Set<String> nodes = new HashSet<>();
+            Visitor visitor = node -> {
+                if (node.getName().equals(userNode.getName())) {
+                    nodes.add(node.getName());
+                }
+            };
+            dfs.traverse(userNode, (c, p) -> {}, visitor, Direction.PARENTS);
+
+            if (nodes.contains(anyUserNode.getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private boolean pcMatches(String user, PolicyClass matchPolicyClass) {
-        // TODO ignoring this for now as it will be inefficient to find all the PCs a user is under
+        // not yet implemented
         return true;
     }
 

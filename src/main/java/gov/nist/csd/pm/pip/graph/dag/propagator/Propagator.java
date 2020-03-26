@@ -6,10 +6,10 @@ import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 public interface Propagator {
 
     /**
-     * Propagate information from the parent node to the child node.
+     * Propagate information from the node to the target node. This can be from a parent to a child if direction is
      *
-     * @param parentNode the parent with information to propagate to the child.
-     * @param childNode the child that will receive any information being propagated by the parent.
+     * @param node the node that holds the information already.
+     * @param target the node to propagate the information to.
      */
-    void propagate(Node parentNode, Node childNode) throws PMException;
+    void propagate(Node node, Node target) throws PMException;
 }

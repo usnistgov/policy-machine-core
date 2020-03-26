@@ -6,6 +6,7 @@ import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.BreadthFirstSearcher;
 import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -276,7 +277,7 @@ public class PReviewDecider implements Decider {
         };
 
         DepthFirstSearcher searcher = new DepthFirstSearcher(graph);
-        searcher.traverse(graph.getNode(target), propagator, visitor);
+        searcher.traverse(graph.getNode(target), propagator, visitor, Direction.PARENTS);
 
         return new TargetContext(visitedNodes.get(target), reachedTargets);
     }
@@ -332,7 +333,7 @@ public class PReviewDecider implements Decider {
         Propagator propagator = (parentNode, childNode) -> {};
 
         // start the bfs
-        searcher.traverse(start, propagator, visitor);
+        searcher.traverse(start, propagator, visitor, Direction.PARENTS);
 
         return new UserContext(borderTargets, reachedProhibitions);
     }

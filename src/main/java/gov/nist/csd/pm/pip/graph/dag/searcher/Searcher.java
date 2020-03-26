@@ -16,6 +16,6 @@ public interface Searcher {
      * @param visitor the handler for visiting nodes during traversal.
      * @throws PMException if there is an exception traversing a graph.
      */
-    void traverse(Node start, Propagator propagator, Visitor visitor) throws PMException;
+    void traverse(Node start, Propagator propagator, Visitor visitor, Direction direction) throws PMException;
 
 }
