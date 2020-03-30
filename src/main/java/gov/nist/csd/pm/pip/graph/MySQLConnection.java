@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pip.graph;
 
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
 
 public class MySQLConnection {
 
@@ -31,8 +33,9 @@ public class MySQLConnection {
             map.put("key", "value");
             map.put("key2", "value 2");
 
-            Node parentNode = mySQLGraph.createPolicyClass(43, "parent",null);
-            Node child1Node = mySQLGraph.createNode(44, "child1", OA, null, 43);
+            /*Node parentNode = mySQLGraph.createPolicyClass("parent",null);
+            Node child1Node = mySQLGraph.createNode("child1", UA, null, "parent");
+            Node child2Node = mySQLGraph.createNode("child2", OA, map, "parent");*/
             //mySQLGraph.isAssigned(3,6);
             //mySQLGraph.updateNode(10, "Update name2 node user attribute", map);
             //mySQLGraph.deleteNode(11);
@@ -45,10 +48,10 @@ public class MySQLConnection {
             //mySQLGraph.getParents(8);
             //mySQLGraph.assign(8,3);
             //mySQLGraph.deassign(9,8);
-            //mySQLGraph.associate(3,8,new HashSet<>(Arrays.asList( "write")));
+            //mySQLGraph.associate("child1","child2", new OperationSet("read", "write"));
             //mySQLGraph.dissociate(3,8);
 
-            //mySQLGraph.getSourceAssociations(4);
+            mySQLGraph.getSourceAssociations("child1");
             //mySQLGraph.getTargetAssociations(10);
 
         } catch (Exception e){

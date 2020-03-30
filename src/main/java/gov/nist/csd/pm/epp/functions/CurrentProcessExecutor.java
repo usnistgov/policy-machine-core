@@ -23,7 +23,7 @@ public class CurrentProcessExecutor implements FunctionExecutor {
      * current processID and type PROCESS.
      */
     @Override
-    public Prohibition.Subject exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
-        return new Prohibition.Subject(processID, Prohibition.Subject.Type.PROCESS);
+    public String exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+        return process;
     }
 }

@@ -15,8 +15,8 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
  */
 public class Assignment extends Relationship implements Serializable {
 
-    public Assignment(long childID, long parentID) {
-        super(childID, parentID);
+    public Assignment(String child, String parent) {
+        super(child, parent);
     }
 
     private static Map<NodeType, NodeType[]> validAssignments = new EnumMap<>(NodeType.class);
@@ -53,12 +53,12 @@ public class Assignment extends Relationship implements Serializable {
         }
 
         Assignment assignment = (Assignment) o;
-        return this.sourceID == assignment.sourceID &&
-                this.targetID == assignment.targetID;
+        return this.source.equals(assignment.source) &&
+                this.target.equals(assignment.target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceID, targetID);
+        return Objects.hash(source, target);
     }
 }

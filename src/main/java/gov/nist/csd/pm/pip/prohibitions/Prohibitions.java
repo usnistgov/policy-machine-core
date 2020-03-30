@@ -39,18 +39,19 @@ public interface Prohibitions {
     /**
      * Get all of the prohibitions a given entity is the direct subject of.  The subject can be a user, user attribute,
      * or process.
-     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @param subject the name of the subject to get the prohibitions for.
      * @return The list of prohibitions the given entity is the subject of.
      */
-    List<Prohibition> getProhibitionsFor(long subjectID) throws PMException;
+    List<Prohibition> getProhibitionsFor(String subject) throws PMException;
 
     /**
-     * Update the given prohibition.  The name of the prohibition is provided in the parameter.
+     * Update the prohibition with the given name. Prohibition names cannot be updated.
      *
+     * @param prohibitionName the name of the prohibition to update.
      * @param prohibition The prohibition to update.
      * @throws PMException if there is an error updating the prohibition.
      */
-    void update(Prohibition prohibition) throws PMException;
+    void update(String prohibitionName, Prohibition prohibition) throws PMException;
 
     /**
      * Delete the prohibition, and remove it from the data structure.

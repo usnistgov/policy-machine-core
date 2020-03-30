@@ -4,11 +4,16 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
+import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class IsNodeContainedInExecutor implements FunctionExecutor {
     @Override
@@ -22,7 +27,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Boolean exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Boolean exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List< Arg > args = function.getArgs();
         if (args.size() != numParams()) {
             throw new PMException(getFunctionName() + " expected " + numParams() + " parameters but got " + args.size());
@@ -34,7 +39,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node childNode = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, f);
+        Node childNode = functionEvaluator.evalNode(eventCtx, user, process, pdp, f);
         if(childNode == null) {
             return false;
         }
@@ -45,11 +50,20 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node parentNode = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, f);
+        Node parentNode = functionEvaluator.evalNode(eventCtx, user, process, pdp, f);
         if(parentNode == null) {
             return false;
         }
 
-        return pdp.getPAP().getGraphPAP().getChildren(parentNode.getID()).contains(childNode.getID());
+        DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
+        Set<String> nodes = new HashSet<>();
+        Visitor visitor = node -> {
+            if (node.getName().equals(parentNode.getName())) {
+                nodes.add(node.getName());
+            }
+        };
+        dfs.traverse(childNode, (c, p) -> {}, visitor, Direction.PARENTS);
+
+        return nodes.contains(parentNode.getName());
     }
 }

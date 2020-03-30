@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import java.util.*;
 
 public class OperationSet extends HashSet<String> {
+    public OperationSet(){
+    }
 
     public OperationSet(String ... ops) {
         this.addAll(Arrays.asList(ops));
@@ -13,4 +15,5 @@ public class OperationSet extends HashSet<String> {
     public OperationSet(Collection<String> ops) {
         this.addAll(ops);
     }
+
 }

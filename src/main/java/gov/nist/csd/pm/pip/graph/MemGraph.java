@@ -1,42 +1,30 @@
 package gov.nist.csd.pm.pip.graph;
 
-import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.decider.Decider;
-import gov.nist.csd.pm.pdp.decider.PReviewDecider;
-import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import gov.nist.csd.pm.pip.graph.model.relationships.Relationship;
-import gov.nist.csd.pm.pip.obligations.MemObligations;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
-import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
-import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 /**
- * MemGraph is an in-memory implementation of the graph interface.  It stores the IDs of the nodes in a DAG structure.
+ * MemGraph is an in-memory implementation of the graph interface.  It stores the names of the nodes in a DAG structure.
  * And stores all other node information in a map for easy/fast retrieval.
  */
 public class MemGraph implements Graph {
 
     private static final String NODE_NOT_FOUND_MSG = "node %s does not exist in the graph";
 
-    private DirectedGraph<Long, Relationship> graph;
-    private HashSet<Long>                     pcs;
-    private HashMap<Long, Node>               nodes;
-    private HashMap<String, Long>             names;
+    private DirectedGraph<String, Relationship> graph;
+    private HashSet<String>                     pcs;
+    private HashMap<String, Node>               nodes;
 
     /**
      * Default constructor to create an empty graph in memory.
@@ -44,75 +32,69 @@ public class MemGraph implements Graph {
     public MemGraph() {
         graph = new DirectedAcyclicGraph<>(Relationship.class);
         nodes = new HashMap<>();
-        names = new HashMap<>();
         pcs = new HashSet<>();
     }
 
     @Override
-    public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
-        if (exists(id)) {
-            throw new IllegalArgumentException("the ID already exists in the graph");
-        }
-        else if (name == null || name.isEmpty()) {
+    public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
+        if (name == null) {
             throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
         }
+        else if (exists(name)) {
+            throw new IllegalArgumentException("the name " + name + " already exists in the graph");
+        }
 
-        // add the pc's ID to the pc set and to the graph
-        pcs.add(id);
-        graph.addVertex(id);
-        names.put(name, id);
+        // add the pc's name to the pc set and to the graph
+        pcs.add(name);
+        graph.addVertex(name);
 
         // create the node
-        Node node = new Node(id, name, PC, properties);
-        nodes.put(id, node);
+        Node node = new Node(name, PC, properties);
+        nodes.put(name, node);
 
         return node;
     }
 
     /**
-     * Create a node in the in-memory graph.  The ID field of the passed Node must not be 0.
+     * Create a node in the in-memory graph.
      *
-     * @return the ID that was passed as part of the node parameter.
-     * @throws IllegalArgumentException When the provided node is null.
-     * @throws IllegalArgumentException When the provided node has an ID of 0.
-     * @throws IllegalArgumentException When the provided node has a null or empty name.
-     * @throws IllegalArgumentException When the provided node has a null type.
+     * @return the Node that was created.
+     * @throws IllegalArgumentException when the provided name is null.
+     * @throws IllegalArgumentException when the provided name already exists in the graph.
+     * @throws IllegalArgumentException when the provided type is null.
+     * @throws IllegalArgumentException when an initial parent is not provided.
      */
 
     @Override
-    public Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long... additionalParents) throws PMException {
+    public Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String... additionalParents) throws PMException {
         //check for null values
         if (type == PC) {
             throw new PMException("use createPolicyClass to create a policy class node");
         }
-        else if (exists(id)) {
-            throw new IllegalArgumentException("the ID already exists in the graph");
-        }
-        else if (name == null || name.isEmpty()) {
+        else if (name == null) {
             throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
+        }
+        else if (exists(name)) {
+            throw new IllegalArgumentException("the name " + name + " already exists in the graph");
         }
         else if (type == null) {
             throw new IllegalArgumentException("a null type was provided to the in memory graph when creating a node");
         }
-        else if (initialParent == 0) {
-            throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
-        }
-        else if (names.containsKey(name)) {
-            throw new PMException("a node with the name " + name + " already exists");
+        else if (initialParent == null) {
+            throw new IllegalArgumentException("must specify an initial parent when creating a non policy class node");
         }
 
         // add the vertex to the graph
-        graph.addVertex(id);
-        names.put(name, id);
+        graph.addVertex(name);
 
         //store the node in the map
-        Node node = new Node(id, name, type, properties);
-        nodes.put(id, node);
+        Node node = new Node(name, type, properties);
+        nodes.put(name, node);
 
         // assign the new node the to given parent nodes
-        assign(id, initialParent);
-        for (long parentID : additionalParents) {
-            assign(id, parentID);
+        assign(name, initialParent);
+        for (String parent : additionalParents) {
+            assign(name, parent);
         }
 
         //return the Node
@@ -125,58 +107,49 @@ public class MemGraph implements Graph {
      * properties.  If the properties are null, they will be skipped. However, if the properties are an empty map, the
      * empty map will be set as the node's new properties.
      * <p>
-     * The ID must be present in order to identify which node to update.
+     * The name must be present in order to identify which node to update.
      *
-     * @throws PMException if the given node ID does not exist in the graph.
+     * @throws PMException if the given node name does not exist in the graph.
      */
     @Override
-    public void updateNode(long id, String name, Map<String, String> properties) throws PMException {
-        Node existingNode = nodes.get(id);
+    public void updateNode(String name, Map<String, String> properties) throws PMException {
+        Node existingNode = nodes.get(name);
         if (existingNode == null) {
-            throw new PMException(String.format("node with the ID %d could not be found to update", id));
-        }
-
-        // update name if present
-        if (name != null && !name.isEmpty()) {
-            names.remove(existingNode.getName());
-            existingNode.name(name);
-            names.put(name, existingNode.getID());
+            throw new PMException(String.format("node with the name %s could not be found to update", name));
         }
 
         // update the properties
         if (properties != null) {
-            existingNode.properties(properties);
+            existingNode.setProperties(properties);
         }
 
         // update the node information
-        nodes.put(existingNode.getID(), existingNode);
+        nodes.put(existingNode.getName(), existingNode);
     }
 
     /**
-     * Delete the node with the given ID from the graph.  If the nodeID is 0 or does not already exist in the graph,
+     * Delete the node with the given name from the graph.  If the name is empty or does not already exist in the graph,
      * no errors will occur.
      *
-     * @param nodeID the ID of the node to delete.
+     * @param name the name of the node to delete.
      */
     @Override
-    public void deleteNode(long nodeID) throws PMException {
-        Node node = getNode(nodeID);
+    public void deleteNode(String name) {
         //remove the vertex from the graph
-        graph.removeVertex(nodeID);
+        graph.removeVertex(name);
         //remove the node from the policies if it is a policy class
-        pcs.remove(nodeID);
+        pcs.remove(name);
         //remove the node from the map
-        nodes.remove(nodeID);
-        names.remove(node.getName());
+        nodes.remove(name);
     }
 
     @Override
-    public boolean exists(long nodeID) {
-        return graph.containsVertex(nodeID);
+    public boolean exists(String name) {
+        return graph.containsVertex(name);
     }
 
     @Override
-    public Set<Long> getPolicyClasses() {
+    public Set<String> getPolicyClasses() {
         return pcs;
     }
 
@@ -186,28 +159,29 @@ public class MemGraph implements Graph {
     }
 
     /**
-     * Retrieve the node from the graph with the given ID.
+     * Retrieve the node from the graph with the given name.
      *
-     * @param id the ID of the node to get.
-     * @return the node with the given ID.
-     * @throws PMException if the provided ID does not exist in the graph.
+     * @param name the name of the node to get.
+     * @return the node with the given name.
+     * @throws PMException if the provided name does not exist in the graph.
      */
     @Override
-    public Node getNode(long id) throws PMException {
-        Node node = nodes.get(id);
+    public Node getNode(String name) throws PMException {
+        Node node = nodes.get(name);
         if (node == null) {
-            throw new PMException(String.format("a node with the ID %d does not exist", id));
+            throw new PMException(String.format("a node with the name %s does not exist", name));
         }
 
         return node;
     }
 
     @Override
-    public Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException {
-        Set<Node> search = search(name, type, properties);
+    public Node getNode(NodeType type, Map<String, String> properties) throws PMException {
+        Set<Node> search = search(type, properties);
         if (search.isEmpty()) {
-            throw new PMException(String.format("a node matching the criteria (%s, %s, %s) does not exist", name, type, properties));
+            throw new PMException(String.format("a node matching the criteria (%s, %s) does not exist", type, properties));
         }
+
         return search.iterator().next();
     }
 
@@ -215,13 +189,12 @@ public class MemGraph implements Graph {
      * Search for nodes in the in-memory graph that match the given parameters. A node must match all parameters provided
      * including every property, to be included in the returned set.
      *
-     * @param name       the name of the nodes to search for.
      * @param type       the type of the nodes to search for.
      * @param properties the properties of the nodes to search for.
      * @return the set of nodes that match the given parameters.
      */
     @Override
-    public Set<Node> search(String name, NodeType type, Map<String, String> properties) {
+    public Set<Node> search(NodeType type, Map<String, String> properties) {
         if (properties == null) {
             properties = new HashMap<>();
         }
@@ -229,10 +202,8 @@ public class MemGraph implements Graph {
         HashSet<Node> results = new HashSet<>();
         // iterate over the nodes to find ones that match the search parameters
         for (Node node : getNodes()) {
-            // if the name parameter is not null and the current node name does not equal the name parameter, do not add
             // if the type parameter is not null and the current node type does not equal the type parameter, do not add
-            if (name != null && !node.getName().equals(name) ||
-                    type != null && !node.getType().equals(type)) {
+            if (type != null && !node.getType().equals(type)) {
                 continue;
             }
 
@@ -259,23 +230,23 @@ public class MemGraph implements Graph {
     /**
      * Find all the nodes that are assigned to the given node.
      *
-     * @param nodeID the ID of the node to get the children of.
+     * @param name the name of the node to get the children of.
      * @return the set of nodes that are assigned to the given node.  The returned set will include each node's information provided in Node objects.
-     * @throws PMException if the provided nodeID does not exist in the graph.
+     * @throws PMException if the provided name does not exist in the graph.
      */
     @Override
-    public Set<Long> getChildren(long nodeID) throws PMException {
-        if (!exists(nodeID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
+    public Set<String> getChildren(String name) throws PMException {
+        if (!exists(name)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
 
-        HashSet<Long> children = new HashSet<>();
-        Set<Relationship> rels = graph.incomingEdgesOf(nodeID);
+        HashSet<String> children = new HashSet<>();
+        Set<Relationship> rels = graph.incomingEdgesOf(name);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 continue;
             }
-            children.add(rel.getSourceID());
+            children.add(rel.getSource());
         }
         return children;
     }
@@ -283,23 +254,23 @@ public class MemGraph implements Graph {
     /**
      * Find all the nodes that the given node is assigned to.
      *
-     * @param nodeID the ID of the node to get the parents of.
+     * @param name the name of the node to get the parents of.
      * @return the set of nodes the given node is assigned to.  The returned set will include each node's information provided in Node objects.
-     * @throws PMException if the provided nodeID does not exist in the graph.
+     * @throws PMException if the provided name does not exist in the graph.
      */
     @Override
-    public Set<Long> getParents(long nodeID) throws PMException {
-        if (!exists(nodeID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
+    public Set<String> getParents(String name) throws PMException {
+        if (!exists(name)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
 
-        HashSet<Long> parents = new HashSet<>();
-        Set<Relationship> rels = graph.outgoingEdgesOf(nodeID);
+        HashSet<String> parents = new HashSet<>();
+        Set<Relationship> rels = graph.outgoingEdgesOf(name);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 continue;
             }
-            parents.add(rel.getTargetID());
+            parents.add(rel.getTarget());
         }
         return parents;
     }
@@ -314,24 +285,24 @@ public class MemGraph implements Graph {
      * @throws PMException if the two types do not make a valid assignment.
      */
     @Override
-    public void assign(long childID, long parentID) throws PMException {
-        if (!exists(childID)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, childID));
+    public void assign(String child, String parent) throws PMException {
+        if (!exists(child)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, child));
         }
-        else if (!exists(parentID)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentID));
-        }
-
-        if (graph.containsEdge(childID, parentID)) {
-            throw new PMException(childID + " is already assigned to" + parentID);
+        else if (!exists(parent)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parent));
         }
 
-        Node child = getNode(childID);
-        Node parent = getNode(parentID);
+        if (graph.containsEdge(child, parent)) {
+            throw new PMException(child + " is already assigned to" + parent);
+        }
 
-        Assignment.checkAssignment(child.getType(), parent.getType());
+        Node childNode = getNode(child);
+        Node parentNode = getNode(parent);
 
-        graph.addEdge(childID, parentID, new Assignment(childID, parentID));
+        Assignment.checkAssignment(childNode.getType(), parentNode.getType());
+
+        graph.addEdge(child, parent, new Assignment(child, parent));
     }
 
     /**
@@ -341,47 +312,45 @@ public class MemGraph implements Graph {
      * @throws IllegalArgumentException if the parent node context is null.
      */
     @Override
-    public void deassign(long childID, long parentID) {
-        graph.removeEdge(childID, parentID);
+    public void deassign(String child, String parent) {
+        graph.removeEdge(child, parent);
     }
 
     @Override
-    public boolean isAssigned(long childID, long parentID) throws PMException {
-        return graph.containsEdge(childID, parentID);
+    public boolean isAssigned(String child, String parent) throws PMException {
+        return graph.containsEdge(child, parent);
     }
 
     /**
      * Associate the user attribute node and the target node.
      *
-     * @throws IllegalArgumentException if the user attribute node context is null.
-     * @throws IllegalArgumentException if the target node context is null.
      * @throws PMException              if the user attribute node does not exist in the graph.
      * @throws PMException              if the target node does not exist in the graph.
      */
     @Override
-    public void associate(long uaID, long targetID, OperationSet operations) throws PMException {
-        if (!exists(uaID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, uaID));
+    public void associate(String ua, String target, OperationSet operations) throws PMException {
+        if (!exists(ua)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, ua));
         }
-        else if (!exists(targetID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
+        else if (!exists(target)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, target));
         }
 
-        Node ua = getNode(uaID);
-        Node target = getNode(targetID);
+        Node uaNode = getNode(ua);
+        Node targetNode = getNode(target);
 
         // check that the association is valid
-        Association.checkAssociation(ua.getType(), target.getType());
+        Association.checkAssociation(uaNode.getType(), targetNode.getType());
 
         // if no edge exists create an association
         // if an assignment exists create a new edge for the association
         // if an association exists update it
-        Relationship edge = graph.getEdge(uaID, targetID);
+        Relationship edge = graph.getEdge(ua, target);
         if (edge == null || edge instanceof Assignment) {
-            graph.addEdge(uaID, targetID, new Association(uaID, targetID, operations));
+            graph.addEdge(ua, target, new Association(ua, target, operations));
         }
         else if (edge instanceof Association) {
-            Association assoc = (Association) graph.getEdge(uaID, targetID);
+            Association assoc = (Association) graph.getEdge(ua, target);
             assoc.setOperations(operations);
         }
     }
@@ -390,29 +359,29 @@ public class MemGraph implements Graph {
      * Dissociate the user attribute node from the target node.  If an association does not exist, nothing happens.
      */
     @Override
-    public void dissociate(long uaID, long targetID) {
-        graph.removeEdge(uaID, targetID);
+    public void dissociate(String ua, String target) {
+        graph.removeEdge(ua, target);
     }
 
     /**
      * Get the associations that the given node is the source of.
      *
-     * @param sourceID the ID of the source node.
+     * @param source the name of the source node.
      * @return a map of the target nodes to the operations for each association that the given node is the source of.
-     * @throws PMException if the given ID does not exist in the graph.
+     * @throws PMException if the given name does not exist in the graph.
      */
     @Override
-    public Map<Long, OperationSet> getSourceAssociations(long sourceID) throws PMException {
-        if (!exists(sourceID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, sourceID));
+    public Map<String, OperationSet> getSourceAssociations(String source) throws PMException {
+        if (!exists(source)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, source));
         }
 
-        Map<Long, OperationSet> assocs = new HashMap<>();
-        Set<Relationship> rels = graph.outgoingEdgesOf(sourceID);
+        Map<String, OperationSet> assocs = new HashMap<>();
+        Set<Relationship> rels = graph.outgoingEdgesOf(source);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 Association assoc = (Association) rel;
-                assocs.put(assoc.getTargetID(), new OperationSet(assoc.getOperations()));
+                assocs.put(assoc.getTarget(), new OperationSet(assoc.getOperations()));
             }
         }
         return assocs;
@@ -421,22 +390,22 @@ public class MemGraph implements Graph {
     /**
      * Get the associations that the given node is the target of.
      *
-     * @param targetID the ID of the target node.
+     * @param target the name of the target node.
      * @return a map of the source nodes to the operations for each association that the given node is the target of.
-     * @throws PMException if the given ID does not exist in the graph.
+     * @throws PMException if the given name does not exist in the graph.
      */
     @Override
-    public Map<Long, OperationSet> getTargetAssociations(long targetID) throws PMException {
-        if (!exists(targetID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
+    public Map<String, OperationSet> getTargetAssociations(String target) throws PMException {
+        if (!exists(target)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, target));
         }
 
-        Map<Long, OperationSet> assocs = new HashMap<>();
-        Set<Relationship> rels = graph.incomingEdgesOf(targetID);
+        Map<String, OperationSet> assocs = new HashMap<>();
+        Set<Relationship> rels = graph.incomingEdgesOf(target);
         for (Relationship rel : rels) {
             if (rel instanceof Association) {
                 Association assoc = (Association) rel;
-                assocs.put(assoc.getSourceID(), new OperationSet(assoc.getOperations()));
+                assocs.put(assoc.getSource(), new OperationSet(assoc.getOperations()));
             }
         }
         return assocs;

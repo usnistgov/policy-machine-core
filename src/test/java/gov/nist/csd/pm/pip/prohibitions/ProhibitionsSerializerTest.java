@@ -2,28 +2,25 @@ package gov.nist.csd.pm.pip.prohibitions;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pip.prohibitions.model.Prohibition.Subject.Type.USER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ProhibitionsSerializerTest {
 
-    Prohibitions dao;
+    private Prohibitions dao;
 
     @BeforeEach
     void setUp() throws PMException {
         dao = new MemProhibitions();
 
-        Prohibition prohibition = new Prohibition();
-        prohibition.setName("prohibition1");
-        prohibition.setSubject(new Prohibition.Subject(123, USER));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.setIntersection(false);
-        prohibition.addNode(new Prohibition.Node(1234, true));
+        Prohibition prohibition = new Prohibition.Builder("prohibition1", "123", new OperationSet("read"))
+                .setIntersection(false)
+                .addContainer("1234", true)
+                .build();
 
         dao.add(prohibition);
     }
@@ -40,6 +37,8 @@ class ProhibitionsSerializerTest {
         assertEquals("prohibition1", prohibition.getName());
         assertFalse(prohibition.isIntersection());
         assertEquals(new OperationSet("read"), prohibition.getOperations());
-        assertEquals(new Prohibition.Node(1234, true), prohibition.getNodes().get(0));
+
+        assertTrue(prohibition.getContainers().containsKey("1234"));
+        assertTrue(prohibition.getContainers().get("1234"));
     }
 }

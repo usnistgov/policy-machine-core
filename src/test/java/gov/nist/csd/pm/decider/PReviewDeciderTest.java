@@ -7,7 +7,6 @@ import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
@@ -15,55 +14,51 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.operations.Operations.READ;
+import static gov.nist.csd.pm.operations.Operations.WRITE;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PReviewDeciderTest {
-
-    private static long getID() {
-        return new Random().nextLong();
-    }
 
     @Test
     void testHasPermissions() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
-        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
-        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
+        Node o2 = graph.createNode("o2", O, null, oa1.getName());
+        Node o3 = graph.createNode("o3", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.check(u1.getID(), 0, o1.getID(), "read", "write"));
+        assertTrue(decider.check(u1.getName(), "", o1.getName(), "read", "write"));
     }
 
     @Test
     void testFilter() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
-        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
-        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
+        Node o2 = graph.createNode("o2", O, null, oa1.getName());
+        Node o3 = graph.createNode("o3", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
         Set<Node> nodes = graph.getNodes();
 
-        Set<Long> nodeIDs = new HashSet<>(Arrays.asList(o1.getID(), o2.getID(), o3.getID(), oa1.getID()));
+        Set<String> nodeIDs = new HashSet<>(Arrays.asList(o1.getName(), o2.getName(), o3.getName(), oa1.getName()));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertEquals(nodeIDs, new HashSet<>(decider.filter(u1.getID(), 0, nodeIDs, "read"))
+        assertEquals(nodeIDs, new HashSet<>(decider.filter(u1.getName(), "", nodeIDs, "read"))
         );
     }
 
@@ -71,20 +66,20 @@ class PReviewDeciderTest {
     void testGetChildren() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
-        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
-        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
+        Node o2 = graph.createNode("o2", O, null, oa1.getName());
+        Node o3 = graph.createNode("o3", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        Set<Long> children = decider.getChildren(u1.getID(), 0, oa1.getID());
+        Set<String> children = decider.getChildren(u1.getName(), "", oa1.getName());
         assertEquals(
-                new HashSet<>(Arrays.asList(o1.getID(), o2.getID(), o3.getID())),
+                new HashSet<>(Arrays.asList(o1.getName(), o2.getName(), o3.getName())),
                 children
         );
     }
@@ -93,294 +88,294 @@ class PReviewDeciderTest {
     void testGetAccessibleNodes() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
-        Node o2 = graph.createNode(getID(), "o2", O, null, oa1.getID());
-        Node o3 = graph.createNode(getID(), "o3", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
+        Node o2 = graph.createNode("o2", O, null, oa1.getName());
+        Node o3 = graph.createNode("o3", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        Map<Long, Set<String>> accessibleNodes = decider.getAccessibleNodes(u1.getID(), 0);
+        Map<String, Set<String>> accessibleNodes = decider.getCapabilityList(u1.getName(), "");
 
-        assertTrue(accessibleNodes.containsKey(oa1.getID()));
-        assertTrue(accessibleNodes.containsKey(o1.getID()));
-        assertTrue(accessibleNodes.containsKey(o2.getID()));
-        assertTrue(accessibleNodes.containsKey(o3.getID()));
+        assertTrue(accessibleNodes.containsKey(oa1.getName()));
+        assertTrue(accessibleNodes.containsKey(o1.getName()));
+        assertTrue(accessibleNodes.containsKey(o2.getName()));
+        assertTrue(accessibleNodes.containsKey(o3.getName()));
 
-        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(oa1.getID()));
-        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(o1.getID()));
-        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(o2.getID()));
-        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(o3.getID()));
+        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(oa1.getName()));
+        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(o1.getName()));
+        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(o2.getName()));
+        assertEquals(new OperationSet("read", "write"), accessibleNodes.get(o3.getName()));
     }
 
     @Test
     void testGraph1() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
     void testGraph2() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID(), pc2.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName(), pc2.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
 
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
     void testGraph3() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
     void testGraph4() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa1.getID(), new OperationSet("write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
     void testGraph5() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read")));
     }
     @Test
     void testGraph6() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read")));
     }
     @Test
     void testGraph7() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
     void testGraph8() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("*")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
     void testGraph9() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
-        graph.associate(ua2.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
+        graph.associate(ua2.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("*")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
     void testGraph10() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
     void testGraph11() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
     void testGraph12() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa1.getID(), new OperationSet("write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
     void testGraph13() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, ua2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, oa2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node ua1 = graph.createNode("ua1", UA, null, ua2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, oa2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("*")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
     void testGraph14() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID(), pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName(), pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
-        graph.associate(ua2.getID(), oa1.getID(), new OperationSet("*"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
+        graph.associate(ua2.getName(), oa1.getName(), new OperationSet("*"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("*")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
     void testGraph15() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, ua2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, oa2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node ua1 = graph.createNode("ua1", UA, null, ua2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, oa2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("*"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("*")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
     void testGraph16() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, ua2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node ua1 = graph.createNode("ua1", UA, null, ua2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa1.getID(), new OperationSet("write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
 
     // removed graph7 due to adding the parent IDs to the createNode, need to always connect to the graph.
@@ -388,118 +383,116 @@ class PReviewDeciderTest {
     @Test
     void testGraph18() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
     void testGraph19() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
     void testGraph20() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read")));
     }
     @Test
     void testGraph21() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID(), ua2.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName(), ua2.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa2.getID(), new OperationSet("write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa2.getName(), new OperationSet("write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
     void testGraph22() throws PMException {
         Graph graph = new MemGraph();
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node pc2 = graph.createPolicyClass(getID(), "pc2", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node pc2 = graph.createPolicyClass("pc2", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
     void testGraph23WithProhibitions() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa3 = graph.createNode(getID(), "oa3", OA, null, pc1.getID());
-        Node oa4 = graph.createNode(getID(), "oa4", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, oa3.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, oa4.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa3 = graph.createNode("oa3", OA, null, pc1.getName());
+        Node oa4 = graph.createNode("oa4", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, oa3.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, oa4.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa3.getID(), new OperationSet("read", "write", "execute"));
+        graph.associate(ua1.getName(), oa3.getName(), new OperationSet("read", "write", "execute"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition();
-        prohibition.setName("deny");
-        prohibition.setSubject(new Prohibition.Subject(ua1.getID(), Prohibition.Subject.Type.USER_ATTRIBUTE));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
-        prohibition.addNode(new Prohibition.Node(oa2.getID(), false));
-        prohibition.setIntersection(true);
+        Prohibition prohibition = new Prohibition.Builder("deny", ua1.getName(), new OperationSet("read"))
+                .addContainer(oa1.getName(), false)
+                .addContainer(oa2.getName(), false)
+                .setIntersection(true)
+                .build();
         prohibitions.add(prohibition);
 
-        prohibition = new Prohibition("deny2", new Prohibition.Subject(u1.getID(), Prohibition.Subject.Type.USER));
-        prohibition.setOperations(new OperationSet("write"));
-        prohibition.addNode(new Prohibition.Node(oa3.getID(), false));
-        prohibition.setIntersection(true);
+        prohibition = new Prohibition.Builder("deny2", u1.getName(), new OperationSet("write"))
+                .setIntersection(true)
+                .addContainer(oa3.getName(), false)
+                .build();
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
-        Set<String> list = decider.list(u1.getID(), 0, o1.getID());
+        Set<String> list = decider.list(u1.getName(), "", o1.getName());
         assertEquals(1, list.size());
         assertTrue(list.contains("execute"));
     }
@@ -508,110 +501,185 @@ class PReviewDeciderTest {
     void testGraph24WithProhibitions() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
-        Node o2 = graph.createNode(getID(), "o2", O, null, oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
+        Node o2 = graph.createNode("o2", O, null, oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(ua1.getID(), Prohibition.Subject.Type.USER_ATTRIBUTE));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
-        prohibition.addNode(new Prohibition.Node(oa2.getID(), true));
-        prohibition.setIntersection(true);
+        Prohibition prohibition = new Prohibition.Builder("deny", ua1.getName(), new OperationSet("read"))
+                .setIntersection(true)
+                .addContainer(oa1.getName(), false)
+                .addContainer(oa2.getName(), true)
+                .build();
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).contains("read"));
-        assertTrue(decider.list(u1.getID(), 0, o2.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).contains("read"));
+        assertTrue(decider.list(u1.getName(), "", o2.getName()).isEmpty());
 
-        graph.associate(ua1.getID(), oa2.getID(), new OperationSet("read"));
+        graph.associate(ua1.getName(), oa2.getName(), new OperationSet("read"));
 
-        prohibition = new Prohibition("deny-process", new Prohibition.Subject(1234, Prohibition.Subject.Type.PROCESS));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
+        prohibition = new Prohibition.Builder("deny-process", "1234", new OperationSet("read"))
+                .setIntersection(false)
+                .addContainer(oa1.getName(), false)
+                .build();
         prohibitions.add(prohibition);
 
-        assertTrue(decider.list(u1.getID(), 1234, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "1234", o1.getName()).isEmpty());
     }
 
     @Test
     void testGraph25WithProhibitions() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, oa1.getID());
-        Node oa3 = graph.createNode(getID(), "oa3", OA, null, oa1.getID());
-        Node oa4 = graph.createNode(getID(), "oa4", OA, null, oa3.getID());
-        Node oa5 = graph.createNode(getID(), "oa5", OA, null, oa2.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa4.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, oa1.getName());
+        Node oa3 = graph.createNode("oa3", OA, null, oa1.getName());
+        Node oa4 = graph.createNode("oa4", OA, null, oa3.getName());
+        Node oa5 = graph.createNode("oa5", OA, null, oa2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa4.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(u1.getID(), Prohibition.Subject.Type.USER));
+        Prohibition prohibition = new Prohibition.Builder("deny", u1.getName(), new OperationSet("read", "write"))
+                .setIntersection(true)
+                .addContainer(oa4.getName(), true)
+                .addContainer(oa1.getName(), false)
+                .build();
         prohibition.setOperations(new OperationSet("read", "write"));
-        prohibition.addNode(new Prohibition.Node(oa4.getID(), true));
-        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
-        prohibition.setIntersection(true);
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
-        assertTrue(decider.list(u1.getID(), 0, oa5.getID()).isEmpty());
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).containsAll(Arrays.asList("read", "write")));
+        assertTrue(decider.list(u1.getName(), "", oa5.getName()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
     void testGraph25WithProhibitions2() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, pc1.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         Prohibitions prohibitions = new MemProhibitions();
-        Prohibition prohibition = new Prohibition("deny", new Prohibition.Subject(u1.getID(), Prohibition.Subject.Type.USER));
-        prohibition.setOperations(new OperationSet("read", "write"));
-        prohibition.addNode(new Prohibition.Node(oa1.getID(), false));
-        prohibition.addNode(new Prohibition.Node(oa2.getID(), false));
-        prohibition.setIntersection(true);
+        Prohibition prohibition = new Prohibition.Builder("deny", u1.getName(), new OperationSet("read", "write"))
+                .setIntersection(true)
+                .addContainer(oa1.getName(), false)
+                .addContainer(oa2.getName(), false)
+                .build();
         prohibitions.add(prohibition);
 
         PReviewDecider decider = new PReviewDecider(graph, prohibitions);
-        assertTrue(decider.list(u1.getID(), 0, o1.getID()).isEmpty());
+        assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
 
     @Test
     void testDeciderWithUA() throws PMException {
         Graph graph = new MemGraph();
 
-        Node pc1 = graph.createPolicyClass(getID(), "pc1", null);
-        Node ua2 = graph.createNode(getID(), "ua2", UA, null, pc1.getID());
-        Node ua1 = graph.createNode(getID(), "ua1", UA, null, ua2.getID());
-        Node u1 = graph.createNode(getID(), "u1", U, null, ua1.getID());
-        Node oa1 = graph.createNode(getID(), "oa1", OA, null, pc1.getID());
-        Node oa2 = graph.createNode(getID(), "oa2", OA, null, pc1.getID());
-        Node o1 = graph.createNode(getID(), "o1", O, null, oa1.getID(), oa2.getID());
-        Node o2 = graph.createNode(getID(), "o2", O, null, oa2.getID());
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua2 = graph.createNode("ua2", UA, null, pc1.getName());
+        Node ua1 = graph.createNode("ua1", UA, null, ua2.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName(), oa2.getName());
+        Node o2 = graph.createNode("o2", O, null, oa2.getName());
 
-        graph.associate(ua1.getID(), oa1.getID(), new OperationSet("read"));
-        graph.associate(ua2.getID(), oa1.getID(), new OperationSet("write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
+        graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
         Decider decider = new PReviewDecider(graph);
-        Set<String> permissions = decider.list(ua1.getID(), 0, oa1.getID());
+        Set<String> permissions = decider.list(ua1.getName(), "", oa1.getName());
         assertTrue(permissions.containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testProhibitionsAllCombinations() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("oa3", OA, null, "pc1");
+        graph.createNode("oa4", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1", "oa2", "oa3");
+        graph.createNode("o2", O, null, "oa1", "oa4");
+
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
+        graph.createNode("u2", U, null, "ua1");
+        graph.createNode("u3", U, null, "ua1");
+        graph.createNode("u4", U, null, "ua1");
+
+        graph.associate("ua1", "oa1", new OperationSet(WRITE, READ));
+
+        Prohibitions prohibitions = new MemProhibitions();
+        Prohibition prohibition = new Prohibition.Builder("p1", "u1", new OperationSet(WRITE))
+                .setIntersection(true)
+                .addContainer("oa1", false)
+                .addContainer("oa2", false)
+                .addContainer("oa3", false)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u2", new OperationSet(WRITE))
+                .setIntersection(false)
+                .addContainer("oa1", false)
+                .addContainer("oa2", false)
+                .addContainer("oa3", false)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u3", new OperationSet(WRITE))
+                .setIntersection(true)
+                .addContainer("oa1", false)
+                .addContainer("oa2", true)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u4", new OperationSet(WRITE))
+                .setIntersection(false)
+                .addContainer("oa1", false)
+                .addContainer("oa2", true)
+                .build();
+        prohibitions.add(prohibition);
+        prohibition = new Prohibition.Builder("p1", "u4", new OperationSet(WRITE))
+                .setIntersection(false)
+                .addContainer("oa2", true)
+                .build();
+        prohibitions.add(prohibition);
+
+        Decider decider = new PReviewDecider(graph, prohibitions);
+
+        Set<String> list = decider.list("u1", "", "o1");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u1", "", "o2");
+        assertTrue(list.contains(READ) && list.contains(WRITE));
+
+        list = decider.list("u2", "", "o2");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u3", "", "o2");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u4", "", "o1");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
+
+        list = decider.list("u4", "", "o2");
+        assertTrue(list.contains(READ) && !list.contains(WRITE));
     }
 }

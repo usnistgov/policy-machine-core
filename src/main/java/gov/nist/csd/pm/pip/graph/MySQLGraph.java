@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pip.graph;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -21,6 +22,7 @@ public class MySQLGraph implements Graph {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final ObjectReader reader = new ObjectMapper().readerFor(HashMap.class);
+    private static final ObjectReader reader2 = new ObjectMapper().readerFor(OperationSet.class);
     private static final String NODE_NOT_FOUND_MSG = "node %s does not exist";
     private final MySQLConnection conn;
 
@@ -44,7 +46,6 @@ public class MySQLGraph implements Graph {
             nodes = all_nodes.stream()
                     .filter(node_k -> node_k.getName().equals(name))
                     .collect(Collectors.toList());
-            nodes.forEach(System.out::println);
             if (nodes.size() >= 1) {
                 return true;
             }
@@ -54,19 +55,52 @@ public class MySQLGraph implements Graph {
         return false;
     }
 
+    public long getNodeIdFromName (String name) throws PMException {
+
+        Collection<Node> all_nodes = getNodes();
+        List<Node> nodes;
+        try {
+            nodes = all_nodes.stream()
+                    .filter(node_k -> node_k.getName().equals(name))
+                    .collect(Collectors.toList());
+            nodes.forEach(System.out::println);
+            if (nodes.size() >= 1) {
+                return nodes.get(0).getId();
+            }
+        } catch (Exception p) {
+            throw new PMException("No nodes in the mysql graph");
+        }
+        throw new PMException("There are no nodes with that name.");
+    }
+
+    public String getNodeNameFromId(long id) throws PMException{
+        Collection<Node> all_nodes = getNodes();
+        List<Node> nodes;
+        try {
+            nodes = all_nodes.stream()
+                    .filter(node_k -> node_k.getId() == id)
+                    .collect(Collectors.toList());
+            nodes.forEach(System.out::println);
+            if (nodes.size() >= 1) {
+                return nodes.get(0).getName();
+            }
+        } catch (Exception p) {
+            throw new PMException("No nodes in the mysql graph");
+        }
+        throw new PMException("There are no nodes with that name.");
+    }
 
     @Override
-    public Node createPolicyClass(long id, String name, Map<String, String> properties) throws PMException {
+    public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
         //check for null values
-        if (id == 0) {
-            throw new IllegalArgumentException("no ID was provided when creating a policy class in the mysql graph");
-        }
-        else if (name == null || name.isEmpty()) {
+
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a policy class in the mysql graph");
         }
-        else if (exists(id)) {
-            throw new PMException("You cannot create a policy class with that ID, another node with that ID already exists.");
+        else if (exists(name)) {
+            throw new PMException("You cannot create a policy class with that name, another node with that name already exists.");
         }
+
         else if (isNameExists(name)){
             throw new PMException("a node with the name '" + name + "' already exists");
         }
@@ -86,18 +120,17 @@ public class MySQLGraph implements Graph {
                 node_type_id = rs_type.getInt("node_type_id");
             }
             //==================== create the node from (id, node_type_id, name, properties) ====================
-            ps = con.prepareStatement("INSERT INTO node(node_id, node_type_id, name, node_property)" +
-                    " VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement("INSERT INTO node(node_type_id, name, node_property)" +
+                    " VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
-            ps.setLong(1, id);
-            ps.setInt(2, node_type_id);
-            ps.setString(3,name);
+            ps.setInt(1, node_type_id);
+            ps.setString(2,name);
             //Json serialization using Jackson
             if ( properties == null) {
-                ps.setString(4, null);
+                ps.setString(3, null);
             } else {
                 try {
-                    ps.setString(4, toJSON(properties));
+                    ps.setString(3, toJSON(properties));
                 } catch (JsonProcessingException j) {
                     j.printStackTrace();
                 }
@@ -105,7 +138,7 @@ public class MySQLGraph implements Graph {
 
             ps.executeUpdate();
 
-            Node node = new Node(id, name, PC, properties);
+            Node node = new Node(name, PC, properties);
             con.close();
             return node;
         } catch (SQLException s) {
@@ -125,21 +158,18 @@ public class MySQLGraph implements Graph {
     }
 
     /**
-     * Create a node in the mysql graph.  The ID field of the passed Node must not be 0.
+     * Create a node in the mysql graph.
      *
      * @return the ID that was passed as part of the node parameter.
      * @throws IllegalArgumentException When the provided node is null.
-     * @throws IllegalArgumentException When the provided node has an ID of 0.
      * @throws IllegalArgumentException When the provided node has a null or empty name.
      * @throws IllegalArgumentException When the provided node has a null type.
-     * @throws PMException When the provided ID already exists in the mysql graph
+     * @throws PMException When the provided name already exists in the mysql graph
      */
     @Override
-    public Node createNode(long id, String name, NodeType type, Map<String, String> properties, long initialParent, long ... additionalParents) throws PMException  {
+    public Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... additionalParents) throws PMException  {
         //check for null values
-        if (id == 0) {
-            throw new IllegalArgumentException("no ID was provided when creating a node in the mysql graph");
-        }
+
         if (type == PC) {
             throw new PMException("use createPolicyClass to create a policy class node");
         }
@@ -149,11 +179,11 @@ public class MySQLGraph implements Graph {
         else if (type == null) {
             throw new IllegalArgumentException("a null type was provided to the mysql graph when creating a node");
         }
-        else if (initialParent == 0) {
-            throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
+        else if (exists(name)) {
+            throw new PMException("You cannot create a policy class with that name, another node with that name already exists.");
         }
-        else if (exists(id)) {
-            throw new PMException("You cannot create a node with that ID, another node with that ID already exists.");
+        else if (initialParent.equals("0")) {
+            throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
         }
         else if (isNameExists(name)){
             throw new PMException("a node with the name '" + name + "' already exists");
@@ -170,21 +200,21 @@ public class MySQLGraph implements Graph {
             pstmt.setString(1, type.toString());
             rs_type = pstmt.executeQuery();
             int node_type_id;
+            int id = 0;
             while (rs_type.next()) {
                 node_type_id = rs_type.getInt("node_type_id");
                 //==================== create the node from (id, node_type_id, name, properties) ====================
-                ps = con.prepareStatement("INSERT INTO node(node_id, node_type_id, name, node_property)" +
-                        " VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                ps = con.prepareStatement("INSERT INTO node(node_type_id, name, node_property)" +
+                        " VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
-                ps.setLong(1, id);
-                ps.setInt(2, node_type_id);
-                ps.setString(3, name);
+                ps.setInt(1, node_type_id);
+                ps.setString(2, name);
                 //Json serialization using Jackson
                 if (properties == null) {
-                    ps.setString(4, null);
+                    ps.setString(3, null);
                 } else {
                     try {
-                        ps.setString(4, toJSON(properties));
+                        ps.setString(3, toJSON(properties));
                     } catch (JsonProcessingException j) {
                         j.printStackTrace();
                     }
@@ -192,11 +222,16 @@ public class MySQLGraph implements Graph {
             }
             ps.executeUpdate();
 
+            ResultSet resultSet = ps.getGeneratedKeys();
+            if(resultSet.next())
+            {
+                id = resultSet.getInt(1);
+            }
             Node node = new Node(id, name, type, properties);
             //assign the new nodes to given parent nodes
-            assign(id, initialParent);
-            for (long parentID : additionalParents) {
-                assign(id, parentID);
+            assign(name, initialParent);
+            for (String parent : additionalParents) {
+                assign(name, parent);
             }
             con.close();
             return node;
@@ -224,13 +259,20 @@ public class MySQLGraph implements Graph {
      * @throws IllegalArgumentException When the provided name is null
      * @throws PMException if there is an error updating the node
      */
+
     @Override
+    public void updateNode (String name, Map<String, String> properties) throws PMException {
+        //method not stable
+    }
+
+
     public void updateNode(long id, String name, Map<String, String> properties) throws PMException {
-        if (id == 0) {
-            throw new IllegalArgumentException("no ID was provided when updating the node in the mysql graph");
-        }
-        else if (name == null || name.isEmpty()) {
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when updating the node in the mysql graph");
+        }
+        Node node = getNode(name);
+        if (node == null) {
+            throw new PMException(String.format("node with the name %s could not be found to update", name));
         }
 
         try (
@@ -244,12 +286,8 @@ public class MySQLGraph implements Graph {
                 j.printStackTrace();
             }
             ps.setLong(3, id);
-            int i = ps.executeUpdate();
-            if (i == 0) {
-                throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, id));
-            }
+            ps.executeUpdate();
 
-            System.out.println("The following node has been updated : " + id);
         } catch (SQLException s) {
             s.printStackTrace();
             throw new PMException("Cannot connect to the database");
@@ -257,19 +295,19 @@ public class MySQLGraph implements Graph {
     }
 
     /**
-     * Delete the node with the given ID from the graph. No error handled if nothing happens while deleting a node that does not exists.
+     * Delete the node with the given name from the graph. No error handled if nothing happens while deleting a node that does not exists.
      *
-     * @param nodeID the ID of the node to delete.
+     * @param name the name of the node to delete.
      * @throws PMException If there was an error deleting the node
      */
     @Override
-    public void deleteNode(long nodeID) throws PMException {
+    public void deleteNode(String name) throws PMException {
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("DELETE from node where node_id=?")
+                PreparedStatement ps = con.prepareStatement("DELETE from node where name=?")
         ){
 
-            ps.setLong(1, nodeID);
+            ps.setString(1, name);
             ps.executeUpdate();
             //TODO : Handle the case if no node got deleted
  /*         int i = ps.executeUpdate();
@@ -282,24 +320,23 @@ public class MySQLGraph implements Graph {
     }
 
     /**
-     * Check that a node with the given ID exists in the graph.
+     * Check that a node with the given name exists in the graph.
      *
-     * @param nodeID the ID of the node to check for.
-     * @return true or False if a node with the given ID exists or not.
+     * @param name of the node to check for.
+     * @return true or False if a node with the given name exists or not.
      * @throws PMException if there is an error checking if the node exists in the graph.
      */
     @Override
-    public boolean exists(long nodeID) throws PMException {
+    public boolean exists(String name) throws PMException {
         try (            Connection con = this.conn.getConnection();
-                         PreparedStatement ps = con.prepareStatement("SELECT * from node where node_id=?");
+                         PreparedStatement ps = con.prepareStatement("SELECT * from node where name=?")
         ){
-            ps.setLong(1, nodeID);
+            ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             List<Node> nodes = new ArrayList<>();
             while (rs.next()) {
-                long                id = rs.getInt("node_id");
-                String              name = rs.getString("name");
-                Node cur_node = new Node(id, name, null, null);
+                String              name_p = rs.getString("name");
+                Node cur_node = new Node(name_p, null, null);
                 nodes.add(cur_node);
             }
             return nodes.size() != 0;
@@ -310,25 +347,25 @@ public class MySQLGraph implements Graph {
     }
 
     /**
-     * Get the set of policy classes. The returned set is just the IDs of each policy class.
+     * Get the set of policy classes. The returned set is just the names of each policy class.
      *
-     * @return the set of policy class IDs.
-     * @throws PMException if there is an error retrieving the IDs of the policy classes.
+     * @return the set of policy class names.
+     * @throws PMException if there is an error retrieving the names of the policy classes.
      */
     @Override
-    public Set<Long> getPolicyClasses() throws PMException {
+    public Set<String> getPolicyClasses() throws PMException {
         Set<Node> nodes = new HashSet<>(getNodes());
-        Set<Long> Ids = new HashSet<>();
+        Set<String> namesPolicyClasses = new HashSet<>();
         for (Node node : nodes){
             if (node.getType().equals(NodeType.toNodeType("PC"))) {
-                Ids.add(node.getID());
+                namesPolicyClasses.add(node.getName());
             }
         }
 
-        if (Ids.isEmpty()) {
+        if (namesPolicyClasses.isEmpty()) {
             throw new PMException("There are no Policies in the current database");
         }
-        return Ids;
+        return namesPolicyClasses;
     }
 
     /**
@@ -354,7 +391,7 @@ public class MySQLGraph implements Graph {
             // return node_type_id instead of numeric value of the node
             long node_type =  0;
             while (rs.next()) {
-                long                node_id = rs.getInt("node_id");
+                long                id = rs.getInt("node_id");
                 String              name = rs.getString("name");
                                     node_type = rs.getInt("node_type_id");
                 String properties_string = rs.getString("node_property");
@@ -369,7 +406,7 @@ public class MySQLGraph implements Graph {
                 }
 
                 NodeType type = null;
-                node = new Node(node_id, name, type, properties);
+                node = new Node(id, name, type, properties);
                 nodesHashmap.put(node, node_type);
                 nodes.add(node);
             }
@@ -410,25 +447,25 @@ public class MySQLGraph implements Graph {
     }
 
     @Override
-    public Node getNode(String name, NodeType type, Map<String, String> properties) throws PMException {
-        Set<Node> search = search(name, type, properties);
+    public Node getNode(NodeType type, Map<String, String> properties) throws PMException {
+        Set<Node> search = search(type, properties);
         if (search.isEmpty()) {
-            throw new PMException(String.format("a node matching the criteria (%s, %s, %s) does not exist", name, type, properties));
+            throw new PMException(String.format("a node matching the criteria (%s, %s) does not exist", type, properties));
         }
         return search.iterator().next();
     }
 
     @Override
-    public Node getNode(long id) throws PMException {
+    public Node getNode(String name) throws PMException {
 
         Collection<Node> nodes = getNodes();
         Node node;
         try {
             node = nodes.stream()
-                    .filter(node_k -> node_k.getID() == id)
+                    .filter(node_k -> node_k.getName().equals(name))
                     .iterator().next();
         } catch (Exception p) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, id));
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, name));
         }
         return node;
     }
@@ -439,33 +476,34 @@ public class MySQLGraph implements Graph {
      * To get all the nodes that have a specific property key with any value use "*" as the value in the parameter.
      * (i.e. {key=*})
      *
-     * @param name       the name of the nodes to search for.
      * @param type       the type of the nodes to search for.
      * @param properties the properties of the nodes to search for.
      * @return a set of nodes that match the given search criteria.
      * @throws PMException if there is an error searching the graph.
      */
     @Override
-    public Set<Node> search(String name, NodeType type, Map<String, String> properties) throws PMException {
+    public Set<Node> search(NodeType type, Map<String, String> properties) throws PMException {
 
         MemGraph graph = new MemGraph();
-        return graph.search(name, type, properties);
+        return graph.search(type, properties);
     }
 
     /**
-     * Get the set of nodes that are assigned to the node with the given ID.
+     * Get the set of nodes that are assigned to the node with the given name.
      *
-     * @param nodeID the ID of the node to get the children of.
-     * @return the Set of NGACNodes that are assigned to the node with the given ID.
+     * @param name of the node to get the children of.
+     * @return the Set of NGACNodes that are assigned to the node with the given name.
      * @throws PMException if there is an error retrieving the children of the node.
      */
     @Override
-    public Set<Long> getChildren(long nodeID) throws PMException {
-        if (!exists(nodeID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
+    public Set<String> getChildren(String name) throws PMException {
+        if (!exists(name)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
 
         Set<Long> sources = new HashSet<>();
+        Set<String> sources_p = new HashSet<>();
+        long nodeID = getNodeIdFromName(name);
 
         try (
                 Connection con = this.conn.getConnection();
@@ -479,7 +517,10 @@ public class MySQLGraph implements Graph {
                 sources.add(start_node_id);
 
             }
-            return sources;
+            for (long id : sources) {
+                sources_p.add(getNodeNameFromId(id));
+            }
+            return sources_p;
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new PMException("Cannot connect to the Database" + ex);
@@ -488,19 +529,21 @@ public class MySQLGraph implements Graph {
     }
 
     /**
-     * Get the set of nodes that the node with the given ID is assigned to.
+     * Get the set of nodes that the node with the given name is assigned to.
      *
-     * @param nodeID the ID of the node to get the parents of.
+     * @param name of the node to get the parents of.
      * @return the Set of NGACNodes that are assigned to the node with the given ID.
      * @throws PMException if there is an error retrieving the parents of the node.
      */
     @Override
-    public Set<Long> getParents(long nodeID) throws PMException {
-        if (!exists(nodeID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, nodeID));
+    public Set<String> getParents(String name) throws PMException {
+        if (!exists(name)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
 
+        Set<String> targets_p = new HashSet<>();
         Set<Long> targets = new HashSet<>();
+        long nodeID = getNodeIdFromName(name);
 
         try (
                 Connection con = this.conn.getConnection();
@@ -512,7 +555,10 @@ public class MySQLGraph implements Graph {
                 long              end_node_id = rs.getInt("end_node_id");
                 targets.add(end_node_id);
             }
-            return targets;
+            for (long id : targets) {
+                targets_p.add(getNodeNameFromId(id));
+            }
+            return targets_p;
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -529,14 +575,14 @@ public class MySQLGraph implements Graph {
      * @throws PMException if the two types do not make a valid assignment.
      */
     @Override
-    public void assign(long childID, long parentID) throws PMException {
-        Node childNode = getNode(childID);
-        Node parentNode = getNode(parentID);
-        if (!exists(childID)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, childID));
+    public void assign(String child, String parent) throws PMException {
+        Node childNode = getNode(child);
+        Node parentNode = getNode(parent);
+        if (!exists(child)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, child));
         }
-        else if (!exists(parentID)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentID));
+        else if (!exists(parent)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parent));
         }
 
         Assignment.checkAssignment(childNode.getType(), parentNode.getType());
@@ -546,8 +592,8 @@ public class MySQLGraph implements Graph {
                 PreparedStatement ps = con.prepareStatement("INSERT into assignment( start_node_id, end_node_id)" +
                         "VALUES (?, ?)")
         ) {
-            ps.setLong(1, childID);
-            ps.setLong(2, parentID);
+            ps.setLong(1, childNode.getId());
+            ps.setLong(2, parentNode.getId());
             ps.executeUpdate();
 
         } catch (SQLException s) {
@@ -563,22 +609,24 @@ public class MySQLGraph implements Graph {
      * @throws PMException if the nodes do not exist
      */
     @Override
-    public void deassign(long childID, long parentID) throws PMException {
+    public void deassign(String child, String parent) throws PMException {
 
-        if (!exists(childID)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, childID));
+        if (!exists(child)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, child));
         }
-        else if (!exists(parentID)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parentID));
+        else if (!exists(parent)) {
+            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parent));
         }
 
+        Node childNode = getNode(child);
+        Node parentNode = getNode(parent);
         try (
                 Connection con = this.conn.getConnection();
                 PreparedStatement ps = con.prepareStatement("DELETE from assignment where start_node_id=? AND end_node_id = ?")
         ) {
 
-            ps.setLong(1, childID);
-            ps.setLong(2, parentID);
+            ps.setLong(1, childNode.getId());
+            ps.setLong(2, parentNode.getId());
             int i = ps.executeUpdate();
             if (i == 0) {
                 throw new IllegalArgumentException("The assignment you want to delete does not exist");
@@ -592,25 +640,50 @@ public class MySQLGraph implements Graph {
     /**
      * Returns true if the child is assigned to the parent.
      *
-     * @param childID the ID of the child node
-     * @param parentID the ID of the parent node
+     * @param child the name of the child node
+     * @param parent the name of the parent node
      * @return true if the child is assigned to the parent, false otherwise
      * @throws PMException if there is an error checking if the child is assigned to the parent
      */
     @Override
-    public boolean isAssigned(long childID, long parentID) throws PMException {
+    public boolean isAssigned(String child, String parent) throws PMException {
 
+        Node childNode = getNode(child);
+        Node parentNode = getNode(parent);
         try (
                 Connection con = this.conn.getConnection();
                 PreparedStatement ps = con.prepareStatement("Select * from assignment where start_node_id=? AND end_node_id = ?")
         ) {
 
-            ps.setLong(1, childID);
-            ps.setLong(2, parentID);
+            ps.setLong(1, childNode.getId());
+            ps.setLong(2, parentNode.getId());
             ResultSet rs = ps.executeQuery();
             List<Integer> ids = new ArrayList<>();
             while (rs.next()){
                 ids.add(rs.getInt("assignment_id"));
+            }
+            return ids.size() != 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new PMException("Cannot connect to the Database" + ex);
+        }
+    }
+
+    public boolean isAssociated(String child, String parent) throws PMException {
+        Node childNode = getNode(child);
+        Node parentNode = getNode(parent);
+
+        try (
+                Connection con = this.conn.getConnection();
+                PreparedStatement ps = con.prepareStatement("Select * from association where start_node_id=? AND end_node_id = ?")
+        ) {
+
+            ps.setLong(1, childNode.getId());
+            ps.setLong(2, parentNode.getId());
+            ResultSet rs = ps.executeQuery();
+            List<Integer> ids = new ArrayList<>();
+            while (rs.next()){
+                ids.add(rs.getInt("association_id"));
             }
             return ids.size() != 0;
         } catch (SQLException ex) {
@@ -624,74 +697,110 @@ public class MySQLGraph implements Graph {
      * already exists between these two nodes, overwrite the existing operations with the ones provided.  Associations
      * can only begin at a user attribute but can point to either an Object or user attribute
      *
-     * @param uaID The ID of the user attribute.
-     * @param targetID The ID of the target attribute.
+     * @param ua The name of the user attribute.
+     * @param target The name of the target attribute.
      * @param operations A Set of operations to add to the association.
      * @throws PMException if there is an error associating the two nodes.
      */
     @Override
-    public void associate(long uaID, long targetID, OperationSet operations) throws PMException {
+    public void associate(String ua, String target, OperationSet operations) throws PMException {
         //throw PMException if nodes does not exists
-        if (!exists(uaID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, uaID));
+        if (!exists(ua)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, ua));
         }
-        else if (!exists(targetID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
+        else if (!exists(target)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, target));
         }
 
-        Node ua = getNode(uaID);
-        Node target = getNode(targetID);
+        Node uaNode = getNode(ua);
+        Node targetNode = getNode(target);
 
         // check that the association is valid
-        Association.checkAssociation(ua.getType(), target.getType());
+        Association.checkAssociation(uaNode.getType(), targetNode.getType());
 
-        try (
-                Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("INSERT into association( start_node_id, end_node_id, operation_set)" +
-                        "VALUES (?, ?, ?)")
-        ) {
+        if (!isAssociated(ua, target)) {
+            // no edge exists between ua and target -> create a new association
 
-            ps.setLong(1, uaID);
-            ps.setLong(2, targetID);
+            try (
+                    Connection con = this.conn.getConnection();
+                    PreparedStatement ps = con.prepareStatement("INSERT into association( start_node_id, end_node_id, operation_set)" +
+                            "VALUES (?, ?, ?)")
+            ) {
 
-            //Json serialization using Jackson
-            if ( operations == null) {
-                ps.setString(3, null);
-            } else {
-                try {
-                    ps.setString(3, hashSetToJSON(operations));
-                } catch (JsonProcessingException j) {
-                    j.printStackTrace();
+                ps.setLong(1, uaNode.getId());
+                ps.setLong(2, targetNode.getId());
+
+                //Json serialization using Jackson
+                if (operations == null) {
+                    ps.setString(3, null);
+                } else {
+                    try {
+                        ps.setString(3, hashSetToJSON(operations));
+                    } catch (JsonProcessingException j) {
+                        j.printStackTrace();
+                    }
                 }
-            }
-            int i = ps.executeUpdate();
-            if (i == 0) {
-                throw new IllegalArgumentException("Something went wrong associating the two nodes.");
-            }
+                int i = ps.executeUpdate();
+                if (i == 0) {
+                    throw new IllegalArgumentException("Something went wrong associating the two nodes.");
+                }
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PMException("Cannot connect to the Database" + ex);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new PMException("Cannot connect to the Database" + ex);
+            }
+        } else {
+            //if an association exists update it
+            try (
+                    Connection con = this.conn.getConnection();
+                    PreparedStatement ps = con.prepareStatement("UPDATE association SET operation_set =?" +
+                            "WHERE start_node_id= ? AND end_node_id = ?")
+            ) {
+
+                ps.setLong(2, uaNode.getId());
+                ps.setLong(3, targetNode.getId());
+
+                //Json serialization using Jackson
+                if (operations == null) {
+                    ps.setString(1, null);
+                } else {
+                    try {
+                        ps.setString(1, hashSetToJSON(operations));
+                    } catch (JsonProcessingException j) {
+                        j.printStackTrace();
+                    }
+                }
+                int i = ps.executeUpdate();
+                if (i == 0) {
+                    throw new IllegalArgumentException("Something went wrong associating the two nodes.");
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new PMException("Cannot connect to the Database" + ex);
+            }
         }
     }
 
     /**
      * Delete the Association between the user attribute and Target node.
      *
-     * @param uaID     the ID of the user attribute.
-     * @param targetID the ID of the target attribute.
+     * @param ua     the name of the user attribute.
+     * @param target the name of the target attribute.
      * @throws PMException if there is an error dissociating the two nodes.
      */
     @Override
-    public void dissociate(long uaID, long targetID) throws PMException {
+    public void dissociate(String ua, String target) throws PMException {
 
+        Node uaNode = getNode(ua);
+        Node targetNode = getNode(target);
         try (
                 Connection con = this.conn.getConnection();
                 PreparedStatement ps = con.prepareStatement("DELETE from association where start_node_id=? AND end_node_id = ?")
 
         ) {
-            ps.setLong(1, uaID);
-            ps.setLong(2, targetID);
+            ps.setLong(1, uaNode.getId());
+            ps.setLong(2, targetNode.getId());
             int i = ps.executeUpdate();
             if (i == 0) {
                 throw new IllegalArgumentException("The association you want to delete does not exist");
@@ -707,40 +816,44 @@ public class MySQLGraph implements Graph {
      * user attribute and this method will throw an exception if an invalid node is provided.  The returned Map will
      * contain the target and operations of each association.
      *
-     * @param sourceID the ID of the source node.
-     * @return a Map of the target node IDs and the operations for each association.
+     * @param source the name of the source node.
+     * @return a map of the target node names and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the source node from the graph.
      */
     @Override
-    public Map<Long, OperationSet> getSourceAssociations(long sourceID) throws PMException {
-        if (!exists(sourceID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, sourceID));
+    public Map<String, OperationSet> getSourceAssociations(String source) throws PMException {
+        if (!exists(source)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, source));
         }
 
-        Node ua = getNode(sourceID);
+        Node ua = getNode(source);
         if (ua.getType() != NodeType.UA) {
             throw new PMException("The source node must be an user attribute.");
         }
-        Map<Long, OperationSet> sourcesAssoc = new HashMap<>();
+        Map<String, OperationSet> sourcesAssoc = new HashMap<>();
+        OperationSet operations_set = new OperationSet();
+
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from association where start_node_id=" + sourceID)
+                ResultSet rs = stmt.executeQuery("SELECT * from association where start_node_id=" + ua.getId())
         ) {
 
             while (rs.next()) {
                 long              end_node_id = rs.getInt("end_node_id");
                 String            operations = rs.getString("operation_set");
-                //remove excessive '[', ']'
-                operations= operations.replace("[","");
-                operations = operations.replace("\"", "");
-                operations = operations.replace("]", "");
 
-                OperationSet operations_set = new OperationSet();
-                operations_set.add(operations);
-                sourcesAssoc.put(end_node_id, operations_set);
+                if (operations != null) {
+                    try {
+                        operations_set = reader2.readValue(operations);
+                    } catch (JsonProcessingException j) {
+                        j.printStackTrace();
+                    }
+                }
+                sourcesAssoc.put(getNodeNameFromId(end_node_id), operations_set);
 
             }
+            System.out.println("sources Assoc =  " + sourcesAssoc);
             return sourcesAssoc;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -754,40 +867,42 @@ public class MySQLGraph implements Graph {
      * Attribute. This method will throw an exception if a node of any other type is provided.  The returned Map will
      * contain the source node IDs and the operations of each association.
      *
-     * @param targetID the ID of the target node.
+     * @param target the name of the target node.
      * @return a Map of the source Ids and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the target node from the graph.
      */
     @Override
-    public Map<Long, OperationSet> getTargetAssociations(long targetID) throws PMException {
+    public Map<String, OperationSet> getTargetAssociations(String target) throws PMException {
 
-        if (!exists(targetID)) {
-            throw new PMException(String.format(NODE_NOT_FOUND_MSG, targetID));
+        if (!exists(target)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, target));
         }
 
-        Node ua = getNode(targetID);
+        Node ua = getNode(target);
 
         if (ua.getType() != NodeType.UA && ua.getType() != NodeType.OA) {
             throw new PMException("The target node must be an user attribute or an object attribute.");
         }
-        Map<Long, OperationSet> targetsAssoc = new HashMap<>();
+        Map<String, OperationSet> targetsAssoc = new HashMap<>();
+        OperationSet operations_set = new OperationSet();
 
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from association where end_node_id=" + targetID)
+                ResultSet rs = stmt.executeQuery("SELECT * from association where end_node_id=" + ua.getId())
         ) {
             while (rs.next()) {
-                long              start_node_id = rs.getInt("start_node_id");
+                long              start_node_id =rs.getInt("start_node_id");
                 String            operations = rs.getString("operation_set");
-                //remove excessive '[', ']'
-                operations= operations.replace("[","");
-                operations = operations.replace("]", "");
-                operations = operations.replace("\"", "");
 
-                OperationSet operations_set = new OperationSet();
-                operations_set.add(operations);
-                targetsAssoc.put(start_node_id, operations_set);
+                if (operations != null) {
+                    try {
+                        operations_set = reader2.readValue(operations);
+                    } catch (JsonProcessingException j) {
+                        j.printStackTrace();
+                    }
+                }
+                targetsAssoc.put(getNodeNameFromId(start_node_id), operations_set);
 
             }
             return targetsAssoc;

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
-import java.util.Set;
+import java.util.*;
 
 public class BreadthFirstSearcher implements Searcher{
 
@@ -17,18 +17,44 @@ public class BreadthFirstSearcher implements Searcher{
     }
 
     @Override
-    public void traverse(Node start, Propagator propagator, Visitor visitor) throws PMException {
-        // visit the start node
-        visitor.visit(start);
+    public void traverse(Node start, Propagator propagator, Visitor visitor, Direction direction) throws PMException {
+        // set up a queue to ensure FIFO
+        Queue<Node> queue = new LinkedList<>();
+        // set up a set to ensure nodes are only visited once
+        Set<Node> seen = new HashSet<>();
+        queue.add(start);
+        seen.add(start);
 
-        Set<Long> parents = graph.getParents(start.getID());
-        while(!parents.isEmpty()) {
-            Long parent = parents.iterator().next();
-            Node parentNode = graph.getNode(parent);
+        while (!queue.isEmpty()) {
+            Node node = queue.poll();
 
-            propagator.propagate(parentNode, start);
-            visitor.visit(parentNode);
-            parents.remove(parent);
+            // visit the current node
+            visitor.visit(node);
+
+            Set<String> nextLevel = getNextLevel(node.getName(), direction);
+            for (String s : nextLevel) {
+                Node n = graph.getNode(s);
+
+                // if this node has already been seen, we don't need to se it again
+                if (seen.contains(n)) {
+                    continue;
+                }
+
+                // add the node to the queue and the seen set
+                queue.add(n);
+                seen.add(n);
+
+                // propagate from the nextLevel to the current node
+                propagator.propagate(node, n);
+            }
+        }
+    }
+
+    private Set<String> getNextLevel(String node, Direction direction) throws PMException {
+        if (direction == Direction.PARENTS) {
+            return graph.getParents(node);
+        } else {
+            return graph.getChildren(node);
         }
     }
 }

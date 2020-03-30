@@ -1,5 +1,39 @@
 # Obligations
-Obligations are defined using a yaml syntax described below. Examples can be found [here](/examples/#obligations).
+Obligations are defined using a yaml syntax described below. 
+
+## Table of Contents
+1. [Common Elements](#common-elements)
+    - [Nodes](#nodes)
+2. [Obligation](#obligation)
+3. [Rule](#rule)
+4. [Event Pattern](#event-pattern)
+    - [Subject](#subject)
+    - [Policy Class](#policy-class)
+    - [Operations](#operations)
+    - [Target](#target)
+5. [Response](#response)
+    - [Condition](#condition)
+    - [Create Action](#create-action)
+    - [Assign Action](#assign-action)
+    - [Grant Action](#grant-action)
+    - [Deny Action (Prohibition)](#deny-action-prohibition)
+    - [Delete Action](#delete-action)
+    - [Function as Action](#function-as-action)
+6. [Functions](#functions)
+    - [Built-in Functions](#built-in-functions)
+      - [child_of_assign](#child_of_assign)
+      - [parent_of_assign](#parent_of_assign)
+      - [create_node](#create_node)
+      - [current_process](#current_process)
+      - [current_target](#current_target)
+      - [current_user](#current_user)
+      - [get_children](#get_children)
+      - [get_node](#get_node)
+      - [get_node_name](#get_node_name)
+      - [is_node_contained_in](#is_node_contained_in)
+      - [to_props](#to_props)
+    - [Custom Functions](#custom-functions)
+7. [Built-in PDP events](#built-in-pdp-events)
 
 ## Common Elements
 ### Nodes
@@ -11,7 +45,7 @@ properties:
   - key: value
 ```
 
-### function
+### Function
 A function refers to a previously defined function that is supported by the Policy Machine Event Processing Point (EPP).  A list of valid functions, as well as tutorial on how to add functions can be found [here](#functions).
 
 _Example_
@@ -23,7 +57,6 @@ function:
     - function:
 ```
 A function has a name and a list of arguments. The arguments are a list of string values or other functions.
-
 
 ##  Obligation
 There is one obligation per yaml file. An obligation can have zero or more rules.
@@ -290,7 +323,7 @@ delete:
     - label:
 ```
 
-### Fuction as Action
+### Function as Action
 You can define a function as a direct action in the response.
 ```yaml
 function:
@@ -298,14 +331,12 @@ function:
   args:
 ```
 
-
-
 ## Functions
 There are two main types of functions: utility and administrative.  Utility functions are functions which aid in writing 
 and executing obligations.  Administrative functions provide a convenient way of bundling several administrative commands
 together.
 
-### Predefined Functions
+### Built-in Functions
 This is a list of functions that are built into the library. They are all utility functions.
 
 #### child_of_assign
@@ -337,7 +368,6 @@ The event must **assign**, **assign to**, **deassign** or **deassign from**.
 function:
   name: child_of_assign  
 ```  
-
 #### create_node
 ##### Description
 Create a new node and return it.
@@ -369,7 +399,7 @@ function:
    
 #### current_process
 ##### Description
-Return the current process ID
+Return the current process
 ##### Parameters
 None
 ##### Return
@@ -381,7 +411,6 @@ None
 function:
   name: current_process  
 ```  
-
 #### current_target
 ##### Description
 Return the node that is the target of the event being processed
@@ -396,7 +425,6 @@ None
 function:
   name: current_target  
 ```  
-
 #### current_user
 ##### Description
 Return the user that triggered the event being processed
@@ -411,22 +439,6 @@ None
 function:
   name: current_user 
 ```  
-
-#### current_user_to_deny_subject
-##### Description
-Return a `Prohibition.Subject` with the current user.
-##### Parameters
-None
-##### Return
-`Prohibition.Subject`
-##### Event Requirements
-None
-##### Example
-```yaml
-function:
-  name: current_user_to_deny_subject 
-```  
-
 #### get_children
 ##### Description
 Returns the children of a node.
@@ -450,7 +462,6 @@ function:
         args:
           - "key=value"
 ```  
-
 #### get_node
 ##### Description
 Returns the node that matches the given name, type, and properties.
@@ -474,7 +485,6 @@ function:
         args:
           - "key=value"
 ```  
-
 #### get_node_name
 ##### Description
 Returns the name of the node that is returned by the function passed as the parameter.
@@ -492,7 +502,6 @@ function:
     - function:
         name: current_target
 ```  
-
 #### is_node_contained_in
 ##### Description
 Returns true if the node passed as the first parameter is assigned to the node passed as the second parameter.  Both parameters
@@ -520,7 +529,6 @@ function:
           - "oa1"
           - "OA"
 ```  
-
 #### to_props
 ##### Description
 Converts an array of strings with the format <key>=<value> to a Map<String, String>.
@@ -582,7 +590,7 @@ public EPP(PDP pdp, FunctionExecutor ... executors) throws PMException {
 
 Any executors that are provided to this constructor will be available to the EPP when processing events. 
 
-## PDP Events
+## Built-in PDP events
 The following events are triggered by the PDP:
 
 - Assign

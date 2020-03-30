@@ -3,18 +3,18 @@ package gov.nist.csd.pm.pip.obligations.model;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
 public class EvrProcess {
-    private long   value;
+    private String   value;
     private Function function;
 
-    public EvrProcess(long process) {
+    public EvrProcess(String process) {
         this.value = process;
     }
 
-    public long getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(long value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -33,10 +33,10 @@ public class EvrProcess {
 
         EvrProcess p = (EvrProcess)o;
 
-        if(this.value == 0) {
+        if(this.value.isEmpty()) {
             return false;
         }
 
-        return this.value == p.value;
+        return this.value.equals(p.value);
     }
 }

@@ -9,10 +9,10 @@ import java.util.Objects;
  * Stores information needed for a node.
  */
 public class Node implements Serializable {
-    private long                id;
     private String              name;
     private NodeType            type;
     private Map<String, String> properties;
+    private long                id;
 
     public Node() {
         this.properties = new HashMap<>();
@@ -24,64 +24,25 @@ public class Node implements Serializable {
         this.properties = properties == null ? new HashMap<>() : properties;
     }
 
+    public Node(String name, NodeType type) {
+        this.name = name;
+        this.type = type;
+    }
+
     public Node(long id, String name, NodeType type, Map<String, String> properties) {
-        this.id = id;
         this.name = name;
         this.type = type;
         this.properties = properties == null ? new HashMap<>() : properties;
+        this.id= id;
     }
 
-    public Node(long id, NodeType type) {
-        this.id = id;
-        this.type = type;
-    }
-
-    public Node id(long id) {
-        if (id == 0) {
-            throw new IllegalArgumentException("a node cannot have an ID of 0");
-        }
-
-        this.id = id;
-        return this;
-    }
-
-    public Node name(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("a node can not have a null or empty name");
-        }
-
-        this.name = name;
-        return this;
-    }
-
-    public Node type(NodeType type) {
-        if (type == null) {
-            throw new IllegalArgumentException("a type cannot be null");
-        }
-        this.type = type;
-        return this;
-    }
-
-    public Node properties(Map<String, String> properties) {
-        if (properties == null) {
-            properties = new HashMap<>();
-        }
-
-        this.properties = properties;
-        return this;
-    }
-
-    public Node property(String key, String value) {
+    public Node addProperty(String key, String value) {
         if (key == null || value == null) {
             throw new IllegalArgumentException("a node cannot have a property with a null key or value");
         }
 
         this.properties.put(key, value);
         return this;
-    }
-
-    public long getID() {
-        return id;
     }
 
     public String getName() {
@@ -96,10 +57,6 @@ public class Node implements Serializable {
         return properties;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -111,6 +68,10 @@ public class Node implements Serializable {
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
+
+    public long getId() { return id; }
+
+    public void setId(long id) { this.id = id; }
 
     /**
      * Two nodes are equal if their IDs are the same.
@@ -134,7 +95,7 @@ public class Node implements Serializable {
 
     @Override
     public String toString() {
-        return name + ":" + type + ":" + id + ":" + properties;
+        return name + ":" + type + ":" + properties;
     }
 
     /**

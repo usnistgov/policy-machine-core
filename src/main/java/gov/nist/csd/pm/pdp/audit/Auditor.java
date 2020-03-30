@@ -25,10 +25,10 @@ public interface Auditor {
      * 	   paths:
      * 	     u1-ua1-oa1-o1 ops=[read, write]
      *
-     * @param userID the ID of the user
-     * @param targetID the ID of the target
+     * @param user the user
+     * @param target the target
      * @return an Explain object containing the details of the user's access on the target.
      * @throws PMException if there is an error traversing the graph to determine the paths.
      */
-    Explain explain(long userID, long targetID) throws PMException;
+    Explain explain(String user, String target) throws PMException;
 }

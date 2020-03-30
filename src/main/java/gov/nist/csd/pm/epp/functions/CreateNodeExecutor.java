@@ -28,21 +28,21 @@ public class CreateNodeExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
 
         // first arg is the name, can be function that returns a string
         Arg parentNameArg = args.get(0);
         String parentName = parentNameArg.getValue();
         if(parentNameArg.getFunction() != null) {
-            parentName = functionEvaluator.evalString(eventCtx, userID, processID, pdp, parentNameArg.getFunction());
+            parentName = functionEvaluator.evalString(eventCtx, user, process, pdp, parentNameArg.getFunction());
         }
 
         // second arg is the type, can be function
         Arg parentTypeArg = args.get(1);
         String parentType = parentTypeArg.getValue();
         if(parentTypeArg.getFunction() != null) {
-            parentType = functionEvaluator.evalString(eventCtx, userID, processID, pdp, parentTypeArg.getFunction());
+            parentType = functionEvaluator.evalString(eventCtx, user, process, pdp, parentTypeArg.getFunction());
         }
 
         // third arg is the properties which is a map that has to come from a function
@@ -50,7 +50,7 @@ public class CreateNodeExecutor implements FunctionExecutor {
         if(args.size() > 2) {
             Arg propsArg = args.get(2);
             if (propsArg.getFunction() != null) {
-                parentProps = (Map) functionEvaluator.evalMap(eventCtx, userID, processID, pdp, propsArg.getFunction());
+                parentProps = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, propsArg.getFunction());
             }
         }*/
 
@@ -58,14 +58,14 @@ public class CreateNodeExecutor implements FunctionExecutor {
         Arg nameArg = args.get(2);
         String name = nameArg.getValue();
         if(nameArg.getFunction() != null) {
-            name = functionEvaluator.evalString(eventCtx, userID, processID, pdp, nameArg.getFunction());
+            name = functionEvaluator.evalString(eventCtx, user, process, pdp, nameArg.getFunction());
         }
 
         // fifth arg is the type, can be function
         Arg typeArg = args.get(3);
         String type = typeArg.getValue();
         if(typeArg.getFunction() != null) {
-            type = functionEvaluator.evalString(eventCtx, userID, processID, pdp, typeArg.getFunction());
+            type = functionEvaluator.evalString(eventCtx, user, process, pdp, typeArg.getFunction());
         }
 
         // sixth arg is the properties which is a map that has to come from a function
@@ -73,19 +73,19 @@ public class CreateNodeExecutor implements FunctionExecutor {
         if(args.size() > 3) {
             Arg propsArg = args.get(4);
             if (propsArg.getFunction() != null) {
-                props = (Map) functionEvaluator.evalMap(eventCtx, userID, processID, pdp, propsArg.getFunction());
+                props = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, propsArg.getFunction());
             }
         }
 
-        long id = new Random().nextLong();
         Graph graph = pdp.getPAP().getGraphPAP();
 
-        Set<Node> search = graph.search(parentName, NodeType.toNodeType(parentType), new HashMap<>());
-        if (search.isEmpty()) {
-            throw new PMException(String.format("parent node %s with type %s and properties %s does not exist", parentName, parentType, new HashMap<>()));
+        Node parentNode;
+        if (parentName != null) {
+            parentNode = graph.getNode(parentName);
+        } else {
+            parentNode = graph.getNode(NodeType.toNodeType(parentType), new HashMap<>());
         }
-        Node parentNode = search.iterator().next();
 
-        return graph.createNode(id, name, NodeType.toNodeType(type), props, parentNode.getID());
+        return graph.createNode(name, NodeType.toNodeType(type), props, parentNode.getName());
     }
 }

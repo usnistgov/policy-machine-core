@@ -28,8 +28,8 @@ class CurrentTargetExecutorTest {
         CurrentTargetExecutor executor = new CurrentTargetExecutor();
 
         EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        long user = testCtx.getU1().getID();
-        long process = 1234;
+        String user = testCtx.getU1().getName();
+        String process = "1234";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 

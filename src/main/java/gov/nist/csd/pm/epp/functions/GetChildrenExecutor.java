@@ -24,10 +24,10 @@ public class GetChildrenExecutor implements FunctionExecutor {
     }
 
     @Override
-    public List<Long> exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public List<String> exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         FunctionExecutor getNodeExecutor = functionEvaluator.getFunctionExecutor("get_node");
-        Node node = (Node)getNodeExecutor.exec(eventCtx, userID, processID, pdp, function, functionEvaluator);
-        Set<Long> children = pdp.getPAP().getGraphPAP().getChildren(node.getID());
+        Node node = (Node)getNodeExecutor.exec(eventCtx, user, process, pdp, function, functionEvaluator);
+        Set<String> children = pdp.getPAP().getGraphPAP().getChildren(node.getName());
         return new ArrayList<>(children);
     }
 }

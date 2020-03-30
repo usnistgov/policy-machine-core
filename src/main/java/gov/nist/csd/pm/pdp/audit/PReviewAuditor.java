@@ -8,6 +8,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
@@ -26,14 +27,14 @@ public class PReviewAuditor implements Auditor {
     }
 
     @Override
-    public Explain explain(long userID, long targetID) throws PMException {
+    public Explain explain(String userID, String target) throws PMException {
         Node userNode = graph.getNode(userID);
-        Node targetNode = graph.getNode(targetID);
+        Node targetNode = graph.getNode(target);
 
         List<EdgePath> userPaths = dfs(userNode);
         List<EdgePath> targetPaths = dfs(targetNode);
 
-        Map<String, PolicyClass> resolvedPaths = resolvePaths(userPaths, targetPaths, targetID);
+        Map<String, PolicyClass> resolvedPaths = resolvePaths(userPaths, targetPaths, target);
         Set<String> perms = resolvePermissions(resolvedPaths);
 
         return new Explain(perms, resolvedPaths);
@@ -96,11 +97,11 @@ public class PReviewAuditor implements Auditor {
      *
      * @param userPaths the set of paths starting with a user.
      * @param targetPaths the set of paths starting with a target node.
-     * @param targetID the ID of the target node.
+     * @param target the name of the target node.
      * @return the set of paths from a user to a target node (through an association) for each policy class in the system.
      * @throws PMException if there is an exception traversing the graph
      */
-    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, long targetID) throws PMException {
+    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, String target) {
         Map<String, PolicyClass> results = new HashMap<>();
         for (EdgePath targetPath : targetPaths) {
             EdgePath.Edge lastTargetEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
@@ -128,8 +129,8 @@ public class PReviewAuditor implements Auditor {
 
                     // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
                     // resolvedPath, continue to the next target edge
-                    if((lastUserEdge.getTarget().getID() != e.getTarget().getID())
-                            && (lastUserEdge.getTarget().getID() != e.getSource().getID() || lastUserEdge.getTarget().getID() != targetID)) {
+                    if((lastUserEdge.getTarget().getName().equals(e.getTarget().getName()))
+                            && (!lastUserEdge.getTarget().getName().equals(e.getSource().getName()) || lastUserEdge.getTarget().getName().equals(target))) {
                         continue;
                     }
 
@@ -143,7 +144,7 @@ public class PReviewAuditor implements Auditor {
                         continue;
                     }
 
-                    Path nodePath = resolvedPath.toNodePath(targetID);
+                    Path nodePath = resolvedPath.toNodePath(target);
 
                     // check that the resolved resolvedPath does not already exist in the results
                     // this can happen if there is more than one resolvedPath to a UA/OA from a U/O
@@ -199,12 +200,12 @@ public class PReviewAuditor implements Auditor {
         DepthFirstSearcher searcher = new DepthFirstSearcher(graph);
 
         final List<EdgePath> paths = new ArrayList<>();
-        final Map<Long, List<EdgePath>> propPaths = new HashMap<>();
+        final Map<String, List<EdgePath>> propPaths = new HashMap<>();
 
         Visitor visitor = node -> {
             List<EdgePath> nodePaths = new ArrayList<>();
 
-            for(long parent : graph.getParents(node.getID())) {
+            for(String parent : graph.getParents(node.getName())) {
                 EdgePath.Edge edge = new EdgePath.Edge(node, graph.getNode(parent), null);
                 List<EdgePath> parentPaths = propPaths.get(parent);
                 if(parentPaths.isEmpty()) {
@@ -224,10 +225,10 @@ public class PReviewAuditor implements Auditor {
                 }
             }
 
-            Map<Long, OperationSet> assocs = graph.getSourceAssociations(node.getID());
-            for(Long targetID : assocs.keySet()) {
-                Set<String> ops = assocs.get(targetID);
-                Node targetNode = graph.getNode(targetID);
+            Map<String, OperationSet> assocs = graph.getSourceAssociations(node.getName());
+            for(String target : assocs.keySet()) {
+                Set<String> ops = assocs.get(target);
+                Node targetNode = graph.getNode(target);
                 EdgePath path = new EdgePath();
                 path.addEdge(new EdgePath.Edge(node, targetNode, ops));
                 nodePaths.add(path);
@@ -237,17 +238,17 @@ public class PReviewAuditor implements Auditor {
             // TODO there might be a more efficient way of doing this
             // we don't need the if for users, only when the target is an OA, so it might have something to do with
             // leafs vs non leafs
-            if (node.getID() == start.getID()) {
+            if (node.getName().equals(start.getName())) {
                 paths.clear();
                 paths.addAll(nodePaths);
             } else {
-                propPaths.put(node.getID(), nodePaths);
+                propPaths.put(node.getName(), nodePaths);
             }
         };
 
         Propagator propagator = (parentNode, childNode) -> {
-            List<EdgePath> childPaths = propPaths.computeIfAbsent(childNode.getID(), k -> new ArrayList<>());
-            List<EdgePath> parentPaths = propPaths.get(parentNode.getID());
+            List<EdgePath> childPaths = propPaths.computeIfAbsent(childNode.getName(), k -> new ArrayList<>());
+            List<EdgePath> parentPaths = propPaths.get(parentNode.getName());
 
             for(EdgePath p : parentPaths) {
                 EdgePath path = new EdgePath();
@@ -260,16 +261,16 @@ public class PReviewAuditor implements Auditor {
                 EdgePath.Edge edge = new EdgePath.Edge(childNode, parentNode, null);
                 newPath.getEdges().add(0, edge);
                 childPaths.add(newPath);
-                propPaths.put(childNode.getID(), childPaths);
+                propPaths.put(childNode.getName(), childPaths);
             }
 
-            if (childNode.getID() == start.getID()) {
+            if (childNode.getName().equals(start.getName())) {
                 paths.clear();
-                paths.addAll(propPaths.get(childNode.getID()));
+                paths.addAll(propPaths.get(childNode.getName()));
             }
         };
 
-        searcher.traverse(start, propagator, visitor);
+        searcher.traverse(start, propagator, visitor, Direction.PARENTS);
         return paths;
     }
 
@@ -300,7 +301,7 @@ public class PReviewAuditor implements Auditor {
             return ops;
         }
 
-        public Path toNodePath(long targetID) {
+        public Path toNodePath(String target) {
             Path nodePath = new Path();
             nodePath.setOperations(this.ops);
 
@@ -321,11 +322,13 @@ public class PReviewAuditor implements Auditor {
                     nodePath.getNodes().add(edge.getSource());
                 }
 
-                nodePath.getNodes().add(node);
+                if (!nodePath.getNodes().contains(node)) {
+                    nodePath.getNodes().add(node);
+                }
 
                 if(edge.getOps() != null) {
                     foundAssoc = true;
-                    if(edge.getTarget().getID() == targetID) {
+                    if(edge.getTarget().getName().equals(target)) {
                         return nodePath;
                     }
                 }

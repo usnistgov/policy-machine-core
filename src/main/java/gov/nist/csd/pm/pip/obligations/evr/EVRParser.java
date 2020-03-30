@@ -319,7 +319,7 @@ public class EVRParser {
 
 
     private static Subject parseProcess(Object o) throws EVRException {
-        Long process = getObject(o, Long.class);
+        String process = getObject(o, String.class);
         return new Subject(new EvrProcess(process));
     }
 

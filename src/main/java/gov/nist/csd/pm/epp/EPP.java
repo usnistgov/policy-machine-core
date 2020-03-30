@@ -7,16 +7,20 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
+import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
+import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.model.*;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 public class EPP {
 
@@ -57,8 +61,8 @@ public class EPP {
         this.pdp = pdp;
     }
 
-    public void processEvent(EventContext eventCtx, long userID, long processID) throws PMException {
-        System.out.println("user " + userID + " (procID=" + processID + ") performed " + eventCtx.getEvent() + " on " + eventCtx.getTarget().getName());
+    public void processEvent(EventContext eventCtx, String user, String process) throws PMException {
+        System.out.println("user " + user + " (procID=" + process + ") performed " + eventCtx.getEvent() + " on " + eventCtx.getTarget().getName());
         List<Obligation> obligations = pap.getObligationsPAP().getAll();
         for(Obligation obligation : obligations) {
             if (!obligation.isEnabled()) {
@@ -67,36 +71,36 @@ public class EPP {
 
             List<Rule> rules = obligation.getRules();
             for(Rule rule : rules) {
-                if(!eventMatches(userID, processID, eventCtx.getEvent(), eventCtx.getTarget(), rule.getEventPattern())) {
+                if(!eventMatches(user, process, eventCtx.getEvent(), eventCtx.getTarget(), rule.getEventPattern())) {
                     continue;
                 }
 
                 // check the response condition
                 ResponsePattern responsePattern = rule.getResponsePattern();
                 Condition condition = responsePattern.getCondition();
-                if(!checkCondition(condition, eventCtx, userID, processID, pdp)) {
+                if(!checkCondition(condition, eventCtx, user, process, pdp)) {
                     continue;
                 }
 
                 for(Action action : rule.getResponsePattern().getActions()) {
-                    if(!checkCondition(action.getCondition(), eventCtx, userID, processID, pdp)) {
+                    if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
                         continue;
                     }
 
-                    applyAction(obligation.getLabel(), eventCtx, userID, processID, action);
+                    applyAction(obligation.getLabel(), eventCtx, user, process, action);
                 }
             }
         }
     }
 
-    private boolean checkCondition(Condition condition, EventContext eventCtx, long userID, long processID, PDP pdp) throws PMException {
+    private boolean checkCondition(Condition condition, EventContext eventCtx, String user, String process, PDP pdp) throws PMException {
         if(condition == null) {
             return true;
         }
 
         List<Function> functions = condition.getCondition();
         for(Function f : functions) {
-            boolean result = functionEvaluator.evalBool(eventCtx, userID, processID, pdp, f);
+            boolean result = functionEvaluator.evalBool(eventCtx, user, process, pdp, f);
             if(!result) {
                 return false;
             }
@@ -105,7 +109,7 @@ public class EPP {
         return true;
     }
 
-    private boolean eventMatches(long userID, long processID, String event, Node target, EventPattern match) throws PMException {
+    private boolean eventMatches(String user, String process, String event, Node target, EventPattern match) throws PMException {
         if(match.getOperations() != null &&
                 !match.getOperations().contains(event)) {
             return false;
@@ -115,12 +119,12 @@ public class EPP {
         PolicyClass matchPolicyClass = match.getPolicyClass();
         Target matchTarget = match.getTarget();
 
-        return subjectMatches(userID, processID, matchSubject) &&
-                pcMatches(userID, matchPolicyClass) &&
+        return subjectMatches(user, process, matchSubject) &&
+                pcMatches(user, matchPolicyClass) &&
                 targetMatches(target, matchTarget);
     }
 
-    private boolean subjectMatches(long userID, long processID, Subject matchSubject) throws PMException {
+    private boolean subjectMatches(String user, String process, Subject matchSubject) throws PMException {
         if(matchSubject == null) {
             return true;
         }
@@ -131,21 +135,61 @@ public class EPP {
             return true;
         }
 
-        Node node = pap.getGraphPAP().getNode(userID);
-        if(matchSubject.getAnyUser() != null && matchSubject.getAnyUser().contains(node.getName())) {
+        // get the current user node
+        Node userNode = pap.getGraphPAP().getNode(user);
+
+        if (checkAnyUser(userNode, matchSubject.getAnyUser())) {
             return true;
         }
 
-        if(matchSubject.getUser() != null && matchSubject.getUser().equals(node.getName())) {
+        if(matchSubject.getUser() != null && matchSubject.getUser().equals(userNode.getName())) {
             return true;
         }
 
         return matchSubject.getProcess() != null &&
-                matchSubject.getProcess().getValue() == processID;
+                matchSubject.getProcess().getValue().equals(process);
     }
 
-    private boolean pcMatches(long userID, PolicyClass matchPolicyClass) {
-        // TODO ignoring this for now as it will be inefficient to find all the PCs a user is under
+    private boolean checkAnyUser(Node userNode, List<String> anyUser) throws PMException {
+        if (anyUser == null || anyUser.isEmpty()) {
+            return true;
+        }
+
+        DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
+
+        // check each user in the anyUser list
+        // there can be users and user attributes
+        for (String u : anyUser) {
+            Node anyUserNode = pdp.getPAP().getGraphPAP().getNode(u);
+
+            // if the node in anyUser == the user than return true
+            if (anyUserNode.getName().equals(userNode.getName())) {
+                return true;
+            }
+
+            // if the anyUser is not an UA, move to the next one
+            if (anyUserNode.getType() != UA) {
+                continue;
+            }
+
+            Set<String> nodes = new HashSet<>();
+            Visitor visitor = node -> {
+                if (node.getName().equals(userNode.getName())) {
+                    nodes.add(node.getName());
+                }
+            };
+            dfs.traverse(userNode, (c, p) -> {}, visitor, Direction.PARENTS);
+
+            if (nodes.contains(anyUserNode.getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean pcMatches(String user, PolicyClass matchPolicyClass) {
+        // not yet implemented
         return true;
     }
 
@@ -165,7 +209,7 @@ public class EPP {
             }
 
             // check that target is contained in any container
-            Set<Node> containers = getContainersOf(target.getID());
+            Set<Node> containers = getContainersOf(target.getName());
             for(EvrNode evrContainer : matchTarget.getContainers()) {
                 for(Node contNode : containers) {
                     if (nodesMatch(evrContainer, contNode)) {
@@ -216,159 +260,129 @@ public class EPP {
         return true;
     }
 
-    private Set<Node> getContainersOf(long id) throws PMException {
+    private Set<Node> getContainersOf(String name) throws PMException {
         Set<Node> nodes = new HashSet<>();
-        Set<Long> parents = pap.getGraphPAP().getParents(id);
-        for (long parent : parents) {
+        Set<String> parents = pap.getGraphPAP().getParents(name);
+        for (String parent : parents) {
             nodes.add(pap.getGraphPAP().getNode(parent));
             nodes.addAll(getContainersOf(parent));
         }
         return nodes;
     }
 
-    private void applyAction(String label, EventContext eventCtx, long userID, long processID, Action action) throws PMException {
+    private void applyAction(String label, EventContext eventCtx, String user, String process, Action action) throws PMException {
         if(action instanceof AssignAction) {
-            applyAssignAction(eventCtx, userID, processID, (AssignAction) action);
+            applyAssignAction(eventCtx, user, process, (AssignAction) action);
         } else if(action instanceof CreateAction) {
-            applyCreateAction(label, eventCtx, userID, processID, (CreateAction) action);
+            applyCreateAction(label, eventCtx, user, process, (CreateAction) action);
         } else if(action instanceof DeleteAction) {
-            applyDeleteAction(eventCtx, userID, processID, (DeleteAction) action);
+            applyDeleteAction(eventCtx, user, process, (DeleteAction) action);
         } else if(action instanceof DenyAction) {
-            applyDenyAction(eventCtx, userID, processID, (DenyAction) action);
+            applyDenyAction(eventCtx, user, process, (DenyAction) action);
         } else if(action instanceof GrantAction) {
-            applyGrantAction(eventCtx, userID, processID, (GrantAction) action);
+            applyGrantAction(eventCtx, user, process, (GrantAction) action);
         } else if(action instanceof FunctionAction) {
-            functionEvaluator.evalNode(eventCtx, userID, processID, pdp, ((FunctionAction) action).getFunction());
+            functionEvaluator.evalNode(eventCtx, user, process, pdp, ((FunctionAction) action).getFunction());
         }
     }
 
-    private void applyGrantAction(EventContext eventCtx, long userID, long processID, GrantAction action) throws PMException {
+    private void applyGrantAction(EventContext eventCtx, String user, String process, GrantAction action) throws PMException {
         EvrNode subject = action.getSubject();
         List<String> operations = action.getOperations();
         EvrNode target = action.getTarget();
 
-        Node subjectNode = toNode(eventCtx, userID, processID, subject);
-        Node targetNode = toNode(eventCtx, userID, processID, target);
+        Node subjectNode = toNode(eventCtx, user, process, subject);
+        Node targetNode = toNode(eventCtx, user, process, target);
 
-        pap.getGraphPAP().associate(subjectNode.getID(), targetNode.getID(), new OperationSet(operations));
+        pap.getGraphPAP().associate(subjectNode.getName(), targetNode.getName(), new OperationSet(operations));
     }
 
-    private void applyDenyAction(EventContext eventCtx, long userID, long processID, DenyAction action) throws PMException {
+    private void applyDenyAction(EventContext eventCtx, String user, String process, DenyAction action) throws PMException {
         EvrNode subject = action.getSubject();
         List<String> operations = action.getOperations();
         DenyAction.Target target = action.getTarget();
 
-        Prohibition.Subject denySubject = toDenySubject(eventCtx, userID, processID, subject);
-        List<Prohibition.Node> denyNodes = toDenyNodes(eventCtx, userID, processID, target);
+        String denySubject = toDenySubject(eventCtx, user, process, subject);
+        Map<String, Boolean> denyNodes = toDenyNodes(eventCtx, user, process, target);
 
-        Prohibition prohibition = new Prohibition();
-        prohibition.setSubject(denySubject);
-        prohibition.setName(action.getLabel());
-        prohibition.setOperations(new HashSet<>(operations));
-        prohibition.setIntersection(target.isIntersection());
-        for(Prohibition.Node node : denyNodes) {
-            prohibition.addNode(node);
+        Prohibition.Builder builder = new Prohibition.Builder(action.getLabel(), denySubject, new OperationSet(operations))
+                .setIntersection(target.isIntersection());
+
+        for(String contName : denyNodes.keySet()) {
+            builder.addContainer(contName, denyNodes.get(contName));
         }
 
         // add the prohibition to the PAP
-        pap.getProhibitionsPAP().add(prohibition);
+        pap.getProhibitionsPAP().add(builder.build());
 
         // TODO this complement is ignored in the current Prohibition object
         boolean complement = target.isComplement();
     }
 
-    private List<Prohibition.Node> toDenyNodes(EventContext eventCtx, long userID, long processID, DenyAction.Target target) throws PMException {
-        List<Prohibition.Node> nodes = new ArrayList<>();
+    private Map<String, Boolean> toDenyNodes(EventContext eventCtx, String user, String process, DenyAction.Target target) throws PMException {
+        Map<String, Boolean> nodes = new HashMap<>();
         List<DenyAction.Target.Container> containers = target.getContainers();
         for(DenyAction.Target.Container container : containers) {
             if(container.getFunction() != null) {
                 Function function = container.getFunction();
-                Object result = functionEvaluator.evalObject(eventCtx, userID, processID, pdp, function);
+                Object result = functionEvaluator.evalObject(eventCtx, user, process, pdp, function);
 
-                if(!(result instanceof Prohibition.Node)) {
-                    throw new PMException("expected function to return a Prohibition.Node but got " + result.getClass().getName());
+                if(!(result instanceof ContainerCondition)) {
+                    throw new PMException("expected function to return a ContainerCondition but got " + result.getClass().getName());
                 }
 
-                nodes.add((Prohibition.Node) result);
+                ContainerCondition cc = (ContainerCondition) result;
+                nodes.put(cc.getName(), cc.isComplement());
             } else {
                 Graph graph = pap.getGraphPAP();
 
-                // get the subject node
-                Set<Node> search = graph.search(container.getName(), NodeType.toNodeType(container.getType()), null);
-                if(search.isEmpty()) {
-                    throw new PMException("no nodes matched subject with name '" + container.getName() + "' and type '" + container.getType() + "'");
-                }
-                Node node = search.iterator().next();
-
-                nodes.add(new Prohibition.Node(node.getID(), container.isComplement()));
+                // get the node
+                Node node = graph.getNode(container.getName());
+                nodes.put(node.getName(), container.isComplement());
             }
         }
 
         return nodes;
     }
 
-    private Prohibition.Subject toDenySubject(EventContext eventCtx, long userID, long processID, EvrNode subject) throws PMException {
-        Prohibition.Subject denySubject;
+    private String toDenySubject(EventContext eventCtx, String user, String process, EvrNode subject) throws PMException {
+        String denySubject;
 
         if(subject.getFunction() != null) {
             Function function = subject.getFunction();
-            denySubject = functionEvaluator.evalProhibitionSubject(eventCtx, userID, processID, pdp, function);
+            denySubject = functionEvaluator.evalString(eventCtx, user, process, pdp, function);
         } else if(subject.getProcess() != null) {
-            denySubject = new Prohibition.Subject(subject.getProcess().getValue(), Prohibition.Subject.Type.PROCESS);
+            denySubject = subject.getProcess().getValue();
         } else {
-            Set<Node> nodes = getNodes(subject.getName(), subject.getType(), subject.getProperties());
-            if(nodes.isEmpty()) {
-                throw new PMException("non existing subject for deny " + subject.getName());
+            if (subject.getName() != null) {
+                denySubject = pap.getGraphPAP().getNode(subject.getName()).getName();
+            } else {
+                denySubject = pap.getGraphPAP().getNode(NodeType.toNodeType(subject.getType()), subject.getProperties()).getName();
             }
-
-            // only one object is used, so grab the first one
-            Node node = nodes.iterator().next();
-            denySubject = new Prohibition.Subject(node.getID(),
-                    node.getType() == UA ? Prohibition.Subject.Type.USER_ATTRIBUTE : Prohibition.Subject.Type.USER);
         }
 
         return denySubject;
     }
 
-    private Set<Node> getNodes(String name, String type, Map<String, String> properties) throws PMException {
-        Graph graph = pap.getGraphPAP();
-
-        Set<Node> search = graph.search(name, NodeType.toNodeType(type), null);
-        if(properties != null) {
-            search.removeIf((n) -> {
-                for (String k : properties.keySet()) {
-                    if(n.getProperties() == null ||
-                            !n.getProperties().containsKey(k) ||
-                            !n.getProperties().get(k).equals(properties.get(k))) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-        }
-
-        return search;
-    }
-
-    private void applyDeleteAction(EventContext eventCtx, long userID, long processID, DeleteAction action) throws PMException {
+    private void applyDeleteAction(EventContext eventCtx, String user, String process, DeleteAction action) throws PMException {
         List<EvrNode> nodes = action.getNodes();
         for (EvrNode evrNode : nodes) {
-            Node node = toNode(eventCtx, userID, processID, evrNode);
-            pdp.getPAP().getGraphPAP().deleteNode(node.getID());
+            Node node = toNode(eventCtx, user, process, evrNode);
+            pdp.getPAP().getGraphPAP().deleteNode(node.getName());
         }
 
         AssignAction assignAction = action.getAssignments();
         for (AssignAction.Assignment assignment : assignAction.getAssignments()) {
-            Node what = toNode(eventCtx, userID, processID, assignment.getWhat());
-            Node where = toNode(eventCtx, userID, processID, assignment.getWhere());
-            pdp.getPAP().getGraphPAP().deassign(what.getID(), where.getID());
+            Node what = toNode(eventCtx, user, process, assignment.getWhat());
+            Node where = toNode(eventCtx, user, process, assignment.getWhere());
+            pdp.getPAP().getGraphPAP().deassign(what.getName(), where.getName());
         }
 
         List<GrantAction> associations = action.getAssociations();
         for (GrantAction grantAction : associations) {
-            Node subject = toNode(eventCtx, userID, processID, grantAction.getSubject());
-            Node target = toNode(eventCtx, userID, processID, grantAction.getTarget());
-            pdp.getPAP().getGraphPAP().dissociate(subject.getID(), target.getID());
+            Node subject = toNode(eventCtx, user, process, grantAction.getSubject());
+            Node target = toNode(eventCtx, user, process, grantAction.getTarget());
+            pdp.getPAP().getGraphPAP().dissociate(subject.getName(), target.getName());
         }
 
         List<String> prohibitions = action.getProhibitions();
@@ -390,17 +404,21 @@ public class EPP {
         }
     }
 
-    private Node toNode(EventContext eventCtx, long userID, long processID, EvrNode evrNode) throws PMException {
+    private Node toNode(EventContext eventCtx, String user, String process, EvrNode evrNode) throws PMException {
         Node node;
         if(evrNode.getFunction() != null) {
-            node = functionEvaluator.evalNode(eventCtx, userID, processID, pdp, evrNode.getFunction());
+            node = functionEvaluator.evalNode(eventCtx, user, process, pdp, evrNode.getFunction());
         } else {
-            node = pap.getGraphPAP().getNode(evrNode.getName(), NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
+            if (evrNode.getName() != null && !evrNode.getName().isEmpty()) {
+                node = pap.getGraphPAP().getNode(evrNode.getName());
+            } else {
+                node = pap.getGraphPAP().getNode(NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
+            }
         }
         return node;
     }
 
-    private void applyCreateAction(String label, EventContext eventCtx, long userID, long processID, CreateAction action) throws PMException {
+    private void applyCreateAction(String label, EventContext eventCtx, String user, String process, CreateAction action) throws PMException {
         for (Rule rule : action.getRules()) {
             createRule(label, eventCtx, rule);
         }
@@ -408,8 +426,8 @@ public class EPP {
         for (CreateAction.CreateNode createNode : action.getCreateNodesList()) {
             EvrNode what = createNode.getWhat();
             EvrNode where = createNode.getWhere();
-            Node whereNode = toNode(eventCtx, userID, processID, where);
-            pap.getGraphPAP().createNode(new Random().nextLong(), what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getID());
+            Node whereNode = toNode(eventCtx, user, process, where);
+            pap.getGraphPAP().createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
         }
     }
 
@@ -421,15 +439,15 @@ public class EPP {
         obligation.setRules(rules);
     }
 
-    private void applyAssignAction(EventContext eventCtx, long userID, long processID, AssignAction action) throws PMException {
+    private void applyAssignAction(EventContext eventCtx, String user, String process, AssignAction action) throws PMException {
         for (AssignAction.Assignment assignment : action.getAssignments()) {
             EvrNode what = assignment.getWhat();
             EvrNode where = assignment.getWhere();
 
-            Node whatNode = toNode(eventCtx, userID, processID, what);
-            Node whereNode = toNode(eventCtx, userID, processID, where);
+            Node whatNode = toNode(eventCtx, user, process, what);
+            Node whereNode = toNode(eventCtx, user, process, where);
 
-            pap.getGraphPAP().assign(whatNode.getID(), whereNode.getID());
+            pap.getGraphPAP().assign(whatNode.getName(), whereNode.getName());
         }
     }
 }

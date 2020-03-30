@@ -65,15 +65,6 @@ public class TestCases {
         };
     }
 
-    public static long u1ID = 1;
-    public static long o1ID = 2;
-    private static long ua1ID = 3;
-    private static long oa1ID = 4;
-    private static long pc1ID = 5;
-    private static long pc2ID = 6;
-    private static long ua2ID = 7;
-    private static long oa2ID = 8;
-
     private static final OperationSet RW = new OperationSet("read", "write");
     private static final OperationSet R = new OperationSet("read");
     private static final OperationSet W = new OperationSet("write");
@@ -81,13 +72,13 @@ public class TestCases {
 
     public static TestCase graph1() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate("ua1", "oa1", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
@@ -96,15 +87,15 @@ public class TestCases {
 
     public static TestCase graph2() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1", "ua2");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, R);
-        graph.associate(ua2ID, oa1ID, W);
+        graph.associate("ua1", "oa1", R);
+        graph.associate("ua2", "oa1", W);
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[write]"));
@@ -114,15 +105,15 @@ public class TestCases {
     public static TestCase graph3() throws PMException {
         Graph graph = new MemGraph();
 
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, ua2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("ua1", UA, null, "ua2");
+        graph.createNode("u1", U, null, "ua1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, R);
-        graph.associate(ua2ID, oa1ID, W);
+        graph.associate("ua1", "oa1", R);
+        graph.associate("ua2", "oa1", W);
 
         
         Map<String, List<String>> expectedPaths = new HashMap<>();
@@ -132,11 +123,11 @@ public class TestCases {
 
     public static TestCase graph4() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
+        graph.createNode("u1", U, null, "ua1");
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
@@ -145,14 +136,14 @@ public class TestCases {
 
     public static TestCase graph5() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua2");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate("ua1", "oa1", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
@@ -163,19 +154,19 @@ public class TestCases {
 
     public static TestCase graph7() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua2", UA, null, "pc2");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.associate(ua1ID, oa1ID, R);
-        graph.associate(ua2ID, oa2ID, RW);
+        graph.associate("ua1", "oa1", R);
+        graph.associate("ua2", "oa2", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
@@ -185,19 +176,19 @@ public class TestCases {
 
     public static TestCase graph8() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc2");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.associate(ua1ID, oa1ID, R);
-        graph.associate(ua2ID, oa2ID, W);
+        graph.associate("ua1", "oa1", R);
+        graph.associate("ua2", "oa2", W);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
@@ -207,14 +198,14 @@ public class TestCases {
 
     public static TestCase graph9() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);   
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);   
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate("ua1", "oa1", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
@@ -224,18 +215,18 @@ public class TestCases {
 
     public static TestCase graph10() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc2");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.associate(ua1ID, oa1ID, R);
+        graph.associate("ua1", "oa1", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
@@ -245,15 +236,15 @@ public class TestCases {
 
     public static TestCase graph11() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass("pc1", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate("ua1", "oa1", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
@@ -262,18 +253,18 @@ public class TestCases {
 
     public static TestCase graph12() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc2ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua1", UA, null, "pc2");
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, R);
-        graph.associate(ua2ID, oa1ID, W);
+        graph.associate("ua1", "oa1", R);
+        graph.associate("ua2", "oa1", W);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[write]"));
@@ -282,19 +273,19 @@ public class TestCases {
 
     public static TestCase graph13() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc2");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.associate(ua1ID, oa1ID, R);
-        graph.associate(ua2ID, oa2ID, RW);
+        graph.associate("ua1", "oa1", R);
+        graph.associate("ua2", "oa2", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
@@ -304,19 +295,19 @@ public class TestCases {
 
     public static TestCase graph14() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc2");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.associate(ua1ID, oa1ID, RW);
-        graph.associate(ua2ID, oa2ID, R);
+        graph.associate("ua1", "oa1", RW);
+        graph.associate("ua2", "oa2", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
@@ -326,17 +317,17 @@ public class TestCases {
 
     public static TestCase graph15() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.associate(ua1ID, oa1ID, RW);
+        graph.associate("ua1", "oa1", RW);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
@@ -346,15 +337,15 @@ public class TestCases {
 
     public static TestCase graph16() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass("pc1", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, R);
+        graph.associate("ua1", "oa1", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
@@ -363,15 +354,15 @@ public class TestCases {
 
     public static TestCase graph17() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass("pc1", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, R);
+        graph.associate("ua1", "oa1", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
@@ -380,19 +371,19 @@ public class TestCases {
 
     public static TestCase graph18() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
-        graph.createPolicyClass(pc2ID, "pc2", null);
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
 
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, ua2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("ua1", UA, null, "ua2");
+        graph.createNode("u1", U, null, "ua1");
 
-        graph.createNode(oa2ID, "oa2", OA, null, pc2ID);
-        graph.createNode(oa1ID, "oa1", OA, null, oa2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa2", OA, null, "pc2");
+        graph.createNode("oa1", OA, null, "oa2");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, RW);
-        graph.associate(ua2ID, oa2ID, R);
+        graph.associate("ua1", "oa1", RW);
+        graph.associate("ua2", "oa2", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList());
@@ -401,18 +392,18 @@ public class TestCases {
 
     public static TestCase graph19() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass("pc1", null);
 
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, ua2ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID);
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("ua1", UA, null, "ua2");
+        graph.createNode("u1", U, null, "ua1");
 
-        graph.createNode(oa2ID, "oa2", OA, null, pc1ID);
-        graph.createNode(oa1ID, "oa1", OA, null, oa2ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("oa1", OA, null, "oa2");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, RW);
-        graph.associate(ua2ID, oa2ID, R);
+        graph.associate("ua1", "oa1", RW);
+        graph.associate("ua2", "oa2", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]", "u1(U)-ua1(UA)-ua2(UA)-oa2(OA)-oa1(OA)-o1(O) ops=[read]"));
@@ -421,18 +412,18 @@ public class TestCases {
 
     public static TestCase graph20() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass("pc1", null);
 
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua2ID, ua1ID);
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(oa2ID, "oa2", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID, oa2ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1", "oa2");
 
-        graph.associate(ua1ID, oa1ID, W);
-        graph.associate(ua2ID, oa1ID, R);
+        graph.associate("ua1", "oa1", W);
+        graph.associate("ua2", "oa1", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[write]"));
@@ -441,17 +432,17 @@ public class TestCases {
 
     public static TestCase graph21() throws PMException {
         Graph graph = new MemGraph();
-        graph.createPolicyClass(pc1ID, "pc1", null);
+        graph.createPolicyClass("pc1", null);
 
-        graph.createNode(ua1ID, "ua1", UA, null, pc1ID);
-        graph.createNode(ua2ID, "ua2", UA, null, pc1ID);
-        graph.createNode(u1ID, "u1", U, null, ua1ID, ua2ID);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "pc1");
+        graph.createNode("u1", U, null, "ua1", "ua2");
 
-        graph.createNode(oa1ID, "oa1", OA, null, pc1ID);
-        graph.createNode(o1ID, "o1", O, null, oa1ID);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
 
-        graph.associate(ua1ID, oa1ID, W);
-        graph.associate(ua2ID, oa1ID, R);
+        graph.associate("ua1", "oa1", W);
+        graph.associate("ua2", "oa1", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[write]"));

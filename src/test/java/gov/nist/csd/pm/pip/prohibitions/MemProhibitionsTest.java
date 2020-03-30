@@ -2,108 +2,96 @@ package gov.nist.csd.pm.pip.prohibitions;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static gov.nist.csd.pm.pip.prohibitions.model.Prohibition.Subject.Type.USER;
-import static gov.nist.csd.pm.pip.prohibitions.model.Prohibition.Subject.Type.USER_ATTRIBUTE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemProhibitionsTest {
 
-    Prohibitions dao;
+    private Prohibitions prohibitions;
 
     @BeforeEach
     void setUp() throws PMException {
-        dao = new MemProhibitions();
+        prohibitions = new MemProhibitions();
 
-        Prohibition prohibition = new Prohibition();
-        prohibition.setName("prohibition1");
-        prohibition.setSubject(new Prohibition.Subject(123, USER));
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.setIntersection(false);
-        prohibition.addNode(new Prohibition.Node(1234, true));
+        Prohibition prohibition = new Prohibition.Builder("prohibition1", "123", new OperationSet("read"))
+                .addContainer("1234", true)
+                .build();
 
-        dao.add(prohibition);
+        prohibitions.add(prohibition);
     }
 
     @Test
     void createProhibition() throws PMException {
         Prohibition p = null;
-        assertThrows(IllegalArgumentException.class, () -> dao.add(p));
+        assertThrows(IllegalArgumentException.class, () -> prohibitions.add(p));
 
-        Prohibition prohibition = new Prohibition();
-        assertThrows(IllegalArgumentException.class, () -> dao.add(prohibition));
-        prohibition.setName("p123");
+        Prohibition prohibition = new Prohibition.Builder("p123", "sub", new OperationSet("read"))
+                .setIntersection(false)
+                .addContainer("1234", true)
+                .build();
 
-        prohibition.setSubject(null);
-        assertThrows(IllegalArgumentException.class, () -> dao.add(prohibition));
-        assertThrows(IllegalArgumentException.class, () -> prohibition.setSubject(new Prohibition.Subject(123L, null)));
-        assertThrows(IllegalArgumentException.class, () -> prohibition.setSubject(new Prohibition.Subject(0, USER)));
-        assertThrows(IllegalArgumentException.class, () -> dao.add(prohibition));
-        prohibition.setSubject(new Prohibition.Subject(123, USER));
+        prohibitions.add(prohibition);
 
-        prohibition.setIntersection(false);
-        prohibition.setOperations(new OperationSet("read"));
-        prohibition.addNode(new Prohibition.Node(1234, true));
-
-        dao.add(prohibition);
-
-        Prohibition p123 = dao.get("p123");
+        Prohibition p123 = prohibitions.get("p123");
         assertEquals("p123", p123.getName());
+        assertEquals("sub", p123.getSubject());
         assertFalse(p123.isIntersection());
         assertEquals(new OperationSet("read"), p123.getOperations());
-        assertEquals(new Prohibition.Node(1234, true), p123.getNodes().get(0));
+        assertTrue(prohibition.getContainers().containsKey("1234"));
+        assertTrue(prohibition.getContainers().get("1234"));
     }
 
     @Test
     void getProhibitions() throws PMException {
-        List<Prohibition> prohibitions = dao.getAll();
+        List<Prohibition> prohibitions = this.prohibitions.getAll();
         assertEquals(1, prohibitions.size());
     }
 
     @Test
     void getProhibition() throws PMException {
-        assertThrows(PMException.class, () -> dao.get("abcd"));
+        assertThrows(PMException.class, () -> prohibitions.get("abcd"));
 
-        Prohibition prohibition = dao.get("prohibition1");
+        Prohibition prohibition = prohibitions.get("prohibition1");
         assertEquals("prohibition1", prohibition.getName());
-        assertEquals(123, prohibition.getSubject().getSubjectID());
-        assertEquals(USER, prohibition.getSubject().getSubjectType());
+        assertEquals("123", prohibition.getSubject());
         assertFalse(prohibition.isIntersection());
         assertEquals(prohibition.getOperations(), new OperationSet("read"));
-        assertEquals(new Prohibition.Node(1234, true), prohibition.getNodes().get(0));
+
+        assertTrue(prohibition.getContainers().containsKey("1234"));
+        assertTrue(prohibition.getContainers().get("1234"));
     }
 
     @Test
     void updateProhibition() throws PMException {
-        assertThrows(IllegalArgumentException.class, () -> dao.update(null));
-        Prohibition p = new Prohibition();
-        assertThrows(IllegalArgumentException.class, () -> dao.update(p));
+        assertThrows(IllegalArgumentException.class, () -> prohibitions.update(null, null));
 
-        Prohibition prohibition = dao.get("prohibition1");
-        prohibition.setName("prohibition123");
-        prohibition.setSubject(new Prohibition.Subject(12345, USER_ATTRIBUTE));
-        prohibition.setOperations(new OperationSet("read", "write"));
-        prohibition.setIntersection(true);
-        prohibition.removeNode(1234);
-        prohibition.addNode(new Prohibition.Node(4321, false));
+        Prohibition prohibition = prohibitions.get("prohibition1");
 
-        dao.update(prohibition);
+        Prohibition newPro = new Prohibition.Builder("new prohibition", "newSubject", new OperationSet("new op"))
+                .setIntersection(true)
+                .addContainer("newCont", false)
+                .build();
 
-        prohibition = dao.get("prohibition123");
+        prohibitions.update(prohibition.getName(), newPro);
+
+        prohibition = prohibitions.get("prohibition1");
         assertTrue(prohibition.isIntersection());
-        assertEquals("prohibition123", prohibition.getName());
-        assertEquals(12345, prohibition.getSubject().getSubjectID());
-        assertEquals(USER_ATTRIBUTE, prohibition.getSubject().getSubjectType());
-        assertEquals(new OperationSet("read", "write"), prohibition.getOperations());
-        assertEquals(new Prohibition.Node(4321, false), prohibition.getNodes().get(0));
+        assertEquals("prohibition1", prohibition.getName());
+        assertEquals("newSubject", prohibition.getSubject());
+        assertEquals(new OperationSet("new op"), prohibition.getOperations());
+        assertTrue(prohibition.getContainers().containsKey("newCont"));
+        assertFalse(prohibition.getContainers().get("newCont"));
     }
 
     @Test
-    void deleteProhibition() {
+    void deleteProhibition() throws PMException {
+        prohibitions.delete("prohibition1");
+        assertTrue(prohibitions.getAll().isEmpty());
     }
 }

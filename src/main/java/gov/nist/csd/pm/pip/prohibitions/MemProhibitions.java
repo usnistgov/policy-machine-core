@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class MemProhibitions implements Prohibitions {
 
-    private Map<Long, List<Prohibition>> prohibitions;
+    private Map<String, List<Prohibition>> prohibitions;
 
     public MemProhibitions() {
         this.prohibitions = new HashMap<>();
@@ -18,7 +18,7 @@ public class MemProhibitions implements Prohibitions {
 
     /**
      * Add the provided prohibition to the list of prohibitions. The prohibition name cannot be null or empty.
-     * The prohibition subject cannot be null, have an ID of 0, or have a null type.
+     * The prohibition subject cannot be null or have a null type.
      *
      * @param prohibition the prohibition to be created.
      * @throws IllegalArgumentException if the prohibition is null.
@@ -37,10 +37,10 @@ public class MemProhibitions implements Prohibitions {
             throw new IllegalArgumentException("a null subject was provided when creating a prohibition");
         }
 
-        long subjectID = prohibition.getSubject().getSubjectID();
-        List<Prohibition> exPros = this.prohibitions.getOrDefault(subjectID, new ArrayList<>());
+        String subject = prohibition.getSubject();
+        List<Prohibition> exPros = this.prohibitions.getOrDefault(subject, new ArrayList<>());
         exPros.add(prohibition);
-        this.prohibitions.put(subjectID, exPros);
+        this.prohibitions.put(subject, exPros);
     }
 
     /**
@@ -73,30 +73,31 @@ public class MemProhibitions implements Prohibitions {
 
     /**
      * Get the Prohibitions the given subject is the direct subject of.
-     * @param subjectID the ID of the subject to get the prohibitions for.
+     * @param subject the subject to get the prohibitions for.
      * @return a list of Prohibitions the given entity is the subject of.
      */
     @Override
-    public List<Prohibition> getProhibitionsFor(long subjectID) {
-        return prohibitions.getOrDefault(subjectID, new ArrayList<>());
+    public List<Prohibition> getProhibitionsFor(String subject) {
+        return prohibitions.getOrDefault(subject, new ArrayList<>());
     }
 
     /**
-     * Update an existing prohibition with the same name as the provided prohibition.  The provided prohibition cannot
-     * be null and the name of the prohibition cannot be null.
+     * Update an existing prohibition with the given prohibition object.
      *
      * @param prohibition the prohibition to update.
      * @throws IllegalArgumentException if the provided prohibition is null.
      * @throws IllegalArgumentException if the provided prohibition name is null or empty.
      */
     @Override
-    public void update(Prohibition prohibition) {
+    public void update(String prohibitionName, Prohibition prohibition) {
         if (prohibition == null) {
             throw new IllegalArgumentException("a null prohibition was provided when updating a prohibition");
+        } else if (prohibitionName == null) {
+            throw new IllegalArgumentException("cannot update a prohibition with a null name");
         }
-        else if (prohibition.getName() == null || prohibition.getName().isEmpty()) {
-            throw new IllegalArgumentException("a null name was provided when updating a prohibition");
-        }
+
+        // set the name of the object to the provided prohibition name
+        prohibition.setName(prohibitionName);
         // delete the prohibition
         delete(prohibition.getName());
         // add the updated prohibition
@@ -110,14 +111,14 @@ public class MemProhibitions implements Prohibitions {
      */
     @Override
     public void delete(String prohibitionName) {
-        for(Long subjectID : prohibitions.keySet()) {
-            List<Prohibition> ps = prohibitions.get(subjectID);
+        for(String subject : prohibitions.keySet()) {
+            List<Prohibition> ps = prohibitions.get(subject);
             Iterator<Prohibition> iterator = ps.iterator();
             while (iterator.hasNext()) {
                 Prohibition p = iterator.next();
                 if(p.getName().equals(prohibitionName)) {
                     iterator.remove();
-                    prohibitions.put(subjectID, ps);
+                    prohibitions.put(subject, ps);
                 }
             }
         }

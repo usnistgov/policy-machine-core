@@ -27,7 +27,7 @@ public class ToPropertiesExecutor implements FunctionExecutor {
      * as a node's properties
      */
     @Override
-    public Map<String, String> exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Map<String, String> exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         Map<String, String> props = new HashMap<>();
         for(Arg arg : function.getArgs()) {
             String value = arg.getValue();

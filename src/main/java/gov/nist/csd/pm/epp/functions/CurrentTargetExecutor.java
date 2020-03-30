@@ -19,7 +19,7 @@ public class CurrentTargetExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, long userID, long processID, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         return eventCtx.getTarget();
     }
 }
