@@ -343,7 +343,9 @@ public class EVRParser {
     }
 
     /**
-     * actions:
+     * response:
+     *   condition:
+     *   actions:
      */
     protected static ResponsePattern parseResponse(Object o) throws EVRException {
         ResponsePattern responsePattern = new ResponsePattern();

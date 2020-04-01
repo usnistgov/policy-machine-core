@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.pip.graph.model.nodes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Common properties used for nodes
  */
@@ -35,4 +38,8 @@ public class Properties {
     public static final String ROW_CONTAINER_NAME          = "Rows";
     public static final String COLUMN_PROPERTY             = "column";
     public static final String REP_PROPERTY                = "rep";
+
+    public static Map<String, String> none() {
+        return new HashMap<>();
+    }
 }
