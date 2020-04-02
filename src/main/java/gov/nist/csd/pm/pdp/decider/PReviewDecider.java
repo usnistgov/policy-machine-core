@@ -88,7 +88,7 @@ public class PReviewDecider implements Decider {
         TargetContext targetCtx = processTargetDAG(target, userCtx);
 
         // resolve the permissions
-        return resolvePermissions(userCtx, targetCtx);
+        return resolvePermissions(userCtx, targetCtx, target);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PReviewDecider implements Decider {
                 // run dfs on the object
                 TargetContext targetCtx = processTargetDAG(object, userCtx);
 
-                HashSet<String> permissions = resolvePermissions(userCtx, targetCtx);
+                HashSet<String> permissions = resolvePermissions(userCtx, targetCtx, object);
                 results.put(object, permissions);
             }
         }
@@ -146,7 +146,7 @@ public class PReviewDecider implements Decider {
         return acl;
     }
 
-    private HashSet<String> resolvePermissions(UserContext userContext, TargetContext targetCtx) {
+    private HashSet<String> resolvePermissions(UserContext userContext, TargetContext targetCtx, String target) {
         Map<String, Set<String>> pcMap = targetCtx.getPcSet();
 
         HashSet<String> inter = new HashSet<>();
@@ -175,7 +175,7 @@ public class PReviewDecider implements Decider {
         }
 
         // remove any prohibited operations
-        Set<String> denied = resolveProhibitions(userContext, targetCtx);
+        Set<String> denied = resolveProhibitions(userContext, targetCtx, target);
         inter.removeAll(denied);
 
         // if the permission set includes *, ignore all other permissions
@@ -187,7 +187,7 @@ public class PReviewDecider implements Decider {
         return inter;
     }
 
-    private Set<String> resolveProhibitions(UserContext userCtx, TargetContext targetCtx) {
+    private Set<String> resolveProhibitions(UserContext userCtx, TargetContext targetCtx, String target) {
         Set<String> denied = new HashSet<>();
 
         Set<Prohibition> prohibitions = userCtx.getProhibitions();
@@ -199,6 +199,11 @@ public class PReviewDecider implements Decider {
 
             boolean addOps = false;
             for (String contName : containers.keySet()) {
+                // ignore a container if it is the target of the decision
+                if (contName.equals(target)) {
+                    continue;
+                }
+
                 boolean isComplement = containers.get(contName);
                 if (!isComplement && reachedTargets.contains(contName) || isComplement && !reachedTargets.contains(contName)) {
                     addOps = true;
