@@ -124,5 +124,49 @@ public class SuperPolicy {
         // associate super ua to super oa
         graph.associate(superUA1.getName(), superOA.getName(), new OperationSet(ALL_OPERATIONS));
         graph.associate(superUA2.getName(), superUA1.getName(), new OperationSet(ALL_OPERATIONS));
+
+        configurePolicyClasses(graph);
+    }
+
+    private void configurePolicyClasses(Graph graph) throws PMException {
+        Set<String> policyClasses = graph.getPolicyClasses();
+        for (String pc : policyClasses) {
+            // configure default nodes
+            String rep = pc + "_rep";
+            String defaultUA = pc + "_default_UA";
+            String defaultOA = pc + "_default_OA";
+
+            if (!graph.exists(defaultOA)) {
+                graph.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, pc), pc);
+            }
+            if (!graph.exists(defaultUA)) {
+                graph.createNode(defaultOA, UA, Node.toProperties(NAMESPACE_PROPERTY, pc), pc);
+            }
+
+            // update pc node if necessary
+            Node node = graph.getNode(pc);
+            Map<String, String> props = node.getProperties();
+            props.put("default_ua", defaultUA);
+            props.put("default_oa", defaultOA);
+            props.put(REP_PROPERTY, rep);
+            graph.updateNode(pc, props);
+
+            // assign both super uas if not already
+            if (!graph.isAssigned(superUA1.getName(), pc)) {
+                graph.assign(superUA1.getName(), pc);
+            }
+            if (!graph.isAssigned(superUA2.getName(), pc)) {
+                graph.assign(superUA2.getName(), pc);
+            }
+
+            // associate super ua 1 with pc default node
+            graph.associate(superUA1.getName(), defaultUA, new OperationSet(ALL_OPERATIONS));
+            graph.associate(superUA1.getName(), defaultOA, new OperationSet(ALL_OPERATIONS));
+
+            // create the rep
+            if (!graph.exists(rep)) {
+                graph.createNode(rep, OA, Node.toProperties("pc", pc), superOA.getName());
+            }
+        }
     }
 }
