@@ -140,7 +140,7 @@ public class SuperPolicy {
                 graph.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, pc), pc);
             }
             if (!graph.exists(defaultUA)) {
-                graph.createNode(defaultOA, UA, Node.toProperties(NAMESPACE_PROPERTY, pc), pc);
+                graph.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, pc), pc);
             }
 
             // update pc node if necessary
