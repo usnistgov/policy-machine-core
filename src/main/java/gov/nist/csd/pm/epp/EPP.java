@@ -62,7 +62,6 @@ public class EPP {
     }
 
     public void processEvent(EventContext eventCtx, String user, String process) throws PMException {
-        System.out.println("user " + user + " (procID=" + process + ") performed " + eventCtx.getEvent() + " on " + eventCtx.getTarget().getName());
         List<Obligation> obligations = pap.getObligationsPAP().getAll();
         for(Obligation obligation : obligations) {
             if (!obligation.isEnabled()) {
