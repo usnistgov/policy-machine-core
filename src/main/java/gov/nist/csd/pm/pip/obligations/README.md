@@ -235,9 +235,12 @@ condition!:
 Each individual action can have conditions that must be met for the action to be executed.
 
 ```yaml
-action:
-  condition:
-  condition!:
+actions:
+  - condition:
+    condition!:
+    create:
+  - condition:
+    assign:
 ```
 
 ### Create Action
