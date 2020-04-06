@@ -204,6 +204,15 @@ policyElements:
 ## Response
 A response is a series of conditional actions. A condition can also be applied to the response itself.
 
+```yaml
+response:
+  condition:
+  condition!:
+  actions:
+```
+
+The **condition** and **condition!** elements can be used together. The actions will be executed if both are satisfied. 
+
 ### Condition
 A condition is a set of boolean expressions that if all evaluate to true, allow for a response or specific action to be executed.
 
@@ -213,8 +222,25 @@ condition:
   - function:
 ```
 
+### Negated Condition
+A negated condition is a set of boolean expressions that if all evaluate to false, allow for a response or specific action to be executed. 
+
+```yaml
+condition!:
+  - function:
+  - function:
+```
+
+### Actions
+Each individual action can have conditions that must be met for the action to be executed.
+
+```yaml
+action:
+  condition:
+  condition!:
+```
+
 ### Create Action
-You can create
 
 - a set of rules
 - a set of nodes
