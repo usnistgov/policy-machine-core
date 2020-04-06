@@ -343,7 +343,9 @@ public class EVRParser {
     }
 
     /**
-     * actions:
+     * response:
+     *   condition:
+     *   actions:
      */
     protected static ResponsePattern parseResponse(Object o) throws EVRException {
         ResponsePattern responsePattern = new ResponsePattern();
@@ -354,6 +356,9 @@ public class EVRParser {
         Map responseMap = getObject(o, Map.class);
         if(responseMap.containsKey("condition")) {
             responsePattern.setCondition(parseCondition(responseMap.get("condition")));
+        }
+        if(responseMap.containsKey("condition!")) {
+            responsePattern.setNegatedCondition(parseNegatedCondition(responseMap.get("condition!")));
         }
         if(responseMap.containsKey("actions")) {
             List actionsList = getObject(responseMap.get("actions"), List.class);
@@ -388,10 +393,36 @@ public class EVRParser {
         return condition;
     }
 
+    /**
+     * condition:
+     *   - function:
+     *   - function:
+     *
+     *   if all functions evaluate to false the condition is true
+     */
+    private static NegatedCondition parseNegatedCondition(Object o) throws EVRException {
+        List list = getObject(o, List.class);
+        List<Function> functions = new ArrayList<>();
+        for(Object l : list) {
+            Map lMap = getObject(l, Map.class);
+            Map funcMap = getObject(lMap.get("function"), Map.class);
+            functions.add(parseFunction(funcMap));
+        }
+
+        NegatedCondition negatedCondition = new NegatedCondition();
+        negatedCondition.setCondition(functions);
+        return negatedCondition;
+    }
+
     private static Action parseAction(Map map) throws EVRException {
         Condition condition = null;
         if (map.containsKey("condition")) {
             condition = parseCondition(map.get("condition"));
+        }
+
+        NegatedCondition negatedCondition = null;
+        if (map.containsKey("condition!")) {
+            negatedCondition = parseNegatedCondition(map.get("condition!"));
         }
 
         Action action = null;
@@ -415,6 +446,10 @@ public class EVRParser {
 
         if(condition != null) {
             action.setCondition(condition);
+        }
+
+        if (negatedCondition != null) {
+            action.setNegatedCondition(negatedCondition);
         }
 
         return action;

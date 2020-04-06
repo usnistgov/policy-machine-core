@@ -24,8 +24,50 @@ rules:
                   args:
                     - oa1
                     - OA
+      condition!:
+        - function:
+            name: is_node_contained_in
+            args:
+              - function:
+                  name: get_node
+                  args:
+                    - o1
+                    - O
+              - function:
+                  name: get_node
+                  args:
+                    - oa2
+                    - OA
       actions:
-        - create:
+        - condition:
+            - function:
+                name: is_node_contained_in
+                args:
+                  - function:
+                      name: get_node
+                      args:
+                        - o1
+                        - O
+                  - function:
+                      name: get_node
+                      args:
+                        - oa1
+                        - OA
+          condition!:
+            - function:
+                name: is_node_contained_in
+                args:
+                  - function:
+                      name: get_node
+                      args:
+                        - o1
+                        - O
+                  - function:
+                      name: get_node
+                      args:
+                        - oa2
+                        - OA
+          create:
             - label: created rule
               event:
                 subject:

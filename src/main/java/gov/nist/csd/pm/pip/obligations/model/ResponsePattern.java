@@ -8,6 +8,7 @@ import java.util.List;
 public class ResponsePattern {
 
     private Condition    condition;
+    private NegatedCondition negatedCondition;
     private List<Action> actions;
 
     public ResponsePattern() {
@@ -20,6 +21,14 @@ public class ResponsePattern {
 
     public void setCondition(Condition condition) {
         this.condition = condition;
+    }
+
+    public NegatedCondition getNegatedCondition() {
+        return negatedCondition;
+    }
+
+    public void setNegatedCondition(NegatedCondition negatedCondition) {
+        this.negatedCondition = negatedCondition;
     }
 
     public List<Action> getActions() {

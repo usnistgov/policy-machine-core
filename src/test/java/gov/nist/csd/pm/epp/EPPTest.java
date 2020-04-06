@@ -41,6 +41,7 @@ class EPPTest {
         pc1 = graph.createPolicyClass("pc1", null);
         ua1 = graph.createNode("ua1", UA, null, pc1.getName());
         oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        graph.createNode("oa2", OA, null, pc1.getName());
         o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());
         u1 = graph.createNode("u1", U, null, ua1.getName());
 
