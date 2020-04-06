@@ -1,16 +1,19 @@
-package gov.nist.csd.pm.pip.graph;
+package gov.nist.csd.pm.pip.graph.mysql;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
+import gov.nist.csd.pm.pip.graph.mysql.MySQLHelper;
+import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
 
 import java.sql.*;
 import java.util.*;
@@ -111,8 +114,7 @@ public class MySQLGraph implements Graph {
         try {
             Connection con = this.conn.getConnection();
             //====================  NodeType parser : Retrieve node_type_id ====================
-            String query = "SELECT * from node_type where name =?";
-            pstmt = con.prepareStatement(query);
+            pstmt = con.prepareStatement(MySQLHelper.SELECT_NODE_TYPE_ID_FROM_NODE_TYPE);
             pstmt.setString(1, "PC");
             rs_type = pstmt.executeQuery();
             int node_type_id = 0;
@@ -120,8 +122,7 @@ public class MySQLGraph implements Graph {
                 node_type_id = rs_type.getInt("node_type_id");
             }
             //==================== create the node from (id, node_type_id, name, properties) ====================
-            ps = con.prepareStatement("INSERT INTO node(node_type_id, name, node_property)" +
-                    " VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement(MySQLHelper.INSERT_NODE, Statement.RETURN_GENERATED_KEYS);
 
             ps.setInt(1, node_type_id);
             ps.setString(2,name);
@@ -195,8 +196,7 @@ public class MySQLGraph implements Graph {
         try {
             Connection con = this.conn.getConnection();
             //====================  NodeType parser : Retrieve node_type_id ====================
-            String query = "SELECT * from node_type where name =?";
-            pstmt = con.prepareStatement(query);
+            pstmt = con.prepareStatement(MySQLHelper.SELECT_NODE_TYPE_ID_FROM_NODE_TYPE);
             pstmt.setString(1, type.toString());
             rs_type = pstmt.executeQuery();
             int node_type_id;
@@ -204,8 +204,7 @@ public class MySQLGraph implements Graph {
             while (rs_type.next()) {
                 node_type_id = rs_type.getInt("node_type_id");
                 //==================== create the node from (id, node_type_id, name, properties) ====================
-                ps = con.prepareStatement("INSERT INTO node(node_type_id, name, node_property)" +
-                        " VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                ps = con.prepareStatement(MySQLHelper.INSERT_NODE, Statement.RETURN_GENERATED_KEYS);
 
                 ps.setInt(1, node_type_id);
                 ps.setString(2, name);
@@ -277,7 +276,7 @@ public class MySQLGraph implements Graph {
 
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("UPDATE node SET name = ?, node_property = ? WHERE node_id = ?")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.UPDATE_NODE)
         ){
             ps.setString(1, name);
             try {
@@ -304,7 +303,7 @@ public class MySQLGraph implements Graph {
     public void deleteNode(String name) throws PMException {
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("DELETE from node where name=?")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.DELETE_NODE)
         ){
 
             ps.setString(1, name);
@@ -329,7 +328,7 @@ public class MySQLGraph implements Graph {
     @Override
     public boolean exists(String name) throws PMException {
         try (            Connection con = this.conn.getConnection();
-                         PreparedStatement ps = con.prepareStatement("SELECT * from node where name=?")
+                         PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_ID_NAME_FROM_NODE)
         ){
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
@@ -385,7 +384,7 @@ public class MySQLGraph implements Graph {
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from node")
+                ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_ALL_FROM_NODE)
 
         ){
             // return node_type_id instead of numeric value of the node
@@ -412,7 +411,7 @@ public class MySQLGraph implements Graph {
             }
             //retrieve all nodes
             for (Map.Entry<Node, Long> node_k: nodesHashmap.entrySet()) {
-                pstmt = con.prepareStatement("SELECT * from node_type where node_type_id =?");
+                pstmt = con.prepareStatement(MySQLHelper.SELECT_NODE_TYPE_NAME_FROM_NODE_TYPE);
                 pstmt.setLong(1, node_k.getValue());
                 rs_type = pstmt.executeQuery();
                 String name_type = "";
@@ -508,7 +507,7 @@ public class MySQLGraph implements Graph {
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from assignment where end_node_id=" + nodeID)
+                ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_START_NODE_ID + nodeID)
 
         ){
 
@@ -548,7 +547,7 @@ public class MySQLGraph implements Graph {
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from assignment where start_node_id=" + nodeID)
+                ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_END_NODE_ID + nodeID)
         ) {
 
             while (rs.next()) {
@@ -589,8 +588,7 @@ public class MySQLGraph implements Graph {
 
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("INSERT into assignment( start_node_id, end_node_id)" +
-                        "VALUES (?, ?)")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.INSERT_ASSIGNMENT)
         ) {
             ps.setLong(1, childNode.getId());
             ps.setLong(2, parentNode.getId());
@@ -622,7 +620,7 @@ public class MySQLGraph implements Graph {
         Node parentNode = getNode(parent);
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("DELETE from assignment where start_node_id=? AND end_node_id = ?")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.DELETE_ASSIGNMENT)
         ) {
 
             ps.setLong(1, childNode.getId());
@@ -652,7 +650,7 @@ public class MySQLGraph implements Graph {
         Node parentNode = getNode(parent);
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("Select * from assignment where start_node_id=? AND end_node_id = ?")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_ASSIGNMENT_ID)
         ) {
 
             ps.setLong(1, childNode.getId());
@@ -675,7 +673,7 @@ public class MySQLGraph implements Graph {
 
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("Select * from association where start_node_id=? AND end_node_id = ?")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_ASSOCIATION_ID)
         ) {
 
             ps.setLong(1, childNode.getId());
@@ -723,8 +721,7 @@ public class MySQLGraph implements Graph {
 
             try (
                     Connection con = this.conn.getConnection();
-                    PreparedStatement ps = con.prepareStatement("INSERT into association( start_node_id, end_node_id, operation_set)" +
-                            "VALUES (?, ?, ?)")
+                    PreparedStatement ps = con.prepareStatement(MySQLHelper.INSERT_ASSOCIATION)
             ) {
 
                 ps.setLong(1, uaNode.getId());
@@ -753,8 +750,7 @@ public class MySQLGraph implements Graph {
             //if an association exists update it
             try (
                     Connection con = this.conn.getConnection();
-                    PreparedStatement ps = con.prepareStatement("UPDATE association SET operation_set =?" +
-                            "WHERE start_node_id= ? AND end_node_id = ?")
+                    PreparedStatement ps = con.prepareStatement(MySQLHelper.UPDATE_ASSOCIATION)
             ) {
 
                 ps.setLong(2, uaNode.getId());
@@ -796,7 +792,7 @@ public class MySQLGraph implements Graph {
         Node targetNode = getNode(target);
         try (
                 Connection con = this.conn.getConnection();
-                PreparedStatement ps = con.prepareStatement("DELETE from association where start_node_id=? AND end_node_id = ?")
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.DELETE_ASSOCIATION)
 
         ) {
             ps.setLong(1, uaNode.getId());
@@ -836,7 +832,7 @@ public class MySQLGraph implements Graph {
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from association where start_node_id=" + ua.getId())
+                ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_END_NODE_ID_OPERATION + ua.getId())
         ) {
 
             while (rs.next()) {
@@ -853,7 +849,6 @@ public class MySQLGraph implements Graph {
                 sourcesAssoc.put(getNodeNameFromId(end_node_id), operations_set);
 
             }
-            System.out.println("sources Assoc =  " + sourcesAssoc);
             return sourcesAssoc;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -889,7 +884,7 @@ public class MySQLGraph implements Graph {
         try (
                 Connection con = this.conn.getConnection();
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * from association where end_node_id=" + ua.getId())
+                ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_START_NODE_ID_OPERATION + ua.getId())
         ) {
             while (rs.next()) {
                 long              start_node_id =rs.getInt("start_node_id");
