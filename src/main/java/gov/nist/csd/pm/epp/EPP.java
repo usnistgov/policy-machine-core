@@ -62,7 +62,6 @@ public class EPP {
     }
 
     public void processEvent(EventContext eventCtx, String user, String process) throws PMException {
-        System.out.println("user " + user + " (procID=" + process + ") performed " + eventCtx.getEvent() + " on " + eventCtx.getTarget().getName());
         List<Obligation> obligations = pap.getObligationsPAP().getAll();
         for(Obligation obligation : obligations) {
             if (!obligation.isEnabled()) {
@@ -77,13 +76,16 @@ public class EPP {
 
                 // check the response condition
                 ResponsePattern responsePattern = rule.getResponsePattern();
-                Condition condition = responsePattern.getCondition();
-                if(!checkCondition(condition, eventCtx, user, process, pdp)) {
+                if(!checkCondition(responsePattern.getCondition(), eventCtx, user, process, pdp)) {
+                    continue;
+                } else if(!checkNegatedCondition(responsePattern.getNegatedCondition(), eventCtx, user, process, pdp)) {
                     continue;
                 }
 
                 for(Action action : rule.getResponsePattern().getActions()) {
                     if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
+                        continue;
+                    } else if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
                         continue;
                     }
 
@@ -102,6 +104,25 @@ public class EPP {
         for(Function f : functions) {
             boolean result = functionEvaluator.evalBool(eventCtx, user, process, pdp, f);
             if(!result) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Return true if the condition is satisfied. A condition is satisfied if all the functions evaluate to false.
+     */
+    private boolean checkNegatedCondition(NegatedCondition condition, EventContext eventCtx, String user, String process, PDP pdp) throws PMException {
+        if(condition == null) {
+            return true;
+        }
+
+        List<Function> functions = condition.getCondition();
+        for(Function f : functions) {
+            boolean result = functionEvaluator.evalBool(eventCtx, user, process, pdp, f);
+            if(result) {
                 return false;
             }
         }

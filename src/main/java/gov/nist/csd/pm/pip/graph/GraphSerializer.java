@@ -401,6 +401,10 @@ public class GraphSerializer {
             if (!graph.exists(child)) {
                 Node childNode = nodes.get(child);
                 graph.createNode(childNode.getName(), childNode.getType(), childNode.getProperties(), parent);
+            } else {
+                if (!graph.isAssigned(child, parent)) {
+                    graph.assign(child, parent);
+                }
             }
 
             // do the same with the child as the parent

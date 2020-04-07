@@ -5,6 +5,7 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.GraphSerializer;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
@@ -12,6 +13,9 @@ import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.READ;
@@ -681,5 +685,113 @@ class PReviewDeciderTest {
 
         list = decider.list("u4", "", "o2");
         assertTrue(list.contains(READ) && !list.contains(WRITE));
+    }
+
+    private static void buildGraph() throws PMException {
+        Graph graph = new MemGraph();
+        Random rand = new Random();
+        Node pc1 = graph.createPolicyClass("PC1", null);
+        Node pc2 = graph.createPolicyClass("PC2", null);
+        Node pc3 = graph.createPolicyClass("PC3", null);
+
+        // first level of UAs
+        List<String> uas = new ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            Node ua = null;
+            switch (i % 3) {
+                case 0:
+                    ua = graph.createNode("UA_" + i, UA, null, pc1.getName());
+                    break;
+                case 1:
+                    ua = graph.createNode("UA_" + i, UA, null, pc2.getName());
+                    break;
+                case 2:
+                    ua = graph.createNode("UA_" + i, UA, null, pc3.getName());
+                    break;
+            }
+            if (ua != null) uas.add(ua.getName());
+
+            for (int j = 1; j <= 3; j++) {
+                Node childUA = graph.createNode("UA_" + i + "_" + j, UA, null, ua.getName());
+                uas.add(childUA.getName());
+
+                for (int k = 1; k <= 2; k++) {
+                    Node gcUA = graph.createNode("UA_" + i + "_" + j + "_" + k, UA, null, childUA.getName());
+                    uas.add(gcUA.getName());
+                }
+            }
+        }
+
+        //users
+        for (int i = 1; i <= 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                String parent = uas.get(rand.nextInt(uas.size()));
+                Node u = graph.createNode("U_" + i, U, null, parent);
+            }
+        }
+
+        // first level of OAs
+        List<String> oas = new ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            Node oa = null;
+            switch (i % 3) {
+                case 0:
+                    oa = graph.createNode("OA_" + i, OA, null, pc1.getName());
+                    break;
+                case 1:
+                    oa = graph.createNode("OA_" + i, OA, null, pc1.getName());
+                    break;
+                case 2:
+                    oa = graph.createNode("OA_" + i, OA, null, pc1.getName());
+                    break;
+            }
+            if (oa != null) oas.add(oa.getName());
+
+
+            for (int j = 1; j <= 6; j++) {
+                Node childOA = graph.createNode("OA_" + i + "_" + j, OA, null, oa.getName());
+                oas.add(childOA.getName());
+
+                for (int k = 1; k <= 6; k++) {
+                    Node gcOA = graph.createNode("OA_" + i + "_" + j + "_" + k, OA, null, childOA.getName());
+                    oas.add(gcOA.getName());
+                }
+            }
+        }
+
+        // objects
+        for (int i = 1; i <= 400; i++) {
+            for (int j = 0; j < 50; j++) {
+                String parent = oas.get(rand.nextInt(oas.size()));
+                Node o = graph.createNode("O_" + i, O, null, parent);
+            }
+        }
+
+        // associations
+        for (String ua : uas) {
+            for (int i = 0; i < 5; i ++) {
+                String target = oas.get(rand.nextInt(oas.size()));
+                graph.associate(ua, target, new OperationSet(READ, WRITE));
+            }
+
+            String target = uas.get(rand.nextInt(uas.size()));
+            if (target.equals(ua) || graph.getChildren(target).contains(ua) || graph.getParents(ua).contains(target)) {
+                continue;
+            }
+
+            graph.associate(ua, target, new OperationSet(READ, WRITE));
+        }
+
+        System.out.println(graph.getNodes().size());
+
+        String s = GraphSerializer.serialize(graph);
+        try {
+            PrintWriter printWriter = new PrintWriter(new File("ngac/evr/large_sample.pm"));
+            printWriter.println(s);
+            printWriter.flush();
+            printWriter.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
