@@ -85,7 +85,7 @@ public class EPP {
                 for(Action action : rule.getResponsePattern().getActions()) {
                     if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
                         continue;
-                    } else if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
+                    } else if(!checkNegatedCondition(action.getNegatedCondition(), eventCtx, user, process, pdp)) {
                         continue;
                     }
 
