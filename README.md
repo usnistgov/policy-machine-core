@@ -8,9 +8,9 @@ This project is comprised of the core components of the NIST Policy Machine, a r
 
 ## Table of Contents
 1. [Installation](#install-using-maven)
-2. [Code Walkthrough](#code-walkthrough)
-3. [Implementation Caveats](#imp)
-3. [Interface Usage](#interface-usage)
+2. [Code Walkthrough](#packages)
+3. [Implementation Caveats](#implementation-caveats)
+3. [Basic Usage](#basic-usage)
 4. [Functional Component Usage](#functional-component-usage)
 5. [Event Response Grammar (Obligations)](https://github.com/PM-Master/policy-machine-core/tree/master/src/main/java/gov/nist/csd/pm/pip/obligations)
 
@@ -91,7 +91,7 @@ themselves cannot be the target of an access decision, these rep attributes prov
 When a policy class is created a representative attribute is also created and assigned to super_oa1. Any time a policy 
 class is the target of an access decision, this rep attribute will be used instead.
 
-## Interface Usage
+## Basic Usage
 The following are examples of using the interfaces and implementations provided in the PIP and PDP packages. These classes
 provide the basic functionality of an NAGC system.
 
@@ -151,12 +151,15 @@ Obligations obligations = new MemObligations();
 // add some nodes, assignments, and associations to the graph
 // create a policy class
 Node pc1 = graph.createPolicyClass("pc1", Node.toProperties("k", "v"));
+
 // create an object and user attribute and assign to pc1
 Node oa1 = graph.createNode("oa1", NodeType.OA, Node.toProperties("k1", "v1"), pc1.getName());
 Node ua1 = graph.createNode("ua1", NodeType.UA, Node.toProperties("k1", "v1"), pc1.getName());
+
 // create and object and user
 Node o1 = graph.createNode("o1", O, Node.toProperties("k", "v"), oa1.getName());
 Node u1 = graph.createNode("u1", NodeType.U, Node.toProperties("k", "v"), ua1.getName());
+
 // associate ua1 and oa1
 graph.associate(ua1.getName(), oa1.getName(), new OperationSet(READ, WRITE, ASSIGN, ASSIGN_TO));
 
