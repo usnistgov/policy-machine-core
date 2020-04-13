@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectReader;
+import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -42,7 +43,7 @@ public class MySQLGraph implements Graph {
         return objectMapper.writeValueAsString(set);
     }
 
-    public boolean isNameExists(String name) throws PMException{
+    public boolean nameExists(String name) throws PMException{
         Collection<Node> all_nodes = getNodes();
         List<Node> nodes;
         try {
@@ -104,7 +105,7 @@ public class MySQLGraph implements Graph {
             throw new PMException("You cannot create a policy class with that name, another node with that name already exists.");
         }
 
-        else if (isNameExists(name)){
+        else if (nameExists(name)){
             throw new PMException("a node with the name '" + name + "' already exists");
         }
 
@@ -186,7 +187,7 @@ public class MySQLGraph implements Graph {
         else if (initialParent.equals("0")) {
             throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
         }
-        else if (isNameExists(name)){
+        else if (nameExists(name)){
             throw new PMException("a node with the name '" + name + "' already exists");
         }
 
@@ -327,8 +328,8 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public boolean exists(String name) throws PMException {
-        try (            Connection con = this.conn.getConnection();
-                         PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_ID_NAME_FROM_NODE)
+        try (Connection con = this.conn.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT node_id, name from node where name=?")
         ){
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();

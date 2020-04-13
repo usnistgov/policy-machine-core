@@ -1,14 +1,19 @@
 package gov.nist.csd.pm.pip.graph.mysql;
 
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
+
 public class MySQLConnection {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/policydb_core";
+    private static final String DB_URL = "jdbc:mysql://localhost:33060/policydb_core";
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "pmAdmin";
@@ -20,13 +25,14 @@ public class MySQLConnection {
             Class.forName(DB_DRIVER);
             MySQLGraph mySQLGraph = new MySQLGraph(new MySQLConnection());
 
+            System.out.println("test");
             Map<String, String> map = new HashMap<>();
             map.put("key", "value");
             map.put("key2", "value 2");
 
-            /*Node parentNode = mySQLGraph.createPolicyClass("parent",null);
+            Node parentNode = mySQLGraph.createPolicyClass("parent",null);
             Node child1Node = mySQLGraph.createNode("child1", UA, null, "parent");
-            Node child2Node = mySQLGraph.createNode("child2", OA, map, "parent");*/
+            Node child2Node = mySQLGraph.createNode("child2", OA, map, "parent");
             //mySQLGraph.isAssigned(3,6);
             //mySQLGraph.updateNode(10, "Update name2 node user attribute", map);
             //mySQLGraph.deleteNode(11);
@@ -52,9 +58,10 @@ public class MySQLConnection {
 
     public static Connection getConnection() {
         Connection con = null;
-
+        System.out.println("Before init");
         try {
             con = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
+            System.out.println("DB connected");
             return con;
         } catch (SQLException ex) {
             return null;
