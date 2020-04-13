@@ -25,7 +25,6 @@ public class MySQLConnection {
             Class.forName(DB_DRIVER);
             MySQLGraph mySQLGraph = new MySQLGraph(new MySQLConnection());
 
-            System.out.println("test");
             Map<String, String> map = new HashMap<>();
             map.put("key", "value");
             map.put("key2", "value 2");
@@ -58,10 +57,8 @@ public class MySQLConnection {
 
     public static Connection getConnection() {
         Connection con = null;
-        System.out.println("Before init");
         try {
             con = DriverManager.getConnection(DB_URL,DB_USER,DB_PASSWORD);
-            System.out.println("DB connected");
             return con;
         } catch (SQLException ex) {
             return null;
