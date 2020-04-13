@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pip.graph.model.relationships;
 
+import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
@@ -33,9 +34,9 @@ public class Assignment extends Relationship implements Serializable {
      *
      * @param childType  The type of the child.
      * @param parentType The type of the parent.
-     * @throws PMException if the child type is not allowed to be assigned to the parent type.
+     * @throws PIPException if the child type is not allowed to be assigned to the parent type.
      */
-    public static void checkAssignment(NodeType childType, NodeType parentType) throws PMException {
+    public static void checkAssignment(NodeType childType, NodeType parentType) throws PIPException {
         NodeType[] check = validAssignments.get(childType);
         for (NodeType nt : check) {
             if (nt.equals(parentType)) {
@@ -43,7 +44,7 @@ public class Assignment extends Relationship implements Serializable {
             }
         }
 
-        throw new PMException(String.format("cannot assign a node of type %s to a node of type %s", childType, parentType));
+        throw new PIPException(String.format("cannot assign a node of type %s to a node of type %s", childType, parentType));
     }
 
     @Override

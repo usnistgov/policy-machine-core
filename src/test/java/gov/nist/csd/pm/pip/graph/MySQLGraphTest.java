@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pip.graph;
 
+import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -27,7 +28,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testCreateNode() throws PMException {
+    void testCreateNode() throws PIPException {
 
         Node pc = graph.createPolicyClass( "pc1", null);
         assertTrue(graph.getPolicyClasses().contains(pc.getName()));
@@ -48,7 +49,7 @@ public class MySQLGraphTest {
     }
 
     //@Test
-    void testUpdateNode() throws PMException {
+    void testUpdateNode() throws PIPException {
         //We use the same method with the ID so we keep the exception
         // create another method getNode from id to retrieve the proper node before updating it with the proper values
 
@@ -67,7 +68,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testDeleteNode() throws PMException {
+    void testDeleteNode() throws PIPException {
         Node node = graph.createPolicyClass("node test 4", Node.toProperties("namespace", "test"));
         graph.deleteNode(node.getName());
 
@@ -83,7 +84,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testExists() throws PMException {
+    void testExists() throws PIPException {
         Node oa1 = graph.createNode("OA 5", OA,null, "pc1");
         Node oa = graph.createNode("oa 6", OA, null, oa1.getName());
 
@@ -92,7 +93,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testGetPolicies() throws PMException {
+    void testGetPolicies() throws PIPException {
 
         //getPolicyClass should not be empty since we have the super_pc node
         //assertTrue(graph.getPolicyClasses().isEmpty());
@@ -106,9 +107,9 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testGetChildren() throws PMException {
+    void testGetChildren() throws PIPException {
 
-        assertThrows(PMException.class, () -> graph.getChildren("Not an existing node"));
+        assertThrows(PIPException.class, () -> graph.getChildren("Not an existing node"));
 
         Node parentNode = graph.createPolicyClass("parent10",Node.toProperties("firstValue", "test"));
         Node child1Node = graph.createNode("child11", OA, null, "parent10");
@@ -119,9 +120,9 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testGetParents() throws PMException {
+    void testGetParents() throws PIPException {
 
-        assertThrows(PMException.class, () -> graph.getChildren("Not an existing node"));
+        assertThrows(PIPException.class, () -> graph.getChildren("Not an existing node"));
 
         Node parent1Node = graph.createPolicyClass( "parent13", null);
         Node parent2Node = graph.createNode("parent14", OA, null, "parent13");
@@ -133,7 +134,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testAssign() throws PMException {
+    void testAssign() throws PIPException {
 
         Node parent1Node = graph.createPolicyClass("parent16", null);
         Node child1Node = graph.createNode("childtest17", OA, null, "parent16");
@@ -150,7 +151,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testDeassign() throws PMException {
+    void testDeassign() throws PIPException {
 
         Node parent1Node = graph.createPolicyClass("parent19", null);
         Node child1Node = graph.createNode("childtest20", OA, null, "parent19");
@@ -165,7 +166,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testAssociate() throws PMException {
+    void testAssociate() throws PIPException {
         Node pcNode = graph.createPolicyClass("pc21", null);
         Node uaNode = graph.createNode("subject 22", UA, null, "pc21");
         Node targetNode = graph.createNode("target 23", OA, null, "pc21");
@@ -185,7 +186,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testDissociate() throws PMException {
+    void testDissociate() throws PIPException {
 
         Node pcNode = graph.createPolicyClass( "pc24", null);
         Node uaNode = graph.createNode("subject 25", UA, null, "pc24");
@@ -203,7 +204,7 @@ public class MySQLGraphTest {
 
 
     @Test
-    void testGetSourceAssociations() throws PMException {
+    void testGetSourceAssociations() throws PIPException {
 
         Node pcNode = graph.createPolicyClass("pc 27", null);
         Node uaNode = graph.createNode("subject 28", UA, null, "pc 27");
@@ -214,12 +215,12 @@ public class MySQLGraphTest {
         Map<String, OperationSet> associations = graph.getSourceAssociations(uaNode.getName());
 
         assertTrue(associations.containsKey(targetNode.getName()));
-        assertThrows(PMException.class, () -> graph.getSourceAssociations("Not an existing node"));
+        assertThrows(PIPException.class, () -> graph.getSourceAssociations("Not an existing node"));
         assertTrue(associations.get(targetNode.getName()).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
-    void testGetTargetAssociations() throws PMException {
+    void testGetTargetAssociations() throws PIPException {
 
         Node pcNode = graph.createPolicyClass("pc 30", null);
         Node uaNode = graph.createNode("subject 31", UA, null, "pc 30");
@@ -230,13 +231,13 @@ public class MySQLGraphTest {
         Map<String, OperationSet> associations = graph.getTargetAssociations(targetNode.getName());
 
         assertTrue(associations.containsKey(uaNode.getName()));
-        assertThrows(PMException.class, () -> graph.getTargetAssociations("Not an existing node"));
+        assertThrows(PIPException.class, () -> graph.getTargetAssociations("Not an existing node"));
 
         assertTrue(associations.get(uaNode.getName()).containsAll(Arrays.asList("read", "write")));
     }
 /*
     //@Test
-    void testSearch() throws PMException {
+    void testSearch() throws PIPException {
         int count_OA = graph.search(null, OA, null).size();
 
         graph.createPolicyClass(33, "pc 33", null);
@@ -274,7 +275,7 @@ public class MySQLGraphTest {
     }
 */
     @Test
-    void testGetNodes() throws PMException {
+    void testGetNodes() throws PIPException {
         int count_nodes = graph.getNodes().size();
 
         graph.createPolicyClass("pc 40", null);
@@ -286,7 +287,7 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testGetNode() throws PMException {
+    void testGetNode() throws PIPException {
         assertThrows(IllegalArgumentException.class, () -> graph.getNode("Not an existing node"));
 
         Node node = graph.createPolicyClass("pc 44", null);
