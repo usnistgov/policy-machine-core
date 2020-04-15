@@ -7,11 +7,11 @@ import java.util.List;
 
 public class DeleteAction extends Action {
 
-    List<EvrNode> nodes;
-    AssignAction assignments;
-    List<GrantAction> associations;
-    List<String> prohibitions;
-    List<String> rules;
+    private List<EvrNode> nodes;
+    private AssignAction assignments;
+    private List<GrantAction> associations;
+    private List<String> prohibitions;
+    private List<String> rules;
 
     public List<EvrNode> getNodes() {
         return nodes;
