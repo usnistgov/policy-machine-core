@@ -70,7 +70,7 @@ public class CreateNodeExecutor implements FunctionExecutor {
 
         // sixth arg is the properties which is a map that has to come from a function
         Map<String, String> props = new HashMap<>();
-        if(args.size() > 3) {
+        if(args.size() > 4) {
             Arg propsArg = args.get(4);
             if (propsArg.getFunction() != null) {
                 props = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, propsArg.getFunction());
