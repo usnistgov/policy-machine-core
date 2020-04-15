@@ -168,6 +168,12 @@ class MemGraphTest {
         associations = graph.getTargetAssociations(targetNode.getName());
         assertTrue(associations.containsKey(uaNode.getName()));
         assertTrue(associations.get(uaNode.getName()).containsAll(Arrays.asList("read", "write")));
+
+        graph.createNode("test", UA, null, "subject");
+        graph.associate("test", "subject", new OperationSet("read"));
+        associations = graph.getSourceAssociations("test");
+        assertTrue(associations.containsKey("subject"));
+        assertTrue(associations.get("subject").contains("read"));
     }
 
     @Test
