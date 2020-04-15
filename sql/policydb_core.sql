@@ -61,10 +61,11 @@ CREATE TABLE IF NOT EXISTS `association` (
 -- Dumping structure for table policydb_core.deny
 CREATE TABLE IF NOT EXISTS `deny` (
   `deny_id` int(11) NOT NULL AUTO_INCREMENT,
-  `deny_name` varchar(50) NOT NULL,
+  `deny_name` varchar(60) NOT NULL,
   `deny_type_id` int(11) NOT NULL,
+  `subject_name` varchar(60) NOT NULL,
   `user_attribute_id` int(11) DEFAULT NULL,
-  `process_id` int(11) DEFAULT NULL,
+  `process_id` varchar(60) DEFAULT NULL,
   `is_intersection` int(1) NOT NULL,
   `deny_operations` json NOT NULL,
   PRIMARY KEY (`deny_id`),
@@ -100,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `deny_obj_attribute` (
 -- Dumping structure for table policydb_core.deny_type
 CREATE TABLE IF NOT EXISTS `deny_type` (
   `deny_type_id` int(11) NOT NULL,
-  `name` varchar(50) DEFAULT NULL,
+  `name` varchar(60) DEFAULT NULL,
   `abbreviation` varchar(2) NOT NULL,
   PRIMARY KEY (`deny_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Deny types';
@@ -117,7 +118,7 @@ INSERT INTO `deny_type` (`deny_type_id`, `name`, `abbreviation`) VALUES
 CREATE TABLE IF NOT EXISTS `node` (
   `node_id` int(11) NOT NULL AUTO_INCREMENT,
   `node_type_id` int(11) NOT NULL,
-  `name` varchar(200) DEFAULT NULL,
+  `name` varchar(60) DEFAULT NULL,
   `node_property` json DEFAULT NULL,
   PRIMARY KEY (`node_id`),
   UNIQUE KEY `name` (`name`),
