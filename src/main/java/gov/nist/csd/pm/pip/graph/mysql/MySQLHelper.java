@@ -24,4 +24,14 @@ public class MySQLHelper {
     public static final String DELETE_ASSOCIATION = "DELETE from association where start_node_id=? AND end_node_id = ?";
     public static final String SELECT_END_NODE_ID_OPERATION = "SELECT end_node_id, operation_set from association where start_node_id=";
     public static final String SELECT_START_NODE_ID_OPERATION = "SELECT start_node_id, operation_set from association where end_node_id=";
+
+    public static final String INSERT_PROHIBITION = "INSERT INTO deny(deny_name, deny_type_id, user_attribute_id, process_id, +" +
+            " is_intersection, deny_operations) VALUES(?,?,?,?,?,?)";
+    public static final String INSERT_CONTAINERS = "INSERT INTO deny_obj_attribute(deny_id, object_attribute_id, +" +
+            "object_complement) VALUES(?,?,?)";
+    public static final String DELETE_PROHIBITION_CONTAINER = "DELETE from deny_obj_attribute where deny_id = ?";
+    public static final String DELETE_PROHIBITION = "DELETE from deny where deny_name = ?";
+
+
+
 }

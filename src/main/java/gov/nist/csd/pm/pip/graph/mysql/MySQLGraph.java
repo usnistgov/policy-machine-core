@@ -49,7 +49,7 @@ public class MySQLGraph implements Graph {
         List<Node> nodes;
         try {
             nodes = all_nodes.stream()
-                    .filter(node_k -> node_k.getName().equals(name))
+                    .filter(node_k -> node_k.getName().equalsIgnoreCase(name))
                     .collect(Collectors.toList());
             nodes.forEach(System.out::println);
             if (nodes.size() >= 1) {
@@ -445,7 +445,7 @@ public class MySQLGraph implements Graph {
         Node node;
         try {
             node = nodes.stream()
-                    .filter(node_k -> node_k.getName().equals(name))
+                    .filter(node_k -> node_k.getName().equalsIgnoreCase(name))
                     .iterator().next();
         } catch (Exception p) {
             throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, name));
