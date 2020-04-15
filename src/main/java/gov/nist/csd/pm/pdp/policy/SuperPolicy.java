@@ -59,13 +59,6 @@ public class SuperPolicy {
             graph.updateNode(superPC.getName(), superPC.getProperties());
         }
 
-        if (!graph.exists(superPCRep)) {
-            superPolicyClassRep = graph.createNode(superPCRep, NodeType.OA,
-                    Node.toProperties(NAMESPACE_PROPERTY, "super", "pc", String.valueOf(superPC.getName())), superOA.getName());
-        } else {
-            superPolicyClassRep = graph.getNode(superPCRep);
-        }
-
         if (!graph.exists("super_ua1")) {
             superUA1 = graph.createNode("super_ua1", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getName());
         } else {
@@ -86,6 +79,13 @@ public class SuperPolicy {
             superOA = graph.createNode("super_oa", OA, Node.toProperties(NAMESPACE_PROPERTY, "super"), superPC.getName());
         } else {
             superOA = graph.getNode("super_oa");
+        }
+
+        if (!graph.exists(superPCRep)) {
+            superPolicyClassRep = graph.createNode(superPCRep, NodeType.OA,
+                    Node.toProperties(NAMESPACE_PROPERTY, "super", "pc", String.valueOf(superPC.getName())), superOA.getName());
+        } else {
+            superPolicyClassRep = graph.getNode(superPCRep);
         }
 
         // check super ua1 is assigned to super pc
