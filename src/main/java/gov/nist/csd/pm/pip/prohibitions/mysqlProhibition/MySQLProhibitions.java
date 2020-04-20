@@ -165,16 +165,18 @@ public class MySQLProhibitions implements Prohibitions {
             pstmt = con.prepareStatement(MySQLHelper.INSERT_CONTAINERS);
 
             ps.setString(1, prohibition.getName());
-            //no type id yet -> 2
-            ps.setInt(2, 2); //type_id
+            //no type id yet -> 1
+            ps.setInt(2, 1); //type_id
             ps.setString(3, prohibition.getSubject());
 
             if ( existsNode(prohibition.getSubject())) {
                 ps.setInt(4, getNodeIdFromSubjectName(prohibition.getSubject())); //user_attribute_id
                 ps.setString(5, null); //process_id null if node exists
+                ps.setInt(2, 2); // deny_type = user attribute
             } else {
                 ps.setString(5, prohibition.getSubject()); //process_id
                 ps.setString(4, null);
+                ps.setInt(2, 3); // deny_type = process
             }
 
             ps.setInt(6, prohibition.isIntersection() ? 1 : 0 );
@@ -360,9 +362,11 @@ public class MySQLProhibitions implements Prohibitions {
             if (existsNode(prohibition.getSubject())) {
                 ps.setInt(3, getNodeIdFromSubjectName(prohibition.getSubject())); //user_attribute_id
                 ps.setString(4, null); //process_id null if node exists
+                ps.setInt(7, 2); // deny_type = user_attribute
             } else {
                 ps.setString(3, null);
                 ps.setString(4, prohibition.getSubject()); //process_id
+                ps.setInt(7, 3); // type = process
             }
 
             ps.setInt(5, prohibition.isIntersection() ? 1 : 0 );
@@ -376,7 +380,7 @@ public class MySQLProhibitions implements Prohibitions {
                 }
             }
 
-            ps.setString(7, prohibitionName);
+            ps.setString(8, prohibitionName);
             ps.executeUpdate();
 
             //delete container before adding new ones

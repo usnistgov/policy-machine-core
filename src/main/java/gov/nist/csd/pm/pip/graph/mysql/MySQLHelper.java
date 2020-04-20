@@ -34,6 +34,6 @@ public class MySQLHelper {
     public static final String SELECT_EXISTS_ID_NODE_ID = "SELECT node_id from node where name =?";
     public static final String SELECT_CONTAINER_DENY_ID = "SELECT object_attribute_id, object_complement from deny_obj_attribute where deny_id=? ";
     public static final String SELECT_CONTAINER_DENY_ID_SIMPLE = "SELECT object_attribute_id, object_complement from deny_obj_attribute where deny_id=";
-    public static final String UPDATE_PROHIBITION = "UPDATE deny SET deny_name=?, subject_name=?, user_attribute_id=?, process_id=?, is_intersection =?, deny_operations=? WHERE deny_name=?";
+    public static final String UPDATE_PROHIBITION = "UPDATE deny SET deny_name=?, subject_name=?, user_attribute_id=?, process_id=?, is_intersection =?, deny_operations=?, deny_type_id = ? WHERE deny_name=?";
 
 }

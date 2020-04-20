@@ -39,8 +39,9 @@ public class MySQLConnection {
                     .addContainer("5", true)
                     .build();
 
+           prohibitions.add(prohibition);
             //prohibitions.update("prohibition90", prohibition);
-            prohibitions.getProhibitionsFor("super_u");
+            //prohibitions.getProhibitionsFor("super_u");
 
         } catch (Exception e){
             System.out.println(e);
