@@ -67,7 +67,7 @@ public class Prohibition {
         this.name = name;
     }
 
-    public Set<String> getOperations() {
+    public OperationSet getOperations() {
         return operations;
     }
 

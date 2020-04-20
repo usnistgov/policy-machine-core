@@ -25,13 +25,15 @@ public class MySQLHelper {
     public static final String SELECT_END_NODE_ID_OPERATION = "SELECT end_node_id, operation_set from association where start_node_id=";
     public static final String SELECT_START_NODE_ID_OPERATION = "SELECT start_node_id, operation_set from association where end_node_id=";
 
-    public static final String INSERT_PROHIBITION = "INSERT INTO deny(deny_name, deny_type_id, user_attribute_id, process_id, +" +
-            " is_intersection, deny_operations) VALUES(?,?,?,?,?,?)";
-    public static final String INSERT_CONTAINERS = "INSERT INTO deny_obj_attribute(deny_id, object_attribute_id, +" +
-            "object_complement) VALUES(?,?,?)";
+    public static final String INSERT_PROHIBITION = "INSERT INTO deny(deny_name, deny_type_id, subject_name, user_attribute_id, process_id, is_intersection, deny_operations) VALUES(?,?,?,?,?,?,?)";
+    public static final String INSERT_CONTAINERS = "INSERT INTO deny_obj_attribute(deny_id, object_attribute_id, object_complement) VALUES(?,?,?)";
     public static final String DELETE_PROHIBITION_CONTAINER = "DELETE from deny_obj_attribute where deny_id = ?";
     public static final String DELETE_PROHIBITION = "DELETE from deny where deny_name = ?";
-
-
+    public static final String SELECT_PROHIBITION_FROM_NAME = "SELECT deny_id, deny_name, subject_name, is_intersection, deny_operations from deny where deny_name =? ";
+    public static final String SELECT_ALL_PROHIBITION = "SELECT deny_id, deny_name, subject_name, is_intersection, deny_operations from deny";
+    public static final String SELECT_EXISTS_ID_NODE_ID = "SELECT node_id from node where name =?";
+    public static final String SELECT_CONTAINER_DENY_ID = "SELECT object_attribute_id, object_complement from deny_obj_attribute where deny_id=? ";
+    public static final String SELECT_CONTAINER_DENY_ID_SIMPLE = "SELECT object_attribute_id, object_complement from deny_obj_attribute where deny_id=";
+    public static final String UPDATE_PROHIBITION = "UPDATE deny SET deny_name=?, subject_name=?, user_attribute_id=?, process_id=?, is_intersection =?, deny_operations=? WHERE deny_name=?";
 
 }

@@ -26,23 +26,22 @@ public class MySQLConnection {
 
         try{
 /*            MySQLGraph mySQLGraph = new MySQLGraph(new MySQLConnection());
-            Map<String, String> map = new HashMap<>();
-            map.put("key", "value");
-            map.put("key2", "value 2");
-
             Node parentNode = mySQLGraph.createPolicyClass("parent",null);
             Node child1Node = mySQLGraph.createNode("child1", UA, null, "parent");
             Node child2Node = mySQLGraph.createNode("child2", OA, map, "parent");
 
             mySQLGraph.getSourceAssociations("child1");*/
 
-
             MySQLProhibitions prohibitions = new MySQLProhibitions(new MySQLConnection());
 
-            Prohibition prohibition = new Prohibition.Builder("prohibition1", "123", new OperationSet("read"))
-                    .addContainer("1", true)
+           Prohibition prohibition = new Prohibition.Builder("prohibition90 new", "super_oa", new OperationSet("read", "write"))
+                    .setIntersection(true)
+                    .addContainer("5", true)
                     .build();
-            prohibitions.add(prohibition);
+
+            //prohibitions.update("prohibition90", prohibition);
+            prohibitions.getProhibitionsFor("super_u");
+
         } catch (Exception e){
             System.out.println(e);
         }
