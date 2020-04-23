@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.prohibitions.mysqlProhibition;
+package gov.nist.csd.pm.pip.prohibitions.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,12 +51,11 @@ public class MySQLProhibitions implements Prohibitions {
             return l.size() != 0 ;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("prohibitions", ex.getMessage());
         }
     }
 
-    public boolean existsNode(String subject_name) throws SQLException{
+    public boolean nodeExists(String subject_name) throws PIPException{
 
         try (
                 Connection con = this.conn.getConnection();
@@ -71,12 +70,11 @@ public class MySQLProhibitions implements Prohibitions {
             return id != 0;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new SQLException("Cannot connect to the Database" + ex);
+            throw new PIPException("prohibitions", ex.getMessage());
         }
     }
 
-    public int getNodeIdFromSubjectName(String subject_name) throws SQLException{
+    public int getNodeIdFromSubjectName(String subject_name) throws PIPException{
 
         try (
                 Connection con = this.conn.getConnection();
@@ -91,12 +89,11 @@ public class MySQLProhibitions implements Prohibitions {
             return id;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new SQLException("Cannot connect to the Database" + ex);
+            throw new PIPException("prohibitions", ex.getMessage());
         }
     }
 
-    public boolean existsContainer(int deny_id) throws SQLException{
+    public boolean existsContainer(int deny_id) throws PIPException{
         try (
                 Connection con = this.conn.getConnection();
                 PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_CONTAINER_DENY_ID)
@@ -110,12 +107,11 @@ public class MySQLProhibitions implements Prohibitions {
             return obj_att_id != 0;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new SQLException("Cannot connect to the Database" + ex);
+            throw new PIPException("prohibitions", ex.getMessage());
         }
     }
 
-    public int getProhibitionIdByProhibitionName (String prohibitionName) throws SQLException{
+    public int getProhibitionIdByProhibitionName (String prohibitionName) throws PIPException{
         try (
                 Connection con = this.conn.getConnection();
                 PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_PROHIBITION_FROM_NAME)
@@ -129,8 +125,7 @@ public class MySQLProhibitions implements Prohibitions {
             return id;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new SQLException("Cannot connect to the Database" + ex);
+            throw new PIPException("prohibitions", ex.getMessage());
         }
     }
 
@@ -166,9 +161,8 @@ public class MySQLProhibitions implements Prohibitions {
 
                 return deny_type_id;
             } catch (SQLException s) {
-                s.printStackTrace();
+                throw new PIPException("prohibitions", s.getMessage());
             }
-            throw new PIPException("This node_id does not exist");
         }
         return 0;
     }
@@ -191,7 +185,7 @@ public class MySQLProhibitions implements Prohibitions {
             throw new IllegalArgumentException("a null subject was provided when creating a prohibition");
         }
         else if (exists(prohibition.getName())) {
-            throw new PIPException("You cannot create the prohibition. Another prohibition with the name '" + prohibition.getName() + "' already exists");
+            throw new PIPException("prohibitions", "You cannot create the prohibition. Another prohibition with the name '" + prohibition.getName() + "' already exists");
         }
 
         PreparedStatement ps = null;
@@ -209,7 +203,7 @@ public class MySQLProhibitions implements Prohibitions {
             ps.setInt(2, 1); //type_id
             ps.setString(3, prohibition.getSubject());
 
-            if ( existsNode(prohibition.getSubject())) {
+            if ( nodeExists(prohibition.getSubject())) {
                 ps.setInt(4, getNodeIdFromSubjectName(prohibition.getSubject())); //user_attribute_id
                 ps.setString(5, null); //process_id null if node exists
                 // deny_type_id = node_type_id if node_id exists
@@ -228,7 +222,7 @@ public class MySQLProhibitions implements Prohibitions {
                 try {
                 ps.setString(7, hashSetToJSON(prohibition.getOperations()));
                 } catch (JsonProcessingException j) {
-                    j.printStackTrace();
+                    throw new PIPException("prohibitions", j.getMessage());
                 }
             }
 
@@ -247,18 +241,18 @@ public class MySQLProhibitions implements Prohibitions {
                     pstmt.setInt(3, container.getValue() ? 1 : 0);
                     pstmt.executeUpdate();
                 } else {
-                    throw new PIPException("The object attribute "+container.getKey()+" does not exist in the graph");
+                    throw new PIPException("prohibitions", "The object attribute "+container.getKey()+" does not exist in the graph");
                 }
             }
             con.close();
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("prohibitions", s.getMessage());
         } finally {
             try {
                 if(rs != null) {rs.close();}
                 if(ps != null) {ps.close();}
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                throw new PIPException("prohibitions", e.getMessage());
             }
         }
     }
@@ -290,7 +284,7 @@ public class MySQLProhibitions implements Prohibitions {
                     try {
                         operations_set = reader2.readValue(deny_operations);
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("prohibitions", j.getMessage());
                     }
                 }
 
@@ -330,9 +324,8 @@ public class MySQLProhibitions implements Prohibitions {
 
             return prohibitions;
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("prohibitions", s.getMessage());
         }
-        return null;
     }
 
     /**
@@ -350,7 +343,7 @@ public class MySQLProhibitions implements Prohibitions {
                     return p;
                 }
             }
-        throw new PIPException(String.format("a prohibition does not exist with the name %s", prohibitionName));
+        throw new PIPException("prohibitions", "a prohibition does not exist with the name " + prohibitionName);
     }
 
     /**
@@ -386,7 +379,7 @@ public class MySQLProhibitions implements Prohibitions {
         } else if (prohibitionName == null || prohibitionName.isEmpty()) {
             throw new IllegalArgumentException("cannot update a prohibition with a null name");
         } else if (exists(prohibition.getName())) {
-            throw new PIPException("Another prohibition with the same name (" + prohibition.getName() + ") already exists.");
+            throw new PIPException("prohibitions", "Another prohibition with the same name (" + prohibition.getName() + ") already exists.");
         }
 
         try (
@@ -400,7 +393,7 @@ public class MySQLProhibitions implements Prohibitions {
             ps.setString(1, prohibition.getName());
             ps.setString(2, prohibition.getSubject());
 
-            if (existsNode(prohibition.getSubject())) {
+            if (nodeExists(prohibition.getSubject())) {
                 ps.setInt(3, getNodeIdFromSubjectName(prohibition.getSubject())); //user_attribute_id
                 ps.setString(4, null); //process_id null if node exists
                 ps.setInt(7, getTypeByNodeId(getNodeIdFromSubjectName(prohibition.getSubject())));
@@ -418,7 +411,7 @@ public class MySQLProhibitions implements Prohibitions {
                 try {
                     ps.setString(6, hashSetToJSON(prohibition.getOperations()));
                 } catch (JsonProcessingException j) {
-                    j.printStackTrace();
+                    throw new PIPException("prohibitions", j.getMessage());
                 }
             }
 
@@ -437,7 +430,7 @@ public class MySQLProhibitions implements Prohibitions {
                 psCont.executeUpdate();
             }
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("prohibitions", s.getMessage());
         }
     }
     /**
@@ -459,11 +452,11 @@ public class MySQLProhibitions implements Prohibitions {
                 ps.setInt(1, getProhibitionIdByProhibitionName(prohibitionName));
                 ps.executeUpdate();
             } else {
-                throw new PIPException(String.format("a prohibition does not exist with the name %s", prohibitionName));
+                throw new PIPException("prohibitions", "a prohibition does not exist with the name "+ prohibitionName);
             }
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new PIPException(e.getMessage());
+            throw new PIPException("prohibitions", e.getMessage());
         }
     }
 }

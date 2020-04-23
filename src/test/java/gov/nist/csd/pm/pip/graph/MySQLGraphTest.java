@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -235,45 +236,44 @@ public class MySQLGraphTest {
 
         assertTrue(associations.get(uaNode.getName()).containsAll(Arrays.asList("read", "write")));
     }
-/*
-    //@Test
-    void testSearch() throws PIPException {
-        int count_OA = graph.search(null, OA, null).size();
 
-        graph.createPolicyClass(33, "pc 33", null);
-        graph.createNode(34, "oa 34", OA, Node.toProperties("namespace specific", "test specific"), 33);
-        graph.createNode(35, "oa 35", OA, Node.toProperties("specific key 1", "specific value 1"), 33);
+    @Test
+    void testSearch() throws PIPException {
+        int count_OA = graph.search(OA, null).size();
+
+        graph.createPolicyClass("pc 33", null);
+        graph.createNode("oa 34", OA, Node.toProperties("namespace specific", "test specific"), "pc 33");
+        graph.createNode("oa 35", OA, Node.toProperties("specific key 1", "specific value 1"), "pc 33");
 
         Map<String, String> map = new HashMap<>();
                             map.put("specific key 1", "specific value 1");
                             map.put("specific key 2", "specific value 2");
-        graph.createNode(36, "oa 36", OA, map, 33);
+        graph.createNode("oa 36", OA, map, "pc 33");
 
         // complete search
-        Set<Node> nodes = graph.search("oa 36", OA, map);
-        //todo : search method - edit method ?
+        Set<Node> nodes = graph.search(OA, map);
         assertEquals(1, nodes.size());
 
         // one property
-        nodes = graph.search(null, null, Node.toProperties("specific key 1", "specific value 1"));
+        nodes = graph.search(null, Node.toProperties("specific key 1", "specific value 1"));
         assertEquals(2, nodes.size());
 
         // just namespace
-        nodes = graph.search(null, null, Node.toProperties("namespace specific", "test specific"));
+        nodes = graph.search(null, Node.toProperties("namespace specific", "test specific"));
         assertEquals(1, nodes.size());
 
         // name, type, namespace
-        nodes = graph.search("oa 34", OA, Node.toProperties("namespace specific", "test specific"));
+        nodes = graph.search(OA, Node.toProperties("namespace specific", "test specific"));
         assertEquals(1, nodes.size());
 
 
-        nodes = graph.search(null, OA, null);
+        nodes = graph.search(OA, null);
         assertEquals(3 + count_OA, nodes.size());
 
-        nodes = graph.search(null, null, null);
+        nodes = graph.search(null, null);
         assertEquals(graph.getNodes().size(), nodes.size());
     }
-*/
+
     @Test
     void testGetNodes() throws PIPException {
         int count_nodes = graph.getNodes().size();

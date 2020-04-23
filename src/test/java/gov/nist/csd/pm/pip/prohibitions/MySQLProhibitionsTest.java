@@ -4,7 +4,7 @@ import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
-import gov.nist.csd.pm.pip.prohibitions.mysqlProhibition.MySQLProhibitions;
+import gov.nist.csd.pm.pip.prohibitions.mysql.MySQLProhibitions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class MySQLProhibitionsTest {
 
         Prohibition prohibition = new Prohibition.Builder("prohibition 1", "super_u", new OperationSet("read"))
                 .setIntersection(false)
-                .addContainer("10", true)
+                .addContainer("2", true)
                 .build();
 
         MySQLProhibitions prohibitions = new MySQLProhibitions(new MySQLConnection());
@@ -30,8 +30,8 @@ public class MySQLProhibitionsTest {
         assertEquals("super_u", prohibition_test.getSubject());
         assertFalse(prohibition_test.isIntersection());
         assertEquals(new OperationSet("read"), prohibition_test.getOperations());
-        assertTrue(prohibition.getContainers().containsKey("10"));
-        assertTrue(prohibition.getContainers().get("10"));
+        assertTrue(prohibition.getContainers().containsKey("2"));
+        assertTrue(prohibition.getContainers().get("2"));
     }
 
     @Test
@@ -43,6 +43,7 @@ public class MySQLProhibitionsTest {
                 .build();
         //prohibition1 is already an existing prohibition
         Prohibition p3 = new Prohibition.Builder("prohibition 1", "super", new OperationSet("read"))
+                .addContainer("10", true)
                 .build();
         MySQLProhibitions prohibitions = new MySQLProhibitions(new MySQLConnection());
 
@@ -80,8 +81,8 @@ public class MySQLProhibitionsTest {
         assertFalse(prohibition.isIntersection());
         assertEquals(prohibition.getOperations(), new OperationSet("read"));
 
-        assertTrue(prohibition.getContainers().containsKey("10"));
-        assertTrue(prohibition.getContainers().get("10"));
+        assertTrue(prohibition.getContainers().containsKey("2"));
+        assertTrue(prohibition.getContainers().get("2"));
     }
 
     @Test
@@ -90,7 +91,7 @@ public class MySQLProhibitionsTest {
 
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test 106", "2", new OperationSet("read"))
                 .setIntersection(false)
-                .addContainer("10", true)
+                .addContainer("3", true)
                 .build();
         prohibitions.add(prohibitionTest);
         assertEquals(1, prohibitions.getProhibitionsFor("2").size());
@@ -101,8 +102,7 @@ public class MySQLProhibitionsTest {
     void update() throws PIPException{
         MySQLProhibitions prohibitions = new MySQLProhibitions(new MySQLConnection());
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test", "newSubject test", new OperationSet("read"))
-                .setIntersection(false)
-                .addContainer("10", true)
+                .addContainer("5", true)
                 .build();
         prohibitions.add(prohibitionTest);
 

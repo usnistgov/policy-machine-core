@@ -7,12 +7,13 @@ public class PIPException extends PMException {
         super(msg);
     }
 
-    public String getSource() {
-        return source;
+    public PIPException(String source, String s) {
+        this(String.format("%s, %s", source, s));
+        this.source = source;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public String getSource() {
+        return source;
     }
 
 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.exceptions.PIPException;
-import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
@@ -56,9 +55,9 @@ public class MySQLGraph implements Graph {
                 return nodes.get(0).getId();
             }
         } catch (Exception p) {
-            throw new PIPException("No nodes in the mysql graph");
+            throw new PIPException("graph", p.getMessage());
         }
-        throw new PIPException("There are no nodes with that name.");
+        throw new PIPException("graph", "There are no nodes with that name.");
     }
 
     public String getNodeNameFromId(long id) throws PIPException{
@@ -73,9 +72,9 @@ public class MySQLGraph implements Graph {
                 return nodes.get(0).getName();
             }
         } catch (Exception p) {
-            throw new PIPException("No nodes in the mysql graph");
+            throw new PIPException("graph", p.getMessage());
         }
-        throw new PIPException("There are no nodes with that name.");
+        throw new PIPException("graph","There are no nodes with that name.");
     }
 
     @Override
@@ -85,7 +84,7 @@ public class MySQLGraph implements Graph {
             throw new IllegalArgumentException("no name was provided when creating a policy class in the mysql graph");
         }
         else if (exists(name)) {
-            throw new PIPException("You cannot create the policy class. Another node with the name '" + name + "' already exists");
+            throw new PIPException("graph", "You cannot create the policy class. Another node with the name '" + name + "' already exists");
         }
 
         ResultSet rs_type = null;
@@ -113,7 +112,7 @@ public class MySQLGraph implements Graph {
                 try {
                     ps.setString(3, toJSON(properties));
                 } catch (JsonProcessingException j) {
-                    j.printStackTrace();
+                    throw new PIPException("graph", j.getMessage());
                 }
             }
 
@@ -123,7 +122,7 @@ public class MySQLGraph implements Graph {
             con.close();
             return node;
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("graph", s.getMessage());
         }
         finally {
             try {
@@ -132,10 +131,9 @@ public class MySQLGraph implements Graph {
                 if(ps != null) {ps.close();}
                 if(pstmt != null) {pstmt.close();}
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                throw new PIPException("graph", e.getMessage());
             }
         }
-        return null;
     }
 
     /**
@@ -152,7 +150,7 @@ public class MySQLGraph implements Graph {
         //check for null values
 
         if (type == PC) {
-            throw new PIPException("use createPolicyClass to create a policy class node");
+            throw new PIPException("graph", "use createPolicyClass to create a policy class node");
         }
         else if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a node in the mysql graph");
@@ -161,7 +159,7 @@ public class MySQLGraph implements Graph {
             throw new IllegalArgumentException("a null type was provided to the mysql graph when creating a node");
         }
         else if (exists(name)) {
-            throw new PIPException("You cannot create the policy class node. Another node with the name '" + name + "' already exists");
+            throw new PIPException("graph", "You cannot create the policy class node. Another node with the name '" + name + "' already exists");
         }
         else if (initialParent.equals("0")) {
             throw new IllegalArgumentException("must specify an initial parent ID when creating a non policy class node");
@@ -192,7 +190,7 @@ public class MySQLGraph implements Graph {
                     try {
                         ps.setString(3, toJSON(properties));
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("graph", j.getMessage());
                     }
                 }
             }
@@ -212,7 +210,7 @@ public class MySQLGraph implements Graph {
             con.close();
             return node;
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("graph", s.getMessage());
         }
         finally {
             try {
@@ -220,10 +218,9 @@ public class MySQLGraph implements Graph {
                 if(ps != null) {ps.close();}
                 if(pstmt != null) {pstmt.close();}
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                throw new PIPException("graph", e.getMessage());
             }
         }
-        return null;
     }
 
     /**
@@ -243,7 +240,7 @@ public class MySQLGraph implements Graph {
             throw new IllegalArgumentException("no name was provided when updating a node in the mysql graph");
         }
         else if (!exists(name)) {
-            throw new PIPException(String.format("node with the name %s could not be found to update", name));
+            throw new PIPException("graph", "node with the name "+ name+ "could not be found to update");
         }
 
         Node node = getNode(name);
@@ -255,7 +252,7 @@ public class MySQLGraph implements Graph {
             throw new IllegalArgumentException("no name was provided when updating the node in the mysql graph");
         }
         else if (!exists(name)) {
-            throw new PIPException(String.format("node with the name %s could not be found to update", name));
+            throw new PIPException("graph", "node with the name "+ name+ "could not be found to update");
         }
 
         try (
@@ -266,14 +263,13 @@ public class MySQLGraph implements Graph {
             try {
                 ps.setString(2, toJSON(properties));
             } catch (JsonProcessingException j) {
-                j.printStackTrace();
+                throw new PIPException("graph", j.getMessage());
             }
             ps.setLong(3, id);
             ps.executeUpdate();
 
         } catch (SQLException s) {
-            s.printStackTrace();
-            throw new PIPException("Cannot connect to the database");
+            throw new PIPException("graph", s.getMessage());
         }
     }
 
@@ -298,7 +294,7 @@ public class MySQLGraph implements Graph {
                 throw new PMException("The node you want to delete does not exist");
             }*/
         } catch (SQLException e) {
-            throw new PIPException(e.getMessage());
+            throw new PIPException("graph", e.getMessage());
         }
     }
 
@@ -324,8 +320,7 @@ public class MySQLGraph implements Graph {
             }
             return nodes.size() != 0;
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
         }
     }
 
@@ -346,7 +341,7 @@ public class MySQLGraph implements Graph {
         }
 
         if (namesPolicyClasses.isEmpty()) {
-            throw new PIPException("There are no Policies in the current database");
+            throw new PIPException("graph", "There are no Policies in the current database");
         }
         return namesPolicyClasses;
     }
@@ -384,7 +379,7 @@ public class MySQLGraph implements Graph {
                     try {
                         properties = reader.readValue(properties_string);
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("graph", j.getMessage());
                     }
                 }
 
@@ -413,7 +408,7 @@ public class MySQLGraph implements Graph {
                 return nodes;
             }*/
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("graph", s.getMessage());
         }
         finally {
             try {
@@ -422,18 +417,16 @@ public class MySQLGraph implements Graph {
                 if(rs_type != null) {rs_type.close();}
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new PIPException("graph", e.getMessage());
             }
         }
-
-        return nodes;
     }
 
     @Override
     public Node getNode(NodeType type, Map<String, String> properties) throws PIPException {
         Set<Node> search = search(type, properties);
         if (search.isEmpty()) {
-            throw new PIPException(String.format("a node matching the criteria (%s, %s) does not exist", type, properties));
+            throw new PIPException("graph", "a node matching the criteria (" + type +"," + properties+ ") does not exist");
         }
         return search.iterator().next();
     }
@@ -466,9 +459,36 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public Set<Node> search(NodeType type, Map<String, String> properties) throws PIPException {
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
 
-        MemGraph graph = new MemGraph();
-        return graph.search(type, properties);
+        HashSet<Node> results = new HashSet<>();
+        // iterate over the nodes to find ones that match the search parameters
+        for (Node node : getNodes()) {
+            // if the type parameter is not null and the current node type does not equal the type parameter, do not add
+            if (type != null && !node.getType().equals(type)) {
+                continue;
+            }
+
+            boolean add = true;
+            for (String key : properties.keySet()) {
+                String checkValue = properties.get(key);
+                String foundValue = node.getProperties().get(key);
+                // if the property provided in the search parameters is null or *, continue to the next property
+                if (!(checkValue == null || checkValue.equals("*")) &&
+                        (foundValue == null || !foundValue.equals(checkValue))) {
+                    add = false;
+                    break;
+                }
+            }
+
+            if (add) {
+                results.add(node);
+            }
+        }
+
+        return results;
     }
 
     /**
@@ -481,7 +501,7 @@ public class MySQLGraph implements Graph {
     @Override
     public Set<String> getChildren(String name) throws PIPException {
         if (!exists(name)) {
-            throw new PIPException(String.format(NODE_NOT_FOUND_MSG, name));
+            throw new PIPException("graph", "node with the name "+ name+ "could not be found to update");
         }
 
         Set<Long> sources = new HashSet<>();
@@ -505,8 +525,7 @@ public class MySQLGraph implements Graph {
             }
             return sources_p;
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
 
         }
     }
@@ -521,7 +540,7 @@ public class MySQLGraph implements Graph {
     @Override
     public Set<String> getParents(String name) throws PIPException {
         if (!exists(name)) {
-            throw new PIPException(String.format(NODE_NOT_FOUND_MSG, name));
+            throw new PIPException("graph", "node "+ name+ " does not exist");
         }
 
         Set<String> targets_p = new HashSet<>();
@@ -544,8 +563,7 @@ public class MySQLGraph implements Graph {
             return targets_p;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
 
         }
     }
@@ -579,7 +597,7 @@ public class MySQLGraph implements Graph {
             ps.executeUpdate();
 
         } catch (SQLException s) {
-            s.printStackTrace();
+            throw new PIPException("graph", s.getMessage());
         }
     }
 
@@ -614,8 +632,7 @@ public class MySQLGraph implements Graph {
                 throw new IllegalArgumentException("The assignment you want to delete does not exist");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
         }
     }
 
@@ -646,8 +663,7 @@ public class MySQLGraph implements Graph {
             }
             return ids.size() != 0;
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
         }
     }
 
@@ -669,8 +685,7 @@ public class MySQLGraph implements Graph {
             }
             return ids.size() != 0;
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
         }
     }
 
@@ -688,10 +703,10 @@ public class MySQLGraph implements Graph {
     public void associate(String ua, String target, OperationSet operations) throws PIPException {
         //throw PIPException if nodes does not exists
         if (!exists(ua)) {
-            throw new PIPException(String.format(NODE_NOT_FOUND_MSG, ua));
+            throw new PIPException("graph", "node "+ ua+ " does not exist");
         }
         else if (!exists(target)) {
-            throw new PIPException(String.format(NODE_NOT_FOUND_MSG, target));
+            throw new PIPException("graph", "node "+ target+ " does not exist");
         }
 
         Node uaNode = getNode(ua);
@@ -718,7 +733,7 @@ public class MySQLGraph implements Graph {
                     try {
                         ps.setString(3, hashSetToJSON(operations));
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("graph", j.getMessage());
                     }
                 }
                 int i = ps.executeUpdate();
@@ -727,8 +742,7 @@ public class MySQLGraph implements Graph {
                 }
 
             } catch (SQLException ex) {
-                ex.printStackTrace();
-                throw new PIPException("Cannot connect to the Database" + ex);
+                throw new PIPException("graph", ex.getMessage());
             }
         } else {
             //if an association exists update it
@@ -747,7 +761,7 @@ public class MySQLGraph implements Graph {
                     try {
                         ps.setString(1, hashSetToJSON(operations));
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("graph", j.getMessage());
                     }
                 }
                 int i = ps.executeUpdate();
@@ -756,8 +770,7 @@ public class MySQLGraph implements Graph {
                 }
 
             } catch (SQLException ex) {
-                ex.printStackTrace();
-                throw new PIPException("Cannot connect to the Database" + ex);
+                throw new PIPException("graph", ex.getMessage());
             }
         }
     }
@@ -786,8 +799,7 @@ public class MySQLGraph implements Graph {
                 throw new IllegalArgumentException("The association you want to delete does not exist");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
         }
     }
 
@@ -803,12 +815,12 @@ public class MySQLGraph implements Graph {
     @Override
     public Map<String, OperationSet> getSourceAssociations(String source) throws PIPException {
         if (!exists(source)) {
-            throw new PIPException(String.format(NODE_NOT_FOUND_MSG, source));
+            throw new PIPException("graph", "node "+ source+ " does not exist");
         }
 
         Node ua = getNode(source);
         if (ua.getType() != NodeType.UA) {
-            throw new PIPException("The source node must be an user attribute.");
+            throw new PIPException("graph", "The source node must be an user attribute.");
         }
         Map<String, OperationSet> sourcesAssoc = new HashMap<>();
         OperationSet operations_set = new OperationSet();
@@ -827,7 +839,7 @@ public class MySQLGraph implements Graph {
                     try {
                         operations_set = reader2.readValue(operations);
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("graph", j.getMessage());
                     }
                 }
                 sourcesAssoc.put(getNodeNameFromId(end_node_id), operations_set);
@@ -835,8 +847,7 @@ public class MySQLGraph implements Graph {
             }
             return sourcesAssoc;
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
 
         }
     }
@@ -854,13 +865,13 @@ public class MySQLGraph implements Graph {
     public Map<String, OperationSet> getTargetAssociations(String target) throws PIPException {
 
         if (!exists(target)) {
-            throw new PIPException(String.format(NODE_NOT_FOUND_MSG, target));
+            throw new PIPException("graph", "node "+ target+ " does not exist");
         }
 
         Node ua = getNode(target);
 
         if (ua.getType() != NodeType.UA && ua.getType() != NodeType.OA) {
-            throw new PIPException("The target node must be an user attribute or an object attribute.");
+            throw new PIPException("graph", "The target node must be an user attribute or an object attribute.");
         }
         Map<String, OperationSet> targetsAssoc = new HashMap<>();
         OperationSet operations_set = new OperationSet();
@@ -878,7 +889,7 @@ public class MySQLGraph implements Graph {
                     try {
                         operations_set = reader2.readValue(operations);
                     } catch (JsonProcessingException j) {
-                        j.printStackTrace();
+                        throw new PIPException("graph", j.getMessage());
                     }
                 }
                 targetsAssoc.put(getNodeNameFromId(start_node_id), operations_set);
@@ -886,8 +897,7 @@ public class MySQLGraph implements Graph {
             }
             return targetsAssoc;
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new PIPException("Cannot connect to the Database" + ex);
+            throw new PIPException("graph", ex.getMessage());
         }
     }
 }
