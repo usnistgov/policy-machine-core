@@ -3,6 +3,8 @@ package gov.nist.csd.pm.pip.graph.mysql;
 public class MySQLHelper {
 
     public static final String SELECT_NODE_TYPE_ID_FROM_NODE_TYPE = "SELECT node_type_id from node_type where name =? ";
+    public static final String SELECT_NODE_TYPE_FROM_NODE_TYPE = "SELECT node_type_id, description from node_type where name =? ";
+
     public static final String SELECT_NODE_TYPE_NAME_FROM_NODE_TYPE = "SELECT name from node_type where node_type_id =?";
 
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
 import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
 import gov.nist.csd.pm.pip.graph.mysql.MySQLHelper;
@@ -133,6 +134,45 @@ public class MySQLProhibitions implements Prohibitions {
         }
     }
 
+    public int getTypeByNodeId (int node_id) throws PIPException {
+        MySQLGraph graph = new MySQLGraph(new MySQLConnection());
+
+        if (graph.exists(graph.getNodeNameFromId(node_id))) {
+
+            try (
+                    Connection con = this.conn.getConnection();
+                    PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_TYPE_FROM_NODE_TYPE)) {
+
+                Node node = graph.getNode(graph.getNodeNameFromId(node_id));
+                String node_type_id_name = node.getType().toString();
+                ps.setString(1, node_type_id_name);
+                ResultSet rs = ps.executeQuery();
+                int deny_type_id = 0;
+                String description = "";
+                while (rs.next()) {
+                    description = rs.getString("description");
+                }
+
+                switch (description) {
+                    case "User":
+                        deny_type_id = 1;
+                        break;
+                    case "User Attribute":
+                        deny_type_id = 2;
+                        break;
+                    default:
+                        deny_type_id = 3;
+                }
+
+                return deny_type_id;
+            } catch (SQLException s) {
+                s.printStackTrace();
+            }
+            throw new PIPException("This node_id does not exist");
+        }
+        return 0;
+    }
+
     /**
      * Create a new prohibition.
      *
@@ -172,7 +212,8 @@ public class MySQLProhibitions implements Prohibitions {
             if ( existsNode(prohibition.getSubject())) {
                 ps.setInt(4, getNodeIdFromSubjectName(prohibition.getSubject())); //user_attribute_id
                 ps.setString(5, null); //process_id null if node exists
-                ps.setInt(2, 2); // deny_type = user attribute
+                // deny_type_id = node_type_id if node_id exists
+                ps.setInt(2, getTypeByNodeId(getNodeIdFromSubjectName(prohibition.getSubject())));
             } else {
                 ps.setString(5, prohibition.getSubject()); //process_id
                 ps.setString(4, null);
@@ -362,7 +403,8 @@ public class MySQLProhibitions implements Prohibitions {
             if (existsNode(prohibition.getSubject())) {
                 ps.setInt(3, getNodeIdFromSubjectName(prohibition.getSubject())); //user_attribute_id
                 ps.setString(4, null); //process_id null if node exists
-                ps.setInt(7, 2); // deny_type = user_attribute
+                ps.setInt(7, getTypeByNodeId(getNodeIdFromSubjectName(prohibition.getSubject())));
+
             } else {
                 ps.setString(3, null);
                 ps.setString(4, prohibition.getSubject()); //process_id
