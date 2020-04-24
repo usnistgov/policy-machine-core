@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
@@ -18,11 +19,10 @@ public class CurrentUserExecutor implements FunctionExecutor {
         return 0;
     }
 
-    /**
-     * @return the Node with the given userID
-     */
     @Override
-    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
-        return pdp.getPAP().getGraphPAP().getNode(user);
+    public Node exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+        return pdp
+                .getGraphService(obligationUser)
+                .getNode(eventCtx.getUserCtx().getUser());
     }
 }

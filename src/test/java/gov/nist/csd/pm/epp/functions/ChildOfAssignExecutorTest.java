@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.events.AssignEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +26,11 @@ class ChildOfAssignExecutorTest {
     void TestExec() throws PMException {
         ChildOfAssignExecutor executor = new ChildOfAssignExecutor();
 
-        EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        String user = testCtx.getU1().getName();
-        String process = "";
+        EventContext eventContext = new AssignEvent(new UserContext(testCtx.getU1().getName()), testCtx.getO1(), testCtx.getOa1());
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
-        Node node = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        Node node = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
 
         assertNotNull(node);
         assertEquals(testCtx.getO1(), node);

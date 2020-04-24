@@ -6,6 +6,7 @@ import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.epp.events.ObjectAccessEvent;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -30,8 +31,6 @@ class CreateNodeExecutorTest {
         CreateNodeExecutor executor = new CreateNodeExecutor();
 
         EventContext eventContext = null;
-        String user = testCtx.getU1().getName();
-        String process = "";
         PDP pdp = testCtx.getPdp();
         Function function =
                 new Function(
@@ -43,7 +42,7 @@ class CreateNodeExecutorTest {
                                 new Arg("OA"),
                                 new Arg(new Function("to_props", Arrays.asList(new Arg("k=v"))))));
 
-        Node n = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        Node n = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
 
         assertNotNull(n);
         assertEquals("testNode", n.getName());

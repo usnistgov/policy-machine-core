@@ -40,8 +40,8 @@ rules:
                 name: anyUser assign success
                 type:  OA
               where:
-                name: pc1
-                type: PC
+                name: oa2
+                type: OA
   - label: anyUser in list deassign
     event:
       subject:
@@ -61,5 +61,5 @@ rules:
                 name: anyUser in list deassign success
                 type: OA
               where:
-                name: pc1
-                type: PC
+                name: oa2
+                type: OA

@@ -1,13 +1,14 @@
 package gov.nist.csd.pm.epp.events;
 
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 public class AssignEvent extends EventContext {
 
     private Node parentNode;
 
-    public AssignEvent(Node target, Node parentNode) {
-        super(ASSIGN_EVENT, target);
+    public AssignEvent(UserContext userCtx, Node target, Node parentNode) {
+        super(userCtx, ASSIGN_EVENT, target);
         this.parentNode = parentNode;
     }
 

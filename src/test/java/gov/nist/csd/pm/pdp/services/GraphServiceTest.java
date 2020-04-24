@@ -119,13 +119,12 @@ class GraphServiceTest {
         PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), null);
         GraphSerializer.deserialize(pdp.getGraphService(new UserContext("super", "")), s);
 
-        Set<Node> papNodes = pdp.getPAP().getGraphPAP().getNodes();
+        Set<Node> papNodes = pdp.getGraphService(new UserContext("super", "")).getNodes();
         UserContext userContext = new UserContext("super", "");
         Graph graphService = pdp.getGraphService(userContext);
         Set<Node> pdpNodes = graphService.getNodes();
 
-        // -1 because the super user will have access to all nodes except the UA which gives it access to itself (superUA2)
-        assertEquals(papNodes.size()-1, pdpNodes.size());
+        assertEquals(papNodes.size(), pdpNodes.size());
     }
 
 }

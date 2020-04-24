@@ -7,6 +7,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -37,50 +38,53 @@ class EPPTest {
 
     @BeforeEach
     void setup() throws PMException {
-        Graph graph = new MemGraph();
+        pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions());
+        Graph graph = pdp.getGraphService(new UserContext("super"));
         pc1 = graph.createPolicyClass("pc1", null);
-        ua1 = graph.createNode("ua1", UA, null, pc1.getName());
-        oa1 = graph.createNode("oa1", OA, null, pc1.getName());
-        graph.createNode("oa2", OA, null, pc1.getName());
+        oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
+        graph.createNode("oa2", NodeType.OA, null, pc1.getName());
         o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());
-        u1 = graph.createNode("u1", U, null, ua1.getName());
+        ua1 = graph.createNode("ua1", NodeType.UA, null, pc1.getName());
+        u1 = graph.createNode("u1", NodeType.U, null, ua1.getName());
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
-
-        pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null);
     }
 
     @Test
     void TestEvent() throws PMException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/event_test.yml");
-        Obligation obligation = EVRParser.parse(is);
-        pdp.getPAP().getObligationsPAP().add(obligation, true);
+        Obligation obligation = EVRParser.parse("super", is);
+
+        UserContext superCtx = new UserContext("super");
+        pdp.getObligationsService(superCtx).add(obligation, true);
 
         // test u1 assign to
-        pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), u1.getName(), "123");
-        Node node = pdp.getPAP().getGraphPAP().getNode("u1 assign to success");
+        pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
+        Node node = pdp.getGraphService(superCtx).getNode("u1 assign to success");
         assertTrue(node.getProperties().containsKey("prop1"));
         assertTrue(node.getProperties().get("prop1").equalsIgnoreCase("val1"));
 
         // test anyUser assign
-        pdp.getEPP().processEvent(new AssignEvent(o1, oa1), u1.getName(), "123");
-        node = pdp.getPAP().getGraphPAP().getNode("anyUser assign success");
+        pdp.getEPP().processEvent(new AssignEvent(new UserContext(u1.getName(), "123"), o1, oa1));
+        node = pdp.getGraphService(superCtx).getNode("anyUser assign success");
 
         // test anyUser in list deassign
-        pdp.getEPP().processEvent(new DeassignEvent(o1, oa1), u1.getName(),"123");
-        node = pdp.getPAP().getGraphPAP().getNode("anyUser in list deassign success");
+        pdp.getEPP().processEvent(new DeassignEvent(new UserContext(u1.getName(),"123"), o1, oa1));
+        node = pdp.getGraphService(superCtx).getNode("anyUser in list deassign success");
     }
 
     @Test
     void TestResponse() throws PMException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/response_test.yml");
-        Obligation obligation = EVRParser.parse(is);
-        pdp.getPAP().getObligationsPAP().add(obligation, true);
+        UserContext superCtx = new UserContext("super");
 
-        pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), u1.getName(), "123");
+        Obligation obligation = EVRParser.parse(superCtx.getUser(), is);
+        pdp.getObligationsService(superCtx).add(obligation, true);
+
+        pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
 
         // check that the rule was created
-        Obligation o = pdp.getPAP().getObligationsPAP().get("test");
+        Obligation o = pdp.getObligationsService(superCtx).get("test");
         List<Rule> rules = o.getRules();
         boolean found = false;
         for (Rule r : rules) {
@@ -92,20 +96,20 @@ class EPPTest {
         assertTrue(found);
 
         // check that the new OA was created
-        Node newOA = pdp.getPAP().getGraphPAP().getNode("new OA");
+        Node newOA = pdp.getGraphService(superCtx).getNode("new OA");
 
         // check that the new OA was assigned to the oa1
-        Set<String> parents = pdp.getPAP().getGraphPAP().getParents(newOA.getName());
+        Set<String> parents = pdp.getGraphService(superCtx).getParents(newOA.getName());
         assertFalse(parents.isEmpty());
         assertEquals(oa1.getName(), parents.iterator().next());
 
         // check ua1 was associated with new OA
-        Map<String, OperationSet> sourceAssociations = pdp.getPAP().getGraphPAP().getSourceAssociations(ua1.getName());
+        Map<String, OperationSet> sourceAssociations = pdp.getGraphService(superCtx).getSourceAssociations(ua1.getName());
         assertTrue(sourceAssociations.containsKey(newOA.getName()));
 
         // check that the deny was created
         // an exception is thrown if one doesnt exist
-        pdp.getPAP().getProhibitionsPAP().get("deny");
+        pdp.getProhibitionsService(superCtx).get("deny");
     }
 
     @Test
@@ -122,13 +126,13 @@ class EPPTest {
         graph.createNode("u1", U, null, "ua1-1");
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
-        Obligation obligation = EVRParser.parse(is);
+        Obligation obligation = EVRParser.parse("super", is);
 
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
 
         PDP pdp = new PDP(new PAP(graph, new MemProhibitions(), obligations), new EPPOptions());
-        pdp.getEPP().processEvent(new AssignToEvent(oa2, o1), "u1", "");
+        pdp.getEPP().processEvent(new AssignToEvent(new UserContext("u1"), oa2, o1));
 
         assertTrue(graph.exists("new OA"));
     }

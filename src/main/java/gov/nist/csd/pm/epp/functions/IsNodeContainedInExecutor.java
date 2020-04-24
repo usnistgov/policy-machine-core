@@ -4,6 +4,8 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
 import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
@@ -27,7 +29,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Boolean exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Boolean exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List< Arg > args = function.getArgs();
         if (args.size() != numParams()) {
             throw new PMException(getFunctionName() + " expected " + numParams() + " parameters but got " + args.size());
@@ -39,7 +41,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node childNode = functionEvaluator.evalNode(eventCtx, user, process, pdp, f);
+        Node childNode = functionEvaluator.evalNode(obligationUser, eventCtx, pdp, f);
         if(childNode == null) {
             return false;
         }
@@ -50,12 +52,13 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node parentNode = functionEvaluator.evalNode(eventCtx, user, process, pdp, f);
+        Node parentNode = functionEvaluator.evalNode(obligationUser, eventCtx, pdp, f);
         if(parentNode == null) {
             return false;
         }
 
-        DepthFirstSearcher dfs = new DepthFirstSearcher(pdp.getPAP().getGraphPAP());
+        Graph graph = pdp.getGraphService(obligationUser);
+        DepthFirstSearcher dfs = new DepthFirstSearcher(graph);
         Set<String> nodes = new HashSet<>();
         Visitor visitor = node -> {
             if (node.getName().equals(parentNode.getName())) {

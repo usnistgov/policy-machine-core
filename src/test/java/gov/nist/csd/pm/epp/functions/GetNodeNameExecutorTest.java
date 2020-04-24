@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -30,14 +31,12 @@ class GetNodeNameExecutorTest {
     void TestExec() throws PMException {
         GetNodeNameExecutor executor = new GetNodeNameExecutor();
 
-        EventContext eventContext = new AssignToEvent(testCtx.getOa1(), testCtx.getO1());
-        String user = testCtx.getU1().getName();
-        String process = "1234";
+        EventContext eventContext = new AssignToEvent(new UserContext(testCtx.getU1().getName(), "1234"), testCtx.getOa1(), testCtx.getO1());
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg(new Function("get_node", Arrays.asList(new Arg("oa1"), new Arg("OA"))))));
 
-        String name = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        String name = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
 
         assertNotNull(name);
         assertEquals("oa1", name);

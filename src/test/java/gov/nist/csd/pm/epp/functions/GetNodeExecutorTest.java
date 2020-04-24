@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -31,13 +32,11 @@ class GetNodeExecutorTest {
         GetNodeExecutor executor = new GetNodeExecutor();
 
         EventContext eventContext = null;
-        String user = testCtx.getU1().getName();
-        String process = "1234";
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
-        Node node = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        Node node = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
 
         assertNotNull(node);
         assertEquals(testCtx.getOa1(), node);

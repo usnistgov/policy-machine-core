@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -21,12 +22,8 @@ public class GetNodeNameExecutor implements FunctionExecutor {
         return 1;
     }
 
-    /**
-     * A function that returns a Node is the only expected parameter in the Function parameter.
-     * @return the name of the node returned from this function.
-     */
     @Override
-    public String exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public String exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
         if (args.size() != numParams()) {
             throw new PMException(getFunctionName() + " expected " + numParams() + " arg but got " + args.size());
@@ -38,7 +35,7 @@ public class GetNodeNameExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expected the first argument to be a function but it was null");
         }
 
-        Node node = functionEvaluator.evalNode(eventCtx, user, process, pdp, argFunction);
+        Node node = functionEvaluator.evalNode(obligationUser, eventCtx, pdp, argFunction);
         return node.getName();
     }
 }

@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -28,44 +29,35 @@ public class CreateNodeExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
 
         // first arg is the name, can be function that returns a string
         Arg parentNameArg = args.get(0);
         String parentName = parentNameArg.getValue();
         if(parentNameArg.getFunction() != null) {
-            parentName = functionEvaluator.evalString(eventCtx, user, process, pdp, parentNameArg.getFunction());
+            parentName = functionEvaluator.evalString(obligationUser, eventCtx, pdp, parentNameArg.getFunction());
         }
 
         // second arg is the type, can be function
         Arg parentTypeArg = args.get(1);
         String parentType = parentTypeArg.getValue();
         if(parentTypeArg.getFunction() != null) {
-            parentType = functionEvaluator.evalString(eventCtx, user, process, pdp, parentTypeArg.getFunction());
+            parentType = functionEvaluator.evalString(obligationUser, eventCtx, pdp, parentTypeArg.getFunction());
         }
-
-        // third arg is the properties which is a map that has to come from a function
-        /*Map<String, String> parentProps = new HashMap<>();
-        if(args.size() > 2) {
-            Arg propsArg = args.get(2);
-            if (propsArg.getFunction() != null) {
-                parentProps = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, propsArg.getFunction());
-            }
-        }*/
 
         // fourth arg is the name, can be function
         Arg nameArg = args.get(2);
         String name = nameArg.getValue();
         if(nameArg.getFunction() != null) {
-            name = functionEvaluator.evalString(eventCtx, user, process, pdp, nameArg.getFunction());
+            name = functionEvaluator.evalString(obligationUser, eventCtx, pdp, nameArg.getFunction());
         }
 
         // fifth arg is the type, can be function
         Arg typeArg = args.get(3);
         String type = typeArg.getValue();
         if(typeArg.getFunction() != null) {
-            type = functionEvaluator.evalString(eventCtx, user, process, pdp, typeArg.getFunction());
+            type = functionEvaluator.evalString(obligationUser, eventCtx, pdp, typeArg.getFunction());
         }
 
         // sixth arg is the properties which is a map that has to come from a function
@@ -73,11 +65,11 @@ public class CreateNodeExecutor implements FunctionExecutor {
         if(args.size() > 4) {
             Arg propsArg = args.get(4);
             if (propsArg.getFunction() != null) {
-                props = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, propsArg.getFunction());
+                props = (Map) functionEvaluator.evalMap(obligationUser, eventCtx, pdp, propsArg.getFunction());
             }
         }
 
-        Graph graph = pdp.getPAP().getGraphPAP();
+        Graph graph = pdp.getGraphService(obligationUser);
 
         Node parentNode;
         if (parentName != null) {

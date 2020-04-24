@@ -32,7 +32,7 @@ public class PDP {
     public PDP(PAP pap, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
 
-        this.epp = new EPP(this, eppOptions);
+        this.epp = new EPP(this, pap, eppOptions);
 
         // initialize services
         this.graphService = new GraphService(this.pap, this.epp);
@@ -46,10 +46,6 @@ public class PDP {
 
     public EPP getEPP() {
         return epp;
-    }
-
-    public PAP getPAP() {
-        return pap;
     }
 
     public Graph getGraphService(UserContext userCtx) {
