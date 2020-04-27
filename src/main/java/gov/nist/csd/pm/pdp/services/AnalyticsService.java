@@ -44,27 +44,27 @@ public class AnalyticsService extends Service {
 
         // Call find_border_oa_priv(u). The result is a Hashtable
         // htoa = {oa -> {op -> pcset}}:
-        Hashtable htOa = findBorderOaPrivRestrictedInternal(userCtx);
+        Hashtable<String, Hashtable<String, Set<String>>> htOa = findBorderOaPrivRestrictedInternal(userCtx);
 
         // For each returned oa (key in htOa)
-        for (Enumeration oas = htOa.keys(); oas.hasMoreElements(); ) {
-            Node oa = (Node)oas.nextElement();
+        for (Enumeration<String> oas = htOa.keys(); oas.hasMoreElements(); ) {
+            String oa = oas.nextElement();
 
             // Compute oa's required PCs by calling find_pc_set(oa).
-            HashSet<String> hsReqPcs = inMemFindPcSet(oa.getName());
+            HashSet<String> hsReqPcs = inMemFindPcSet(oa);
             // Extract oa's label.
-            Hashtable htOaLabel = (Hashtable)htOa.get(oa);
+            Hashtable<String, Set<String>> htOaLabel = htOa.get(oa);
 
             // Walk through the op -> pcset of the oa's label.
             // For each operation/access right
             for (Enumeration ops = htOaLabel.keys(); ops.hasMoreElements(); ) {
                 String sOp = (String)ops.nextElement();
                 // Extract the pcset corresponding to this operation/access right.
-                HashSet hsActualPcs = (HashSet)htOaLabel.get(sOp);
+                Set<String> hsActualPcs = htOaLabel.get(sOp);
                 // if the set of required PCs is a subset of the actual pcset,
                 // then user u has some privileges on the current oa node.
                 if (hsActualPcs.containsAll(hsReqPcs)) {
-                    hsOa.add(oa);
+                    hsOa.add(getGraphPAP().getNode(oa));
                     break;
                 }
             }
@@ -73,13 +73,13 @@ public class AnalyticsService extends Service {
         return new HashSet<>(hsOa);
     }
 
-    private Hashtable findBorderOaPrivRestrictedInternal(UserContext userCtx) throws PMException {
+    private Hashtable<String, Hashtable<String, Set<String>>> findBorderOaPrivRestrictedInternal(UserContext userCtx) throws PMException {
         // Uses a hashtable htReachableOas of reachable oas (see find_border_oa_priv(u))
         // An oa is a key in this hashtable. The value is another hashtable that
         // represents a label of the oa. A label is a set of pairs {(op -> pcset)}, with
         // the op being the key and pcset being the value.
         // {oa -> {op -> pcset}}.
-        Hashtable htReachableOas = new Hashtable();
+        Hashtable<String, Hashtable<String, Set<String>>> htReachableOas = new Hashtable<>();
 
         // BFS from u (the base node). Prepare a queue.
         Set<String> visited = new HashSet<>();
@@ -113,41 +113,39 @@ public class AnalyticsService extends Service {
                         if (htReachableOas.containsKey(target)) {
                             // Then oa has a label op1 -> hsPcs1, op2 -> hsPcs2,...
                             // Extract its label:
-                            Hashtable htOaLabel = (Hashtable)htReachableOas.get(target);
+                            Hashtable<String, Set<String>> htOaLabel = htReachableOas.get(target);
 
                             // Get the operations from the opset:
                             Set opers = assocs.get(target);
                             // For each operation in the opset
-                            Iterator opersIter = opers.iterator();
-                            while (opersIter.hasNext()) {
-                                String sOp = (String)opersIter.next();
+                            for (Object oper : opers) {
+                                String sOp = (String) oper;
                                 // If the oa's label already contains the operation sOp
                                 if (htOaLabel.containsKey(sOp)) {
                                     // The label contains op -> some pcset.
                                     // Do the union of the old pc with ua's pcset
-                                    HashSet hsPcs = (HashSet)htOaLabel.get(sOp);
+                                    Set<String> hsPcs = htOaLabel.get(sOp);
                                     hsPcs.addAll(hsUaPcs);
                                 } else {
                                     // The op is not in the oa's label.
                                     // Create new op -> ua's pcs mappiing in the label.
-                                    HashSet hsNewPcs = new HashSet(hsUaPcs);
+                                    Set<String> hsNewPcs = new HashSet<>(hsUaPcs);
                                     htOaLabel.put(sOp, hsNewPcs);
                                 }
                             }
                         } else {
                             // oa is not in htReachableOas.
                             // Prepare a new label
-                            Hashtable htOaLabel = new Hashtable();
+                            Hashtable<String, Set<String>> htOaLabel = new Hashtable<>();
 
                             // Get the operations from the opset:
                             Set opers = assocs.get(target);
                             // For each operation in the opset
-                            Iterator opersIter = opers.iterator();
-                            while (opersIter.hasNext()) {
-                                String sOp = (String)opersIter.next();
+                            for (Object oper : opers) {
+                                String sOp = (String) oper;
                                 // Add op -> pcs to the label.
-                                HashSet hsNewPcs = new HashSet(hsUaPcs);
-                                htOaLabel.put(sOp,  hsNewPcs);
+                                Set<String> hsNewPcs = new HashSet<>(hsUaPcs);
+                                htOaLabel.put(sOp, hsNewPcs);
                             }
 
                             // Add oa -> {op -> pcs}
@@ -164,19 +162,19 @@ public class AnalyticsService extends Service {
 
 
         // For each reachable oa in htReachableOas.keys
-        for (Enumeration keys = htReachableOas.keys(); keys.hasMoreElements() ;) {
-            Node oa = (Node)keys.nextElement();
+        for (Enumeration<String> keys = htReachableOas.keys(); keys.hasMoreElements() ;) {
+            String oa = keys.nextElement();
             // Compute {pc | oa ->+ pc}
-            HashSet hsOaPcs = inMemFindPcSet(oa.getName());
+            Set<String> hsOaPcs = inMemFindPcSet(oa);
             // Extract oa's label.
-            Hashtable htOaLabel = (Hashtable)htReachableOas.get(oa);
+            Hashtable<String, Set<String>> htOaLabel = htReachableOas.get(oa);
             // The label contains op1 -> pcs1, op2 -> pcs2,...
             // For each operation in the label
-            for (Enumeration lbl = htOaLabel.keys(); lbl.hasMoreElements();) {
-                String sOp = (String)lbl.nextElement();
+            for (Enumeration<String> lbl = htOaLabel.keys(); lbl.hasMoreElements();) {
+                String sOp = lbl.nextElement();
                 // Intersect the pcset corresponding to this operation,
                 // which comes from the uas, with the oa's pcset.
-                HashSet oaPcs = (HashSet)htOaLabel.get(sOp);
+                Set<String> oaPcs = htOaLabel.get(sOp);
                 oaPcs.retainAll(hsOaPcs);
                 if (oaPcs.isEmpty()) htOaLabel.remove(sOp);
             }
@@ -198,6 +196,8 @@ public class AnalyticsService extends Service {
         // Insert the start node into the queue
         queue.add(node);
 
+        Set<String> policyClasses = getGraphPAP().getPolicyClasses();
+
         // While queue is not empty
         while (!queue.isEmpty()) {
             // Extract current element from queue
@@ -210,10 +210,8 @@ public class AnalyticsService extends Service {
                 // insert it into the queue. If it is a pc, add it to reachable,
                 // if not already there
                 Set<String> hsContainers = getGraphPAP().getParents(crtNode);
-                Iterator<String> hsiter = hsContainers.iterator();
-                while (hsiter.hasNext()) {
-                    String n = hsiter.next();
-                    if(getGraphPAP().getPolicyClasses().contains(n)) {
+                for (String n : hsContainers) {
+                    if (policyClasses.contains(n)) {
                         reachable.add(n);
                     } else {
                         queue.add(n);

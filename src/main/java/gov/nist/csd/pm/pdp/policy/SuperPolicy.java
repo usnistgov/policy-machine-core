@@ -81,9 +81,11 @@ public class SuperPolicy {
             superOA = graph.getNode("super_oa");
         }
 
-        if (!graph.exists("super_pc_rep")) {
+        if (!graph.exists(superPCRep)) {
             superPolicyClassRep = graph.createNode(superPCRep, NodeType.OA,
                     Node.toProperties(NAMESPACE_PROPERTY, "super", "pc", String.valueOf(superPC.getName())), superOA.getName());
+        } else {
+            superPolicyClassRep = graph.getNode(superPCRep);
         }
 
         // check super ua1 is assigned to super pc

@@ -85,7 +85,7 @@ public class EPP {
                 for(Action action : rule.getResponsePattern().getActions()) {
                     if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
                         continue;
-                    } else if(!checkCondition(action.getCondition(), eventCtx, user, process, pdp)) {
+                    } else if(!checkNegatedCondition(action.getNegatedCondition(), eventCtx, user, process, pdp)) {
                         continue;
                     }
 
@@ -292,6 +292,10 @@ public class EPP {
     }
 
     private void applyAction(String label, EventContext eventCtx, String user, String process, Action action) throws PMException {
+        if (action == null) {
+            return;
+        }
+
         if(action instanceof AssignAction) {
             applyAssignAction(eventCtx, user, process, (AssignAction) action);
         } else if(action instanceof CreateAction) {
@@ -387,38 +391,48 @@ public class EPP {
 
     private void applyDeleteAction(EventContext eventCtx, String user, String process, DeleteAction action) throws PMException {
         List<EvrNode> nodes = action.getNodes();
-        for (EvrNode evrNode : nodes) {
-            Node node = toNode(eventCtx, user, process, evrNode);
-            pdp.getPAP().getGraphPAP().deleteNode(node.getName());
+        if (nodes != null) {
+            for (EvrNode evrNode : nodes) {
+                Node node = toNode(eventCtx, user, process, evrNode);
+                pdp.getPAP().getGraphPAP().deleteNode(node.getName());
+            }
         }
 
         AssignAction assignAction = action.getAssignments();
-        for (AssignAction.Assignment assignment : assignAction.getAssignments()) {
-            Node what = toNode(eventCtx, user, process, assignment.getWhat());
-            Node where = toNode(eventCtx, user, process, assignment.getWhere());
-            pdp.getPAP().getGraphPAP().deassign(what.getName(), where.getName());
+        if (assignAction != null) {
+            for (AssignAction.Assignment assignment : assignAction.getAssignments()) {
+                Node what = toNode(eventCtx, user, process, assignment.getWhat());
+                Node where = toNode(eventCtx, user, process, assignment.getWhere());
+                pdp.getPAP().getGraphPAP().deassign(what.getName(), where.getName());
+            }
         }
 
         List<GrantAction> associations = action.getAssociations();
-        for (GrantAction grantAction : associations) {
-            Node subject = toNode(eventCtx, user, process, grantAction.getSubject());
-            Node target = toNode(eventCtx, user, process, grantAction.getTarget());
-            pdp.getPAP().getGraphPAP().dissociate(subject.getName(), target.getName());
+        if (associations != null){
+            for (GrantAction grantAction : associations) {
+                Node subject = toNode(eventCtx, user, process, grantAction.getSubject());
+                Node target = toNode(eventCtx, user, process, grantAction.getTarget());
+                pdp.getPAP().getGraphPAP().dissociate(subject.getName(), target.getName());
+            }
         }
 
         List<String> prohibitions = action.getProhibitions();
-        for (String label : prohibitions) {
-            pdp.getPAP().getProhibitionsPAP().delete(label);
+        if (prohibitions != null) {
+            for (String label : prohibitions) {
+                pdp.getPAP().getProhibitionsPAP().delete(label);
+            }
         }
 
         List<String> rules = action.getRules();
-        for (String label : rules) {
-            List<Obligation> obligations = pdp.getPAP().getObligationsPAP().getAll();
-            for (Obligation obligation : obligations) {
-                List<Rule> oblRules = obligation.getRules();
-                for (Rule rule : oblRules) {
-                    if (rule.getLabel().equals(label)) {
-                        oblRules.remove(rule);
+        if (rules != null) {
+            for (String label : rules) {
+                List<Obligation> obligations = pdp.getPAP().getObligationsPAP().getAll();
+                for (Obligation obligation : obligations) {
+                    List<Rule> oblRules = obligation.getRules();
+                    for (Rule rule : oblRules) {
+                        if (rule.getLabel().equals(label)) {
+                            oblRules.remove(rule);
+                        }
                     }
                 }
             }
@@ -440,15 +454,21 @@ public class EPP {
     }
 
     private void applyCreateAction(String label, EventContext eventCtx, String user, String process, CreateAction action) throws PMException {
-        for (Rule rule : action.getRules()) {
-            createRule(label, eventCtx, rule);
+        List<Rule> rules = action.getRules();
+        if (rules != null) {
+            for (Rule rule : rules) {
+                createRule(label, eventCtx, rule);
+            }
         }
 
-        for (CreateAction.CreateNode createNode : action.getCreateNodesList()) {
-            EvrNode what = createNode.getWhat();
-            EvrNode where = createNode.getWhere();
-            Node whereNode = toNode(eventCtx, user, process, where);
-            pap.getGraphPAP().createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
+        List<CreateAction.CreateNode> createNodesList = action.getCreateNodesList();
+        if (createNodesList != null) {
+            for (CreateAction.CreateNode createNode : createNodesList) {
+                EvrNode what = createNode.getWhat();
+                EvrNode where = createNode.getWhere();
+                Node whereNode = toNode(eventCtx, user, process, where);
+                pap.getGraphPAP().createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
+            }
         }
     }
 
@@ -461,14 +481,17 @@ public class EPP {
     }
 
     private void applyAssignAction(EventContext eventCtx, String user, String process, AssignAction action) throws PMException {
-        for (AssignAction.Assignment assignment : action.getAssignments()) {
-            EvrNode what = assignment.getWhat();
-            EvrNode where = assignment.getWhere();
+        List<AssignAction.Assignment> assignments = action.getAssignments();
+        if (assignments != null) {
+            for (AssignAction.Assignment assignment : assignments) {
+                EvrNode what = assignment.getWhat();
+                EvrNode where = assignment.getWhere();
 
-            Node whatNode = toNode(eventCtx, user, process, what);
-            Node whereNode = toNode(eventCtx, user, process, where);
+                Node whatNode = toNode(eventCtx, user, process, what);
+                Node whereNode = toNode(eventCtx, user, process, where);
 
-            pap.getGraphPAP().assign(whatNode.getName(), whereNode.getName());
+                pap.getGraphPAP().assign(whatNode.getName(), whereNode.getName());
+            }
         }
     }
 }
