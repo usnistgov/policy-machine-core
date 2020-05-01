@@ -88,7 +88,7 @@ public class GraphSerializer {
      * @return the provided Graph implementation with the data from the json string.
      * @throws PMException if there is an error converting the string to a Graph.
      */
-    public static void fromJson(Graph graph, String json) throws PMException {
+    public static Graph fromJson(Graph graph, String json) throws PMException {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
 
         Collection<Node> nodes = jsonGraph.getNodes();
@@ -130,6 +130,7 @@ public class GraphSerializer {
             String target = association.getTarget();
             graph.associate(ua, target, new OperationSet(association.getOperations()));
         }
+        return graph;
     }
 
     private static class JsonGraph {

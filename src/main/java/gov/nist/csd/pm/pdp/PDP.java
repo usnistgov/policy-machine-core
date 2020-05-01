@@ -52,7 +52,7 @@ public class PDP {
         return pap;
     }
 
-    public Graph getGraphService(UserContext userCtx) {
+    public GraphService getGraphService(UserContext userCtx) {
         graphService.setUserCtx(userCtx);
         return graphService;
     }
