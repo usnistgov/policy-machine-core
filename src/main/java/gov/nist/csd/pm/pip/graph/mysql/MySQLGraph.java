@@ -371,8 +371,8 @@ public class MySQLGraph implements Graph {
             while (rs.next()) {
                 long                id = rs.getInt("node_id");
                 String              name = rs.getString("name");
-                node_type = rs.getInt("node_type_id");
-                String properties_string = rs.getString("node_property");
+                                    node_type = rs.getInt("node_type_id");
+                String              properties_string = rs.getString("node_property");
                 Map<String, String> properties = null;
 
                 if (properties_string != null) {
@@ -402,17 +402,11 @@ public class MySQLGraph implements Graph {
             nodes = nodesHashmap.keySet();
             con.close();
             return nodes;
-/*            if (nodes.size() == 0 ) {
-                throw new PIPException("There are no nodes.");
-            }else {
-                return nodes;
-            }*/
         } catch (SQLException s) {
             throw new PIPException("graph", s.getMessage());
         }
         finally {
             try {
-
                 if(pstmt != null) {pstmt.close();}
                 if(rs_type != null) {rs_type.close();}
 

@@ -326,13 +326,15 @@ public class PReviewDecider implements Decider {
             Set<String> parents = graph.getParents(node.getName());
             while (!parents.isEmpty()) {
                 String parentNode = parents.iterator().next();
+                Node parentN = graph.getNode(parentNode);
+                if (parentN.getType() == UA) {
 
-                //get the associations the current parent node is the source of
-                Map<String, OperationSet> assocs = graph.getSourceAssociations(parentNode);
+                    //get the associations the current parent node is the source of
+                    Map<String, OperationSet> assocs = graph.getSourceAssociations(parentNode);
 
-                //collect the target and operation information for each association
-                collectAssociations(assocs, borderTargets);
-
+                    //collect the target and operation information for each association
+                    collectAssociations(assocs, borderTargets);
+                }
                 //add all of the current parent node's parents to the queue
                 parents.addAll(graph.getParents(parentNode));
 
