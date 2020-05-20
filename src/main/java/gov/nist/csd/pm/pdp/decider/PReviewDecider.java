@@ -10,9 +10,11 @@ import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
+import gov.nist.csd.pm.pip.prohibitions.mysql.MySQLProhibitions;
 
 import java.util.*;
 
@@ -22,6 +24,8 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
  * An implementation of the Decider interface that uses an in memory NGAC graph
  */
 public class PReviewDecider implements Decider {
+
+    private final MySQLConnection conn = new MySQLConnection();
 
     public static final String ANY_OPERATIONS = "any";
     public static final String ALL_OPERATIONS = "*";
@@ -35,7 +39,7 @@ public class PReviewDecider implements Decider {
         }
 
         this.graph = graph;
-        this.prohibitions = new MemProhibitions();
+        this.prohibitions = new MySQLProhibitions(conn);
     }
 
     public PReviewDecider(Graph graph, Prohibitions prohibitions) {
@@ -44,7 +48,7 @@ public class PReviewDecider implements Decider {
         }
 
         if (prohibitions == null) {
-            prohibitions = new MemProhibitions();
+            prohibitions = new MySQLProhibitions(conn);
         }
 
         this.graph = graph;
