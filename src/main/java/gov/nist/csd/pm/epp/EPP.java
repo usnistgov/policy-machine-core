@@ -50,10 +50,6 @@ public class EPP {
         return pdp;
     }
 
-    public void setPDP(PDP pdp) {
-        this.pdp = pdp;
-    }
-
     public void processEvent(EventContext eventCtx) throws PMException {
         List<Obligation> obligations = pap.getObligationsPAP().getAll();
         for(Obligation obligation : obligations) {
