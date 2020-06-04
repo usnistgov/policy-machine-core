@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.events.AssignEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -30,13 +31,11 @@ class ToPropertiesExecutorTest {
     void TestExec() throws PMException {
         ToPropertiesExecutor executor = new ToPropertiesExecutor();
 
-        EventContext eventContext = new AssignEvent(testCtx.getO1(), testCtx.getOa1());
-        String user = testCtx.getU1().getName();
-        String process = "";
+        EventContext eventContext = null;
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), Arrays.asList(new Arg("k=v"), new Arg("k1=v1"), new Arg("k2=v2")));
 
-        Map props = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        Map props = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
 
         assertNotNull(props);
         assertEquals(3, props.size());

@@ -6,6 +6,7 @@ import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -32,14 +33,12 @@ class GetChildrenExecutorTest {
     void TestExec() throws PMException {
         GetChildrenExecutor executor = new GetChildrenExecutor();
 
-        EventContext eventContext = new AssignToEvent(testCtx.getOa1(), testCtx.getO1());
-        String user = testCtx.getU1().getName();
-        String process = "1234";
+        EventContext eventContext = new AssignToEvent(new UserContext(testCtx.getU1().getName(), "1234"), testCtx.getOa1(), testCtx.getO1());
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
-        List<String> children = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        List<String> children = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
 
         assertNotNull(children);
         assertEquals(Arrays.asList(testCtx.getO1().getName()), children);

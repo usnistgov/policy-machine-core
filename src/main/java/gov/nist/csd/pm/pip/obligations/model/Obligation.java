@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Obligation {
+    private String user;
     private boolean enabled;
     private String     label;
     private List<Rule> rules;
     private String source;
 
-    public Obligation() {
+    public Obligation(String user) {
+        this.user = user;
         this.rules = new ArrayList<>();
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public boolean isEnabled() {

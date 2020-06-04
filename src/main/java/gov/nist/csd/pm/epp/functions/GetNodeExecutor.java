@@ -4,6 +4,8 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
@@ -26,7 +28,7 @@ public class GetNodeExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List<Arg> args = function.getArgs();
         if (args == null || args.size() < numParams() || args.size() > numParams()) {
             throw new PMException(getFunctionName() + " expected at least two arguments (name and type) but found none");
@@ -36,29 +38,30 @@ public class GetNodeExecutor implements FunctionExecutor {
         Arg arg = args.get(0);
         String name = arg.getValue();
         if(arg.getFunction() != null) {
-            name = functionEvaluator.evalString(eventCtx, user, process, pdp, arg.getFunction());
+            name = functionEvaluator.evalString(obligationUser, eventCtx, pdp, arg.getFunction());
         }
 
         // second arg should be the type of the node to search for
         arg = args.get(1);
         String type = arg.getValue();
         if(arg.getFunction() != null) {
-            type = functionEvaluator.evalString(eventCtx, user, process, pdp, arg.getFunction());
+            type = functionEvaluator.evalString(obligationUser, eventCtx, pdp, arg.getFunction());
         }
 
         Map<String, String> props = new HashMap<>();
         if(args.size() > 2) {
             arg = args.get(2);
             if (arg.getFunction() != null) {
-                props = (Map) functionEvaluator.evalMap(eventCtx, user, process, pdp, arg.getFunction());
+                props = (Map) functionEvaluator.evalMap(obligationUser, eventCtx, pdp, arg.getFunction());
             }
         }
 
+        Graph graph = pdp.getGraphService(obligationUser);
+
         if (name != null) {
-            return pdp.getPAP().getGraphPAP().getNode(name);
+            return graph.getNode(name);
         }
 
-        Set<Node> search = pdp.getPAP().getGraphPAP().search(NodeType.toNodeType(type), props);
-        return search.iterator().next();
+        return graph.getNode(NodeType.toNodeType(type), props);
     }
 }

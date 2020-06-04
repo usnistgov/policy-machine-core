@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.epp.functions.*;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
@@ -42,46 +43,46 @@ public class FunctionEvaluator {
         return funExecs.get(name);
     }
 
-    public boolean evalBool(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public boolean evalBool(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
 
-        return (boolean)functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return (boolean)functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 
-    public List evalNodeList(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public List evalNodeList(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return (List) functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return (List) functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 
-    public Node evalNode(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public Node evalNode(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return (Node)functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return (Node)functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 
-    public String evalString(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public String evalString(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return (String)functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return (String)functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 
-    public String evalLong(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public String evalLong(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return (String)functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return (String)functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 
-    public Map evalMap(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public Map evalMap(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return (Map)functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return (Map)functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 
-    public Object evalObject(EventContext eventCtx, String user, String process, PDP pdp, Function function) throws PMException {
+    public Object evalObject(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function) throws PMException {
         String functionName = function.getName();
         FunctionExecutor functionExecutor = getFunctionExecutor(functionName);
-        return functionExecutor.exec(eventCtx, user, process, pdp, function, this);
+        return functionExecutor.exec(obligationUser, eventCtx, pdp, function, this);
     }
 }

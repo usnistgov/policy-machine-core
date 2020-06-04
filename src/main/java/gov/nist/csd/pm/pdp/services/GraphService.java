@@ -155,11 +155,11 @@ public class GraphService extends Service implements Graph {
         Node node = getGraphPAP().createNode(name, type, properties, initialParent, additionalParents);
 
         // process event for initial parent
-        getEPP().processEvent(new AssignToEvent(parentNode, node), userCtx.getUser(), userCtx.getProcess());
+        getEPP().processEvent(new AssignToEvent(userCtx, parentNode, node));
         // process event for any additional parents
         for (String parent : additionalParents) {
             parentNode = graph.getNode(parent);
-            getEPP().processEvent(new AssignToEvent(parentNode, node), userCtx.getUser(), userCtx.getProcess());
+            getEPP().processEvent(new AssignToEvent(userCtx, parentNode, node));
         }
 
         return node;
@@ -221,8 +221,8 @@ public class GraphService extends Service implements Graph {
 
             Node parentNode = getGraphPAP().getNode(parent);
 
-            getEPP().processEvent(new DeassignEvent(node, parentNode), userCtx.getUser(), userCtx.getProcess());
-            getEPP().processEvent(new DeassignFromEvent(parentNode, node), userCtx.getUser(), userCtx.getProcess());
+            getEPP().processEvent(new DeassignEvent(userCtx, node, parentNode));
+            getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, node));
         }
 
         // if it's a PC, delete the rep
@@ -415,8 +415,8 @@ public class GraphService extends Service implements Graph {
         // assign in the PAP
         getGraphPAP().assign(child, parent);
 
-        getEPP().processEvent(new AssignEvent(childNode, parentNode), userCtx.getUser(), userCtx.getProcess());
-        getEPP().processEvent(new AssignToEvent(parentNode, childNode), userCtx.getUser(), userCtx.getProcess());
+        getEPP().processEvent(new AssignEvent(userCtx, childNode, parentNode));
+        getEPP().processEvent(new AssignToEvent(userCtx, parentNode, childNode));
     }
 
     /**
@@ -461,8 +461,8 @@ public class GraphService extends Service implements Graph {
         Node parentNode = getNode(parent);
         Node childNode = getNode(child);
 
-        getEPP().processEvent(new DeassignEvent(childNode, parentNode), userCtx.getUser(), userCtx.getProcess());
-        getEPP().processEvent(new DeassignFromEvent(parentNode, childNode), userCtx.getUser(), userCtx.getProcess());
+        getEPP().processEvent(new DeassignEvent(userCtx, childNode, parentNode));
+        getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, childNode));
     }
 
     @Override

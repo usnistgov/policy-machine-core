@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.epp.functions;
 
+import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -15,7 +17,8 @@ import java.util.Random;
 
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
-        Graph graph = new MemGraph();
+        PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions());
+        Graph graph = pdp.getGraphService(new UserContext("super"));
         Node pc1 = graph.createPolicyClass("pc1", null);
         Node oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
         Node o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());
@@ -24,8 +27,7 @@ class TestUtil {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        return new TestContext(new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null),
-                u1, ua1, o1, oa1, pc1);
+        return new TestContext(pdp, u1, ua1, o1, oa1, pc1);
     }
 
     static class TestContext {
