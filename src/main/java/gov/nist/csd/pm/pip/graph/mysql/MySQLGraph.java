@@ -50,7 +50,7 @@ public class MySQLGraph implements Graph {
             nodes = all_nodes.stream()
                     .filter(node_k -> node_k.getName().equalsIgnoreCase(name))
                     .collect(Collectors.toList());
-            nodes.forEach(System.out::println);
+            //nodes.forEach(System.out::println);
             if (nodes.size() >= 1) {
                 return nodes.get(0).getId();
             }
@@ -67,7 +67,7 @@ public class MySQLGraph implements Graph {
             nodes = all_nodes.stream()
                     .filter(node_k -> node_k.getId() == id)
                     .collect(Collectors.toList());
-            nodes.forEach(System.out::println);
+            //nodes.forEach(System.out::println);
             if (nodes.size() >= 1) {
                 return nodes.get(0).getName();
             }
