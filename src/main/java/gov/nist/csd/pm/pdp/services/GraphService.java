@@ -612,6 +612,16 @@ public class GraphService extends Service implements Graph {
         return getGraphPAP().getTargetAssociations(target);
     }
 
+    @Override
+    public String toJson() throws PMException {
+        return getGraphPAP().toJson();
+    }
+
+    @Override
+    public void fromJson(String s) throws PMException {
+        getGraphPAP().fromJson(s);
+    }
+
     /**
      * Search the NGAC graph for nodes that match the given parameters. A node must match all non null parameters to be
      * returned in the search.

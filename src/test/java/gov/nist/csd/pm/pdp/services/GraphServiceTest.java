@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.GraphSerializer;
 import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.graph.MemGraphSerializer;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
@@ -116,8 +117,9 @@ class GraphServiceTest {
                 "assoc okta_users records [read]\n" +
                 "assoc local_users records [read,write]";
 
-        PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), null);
-        GraphSerializer.deserialize(pdp.getGraphService(new UserContext("super", "")), s);
+        MemGraph graph = new MemGraph();
+        PDP pdp = new PDP(new PAP(graph, new MemProhibitions(), new MemObligations()), null);
+        new MemGraphSerializer(graph).deserialize(s);
 
         Set<Node> papNodes = pdp.getGraphService(new UserContext("super", "")).getNodes();
         UserContext userContext = new UserContext("super", "");
