@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.pip.graph;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -23,9 +25,9 @@ public class MemGraph implements Graph {
 
     private static final String NODE_NOT_FOUND_MSG = "node %s does not exist in the graph";
 
-    private DirectedGraph<String, Relationship> graph;
-    private HashSet<String>                     pcs;
-    private HashMap<String, Node>               nodes;
+    protected DirectedGraph<String, Relationship> graph;
+    protected HashSet<String>                     pcs;
+    protected HashMap<String, Node>               nodes;
 
     /**
      * Default constructor to create an empty graph in memory.
@@ -410,5 +412,114 @@ public class MemGraph implements Graph {
             }
         }
         return assocs;
+    }
+
+    @Override
+    public String toJson() throws PMException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Collection<Node> nodes = this.getNodes();
+        HashSet<String[]> jsonAssignments = new HashSet<>();
+        HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
+        for (Node node : nodes) {
+            Set<String> parents = this.getParents(node.getName());
+
+            for (String parent : parents) {
+                jsonAssignments.add(new String[]{node.getName(), parent});
+            }
+
+            Map<String, OperationSet> associations = this.getSourceAssociations(node.getName());
+            for (String target : associations.keySet()) {
+                OperationSet ops = associations.get(target);
+                Node targetNode = this.getNode(target);
+
+                jsonAssociations.add(new JsonAssociation(node.getName(), targetNode.getName(), ops));
+            }
+        }
+
+        return gson.toJson(new JsonGraph(nodes, jsonAssignments, jsonAssociations));
+    }
+
+    @Override
+    public void fromJson(String json) throws PMException {
+        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+
+        Collection<Node> nodes = jsonGraph.getNodes();
+        Map<String, Node> nodesMap = new HashMap<>();
+        for (Node node : nodes) {
+            if (node.getType().equals(PC)) {
+                this.createPolicyClass(node.getName(), node.getProperties());
+            } else {
+                this.graph.addVertex(node.getName());
+                this.nodes.put(node.getName(), node);
+            }
+        }
+
+        List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
+        for (String[] assignment : assignments) {
+            if (assignment.length != 2) {
+                throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
+            }
+
+            String source = assignment[0];
+            String target = assignment[1];
+
+            this.assign(source, target);
+        }
+
+        Set<JsonAssociation> associations = jsonGraph.getAssociations();
+        for (JsonAssociation association : associations) {
+            String ua = association.getSource();
+            String target = association.getTarget();
+            this.associate(ua, target, new OperationSet(association.getOperations()));
+        }
+    }
+
+    private static class JsonGraph {
+        Collection<Node> nodes;
+        Set<String[]>  assignments;
+        Set<JsonAssociation> associations;
+
+        JsonGraph(Collection<Node> nodes, Set<String[]> assignments, Set<JsonAssociation> associations) {
+            this.nodes = nodes;
+            this.assignments = assignments;
+            this.associations = associations;
+        }
+
+        Collection<Node> getNodes() {
+            return nodes;
+        }
+
+        Set<String[]> getAssignments() {
+            return assignments;
+        }
+
+        Set<JsonAssociation> getAssociations() {
+            return associations;
+        }
+    }
+
+    private static class JsonAssociation {
+        String source;
+        String target;
+        Set<String> operations;
+
+        public JsonAssociation(String source, String target, Set<String> operations) {
+            this.source = source;
+            this.target = target;
+            this.operations = operations;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public Set<String> getOperations() {
+            return operations;
+        }
     }
 }

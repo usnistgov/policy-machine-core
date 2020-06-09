@@ -207,4 +207,42 @@ public interface Graph {
      * @throws PMException if there is an retrieving the associations of the target node from the graph.
      */
     Map<String, OperationSet> getTargetAssociations(String target) throws PMException;
+
+    /**
+     * Convert the graph to a json string with the format:
+     * {
+     *   "nodes": [
+     *     {
+     *       "name": "pc1",
+     *       "type": "PC",
+     *       "properties": {}
+     *     },
+     *     ...
+     *   ],
+     *   "assignments": [
+     *     ["child1", "parent1"],
+     *     ["child1", "parent2"],
+     *     ...
+     *   ],
+     *   "associations": [
+     *     {
+     *       "operations": [
+     *         "read",
+     *         "write"
+     *       ],
+     *       "source": "ua",
+     *       "target": "oa"
+     *     }
+     *   ]
+     * }
+     *
+     * @return the json string representation of the graph
+     */
+    String toJson() throws PMException;
+
+    /**
+     * Load a json string representation of a graph into the current graph.
+     * @param s the string representation of the graph
+     */
+    void fromJson(String s) throws PMException;
 }

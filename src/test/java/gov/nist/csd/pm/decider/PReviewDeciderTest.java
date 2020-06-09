@@ -5,8 +5,8 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.GraphSerializer;
 import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.graph.MemGraphSerializer;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
@@ -688,7 +688,7 @@ class PReviewDeciderTest {
     }
 
     private static void buildGraph() throws PMException {
-        Graph graph = new MemGraph();
+        MemGraph graph = new MemGraph();
         Random rand = new Random();
         Node pc1 = graph.createPolicyClass("PC1", null);
         Node pc2 = graph.createPolicyClass("PC2", null);
@@ -782,9 +782,9 @@ class PReviewDeciderTest {
             graph.associate(ua, target, new OperationSet(READ, WRITE));
         }
 
-        System.out.println(graph.getNodes().size());
+        MemGraphSerializer memGraphSerializer = new MemGraphSerializer(graph);
 
-        String s = GraphSerializer.serialize(graph);
+        String s = memGraphSerializer.serialize();
         try {
             PrintWriter printWriter = new PrintWriter(new File("ngac/evr/large_sample.pm"));
             printWriter.println(s);
