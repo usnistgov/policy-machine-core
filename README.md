@@ -121,6 +121,32 @@ Prohibition prohibition = new Prohibition.Builder("test-prohibition", ua1.getNam
         .build();
 prohibitions.add(prohibition);
 ```
+
+### Graph and Prohibitions Serialization
+
+#### Graph
+Graphs have built in functions to serialize and deserialize graphs from json.
+```java
+String json = graph.toJson();
+graph.fromJson(json);
+```
+The `toJson` method returns a json string representation of the graph. The `fromJson` method loads the nodes, assignments, 
+and associations into a graph.
+
+Graphs also support a more readable format of configuration using the `GraphSerializer` interface.
+```java
+GraphSerializer serializer = new MemGraphSerializer(graph);
+String serialized = serializer.serialize();
+
+serializer = new MemGraphSerializer(new MemGraph());
+serializer.deserialize(serialized);
+```
+
+#### Prohibitions
+```java
+ProhibitionsSerializer.toJson(prohibitions);
+ProhibitionsSerializer.fromJson(prohibitions, json);
+```
     
 ### Decider and Auditor
 The `Decider` interface provides functions for making access decisions on a graph.    
