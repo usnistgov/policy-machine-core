@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pip.graph;
 
+import com.google.gson.Gson;
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -9,10 +10,7 @@ import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -296,4 +294,87 @@ public class MySQLGraphTest {
         assertEquals(PC, node.getType());
     }
 
+    String json = "{" +
+            "\"nodes\": [" +
+                    "{" +
+                        "\"name\": \"sample PC\", " +
+                        "\"type\": \"PC\", " +
+                        "\"properties\": {" +
+                        "\"namespace\": \"super_sample\"\n" +
+                        "}" +
+                    "}," +
+                    "{" +
+                        "\"name\": \"sample UA\", " +
+                        "\"type\": \"UA\", " +
+                        "\"properties\": {" +
+                        "\"namespace\": \"super_ua\"\n" +
+                        "}" +
+                    "}," +
+                    "{" +
+                        "\"name\": \"sample OA\", " +
+                        "\"type\": \"OA\", " +
+                        "\"properties\": {" +
+                        "\"namespace\": \"super_oa\"\n" +
+                        "}" +
+                    "}," +
+                    "{" +
+                        "\"name\": \"sample UA2\", " +
+                        "\"type\": \"UA\", " +
+                        "\"properties\": {" +
+                        "\"namespace\": \"super_ua2\"\n" +
+                        "}" +
+                    "}" +
+            "]," +
+            "\"assignments\": [" +
+                    "[" +
+                        "\"sample UA\"," +
+                        "\"sample PC\"" +
+                    "]," +
+                    "[" +
+                        "\"sample OA\"," +
+                        "\"sample PC\"" +
+                    "]," +
+                    "[" +
+                        "\"sample UA2\"," +
+                        "\"sample PC\"" +
+                    "]" +
+            "]," +
+            "\"associations\": [" +
+                    "{" +
+                        "\"source\": \"sample UA\"," +
+                        "\"target\": \"sample UA2\", " +
+                        "\"operations\": [" +
+                        "\"*\"" +
+                        "]" +
+                    "}" +
+            "]" +
+    "}";
+    @Test
+    void testToJson() throws PMException {
+
+        MySQLGraph.JsonGraph jsonGraph = new Gson().fromJson(json, MySQLGraph.JsonGraph.class);
+        assertEquals(jsonGraph.getNodes().stream().filter(node ->
+                node.getName().equalsIgnoreCase("sample UA")).iterator().next(), graph.getNode("sample UA"));
+
+        Collection<String> children = new ArrayList<String>();
+        children.add("sample UA");
+        children.add("sample UA2");
+        children.add("sample OA");
+
+        assertTrue(graph.getParents("sample UA").contains("sample PC"));
+        assertTrue(graph.getChildren("sample PC").containsAll(children));
+        assertThrows(NoSuchElementException.class, () -> jsonGraph.getNodes().stream().filter(node ->
+                node.getName().equalsIgnoreCase("not in the JSON")).iterator().next());
+    }
+
+    @Test
+    void testFromJson() throws PMException {
+        //graph.createNode("new node in the graph", UA, Node.toProperties("namespace", "test"), "super_ua1");
+        String json2 = graph.toJson();
+        assertTrue(json2.contains("\"name\": \"new node in the graph\""));
+        String assign = "\"new node in the graph\",\n" +
+                "      \"super_ua1\"";
+
+        assertTrue(json2.contains(assign));
+    }
 }

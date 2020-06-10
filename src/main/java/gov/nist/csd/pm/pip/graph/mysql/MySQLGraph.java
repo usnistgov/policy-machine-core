@@ -1055,7 +1055,7 @@ public class MySQLGraph implements Graph {
         }
     }
 
-    private static class JsonGraph {
+    public static class JsonGraph {
         Collection<Node> nodes;
         Set<String[]>  assignments;
         Set<JsonAssociation> associations;
@@ -1066,15 +1066,15 @@ public class MySQLGraph implements Graph {
             this.associations = associations;
         }
 
-        Collection<Node> getNodes() {
+        public Collection<Node> getNodes() {
             return nodes;
         }
 
-        Set<String[]> getAssignments() {
+        public Set<String[]> getAssignments() {
             return assignments;
         }
 
-        Set<JsonAssociation> getAssociations() {
+        public Set<JsonAssociation> getAssociations() {
             return associations;
         }
     }
