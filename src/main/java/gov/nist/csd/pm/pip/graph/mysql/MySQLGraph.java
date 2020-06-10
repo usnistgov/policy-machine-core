@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PIPException;
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
@@ -224,6 +227,75 @@ public class MySQLGraph implements Graph {
     }
 
     /**
+     * Method without initial parents
+     * @param name
+     * @param type
+     * @param properties
+     * @return
+     * @throws PIPException
+     */
+    public void createNode(String name, NodeType type, Map<String, String> properties) throws PIPException  {
+        //check for null values
+
+        if (type == PC) {
+            throw new PIPException("graph", "use createPolicyClass to create a policy class node");
+        }
+        else if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no name was provided when creating a node in the mysql graph");
+        }
+        else if (type == null) {
+            throw new IllegalArgumentException("a null type was provided to the mysql graph when creating a node");
+        }
+        else if (exists(name)) {
+            throw new PIPException("graph", "You cannot create the policy class node. Another node with the name '" + name + "' already exists");
+        }
+
+        ResultSet rs_type = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement ps = null;
+        try {
+            Connection con = this.conn.getConnection();
+            //====================  NodeType parser : Retrieve node_type_id ====================
+            pstmt = con.prepareStatement(MySQLHelper.SELECT_NODE_TYPE_ID_FROM_NODE_TYPE);
+            pstmt.setString(1, type.toString());
+            rs_type = pstmt.executeQuery();
+            int node_type_id;
+            int id = 0;
+            while (rs_type.next()) {
+                node_type_id = rs_type.getInt("node_type_id");
+                //==================== create the node from (id, node_type_id, name, properties) ====================
+                ps = con.prepareStatement(MySQLHelper.INSERT_NODE, Statement.RETURN_GENERATED_KEYS);
+
+                ps.setInt(1, node_type_id);
+                ps.setString(2, name);
+                //Json serialization using Jackson
+                if (properties == null) {
+                    ps.setString(3, null);
+                } else {
+                    try {
+                        ps.setString(3, toJSON(properties));
+                    } catch (JsonProcessingException j) {
+                        throw new PIPException("graph", j.getMessage());
+                    }
+                }
+            }
+            ps.executeUpdate();
+            con.close();
+        } catch (SQLException s) {
+            throw new PIPException("graph", s.getMessage());
+        }
+        finally {
+            try {
+                if(rs_type != null) {rs_type.close();}
+                if(ps != null) {ps.close();}
+                if(pstmt != null) {pstmt.close();}
+            } catch (SQLException e) {
+                throw new PIPException("graph", e.getMessage());
+            }
+        }
+    }
+
+    /**
      * Update a node with the given node context. Only the name and properties can be updated. If the name of the context
      * is null, then the node will not be updated.  The properties provided in the context will overwrite any existing
      * properties.  If the properties are null, they will be skipped. However, if the properties are an empty map, the
@@ -245,7 +317,6 @@ public class MySQLGraph implements Graph {
 
         Node node = getNode(name);
     }
-
 
     public void updateNode(long id, String name, Map<String, String> properties) throws PIPException {
         if (name == null || name.isEmpty()) {
@@ -894,4 +965,143 @@ public class MySQLGraph implements Graph {
             throw new PIPException("graph", ex.getMessage());
         }
     }
+
+    /**
+     * Convert the graph to a json string with the format:
+     * {
+     * "nodes": [
+     * {
+     * "name": "pc1",
+     * "type": "PC",
+     * "properties": {}
+     * },
+     * ...
+     * ],
+     * "assignments": [
+     * ["child1", "parent1"],
+     * ["child1", "parent2"],
+     * ...
+     * ],
+     * "associations": [
+     * {
+     * "operations": [
+     * "read",
+     * "write"
+     * ],
+     * "source": "ua",
+     * "target": "oa"
+     * }
+     * ]
+     * }
+     *
+     * @return the json string representation of the graph
+     */
+    @Override
+    public String toJson() throws PMException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Collection<Node> nodes = this.getNodes();
+        HashSet<String[]> jsonAssignments = new HashSet<>();
+        HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
+
+        for (Node node : nodes) {
+            Set<String> parents = this.getParents(node.getName());
+            for (String parent : parents) {
+                jsonAssignments.add(new String[]{node.getName(), parent});
+            }
+            if (node.getType() == NodeType.UA) {
+                Map<String, OperationSet> associations = this.getSourceAssociations(node.getName());
+                for (String target : associations.keySet()) {
+                    OperationSet ops = associations.get(target);
+                    Node targetNode = this.getNode(target);
+                    jsonAssociations.add(new JsonAssociation(node.getName(), targetNode.getName(), ops));
+                }
+            }
+        }
+        return gson.toJson(new JsonGraph(nodes, jsonAssignments, jsonAssociations));
+    }
+
+    /**
+     * Load a json string representation of a graph into the current graph.
+     *
+     * @param json the string representation of the graph
+     */
+    @Override
+    public void fromJson(String json) throws PMException {
+       JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+        Collection<Node> nodes = jsonGraph.getNodes();
+        for (Node node : nodes) {
+            if (node.getType().equals(PC)) {
+                this.createPolicyClass(node.getName(), node.getProperties());
+            } else {
+                this.createNode(node.getName(), node.getType(), node.getProperties());
+            }
+        }
+        List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
+        for (String[] assignment : assignments) {
+            if (assignment.length != 2) {
+                throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
+            }
+            String source = assignment[0];
+            String target = assignment[1];
+            this.assign(source, target);
+        }
+
+        Set<JsonAssociation> associations = jsonGraph.getAssociations();
+        for (JsonAssociation association : associations) {
+            String ua = association.getSource();
+            String target = association.getTarget();
+            this.associate(ua, target, new OperationSet(association.getOperations()));
+        }
+    }
+
+    private static class JsonGraph {
+        Collection<Node> nodes;
+        Set<String[]>  assignments;
+        Set<JsonAssociation> associations;
+
+        JsonGraph(Collection<Node> nodes, Set<String[]> assignments, Set<JsonAssociation> associations) {
+            this.nodes = nodes;
+            this.assignments = assignments;
+            this.associations = associations;
+        }
+
+        Collection<Node> getNodes() {
+            return nodes;
+        }
+
+        Set<String[]> getAssignments() {
+            return assignments;
+        }
+
+        Set<JsonAssociation> getAssociations() {
+            return associations;
+        }
+    }
+
+    private static class JsonAssociation {
+        String source;
+        String target;
+        Set<String> operations;
+
+        public JsonAssociation(String source, String target, Set<String> operations) {
+            this.source = source;
+            this.target = target;
+            this.operations = operations;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public Set<String> getOperations() {
+            return operations;
+        }
+    }
 }
+
+
