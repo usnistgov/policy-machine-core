@@ -27,26 +27,26 @@ public class EVRParser {
         return type.cast(o);
     }
 
-    public static Obligation parse(String yml) throws EVRException {
+    public static Obligation parse(String user, String yml) throws EVRException {
         Yaml yaml = new Yaml();
         Map<Object, Object> map = yaml.load(yml);
 
-        return parse(map);
+        return parse(user, map);
     }
 
     /**
      * label: string required
      * rules: array
      */
-    public static Obligation parse(InputStream is) throws EVRException {
+    public static Obligation parse(String user, InputStream is) throws EVRException {
         Yaml yaml = new Yaml();
         Map<Object, Object> map = yaml.load(is);
 
-        return parse(map);
+        return parse(user, map);
     }
 
-    public static Obligation parse(Map<Object, Object> map) throws EVRException {
-        Obligation obligation = new Obligation();
+    private static Obligation parse(String user, Map<Object, Object> map) throws EVRException {
+        Obligation obligation = new Obligation(user);
 
         String label = getObject(map.get("label"), String.class);
         if (label == null) {

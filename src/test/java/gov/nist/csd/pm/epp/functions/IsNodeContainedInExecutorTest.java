@@ -5,6 +5,7 @@ import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +28,7 @@ class IsNodeContainedInExecutorTest {
     void TestExec() throws PMException {
         IsNodeContainedInExecutor executor = new IsNodeContainedInExecutor();
 
-        EventContext eventContext = new AssignToEvent(testCtx.getOa1(), testCtx.getO1());
-        String user = testCtx.getU1().getName();
-        String process = "1234";
+        EventContext eventContext = new AssignToEvent(new UserContext(testCtx.getU1().getName(), "1234"), testCtx.getOa1(), testCtx.getO1());
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(
@@ -41,7 +40,7 @@ class IsNodeContainedInExecutorTest {
                         )
                 )
         );
-        boolean isContained = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        boolean isContained = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
         assertTrue(isContained);
 
         function = new Function(executor.getFunctionName(),
@@ -54,7 +53,7 @@ class IsNodeContainedInExecutorTest {
                         )
                 )
         );
-        isContained = executor.exec(eventContext, user, process, pdp, function, new FunctionEvaluator());
+        isContained = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
         assertFalse(isContained);
     }
 }

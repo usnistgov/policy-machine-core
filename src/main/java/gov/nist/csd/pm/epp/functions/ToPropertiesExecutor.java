@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
@@ -21,13 +22,8 @@ public class ToPropertiesExecutor implements FunctionExecutor {
         return 0;
     }
 
-    /**
-     * The args should all be strings with the format: "key=value"
-     * This function takes those strings and returns a Map<String,String> to be used
-     * as a node's properties
-     */
     @Override
-    public Map<String, String> exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Map<String, String> exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         Map<String, String> props = new HashMap<>();
         for(Arg arg : function.getArgs()) {
             String value = arg.getValue();

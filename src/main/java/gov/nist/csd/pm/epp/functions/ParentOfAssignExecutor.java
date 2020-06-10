@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.evr.EVRException;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
@@ -20,7 +21,7 @@ public class ParentOfAssignExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Node exec(EventContext eventCtx, String user, String process, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Node exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         Node parent;
         if(eventCtx instanceof AssignToEvent) {
             parent = eventCtx.getTarget();
