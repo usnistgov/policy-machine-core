@@ -363,6 +363,8 @@ public class MySQLGraphTest {
 
         assertTrue(graph.getParents("sample UA").contains("sample PC"));
         assertTrue(graph.getChildren("sample PC").containsAll(children));
+        assertTrue(graph.getSourceAssociations("sample UA").containsKey("sample UA2"));
+        assertTrue(graph.getSourceAssociations("sample UA").get("sample UA2").contains("*"));
         assertThrows(NoSuchElementException.class, () -> jsonGraph.getNodes().stream().filter(node ->
                 node.getName().equalsIgnoreCase("not in the JSON")).iterator().next());
     }
@@ -374,7 +376,12 @@ public class MySQLGraphTest {
         assertTrue(json2.contains("\"name\": \"new node in the graph\""));
         String assign = "\"new node in the graph\",\n" +
                 "      \"super_ua1\"";
-
+        String associate = "      \"source\": \"sample UA\",\n" +
+                "      \"target\": \"sample UA2\",\n" +
+                "      \"operations\": [\n" +
+                "        \"*\"\n" +
+                "      ]";
         assertTrue(json2.contains(assign));
+        assertTrue(json2.contains(associate));
     }
 }
