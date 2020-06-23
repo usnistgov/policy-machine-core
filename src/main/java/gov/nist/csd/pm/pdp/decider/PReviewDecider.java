@@ -39,7 +39,7 @@ public class PReviewDecider implements Decider {
         }
 
         this.graph = graph;
-        this.prohibitions = new MySQLProhibitions(conn);
+        this.prohibitions = new MemProhibitions();
     }
 
     public PReviewDecider(Graph graph, Prohibitions prohibitions) {
@@ -48,7 +48,7 @@ public class PReviewDecider implements Decider {
         }
 
         if (prohibitions == null) {
-            prohibitions = new MySQLProhibitions(conn);
+            prohibitions = new MemProhibitions();
         }
 
         this.graph = graph;
