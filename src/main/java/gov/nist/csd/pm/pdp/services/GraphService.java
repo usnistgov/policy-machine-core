@@ -706,5 +706,6 @@ public class GraphService extends Service implements Graph {
         for (String name : names) {
             getGraphPAP().deleteNode(name);
         }
+        configureSuperPolicy();
     }
 }
