@@ -702,6 +702,38 @@ public class GraphService extends Service implements Graph {
         Set<String> names = new HashSet<>();
         for (Node node: nodes) {
             names.add(node.getName());
+            if (node.getType() == UA || node.getType() == OA) {
+                getGraphPAP().getTargetAssociations(node.getName()).keySet().forEach(el -> {
+                    try {
+                        dissociate(el, node.getName());
+                    } catch (PMException pmException) {
+                        pmException.printStackTrace();
+                    }
+                });
+                if (node.getType() == UA) {
+                    getGraphPAP().getSourceAssociations(node.getName()).keySet().forEach(el -> {
+                        try {
+                            dissociate(node.getName(), el);
+                        } catch (PMException pmException) {
+                            pmException.printStackTrace();
+                        }
+                    });
+                }
+            }
+            getGraphPAP().getChildren(node.getName()).forEach(el -> {
+                try {
+                    deassign(node.getName(), el);
+                } catch (PMException pmException) {
+                    pmException.printStackTrace();
+                }
+            });
+            getGraphPAP().getParents(node.getName()).forEach(el -> {
+                try {
+                    deassign(el, node.getName());
+                } catch (PMException pmException) {
+                    pmException.printStackTrace();
+                }
+            });
         }
         for (String name : names) {
             getGraphPAP().deleteNode(name);
