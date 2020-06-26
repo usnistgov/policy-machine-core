@@ -18,14 +18,20 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
-import static gov.nist.csd.pm.operations.Operations.READ;
-import static gov.nist.csd.pm.operations.Operations.WRITE;
+import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PReviewDeciderTest {
 
+    private static final Set<String> RWE = new HashSet<>();
+    {
+        RWE.add("read");
+        RWE.add("write");
+        RWE.add("execute");
+    }
+    
     @Test
     void testHasPermissions() throws PMException {
         Graph graph = new MemGraph();
@@ -40,7 +46,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.check(u1.getName(), "", o1.getName(), "read", "write"));
     }
 
@@ -61,7 +67,7 @@ class PReviewDeciderTest {
 
         Set<String> nodeIDs = new HashSet<>(Arrays.asList(o1.getName(), o2.getName(), o3.getName(), oa1.getName()));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertEquals(nodeIDs, new HashSet<>(decider.filter(u1.getName(), "", nodeIDs, "read"))
         );
     }
@@ -80,7 +86,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         Set<String> children = decider.getChildren(u1.getName(), "", oa1.getName());
         assertEquals(
                 new HashSet<>(Arrays.asList(o1.getName(), o2.getName(), o3.getName())),
@@ -102,7 +108,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         Map<String, Set<String>> accessibleNodes = decider.getCapabilityList(u1.getName(), "");
 
         assertTrue(accessibleNodes.containsKey(oa1.getName()));
@@ -128,7 +134,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
@@ -147,7 +153,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
@@ -161,7 +167,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
@@ -177,7 +183,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
@@ -196,7 +202,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read")));
     }
     @Test
@@ -214,7 +220,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read")));
     }
     @Test
@@ -231,7 +237,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
@@ -245,7 +251,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
@@ -261,7 +267,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
@@ -279,7 +285,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
@@ -295,7 +301,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
@@ -311,7 +317,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
     @Test
@@ -328,7 +334,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
@@ -345,7 +351,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("*"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
@@ -362,7 +368,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
     }
     @Test
@@ -378,7 +384,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
 
@@ -396,7 +402,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
@@ -411,7 +417,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
@@ -429,7 +435,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read")));
     }
     @Test
@@ -447,7 +453,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
     @Test
@@ -462,7 +468,7 @@ class PReviewDeciderTest {
 
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
 
-        PReviewDecider decider = new PReviewDecider(graph);
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
 
@@ -495,7 +501,7 @@ class PReviewDeciderTest {
                 .build();
         prohibitions.add(prohibition);
 
-        PReviewDecider decider = new PReviewDecider(graph, prohibitions);
+        PReviewDecider decider = new PReviewDecider(graph, prohibitions, RWE);
         Set<String> list = decider.list(u1.getName(), "", o1.getName());
         assertEquals(1, list.size());
         assertTrue(list.contains("execute"));
@@ -523,7 +529,7 @@ class PReviewDeciderTest {
                 .build();
         prohibitions.add(prohibition);
 
-        PReviewDecider decider = new PReviewDecider(graph, prohibitions);
+        PReviewDecider decider = new PReviewDecider(graph, prohibitions, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).contains("read"));
         assertTrue(decider.list(u1.getName(), "", o2.getName()).isEmpty());
 
@@ -563,7 +569,7 @@ class PReviewDeciderTest {
         prohibition.setOperations(new OperationSet("read", "write"));
         prohibitions.add(prohibition);
 
-        PReviewDecider decider = new PReviewDecider(graph, prohibitions);
+        PReviewDecider decider = new PReviewDecider(graph, prohibitions, RWE);
         assertTrue(decider.list(u1.getName(), "", oa5.getName()).isEmpty());
         assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("read", "write")));
     }
@@ -589,7 +595,7 @@ class PReviewDeciderTest {
                 .build();
         prohibitions.add(prohibition);
 
-        PReviewDecider decider = new PReviewDecider(graph, prohibitions);
+        PReviewDecider decider = new PReviewDecider(graph, prohibitions, RWE);
         assertTrue(decider.list(u1.getName(), "", o1.getName()).isEmpty());
     }
 
@@ -609,7 +615,7 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read"));
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("write"));
 
-        Decider decider = new PReviewDecider(graph);
+        Decider decider = new PReviewDecider(graph, RWE);
         Set<String> permissions = decider.list(ua1.getName(), "", oa1.getName());
         assertTrue(permissions.containsAll(Arrays.asList("read", "write")));
     }
@@ -666,7 +672,7 @@ class PReviewDeciderTest {
                 .build();
         prohibitions.add(prohibition);
 
-        Decider decider = new PReviewDecider(graph, prohibitions);
+        Decider decider = new PReviewDecider(graph, prohibitions, RWE);
 
         Set<String> list = decider.list("u1", "", "o1");
         assertTrue(list.contains(READ) && !list.contains(WRITE));
@@ -685,6 +691,34 @@ class PReviewDeciderTest {
 
         list = decider.list("u4", "", "o2");
         assertTrue(list.contains(READ) && !list.contains(WRITE));
+    }
+
+    @Test
+    void testPermissions() throws PMException {
+        Graph graph = new MemGraph();
+
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, pc1.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
+
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet(ALL_OPS));
+
+        PReviewDecider decider = new PReviewDecider(graph, RWE);
+        Set<String> list = decider.list("u1", "", "o1");
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertTrue(list.containsAll(RWE));
+
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet(ALL_ADMIN_OPS));
+        list = decider.list("u1", "", "o1");
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertFalse(list.containsAll(RWE));
+
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet(ALL_RESOURCE_OPS));
+        list = decider.list("u1", "", "o1");
+        assertFalse(list.containsAll(ADMIN_OPS));
+        assertTrue(list.containsAll(RWE));
     }
 
     private static void buildGraph() throws PMException {

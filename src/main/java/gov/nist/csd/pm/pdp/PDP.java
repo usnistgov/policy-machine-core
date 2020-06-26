@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.policy.SuperPolicy;
 import gov.nist.csd.pm.pdp.services.*;
@@ -12,10 +13,11 @@ import gov.nist.csd.pm.pip.graph.GraphSerializer;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
+import java.util.Set;
+
 public class PDP {
 
     private EPP epp;
-    private PAP pap;
 
     private GraphService graphService;
     private ProhibitionsService prohibitionsService;
@@ -27,21 +29,20 @@ public class PDP {
      * used by the EPP.
      * @param pap the Policy Administration Point that the PDP will use to change the graph.
      * @param eppOptions an optional list of external functions to be used by the PDP's EPP at runtime.
+     * @param resourceOps the set of operations that the PDP will understand while traversing the graph.
      * @throws PMException if there is an error initializing the EPP.
      */
-    public PDP(PAP pap, EPPOptions eppOptions) throws PMException {
-        this.pap = pap;
-
+    public PDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
         this.epp = new EPP(this, pap, eppOptions);
 
         // initialize services
-        this.graphService = new GraphService(this.pap, this.epp);
+        this.graphService = new GraphService(pap, this.epp, resourceOps);
         // configure the super policy
         SuperPolicy superPolicy = this.graphService.configureSuperPolicy();
 
-        this.prohibitionsService = new ProhibitionsService(this.pap, this.epp, superPolicy);
-        this.analyticsService = new AnalyticsService(this.pap, this.epp);
-        this.obligationsService = new ObligationsService(this.pap, this.epp, superPolicy);
+        this.prohibitionsService = new ProhibitionsService(pap, this.epp, resourceOps, superPolicy);
+        this.analyticsService = new AnalyticsService(pap, this.epp, resourceOps);
+        this.obligationsService = new ObligationsService(pap, this.epp, resourceOps, superPolicy);
     }
 
     public EPP getEPP() {

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.BreadthFirstSearcher;
@@ -16,6 +17,7 @@ import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 /**
@@ -23,22 +25,21 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
  */
 public class PReviewDecider implements Decider {
 
-    public static final String ANY_OPERATIONS = "any";
-    public static final String ALL_OPERATIONS = "*";
-
     private Graph graph;
     private Prohibitions prohibitions;
+    private Set<String> resourceOps;
 
-    public PReviewDecider(Graph graph) {
+    public PReviewDecider(Graph graph, Set<String> resourceOps) {
         if (graph == null) {
             throw new IllegalArgumentException("NGAC graph cannot be null");
         }
 
         this.graph = graph;
         this.prohibitions = new MemProhibitions();
+        this.resourceOps = resourceOps;
     }
 
-    public PReviewDecider(Graph graph, Prohibitions prohibitions) {
+    public PReviewDecider(Graph graph, Prohibitions prohibitions, Set<String> resourceOps) {
         if (graph == null) {
             throw new IllegalArgumentException("NGAC graph cannot be null");
         }
@@ -49,6 +50,7 @@ public class PReviewDecider implements Decider {
 
         this.graph = graph;
         this.prohibitions = prohibitions;
+        this.resourceOps = resourceOps;
     }
 
     @Override
@@ -62,14 +64,7 @@ public class PReviewDecider implements Decider {
         // permissions to check for
         if (permsToCheck.contains(ANY_OPERATIONS)) {
             return !permissions.isEmpty();
-        }
-        else if (permissions.contains(ALL_OPERATIONS)) {
-            return true;
-        }
-        else if (permissions.isEmpty()) {
-            return false;
-        }
-        else {
+        } else {
             return permissions.containsAll(permsToCheck);
         }
     }
@@ -126,7 +121,7 @@ public class PReviewDecider implements Decider {
                 // run dfs on the object
                 TargetContext targetCtx = processTargetDAG(object, userCtx);
 
-                HashSet<String> permissions = resolvePermissions(userCtx, targetCtx, object);
+                Set<String> permissions = resolvePermissions(userCtx, targetCtx, object);
                 results.put(object, permissions);
             }
         }
@@ -146,45 +141,67 @@ public class PReviewDecider implements Decider {
         return acl;
     }
 
-    private HashSet<String> resolvePermissions(UserContext userContext, TargetContext targetCtx, String target) {
+    private Set<String> resolvePermissions(UserContext userContext, TargetContext targetCtx, String target) {
+        Set<String> allowed = resolveAllowedPermissions(targetCtx);
+
+        // resolve any special permissions to real permissions
+        // *, *a, *r to their actual permissions
+        resolveSpecialPermissions(allowed);
+
+        // remove any prohibited operations
+        Set<String> denied = resolveProhibitions(userContext, targetCtx, target);
+        allowed.removeAll(denied);
+
+        return allowed;
+    }
+
+    private Set<String> resolveAllowedPermissions(TargetContext targetCtx) {
         Map<String, Set<String>> pcMap = targetCtx.getPcSet();
 
-        HashSet<String> inter = new HashSet<>();
+        HashSet<String> allowed = new HashSet<>();
         boolean first = true;
         for (String pc : pcMap.keySet()) {
             Set<String> ops = pcMap.get(pc);
             if(first) {
-                inter.addAll(ops);
+                allowed.addAll(ops);
                 first = false;
             } else {
-                if (inter.contains(ALL_OPERATIONS)) {
+                if (allowed.contains(ALL_OPS)) {
                     // clear all of the existing permissions because the intersection already had *
                     // all permissions can be added
-                    inter.clear();
-                    inter.addAll(ops);
+                    allowed.clear();
+                    allowed.addAll(ops);
                 } else {
                     // if the ops for the pc are empty then the user has no permissions on the target
                     if (ops.isEmpty()) {
-                        inter.clear();
+                        allowed.clear();
                         break;
-                    } else if (!ops.contains(ALL_OPERATIONS)) {
-                        inter.retainAll(ops);
+                    } else if (!ops.contains(ALL_OPS)) {
+                        allowed.retainAll(ops);
                     }
                 }
             }
         }
 
-        // remove any prohibited operations
-        Set<String> denied = resolveProhibitions(userContext, targetCtx, target);
-        inter.removeAll(denied);
+        return allowed;
+    }
 
-        // if the permission set includes *, ignore all other permissions
-        if (inter.contains(ALL_OPERATIONS)) {
-            inter.clear();
-            inter.add(ALL_OPERATIONS);
+    private void resolveSpecialPermissions(Set<String> permissions) {
+        // if the permission set includes *, remove the * and add all resource operations
+        if (permissions.contains(ALL_OPS)) {
+            permissions.remove(ALL_OPS);
+            permissions.addAll(ADMIN_OPS);
+            permissions.addAll(resourceOps);
+        } else {
+            // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
+            if (permissions.contains(ALL_ADMIN_OPS)) {
+                permissions.remove(ALL_OPS);
+                permissions.addAll(ADMIN_OPS);
+            } else if (permissions.contains(ALL_RESOURCE_OPS)) {
+                permissions.remove(ALL_RESOURCE_OPS);
+                permissions.addAll(resourceOps);
+            }
         }
-
-        return inter;
     }
 
     private Set<String> resolveProhibitions(UserContext userCtx, TargetContext targetCtx, String target) {

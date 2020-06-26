@@ -8,8 +8,6 @@ import java.util.Set;
  * Constants for operations in the Policy Machine
  */
 public class Operations {
-    public static final String FILE_WRITE                 = "file write";
-    public static final String FILE_READ                  = "file read";
     public static final String WRITE                      = "write";
     public static final String READ                       = "read";
     public static final String CREATE_POLICY_CLASS        = "create policy class";
@@ -34,7 +32,6 @@ public class Operations {
     public static final String UPDATE_ASSOCIATION         = "update association";
     public static final String DELETE_ASSOCIATION         = "delete association";
     public static final String GET_ASSOCIATIONS           = "get associations";
-    public static final String ALL_OPERATIONS             = "*";
     public static final String ANY_OPERATIONS             = "any";
     public static final String RESET                      = "reset";
     public static final String GET_PERMISSIONS            = "get permissions";
@@ -45,7 +42,11 @@ public class Operations {
     public static final String PROHIBIT_SUBJECT           = "prohibit subject";
     public static final String PROHIBIT_RESOURCE          = "prohibit resource";
 
-    private static final Set<String> admin = new OperationSet(
+    public static final String ALL_OPS = "*";
+    public static final String ALL_ADMIN_OPS = "*a";
+    public static final String ALL_RESOURCE_OPS = "*r";
+
+    public static final Set<String> ADMIN_OPS = new OperationSet(
             CREATE_POLICY_CLASS,
             ASSIGN_OBJECT_ATTRIBUTE,
             ASSIGN_OBJECT_ATTRIBUTE_TO,
@@ -67,7 +68,7 @@ public class Operations {
             UPDATE_ASSOCIATION,
             DELETE_ASSOCIATION,
             GET_ASSOCIATIONS,
-            ALL_OPERATIONS,
+            ALL_OPS,
             ANY_OPERATIONS,
             GET_PERMISSIONS,
             CREATE_PROHIBITION,
@@ -78,15 +79,4 @@ public class Operations {
             PROHIBIT_RESOURCE,
             RESET
     );
-
-    private static final Set<String> resource = new OperationSet(
-            FILE_WRITE,
-            FILE_READ,
-            WRITE,
-            READ
-    );
-
-    public static boolean isAdmin(String op) {
-        return admin.contains(op);
-    }
 }
