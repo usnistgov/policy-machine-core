@@ -252,7 +252,9 @@ class PReviewDeciderTest {
         graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*"));
 
         PReviewDecider decider = new PReviewDecider(graph, RWE);
-        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
+        Set<String> list = decider.list(u1.getName(), "", o1.getName());
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertTrue(list.containsAll(RWE));
     }
     @Test
     void testGraph9() throws PMException {
@@ -268,7 +270,9 @@ class PReviewDeciderTest {
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("read", "write"));
 
         PReviewDecider decider = new PReviewDecider(graph, RWE);
-        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
+        Set<String> list = decider.list(u1.getName(), "", o1.getName());
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertTrue(list.containsAll(RWE));
     }
     @Test
     void testGraph10() throws PMException {
@@ -335,7 +339,9 @@ class PReviewDeciderTest {
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph, RWE);
-        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
+        Set<String> list = decider.list(u1.getName(), "", o1.getName());
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertTrue(list.contains(READ));
     }
     @Test
     void testGraph14() throws PMException {
@@ -352,7 +358,9 @@ class PReviewDeciderTest {
         graph.associate(ua2.getName(), oa1.getName(), new OperationSet("*"));
 
         PReviewDecider decider = new PReviewDecider(graph, RWE);
-        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
+        Set<String> list = decider.list(u1.getName(), "", o1.getName());
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertTrue(list.containsAll(RWE));
     }
     @Test
     void testGraph15() throws PMException {
@@ -369,7 +377,9 @@ class PReviewDeciderTest {
         graph.associate(ua2.getName(), oa2.getName(), new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph, RWE);
-        assertTrue(decider.list(u1.getName(), "", o1.getName()).containsAll(Arrays.asList("*")));
+        Set<String> list = decider.list(u1.getName(), "", o1.getName());
+        assertTrue(list.containsAll(ADMIN_OPS));
+        assertTrue(list.containsAll(RWE));
     }
     @Test
     void testGraph16() throws PMException {
