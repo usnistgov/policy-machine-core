@@ -55,17 +55,11 @@ public class PReviewDecider implements Decider {
 
     @Override
     public boolean check(String subject, String process, String target, String... perms) throws PMException {
-        List<String> permsToCheck = Arrays.asList(perms);
-        Set<String> permissions = list(subject, process, target);
-
-        //if just checking for any operations, return true if the resulting permissions set is not empty.
-        //if the resulting permissions set contains * or all operations, return true.
-        //if neither of the above apply, return true iff the resulting permissions set contains all the provided
-        // permissions to check for
-        if (permsToCheck.contains(ANY_OPERATIONS)) {
-            return !permissions.isEmpty();
+        Set<String> allowed = list(subject, process, target);
+        if(perms.length == 0) {
+            return !allowed.isEmpty();
         } else {
-            return permissions.containsAll(permsToCheck);
+            return  allowed.containsAll(Arrays.asList(perms));
         }
     }
 

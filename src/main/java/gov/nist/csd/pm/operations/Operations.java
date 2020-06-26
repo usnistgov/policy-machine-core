@@ -32,7 +32,6 @@ public class Operations {
     public static final String UPDATE_ASSOCIATION         = "update association";
     public static final String DELETE_ASSOCIATION         = "delete association";
     public static final String GET_ASSOCIATIONS           = "get associations";
-    public static final String ANY_OPERATIONS             = "any";
     public static final String RESET                      = "reset";
     public static final String GET_PERMISSIONS            = "get permissions";
     public static final String CREATE_PROHIBITION         = "create prohibition";

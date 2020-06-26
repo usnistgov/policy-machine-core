@@ -15,7 +15,6 @@ import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import java.util.Arrays;
 import java.util.Set;
 
-import static gov.nist.csd.pm.operations.Operations.ANY_OPERATIONS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
