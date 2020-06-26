@@ -19,7 +19,6 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
-import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ALL_OPERATIONS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 
@@ -31,8 +30,8 @@ public class GraphService extends Service implements Graph {
 
     private Graph graph;
 
-    public GraphService(PAP pap, EPP epp) throws PMException {
-        super(pap, epp);
+    public GraphService(PAP pap, EPP epp, OperationSet resourceOps) throws PMException {
+        super(pap, epp, resourceOps);
 
         this.graph = pap.getGraphPAP();
     }
@@ -73,9 +72,9 @@ public class GraphService extends Service implements Graph {
         getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
         getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
         // associate Super UA and PC UA
-        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPERATIONS));
+        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
         // associate Super UA and PC OA
-        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPERATIONS));
+        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
 
         // create an OA that will represent the pc
         getPAP().getGraphPAP().createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
