@@ -68,8 +68,6 @@ public class Operations {
             UPDATE_ASSOCIATION,
             DELETE_ASSOCIATION,
             GET_ASSOCIATIONS,
-            ALL_OPS,
-            ANY_OPERATIONS,
             GET_PERMISSIONS,
             CREATE_PROHIBITION,
             GET_ACCESSIBLE_CHILDREN,

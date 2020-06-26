@@ -91,13 +91,11 @@ public class Service {
             target = node.getProperties().get(REP_PROPERTY);
         }
 
-        Set<String> perms = decider.list(userCtx.getUser(), userCtx.getProcess(), target);
-        if(permissions.length == 0 || Arrays.asList(permissions).contains(ANY_OPERATIONS)) {
-            return !perms.isEmpty();
-        } else if (perms.contains("*")) {
-            return true;
+        Set<String> allowed = decider.list(userCtx.getUser(), userCtx.getProcess(), target);
+        if(permissions.length == 0) {
+            return !allowed.isEmpty();
         } else {
-            return !perms.isEmpty() && perms.containsAll(Arrays.asList(permissions));
+            return  allowed.containsAll(Arrays.asList(permissions));
         }
     }
 }
