@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ALL_OPERATIONS;
+import static gov.nist.csd.pm.operations.Operations.ALL_OPS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.NAMESPACE_PROPERTY;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
@@ -124,8 +124,8 @@ public class SuperPolicy {
         }
 
         // associate super ua to super oa
-        graph.associate(superUA1.getName(), superOA.getName(), new OperationSet(ALL_OPERATIONS));
-        graph.associate(superUA2.getName(), superUA1.getName(), new OperationSet(ALL_OPERATIONS));
+        graph.associate(superUA1.getName(), superOA.getName(), new OperationSet(ALL_OPS));
+        graph.associate(superUA2.getName(), superUA1.getName(), new OperationSet(ALL_OPS));
 
         configurePolicyClasses(graph);
     }
@@ -162,8 +162,8 @@ public class SuperPolicy {
             }
 
             // associate super ua 1 with pc default node
-            graph.associate(superUA1.getName(), defaultUA, new OperationSet(ALL_OPERATIONS));
-            graph.associate(superUA1.getName(), defaultOA, new OperationSet(ALL_OPERATIONS));
+            graph.associate(superUA1.getName(), defaultUA, new OperationSet(ALL_OPS));
+            graph.associate(superUA1.getName(), defaultOA, new OperationSet(ALL_OPS));
 
             // create the rep
             if (!graph.exists(rep)) {

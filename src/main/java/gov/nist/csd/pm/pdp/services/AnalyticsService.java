@@ -17,8 +17,8 @@ import java.util.*;
  */
 public class AnalyticsService extends Service {
 
-    public AnalyticsService(PAP pap, EPP epp) {
-        super(pap, epp);
+    public AnalyticsService(PAP pap, EPP epp, OperationSet resourceOps) {
+        super(pap, epp, resourceOps);
     }
 
     /**

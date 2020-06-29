@@ -19,7 +19,6 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
-import static gov.nist.csd.pm.pdp.decider.PReviewDecider.ALL_OPERATIONS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 
@@ -31,8 +30,8 @@ public class GraphService extends Service implements Graph {
 
     private Graph graph;
 
-    public GraphService(PAP pap, EPP epp) throws PMException {
-        super(pap, epp);
+    public GraphService(PAP pap, EPP epp, OperationSet resourceOps) throws PMException {
+        super(pap, epp, resourceOps);
 
         this.graph = pap.getGraphPAP();
     }
@@ -73,9 +72,9 @@ public class GraphService extends Service implements Graph {
         getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
         getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
         // associate Super UA and PC UA
-        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPERATIONS));
+        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
         // associate Super UA and PC OA
-        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPERATIONS));
+        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
 
         // create an OA that will represent the pc
         getPAP().getGraphPAP().createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
@@ -257,11 +256,11 @@ public class GraphService extends Service implements Graph {
         if (node.getType().equals(PC)) {
             String pcRep = node.getProperties().get(REP_PROPERTY);
             node = getGraphPAP().getNode(pcRep);
-            return hasPermissions(userCtx, node.getName(), ANY_OPERATIONS);
+            return hasPermissions(userCtx, node.getName());
         }
 
         // node exists, return false if the user does not have access to it.
-        return hasPermissions(userCtx, name, ANY_OPERATIONS);
+        return hasPermissions(userCtx, name);
     }
 
     /**
@@ -278,7 +277,7 @@ public class GraphService extends Service implements Graph {
         Set<Node> nodes = new HashSet<>(getGraphPAP().getNodes());
         nodes.removeIf((node) -> {
             try {
-                return !hasPermissions(userCtx, node.getName(), ANY_OPERATIONS);
+                return !hasPermissions(userCtx, node.getName());
             }
             catch (PMException e) {
                 e.printStackTrace();
@@ -324,7 +323,7 @@ public class GraphService extends Service implements Graph {
         Set<String> children = getGraphPAP().getChildren(name);
         children.removeIf((node) -> {
             try {
-                return !hasPermissions(userCtx, node, ANY_OPERATIONS);
+                return !hasPermissions(userCtx, node);
             }
             catch (PMException e) {
                 e.printStackTrace();
@@ -355,7 +354,7 @@ public class GraphService extends Service implements Graph {
         Set<String> parents = getGraphPAP().getParents(name);
         parents.removeIf((node) -> {
             try {
-                return !hasPermissions(userCtx, node, ANY_OPERATIONS);
+                return !hasPermissions(userCtx, node);
             }
             catch (PMException e) {
                 e.printStackTrace();
@@ -641,7 +640,7 @@ public class GraphService extends Service implements Graph {
         Set<Node> search = getGraphPAP().search(type, properties);
         search.removeIf(x -> {
             try {
-                return !hasPermissions(userCtx, x.getName(), ANY_OPERATIONS);
+                return !hasPermissions(userCtx, x.getName());
             }
             catch (PMException e) {
                 return true;
@@ -667,8 +666,8 @@ public class GraphService extends Service implements Graph {
             throw new PMException(String.format("node %s could not be found", name));
         }
 
-        if(!hasPermissions(userCtx, name, ANY_OPERATIONS)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", name, ANY_OPERATIONS));
+        if(!hasPermissions(userCtx, name)) {
+            throw new PMAuthorizationException(String.format("no permissions on %s: %s", name));
         }
 
         return getGraphPAP().getNode(name);
@@ -677,7 +676,7 @@ public class GraphService extends Service implements Graph {
     @Override
     public Node getNode(NodeType type, Map<String, String> properties) throws PMException {
         Node node = getGraphPAP().getNode(type, properties);
-        if (!hasPermissions(userCtx, node.getName(), ANY_OPERATIONS)) {
+        if (!hasPermissions(userCtx, node.getName())) {
             throw new PMException(String.format("node (%s, %s) could not be found", type, properties.toString()));
         }
         return node;

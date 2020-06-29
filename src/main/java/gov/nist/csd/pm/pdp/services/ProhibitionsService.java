@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp.services;
 
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
@@ -17,8 +18,8 @@ import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsService extends Service implements Prohibitions {
 
-    public ProhibitionsService(PAP pap, EPP epp, SuperPolicy superPolicy) {
-        super(pap, epp);
+    public ProhibitionsService(PAP pap, EPP epp, OperationSet resourceOps, SuperPolicy superPolicy) {
+        super(pap, epp, resourceOps);
 
         this.superPolicy = superPolicy;
     }
