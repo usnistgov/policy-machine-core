@@ -14,6 +14,7 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
@@ -418,7 +419,13 @@ public class MemGraph implements Graph {
     public String toJson() throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        Collection<Node> nodes = this.getNodes();
+        Collection<Node> nodes = this.getNodes().stream().filter(
+                node -> !node.getName().equalsIgnoreCase("super_pc")
+                        && !node.getName().equalsIgnoreCase("super_ua1")
+                        && !node.getName().equalsIgnoreCase("super_ua2")
+                        && !node.getName().equalsIgnoreCase("super_oa")
+                        && !node.getName().equalsIgnoreCase("super"))
+                .collect(Collectors.toList());
         HashSet<String[]> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
@@ -444,7 +451,13 @@ public class MemGraph implements Graph {
     public void fromJson(String json) throws PMException {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
 
-        Collection<Node> nodes = jsonGraph.getNodes();
+        Collection<Node> nodes = jsonGraph.getNodes().stream().filter(
+                node -> !node.getName().equalsIgnoreCase("super_pc")
+                        && !node.getName().equalsIgnoreCase("super_ua1")
+                        && !node.getName().equalsIgnoreCase("super_ua2")
+                        && !node.getName().equalsIgnoreCase("super_oa")
+                        && !node.getName().equalsIgnoreCase("super"))
+                .collect(Collectors.toList());
         Map<String, Node> nodesMap = new HashMap<>();
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
