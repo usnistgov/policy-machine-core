@@ -165,6 +165,10 @@ public class SuperPolicy {
             graph.associate(superUA1.getName(), defaultUA, new OperationSet(ALL_OPS));
             graph.associate(superUA1.getName(), defaultOA, new OperationSet(ALL_OPS));
 
+            // associate super ua 2 with pc default node
+            graph.associate(superUA2.getName(), defaultUA, new OperationSet(ALL_OPS));
+            graph.associate(superUA2.getName(), defaultOA, new OperationSet(ALL_OPS));
+
             // create the rep
             if (!graph.exists(rep)) {
                 graph.createNode(rep, OA, Node.toProperties("pc", pc), superOA.getName());
