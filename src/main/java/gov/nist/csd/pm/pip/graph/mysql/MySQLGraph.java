@@ -1005,7 +1005,10 @@ public class MySQLGraph implements Graph {
                         && !node.getName().equalsIgnoreCase("super_ua1")
                         && !node.getName().equalsIgnoreCase("super_ua2")
                         && !node.getName().equalsIgnoreCase("super_oa")
-                        && !node.getName().equalsIgnoreCase("super"))
+                        && !node.getName().equalsIgnoreCase("super")
+                        && !node.getName().equalsIgnoreCase("super_pc_default_UA")
+                        && !node.getName().equalsIgnoreCase("super_pc_default_OA")
+                        && !node.getName().equalsIgnoreCase("super_pc_rep"))
                 .collect(Collectors.toList());
         HashSet<String[]> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
@@ -1040,7 +1043,10 @@ public class MySQLGraph implements Graph {
                         && !node.getName().equalsIgnoreCase("super_ua1")
                         && !node.getName().equalsIgnoreCase("super_ua2")
                         && !node.getName().equalsIgnoreCase("super_oa")
-                        && !node.getName().equalsIgnoreCase("super"))
+                        && !node.getName().equalsIgnoreCase("super")
+                        && !node.getName().equalsIgnoreCase("super_pc_default_UA")
+                        && !node.getName().equalsIgnoreCase("super_pc_default_OA")
+                        && !node.getName().equalsIgnoreCase("super_pc_rep"))
                 .collect(Collectors.toList());
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
