@@ -33,12 +33,15 @@ CREATE TABLE IF NOT EXISTS `assignment` (
 -- Dumping data for table policydb_core.assignment: ~6 rows (approximately)
 /*!40000 ALTER TABLE `assignment` DISABLE KEYS */;
 INSERT INTO `assignment` (`assignment_id`, `start_node_id`, `end_node_id`) VALUES
-	(1, 3, 2),
-	(4, 4, 3),
-	(5, 4, 7),
-	(2, 7, 2),
-	(3, 8, 2),
-	(6, 9, 8);
+	(1, 2, 1),
+	(2, 4, 1),
+	(3, 5, 1),
+	(4, 6, 1),
+	(5, 7, 1)
+	(6, 3, 2),
+	(7, 3, 4),
+	(8, 8, 5);
+
 /*!40000 ALTER TABLE `assignment` ENABLE KEYS */;
 
 -- Dumping structure for table policydb_core.association
@@ -128,14 +131,16 @@ CREATE TABLE IF NOT EXISTS `node` (
 
 -- Dumping data for table policydb_core.node: ~7 rows (approximately)
 /*!40000 ALTER TABLE `node` DISABLE KEYS */;
-INSERT INTO `node` (`node_id`, `node_type_id`, `name`, `node_property`) VALUES
-	(2, 5, 'super_pc', NULL),
-	(3, 2, 'super_ua1', NULL),
-	(4, 3, 'super_u', NULL),
-	(5, 1, 'everything', NULL),
-	(7, 2, 'super_ua2', NULL),
-	(8, 1, 'super_oa', NULL),
-	(9, 4, 'super_o', NULL);
+insert into `node`(`node_id`, `node_type_id`, `name`, `node_property`) values
+	(1, 5, 'super_pc', '{\"namespace\": \"super\", \"default_oa\": \"super_pc_default_OA\", \"default_ua\": \"super_pc_default_UA\",\"rep\": \"super_pc_rep\"}'),
+	(2, 2, 'super_ua1','{\"namespace\": \"super\"}'),
+	(3, 3, 'super',    '{\"namespace\": \"super\"}'),
+	(4, 2, 'super_ua2', '{\"namespace\": \"super\"}'),
+	(5, 1, 'super_oa',  '{\"namespace\": \"super\"}'),
+	(6, 2, 'super_pc_default_UA', '{\"namespace\": \"super_pc\"}'),
+	(7, 1, 'super_pc_default_OA', '{\"namespace\": \"super_pc\"}'),
+	(8, 1, 'super_pc_rep', '{\"namespace\": \"super_pc\", \"pc\": \"super_pc\"}'),
+	(9, 4, 'super_o', '{\"namespace\": \"super\"}');
 /*!40000 ALTER TABLE `node` ENABLE KEYS */;
 
 -- Dumping structure for table policydb_core.node_type
@@ -158,6 +163,10 @@ INSERT INTO `node_type` (`node_type_id`, `name`, `description`) VALUES
 	(5, 'PC', 'Policy Class'),
 	(6, 'OS', 'Operation Set');
 /*!40000 ALTER TABLE `node_type` ENABLE KEYS */;
+INSERT INTO `association` (`association_id`, `start_node_id`, `end_node_id`, `operation_set`) VALUES
+    (1, 5, 1, '[\"*\"]'),
+    (2, 7, 2, '[\"*\"]'),
+    (3, 6, 2, '[\"*\"]');
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
