@@ -37,7 +37,7 @@ INSERT INTO `assignment` (`assignment_id`, `start_node_id`, `end_node_id`) VALUE
 	(2, 4, 1),
 	(3, 5, 1),
 	(4, 6, 1),
-	(5, 7, 1)
+	(5, 7, 1),
 	(6, 3, 2),
 	(7, 3, 4),
 	(8, 8, 5);
