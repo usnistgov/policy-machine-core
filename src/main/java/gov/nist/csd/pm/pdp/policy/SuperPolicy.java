@@ -83,7 +83,7 @@ public class SuperPolicy {
 
         if (!graph.exists(superPCRep)) {
             superPolicyClassRep = graph.createNode(superPCRep, NodeType.OA,
-                    Node.toProperties(NAMESPACE_PROPERTY, "super", "pc", String.valueOf(superPC.getName())), superOA.getName());
+                    Node.toProperties(NAMESPACE_PROPERTY, "super", "pc", superPC.getName()), superOA.getName());
         } else {
             superPolicyClassRep = graph.getNode(superPCRep);
         }
@@ -97,11 +97,7 @@ public class SuperPolicy {
         if(!children.contains(superUA2.getName())) {
             graph.assign(superUA2.getName(), superPC.getName());
         }
-        // check super ua2 is assigned to super pc
-        children = graph.getChildren(superPC.getName());
-        if(!children.contains(superUA2.getName())) {
-            graph.assign(superUA2.getName(), superPC.getName());
-        }
+
         // check super user is assigned to super ua1
         children = graph.getChildren(superUA1.getName());
         if(!children.contains(superUser.getName())) {
@@ -125,7 +121,7 @@ public class SuperPolicy {
 
         // associate super ua to super oa
         graph.associate(superUA1.getName(), superOA.getName(), new OperationSet(ALL_OPS));
-        graph.associate(superUA2.getName(), superUA1.getName(), new OperationSet(ALL_OPS));
+        graph.associate(superUA2.getName(), superOA.getName(), new OperationSet(ALL_OPS));
 
         configurePolicyClasses(graph);
     }
