@@ -43,7 +43,7 @@ public class Explain {
         for (String pc : policyClasses.keySet()) {
             PolicyClass policyClass = policyClasses.get(pc);
             str.append("\n\t\t").append(pc).append(": ").append(policyClass.getOperations());
-            List<Path> paths = policyClass.getPaths();
+            Set<Path> paths = policyClass.getPaths();
             for (Path path : paths) {
                 str.append("\n\t\t\t- ").append(path);
             }

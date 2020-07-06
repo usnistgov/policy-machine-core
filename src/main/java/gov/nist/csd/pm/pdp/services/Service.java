@@ -74,6 +74,10 @@ public class Service {
         return resourceOps;
     }
 
+    public void setResourceOps(OperationSet resourceOps) {
+        this.resourceOps = resourceOps;
+    }
+
     public Decider getDecider() {
         return new PReviewDecider(getGraphPAP(), getProhibitionsPAP(), resourceOps);
     }

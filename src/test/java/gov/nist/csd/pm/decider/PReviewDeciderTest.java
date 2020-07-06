@@ -25,12 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PReviewDeciderTest {
 
-    private static final Set<String> RWE = new HashSet<>();
-    {
-        RWE.add("read");
-        RWE.add("write");
-        RWE.add("execute");
-    }
+    private static final OperationSet RWE = new OperationSet("read", "write", "execute");
     
     @Test
     void testHasPermissions() throws PMException {
@@ -44,7 +39,7 @@ class PReviewDeciderTest {
         Node o2 = graph.createNode("o2", O, null, oa1.getName());
         Node o3 = graph.createNode("o3", O, null, oa1.getName());
 
-        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write", "unknown-op"));
 
         PReviewDecider decider = new PReviewDecider(graph, RWE);
         assertTrue(decider.check(u1.getName(), "", o1.getName(), "read", "write"));

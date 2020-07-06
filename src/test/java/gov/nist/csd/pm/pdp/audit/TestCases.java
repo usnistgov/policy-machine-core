@@ -2,8 +2,11 @@ package gov.nist.csd.pm.pdp.audit;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
@@ -61,7 +64,11 @@ public class TestCases {
                 graph18(),
                 graph19(),
                 graph20(),
-                graph21()
+                graph21(),
+                graph22(),
+                graph23(),
+                graph24(),
+                graph25(),
         };
     }
 
@@ -447,5 +454,71 @@ public class TestCases {
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua2(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[write]"));
         return new TestCase("graph21", graph, expectedPaths, RW);
+    }
+
+    public static TestCase graph22() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1", "oa2");
+        graph.createNode("u1", U, null, "ua1");
+
+        graph.associate("ua1", "oa1", new OperationSet("read"));
+
+        Map<String, List<String>> expectedPaths = new HashMap<>();
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
+        return new TestCase("graph22", graph, expectedPaths, R);
+    }
+
+    public static TestCase graph23() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa1", OA, null, "pc1");
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
+        graph.createNode("u1", U, null, "ua1");
+
+        graph.associate("ua1", "oa1", new OperationSet("read"));
+        graph.associate("ua1", "oa2", new OperationSet("write"));
+
+        Map<String, List<String>> expectedPaths = new HashMap<>();
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]"));
+        return new TestCase("graph23", graph, expectedPaths, R);
+    }
+
+    public static TestCase graph24() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("oa2", OA, null, "pc1");
+        graph.createNode("oa1", OA, null, "oa2");
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("o1", O, null, "oa1");
+        graph.createNode("u1", U, null, "ua1");
+
+        graph.associate("ua1", "oa1", new OperationSet("read"));
+        graph.associate("ua1", "oa2", new OperationSet("write"));
+
+        Map<String, List<String>> expectedPaths = new HashMap<>();
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa2(OA)-oa1(OA)-o1(O) ops=[write]"));
+        return new TestCase("graph24", graph, expectedPaths, RW);
+    }
+
+    public static TestCase graph25() throws PMException {
+        Graph graph = new MemGraph();
+        Node pc1 = graph.createPolicyClass("pc1", null);
+        Node ua1 = graph.createNode("ua1", UA, null, pc1.getName());
+        Node u1 = graph.createNode("u1", U, null, ua1.getName());
+        Node oa2 = graph.createNode("oa2", OA, null, pc1.getName());
+        Node oa1 = graph.createNode("oa1", OA, null, oa2.getName());
+        Node o1 = graph.createNode("o1", O, null, oa1.getName());
+
+        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("*r"));
+
+        Map<String, List<String>> expectedPaths = new HashMap<>();
+        expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write, execute]"));
+        return new TestCase("graph25", graph, expectedPaths, RW);
     }
 }

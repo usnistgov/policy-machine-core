@@ -12,8 +12,11 @@ import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.util.*;
 
+import static gov.nist.csd.pm.operations.Operations.*;
+import static gov.nist.csd.pm.operations.Operations.ALL_RESOURCE_OPS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 public class PReviewAuditor implements Auditor {
@@ -21,9 +24,11 @@ public class PReviewAuditor implements Auditor {
     private static final String ALL_OPERATIONS = "*";
 
     private Graph graph;
+    private OperationSet resourceOps;
 
-    public PReviewAuditor(Graph graph) {
+    public PReviewAuditor(Graph graph, OperationSet resourceOps) {
         this.graph = graph;
+        this.resourceOps = resourceOps;
     }
 
     @Override
@@ -79,10 +84,23 @@ public class PReviewAuditor implements Auditor {
             }
         }
 
-        // if the permission set includes *, ignore all other permissions
-        if (perms.contains(ALL_OPERATIONS)) {
-            perms.clear();
-            perms.add(ALL_OPERATIONS);
+        // remove any unknown ops
+        perms.retainAll(resourceOps);
+
+        // if the permission set includes *, remove the * and add all resource operations
+        if (perms.contains(ALL_OPS)) {
+            perms.remove(ALL_OPS);
+            perms.addAll(ADMIN_OPS);
+            perms.addAll(resourceOps);
+        } else {
+            // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
+            if (perms.contains(ALL_ADMIN_OPS)) {
+                perms.remove(ALL_OPS);
+                perms.addAll(ADMIN_OPS);
+            } else if (perms.contains(ALL_RESOURCE_OPS)) {
+                perms.remove(ALL_RESOURCE_OPS);
+                perms.addAll(resourceOps);
+            }
         }
 
         return perms;
@@ -101,72 +119,93 @@ public class PReviewAuditor implements Auditor {
      * @return the set of paths from a user to a target node (through an association) for each policy class in the system.
      * @throws PMException if there is an exception traversing the graph
      */
-    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, String target) {
+    private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, String target) throws PMException {
         Map<String, PolicyClass> results = new HashMap<>();
+
+        // initialize with all policy classes
+        Set<String> policyClasses = graph.getPolicyClasses();
+        for (String pc : policyClasses) {
+            results.put(pc, new PolicyClass());
+        }
+
         for (EdgePath targetPath : targetPaths) {
-            EdgePath.Edge lastTargetEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
+            EdgePath.Edge pcEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
 
             // if the last element in the target path is a pc, the target belongs to that pc, add the pc to the results
             // skip to the next target path if it is not a policy class
-            if (lastTargetEdge.getTarget().getType() == PC) {
-                if(!results.containsKey(lastTargetEdge.getTarget().getName())) {
-                    results.put(lastTargetEdge.getTarget().getName(), new PolicyClass());
-                }
-            } else {
+            if (pcEdge.getTarget().getType() != PC) {
                 continue;
             }
 
-            for(EdgePath userPath : userPaths) {
-                EdgePath.Edge lastUserEdge = userPath.getEdges().get(userPath.getEdges().size()-1);
+            PolicyClass policyClass = results.getOrDefault(pcEdge.getTarget().getName(), new PolicyClass());
 
-                // if the last edge does not have any ops, it is not an association, so ignore it
-                if (lastUserEdge.getOps() == null) {
+            // compute the paths for this target path
+            Set<Path> paths = computePaths(userPaths, targetPath, target, pcEdge);
+
+            // add all paths
+            Set<Path> existingPaths = policyClass.getPaths();
+            existingPaths.addAll(paths);
+
+            // collect all ops
+            for (Path p : paths) {
+                policyClass.getOperations().addAll(p.getOperations());
+            }
+
+            // update results
+            results.put(pcEdge.getTarget().getName(), policyClass);
+        }
+
+        return results;
+    }
+
+    private Set<Path> computePaths(List<EdgePath> userPaths, EdgePath targetPath, String target, EdgePath.Edge pcEdge) {
+        Set<Path> computedPaths = new HashSet<>();
+
+        for(EdgePath userPath : userPaths) {
+            EdgePath.Edge lastUserEdge = userPath.getEdges().get(userPath.getEdges().size()-1);
+
+            // if the last edge does not have any ops, it is not an association, so ignore it
+            if (lastUserEdge.getOps() == null) {
+                continue;
+            }
+
+            for(int i = 0; i < targetPath.getEdges().size(); i++) {
+                EdgePath.Edge curEdge = targetPath.getEdges().get(i);
+                // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
+                // resolvedPath, continue to the next target edge
+                String lastUserEdgeTarget = lastUserEdge.getTarget().getName();
+                String curEdgeSource = curEdge.getSource().getName();
+                String curEdgeTarget = curEdge.getTarget().getName();
+
+                // if the target of the last edge in a user path does not match the target of the current edge in the target path
+                // AND if the target of the last edge in a user path does not match the source of the current edge in the target path
+                //     OR if the target of the last edge in a user path does not match the target of the explain
+                // continue to the next target edge
+                if((!lastUserEdgeTarget.equals(curEdgeTarget)) &&
+                        (!lastUserEdgeTarget.equals(curEdgeSource)
+                                || lastUserEdgeTarget.equals(target))) {
                     continue;
                 }
 
-                for(int i = 0; i < targetPath.getEdges().size(); i++) {
-                    EdgePath.Edge e = targetPath.getEdges().get(i);
+                List<EdgePath.Edge> pathToTarget = new ArrayList<>();
+                for(int j = 0; j <= i; j++) {
+                    pathToTarget.add(targetPath.getEdges().get(j));
+                }
 
-                    // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
-                    // resolvedPath, continue to the next target edge
-                    if((lastUserEdge.getTarget().getName().equals(e.getTarget().getName()))
-                            && (!lastUserEdge.getTarget().getName().equals(e.getSource().getName()) || lastUserEdge.getTarget().getName().equals(target))) {
-                        continue;
-                    }
+                ResolvedPath resolvedPath = resolvePath(userPath, pathToTarget, pcEdge);
+                if (resolvedPath == null) {
+                    continue;
+                }
 
-                    List<EdgePath.Edge> pathToTarget = new ArrayList<>();
-                    for(int j = 0; j <= i; j++) {
-                        pathToTarget.add(targetPath.getEdges().get(j));
-                    }
+                Path nodePath = resolvedPath.toNodePath(target);
 
-                    ResolvedPath resolvedPath = resolvePath(userPath, pathToTarget, lastTargetEdge);
-                    if (resolvedPath == null) {
-                        continue;
-                    }
 
-                    Path nodePath = resolvedPath.toNodePath(target);
-
-                    // check that the resolved resolvedPath does not already exist in the results
-                    // this can happen if there is more than one resolvedPath to a UA/OA from a U/O
-                    PolicyClass exPC = results.get(resolvedPath.getPc().getName());
-                    boolean found = false;
-                    for(Path p : exPC.getPaths()) {
-                        if(p.equals(nodePath)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found) {
-                        continue;
-                    }
-
-                    // add resolvedPath to policy class' paths
-                    exPC.getPaths().add(nodePath);
-                    exPC.getOperations().addAll(resolvedPath.getOps());
-               }
+                // add resolvedPath to policy class' paths
+                computedPaths.add(nodePath);
             }
         }
-        return results;
+
+        return computedPaths;
     }
 
     private ResolvedPath resolvePath(EdgePath userPath, List<EdgePath.Edge> pathToTarget, EdgePath.Edge pcEdge) {
@@ -176,10 +215,15 @@ public class PReviewAuditor implements Auditor {
 
         // get the operations in this path
         // the operations are the ops of the association in the user path
-        Set<String> ops = new HashSet<>();
+        // convert * to actual operations
+        OperationSet ops = new OperationSet();
         for(EdgePath.Edge edge : userPath.getEdges()) {
             if(edge.getOps() != null) {
                 ops = edge.getOps();
+
+                // resolve the operation set
+                resolveOperationSet(ops, resourceOps);
+
                 break;
             }
         }
@@ -194,6 +238,33 @@ public class PReviewAuditor implements Auditor {
         }
 
         return new ResolvedPath(pcEdge.getTarget(), path, ops);
+    }
+
+    /**
+     * Removes any ops in ops that are not in resourceOps and converts special ops to actual ops (*, *a, *r)
+     * @param ops the set of ops to check against the resource ops
+     * @param resourceOps the set of resource operations
+     */
+    private void resolveOperationSet(OperationSet ops, OperationSet resourceOps) {
+        // if the permission set includes *, remove the * and add all resource operations
+        if (ops.contains(ALL_OPS)) {
+            ops.remove(ALL_OPS);
+            ops.addAll(ADMIN_OPS);
+            ops.addAll(resourceOps);
+        } else {
+            // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
+            if (ops.contains(ALL_ADMIN_OPS)) {
+                ops.remove(ALL_ADMIN_OPS);
+                ops.addAll(ADMIN_OPS);
+            }
+            if (ops.contains(ALL_RESOURCE_OPS)) {
+                ops.remove(ALL_RESOURCE_OPS);
+                ops.addAll(resourceOps);
+            }
+        }
+
+        // remove any unknown ops
+        ops.removeIf(op -> !resourceOps.contains(op) && !ADMIN_OPS.contains(op));
     }
 
     private List<EdgePath> dfs(Node start) throws PMException {
@@ -227,7 +298,7 @@ public class PReviewAuditor implements Auditor {
 
             Map<String, OperationSet> assocs = graph.getSourceAssociations(node.getName());
             for(String target : assocs.keySet()) {
-                Set<String> ops = assocs.get(target);
+                OperationSet ops = assocs.get(target);
                 Node targetNode = graph.getNode(target);
                 EdgePath path = new EdgePath();
                 path.addEdge(new EdgePath.Edge(node, targetNode, ops));
@@ -364,9 +435,9 @@ public class PReviewAuditor implements Auditor {
         private static class Edge {
             private Node source;
             private Node target;
-            private Set<String> ops;
+            private OperationSet ops;
 
-            public Edge(Node source, Node target, Set<String> ops) {
+            public Edge(Node source, Node target, OperationSet ops) {
                 this.source = source;
                 this.target = target;
                 this.ops = ops;
@@ -388,11 +459,11 @@ public class PReviewAuditor implements Auditor {
                 this.target = target;
             }
 
-            public Set<String> getOps() {
+            public OperationSet getOps() {
                 return ops;
             }
 
-            public void setOps(Set<String> ops) {
+            public void setOps(OperationSet ops) {
                 this.ops = ops;
             }
 
