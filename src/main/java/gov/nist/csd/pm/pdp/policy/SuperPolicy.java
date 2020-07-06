@@ -123,6 +123,7 @@ public class SuperPolicy {
         graph.associate(superUA1.getName(), superOA.getName(), new OperationSet(ALL_OPS));
         graph.associate(superUA2.getName(), superUA1.getName(), new OperationSet(ALL_OPS));
 
+        graph.associate(superUA1.getName(), superUA2.getName(), new OperationSet(ALL_OPS));
         configurePolicyClasses(graph);
     }
 
