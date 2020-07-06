@@ -721,14 +721,18 @@ public class GraphService extends Service implements Graph {
             }
             getGraphPAP().getChildren(node.getName()).forEach(el -> {
                 try {
-                    deassign(node.getName(), el);
+                    if (isAssigned(node.getName(), el)) {
+                        deassign(node.getName(), el);
+                    }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
                 }
             });
             getGraphPAP().getParents(node.getName()).forEach(el -> {
                 try {
-                    deassign(el, node.getName());
+                    if (isAssigned(el, node.getName())) {
+                        deassign(el, node.getName());
+                    }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
                 }
