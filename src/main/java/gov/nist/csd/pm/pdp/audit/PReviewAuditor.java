@@ -122,12 +122,6 @@ public class PReviewAuditor implements Auditor {
     private Map<String, PolicyClass> resolvePaths(List<EdgePath> userPaths, List<EdgePath> targetPaths, String target) throws PMException {
         Map<String, PolicyClass> results = new HashMap<>();
 
-        // initialize with all policy classes
-        Set<String> policyClasses = graph.getPolicyClasses();
-        for (String pc : policyClasses) {
-            results.put(pc, new PolicyClass());
-        }
-
         for (EdgePath targetPath : targetPaths) {
             EdgePath.Edge pcEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
 

@@ -32,7 +32,7 @@ class PReviewAuditorTest {
                 assertNotNull(expectedPaths, tc.name);
 
                 PolicyClass pc = explain.getPolicyClasses().get(pcName);
-                assertEquals(expectedPaths.size(), pc.getPaths().size());
+                assertEquals(expectedPaths.size(), pc.getPaths().size(), tc.name);
                 for (String exPathStr : expectedPaths) {
                     boolean match = false;
                     for (Path resPath : pc.getPaths()) {

@@ -216,8 +216,7 @@ public class TestCases {
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
         expectedPaths.put("pc1", Arrays.asList("u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
-        expectedPaths.put("pc2", Arrays.asList());
-        return new TestCase("graph9", graph, expectedPaths, NOOPS);
+        return new TestCase("graph9", graph, expectedPaths, RW);
     }
 
     public static TestCase graph10() throws PMException {
@@ -393,7 +392,7 @@ public class TestCases {
         graph.associate("ua2", "oa2", R);
 
         Map<String, List<String>> expectedPaths = new HashMap<>();
-        expectedPaths.put("pc1", Arrays.asList());
+        expectedPaths.put("pc2", Arrays.asList("u1(U)-ua1(UA)-ua2(UA)-oa2(OA)-oa1(OA)-o1(O) ops=[read]", "u1(U)-ua1(UA)-oa1(OA)-o1(O) ops=[read, write]"));
         return new TestCase("graph18", graph, expectedPaths, NOOPS);
     }
 
