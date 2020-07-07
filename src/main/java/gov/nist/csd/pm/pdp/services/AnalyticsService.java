@@ -227,7 +227,7 @@ public class AnalyticsService extends Service {
     }
 
     public Explain explain(String user, String target) throws PMException {
-        Auditor auditor = new PReviewAuditor(getGraphPAP());
+        Auditor auditor = new PReviewAuditor(getGraphPAP(), getResourceOps());
         return auditor.explain(user, target);
     }
 }

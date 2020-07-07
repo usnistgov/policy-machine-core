@@ -7,14 +7,14 @@ import java.util.Set;
 
 public class PolicyClass {
     private Set<String> operations;
-    private List<Path> paths;
+    private Set<Path> paths;
 
     public PolicyClass() {
         operations = new HashSet<>();
-        paths = new ArrayList<>();
+        paths = new HashSet<>();
     }
 
-    public PolicyClass(Set<String> operations, List<Path> paths) {
+    public PolicyClass(Set<String> operations, Set<Path> paths) {
         this.operations = operations;
         this.paths = paths;
     }
@@ -27,11 +27,11 @@ public class PolicyClass {
         this.operations = operations;
     }
 
-    public List<Path> getPaths() {
+    public Set<Path> getPaths() {
         return paths;
     }
 
-    public void setPaths(List<Path> paths) {
+    public void setPaths(Set<Path> paths) {
         this.paths = paths;
     }
 }
