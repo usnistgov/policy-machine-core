@@ -21,18 +21,19 @@ class PReviewAuditorTest {
     @Test
     void testExplain() throws PMException {
         for(TestCases.TestCase tc : TestCases.getTests()) {
-            PReviewAuditor auditor = new PReviewAuditor(tc.graph);
+            PReviewAuditor auditor = new PReviewAuditor(tc.graph, new OperationSet("read", "write", "execute"));
             Explain explain = auditor.explain("u1", "o1");
 
             assertTrue(explain.getPermissions().containsAll(tc.getExpectedOps()),
                     tc.name + " expected ops " + tc.getExpectedOps() + " but got " + explain.getPermissions());
 
             for (String pcName : tc.expectedPaths.keySet()) {
-                List<String> paths = tc.expectedPaths.get(pcName);
-                assertNotNull(paths, tc.name);
+                List<String> expectedPaths = tc.expectedPaths.get(pcName);
+                assertNotNull(expectedPaths, tc.name);
 
                 PolicyClass pc = explain.getPolicyClasses().get(pcName);
-                for (String exPathStr : paths) {
+                assertEquals(expectedPaths.size(), pc.getPaths().size(), tc.name);
+                for (String exPathStr : expectedPaths) {
                     boolean match = false;
                     for (Path resPath : pc.getPaths()) {
                         if(pathsMatch(exPathStr, resPath.toString())) {

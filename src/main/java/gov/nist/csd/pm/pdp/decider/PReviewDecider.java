@@ -27,9 +27,9 @@ public class PReviewDecider implements Decider {
 
     private Graph graph;
     private Prohibitions prohibitions;
-    private Set<String> resourceOps;
+    private OperationSet resourceOps;
 
-    public PReviewDecider(Graph graph, Set<String> resourceOps) {
+    public PReviewDecider(Graph graph, OperationSet resourceOps) {
         if (graph == null) {
             throw new IllegalArgumentException("NGAC graph cannot be null");
         }
@@ -39,7 +39,7 @@ public class PReviewDecider implements Decider {
         this.resourceOps = resourceOps;
     }
 
-    public PReviewDecider(Graph graph, Prohibitions prohibitions, Set<String> resourceOps) {
+    public PReviewDecider(Graph graph, Prohibitions prohibitions, OperationSet resourceOps) {
         if (graph == null) {
             throw new IllegalArgumentException("NGAC graph cannot be null");
         }
@@ -50,6 +50,14 @@ public class PReviewDecider implements Decider {
 
         this.graph = graph;
         this.prohibitions = prohibitions;
+        this.resourceOps = resourceOps;
+    }
+
+    public OperationSet getResourceOps() {
+        return resourceOps;
+    }
+
+    public void setResourceOps(OperationSet resourceOps) {
         this.resourceOps = resourceOps;
     }
 
@@ -142,6 +150,9 @@ public class PReviewDecider implements Decider {
         // *, *a, *r to their actual permissions
         resolveSpecialPermissions(allowed);
 
+        // retain only the ops that the decider knows about
+        allowed.removeIf(op -> !resourceOps.contains(op) && !ADMIN_OPS.contains(op));
+
         // remove any prohibited operations
         Set<String> denied = resolveProhibitions(userContext, targetCtx, target);
         allowed.removeAll(denied);
@@ -189,9 +200,10 @@ public class PReviewDecider implements Decider {
         } else {
             // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
             if (permissions.contains(ALL_ADMIN_OPS)) {
-                permissions.remove(ALL_OPS);
+                permissions.remove(ALL_ADMIN_OPS);
                 permissions.addAll(ADMIN_OPS);
-            } else if (permissions.contains(ALL_RESOURCE_OPS)) {
+            }
+            if (permissions.contains(ALL_RESOURCE_OPS)) {
                 permissions.remove(ALL_RESOURCE_OPS);
                 permissions.addAll(resourceOps);
             }

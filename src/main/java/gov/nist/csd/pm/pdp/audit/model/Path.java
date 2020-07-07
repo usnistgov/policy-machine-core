@@ -46,4 +46,19 @@ public class Path {
 
         return sb.deleteCharAt(sb.length()-1).append(" ops=").append(operations).toString();
     }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Path)) {
+            return false;
+        }
+
+        Path p = (Path)o;
+        return this.nodes.equals(p.nodes) && this.operations.equals(p.operations);
+    }
 }
