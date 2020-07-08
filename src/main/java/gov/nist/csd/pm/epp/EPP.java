@@ -45,6 +45,10 @@ public class EPP {
             }
         }
     }
+
+    public PAP getPAP() {
+        return pap;
+    }
     
     public PDP getPDP() {
         return pdp;
