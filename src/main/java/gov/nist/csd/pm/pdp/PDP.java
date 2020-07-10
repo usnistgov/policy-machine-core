@@ -2,18 +2,14 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.epp.EPPOptions;
-import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.policy.SuperPolicy;
+import gov.nist.csd.pm.pap.policies.SuperPolicy;
 import gov.nist.csd.pm.pdp.services.*;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.GraphSerializer;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
-
-import java.util.Set;
 
 public class PDP {
 
@@ -65,12 +61,9 @@ public class PDP {
     private void initServices() throws PMException {
         // initialize services
         this.graphService = new GraphService(pap, this.epp, resourceOps);
-        // configure the super policy
-        SuperPolicy superPolicy = this.graphService.configureSuperPolicy();
-
-        this.prohibitionsService = new ProhibitionsService(pap, this.epp, resourceOps, superPolicy);
+        this.prohibitionsService = new ProhibitionsService(pap, this.epp, resourceOps);
         this.analyticsService = new AnalyticsService(pap, this.epp, resourceOps);
-        this.obligationsService = new ObligationsService(pap, this.epp, resourceOps, superPolicy);
+        this.obligationsService = new ObligationsService(pap, this.epp, resourceOps);
     }
 
     public EPP getEPP() {

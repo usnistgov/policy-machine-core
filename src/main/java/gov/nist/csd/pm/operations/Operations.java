@@ -35,11 +35,16 @@ public class Operations {
     public static final String RESET                      = "reset";
     public static final String GET_PERMISSIONS            = "get permissions";
     public static final String CREATE_PROHIBITION         = "create prohibition";
+    public static final String UPDATE_PROHIBITION         = "update prohibition";
+    public static final String VIEW_PROHIBITION           = "view prohibition";
+    public static final String DELETE_PROHIBITION         = "delete prohibition";
     public static final String GET_ACCESSIBLE_CHILDREN    = "get accessible children";
     public static final String GET_PROHIBITED_OPS         = "get prohibited ops";
     public static final String GET_ACCESSIBLE_NODES       = "get accessible nodes";
     public static final String PROHIBIT_SUBJECT           = "prohibit subject";
     public static final String PROHIBIT_RESOURCE          = "prohibit resource";
+    public static final String TO_JSON                    = "to json";
+    public static final String FROM_JSON                  = "from json";
 
     public static final String ALL_OPS = "*";
     public static final String ALL_ADMIN_OPS = "*a";
@@ -74,6 +79,8 @@ public class Operations {
             GET_ACCESSIBLE_NODES,
             PROHIBIT_SUBJECT,
             PROHIBIT_RESOURCE,
-            RESET
+            RESET,
+            TO_JSON,
+            FROM_JSON
     );
 }

@@ -45,7 +45,7 @@ public class EPP {
     }
 
     public void processEvent(EventContext eventCtx) throws PMException {
-        List<Obligation> obligations = pap.getObligationsPAP().getAll();
+        List<Obligation> obligations = pap.getObligationsAdmin().getAll();
         for(Obligation obligation : obligations) {
             if (!obligation.isEnabled()) {
                 continue;
@@ -142,7 +142,7 @@ public class EPP {
         }
 
         // get the current user node
-        Node userNode = pap.getGraphPAP().getNode(user);
+        Node userNode = pap.getGraphAdmin().getNode(user);
 
         if (checkAnyUser(userNode, matchSubject.getAnyUser())) {
             return true;
@@ -161,12 +161,12 @@ public class EPP {
             return true;
         }
 
-        DepthFirstSearcher dfs = new DepthFirstSearcher(pap.getGraphPAP());
+        DepthFirstSearcher dfs = new DepthFirstSearcher(pap.getGraphAdmin());
 
         // check each user in the anyUser list
         // there can be users and user attributes
         for (String u : anyUser) {
-            Node anyUserNode = pap.getGraphPAP().getNode(u);
+            Node anyUserNode = pap.getGraphAdmin().getNode(u);
 
             // if the node in anyUser == the user than return true
             if (anyUserNode.getName().equals(userNode.getName())) {
@@ -268,9 +268,9 @@ public class EPP {
 
     private Set<Node> getContainersOf(String name) throws PMException {
         Set<Node> nodes = new HashSet<>();
-        Set<String> parents = pap.getGraphPAP().getParents(name);
+        Set<String> parents = pap.getGraphAdmin().getParents(name);
         for (String parent : parents) {
-            nodes.add(pap.getGraphPAP().getNode(parent));
+            nodes.add(pap.getGraphAdmin().getNode(parent));
             nodes.addAll(getContainersOf(parent));
         }
         return nodes;
@@ -304,7 +304,7 @@ public class EPP {
         Node subjectNode = toNode(definingUser, eventCtx, subject);
         Node targetNode = toNode(definingUser, eventCtx, target);
 
-        pap.getGraphPAP().associate(subjectNode.getName(), targetNode.getName(), new OperationSet(operations));
+        pap.getGraphAdmin().associate(subjectNode.getName(), targetNode.getName(), new OperationSet(operations));
     }
 
     private void applyDenyAction(UserContext definingUser, EventContext eventCtx, DenyAction action) throws PMException {
@@ -323,7 +323,7 @@ public class EPP {
         }
 
         // add the prohibition to the PAP
-        pap.getProhibitionsPAP().add(builder.build());
+        pap.getProhibitionsAdmin().add(builder.build());
 
         // TODO this complement is ignored in the current Prohibition object
         boolean complement = target.isComplement();
@@ -344,7 +344,7 @@ public class EPP {
                 ContainerCondition cc = (ContainerCondition) result;
                 nodes.put(cc.getName(), cc.isComplement());
             } else {
-                Graph graph = pap.getGraphPAP();
+                Graph graph = pap.getGraphAdmin();
 
                 // get the node
                 Node node = graph.getNode(container.getName());
@@ -365,9 +365,9 @@ public class EPP {
             denySubject = subject.getProcess().getValue();
         } else {
             if (subject.getName() != null) {
-                denySubject = pap.getGraphPAP().getNode(subject.getName()).getName();
+                denySubject = pap.getGraphAdmin().getNode(subject.getName()).getName();
             } else {
-                denySubject = pap.getGraphPAP().getNode(NodeType.toNodeType(subject.getType()), subject.getProperties()).getName();
+                denySubject = pap.getGraphAdmin().getNode(NodeType.toNodeType(subject.getType()), subject.getProperties()).getName();
             }
         }
 
@@ -379,7 +379,7 @@ public class EPP {
         if (nodes != null) {
             for (EvrNode evrNode : nodes) {
                 Node node = toNode(definingUser, eventCtx, evrNode);
-                pap.getGraphPAP().deleteNode(node.getName());
+                pap.getGraphAdmin().deleteNode(node.getName());
             }
         }
 
@@ -388,7 +388,7 @@ public class EPP {
             for (AssignAction.Assignment assignment : assignAction.getAssignments()) {
                 Node what = toNode(definingUser, eventCtx, assignment.getWhat());
                 Node where = toNode(definingUser, eventCtx, assignment.getWhere());
-                pap.getGraphPAP().deassign(what.getName(), where.getName());
+                pap.getGraphAdmin().deassign(what.getName(), where.getName());
             }
         }
 
@@ -397,21 +397,21 @@ public class EPP {
             for (GrantAction grantAction : associations) {
                 Node subject = toNode(definingUser, eventCtx, grantAction.getSubject());
                 Node target = toNode(definingUser, eventCtx, grantAction.getTarget());
-                pap.getGraphPAP().dissociate(subject.getName(), target.getName());
+                pap.getGraphAdmin().dissociate(subject.getName(), target.getName());
             }
         }
 
         List<String> prohibitions = action.getProhibitions();
         if (prohibitions != null) {
             for (String label : prohibitions) {
-                pap.getProhibitionsPAP().delete(label);
+                pap.getProhibitionsAdmin().delete(label);
             }
         }
 
         List<String> rules = action.getRules();
         if (rules != null) {
             for (String label : rules) {
-                List<Obligation> obligations = pap.getObligationsPAP().getAll();
+                List<Obligation> obligations = pap.getObligationsAdmin().getAll();
                 for (Obligation obligation : obligations) {
                     List<Rule> oblRules = obligation.getRules();
                     for (Rule rule : oblRules) {
@@ -430,9 +430,9 @@ public class EPP {
             node = functionEvaluator.evalNode(definingUser, eventCtx, pdp, evrNode.getFunction());
         } else {
             if (evrNode.getName() != null && !evrNode.getName().isEmpty()) {
-                node = pap.getGraphPAP().getNode(evrNode.getName());
+                node = pap.getGraphAdmin().getNode(evrNode.getName());
             } else {
-                node = pap.getGraphPAP().getNode(NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
+                node = pap.getGraphAdmin().getNode(NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
             }
         }
         return node;
@@ -452,14 +452,14 @@ public class EPP {
                 EvrNode what = createNode.getWhat();
                 EvrNode where = createNode.getWhere();
                 Node whereNode = toNode(definingUser, eventCtx, where);
-                pap.getGraphPAP().createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
+                pap.getGraphAdmin().createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
             }
         }
     }
 
     private void createRule(String obligationLabel, EventContext eventCtx, Rule rule) {
         // add the rule to the obligation
-        Obligation obligation = pap.getObligationsPAP().get(obligationLabel);
+        Obligation obligation = pap.getObligationsAdmin().get(obligationLabel);
         List<Rule> rules = obligation.getRules();
         rules.add(rule);
         obligation.setRules(rules);
@@ -475,7 +475,7 @@ public class EPP {
                 Node whatNode = toNode(definingUser, eventCtx, what);
                 Node whereNode = toNode(definingUser, eventCtx, where);
 
-                pap.getGraphPAP().assign(whatNode.getName(), whereNode.getName());
+                pap.getGraphAdmin().assign(whatNode.getName(), whereNode.getName());
             }
         }
     }
