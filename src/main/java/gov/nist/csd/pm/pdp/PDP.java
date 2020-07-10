@@ -33,7 +33,7 @@ public class PDP {
      * @throws PMException if there is an error initializing the EPP.
      */
     public PDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
-        this.epp = new EPP(this, pap, eppOptions);
+        this.epp = new EPP(new PDP(pap, eppOptions, resourceOps), pap, eppOptions);
 
         // initialize services
         this.graphService = new GraphService(pap, this.epp, resourceOps);
