@@ -315,11 +315,9 @@ public class MySQLProhibitions implements Prohibitions {
                         p.addContainer(String.valueOf(object_attribute_id_c.get(i)), object_complement_c.get(i) ==1);
                     }
 
-                    prohibitions.add(p);
 
-                } else {
-                    prohibitions.add(p);
                 }
+                prohibitions.add(p);
             }
 
             return prohibitions;
