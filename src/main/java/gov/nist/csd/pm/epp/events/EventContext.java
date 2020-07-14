@@ -9,7 +9,7 @@ public class EventContext {
     public static final String ASSIGN_EVENT = "assign";
     public static final String DEASSIGN_FROM_EVENT = "deassign from";
     public static final String DEASSIGN_EVENT = "deassign";
-    public static final String ACCESS_DENIED_EVENT = "deassign";
+    public static final String ACCESS_DENIED_EVENT = "access denied";
 
     private UserContext userCtx;
     private String event;
