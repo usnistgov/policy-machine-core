@@ -17,8 +17,30 @@ import java.util.Set;
 
 public class PDP {
 
-    private EPP epp;
+    /**
+     * Factory method to create a new PDP and EPP, while abstracting the initialization process. A PDP needs an EPP, and
+     * vice versa. These steps need to occur each time a new PDP/EPP is created. The order of each step matters inorder to
+     * avoid any race conditions. The EPP is accessible via the PDP's getEPP method.
+     *
+     * @return the new PDP instance
+     */
+    public static PDP newPDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
+        // create PDP
+        PDP pdp = new PDP(pap, resourceOps);
+        // create the EPP
+        EPP epp = new EPP(pap, pdp, eppOptions);
+        // set the PDPs EPP
+        pdp.setEPP(epp);
+        // initialize PDP services which need the epp that was just set
+        pdp.initServices();
 
+        return pdp;
+    }
+
+    private PAP pap;
+    private OperationSet resourceOps;
+
+    private EPP epp;
     private GraphService graphService;
     private ProhibitionsService prohibitionsService;
     private AnalyticsService    analyticsService;
@@ -28,13 +50,19 @@ public class PDP {
      * Create a new PDP instance given a Policy Administration Point and an optional set of FunctionExecutors to be
      * used by the EPP.
      * @param pap the Policy Administration Point that the PDP will use to change the graph.
-     * @param eppOptions an optional list of external functions to be used by the PDP's EPP at runtime.
      * @param resourceOps the set of operations that the PDP will understand while traversing the graph.
      * @throws PMException if there is an error initializing the EPP.
      */
-    public PDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
-        this.epp = new EPP(new PDP(pap, eppOptions, resourceOps), pap, eppOptions);
+    private PDP(PAP pap, OperationSet resourceOps) throws PMException {
+        this.pap = pap;
+        this.resourceOps = resourceOps;
+    }
 
+    private void setEPP(EPP epp) {
+        this.epp = epp;
+    }
+
+    private void initServices() throws PMException {
         // initialize services
         this.graphService = new GraphService(pap, this.epp, resourceOps);
         // configure the super policy
