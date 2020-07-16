@@ -29,13 +29,7 @@ public class EPP {
     private PDP pdp;
     private FunctionEvaluator functionEvaluator;
 
-    public EPP(PDP pdp, PAP pap) throws PMException {
-        this.pap = pap;
-        this.pdp = pdp;
-        this.functionEvaluator = new FunctionEvaluator();
-    }
-
-    public EPP(PDP pdp, PAP pap, EPPOptions eppOptions) throws PMException {
+    public EPP(PAP pap, PDP pdp, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
         this.pdp = pdp;
         this.functionEvaluator = new FunctionEvaluator();

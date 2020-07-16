@@ -207,9 +207,12 @@ PAP pap = new PAP(graph, prohibitions, obligations);
 
 ### Policy Decision Point (PDP)
 The PDP implements the same interfaces in the PIP but provides a layer of access control to restrict access to the administrative commands of the PAP.
+Use the static PDP.newPDP() method to create a new PDP and initialize it's EPP reference.  The static method is used because there
+is a circular dependency between the PDP and EPP and a specific series of steps is required to properly initialize both.
 
+The *EPP* will be available via `pdp.getEPP()`
 ```java
-PDP pdp = new PDP(pap, new EPPOptions());
+PDP pdp = PDP.newPDP(pap, eppOptions, resourceOps)
 
 // access the PDP's GraphService (which sits in front of the Graph made earlier) as u1
 // we'll provide an empty process identifier for this example
@@ -286,9 +289,9 @@ Obligation obligation = EVRParser.parse(is);
 
 Obligations obligations = new MemObligations();
 
-PDP pdp = new PDP(graph, new MemProhibitions(), obligations);
+PDP pdp = PDP.newPDP(pap, eppOptions, resourceOps)
 // add the obligation and enable it
-pdp.getPAP().getObligationsPAP().add(obligation, true);
+pdp.getObligationsServiceadd(obligation, true);
 ```
 
 #### Processing Event

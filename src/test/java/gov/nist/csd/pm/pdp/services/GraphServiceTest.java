@@ -18,7 +18,7 @@ class GraphServiceTest {
 
     @Test
     void testPolicyClassReps() throws PMException {
-        PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), null, new OperationSet("read", "write", "execute"));
+        PDP pdp = PDP.newPDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), null, new OperationSet("read", "write", "execute"));
         Graph graph = pdp.getGraphService(new UserContext("super", ""));
 
         Node test = graph.createPolicyClass("test", null);

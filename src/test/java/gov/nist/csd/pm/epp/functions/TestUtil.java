@@ -17,7 +17,7 @@ import java.util.Random;
 
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
-        PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions(), new OperationSet("read", "write", "execute"));
+        PDP pdp = PDP.newPDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions(), new OperationSet("read", "write", "execute"));
         Graph graph = pdp.getGraphService(new UserContext("super"));
         Node pc1 = graph.createPolicyClass("pc1", null);
         Node oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());

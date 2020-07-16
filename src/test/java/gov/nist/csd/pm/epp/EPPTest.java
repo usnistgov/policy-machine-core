@@ -38,7 +38,7 @@ class EPPTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions(), new OperationSet("read", "write", "execute"));
+        pdp = PDP.newPDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions(), new OperationSet("read", "write", "execute"));
         Graph graph = pdp.getGraphService(new UserContext("super"));
         pc1 = graph.createPolicyClass("pc1", null);
         oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
@@ -131,7 +131,7 @@ class EPPTest {
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
 
-        PDP pdp = new PDP(new PAP(graph, new MemProhibitions(), obligations), new EPPOptions(), new OperationSet("read", "write", "execute"));
+        PDP pdp = PDP.newPDP(new PAP(graph, new MemProhibitions(), obligations), new EPPOptions(), new OperationSet("read", "write", "execute"));
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext("u1"), oa2, o1));
 
         assertTrue(graph.exists("new OA"));
