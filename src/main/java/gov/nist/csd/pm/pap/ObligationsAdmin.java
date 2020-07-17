@@ -16,36 +16,36 @@ public class ObligationsAdmin implements Obligations {
 
     @Override
     public void add(Obligation obligation, boolean enable) throws PMException {
-
+        obligations.add(obligation, enable);
     }
 
     @Override
-    public Obligation get(String label) {
-        return null;
+    public Obligation get(String label) throws PMException {
+        return obligations.get(label);
     }
 
     @Override
-    public List<Obligation> getAll() {
-        return null;
+    public List<Obligation> getAll() throws PMException {
+        return obligations.getAll();
     }
 
     @Override
-    public void update(String label, Obligation obligation) {
-
+    public void update(String label, Obligation obligation) throws PMException {
+        obligations.update(label, obligation);
     }
 
     @Override
-    public void delete(String label) {
-
+    public void delete(String label) throws PMException {
+        obligations.delete(label);
     }
 
     @Override
-    public void setEnable(String label, boolean enabled) {
-
+    public void setEnable(String label, boolean enabled) throws PMException {
+        obligations.setEnable(label, enabled);
     }
 
     @Override
-    public List<Obligation> getEnabled() {
-        return null;
+    public List<Obligation> getEnabled() throws PMException {
+        return obligations.getEnabled();
     }
 }

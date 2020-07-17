@@ -457,7 +457,7 @@ public class EPP {
         }
     }
 
-    private void createRule(String obligationLabel, EventContext eventCtx, Rule rule) {
+    private void createRule(String obligationLabel, EventContext eventCtx, Rule rule) throws PMException {
         // add the rule to the obligation
         Obligation obligation = pap.getObligationsAdmin().get(obligationLabel);
         List<Rule> rules = obligation.getRules();
