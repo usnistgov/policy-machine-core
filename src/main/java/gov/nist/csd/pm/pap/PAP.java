@@ -7,37 +7,37 @@ import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
 public class PAP {
 
-    private Graph        graphPAP;
-    private Prohibitions prohibitionsPAP;
-    private Obligations  obligationsPAP;
+    private GraphAdmin        graphAdmin;
+    private ProhibitionsAdmin prohibitionsAdmin;
+    private ObligationsAdmin  obligationsAdmin;
 
-    public PAP(Graph graphPAP, Prohibitions prohibitionsPAP, Obligations obligationsPAP) throws PMException {
-        this.graphPAP = graphPAP;
-        this.prohibitionsPAP = prohibitionsPAP;
-        this.obligationsPAP = obligationsPAP;
+    public PAP(GraphAdmin graphAdmin, ProhibitionsAdmin prohibitionsAdmin, ObligationsAdmin obligationsAdmin) throws PMException {
+        this.graphAdmin = graphAdmin;
+        this.prohibitionsAdmin = prohibitionsAdmin;
+        this.obligationsAdmin = obligationsAdmin;
     }
 
-    public Graph getGraphPAP() {
-        return graphPAP;
+    public GraphAdmin getGraphAdmin() {
+        return graphAdmin;
     }
 
-    public void setGraphPAP(Graph graphPAP) {
-        this.graphPAP = graphPAP;
+    public void setGraphAdmin(GraphAdmin graphAdmin) {
+        this.graphAdmin = graphAdmin;
     }
 
-    public Prohibitions getProhibitionsPAP() {
-        return prohibitionsPAP;
+    public ProhibitionsAdmin getProhibitionsAdmin() {
+        return prohibitionsAdmin;
     }
 
-    public void setProhibitionsPAP(Prohibitions prohibitionsPAP) {
-        this.prohibitionsPAP = prohibitionsPAP;
+    public void setProhibitionsAdmin(ProhibitionsAdmin prohibitionsAdmin) {
+        this.prohibitionsAdmin = prohibitionsAdmin;
     }
 
-    public Obligations getObligationsPAP() {
-        return obligationsPAP;
+    public ObligationsAdmin getObligationsAdmin() {
+        return obligationsAdmin;
     }
 
-    public void setObligationsPAP(Obligations obligationsPAP) {
-        this.obligationsPAP = obligationsPAP;
+    public void setObligationsAdmin(ObligationsAdmin obligationsAdmin) {
+        this.obligationsAdmin = obligationsAdmin;
     }
 }

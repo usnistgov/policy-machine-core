@@ -64,7 +64,7 @@ public class AnalyticsService extends Service {
                 // if the set of required PCs is a subset of the actual pcset,
                 // then user u has some privileges on the current oa node.
                 if (hsActualPcs.containsAll(hsReqPcs)) {
-                    hsOa.add(getGraphPAP().getNode(oa));
+                    hsOa.add(getGraphAdmin().getNode(oa));
                     break;
                 }
             }
@@ -86,7 +86,7 @@ public class AnalyticsService extends Service {
         String crtNode;
 
         // Get u's directly assigned attributes and put them into the queue.
-        Set<String> hsAttrs = getGraphPAP().getParents(userCtx.getUser());
+        Set<String> hsAttrs = getGraphAdmin().getParents(userCtx.getUser());
         List<String> queue = new ArrayList<>(hsAttrs);
 
         // While the queue has elements, extract an element from the queue
@@ -104,7 +104,7 @@ public class AnalyticsService extends Service {
 
                     // Find the opsets of this user attribute. Note that the set of containers for this
                     // node (user attribute) may contain not only opsets.
-                    Map<String, OperationSet> assocs = getGraphPAP().getSourceAssociations(crtNode);
+                    Map<String, OperationSet> assocs = getGraphAdmin().getSourceAssociations(crtNode);
 
                     // Go through the containers and only for opsets do the following.
                     // For each opset ops of ua:
@@ -155,7 +155,7 @@ public class AnalyticsService extends Service {
                 }
                 visited.add(crtNode);
 
-                Set<String> hsDescs = getGraphPAP().getParents(crtNode);
+                Set<String> hsDescs = getGraphAdmin().getParents(crtNode);
                 queue.addAll(hsDescs);
             }
         }
@@ -196,7 +196,7 @@ public class AnalyticsService extends Service {
         // Insert the start node into the queue
         queue.add(node);
 
-        Set<String> policyClasses = getGraphPAP().getPolicyClasses();
+        Set<String> policyClasses = getGraphAdmin().getPolicyClasses();
 
         // While queue is not empty
         while (!queue.isEmpty()) {
@@ -209,7 +209,7 @@ public class AnalyticsService extends Service {
                 // Extract its direct descendants. If a descendant is an attribute,
                 // insert it into the queue. If it is a pc, add it to reachable,
                 // if not already there
-                Set<String> hsContainers = getGraphPAP().getParents(crtNode);
+                Set<String> hsContainers = getGraphAdmin().getParents(crtNode);
                 for (String n : hsContainers) {
                     if (policyClasses.contains(n)) {
                         reachable.add(n);
@@ -223,11 +223,11 @@ public class AnalyticsService extends Service {
     }
 
     private boolean inMemUattrHasOpsets(String uaNode) throws PMException {
-        return !getGraphPAP().getSourceAssociations(uaNode).isEmpty();
+        return !getGraphAdmin().getSourceAssociations(uaNode).isEmpty();
     }
 
     public Explain explain(String user, String target) throws PMException {
-        Auditor auditor = new PReviewAuditor(getGraphPAP(), getResourceOps());
+        Auditor auditor = new PReviewAuditor(getGraphAdmin(), getResourceOps());
         return auditor.explain(user, target);
     }
 }

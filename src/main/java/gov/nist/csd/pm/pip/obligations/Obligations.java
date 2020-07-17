@@ -8,16 +8,16 @@ import java.util.List;
 public interface Obligations {
     void add(Obligation obligation, boolean enable) throws PMException;
 
-    Obligation get(String label);
+    Obligation get(String label) throws PMException;
 
-    List<Obligation> getAll();
+    List<Obligation> getAll() throws PMException;
 
-    void update(String label, Obligation obligation);
+    void update(String label, Obligation obligation) throws PMException;
 
-    void delete(String label);
+    void delete(String label) throws PMException;
 
-    void setEnable(String label, boolean enabled);
+    void setEnable(String label, boolean enabled) throws PMException;
 
-    List<Obligation> getEnabled();
+    List<Obligation> getEnabled() throws PMException;
 
 }
