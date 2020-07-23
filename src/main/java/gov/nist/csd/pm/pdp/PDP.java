@@ -68,7 +68,7 @@ public class PDP {
         this.obligationsService = new ObligationsService(pap, this.epp, resourceOps);
     }
 
-    public OperationSet getResourceOps() {
+    public OperationSet getResourceOps() throws PMException{
         return resourceOps;
     }
 
