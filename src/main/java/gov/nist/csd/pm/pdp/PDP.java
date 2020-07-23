@@ -72,7 +72,7 @@ public class PDP {
         return resourceOps;
     }
 
-    public void setResourceOps(OperationSet resourceOps) {
+    public void setResourceOps(OperationSet resourceOps)  throws PMException {
         this.graphService.setResourceOps(resourceOps);
         this.prohibitionsService.setResourceOps(resourceOps);
         this.analyticsService.setResourceOps(resourceOps);
@@ -80,7 +80,7 @@ public class PDP {
         this.resourceOps = resourceOps;
     }
 
-    public void addResourceOps (String... ops) {
+    public void addResourceOps (String... ops) throws PMException {
         OperationSet resourceOperations = getResourceOps();
         String[] newOps = ops;
         for (String op: newOps) {
@@ -91,7 +91,7 @@ public class PDP {
         setResourceOps(resourceOperations);
     }
 
-    public void deleteResourceOps (String... ops) {
+    public void deleteResourceOps (String... ops) throws PMException {
         OperationSet resourceOperations = getResourceOps();
         String[] newOps = ops;
         for (String op: newOps) {
