@@ -11,6 +11,8 @@ import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
+import java.util.Set;
+
 public class PDP {
 
     /**
@@ -64,6 +66,40 @@ public class PDP {
         this.prohibitionsService = new ProhibitionsService(pap, this.epp, resourceOps);
         this.analyticsService = new AnalyticsService(pap, this.epp, resourceOps);
         this.obligationsService = new ObligationsService(pap, this.epp, resourceOps);
+    }
+
+    public OperationSet getResourceOps() {
+        return resourceOps;
+    }
+
+    public void setResourceOps(OperationSet resourceOps) {
+        this.graphService.setResourceOps(resourceOps);
+        this.prohibitionsService.setResourceOps(resourceOps);
+        this.analyticsService.setResourceOps(resourceOps);
+        this.obligationsService.setResourceOps(resourceOps);
+        this.resourceOps = resourceOps;
+    }
+
+    public void addResourceOps (String... ops) {
+        OperationSet resourceOperations = getResourceOps();
+        String[] newOps = ops;
+        for (String op: newOps) {
+            if (!resourceOperations.contains(op)) {
+                resourceOperations.add(op);
+            }
+        }
+        setResourceOps(resourceOperations);
+    }
+
+    public void deleteResourceOps (String... ops) {
+        OperationSet resourceOperations = getResourceOps();
+        String[] newOps = ops;
+        for (String op: newOps) {
+            if (resourceOperations.contains(op)) {
+                resourceOperations.remove(op);
+            }
+        }
+        setResourceOps(resourceOperations);
     }
 
     public EPP getEPP() {
