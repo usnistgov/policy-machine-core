@@ -51,7 +51,8 @@ public class PDP {
      * @param resourceOps the set of operations that the PDP will understand while traversing the graph.
      * @throws PMException if there is an error initializing the EPP.
      */
-    private PDP(PAP pap, OperationSet resourceOps) throws PMException {
+
+    public PDP(PAP pap, OperationSet resourceOps) throws PMException {
         this.pap = pap;
         this.resourceOps = resourceOps;
     }

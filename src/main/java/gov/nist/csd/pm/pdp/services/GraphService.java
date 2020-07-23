@@ -186,6 +186,10 @@ public class GraphService extends Service implements Graph {
         return graph.getPolicyClasses();
     }
 
+    public String getPolicyClassDefault(String pc, NodeType type) {
+        return pc + "_default_" + type.toString();
+    }
+
     /**
      * Get the children of the node from the graph.  Get the children from the database to ensure all node information
      * is present.  Before returning the set of nodes, filter out any nodes that the user has no permissions on.
@@ -453,7 +457,7 @@ public class GraphService extends Service implements Graph {
         for (Node node: nodes) {
             names.add(node.getName());
             if (node.getType() == UA || node.getType() == OA) {
-                getGraphAdmin().getTargetAssociations(node.getName()).keySet().forEach(el -> {
+                graph.getTargetAssociations(node.getName()).keySet().forEach(el -> {
                     try {
                         dissociate(el, node.getName());
                     } catch (PMException pmException) {
@@ -461,7 +465,7 @@ public class GraphService extends Service implements Graph {
                     }
                 });
                 if (node.getType() == UA) {
-                    getGraphAdmin().getSourceAssociations(node.getName()).keySet().forEach(el -> {
+                    graph.getSourceAssociations(node.getName()).keySet().forEach(el -> {
                         try {
                             dissociate(node.getName(), el);
                         } catch (PMException pmException) {
@@ -470,19 +474,19 @@ public class GraphService extends Service implements Graph {
                     });
                 }
             }
-            getGraphAdmin().getChildren(node.getName()).forEach(el -> {
+            graph.getChildren(node.getName()).forEach(el -> {
                 try {
-                    if (isAssigned(node.getName(), el)) {
-                        deassign(node.getName(), el);
+                    if (isAssigned(el, node.getName())) {
+                        deassign(el, node.getName());
                     }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
                 }
             });
-            getGraphAdmin().getParents(node.getName()).forEach(el -> {
+            graph.getParents(node.getName()).forEach(el -> {
                 try {
-                    if (isAssigned(el, node.getName())) {
-                        deassign(el, node.getName());
+                    if (isAssigned(node.getName(), el)) {
+                        deassign(node.getName(), el);
                     }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
