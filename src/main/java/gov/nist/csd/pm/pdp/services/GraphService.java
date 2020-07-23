@@ -9,6 +9,7 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.policies.SuperPolicy;
 import gov.nist.csd.pm.pdp.services.guard.GraphGuard;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -452,7 +453,7 @@ public class GraphService extends Service implements Graph {
         for (Node node: nodes) {
             names.add(node.getName());
             if (node.getType() == UA || node.getType() == OA) {
-                getGraphPAP().getTargetAssociations(node.getName()).keySet().forEach(el -> {
+                graph.getTargetAssociations(node.getName()).keySet().forEach(el -> {
                     try {
                         dissociate(el, node.getName());
                     } catch (PMException pmException) {
@@ -460,7 +461,7 @@ public class GraphService extends Service implements Graph {
                     }
                 });
                 if (node.getType() == UA) {
-                    getGraphPAP().getSourceAssociations(node.getName()).keySet().forEach(el -> {
+                    graph.getSourceAssociations(node.getName()).keySet().forEach(el -> {
                         try {
                             dissociate(node.getName(), el);
                         } catch (PMException pmException) {
@@ -469,19 +470,19 @@ public class GraphService extends Service implements Graph {
                     });
                 }
             }
-            getGraphPAP().getChildren(node.getName()).forEach(el -> {
+            graph.getChildren(node.getName()).forEach(el -> {
                 try {
-                    if (isAssigned(node.getName(), el)) {
-                        deassign(node.getName(), el);
+                    if (isAssigned(el, node.getName())) {
+                        deassign(el, node.getName());
                     }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
                 }
             });
-            getGraphPAP().getParents(node.getName()).forEach(el -> {
+            graph.getParents(node.getName()).forEach(el -> {
                 try {
-                    if (isAssigned(el, node.getName())) {
-                        deassign(el, node.getName());
+                    if (isAssigned(node.getName(), el)) {
+                        deassign(node.getName(), el);
                     }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
@@ -491,6 +492,7 @@ public class GraphService extends Service implements Graph {
         for (String name : names) {
             graph.deleteNode(name);
         }
-        configureSuperPolicy();
+        SuperPolicy superPolicy = new SuperPolicy();
+        superPolicy.configure(graph);
     }
 }
