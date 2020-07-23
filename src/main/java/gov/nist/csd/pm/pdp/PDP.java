@@ -29,7 +29,6 @@ public class PDP {
         pdp.setEPP(epp);
         // initialize PDP services which need the epp that was just set
         pdp.initServices();
-
         return pdp;
     }
 
@@ -59,7 +58,7 @@ public class PDP {
         this.epp = epp;
     }
 
-    private void initServices() throws PMException {
+    public void initServices() throws PMException {
         // initialize services
         this.graphService = new GraphService(pap, this.epp, resourceOps);
         this.prohibitionsService = new ProhibitionsService(pap, this.epp, resourceOps);
