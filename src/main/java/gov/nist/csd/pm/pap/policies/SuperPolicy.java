@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp.policy;
+package gov.nist.csd.pm.pap.policies;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -15,7 +15,7 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class SuperPolicy {
 
-    private static final Node superUser = new Node("super", U, Node.toProperties(NAMESPACE_PROPERTY, "super"));
+    private final Node superUser = new Node("super", U, Node.toProperties(NAMESPACE_PROPERTY, "super"));
     private Node superUA1;
     private Node superUA2;
     private Node superPolicyClassRep;
@@ -103,23 +103,26 @@ public class SuperPolicy {
         if(!children.contains(superUser.getName())) {
             graph.assign(superUser.getName(), superUA1.getName());
         }
+
         // check super user is assigned to super ua2
         children = graph.getChildren(superUA2.getName());
         if(!children.contains(superUser.getName())) {
             graph.assign(superUser.getName(), superUA2.getName());
         }
+
         // check super oa is assigned to super pc
         children = graph.getChildren(superPC.getName());
         if(!children.contains(superOA.getName())) {
             graph.assign(superOA.getName(), superPC.getName());
         }
+
         // check super o is assigned to super oa
         children = graph.getChildren(superOA.getName());
         if(!children.contains(superPolicyClassRep.getName())) {
             graph.assign(superPolicyClassRep.getName(), superOA.getName());
         }
 
-        // associate super ua to super oa
+        // associate super_ua1 to super_oa and super_ua2 to super_ua1
         graph.associate(superUA1.getName(), superOA.getName(), new OperationSet(ALL_OPS));
         graph.associate(superUA2.getName(), superUA1.getName(), new OperationSet(ALL_OPS));
 
@@ -158,13 +161,18 @@ public class SuperPolicy {
                 graph.assign(superUA2.getName(), pc);
             }
 
-            // associate super ua 1 with pc default node
+            // associate super ua 1 with pc default nodes
             graph.associate(superUA1.getName(), defaultUA, new OperationSet(ALL_OPS));
             graph.associate(superUA1.getName(), defaultOA, new OperationSet(ALL_OPS));
 
             // create the rep
             if (!graph.exists(rep)) {
                 graph.createNode(rep, OA, Node.toProperties("pc", pc), superOA.getName());
+            } else {
+                // check that the rep is assigned to the super OA
+                if (!graph.isAssigned(rep, superOA.getName())) {
+                    graph.assign(rep, superOA.getName());
+                }
             }
         }
     }

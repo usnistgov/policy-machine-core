@@ -3,7 +3,10 @@ package gov.nist.csd.pm.epp.functions;
 import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.GraphAdmin;
+import gov.nist.csd.pm.pap.ObligationsAdmin;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.ProhibitionsAdmin;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -13,11 +16,12 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.obligations.MemObligations;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 
-import java.util.Random;
-
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
-        PDP pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions(), new OperationSet("read", "write", "execute"));
+        PDP pdp = PDP.newPDP(
+                new PAP(new GraphAdmin(new MemGraph()), new ProhibitionsAdmin(new MemProhibitions()), new ObligationsAdmin(new MemObligations())),
+                new EPPOptions(),
+                new OperationSet("read", "write", "execute"));
         Graph graph = pdp.getGraphService(new UserContext("super"));
         Node pc1 = graph.createPolicyClass("pc1", null);
         Node oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());

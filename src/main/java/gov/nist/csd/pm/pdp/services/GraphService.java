@@ -9,7 +9,7 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.policy.SuperPolicy;
+import gov.nist.csd.pm.pdp.services.guard.GraphGuard;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -29,58 +29,21 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 public class GraphService extends Service implements Graph {
 
     private Graph graph;
+    private GraphGuard guard;
 
     public GraphService(PAP pap, EPP epp, OperationSet resourceOps) throws PMException {
         super(pap, epp, resourceOps);
-
-        this.graph = pap.getGraphPAP();
-    }
-
-    public SuperPolicy configureSuperPolicy() throws PMException {
-        superPolicy = new SuperPolicy();
-        superPolicy.configure(graph);
-        return superPolicy;
+        this.graph = pap.getGraphAdmin();
+        this.guard = new GraphGuard(pap, resourceOps);
     }
 
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        // check that the user can create a policy class
-        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getName(), CREATE_POLICY_CLASS)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
-        }
+        // check user has permission to create a policy class
+        guard.checkCreatePolicyClass(userCtx);
 
-        if (properties == null) {
-            properties = new HashMap<>();
-        }
-
-        // create the PC node
-        String rep = name + "_rep";
-        String defaultUA = name + "_default_UA";
-        String defaultOA = name + "_default_OA";
-
-        properties.putAll(Node.toProperties("default_ua", defaultUA, "default_oa", defaultOA,
-                REP_PROPERTY, rep));
-        Node pcNode = getPAP().getGraphPAP().createPolicyClass(name, properties);
-        // create the PC UA node
-        Node pcUANode = getPAP().getGraphPAP().createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
-        // create the PC OA node
-        Node pcOANode = getPAP().getGraphPAP().createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
-
-        // assign Super U to PC UA
-        // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
-        // assign superUA and superUA2 to PC
-        getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
-        getPAP().getGraphPAP().assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
-        // associate Super UA and PC UA
-        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
-        // associate Super UA and PC OA
-        getPAP().getGraphPAP().associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
-
-        // create an OA that will represent the pc
-        getPAP().getGraphPAP().createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
-                superPolicy.getSuperObjectAttribute().getName());
-
-        return pcNode;
+        // create and return the new policy class
+        return graph.createPolicyClass(name, properties);
     }
 
     /**
@@ -106,66 +69,28 @@ public class GraphService extends Service implements Graph {
      */
     @Override
     public Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... additionalParents) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        if (name == null) {
-            throw new IllegalArgumentException("a node cannot have a null name");
-        } else if (type == null) {
-            throw new IllegalArgumentException("a node cannot have a null type");
-        }
-
-        // instantiate the properties map if it's null
-        // if this node is a user, hash the password if present in the properties
-        if(properties == null) {
-            properties = new HashMap<>();
-        }
-        
-        // check that the user has the permission to assign to the parent node
-        if (!hasPermissions(userCtx, initialParent, ASSIGN_TO)) {
-            // if the user cannot assign to the parent node, delete the newly created node
-            throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node %s", ASSIGN_TO, initialParent));
-        }
-        // if the parent is a PC get the PC default
-        Node parentNode = graph.getNode(initialParent);
-        if (parentNode.getType().equals(PC)) {
-            initialParent = getPolicyClassDefault(parentNode.getName(), type);
-            parentNode = getNode(initialParent);
-        }
-
-        // check any additional parents before assigning
-        for (int i = 0; i < additionalParents.length; i++) {
-            String parent = additionalParents[i];
-
-            if (!hasPermissions(userCtx, parent, ASSIGN_TO)) {
-                // if the user cannot assign to the parent node, delete the newly created node
-                throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on %s", ASSIGN_TO, parent));
-            }
-
-            // if the parent is a PC get the PC default
-            Node additionalParentNode = graph.getNode(parent);
-            if (additionalParentNode.getType().equals(PC)) {
-               additionalParents[i] = getPolicyClassDefault(additionalParentNode.getName(), type);
-            }
-        }
+        // check that the user can create the node in each of the parents
+        guard.checkCreateNode(userCtx, initialParent, additionalParents);
 
         //create the node
-        Node node = getGraphPAP().createNode(name, type, properties, initialParent, additionalParents);
+        Node node = graph.createNode(name, type, properties, initialParent, additionalParents);
 
+        // process the event
+        processCreateNodeEvent(node, initialParent, additionalParents);
+
+        return node;
+    }
+
+    private void processCreateNodeEvent (Node node, String initialParent, String[] additionalParents) throws PMException {
         // process event for initial parent
+        Node parentNode = graph.getNode(initialParent);
         getEPP().processEvent(new AssignToEvent(userCtx, parentNode, node));
+
         // process event for any additional parents
         for (String parent : additionalParents) {
             parentNode = graph.getNode(parent);
             getEPP().processEvent(new AssignToEvent(userCtx, parentNode, node));
         }
-
-        return node;
-    }
-
-    public String getPolicyClassDefault(String pc, NodeType type) throws PMException {
-        return pc + "_default_" + type.toString();
     }
 
     /**
@@ -178,17 +103,11 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the user is not authorized to update the node.
      */
     public void updateNode(String name, Map<String, String> properties) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
         // check that the user can update the node
-        if(!hasPermissions(userCtx, name, UPDATE_NODE)) {
-            throw new PMAuthorizationException(String.format("unauthorized permission %s on node %s", UPDATE_NODE, name));
-        }
+        guard.checkUpdateNode(userCtx, name);
 
         //update node in the PAP
-        getGraphPAP().updateNode(name, properties);
+        graph.updateNode(name, properties);
     }
 
     /**
@@ -200,67 +119,49 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the user is not authorized to delete the node.
      */
     public void deleteNode(String name) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
+        // check that the user can delete the node
+        guard.checkDeleteNode(userCtx, name);
 
-        Node node = getGraphPAP().getNode(name);
-
-        // check the user can deassign the node
-        if (!hasPermissions(userCtx, name, DEASSIGN)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", name, DEASSIGN));
-        }
-
-        // check that the user can deassign from the node's parents
-        Set<String> parents = getGraphPAP().getParents(name);
-        for(String parent : parents) {
-            if(!hasPermissions(userCtx, parent, DEASSIGN_FROM)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parent, DEASSIGN_FROM));
-            }
-
-            Node parentNode = getGraphPAP().getNode(parent);
-
-            getEPP().processEvent(new DeassignEvent(userCtx, node, parentNode));
-            getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, node));
-        }
+        Node node = graph.getNode(name);
 
         // if it's a PC, delete the rep
         if (node.getType().equals(PC)) {
             if (node.getProperties().containsKey(REP_PROPERTY)) {
-                getGraphPAP().deleteNode(node.getProperties().get(REP_PROPERTY));
+                graph.deleteNode(node.getProperties().get(REP_PROPERTY));
             }
         }
 
-        getGraphPAP().deleteNode(name);
+        // delete the node
+        graph.deleteNode(name);
+
+        // process the delete event
+        Set<String> parents = graph.getParents(name);
+        for(String parent : parents) {
+            Node parentNode = graph.getNode(parent);
+
+            getEPP().processEvent(new DeassignEvent(userCtx, node, parentNode));
+            getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, node));
+        }
     }
 
     /**
-     * Check that a node with the given name exists.  Just checking the in-memory graph is faster.
+     * Check that a node with the given name exists. This method will return false if the user does not have access to
+     * the node.
      * @param name the name of the node to check for.
      * @return true if a node with the given name exists, false otherwise.
      * @throws PMException if there is an error checking if the node exists in the graph through the PAP.
      */
     public boolean exists(String name) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        boolean exists = getGraphPAP().exists(name);
+        boolean exists = graph.exists(name);
         if (!exists) {
             return false;
         }
 
-        Node node = getGraphPAP().getNode(name);
+        // check that this user can access this node
+        guard.checkExists(userCtx, name);
 
-        // if the node is a pc the user must have permission on the rep OA of the PC
-        if (node.getType().equals(PC)) {
-            String pcRep = node.getProperties().get(REP_PROPERTY);
-            node = getGraphPAP().getNode(pcRep);
-            return hasPermissions(userCtx, node.getName());
-        }
-
-        // node exists, return false if the user does not have access to it.
-        return hasPermissions(userCtx, name);
+        // if the user can access this node than return true
+        return true;
     }
 
     /**
@@ -270,21 +171,8 @@ public class GraphService extends Service implements Graph {
      * @throws PMException if there is an error getting the nodes from the PAP.
      */
     public Set<Node> getNodes() throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        Set<Node> nodes = new HashSet<>(getGraphPAP().getNodes());
-        nodes.removeIf((node) -> {
-            try {
-                return !hasPermissions(userCtx, node.getName());
-            }
-            catch (PMException e) {
-                e.printStackTrace();
-                return true;
-            }
-        });
-
+        Set<Node> nodes = new HashSet<>(graph.getNodes());
+        guard.filterNodes(userCtx, nodes);
         return new HashSet<>(nodes);
     }
 
@@ -294,17 +182,13 @@ public class GraphService extends Service implements Graph {
      * @throws PMException if there is an error getting the policy classes from the PAP.
      */
     public Set<String> getPolicyClasses() throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        return getGraphPAP().getPolicyClasses();
+        return graph.getPolicyClasses();
     }
 
     /**
      * Get the children of the node from the graph.  Get the children from the database to ensure all node information
      * is present.  Before returning the set of nodes, filter out any nodes that the user has no permissions on.
-     * 
+     *
      * @param name the name of the node to get the children of.
      * @return a set of Node objects, representing the children of the target node.
      * @throws PMException if the target node does not exist.
@@ -312,56 +196,30 @@ public class GraphService extends Service implements Graph {
 
      */
     public Set<String> getChildren(String name) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
         if(!exists(name)) {
             throw new PMException(String.format("node %s could not be found", name));
         }
 
-        Set<String> children = getGraphPAP().getChildren(name);
-        children.removeIf((node) -> {
-            try {
-                return !hasPermissions(userCtx, node);
-            }
-            catch (PMException e) {
-                e.printStackTrace();
-                return true;
-            }
-        });
-
+        Set<String> children = graph.getChildren(name);
+        guard.filter(userCtx, children);
         return children;
     }
 
     /**
-     * Get the parents of the node from the graph.  Get the parents from the database to ensure all node information
-     * is present.  Before returning the set of nodes, filter out any nodes that the user has no permissions on.
+     * Get the parents of the node from the graph.  Before returning the set of nodes, filter out any nodes that the user
+     * has no permissions on.
      * @param name the name of the node to get the parents of.
      * @return a set of Node objects, representing the parents of the target node.
      * @throws PMException if the target node does not exist.
      * @throws PMException if there is an error getting the parents from the PAP.
      */
     public Set<String> getParents(String name) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
         if(!exists(name)) {
             throw new PMException(String.format("node %s could not be found", name));
         }
 
-        Set<String> parents = getGraphPAP().getParents(name);
-        parents.removeIf((node) -> {
-            try {
-                return !hasPermissions(userCtx, node);
-            }
-            catch (PMException e) {
-                e.printStackTrace();
-                return true;
-            }
-        });
-
+        Set<String> parents = graph.getParents(name);
+        guard.filter(userCtx, parents);
         return parents;
     }
 
@@ -377,43 +235,15 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the current user does not have permission to create the assignment.
      */
     public void assign(String child, String parent) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        // check that the nodes are not null
-        if(child == null) {
-            throw new IllegalArgumentException("the child node name cannot be null when creating an assignment");
-        } else if(parent == null) {
-            throw new IllegalArgumentException("the parent node name cannot be null when creating an assignment");
-        } else if(!exists(child)) {
-            throw new PMException(String.format("child node %s does not exist", child));
-        } else if(!exists(parent)) {
-            throw new PMException(String.format("parent node %s does not exist", parent));
-        }
-
-        //check the user can assign the child
-        if(!hasPermissions(userCtx, child, ASSIGN)) {
-            throw new PMAuthorizationException(String.format("unauthorized permission %s on node %s", ASSIGN, child));
-        }
-
-        //check if the assignment is valid
-        Node childNode = getNode(child);
-        Node parentNode = getNode(parent);
-        Assignment.checkAssignment(childNode.getType(), parentNode.getType());
-
-        // check that the user can assign to the parent node
-        if (!hasPermissions(userCtx, parent, ASSIGN_TO)) {
-            throw new PMAuthorizationException(String.format("unauthorized permission %s on node %s", ASSIGN_TO, parent));
-        }
-
-        if (parentNode.getType().equals(PC)) {
-            parent = getPolicyClassDefault(parentNode.getName(), childNode.getType());
-        }
+        // check that the user can make the assignment
+        guard.checkAssign(userCtx, child, parent);
 
         // assign in the PAP
-        getGraphPAP().assign(child, parent);
+        graph.assign(child, parent);
 
+        // process the assignment as to events - assign and assign to
+        Node childNode = getNode(child);
+        Node parentNode = getNode(parent);
         getEPP().processEvent(new AssignEvent(userCtx, childNode, parentNode));
         getEPP().processEvent(new AssignToEvent(userCtx, parentNode, childNode));
     }
@@ -429,51 +259,25 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the current user does not have permission to delete the assignment.
      */
     public void deassign(String child, String parent) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        // check that the parameters are correct
-        if(child == null) {
-            throw new IllegalArgumentException("the child node cannot be null when deassigning");
-        } else if(parent == null) {
-            throw new IllegalArgumentException("the parent node cannot be null when deassigning");
-        } else if(!exists(child)) {
-            throw new PMException(String.format("child node %s could not be found when deassigning", child));
-        } else if(!exists(parent)) {
-            throw new PMException(String.format("parent node %s could not be found when deassigning", parent));
-        }
-
-        //check the user can deassign the child
-        if(!hasPermissions(userCtx, child, DEASSIGN)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", child, DEASSIGN));
-        }
-
-        //check that the user can deassign from the parent
-        if (!hasPermissions(userCtx, parent, DEASSIGN_FROM)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parent, DEASSIGN_FROM));
-        }
+        // check the user can delete the assignment
+        guard.checkDeassign(userCtx, child, parent);
 
         //delete assignment in PAP
-        getGraphPAP().deassign(child, parent);
+        graph.deassign(child, parent);
 
+        // process the deassign as two events - deassign and deassign from
         Node parentNode = getNode(parent);
         Node childNode = getNode(child);
-
         getEPP().processEvent(new DeassignEvent(userCtx, childNode, parentNode));
         getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, childNode));
     }
 
     @Override
     public boolean isAssigned(String child, String parent) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
         Node parentNode = getNode(parent);
         Node childNode = getNode(child);
 
-        return getGraphPAP().isAssigned(childNode.getName(), parentNode.getName());
+        return graph.isAssigned(childNode.getName(), parentNode.getName());
 
     }
 
@@ -493,31 +297,11 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the current user does not have permission to create the association.
      */
     public void associate(String ua, String target, OperationSet operations) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        if(ua == null) {
-            throw new IllegalArgumentException("the user attribute cannot be null when creating an association");
-        } else if(target == null) {
-            throw new IllegalArgumentException("the target node cannot be null when creating an association");
-        }
-
-        Node sourceNode = getNode(ua);
-        Node targetNode = getNode(target);
-
-        Association.checkAssociation(sourceNode.getType(), targetNode.getType());
-
-        //check the user can associate the source and target nodes
-        if(!hasPermissions(userCtx, ua, ASSOCIATE)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", sourceNode.getName(), ASSOCIATE));
-        }
-        if (!hasPermissions(userCtx, target, ASSOCIATE)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", targetNode.getName(), ASSOCIATE));
-        }
+        // check that this user can create the association
+        guard.checkAssociate(userCtx, ua, target);
 
         //create association in PAP
-        getGraphPAP().associate(ua, target, operations);
+        graph.associate(ua, target, operations);
     }
 
     /**
@@ -533,30 +317,11 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException If the current user does not have permission to delete the association.
      */
     public void dissociate(String ua, String target) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        if(ua == null) {
-            throw new IllegalArgumentException("the user attribute cannot be null when creating an association");
-        } else if(target == null) {
-            throw new IllegalArgumentException("the target cannot be null when creating an association");
-        } else if(!exists(ua)) {
-            throw new PMException(String.format("node %s could not be found when creating an association", ua));
-        } else if(!exists(target)) {
-            throw new PMException(String.format("node %s could not be found when creating an association", target));
-        }
-
-        //check the user can associate the source and target nodes
-        if(!hasPermissions(userCtx, ua, DISASSOCIATE)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", ua, DISASSOCIATE));
-        }
-        if (!hasPermissions(userCtx, target, DISASSOCIATE)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", target, DISASSOCIATE));
-        }
+        // check that the user can delete the association
+        guard.checkDissociate(userCtx, ua, target);
 
         //create association in PAP
-        getGraphPAP().dissociate(ua, target);
+        graph.dissociate(ua, target);
     }
 
     /**
@@ -569,20 +334,16 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
     public Map<String, OperationSet> getSourceAssociations(String source) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
+        // check that this user can get the associations of the source node
+        guard.checkGetAssociations(userCtx, source);
 
-        if(!exists(source)) {
-            throw new PMException(String.format("node %s could not be found", source));
-        }
+        // get the associations for the source node
+        Map<String, OperationSet> sourceAssociations = graph.getSourceAssociations(source);
 
-        //check the user can get the associations of the source node
-        if(!hasPermissions(userCtx, source, GET_ASSOCIATIONS)){
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", source, GET_ASSOCIATIONS));
-        }
+        // filter out any associations in which the user does not have access to the target attribute
+        guard.filter(userCtx, sourceAssociations);
 
-        return getGraphPAP().getSourceAssociations(source);
+        return sourceAssociations;
     }
 
     /**
@@ -595,30 +356,32 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException If the current user does not have permission to get hte node's associations.
      */
     public Map<String, OperationSet> getTargetAssociations(String target) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
+        // check that this user can get the associations of the target node
+        guard.checkGetAssociations(userCtx, target);
 
-        if(!exists(target)) {
-            throw new PMException(String.format("node %s could not be found", target));
-        }
+        // get the associations for the target node
+        Map<String, OperationSet> targetAssociations = graph.getTargetAssociations(target);
 
-        //check the user can get the associations of the source node
-        if(!hasPermissions(userCtx, target, GET_ASSOCIATIONS)){
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", target, GET_ASSOCIATIONS));
-        }
+        // filter out any associations in which the user does not have access to the source attribute
+        guard.filter(userCtx, targetAssociations);
 
-        return getGraphPAP().getTargetAssociations(target);
+        return targetAssociations;
     }
 
     @Override
     public String toJson() throws PMException {
-        return getGraphPAP().toJson();
+        // check that the user can serialize to json
+        guard.checkToJson(userCtx);
+
+        return graph.toJson();
     }
 
     @Override
     public void fromJson(String s) throws PMException {
-        getGraphPAP().fromJson(s);
+        // check that the user can deserialize a json string to the graph
+        guard.checkFromJson(userCtx);
+
+        graph.fromJson(s);
     }
 
     /**
@@ -633,19 +396,8 @@ public class GraphService extends Service implements Graph {
      */
     @Override
     public Set<Node> search(NodeType type, Map<String, String> properties) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
-
-        Set<Node> search = getGraphPAP().search(type, properties);
-        search.removeIf(x -> {
-            try {
-                return !hasPermissions(userCtx, x.getName());
-            }
-            catch (PMException e) {
-                return true;
-            }
-        });
+        Set<Node> search = graph.search(type, properties);
+        guard.filterNodes(userCtx, search);
         return search;
     }
 
@@ -658,27 +410,32 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the current user is not authorized to access this node.
      */
     public Node getNode(String name) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
+        // get node
+        Node node = graph.getNode(name);
 
-        if(!exists(name)) {
+        // check user has permissions on the node
+        try {
+            guard.checkExists(userCtx, name);
+        } catch (PMException e) {
+            // if no permissions, the user shouldn't know it exists
             throw new PMException(String.format("node %s could not be found", name));
         }
 
-        if(!hasPermissions(userCtx, name)) {
-            throw new PMAuthorizationException(String.format("no permissions on %s: %s", name));
-        }
-
-        return getGraphPAP().getNode(name);
+        return node;
     }
 
     @Override
     public Node getNode(NodeType type, Map<String, String> properties) throws PMException {
-        Node node = getGraphPAP().getNode(type, properties);
-        if (!hasPermissions(userCtx, node.getName())) {
+        Node node = graph.getNode(type, properties);
+
+        // check user has permissions on the node
+        try {
+            guard.checkExists(userCtx, node.getName());
+        } catch (PMException e) {
+            // if no permissions, the user shouldn't know it exists
             throw new PMException(String.format("node (%s, %s) could not be found", type, properties.toString()));
         }
+
         return node;
     }
 
@@ -688,16 +445,9 @@ public class GraphService extends Service implements Graph {
      * @throws PMException if something goes wrong in the deletion process
      */
     public void reset(UserContext userCtx) throws PMException {
-        if(userCtx == null) {
-            throw new PMException("no user context provided to the PDP");
-        }
+        guard.checkReset(userCtx);
 
-        // check that the user can reset the graph
-        if (!hasPermissions(userCtx, superPolicy.getSuperPolicyClassRep().getName(), RESET)) {
-            throw new PMAuthorizationException("unauthorized permissions to reset the graph");
-        }
-
-        Collection<Node> nodes = getGraphPAP().getNodes();
+        Collection<Node> nodes = graph.getNodes();
         Set<String> names = new HashSet<>();
         for (Node node: nodes) {
             names.add(node.getName());
@@ -739,7 +489,7 @@ public class GraphService extends Service implements Graph {
             });
         }
         for (String name : names) {
-            getGraphPAP().deleteNode(name);
+            graph.deleteNode(name);
         }
         configureSuperPolicy();
     }

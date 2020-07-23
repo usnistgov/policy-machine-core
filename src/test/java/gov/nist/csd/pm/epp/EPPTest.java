@@ -5,7 +5,10 @@ import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.DeassignEvent;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.GraphAdmin;
+import gov.nist.csd.pm.pap.ObligationsAdmin;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.ProhibitionsAdmin;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -38,7 +41,13 @@ class EPPTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pdp = new PDP(new PAP(new MemGraph(), new MemProhibitions(), new MemObligations()), new EPPOptions(), new OperationSet("read", "write", "execute"));
+        pdp = PDP.newPDP(
+                new PAP(
+                        new GraphAdmin(new MemGraph()),
+                        new ProhibitionsAdmin(new MemProhibitions()),
+                        new ObligationsAdmin(new MemObligations())),
+                new EPPOptions(),
+                new OperationSet("read", "write", "execute"));
         Graph graph = pdp.getGraphService(new UserContext("super"));
         pc1 = graph.createPolicyClass("pc1", null);
         oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
@@ -131,7 +140,10 @@ class EPPTest {
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
 
-        PDP pdp = new PDP(new PAP(graph, new MemProhibitions(), obligations), new EPPOptions(), new OperationSet("read", "write", "execute"));
+        PDP pdp = PDP.newPDP(
+                new PAP(new GraphAdmin(graph), new ProhibitionsAdmin(new MemProhibitions()), new ObligationsAdmin(obligations)),
+                new EPPOptions(),
+                new OperationSet("read", "write", "execute"));
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext("u1"), oa2, o1));
 
         assertTrue(graph.exists("new OA"));
