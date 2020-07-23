@@ -186,6 +186,10 @@ public class GraphService extends Service implements Graph {
         return graph.getPolicyClasses();
     }
 
+    public String getPolicyClassDefault(String pc, NodeType type) {
+        return pc + "_default_" + type.toString();
+    }
+
     /**
      * Get the children of the node from the graph.  Get the children from the database to ensure all node information
      * is present.  Before returning the set of nodes, filter out any nodes that the user has no permissions on.
