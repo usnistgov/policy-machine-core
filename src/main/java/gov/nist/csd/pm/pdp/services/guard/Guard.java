@@ -20,6 +20,7 @@ public class Guard {
 
     protected PAP pap;
     protected Decider decider;
+
     private OperationSet resourceOps;
 
     public Guard(PAP pap, OperationSet resourceOps) {
@@ -64,4 +65,11 @@ public class Guard {
         }
     }
 
+    public OperationSet getResourceOps() {
+        return resourceOps;
+    }
+
+    public void setResourceOps(OperationSet resourceOps) {
+        this.resourceOps = resourceOps;
+    }
 }

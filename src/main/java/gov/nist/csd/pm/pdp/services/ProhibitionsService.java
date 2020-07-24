@@ -78,4 +78,10 @@ public class ProhibitionsService extends Service implements Prohibitions {
             delete(name);
         }
     }
+
+    @Override
+    public void setResourceOps(OperationSet resourceOps) {
+        super.setResourceOps(resourceOps);
+        guard.setResourceOps(resourceOps);
+    }
 }
