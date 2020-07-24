@@ -499,4 +499,10 @@ public class GraphService extends Service implements Graph {
         SuperPolicy superPolicy = new SuperPolicy();
         superPolicy.configure(graph);
     }
+
+    @Override
+    public void setResourceOps(OperationSet resourceOps) {
+        super.setResourceOps(resourceOps);
+        guard.setResourceOps(resourceOps);
+    }
 }

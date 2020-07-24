@@ -87,4 +87,10 @@ public class ObligationsService extends Service implements Obligations {
             delete(label);
         }
     }
+
+    @Override
+    public void setResourceOps(OperationSet resourceOps) {
+        super.setResourceOps(resourceOps);
+        guard.setResourceOps(resourceOps);
+    }
 }
