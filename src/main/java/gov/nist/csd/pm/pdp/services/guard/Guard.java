@@ -71,5 +71,8 @@ public class Guard {
 
     public void setResourceOps(OperationSet resourceOps) {
         this.resourceOps = resourceOps;
+        if (decider instanceof PReviewDecider) {
+            ((PReviewDecider) decider).setResourceOps(resourceOps);
+        }
     }
 }
