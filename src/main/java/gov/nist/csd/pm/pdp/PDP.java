@@ -23,15 +23,15 @@ public class PDP {
      * @return the new PDP instance
      */
     public static PDP newPDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
-//        // create PDP
-//        PDP pdp = new PDP(pap, resourceOps);
-//        // create the EPP
-//        EPP epp = new EPP(pap, pdp, eppOptions);
-//        // set the PDPs EPP
-//        pdp.setEPP(epp);
-//        // initialize PDP services which need the epp that was just set
-//        pdp.initServices();
-        return new PDP(pap, eppOptions, resourceOps);
+        // create PDP
+        PDP pdp = new PDP(pap, resourceOps);
+        // create the EPP
+        EPP epp = new EPP(pap, pdp, eppOptions);
+        // set the PDPs EPP
+        pdp.setEPP(epp);
+        // initialize PDP services which need the epp that was just set
+        pdp.initServices();
+        return pdp;
     }
 
     private PAP pap;
@@ -51,19 +51,9 @@ public class PDP {
      * @throws PMException if there is an error initializing the EPP.
      */
 
-    public PDP(PAP pap, OperationSet resourceOps) throws PMException {
+    private PDP(PAP pap, OperationSet resourceOps) throws PMException {
         this.pap = pap;
         this.resourceOps = resourceOps;
-    }
-
-    public PDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
-        this(pap, resourceOps);
-        // create the EPP
-        EPP epp = new EPP(pap, this, eppOptions);
-        // set the PDPs EPP
-        this.setEPP(epp);
-        // initialize PDP services which need the epp that was just set
-        this.initServices();
     }
 
     private void setEPP(EPP epp) {
