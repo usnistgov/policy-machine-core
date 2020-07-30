@@ -16,6 +16,7 @@ import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
+import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
 
 import java.util.*;
 
@@ -459,15 +460,16 @@ public class GraphService extends Service implements Graph {
             if (node.getType() == UA || node.getType() == OA) {
                 graph.getTargetAssociations(node.getName()).keySet().forEach(el -> {
                     try {
-                        dissociate(el, node.getName());
+                        graph.dissociate(el, node.getName());
                     } catch (PMException pmException) {
                         pmException.printStackTrace();
                     }
                 });
                 if (node.getType() == UA) {
                     graph.getSourceAssociations(node.getName()).keySet().forEach(el -> {
+
                         try {
-                            dissociate(node.getName(), el);
+                            graph.dissociate(node.getName(), el);
                         } catch (PMException pmException) {
                             pmException.printStackTrace();
                         }
@@ -476,8 +478,8 @@ public class GraphService extends Service implements Graph {
             }
             graph.getChildren(node.getName()).forEach(el -> {
                 try {
-                    if (isAssigned(el, node.getName())) {
-                        deassign(el, node.getName());
+                    if (graph.isAssigned(el, node.getName())) {
+                        graph.deassign(el, node.getName());
                     }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
@@ -485,8 +487,8 @@ public class GraphService extends Service implements Graph {
             });
             graph.getParents(node.getName()).forEach(el -> {
                 try {
-                    if (isAssigned(node.getName(), el)) {
-                        deassign(node.getName(), el);
+                    if (graph.isAssigned(node.getName(), el)) {
+                        graph.deassign(node.getName(), el);
                     }
                 } catch (PMException pmException) {
                     pmException.printStackTrace();
