@@ -62,7 +62,7 @@ class EPPTest {
     @Test
     void TestEvent() throws PMException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/event_test.yml");
-        Obligation obligation = EVRParser.parse("super", is);
+        Obligation obligation = new EVRParser().parse("super", is);
 
         UserContext superCtx = new UserContext("super");
         pdp.getObligationsService(superCtx).add(obligation, true);
@@ -87,7 +87,7 @@ class EPPTest {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/response_test.yml");
         UserContext superCtx = new UserContext("super");
 
-        Obligation obligation = EVRParser.parse(superCtx.getUser(), is);
+        Obligation obligation = new EVRParser().parse(superCtx.getUser(), is);
         pdp.getObligationsService(superCtx).add(obligation, true);
 
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
@@ -135,7 +135,7 @@ class EPPTest {
         graph.createNode("u1", U, null, "ua1-1");
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
-        Obligation obligation = EVRParser.parse("super", is);
+        Obligation obligation = new EVRParser().parse("super", is);
 
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
