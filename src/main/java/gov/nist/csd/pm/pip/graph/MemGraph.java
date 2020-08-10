@@ -106,6 +106,37 @@ public class MemGraph implements Graph {
     }
 
     /**
+     * Create a node in the in-memory graph without parents (for import/export)
+     *
+     * @throws IllegalArgumentException when the provided name is null.
+     * @throws IllegalArgumentException when the provided name already exists in the graph.
+     * @throws IllegalArgumentException when the provided type is null.
+     * @throws IllegalArgumentException when an initial parent is not provided.
+     */
+    private void createNode(String name, NodeType type, Map<String, String> properties) throws PMException {
+        //check for null values
+        if (type == PC) {
+            throw new PMException("use createPolicyClass to create a policy class node");
+        }
+        else if (name == null) {
+            throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
+        }
+        else if (exists(name)) {
+            throw new IllegalArgumentException("the name " + name + " already exists in the graph");
+        }
+        else if (type == null) {
+            throw new IllegalArgumentException("a null type was provided to the in memory graph when creating a node");
+        }
+
+        // add the vertex to the graph
+        graph.addVertex(name);
+
+        //store the node in the map
+        Node node = new Node(name, type, properties);
+        nodes.put(name, node);
+    }
+
+    /**
      * Update a node with the given node context. Only the name and properties can be updated. If the name of the context
      * is null, then the name will not be updated.  The properties provided in the context will overwrite any existing
      * properties.  If the properties are null, they will be skipped. However, if the properties are an empty map, the
@@ -469,8 +500,9 @@ public class MemGraph implements Graph {
             if (node.getType().equals(PC)) {
                 this.createPolicyClass(node.getName(), node.getProperties());
             } else {
-                this.graph.addVertex(node.getName());
-                this.nodes.put(node.getName(), node);
+                /*this.graph.addVertex(node.getName());
+                this.nodes.put(node.getName(), node);*/
+                this.createNode(node.getName(), node.getType(), node.getProperties());
             }
         }
 
