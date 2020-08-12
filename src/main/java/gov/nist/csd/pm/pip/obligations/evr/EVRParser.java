@@ -134,7 +134,7 @@ public class EVRParser {
         }
 
         EventParser parser = this.customEventParsers.get(key);
-        return parser.parse(getObject(map.get(key), Map.class));
+        return parser.parse(map);
     }
 
     private boolean isSystemEvent(Map map) {
