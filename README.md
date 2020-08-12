@@ -46,7 +46,7 @@ a PDP.
 
 ### PIP
 The PIP package provides 3 interfaces: `Graph`, `Prohibitions`, and `Obligations` and implementations of each. The obligations 
-sub package also includes methods to parse [Event Response](https://github.com/PM-Master/policy-machine-core/tree/master/src/main/java/gov/nist/csd/pm/pip/obligationsd) grammar.
+sub package also includes methods to parse [Event Response](https://github.com/PM-Master/policy-machine-core/tree/master/src/main/java/gov/nist/csd/pm/pip/obligations) grammar.
 ### PAP
 The PAP provides a single class that aggregates the elements in the PIP.
 ### EPP
@@ -298,3 +298,14 @@ pdp.getObligationsServiceadd(obligation, true);
 ```java
 pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), userID, processID);
 ```
+
+#### Custom Events
+Custom events can be done in four steps:
+
+1. Implement the [EventParser](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventParser.java) interface.
+2. Extend the [EventPattern](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventPattern.java) class. 
+3. Extend the [EventContext](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventContext.java) class and override the
+`matchesPattern` method.
+4. Call `epp.processEvent()` passing the custom EventContext.
+
+An example can be found [here](https://github.com/PM-Master/pm-time)
