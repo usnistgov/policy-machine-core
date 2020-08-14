@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.GraphAdmin;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
@@ -495,10 +496,11 @@ public class MemGraph implements Graph {
                         && !node.getName().equalsIgnoreCase("super_pc_default_OA")
                         && !node.getName().equalsIgnoreCase("super_pc_rep"))
                 .collect(Collectors.toList());
-        Map<String, Node> nodesMap = new HashMap<>();
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
-                this.createPolicyClass(node.getName(), node.getProperties());
+                //use createpolicyClass from GraphService/ GraphAdmin instead of the class method
+                GraphAdmin graphAdmin = new GraphAdmin(this);
+                graphAdmin.createPolicyClass(node.getName(), node.getProperties());
             } else {
                 /*this.graph.addVertex(node.getName());
                 this.nodes.put(node.getName(), node);*/
