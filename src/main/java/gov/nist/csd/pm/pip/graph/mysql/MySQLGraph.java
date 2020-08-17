@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.GraphAdmin;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -1050,7 +1051,8 @@ public class MySQLGraph implements Graph {
                 .collect(Collectors.toList());
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
-                this.createPolicyClass(node.getName(), node.getProperties());
+                GraphAdmin graphAdmin = new GraphAdmin(this);
+                graphAdmin.createPolicyClass(node.getName(), node.getProperties());
             } else {
                 this.createNode(node.getName(), node.getType(), node.getProperties());
             }
