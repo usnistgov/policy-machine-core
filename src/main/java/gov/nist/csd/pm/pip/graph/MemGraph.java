@@ -459,11 +459,15 @@ public class MemGraph implements Graph {
                         && !node.getName().equalsIgnoreCase("super")
                         && !node.getName().equalsIgnoreCase("super_pc_default_UA")
                         && !node.getName().equalsIgnoreCase("super_pc_default_OA")
-                        && !node.getName().equalsIgnoreCase("super_pc_rep"))
+                        && !node.getName().equalsIgnoreCase("super_pc_rep")
+                        && !node.getName().contains("_default_UA")
+                        && !node.getName().contains("_default_OA")
+                        && !node.getName().contains("_rep"))
                 .collect(Collectors.toList());
         HashSet<String[]> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
+
             Set<String> parents = this.getParents(node.getName());
 
             for (String parent : parents) {
