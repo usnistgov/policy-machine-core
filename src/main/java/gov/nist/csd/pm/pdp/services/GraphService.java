@@ -133,9 +133,6 @@ public class GraphService extends Service implements Graph {
             }
         }
 
-        // delete the node
-        graph.deleteNode(name);
-
         // process the delete event
         Set<String> parents = graph.getParents(name);
         for(String parent : parents) {
@@ -144,6 +141,9 @@ public class GraphService extends Service implements Graph {
             getEPP().processEvent(new DeassignEvent(userCtx, node, parentNode));
             getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, node));
         }
+
+        // delete the node
+        graph.deleteNode(name);
     }
 
     /**
