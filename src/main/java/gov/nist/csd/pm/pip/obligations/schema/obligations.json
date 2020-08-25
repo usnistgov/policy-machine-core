@@ -1,0 +1,690 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string"
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/rule"
+      }
+    }
+  },
+  "definitions": {
+    "rule": {
+      "$id": "#/definitions/rule",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "event": {
+          "$ref": "#/definitions/event"
+        },
+        "response": {
+          "$ref": "#/definitions/response"
+        }
+      }
+    },
+    "event": {
+      "$id": "#/definitions/event",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/subject"
+        },
+        "policyClass": {
+          "$ref": "#/definitions/policyClass"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operation"
+          }
+        },
+        "target": {
+          "$ref": "#/definitions/target"
+        }
+      }
+    },
+    "subject": {
+      "$id": "#/definitions/subject",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "user": {
+              "type": "string"
+            },
+            "anyUser": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "process": {
+              "type": "integer"
+            }
+          }
+        }
+      ]
+    },
+    "policyClass": {
+      "$id": "#/definitions/policyClass",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "anyOf": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "eachOf": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "operation": {
+      "$id": "#/definitions/operation",
+      "type": "string",
+      "enum": [
+        "write",
+        "read",
+        "execute",
+        "create policy class",
+        "assign object attribute",
+        "assign object attribute to",
+        "assign object",
+        "assign object to",
+        "create node",
+        "delete node",
+        "update node",
+        "object access",
+        "assign to",
+        "assign",
+        "associate",
+        "disassociate",
+        "create object",
+        "create object attribute",
+        "create user attribute",
+        "deassign",
+        "deassign from",
+        "create association",
+        "update association",
+        "delete association",
+        "get associations",
+        "reset",
+        "get permissions",
+        "create prohibition",
+        "update prohibition",
+        "view prohibition",
+        "delete prohibition",
+        "get accessible children",
+        "get prohibited ops",
+        "get accessible nodes",
+        "to json",
+        "from json",
+        "add obligation",
+        "update obligation",
+        "delete obligation",
+        "enable obligation",
+        "*",
+        "*a",
+        "*r"
+      ]
+    },
+    "target": {
+      "$id": "#/definitions/target",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "policyElements": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/policyElement"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "complement": {
+              "type": "boolean"
+            },
+            "intersection": {
+              "type": "boolean"
+            },
+            "containers": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "$ref": "#/definitions/type"
+                      },
+                      "complement": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      },
+                      "complement": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "policyElement": {
+      "$id": "#/definitions/policyElement",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/type"
+        }
+      }
+    },
+    "type": {
+      "$id": "#/definitions/type",
+      "type": "string",
+      "enum": [
+        "PC",
+        "OA",
+        "O",
+        "UA",
+        "U",
+        "OS"
+      ]
+    },
+    "response": {
+      "$id": "#/definitions/response",
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/condition"
+          },
+          "minItems": 1
+        },
+        "condition!": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negatedCondition"
+          },
+          "minItems": 1
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/action"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "condition": {
+      "$id": "#/definitions/condition",
+      "type": "object",
+      "properties": {
+        "function": {
+          "$ref": "#/definitions/function"
+        }
+      }
+    },
+    "negatedCondition": {
+      "$ref": "#/definitions/condition"
+    },
+    "function": {
+      "$id": "#/definitions/function",
+      "type": "object",
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "child_of_assign",
+                "parent_of_assign",
+                "create_node",
+                "current_process",
+                "current_target",
+                "current_user",
+                "get_children",
+                "get_node",
+                "get_node_name",
+                "is_node_contained_in",
+                "to_props"
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "create_node"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "function": {
+                          "$ref": "#/definitions/function"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "minItems": 5,
+                "maxItems": 5
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "get_children"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "function": {
+                          "$ref": "#/definitions/function"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "get_node"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "function": {
+                          "$ref": "#/definitions/function"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "get_node_name"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "function": {
+                      "$ref": "#/definitions/function"
+                    }
+                  }
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "is_node_contained_in"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "function": {
+                      "$ref": "#/definitions/function"
+                    }
+                  }
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "to_props"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "action": {
+      "$id": "#/definitions/action",
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/condition"
+          },
+          "minItems": 1
+        },
+        "condition!": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negatedCondition"
+          },
+          "minItems": 1
+        },
+        "create": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/create"
+          },
+          "minItems": 1
+        },
+        "assign": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/node"
+          },
+          "minItems": 1
+        },
+        "grant": {
+          "$ref": "#/definitions/grant"
+        },
+        "deny": {
+          "$ref": "#/definitions/deny"
+        },
+        "delete": {
+          "$ref": "#/definitions/delete"
+        }
+      }
+    },
+    "create": {
+      "$id": "#/definitions/create",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "event": {
+              "$ref": "#/definitions/event"
+            },
+            "response": {
+              "$ref": "#/definitions/response"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/node"
+        }
+      ]
+    },
+    "node": {
+      "$id": "#/definitions/node",
+      "type": "object",
+      "properties": {
+        "what": {
+          "$ref": "#/definitions/evrNode"
+        },
+        "where": {
+          "$ref": "#/definitions/evrNode"
+        }
+      }
+    },
+    "evrNode": {
+      "$id": "#/definitions/evrNode",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/type"
+        }
+      }
+    },
+    "grant": {
+      "$id": "#/definitions/grant",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/evrNode"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operation"
+          },
+          "minItems": 1
+        },
+        "target": {
+          "$ref": "#/definitions/evrNode"
+        }
+      }
+    },
+    "deny": {
+      "$id": "#/definitions/deny",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operation"
+          },
+          "minItems": 1
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "complement": {
+              "type": "boolean"
+            },
+            "containers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/evrNode"
+              },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "type": "object",
+      "properties": {
+        "prohibitions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "associations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/association"
+          },
+          "minItems": 1
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/node"
+          },
+          "minItems": 1
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/node"
+          },
+          "minItems": 1
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "association": {
+      "$id": "#/definitions/association",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/evrNode"
+        },
+        "target": {
+          "$ref": "#/definitions/evrNode"
+        }
+      }
+    }
+  }
+}
