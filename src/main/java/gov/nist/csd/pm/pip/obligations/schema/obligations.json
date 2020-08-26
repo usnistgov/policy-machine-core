@@ -293,23 +293,20 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/condition"
-          },
-          "minItems": 1
+          }
         },
         "condition!": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/negatedCondition"
-          },
-          "minItems": 1
+          }
         },
         "actions": {
           "type": "array",
           "description": "Set of actions to execute if defined conditions are met.",
           "items": {
             "$ref": "#/definitions/action"
-          },
-          "minItems": 1
+          }
         }
       }
     },
@@ -560,29 +557,25 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/condition"
-          },
-          "minItems": 1
+          }
         },
         "condition!": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/negatedCondition"
-          },
-          "minItems": 1
+          }
         },
         "create": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/create"
-          },
-          "minItems": 1
+          }
         },
         "assign": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/node"
-          },
-          "minItems": 1
+          }
         },
         "grant": {
           "$ref": "#/definitions/grant"
