@@ -327,23 +327,28 @@
             "properties": {
               "args": {
                 "type": "array",
-                "items": {
-                  "allOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "function": {
-                          "$ref": "#/definitions/function"
-                        }
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
                       }
                     }
-                  ]
-                },
-                "minItems": 5,
-                "maxItems": 5
+                  }
+                ]
               }
             }
           }
@@ -360,23 +365,22 @@
             "properties": {
               "args": {
                 "type": "array",
-                "items": {
-                  "allOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "function": {
-                          "$ref": "#/definitions/function"
-                        }
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
                       }
                     }
-                  ]
-                },
-                "minItems": 3,
-                "maxItems": 3
+                  }
+                ]
               }
             }
           }
@@ -393,23 +397,22 @@
             "properties": {
               "args": {
                 "type": "array",
-                "items": {
-                  "allOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "function": {
-                          "$ref": "#/definitions/function"
-                        }
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
                       }
                     }
-                  ]
-                },
-                "minItems": 3,
-                "maxItems": 3
+                  }
+                ]
               }
             }
           }
@@ -426,16 +429,16 @@
             "properties": {
               "args": {
                 "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "function": {
-                      "$ref": "#/definitions/function"
+                "items": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      }
                     }
                   }
-                },
-                "minItems": 1,
-                "maxItems": 1
+                ]
               }
             }
           }
@@ -452,16 +455,24 @@
             "properties": {
               "args": {
                 "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "function": {
-                      "$ref": "#/definitions/function"
+                "items": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      }
                     }
                   }
-                },
-                "minItems": 2,
-                "maxItems": 2
+                ]
               }
             }
           }
