@@ -66,14 +66,11 @@ public class GraphGuard extends Guard {
         }
     }
 
-    public void checkExists(UserContext userCtx, String name) throws PMException {
+    public boolean checkExists(UserContext userCtx, String name) throws PMException {
         // a user only needs one permission to know a node exists
         // however receiving an unauthorized exception would let the user know it exists
-        // therefore, a general PMException is thrown indicating that the node may not exist or
-        // the user may not have permissions
-        if(!hasPermissions(userCtx, name)) {
-            throw new PMException(name + " does not exist or " + userCtx + " is not authorized");
-        }
+        // therefore, false is returned if they don't have permissions on the node
+        return hasPermissions(userCtx, name);
     }
 
     public void filter(UserContext userCtx, Set<String> nodes) throws PMException {
