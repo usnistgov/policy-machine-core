@@ -64,7 +64,7 @@ There is one obligation per yaml file. An obligation can have zero or more rules
 label:
 rules:
 ```
-- **_label_** - A label to give the obligation.  If one is not specified, then a random value will be used.
+- **_label_** *(required)* - A label to give the obligation.
 - **_rules_** - Contains a set of zero or more rules.
 
 ##  Rule
@@ -73,7 +73,7 @@ label:
 event:
 response:
 ```
-- **_label_** - A label to give the rule.  If one is not specified a random value will be used.
+- **_label_** *(required)* - A label to give the rule.  If one is not specified a random value will be used.
 - **_event_** - The event pattern for this rule.
 - **_response_** - The response to the event.
 
@@ -247,7 +247,7 @@ actions:
 
 - a set of rules
 - a set of nodes
-#### rule
+#### rules
 ```yaml
 create:
   - label:
