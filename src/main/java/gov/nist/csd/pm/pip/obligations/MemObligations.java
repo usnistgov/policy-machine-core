@@ -23,13 +23,7 @@ public class MemObligations implements Obligations {
 
     @Override
     public Obligation get(String label) {
-        for(String l : obligations.keySet()) {
-            if(l.equals(label)) {
-                return obligations.get(l);
-            }
-        }
-
-        return null;
+        return obligations.get(label);
     }
 
     @Override
@@ -39,7 +33,15 @@ public class MemObligations implements Obligations {
 
     @Override
     public void update(String label, Obligation obligation) {
-        obligations.put(label, obligation);
+        String updatedLabel = obligation.getLabel();
+        if (updatedLabel != null && !updatedLabel.equals(label)) {
+            obligations.remove(label);
+        } else if (updatedLabel == null) {
+            // update the obligations label with the provided label if it's not set
+            obligation.setLabel(label);
+        }
+
+        obligations.put(obligation.getLabel(), obligation);
     }
 
     @Override
