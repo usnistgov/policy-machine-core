@@ -21,10 +21,13 @@ import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.obligations.model.Rule;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
@@ -60,9 +63,10 @@ class EPPTest {
     }
 
     @Test
-    void TestEvent() throws PMException {
+    void TestEvent() throws PMException, IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/event_test.yml");
-        Obligation obligation = new EVRParser().parse("super", is);
+        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+        Obligation obligation = new EVRParser().parse("super", yml);
 
         UserContext superCtx = new UserContext("super");
         pdp.getObligationsService(superCtx).add(obligation, true);
@@ -83,11 +87,12 @@ class EPPTest {
     }
 
     @Test
-    void TestResponse() throws PMException {
+    void TestResponse() throws PMException, IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/response_test.yml");
+        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
         UserContext superCtx = new UserContext("super");
 
-        Obligation obligation = new EVRParser().parse(superCtx.getUser(), is);
+        Obligation obligation = new EVRParser().parse(superCtx.getUser(), yml);
         pdp.getObligationsService(superCtx).add(obligation, true);
 
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
@@ -122,7 +127,7 @@ class EPPTest {
     }
 
     @Test
-    void testUserContainedIn() throws PMException {
+    void testUserContainedIn() throws PMException, IOException {
         Graph graph = new MemGraph();
 
         graph.createPolicyClass("pc1", null);
@@ -135,7 +140,8 @@ class EPPTest {
         graph.createNode("u1", U, null, "ua1-1");
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
-        Obligation obligation = new EVRParser().parse("super", is);
+        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+        Obligation obligation = new EVRParser().parse("super", yml);
 
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
