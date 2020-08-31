@@ -403,6 +403,7 @@ public class GraphService extends Service implements Graph {
     @Override
     public Set<Node> search(NodeType type, Map<String, String> properties) throws PMException {
         Set<Node> search = graph.search(type, properties);
+        //System.out.println(search);
         guard.filterNodes(userCtx, search);
         return search;
     }
