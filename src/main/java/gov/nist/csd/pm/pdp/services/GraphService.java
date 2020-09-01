@@ -159,11 +159,7 @@ public class GraphService extends Service implements Graph {
             return false;
         }
 
-        // check that this user can access this node
-        guard.checkExists(userCtx, name);
-
-        // if the user can access this node than return true
-        return true;
+        return guard.checkExists(userCtx, name);
     }
 
     /**

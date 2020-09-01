@@ -37,23 +37,8 @@ public class EVRParser {
     public Obligation parse(String user, String yml) throws EVRException {
         Yaml yaml = new Yaml();
         Map<Object, Object> map = yaml.load(yml);
-
-        return parse(user, map);
-    }
-
-    /**
-     * label: string required
-     * rules: array
-     */
-    public Obligation parse(String user, InputStream is) throws EVRException {
-        Yaml yaml = new Yaml();
-        Map<Object, Object> map = yaml.load(is);
-
-        return parse(user, map);
-    }
-
-    private Obligation parse(String user, Map<Object, Object> map) throws EVRException {
         Obligation obligation = new Obligation(user);
+        obligation.setSource(yml);
 
         String label = getObject(map.get("label"), String.class);
         if (label == null) {

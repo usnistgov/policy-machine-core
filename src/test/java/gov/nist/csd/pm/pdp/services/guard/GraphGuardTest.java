@@ -164,8 +164,8 @@ class GraphGuardTest {
         }
 
         @Test
-        void testU1Error() {
-            assertThrows(PMException.class, () -> guard.checkExists(u1Ctx, "pc1"));
+        void testU1Error() throws PMException {
+            assertFalse(guard.checkExists(u1Ctx, "pc1"));
         }
 
     }
