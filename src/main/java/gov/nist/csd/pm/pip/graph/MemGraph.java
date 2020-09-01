@@ -137,7 +137,11 @@ public class MemGraph implements Graph {
      * @param name the name of the node to delete.
      */
     @Override
-    public void deleteNode(String name) {
+    public void deleteNode(String name) throws PMException {
+        if (graph.incomingEdgesOf(name).size() != 0) {
+            throw new PMException("cannot delete " + name + ", nodes are still assigned to it");
+        }
+
         //remove the vertex from the graph
         graph.removeVertex(name);
         //remove the node from the policies if it is a policy class

@@ -118,6 +118,10 @@ public class GraphAdmin implements Graph {
 
     @Override
     public void deleteNode(String name) throws PMException {
+        if (graph.getChildren(name).size() != 0) {
+            throw new PMException("cannot delete " + name + ", nodes are still assigned to it");
+        }
+
         graph.deleteNode(name);
     }
 

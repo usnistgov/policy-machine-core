@@ -122,6 +122,11 @@ public class GraphService extends Service implements Graph {
         // check that the user can delete the node
         guard.checkDeleteNode(userCtx, name);
 
+        // check that the node does not have any children
+        if (graph.getChildren(name).size() != 0) {
+            throw new PMException("cannot delete " + name + ", nodes are still assigned to it");
+        }
+
         Node node = graph.getNode(name);
 
         // if it's a PC, delete the rep
