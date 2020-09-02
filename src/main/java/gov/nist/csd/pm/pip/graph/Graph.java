@@ -47,9 +47,10 @@ public interface Graph {
     void updateNode(String name, Map<String, String> properties) throws PMException;
 
     /**
-     * Delete the node with the given name from the graph.
+     * Delete the node with the given name from the graph. The node must not have any other nodes assigned to it.
      *
      * @param name the name of the node to delete.
+     * @throws PMException if the node being deleted still has other nodes assigned to it.
      * @throws PMException if there is an error deleting the node from the graph.
      */
     void deleteNode(String name) throws PMException;
