@@ -1,0 +1,865 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "NGAC obligation schema",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string",
+      "description": "Obligation label. If unspecified, a random value is used."
+    },
+    "rules": {
+      "type": "array",
+      "description": "Set of zero or more rules.",
+      "items": {
+        "$ref": "#/definitions/rule"
+      }
+    }
+  },
+  "definitions": {
+    "rule": {
+      "$id": "#/definitions/rule",
+      "type": "object",
+      "description": "Obligation rule",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Rule label. If unspecified, a random value is used."
+        },
+        "event": {
+          "$ref": "#/definitions/event",
+          "description": "Event pattern for this rule."
+        },
+        "response": {
+          "$ref": "#/definitions/response",
+          "description": "Response to the event."
+        }
+      }
+    },
+    "event": {
+      "$id": "#/definitions/event",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/subject"
+        },
+        "policyClass": {
+          "$ref": "#/definitions/policyClass"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operation"
+          }
+        },
+        "target": {
+          "$ref": "#/definitions/target"
+        }
+      }
+    },
+    "subject": {
+      "$id": "#/definitions/subject",
+      "description": "Specific user, any user, any user from a set of users and/or user attributes or a process. If omitted, all events will match this component of an access event",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "user": {
+              "type": "string",
+              "description": "User identified by name."
+            },
+            "anyUser": {
+              "anyOf": [
+                {
+                  "type": "null",
+                  "description": "If empty, match any user."
+                },
+                {
+                  "type": "array",
+                  "description": "List of user names.",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "process": {
+              "type": "integer",
+              "description": "Process identifier."
+            }
+          }
+        }
+      ]
+    },
+    "policyClass": {
+      "$id": "#/definitions/policyClass",
+      "description": "Policy class definition.",
+      "oneOf": [
+        {
+          "type": "null",
+          "description": "Any policy class."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "anyOf": {
+              "type": "array",
+              "description": "Any of the policy classes in the set.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "eachOf": {
+              "type": "array",
+              "description": "All of the policy classes in the set.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "operation": {
+      "$id": "#/definitions/operation",
+      "description": "Operation type.",
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "write",
+            "read",
+            "execute",
+            "create policy class",
+            "assign object attribute",
+            "assign object attribute to",
+            "assign object",
+            "assign object to",
+            "create node",
+            "delete node",
+            "update node",
+            "object access",
+            "assign to",
+            "assign",
+            "associate",
+            "disassociate",
+            "create object",
+            "create object attribute",
+            "create user attribute",
+            "deassign",
+            "deassign from",
+            "create association",
+            "update association",
+            "delete association",
+            "get associations",
+            "reset",
+            "get permissions",
+            "create prohibition",
+            "update prohibition",
+            "view prohibition",
+            "delete prohibition",
+            "get accessible children",
+            "get prohibited ops",
+            "get accessible nodes",
+            "to json",
+            "from json",
+            "add obligation",
+            "update obligation",
+            "delete obligation",
+            "enable obligation",
+            "*",
+            "*a",
+            "*r"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "target": {
+      "$id": "#/definitions/target",
+      "description": "Event target.",
+      "anyOf": [
+        {
+          "type": "object",
+          "description": "Policy elements.",
+          "properties": {
+            "policyElements": {
+              "oneOf": [
+                {
+                  "type": "null",
+                  "description": "Any policy element."
+                },
+                {
+                  "type": "array",
+                  "description": "Specific policy elements.",
+                  "items": {
+                    "$ref": "#/definitions/policyElement"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "description": "",
+          "properties": {
+            "complement": {
+              "type": "boolean"
+            },
+            "intersection": {
+              "type": "boolean"
+            },
+            "containers": {
+              "type": "array",
+              "description": "Policy elements contained in other policy elements",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Policy element name."
+                      },
+                      "type": {
+                        "$ref": "#/definitions/type",
+                        "description": "Policy element type."
+                      },
+                      "complement": {
+                        "type": "boolean",
+                        "description": "Complement of the logical evaluation of policy elements."
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      },
+                      "complement": {
+                        "type": "boolean",
+                        "description": "Complement of the logical evaluation of policy elements."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "policyElement": {
+      "$id": "#/definitions/policyElement",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/type"
+        }
+      }
+    },
+    "type": {
+      "$id": "#/definitions/type",
+      "type": "string",
+      "enum": [
+        "PC",
+        "OA",
+        "O",
+        "UA",
+        "U",
+        "OS"
+      ]
+    },
+    "response": {
+      "$id": "#/definitions/response",
+      "description": "Series of conditional actions.",
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/condition"
+          }
+        },
+        "condition!": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negatedCondition"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "description": "Set of actions to execute if defined conditions are met.",
+          "items": {
+            "$ref": "#/definitions/action"
+          }
+        }
+      }
+    },
+    "condition": {
+      "$id": "#/definitions/condition",
+      "description": "Set of boolean expressions that if all evaluate to true, allows for a response or specific action to be executed.",
+      "type": "object",
+      "properties": {
+        "function": {
+          "$ref": "#/definitions/function"
+        }
+      }
+    },
+    "negatedCondition": {
+      "$ref": "#/definitions/condition",
+      "description": "Set of boolean expressions that if all evaluate to false, allows for a response or specific action to be executed."
+    },
+    "function": {
+      "$id": "#/definitions/function",
+      "description": "Function to execute.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "Built-in function type.",
+              "enum": [
+                "child_of_assign",
+                "parent_of_assign",
+                "create_node",
+                "current_process",
+                "current_target",
+                "current_user",
+                "get_children",
+                "get_node",
+                "get_node_name",
+                "is_node_contained_in",
+                "to_props"
+              ]
+            },
+            {
+              "type": "string",
+              "description": "Custom function type."
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "create_node"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "description": "Required args for create_node function.",
+                "items": [
+                  {
+                    "type": "string",
+                    "description": "Parent name."
+                  },
+                  {
+                    "$ref": "#/definitions/type",
+                    "description": "Parent type."
+                  },
+                  {
+                    "type": "string",
+                    "description": "Name."
+                  },
+                  {
+                    "$ref": "#/definitions/type",
+                    "description": "Type."
+                  },
+                  {
+                    "$ref": "#/definitions/toProps"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "get_children"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "description": "Required args for the get_children function.",
+                "items": [
+                  {
+                    "type": "string",
+                    "description": "Name."
+                  },
+                  {
+                    "$ref": "#/definitions/type",
+                    "description": "Type."
+                  },
+                  {
+                    "$ref": "#/definitions/toProps"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "get_node"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "description": "Required args for the get_node function.",
+                "items": [
+                  {
+                    "type": "string",
+                    "description": "Name."
+                  },
+                  {
+                    "$ref": "#/definitions/type",
+                    "description": "Type."
+                  },
+                  {
+                    "$ref": "#/definitions/toProps"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "get_node_name"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "description": "Required args for the get_node_name function.",
+                "items": [
+                  {
+                    "type": "object",
+                    "description": "Node.",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "is_node_contained_in"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "array",
+                "description": "Required args for the is_node_contained_in function.",
+                "items": [
+                  {
+                    "type": "object",
+                    "description": "Child.",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Parent.",
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "toProps": {
+      "$id": "#/definitions/toProps",
+      "type": "object",
+      "description": "Convert array of strings in the format key=value to requisite map.",
+      "properties": {
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "const": "to_props"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Key value pairs",
+                "examples": [
+                  "key1=value1",
+                  "key2=value2"
+                ],
+                "pattern": "(\\w+)=([^\\s]+)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "action": {
+      "$id": "#/definitions/action",
+      "description": "Action to execute.",
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/condition"
+          }
+        },
+        "condition!": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negatedCondition"
+          }
+        },
+        "create": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/create"
+          }
+        },
+        "assign": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/node"
+          }
+        },
+        "grant": {
+          "$ref": "#/definitions/grant"
+        },
+        "deny": {
+          "$ref": "#/definitions/deny"
+        },
+        "delete": {
+          "$ref": "#/definitions/delete"
+        },
+        "function": {
+          "$ref": "#/definitions/function"
+        }
+      }
+    },
+    "create": {
+      "$id": "#/definitions/create",
+      "description": "Action for creating a set of rules and/or nodes.",
+      "anyOf": [
+        {
+          "type": "object",
+          "description": "Rule to create.",
+          "properties": {
+            "label": {
+              "type": "string",
+              "description": "Rule label."
+            },
+            "event": {
+              "$ref": "#/definitions/event",
+              "description": "Rule event."
+            },
+            "response": {
+              "$ref": "#/definitions/response",
+              "description": "Rule response."
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/node",
+          "description": "Node to create."
+        }
+      ]
+    },
+    "node": {
+      "$id": "#/definitions/node",
+      "description": "Node.",
+      "type": "object",
+      "properties": {
+        "what": {
+          "$ref": "#/definitions/evrNode",
+          "description": "Target node"
+        },
+        "where": {
+          "$ref": "#/definitions/evrNode",
+          "description": "Node target is assigned to."
+        }
+      }
+    },
+    "evrNode": {
+      "$id": "#/definitions/evrNode",
+      "description": "Node.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        },
+        "type": {
+          "$ref": "#/definitions/type",
+          "description": "Node type."
+        },
+        "properties": {
+          "type": "array",
+          "description": "List of properties describing the node.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "grant": {
+      "$id": "#/definitions/grant",
+      "description": "Action for granting specific operations to subjects and targets.",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/evrNode",
+          "description": "Node that will be the subject of the association."
+        },
+        "operations": {
+          "type": "array",
+          "description": "Operations to add to the association.",
+          "items": {
+            "$ref": "#/definitions/operation"
+          },
+          "minItems": 1
+        },
+        "target": {
+          "$ref": "#/definitions/evrNode",
+          "description": "Node that will be the target of the association."
+        }
+      }
+    },
+    "deny": {
+      "$id": "#/definitions/deny",
+      "description": "Set of disallowed operations on a set of target attributes.",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Deny action label"
+        },
+        "subject": {
+          "type": "object",
+          "description": "Subject the deny action will apply to.",
+          "oneOf": [
+            {
+              "description": "Function subject",
+              "properties": {
+                "function": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "description": "Process subject",
+              "properties": {
+                "process": {
+                  "type": "integer",
+                  "description": "Process identifier of deny action subject."
+                }
+              }
+            },
+            {
+              "description": "Node subject",
+              "$ref": "#/definitions/evrNode"
+            }
+          ]
+        },
+        "operations": {
+          "type": "array",
+          "description": "Disallowed operations.",
+          "items": {
+            "$ref": "#/definitions/operation"
+          },
+          "minItems": 1
+        },
+        "target": {
+          "type": "object",
+          "description": "Target of the deny.",
+          "properties": {
+            "complement": {
+              "type": "boolean",
+              "description": "Complement of logical evaluation of containers."
+            },
+            "intersection": {
+              "type": "boolean",
+              "description": "Intersection of containers after evaluation."
+            },
+            "containers": {
+              "type": "array",
+              "description": "Set of containers.",
+              "items": {
+                "type": "object",
+                "anyOf": [
+                  {
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "name": "Name of container."
+                      },
+                      "type": {
+                        "$ref": "#/definitions/type",
+                        "description": "Type of container."
+                      },
+                      "complement": {
+                        "type": "boolean",
+                        "description": "Complement of individual container."
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "function": {
+                        "$ref": "#/definitions/function",
+                        "description": "Function container."
+                      },
+                      "complement": {
+                        "type": "boolean",
+                        "description": "Complement of individual container."
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "type": "object",
+      "description": "Delete action.",
+      "properties": {
+        "prohibitions": {
+          "type": "array",
+          "description": "Prohibitions to delete.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "associations": {
+          "type": "array",
+          "description": "Associations to delete.",
+          "items": {
+            "$ref": "#/definitions/association"
+          }
+        },
+        "assignments": {
+          "type": "array",
+          "description": "Assignments to delete",
+          "items": {
+            "$ref": "#/definitions/node"
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "description": "Nodes to delete.",
+          "items": {
+            "$ref": "#/definitions/node"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "association": {
+      "$id": "#/definitions/association",
+      "description": "Association.",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/evrNode",
+          "description": "Subject of the association."
+        },
+        "target": {
+          "$ref": "#/definitions/evrNode",
+          "description": "Target of the association."
+        }
+      }
+    }
+  }
+}
