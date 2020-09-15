@@ -13,6 +13,7 @@ This project is comprised of the core components of the NIST Policy Machine, a r
 3. [Basic Usage](#basic-usage)
 4. [Functional Component Usage](#functional-component-usage)
 5. [Event Response Grammar (Obligations)](https://github.com/PM-Master/policy-machine-core/tree/master/src/main/java/gov/nist/csd/pm/pip/obligations)
+6. [Custom Obligations](#custom-obligations)
 
 ## Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import into projects.
@@ -299,13 +300,162 @@ pdp.getObligationsServiceadd(obligation, true);
 pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), userID, processID);
 ```
 
+### Custom Obligations
+
 #### Custom Events
 Custom events can be done in four steps:
 
-1. Implement the [EventParser](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventParser.java) interface.
-2. Extend the [EventPattern](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventPattern.java) class. 
-3. Extend the [EventContext](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventContext.java) class and override the
+1. Extend the [EventPattern](src/main/java/gov/nist/csd/pm/pip/obligations/model/EventPattern.java) class. 
+2. Implement the [EventParser](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventParser.java) interface in order to parse the yaml of the custom event.
+3. Extend the [EventContext](src/main/java/gov/nist/csd/pm/epp/events/EventContext.java) class and override the
 `matchesPattern` method.
-4. Call `epp.processEvent()` passing the custom EventContext.
+4. Call `epp.processEvent` passing the custom EventContext.
 
-An example can be found [here](https://github.com/PM-Master/pm-time)
+##### Example
+
+ 1. Extend `EventPattern`.
+
+    ```java
+    public class TestEventPattern extends EventPattern {
+    
+        private List<String> strings;
+    
+        public TestEventPattern() {
+            strings = new ArrayList();
+        }
+    
+        public List<String> getStrings() {
+            return times;
+        }
+    
+        public void setStrings(List<String> strings) {
+            this.strings = strings;
+        }
+    
+        public void addString(String string) {
+            this.strings.add(string);
+        }
+    }
+    ```
+
+ 2. Implement `EventParser`. For this example, we will create a custom event that accepts an array of strings.
+
+    ```java
+    public class TestEventParser implements EventParser {
+    
+        @Override
+        public String key() {
+            return "test_event";
+        }
+    
+        @Override
+        public EventPattern parse(Map map) throws EVRException {
+            if (!map.containsKey(key())) {
+                throw new EVRException("test event requires test_event key");
+            }
+    
+            // expect an array of strings
+            Object o = map.get(key());
+            List list = EVRParser.getObject(o, List.class);
+    
+            TestEventPattern pattern = new TestEventPattern();
+            for (Object obj : list) {
+                String str = String.valueOf(EVRParser.getObject(obj, Object.class));
+                pattern.addString(str);
+            }
+    
+            return pattern;
+        }
+    }
+    ```
+
+    The YAML would look like:
+    
+    ```yaml
+    label: test_event
+    rules:
+      - label: test_rule
+        event:
+          time:
+            - "theString"
+            - "aString1"
+            - "aString2"
+        response:
+        ...
+    ```
+
+3. Extend `EventContext`. For this example, the test event pattern will match if the given string is contained in the pattern's list of strings.
+
+    ```java
+    public class TestEventContext extends EventContext {
+    
+        private String theString;
+    
+        public TimeEventContext(UserContext userCtx, String theString) {
+            super(userCtx, "test_event", null);
+    
+            this.theString = theString;
+        }
+    
+        @Override
+        public boolean matchesPattern(EventPattern event, Graph graph) {
+            if (!(event instanceof TestEventPattern)) {
+                return false;
+            }
+    
+            TestEventPattern testEventPattern = (TestEventPattern)event;
+            List<String> strings = testEventPattern.getStrings();
+            return strings.contains(theString);
+        }
+    
+    }
+    ```
+
+4. Processing the custom event.
+
+    ```java
+    epp.processEvent(new TestEventContext(new UserContext("aUser"), "theString"));
+    ```
+
+#### Custom Responses
+Custom responses can be done in four steps:
+
+1. Extend the [ResponsePattern](src/main/java/gov/nist/csd/pm/pip/obligations/model/ResponsePattern.java) class and override 
+the `apply` method.
+2. Implement the [ResponseParser](src/main/java/gov/nist/csd/pm/pip/obligations/evr/ResponseParser.java) interface in order to parse the yaml of the custom response.
+
+#### Example
+
+1. Extend `ResponsePattern`.
+
+    ```java
+    public class TestResponsePattern extends ResponsePattern {
+    
+       @Override
+       public void apply(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator, UserContext definingUser,
+                        EventContext eventCtx, Rule rule, String obligationLabel) throws PMException {
+           // do something
+       }
+    
+    }
+    ```
+   
+2. Implement `ResponseParser`.
+
+    ```java
+   public class TestResponseParser implements ResponseParser {
+       @Override
+       public String key() {
+           // system responses are handled in the parser and don't need a key
+           return "";
+       }
+
+       public ResponsePattern parse(Map map) throws EVRException {   
+           ResponsePattern responsePattern = new TestResponsePattern();
+   
+           // parse yaml map
+       
+           return responsePattern;
+       }
+   }
+   ```
