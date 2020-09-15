@@ -66,7 +66,8 @@ class EPPTest {
     void TestEvent() throws PMException, IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/event_test.yml");
         String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        Obligation obligation = new EVRParser().parse("super", yml);
+        Obligation obligation = new EVRParser(null, null)
+                .parse("super", yml);
 
         UserContext superCtx = new UserContext("super");
         pdp.getObligationsService(superCtx).add(obligation, true);
@@ -92,7 +93,7 @@ class EPPTest {
         String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
         UserContext superCtx = new UserContext("super");
 
-        Obligation obligation = new EVRParser().parse(superCtx.getUser(), yml);
+        Obligation obligation = new EVRParser(null, null).parse(superCtx.getUser(), yml);
         pdp.getObligationsService(superCtx).add(obligation, true);
 
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
@@ -141,7 +142,7 @@ class EPPTest {
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
         String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        Obligation obligation = new EVRParser().parse("super", yml);
+        Obligation obligation = new EVRParser(null, null).parse("super", yml);
 
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
