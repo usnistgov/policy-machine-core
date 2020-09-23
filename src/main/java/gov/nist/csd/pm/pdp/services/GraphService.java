@@ -1,10 +1,7 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.epp.events.AssignEvent;
-import gov.nist.csd.pm.epp.events.AssignToEvent;
+import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.epp.events.DeassignEvent;
-import gov.nist.csd.pm.epp.events.DeassignFromEvent;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -303,6 +300,8 @@ public class GraphService extends Service implements Graph {
 
         //create association in PAP
         graph.associate(ua, target, operations);
+
+        getEPP().processEvent(new AssociationEvent(userCtx, graph.getNode(ua), graph.getNode(target)));
     }
 
     /**
@@ -323,6 +322,8 @@ public class GraphService extends Service implements Graph {
 
         //create association in PAP
         graph.dissociate(ua, target);
+
+        getEPP().processEvent(new DeleteAssociationEvent(userCtx, graph.getNode(ua), graph.getNode(target)));
     }
 
     /**
