@@ -9,7 +9,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.util.*;
 
 public class EVRParser {
-
+    
     public static <T> T getObject(Object o, Class<T> type) throws EVRException {
         if(!type.isInstance(o)) {
             throw new EVRException("expected " + type + " got " + o.getClass() + " at \"" + o + "\"");
@@ -24,7 +24,6 @@ public class EVRParser {
         }
 
         if(map.containsKey("function")) {
-            System.out.println("found function: " + map.get("function"));
             Map funcMap = getObject(map.get("function"), Map.class);
             return new EvrNode(parseFunction(funcMap));
         } else {
@@ -89,6 +88,13 @@ public class EVRParser {
         setCustomResponseParsers(customResponseParsers);
 
         this.systemResponseParser = new PmResponseParser(customEventParsers, customResponseParsers);
+    }
+
+    public EVRParser() {
+        this.customEventParsers = new HashMap<>();
+        this.customResponseParsers = new HashMap<>();
+
+        this.systemResponseParser = new PmResponseParser(new ArrayList<>(), new ArrayList<>());
     }
 
     private void setCustomEventParsers(List<EventParser> customEventParsers) {
