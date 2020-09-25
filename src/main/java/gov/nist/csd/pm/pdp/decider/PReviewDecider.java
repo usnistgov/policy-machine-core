@@ -119,6 +119,10 @@ public class PReviewDecider implements Decider {
         for(String borderTarget : userCtx.getBorderTargets().keySet()) {
             Set<String> objects = getAscendants(graph.getNode(borderTarget).getName());
             for (String object : objects) {
+                if (results.containsKey(object)) {
+                    continue;
+                }
+
                 // run dfs on the object
                 TargetContext targetCtx = processTargetDAG(object, userCtx);
 
