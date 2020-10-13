@@ -33,6 +33,11 @@ public class Association extends Relationship implements Serializable {
         this.operations = operations;
     }
 
+    public Association(String ua, String target) {
+        super(ua, target);
+        this.operations = new OperationSet();
+    }
+
     public OperationSet getOperations() {
         return operations;
     }
@@ -68,12 +73,11 @@ public class Association extends Relationship implements Serializable {
 
         Association association = (Association) o;
         return this.source.equals(association.source) &&
-                this.target.equals(association.target) &&
-                this.operations.equals(association.operations);
+                this.target.equals(association.target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source, target, operations);
+        return Objects.hash(source, target);
     }
 }
