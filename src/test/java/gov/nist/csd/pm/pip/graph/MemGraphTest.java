@@ -283,4 +283,24 @@ class MemGraphTest {
         assertEquals("pc", node.getName());
         assertEquals(PC, node.getType());
     }
+
+    @Test
+    void testParallelEdges() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua1");
+        graph.createNode("u1", U, null, "ua2");
+        graph.associate("ua2", "ua1", new OperationSet("r"));
+        graph.dissociate("ua2", "ua1");
+
+        assertTrue(graph.isAssigned("ua2", "ua1"));
+        assertFalse(graph.getSourceAssociations("ua2").containsKey("ua1"));
+
+        graph.associate("ua2", "ua1", new OperationSet("r"));
+        graph.deassign("ua2", "ua1");
+
+        assertFalse(graph.isAssigned("ua2", "ua1"));
+        assertTrue(graph.getSourceAssociations("ua2").containsKey("ua1"));
+    }
 }
