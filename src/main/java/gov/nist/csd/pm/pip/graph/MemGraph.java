@@ -353,16 +353,17 @@ public class MemGraph implements Graph {
      */
     @Override
     public void deassign(String child, String parent) {
-        graph.removeEdge(child, parent);
+        graph.removeEdge(new Assignment(child, parent));
     }
 
     @Override
     public boolean isAssigned(String child, String parent) throws PMException {
-        return graph.containsEdge(child, parent);
+        return graph.containsEdge(new Assignment(child, parent));
     }
 
     /**
-     * Associate the user attribute node and the target node.
+     * Associate the user attribute node and the target node. If an association already exists, the operations will
+     * be updated with the given operations.
      *
      * @throws PMException              if the user attribute node does not exist in the graph.
      * @throws PMException              if the target node does not exist in the graph.
@@ -400,7 +401,7 @@ public class MemGraph implements Graph {
      */
     @Override
     public void dissociate(String ua, String target) {
-        graph.removeEdge(ua, target);
+        graph.removeEdge(new Association(ua, target));
     }
 
     /**
