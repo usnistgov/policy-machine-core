@@ -384,13 +384,11 @@ public class MySQLGraph implements Graph {
         ){
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
-            List<Node> nodes = new ArrayList<>();
+            int count = 0;
             while (rs.next()) {
-                String              name_p = rs.getString("name");
-                Node cur_node = new Node(name_p, null, null);
-                nodes.add(cur_node);
+                count = rs.getInt("total");
             }
-            return nodes.size() != 0;
+            return count != 0;
         } catch (SQLException ex) {
             throw new PIPException("graph", ex.getMessage());
         }
@@ -426,11 +424,25 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public Set<Node> getNodes() throws PIPException {
-        ResultSet rs_type = null;
-        PreparedStatement pstmt = null;
         Node node = null;
         Set<Node> nodes = new HashSet<>();
-        HashMap<Node, Long> nodesHashmap = new HashMap<>();
+        HashMap<Long, String> nodeType = new HashMap<>();
+        //store node_type_id
+        try (
+                Connection con2 = this.conn.getConnection();
+                Statement statement = con2.createStatement();
+                ResultSet resultSet = statement.executeQuery(MySQLHelper.SELECT_ALL_NODE_TYPE)
+        ) {
+
+            while (resultSet.next()) {
+                int node_typeID = resultSet.getInt("node_type_id");
+                String node_typeName = resultSet.getString("name");
+                nodeType.put((long) node_typeID, node_typeName);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new PIPException("graph", sqlException.getMessage());
+        }
 
         try (
                 Connection con = this.conn.getConnection();
@@ -438,12 +450,10 @@ public class MySQLGraph implements Graph {
                 ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_ALL_FROM_NODE)
 
         ){
-            // return node_type_id instead of numeric value of the node
-            long node_type =  0;
             while (rs.next()) {
                 long                id = rs.getInt("node_id");
                 String              name = rs.getString("name");
-                                    node_type = rs.getInt("node_type_id");
+                long                node_type = rs.getInt("node_type_id");
                 String              properties_string = rs.getString("node_property");
                 Map<String, String> properties = null;
 
@@ -456,35 +466,18 @@ public class MySQLGraph implements Graph {
                 }
 
                 NodeType type = null;
+                for (Map.Entry<Long, String> node_type_k : nodeType.entrySet()) {
+                    if ( node_type == node_type_k.getKey()) {
+                        type = NodeType.toNodeType(node_type_k.getValue());
+                    }
+                }
                 node = new Node(id, name, type, properties);
-                nodesHashmap.put(node, node_type);
                 nodes.add(node);
             }
-            //retrieve all nodes
-            for (Map.Entry<Node, Long> node_k: nodesHashmap.entrySet()) {
-                pstmt = con.prepareStatement(MySQLHelper.SELECT_NODE_TYPE_NAME_FROM_NODE_TYPE);
-                pstmt.setLong(1, node_k.getValue());
-                rs_type = pstmt.executeQuery();
-                String name_type = "";
-                while (rs_type.next()){
-                    name_type = rs_type.getString("name");
-                }
-                node_k.getKey().setType(NodeType.toNodeType(name_type));
-            }
-            nodes = nodesHashmap.keySet();
             con.close();
             return nodes;
         } catch (SQLException s) {
             throw new PIPException("graph", s.getMessage());
-        }
-        finally {
-            try {
-                if(pstmt != null) {pstmt.close();}
-                if(rs_type != null) {rs_type.close();}
-
-            } catch (SQLException e) {
-                throw new PIPException("graph", e.getMessage());
-            }
         }
     }
 
