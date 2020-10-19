@@ -31,12 +31,25 @@ public class MySQLGraph implements Graph {
     private static final ObjectReader reader = new ObjectMapper().readerFor(HashMap.class);
     private static final ObjectReader reader2 = new ObjectMapper().readerFor(OperationSet.class);
     private static final String NODE_NOT_FOUND_MSG = "node %s does not exist";
+    private static final HashMap<Long, String> nodeType = new HashMap<>();
+
+    public static HashMap<Long, String> getNodeType() {
+        nodeType.clear();
+
+        nodeType.put((long) 1, "OA");
+        nodeType.put((long) 2, "UA");
+        nodeType.put((long) 3, "U");
+        nodeType.put((long) 4, "O");
+        nodeType.put((long) 5, "PC");
+        nodeType.put((long) 6, "OS");
+        return nodeType;
+    }
+
     private final MySQLConnection conn;
 
     public MySQLGraph(MySQLConnection connection) {
         this.conn = connection;
     }
-
 
     public static String toJSON(Map<String, String> map) throws JsonProcessingException {
         return objectMapper.writeValueAsString(map);
@@ -426,23 +439,7 @@ public class MySQLGraph implements Graph {
     public Set<Node> getNodes() throws PIPException {
         Node node = null;
         Set<Node> nodes = new HashSet<>();
-        HashMap<Long, String> nodeType = new HashMap<>();
-        //store node_type_id
-        try (
-                Connection con2 = this.conn.getConnection();
-                Statement statement = con2.createStatement();
-                ResultSet resultSet = statement.executeQuery(MySQLHelper.SELECT_ALL_NODE_TYPE)
-        ) {
-
-            while (resultSet.next()) {
-                int node_typeID = resultSet.getInt("node_type_id");
-                String node_typeName = resultSet.getString("name");
-                nodeType.put((long) node_typeID, node_typeName);
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            throw new PIPException("graph", sqlException.getMessage());
-        }
+        HashMap<Long, String> nodeType = getNodeType();
 
         try (
                 Connection con = this.conn.getConnection();
