@@ -536,6 +536,38 @@ public class MemGraph implements Graph {
         }
     }
 
+    public void fromJson_with_config(String json) throws PMException {
+        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+
+        Collection<Node> nodes = jsonGraph.getNodes();
+        for (Node node : nodes) {
+            if (node.getType().equals(PC)) {
+                this.createPolicyClass(node.getName(), node.getProperties());
+            } else {
+                this.createNode(node.getName(), node.getType(), node.getProperties());
+            }
+        }
+
+        List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
+        for (String[] assignment : assignments) {
+            if (assignment.length != 2) {
+                throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
+            }
+
+            String source = assignment[0];
+            String target = assignment[1];
+
+            this.assign(source, target);
+        }
+
+        Set<JsonAssociation> associations = jsonGraph.getAssociations();
+        for (JsonAssociation association : associations) {
+            String ua = association.getSource();
+            String target = association.getTarget();
+            this.associate(ua, target, new OperationSet(association.getOperations()));
+        }
+    }
+
     private static class JsonGraph {
         Collection<Node> nodes;
         Set<String[]>  assignments;

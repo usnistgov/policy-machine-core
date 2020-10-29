@@ -489,20 +489,44 @@ public class MySQLGraph implements Graph {
 
     @Override
     public Node getNode(String name) throws PIPException {
+        HashMap<Long, String> nodeType = getNodeType();
+        Node node = null;
+        try (
+                Connection con = this.conn.getConnection();
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_ALL_FROM_NAME)
+        ) {
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                long                id = rs.getInt("node_id");
+                String              name_node = rs.getString("name");
+                long                node_type = rs.getInt("node_type_id");
+                String              properties_string = rs.getString("node_property");
+                Map<String, String> properties = null;
 
-        Collection<Node> nodes = getNodes();
-        Node node;
-        try {
-            node = nodes.stream()
-                    .filter(node_k -> node_k.getName().equalsIgnoreCase(name))
-                    .iterator().next();
-        } catch (Exception p) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, name));
+                if (properties_string != null) {
+                    try {
+                        properties = reader.readValue(properties_string);
+                    } catch (JsonProcessingException j) {
+                        throw new PIPException("graph", j.getMessage());
+                    }
+                }
+
+                NodeType type = null;
+                for (Map.Entry<Long, String> node_type_k : nodeType.entrySet()) {
+                    if ( node_type == node_type_k.getKey()) {
+                        type = NodeType.toNodeType(node_type_k.getValue());
+                    }
+                }
+                node = new Node(id, name, type, properties);
+            }
+            return node;
+        } catch (SQLException s) {
+            throw new PIPException("graph", s.getMessage());
         }
-        return node;
     }
 
-    /**
+        /**
      * Search the graph for nodes matching the given parameters. A node must
      * contain all properties provided to be returned.
      * To get all the nodes that have a specific property key with any value use "*" as the value in the parameter.
@@ -1066,6 +1090,30 @@ public class MySQLGraph implements Graph {
             String target = association.getTarget();
             this.associate(ua, target, new OperationSet(association.getOperations()));
         }
+    }
+
+    public String toJson_with_config() throws PMException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Collection<Node> nodes = this.getNodes();
+        HashSet<String[]> jsonAssignments = new HashSet<>();
+        HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
+
+        for (Node node : nodes) {
+            Set<String> parents = this.getParents(node.getName());
+            for (String parent : parents) {
+                jsonAssignments.add(new String[]{node.getName(), parent});
+            }
+            if (node.getType() == NodeType.UA) {
+                Map<String, OperationSet> associations = this.getSourceAssociations(node.getName());
+                for (String target : associations.keySet()) {
+                    OperationSet ops = associations.get(target);
+                    Node targetNode = this.getNode(target);
+                    jsonAssociations.add(new JsonAssociation(node.getName(), targetNode.getName(), ops));
+                }
+            }
+        }
+        return gson.toJson(new JsonGraph(nodes, jsonAssignments, jsonAssociations));
     }
 
     public static class JsonGraph {
