@@ -35,15 +35,24 @@ public class EPP {
         this.functionEvaluator = new FunctionEvaluator();
         if (eppOptions != null) {
             for (FunctionExecutor executor : eppOptions.getExecutors()) {
-                this.functionEvaluator.addFunctionExecutor(executor);
+                addFunctionExecutor(executor);
             }
         }
+    }
+
+    public void addFunctionExecutor(FunctionExecutor executor) {
+        this.functionEvaluator.addFunctionExecutor(executor);
+    }
+
+    public void removeFunctionExecutor(FunctionExecutor executor) {
+        this.functionEvaluator.removeFunctionExecutor(executor);
     }
 
     public PAP getPAP() {
         return pap;
     }
-    
+
+
     public PDP getPDP() {
         return pdp;
     }

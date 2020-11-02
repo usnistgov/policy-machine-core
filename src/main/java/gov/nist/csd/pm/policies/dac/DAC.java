@@ -3,49 +3,101 @@ package gov.nist.csd.pm.policies.dac;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.operations.Operations;
+import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.obligations.Obligations;
+import gov.nist.csd.pm.pip.obligations.evr.EVRException;
+import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
+import gov.nist.csd.pm.pip.obligations.model.Obligation;
+import gov.nist.csd.pm.policies.dac.functionExecutors.ConfigConsentFunctionExecutor;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Utilities for any operation relating to the DAC NGAC concept
+ *
+ * Assumptions:
+ *  -
  */
 public class DAC {
+
+    private static String DAC_USERS_NAME = "DAC_users";
+    private static String DAC_OBJECTS_NAME = "DAC_objects";
+    private static String DAC_PC_NAME = "DAC";
+    private static Node DAC_USERS_NODE;
+    private static Node DAC_OBJECTS_NODE;
+    private static Node DAC_PC_NODE;
+
+
     /**
-     * This sets the DAC PC for any of the methods in this class.
+     * This sets/makes the DAC PC for any of the methods in this class.
      * If the given PC already exists it will mark it as the DAC PC,
      * otherwise it will create and mark it.
      *
+     * This method will add DAC Attributes:
+     *  - DAC_Users: contains all of the users in the graph
+     *  - DAC_Objects: contains all of the user_home OAs
+     *
+     * This method will also added the consent obligation.
+     * This will automatically the user delegation configuration whenever a user is added to the DAC.
+     * The obligation will, for any user added to the DAC_users UA,:
+     *  - create:
+     *    - user_consent_admin
+     *    - user_consent_group
+     *    - user_consent_container_UA
+     *    - user_consent_container_OA
+     *  - associate:
+     *    - consent_admin to group
+     *    - consent_admin to container_UA
+     *    - consent_admin to container_OA
+     *  - assign:
+     *    - user to user admin
+     *
+     *
      * This will likely be the first call in any method of this class.
      *
+     *
      * @param DACname the name of the DAC PC
-     * @param graph
+     * @param pdp PDP of the existing graph
      * @return the DAC PC
-     * @throws PMException
+     * @throws PMException if anything goes wrong
      */
-    private static Node configure (String DACname, Graph graph) throws PMException {
-        if (!graph.exists(DACname)) {
-            return graph.createPolicyClass(DACname, Node.toProperties("ngac_type", "DAC"));
-        } else {
-            Node DAC = graph.getNode(DACname);
+    public static Node configure (String DACname, PDP pdp, UserContext superUser) throws PMException {
 
-            // add ngac_type=DAC to properties
-            String typeValue = DAC.getProperties().get("ngac_type");
-            if (typeValue == null) {
-                DAC.addProperty("ngac_type", "DAC");
-            } else if (!typeValue.equals("DAC")) {
-                throw new PMException("Node cannot have property key of ngac_type");
-            }
+        Graph graph = pdp.getGraphService(superUser);
+        Obligations obligations = pdp.getObligationsService(superUser);
 
-            return DAC;
+        // todo: reset graph
+
+        //// Creating and Adding the DAC PC and Attributes
+        if (DACname != null) {
+            DAC_PC_NAME = DACname;
         }
+
+        // DAC PC
+        DAC_PC_NODE = checkAndCreateDACNode(graph, DAC_PC_NAME, NodeType.PC);
+
+        // DAC_users UA
+        DAC_USERS_NODE = checkAndCreateDACNode(graph, DAC_USERS_NAME, NodeType.UA);
+
+        // DAC_objects OA
+        DAC_OBJECTS_NODE = checkAndCreateDACNode(graph, DAC_OBJECTS_NAME, NodeType.OA);
+
+
+        //// Adding the consent obligation for user config
+        // first add the function executor
+        pdp.getEPP().addFunctionExecutor(new ConfigConsentFunctionExecutor());
+        obligations.add(getConsentObligation(superUser), true);
+
+
+        // return the DAC PC
+        return DAC_PC_NODE;
     }
+
+
 
     /**
      * Add a delegation. This essentially creates an association from the context of the delegator.
@@ -56,30 +108,31 @@ public class DAC {
      *  - Delegator must have "create association" and all given ops on all targets
      *
      * @param DACname the String of the DAC PC
-     * @param graph
+     * @param pdp the PDP for the graph
      * @param delegator the UserContext of the delegator
      * @param delegateeName the source of the delegation
      * @param ops the set of operations attempting to be delegated
      * @param targetNames the names of the targets of the delegation
      * @throws PMException if any of the above pre-conditions are not met
      */
-    private static void delegate (String DACname, Graph graph, UserContext delegator,
+    public static void delegate (String DACname, PDP pdp, UserContext delegator,
                                   String delegateeName, OperationSet ops, Set<String> targetNames) throws PMException {
+        assert !(ops == null || ops.isEmpty()) : "Operations cannot be null or empty";
+        assert delegateeName != null : "Delegatee must exist in graph";
+        assert pdp != null : "PDP must exist";
+        assert delegator != null : "Delegator must exist";
+        assert !(targetNames == null || targetNames.isEmpty()) : "Must have targets";
+
+        // todo: throw error if not configured
+
+        Graph graph = pdp.getGraphService(delegator);
 
         Node delegatee = graph.getNode(delegateeName);
-        Set<Node> targets = new HashSet<>();
         NodeType targetsType = null;
         Map<String, OperationSet> sourceAssociations = graph.getSourceAssociations(delegator.getUser());
 
-        assert ops == null || ops.isEmpty() : "Operations cannot be null or empty";
-        assert delegateeName == null : "Delegatee must exist in graph";
-        assert graph == null : "Graph must exist";
-        assert delegator == null : "Delegator must exist";
 
-
-        // make sure that the DAC PC exists
-        Node DAC = configure(DACname, graph);
-
+        //// Checking pre-conditions
         // check if delegatee is UA or U
         if (!(delegatee.getType() == NodeType.UA || delegatee.getType() == NodeType.U))
             throw new PMException("Delegatee must either be a UA or U");
@@ -87,7 +140,7 @@ public class DAC {
         // get all targets and check if all the targets are a consistent type AND get also get that type
         for (String targetName: targetNames) {
             Node _target = graph.getNode(targetName);
-            if (targetsType == null) { //
+            if (targetsType == null) {
                 if (_target.getType() == NodeType.UA || _target.getType() == NodeType.U)
                     targetsType = NodeType.UA;
                 else if (_target.getType() == NodeType.OA ||_target.getType() == NodeType.O)
@@ -96,7 +149,7 @@ public class DAC {
                 if (targetsType == NodeType.UA) {
                     if (!(_target.getType() == NodeType.UA || _target.getType() == NodeType.U))
                         throw new PMException("Targets have to have consistent types.");
-                } else if (targetsType == NodeType.OA) {
+                } else {
                     if (!(_target.getType() == NodeType.OA || _target.getType() == NodeType.O))
                         throw new PMException("Targets have to have consistent types.");
                 }
@@ -105,12 +158,10 @@ public class DAC {
             if (_target.getType() == NodeType.PC) {
                 throw new PMException("Targets cannot be a PC.");
             }
-
-            targets.add(_target);
         }
 
         // check if delegator has create association on the delegatee
-        OperationSet delegateeOps = sourceAssociations.get(delegatee);
+        OperationSet delegateeOps = sourceAssociations.get(delegatee.getName());
         if (!delegateeOps.contains(Operations.CREATE_ASSOCIATION)) {
             throw new PMException("Delegator must have the 'Create Association' Access Right on delegatee.");
         }
@@ -129,24 +180,38 @@ public class DAC {
         }
 
 
-        /////// EVERYTHING checked at this point, and the delegation can be created
+        //// Pre-conditions checked at this point, and the delegation can be created
+        ConsentNodes consentNodes = findConsentNodes(graph, delegator.getUser());
+
         // create user attribute over delegatee (delegator_delegatee_delegation_UUID)
         String delegationID = UUID.randomUUID().toString();
         Node delegationUA = graph.createNode(
                 delegator.getUser() + "_" + delegateeName + "_delegationUA_" + delegationID,
                 NodeType.UA,
                 Node.toProperties("delegationID", delegationID),
-                DAC.getName()
+                consentNodes.consent_group.getName()
         );
         graph.assign(delegateeName, delegationUA.getName());
 
         // create respective attribute over target (delegator_delegatee_delegation_UUID)
-        Node delegationTargetA = graph.createNode(
-                delegator.getUser() + "_" + delegateeName + "_delegationOA_" + delegationID,
-                targetsType,
-                Node.toProperties("delegationID", delegationID),
-                DAC.getName()
-        );
+        Node delegationTargetA;
+        if (targetsType.equals(NodeType.OA)) {
+            delegationTargetA = graph.createNode(
+                    delegator.getUser() + "_" + delegateeName + "_delegationOA_" + delegationID,
+                    targetsType,
+                    Node.toProperties("delegationID", delegationID),
+                    consentNodes.consent_container_oa.getName()
+            );
+        } else {
+            delegationTargetA = graph.createNode(
+                    delegator.getUser() + "_" + delegateeName + "_delegationUA_" + delegationID,
+                    targetsType,
+                    Node.toProperties("delegationID", delegationID),
+                    // container ua
+                    consentNodes.consent_container_ua.getName()
+            );
+        }
+
         for (String targetName: targetNames) {
             graph.assign(targetName, delegationTargetA.getName());
         }
@@ -156,10 +221,108 @@ public class DAC {
 
     }
 
-    // todo: add prohibitions
-//    private static void delegate (String DACname, Graph graph, UserContext delegator,
-//                                  String delegatee, OperationSet permission, Set<String> target) throws PMException {
-//        configure(DACname, graph);
-//        // check if delegator
-//    }
+    // todo: add an over-ridden version of delegate which also takes into account prohibitions
+
+
+    /********************
+     * Helper Functions *
+     ********************/
+
+    /**
+     * Helper method to get the consent obligation.
+     * This obligation will run the Consent Function Executor whenever a user is assigned to DAC_users.
+     */
+    private static Obligation getConsentObligation(UserContext userCtx) throws EVRException {
+        String yaml =
+                "label: consent obligation\n" +
+                        "rules:\n" +
+                        "  - label: consent rule\n" +
+                        "    event:\n" +
+                        "      subject:\n" +
+                        "      operations:\n" +
+                        "        - assign to\n" +
+                        "      target:\n" +
+                        "        policyElements:\n" +
+                        "          - name: " + DAC_USERS_NAME + "\n" +
+                        "            type: UA\n" +
+                        "    response:\n" +
+                        "      actions:\n" +
+                        "        - function:\n" +
+                        "            name: config_consent";
+        EVRParser parser = new EVRParser();
+        return parser.parse(userCtx.getUser(), yaml);
+    }
+
+    /**
+     * Helper Method to check if a DAC node exists, and other wise create it.
+     * It will also set the corresponding property for that DAC node.
+     *
+     * This methods is specifically for DAC nodes, and not meant to be used elsewhere
+     */
+    private static Node checkAndCreateDACNode(Graph graph, String name, NodeType type) throws PMException {
+        Node DAC;
+        if (!graph.exists(name)) {
+            if (type == NodeType.PC) {
+                return graph.createPolicyClass(name, Node.toProperties("ngac_type", "DAC"));
+            } else {
+                return graph.createNode (
+                        name,
+                        type,
+                        Node.toProperties("ngac_type", name),
+                        DAC_PC_NAME
+                );
+            }
+        } else {
+            DAC = graph.getNode(name);
+
+            // add ngac_type=DAC to properties
+            String typeValue = DAC.getProperties().get("ngac_type");
+            if (typeValue == null) {
+                DAC.addProperty("ngac_type", name);
+            } else if (!typeValue.equals(name)) {
+                throw new PMException("Node cannot have property key of ngac_type");
+            }
+        }
+        return DAC;
+    }
+
+    /**
+     * Helper Method to find the corresponding consent nodes for a certain user.
+     *
+     * Under it a small class to group all of the nodes into one object
+     */
+    private static ConsentNodes findConsentNodes(Graph graph, String forUser) throws PMException {
+        ConsentNodes consentNodes = new ConsentNodes();
+
+        Set<Node> all_nodes = graph.getNodes();
+        all_nodes.stream().forEach((n) -> {
+            if (n.getProperties().get("consent_admin for").equals(forUser)) {
+                consentNodes.consent_admin = n;
+            } else if (n.getProperties().get("consent_group for").equals(forUser)) {
+                consentNodes.consent_group = n;
+            } else if (n.getProperties().get("consent_container_OA for").equals(forUser)) {
+                consentNodes.consent_container_oa = n;
+            } else if (n.getProperties().get("consent_container_UA for").equals(forUser)) {
+                consentNodes.consent_container_ua = n;
+            }
+        });
+
+        if (consentNodes.anyAreEmpty())
+            throw new PMException("Consent Nodes for user, " + forUser + ", not properly created.");
+        else
+            return consentNodes;
+    }
+    protected static class ConsentNodes {
+        Node consent_admin = null;
+        Node consent_group = null;
+        Node consent_container_oa = null;
+        Node consent_container_ua = null;
+
+        boolean anyAreEmpty() {
+            return consent_admin == null ||
+                   consent_group == null ||
+                   consent_container_oa == null ||
+                   consent_container_ua == null;
+        }
+    }
 }
