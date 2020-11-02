@@ -43,7 +43,7 @@ public class ConfigConsentFunctionExecutor implements FunctionExecutor {
         //// create the consent configuration for this user -- ths user has already been assigned to dac_users
         // create a dac consent admin UA for this user, assign user to it, put it in DAC class
         Node userConsentAdminNode = graph.createNode(
-                userNode.getName() + "consent_admin",
+                userNode.getName() + "_consent_admin",
                 UA,
                 Node.toProperties("consent_admin for", userNode.getName()),
                 "DAC_default_UA"

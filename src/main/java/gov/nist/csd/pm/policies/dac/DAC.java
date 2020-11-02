@@ -4,6 +4,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.GraphService;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -24,12 +25,12 @@ import java.util.*;
  */
 public class DAC {
 
-    private static String DAC_USERS_NAME = "DAC_users";
-    private static String DAC_OBJECTS_NAME = "DAC_objects";
-    private static String DAC_PC_NAME = "DAC";
-    private static Node DAC_USERS_NODE;
-    private static Node DAC_OBJECTS_NODE;
-    private static Node DAC_PC_NODE;
+    public static String DAC_USERS_NAME = "DAC_users";
+    public static String DAC_OBJECTS_NAME = "DAC_objects";
+    public static String DAC_PC_NAME = "DAC";
+    public static Node DAC_USERS_NODE = null;
+    public static Node DAC_OBJECTS_NODE = null;
+    public static Node DAC_PC_NODE = null;
 
 
     /**
@@ -60,17 +61,18 @@ public class DAC {
      * This will likely be the first call in any method of this class.
      *
      *
-     * @param DACname the name of the DAC PC
+     * @param DACname the name of the DAC PC, null if you want to use the default name
      * @param pdp PDP of the existing graph
      * @return the DAC PC
      * @throws PMException if anything goes wrong
      */
     public static Node configure (String DACname, PDP pdp, UserContext superUser) throws PMException {
 
-        Graph graph = pdp.getGraphService(superUser);
+        GraphService graph = pdp.getGraphService(superUser);
         Obligations obligations = pdp.getObligationsService(superUser);
 
-        // todo: reset graph
+        // Reset graph. Soon will be replaced with on boarding methods.
+        graph.reset(superUser);
 
         //// Creating and Adding the DAC PC and Attributes
         if (DACname != null) {
@@ -125,7 +127,7 @@ public class DAC {
 
         // todo: throw error if not configured
 
-        Graph graph = pdp.getGraphService(delegator);
+        GraphService graph = pdp.getGraphService(delegator);
 
         Node delegatee = graph.getNode(delegateeName);
         NodeType targetsType = null;
