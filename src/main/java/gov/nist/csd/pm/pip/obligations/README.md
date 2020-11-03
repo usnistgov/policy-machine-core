@@ -622,13 +622,15 @@ Any executors that are provided to this constructor will be available to the EPP
 ## Built-in PDP events
 The following events are triggered by the PDP:
 
-- Assign
-- Assign to
-- Deassign
-- Deassign From
+- assign
+- assign to
+- deassign
+- deassign From
+- association
+- delete association
 
 For each call to `assign()` and `deassign()` in the PDP, there are two events.  The child is being assigned/deassigned 
-and the parent is being assigned to/deassigned from.
+and the parent is being assigned to/deassigned from. The 'association' event occurs in `associate()` and 'delete association' occurs in `dissociate()`.
 
 These are only the built in events.  Also, the PDP is not the only component that can trigger an event.  The PEP is also 
 capable of triggering events of any kind. This is where custom events can be triggered. 

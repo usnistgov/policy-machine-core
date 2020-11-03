@@ -6,21 +6,16 @@ import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
-import gov.nist.csd.pm.pip.graph.MemGraphSerializer;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PReviewDeciderTest {
@@ -726,7 +721,7 @@ class PReviewDeciderTest {
         assertTrue(list.containsAll(RWE));
     }
 
-    private static void buildGraph() throws PMException {
+    private static Graph buildGraph() throws PMException {
         MemGraph graph = new MemGraph();
         Random rand = new Random();
         Node pc1 = graph.createPolicyClass("PC1", null);
@@ -761,14 +756,6 @@ class PReviewDeciderTest {
             }
         }
 
-        //users
-        for (int i = 1; i <= 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                String parent = uas.get(rand.nextInt(uas.size()));
-                Node u = graph.createNode("U_" + i, U, null, parent);
-            }
-        }
-
         // first level of OAs
         List<String> oas = new ArrayList<>();
         for (int i = 1; i <= 6; i++) {
@@ -798,12 +785,25 @@ class PReviewDeciderTest {
             }
         }
 
-        // objects
+        //objects
         for (int i = 1; i <= 400; i++) {
+            String iParent = "";
+            List<String> parents = new ArrayList<>();
             for (int j = 0; j < 50; j++) {
-                String parent = oas.get(rand.nextInt(oas.size()));
-                Node o = graph.createNode("O_" + i, O, null, parent);
+                String parent = uas.get(rand.nextInt(uas.size()));
+                if (parents.contains(parent) || iParent.equals(parent)) {
+                    j--;
+                    continue;
+                }
+
+                if (j == 0) {
+                    iParent = parent;
+                } else {
+                    parents.add(parent);
+                }
             }
+
+            Node u = graph.createNode("U_" + i, U, null, iParent, parents.toArray(new String[]{}));
         }
 
         // associations
@@ -821,16 +821,6 @@ class PReviewDeciderTest {
             graph.associate(ua, target, new OperationSet(READ, WRITE));
         }
 
-        MemGraphSerializer memGraphSerializer = new MemGraphSerializer(graph);
-
-        String s = memGraphSerializer.serialize();
-        try {
-            PrintWriter printWriter = new PrintWriter(new File("ngac/evr/large_sample.pm"));
-            printWriter.println(s);
-            printWriter.flush();
-            printWriter.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        return graph;
     }
 }

@@ -77,6 +77,14 @@ rules:
                     - name: oa1
                       type: OA
               response:
+                actions:
+                  - create:
+                      - what:
+                          name: createdRuleNode
+                          type: OA
+                        where:
+                          name: oa1
+                          type: OA
         - create:
             - what:
                 name: new OA

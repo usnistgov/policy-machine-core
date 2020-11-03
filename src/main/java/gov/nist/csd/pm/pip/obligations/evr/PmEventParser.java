@@ -10,11 +10,11 @@ import java.util.Map;
 /**
  * The EventParser for Admin/Access events.
  */
-public class SystemEventParser implements EventParser {
+public class PmEventParser implements EventParser {
 
     @Override
     public String key() {
-        // system events are handled in the parser and doesn't need a key
+        // system events are handled in the parser and don't need a key
         return "";
     }
 

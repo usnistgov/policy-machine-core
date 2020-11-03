@@ -66,7 +66,8 @@ class EPPTest {
     void TestEvent() throws PMException, IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("epp/event_test.yml");
         String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        Obligation obligation = new EVRParser().parse("super", yml);
+        Obligation obligation = new EVRParser()
+                .parse("super", yml);
 
         UserContext superCtx = new UserContext("super");
         pdp.getObligationsService(superCtx).add(obligation, true);
