@@ -6,13 +6,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MemObligations implements Obligations {
 
     private Map<String, Obligation> obligations;
+    public Lock lock;
 
     public MemObligations() {
         this.obligations = new HashMap<>();
+
+        ReadWriteLock lock = new ReentrantReadWriteLock();
+        this.lock = lock.writeLock();
+    }
+
+    public void lock() {
+        this.lock.lock();
+    }
+
+    public void unlock() {
+        this.lock.unlock();
     }
 
     @Override

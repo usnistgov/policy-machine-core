@@ -303,4 +303,62 @@ class MemGraphTest {
         assertFalse(graph.isAssigned("ua2", "ua1"));
         assertTrue(graph.getSourceAssociations("ua2").containsKey("ua1"));
     }
+
+    @Test
+    void testGetPolicyClassesUpdatesNodes() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua1");
+        graph.createNode("u1", U, null, "ua2");
+        graph.associate("ua2", "ua1", new OperationSet("r"));
+        graph.dissociate("ua2", "ua1");
+
+        Set<String> pcs = graph.getPolicyClasses();
+        pcs.add("test");
+
+        pcs = graph.getPolicyClasses();
+        assertFalse(pcs.contains("test"));
+    }
+
+    @Test
+    void testGetNodesUpdatesNodes() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua1");
+        graph.createNode("u1", U, null, "ua2");
+        graph.associate("ua2", "ua1", new OperationSet("r"));
+        graph.dissociate("ua2", "ua1");
+
+        Set<Node> nodes = graph.getNodes();
+        Node node = nodes.iterator().next();
+        assertTrue(node.getProperties().isEmpty());
+
+        node.setProperties(Node.toProperties("a", "b"));
+        node = graph.getNode(node.getName());
+        assertTrue(node.getProperties().isEmpty());
+    }
+
+    @Test
+    void testConcurrency() throws PMException, InterruptedException {
+        MemGraph graph = new MemGraph();
+        new Thread(() -> {access(graph, 1);}).start();
+        new Thread(() -> {access(graph, 2);}).start();
+        new Thread(() -> {access(graph, 3);}).start();
+        new Thread(() -> {access(graph, 4);}).start();
+        System.out.println(graph.getPolicyClasses());
+    }
+
+    private void access(MemGraph graph, int i) {
+        try {
+            graph.lock.lock();
+            graph.createPolicyClass("pc" + i, null);
+            Thread.sleep(2000);
+        } catch (PMException | InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            graph.lock.unlock();
+        }
+    }
 }

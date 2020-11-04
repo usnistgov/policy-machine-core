@@ -17,6 +17,12 @@ public class Node implements Serializable {
         this.properties = new HashMap<>();
     }
 
+    public Node(Node node) {
+        this.name = node.getName();
+        this.type = node.getType();
+        this.properties = node.getProperties() == null ? new HashMap<>() : node.getProperties();
+    }
+
     public Node(String name, NodeType type, Map<String, String> properties) {
         this.name = name;
         this.type = type;

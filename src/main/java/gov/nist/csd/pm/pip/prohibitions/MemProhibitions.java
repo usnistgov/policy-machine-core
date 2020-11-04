@@ -4,6 +4,9 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * An in memory implementation of the Prohibitions interface, that stores prohibitions in a list.
@@ -11,10 +14,23 @@ import java.util.*;
 public class MemProhibitions implements Prohibitions {
 
     private Map<String, List<Prohibition>> prohibitions;
+    public Lock lock;
 
     public MemProhibitions() {
         this.prohibitions = new HashMap<>();
+
+        ReadWriteLock lock = new ReentrantReadWriteLock();
+        this.lock = lock.writeLock();
     }
+
+    public void lock() {
+        this.lock.lock();
+    }
+
+    public void unlock() {
+        this.lock.unlock();
+    }
+
 
     /**
      * Add the provided prohibition to the list of prohibitions. The prohibition name cannot be null or empty.

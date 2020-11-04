@@ -14,6 +14,10 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
@@ -28,6 +32,8 @@ public class MemGraph implements Graph {
     protected DirectedGraph<String, Relationship> graph;
     protected HashSet<String>                     pcs;
     protected HashMap<String, Node>               nodes;
+    public Lock lock;
+
 
     /**
      * Default constructor to create an empty graph in memory.
@@ -36,6 +42,17 @@ public class MemGraph implements Graph {
         graph = new DirectedMultigraph<>(Relationship.class);
         nodes = new HashMap<>();
         pcs = new HashSet<>();
+
+        ReadWriteLock lock = new ReentrantReadWriteLock();
+        this.lock = lock.writeLock();
+    }
+
+    public void lock() {
+        this.lock.lock();
+    }
+
+    public void unlock() {
+        this.lock.unlock();
     }
 
     @Override
@@ -157,12 +174,17 @@ public class MemGraph implements Graph {
 
     @Override
     public Set<String> getPolicyClasses() {
-        return pcs;
+        return new HashSet<>(pcs);
     }
 
     @Override
     public Set<Node> getNodes() {
-        return new HashSet<>(nodes.values());
+        Collection<Node> nodes = this.nodes.values();
+        Set<Node> nodeSet = new HashSet<>();
+        for (Node node : nodes) {
+            nodeSet.add(new Node(node));
+        }
+        return nodeSet;
     }
 
     /**
@@ -179,7 +201,7 @@ public class MemGraph implements Graph {
             throw new PMException(String.format("a node with the name %s does not exist", name));
         }
 
-        return node;
+        return new Node(node);
     }
 
     @Override
@@ -189,7 +211,7 @@ public class MemGraph implements Graph {
             throw new PMException(String.format("a node matching the criteria (%s, %s) does not exist", type, properties));
         }
 
-        return search.iterator().next();
+        return new Node(search.iterator().next());
     }
 
     /**
@@ -227,7 +249,7 @@ public class MemGraph implements Graph {
             }
 
             if (add) {
-                results.add(node);
+                results.add(new Node(node));
             }
         }
 

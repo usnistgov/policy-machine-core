@@ -721,6 +721,26 @@ class PReviewDeciderTest {
         assertTrue(list.containsAll(RWE));
     }
 
+    @Test
+    void testPermissionsInOnlyOnePC() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
+        graph.createNode("ua3", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua3");
+        graph.createNode("u1", UA, null, "ua2");
+
+        graph.createNode("oa1", UA, null, "pc1");
+        graph.createNode("oa3", UA, null, "pc2");
+        graph.assign("oa3", "oa1");
+        graph.createNode("o1", UA, null, "oa3");
+
+        graph.associate("ua3", "oa1", new OperationSet("read"));
+
+        PReviewDecider decider = new PReviewDecider(graph, new OperationSet("read"));
+        assertFalse(decider.list("u1", "", "o1").isEmpty());
+    }
+
     private static Graph buildGraph() throws PMException {
         MemGraph graph = new MemGraph();
         Random rand = new Random();
