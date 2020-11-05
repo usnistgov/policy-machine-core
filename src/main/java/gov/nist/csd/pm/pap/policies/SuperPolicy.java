@@ -119,7 +119,7 @@ public class SuperPolicy {
         // check super o is assigned to super oa
         children = graph.getChildren(superOA.getName());
         if(!children.contains(superPolicyClassRep.getName())) {
-            graph.assign(superOA.getName(), superPolicyClassRep.getName());
+            graph.assign(superPolicyClassRep.getName(), superOA.getName());
         }
 
         // associate super_ua1 to super_oa and super_ua2 to super_ua1
