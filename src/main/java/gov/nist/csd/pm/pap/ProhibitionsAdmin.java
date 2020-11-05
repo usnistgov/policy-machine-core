@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.prohibitions.MemDBProhibitions;
+import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -10,7 +12,10 @@ public class ProhibitionsAdmin implements Prohibitions {
 
     private Prohibitions prohibitions;
 
-    public ProhibitionsAdmin(Prohibitions prohibitions) {
+    public ProhibitionsAdmin(Prohibitions prohibitions) throws PMException {
+        if (!(prohibitions instanceof MemProhibitions)) {
+            this.prohibitions = new MemDBProhibitions(prohibitions);
+        }
         this.prohibitions = prohibitions;
     }
 
