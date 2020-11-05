@@ -131,7 +131,7 @@ public class DAC {
 
         Node delegatee = graph.getNode(delegateeName);
         NodeType targetsType = null;
-        Map<String, OperationSet> sourceAssociations = graph.getSourceAssociations(delegator.getUser());
+//        Map<String, OperationSet> sourceAssociations = graph.getSourceAssociations(delegator.getUser());
         AnalyticsService analyticsService = pdp.getAnalyticsService(delegator);
 
 
