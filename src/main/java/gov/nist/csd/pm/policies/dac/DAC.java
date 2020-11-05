@@ -4,6 +4,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.AnalyticsService;
 import gov.nist.csd.pm.pdp.services.GraphService;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -109,7 +110,6 @@ public class DAC {
      *  - Delegator must have "create association" access right on delegatee
      *  - Delegator must have "create association" and all given ops on all targets
      *
-     * @param DACname the String of the DAC PC
      * @param pdp the PDP for the graph
      * @param delegator the UserContext of the delegator
      * @param delegateeName the source of the delegation
@@ -117,7 +117,7 @@ public class DAC {
      * @param targetNames the names of the targets of the delegation
      * @throws PMException if any of the above pre-conditions are not met
      */
-    public static void delegate (String DACname, PDP pdp, UserContext delegator,
+    public static void delegate (PDP pdp, UserContext delegator,
                                   String delegateeName, OperationSet ops, Set<String> targetNames) throws PMException {
         assert !(ops == null || ops.isEmpty()) : "Operations cannot be null or empty";
         assert delegateeName != null : "Delegatee must exist in graph";
@@ -132,6 +132,7 @@ public class DAC {
         Node delegatee = graph.getNode(delegateeName);
         NodeType targetsType = null;
         Map<String, OperationSet> sourceAssociations = graph.getSourceAssociations(delegator.getUser());
+        AnalyticsService analyticsService = pdp.getAnalyticsService(delegator);
 
 
         //// Checking pre-conditions
@@ -163,14 +164,17 @@ public class DAC {
         }
 
         // check if delegator has create association on the delegatee
-        OperationSet delegateeOps = sourceAssociations.get(delegatee.getName());
+        OperationSet delegateeOps = (OperationSet) analyticsService.getPermissions(delegatee.getName());
+//        OperationSet delegateeOps = sourceAssociations.get(delegatee.getName());
         if (!delegateeOps.contains(Operations.CREATE_ASSOCIATION)) {
             throw new PMException("Delegator must have the 'Create Association' Access Right on delegatee.");
         }
 
         // check if delegator has all ops adn create association on ALL of the targets
         for (String targetName: targetNames) {
-            OperationSet _targetOps = sourceAssociations.get(targetName);
+//            OperationSet _targetOps = sourceAssociations.get(targetName);
+            OperationSet _targetOps = (OperationSet) analyticsService.getPermissions(targetName);
+
 
             if (!_targetOps.containsAll(ops)) {
                 throw new PMException("Delegator must have all of the given Access Rights on all of the targets.");
