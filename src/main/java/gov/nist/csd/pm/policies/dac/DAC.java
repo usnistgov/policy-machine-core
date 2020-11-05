@@ -164,7 +164,7 @@ public class DAC {
         }
 
         // check if delegator has create association on the delegatee
-        OperationSet delegateeOps = (OperationSet) analyticsService.getPermissions(delegatee.getName());
+        OperationSet delegateeOps = new OperationSet(analyticsService.getPermissions(delegatee.getName()));
 //        OperationSet delegateeOps = sourceAssociations.get(delegatee.getName());
         if (!delegateeOps.contains(Operations.CREATE_ASSOCIATION)) {
             throw new PMException("Delegator must have the 'Create Association' Access Right on delegatee.");
@@ -173,7 +173,7 @@ public class DAC {
         // check if delegator has all ops adn create association on ALL of the targets
         for (String targetName: targetNames) {
 //            OperationSet _targetOps = sourceAssociations.get(targetName);
-            OperationSet _targetOps = (OperationSet) analyticsService.getPermissions(targetName);
+            OperationSet _targetOps = new OperationSet (analyticsService.getPermissions(targetName));
 
 
             if (!_targetOps.containsAll(ops)) {
