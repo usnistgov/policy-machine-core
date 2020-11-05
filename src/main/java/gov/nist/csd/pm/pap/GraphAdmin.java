@@ -4,6 +4,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
 import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.MemDBGraph;
 import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -22,20 +23,14 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 public class GraphAdmin implements Graph {
 
     private Graph graph;
-    private Graph graph_copy_mysql;
     private SuperPolicy superPolicy;
 
     public GraphAdmin(Graph graph) throws PMException {
-        if (graph instanceof MySQLGraph) {
-            //copy the whole sql graph
-            this.graph_copy_mysql = graph;
-            MemGraph memGraph =  new MemGraph();
-            memGraph.fromJson_with_config(((MySQLGraph) graph).toJson_with_config());
-            //transform the sql graph in a memGraph and perform checks on that graph
-            this.graph = memGraph;
-        } else {
+        if (!(graph instanceof MemGraph)) {
+            graph = new MemDBGraph(graph);
             this.graph = graph;
         }
+        this.graph = graph;
         this.superPolicy = new SuperPolicy();
         this.superPolicy.configure(this.graph);
     }
@@ -43,8 +38,6 @@ public class GraphAdmin implements Graph {
     public SuperPolicy getSuperPolicy() {
         return superPolicy;
     }
-
-    //for all methods if graph_copy_mysql != null, apply each write/delete methods of graph to graph_copy_mysql
 
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
@@ -66,42 +59,23 @@ public class GraphAdmin implements Graph {
         Node pcUANode = graph.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
         // create the PC OA node
         Node pcOANode = graph.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
-        Node pcNode_sql = null;
-
-        if (graph_copy_mysql != null) {
-            pcNode_sql = graph_copy_mysql.createPolicyClass(name, properties);
-            Node pcUANode_sql = graph_copy_mysql.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode_sql.getName());
-            Node pcOANode_sql = graph_copy_mysql.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode_sql.getName());
-        }
 
         // assign Super U to PC UA
         // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
         // assign superUA and superUA2 to PC
         if (superPolicy.getSuperUserAttribute() != null) {
             if (graph.exists(superPolicy.getSuperUserAttribute().getName())) {
-                if (graph_copy_mysql != null) {
-                    graph_copy_mysql.assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
-                }
                 graph.assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
 
             } else {
-                if (graph_copy_mysql != null) {
-                    graph_copy_mysql.createNode("super_ua1", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), pcNode.getName());
-                }
                 graph.createNode("super_ua1", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), pcNode.getName());
             }
         }
 
         if (graph.exists(superPolicy.getSuperUserAttribute2().getName())) {
-            if (graph_copy_mysql != null) {
-                graph_copy_mysql.assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
-            }
             graph.assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
 
         } else {
-            if (graph_copy_mysql != null) {
-                graph_copy_mysql.createNode("super_ua2", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), pcNode.getName());
-            }
             graph.createNode("super_ua2", UA, Node.toProperties(NAMESPACE_PROPERTY, "super"), pcNode.getName());
 
         }
@@ -110,26 +84,13 @@ public class GraphAdmin implements Graph {
         // associate Super UA and PC OA
         graph.associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
 
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
-            graph_copy_mysql.associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
-        }
         // create an OA that will represent the pc
         if (!graph.exists(superPolicy.getSuperObjectAttribute().getName())) {
-            if (graph_copy_mysql != null) {
-                graph_copy_mysql.createNode("super_oa", OA, Node.toProperties(NAMESPACE_PROPERTY, "super"), pcNode.getName());
-            }
             graph.createNode("super_oa", OA, Node.toProperties(NAMESPACE_PROPERTY, "super"), pcNode.getName());
         }
         graph.createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
                 superPolicy.getSuperObjectAttribute().getName());
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
-                    superPolicy.getSuperObjectAttribute().getName());
-        }
-        if (graph_copy_mysql != null) {
-            return pcNode_sql;
-        }
+
         return pcNode;
     }
 
@@ -167,10 +128,6 @@ public class GraphAdmin implements Graph {
             }
         }
 
-        if (graph_copy_mysql != null) {
-            graph.createNode(name, type, properties, initialParent, additionalParents);
-            return graph_copy_mysql.createNode(name, type, properties, initialParent, additionalParents);
-        }
         return graph.createNode(name, type, properties, initialParent, additionalParents);
     }
 
@@ -180,9 +137,6 @@ public class GraphAdmin implements Graph {
 
     @Override
     public void updateNode(String name, Map<String, String> properties) throws PMException {
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.updateNode(name, properties);
-        }
         graph.updateNode(name, properties);
     }
 
@@ -190,10 +144,6 @@ public class GraphAdmin implements Graph {
     public void deleteNode(String name) throws PMException {
         if (graph.getChildren(name).size() != 0) {
             throw new PMException("cannot delete " + name + ", nodes are still assigned to it");
-        }
-
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.deleteNode(name);
         }
         graph.deleteNode(name);
     }
@@ -264,9 +214,6 @@ public class GraphAdmin implements Graph {
             parent = getPolicyClassDefault(parentNode.getName(), childNode.getType());
         }
 
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.assign(child, parent);
-        }
         graph.assign(child, parent);
     }
 
@@ -283,9 +230,6 @@ public class GraphAdmin implements Graph {
             throw new PMException(String.format("parent node %s could not be found when deassigning", parent));
         }
 
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.deassign(child, parent);
-        }
         graph.deassign(child, parent);
     }
 
@@ -306,9 +250,6 @@ public class GraphAdmin implements Graph {
             throw new PMException(String.format("node %s could not be found when creating an association", target));
         }
 
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.associate(ua, target, operations);
-        }
         graph.associate(ua, target, operations);
     }
 
@@ -324,9 +265,6 @@ public class GraphAdmin implements Graph {
             throw new PMException(String.format("node %s could not be found when deleting an association", target));
         }
 
-        if (graph_copy_mysql != null) {
-            graph_copy_mysql.dissociate(ua, target);
-        }
         graph.dissociate(ua, target);
     }
 
