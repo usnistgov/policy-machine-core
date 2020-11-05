@@ -26,10 +26,6 @@ public class GraphAdmin implements Graph {
     private SuperPolicy superPolicy;
 
     public GraphAdmin(Graph graph) throws PMException {
-        if (!(graph instanceof MemGraph)) {
-            graph = new MemDBGraph(graph);
-            this.graph = graph;
-        }
         this.graph = graph;
         this.superPolicy = new SuperPolicy();
         this.superPolicy.configure(this.graph);
