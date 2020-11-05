@@ -25,7 +25,6 @@ public class MySQLProhibitions implements Prohibitions {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final ObjectReader reader2 = new ObjectMapper().readerFor(OperationSet.class);
     private final MySQLConnection conn;
-    List<Deny_obj_attr> containers = getAllContainers();
 
 
     public MySQLProhibitions(MySQLConnection connection) throws PIPException {
@@ -275,6 +274,7 @@ public class MySQLProhibitions implements Prohibitions {
         ) {
             OperationSet operations_set = new OperationSet();
             List<Prohibition> prohibitions = new ArrayList<>();
+            List<Deny_obj_attr> containers = getAllContainers();
 
             while (rs.next()) {
                 int id                  = rs.getInt("deny_id");
@@ -303,31 +303,6 @@ public class MySQLProhibitions implements Prohibitions {
                 for (Deny_obj_attr deny_obj_attr : containers_curr) {
                     p.addContainer(String.valueOf(deny_obj_attr.obj_att_id), deny_obj_attr.obj_compl == 1);
                 }
-/*                if (existsContainer(id)) {
-
-                    List<Integer> object_attribute_id_c = new ArrayList<>();
-                    List<Integer> object_complement_c = new ArrayList<>();
-
-                    int object_attribute_id = 0;
-                    int object_complement = 0;
-                    try (Statement statement = con.createStatement();
-                         ResultSet rs_container = statement.executeQuery(MySQLHelper.SELECT_CONTAINER_DENY_ID_SIMPLE + id)){
-
-                        while (rs_container.next()) {
-
-                            object_complement = rs_container.getInt("object_complement");
-                            object_attribute_id = rs_container.getInt("object_attribute_id");
-                            object_attribute_id_c.add(object_attribute_id);
-                            object_complement_c.add(object_complement);
-                        }
-                    }
-
-                    for (int i=0; i < object_attribute_id_c.size(); i++) {
-                        p.addContainer(String.valueOf(object_attribute_id_c.get(i)), object_complement_c.get(i) ==1);
-                    }
-
-
-                }*/
                 prohibitions.add(p);
             }
 
