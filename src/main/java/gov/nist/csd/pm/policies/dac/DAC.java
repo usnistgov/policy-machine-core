@@ -188,6 +188,10 @@ public class DAC {
 
         //// Pre-conditions checked at this point, and the delegation can be created
         ConsentNodes consentNodes = findConsentNodes(graph, delegator.getUser());
+        if (consentNodes.consent_group == null || consentNodes.consent_container_oa == null ||
+                consentNodes.consent_container_ua == null) {
+            throw new PMException("Consent Nodes for user, " + delegator.getUser() + ", not properly created.");
+        }
 
         // create user attribute over delegatee (delegator_delegatee_delegation_UUID)
         String delegationID = UUID.randomUUID().toString();
@@ -317,22 +321,12 @@ public class DAC {
             }
         });
 
-        if (consentNodes.anyAreEmpty())
-            throw new PMException("Consent Nodes for user, " + forUser + ", not properly created.");
-        else
-            return consentNodes;
+        return consentNodes;
     }
     protected static class ConsentNodes {
         Node consent_admin = null;
         Node consent_group = null;
         Node consent_container_oa = null;
         Node consent_container_ua = null;
-
-        boolean anyAreEmpty() {
-            return consent_admin == null ||
-                   consent_group == null ||
-                   consent_container_oa == null ||
-                   consent_container_ua == null;
-        }
     }
 }
