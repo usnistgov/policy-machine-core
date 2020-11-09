@@ -302,13 +302,17 @@ public class DAC {
 
         Set<Node> all_nodes = graph.getNodes();
         all_nodes.stream().forEach((n) -> {
-            if (n.getProperties().get("consent_admin for").equals(forUser)) {
+            String consentAdminFor = n.getProperties().get("consent_admin for");
+            String consentGroupFor = n.getProperties().get("consent_group for");
+            String consentContainerOAFor = n.getProperties().get("consent_container_OA for");
+            String consentContainerUAFor = n.getProperties().get("consent_container_UA for");
+            if (consentAdminFor != null && consentAdminFor.equals(forUser)) {
                 consentNodes.consent_admin = n;
-            } else if (n.getProperties().get("consent_group for").equals(forUser)) {
+            } else if (consentGroupFor != null && consentGroupFor.equals(forUser)) {
                 consentNodes.consent_group = n;
-            } else if (n.getProperties().get("consent_container_OA for").equals(forUser)) {
+            } else if (consentContainerOAFor != null && consentContainerOAFor.equals(forUser)) {
                 consentNodes.consent_container_oa = n;
-            } else if (n.getProperties().get("consent_container_UA for").equals(forUser)) {
+            } else if (consentContainerUAFor != null && consentContainerUAFor.equals(forUser)) {
                 consentNodes.consent_container_ua = n;
             }
         });
