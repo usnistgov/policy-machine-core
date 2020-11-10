@@ -16,8 +16,9 @@ public class MemDBProhibitions implements Prohibitions{
             MemProhibitions memProhibitions = new MemProhibitions();
             String json = ProhibitionsSerializer.toJson(prohibitions);
             this.prohibitions = ProhibitionsSerializer.fromJson(memProhibitions, json);
+        } else {
+            this.prohibitions = prohibitions;
         }
-        this.prohibitions = prohibitions;
     }
     /**
      * Create a new prohibition.

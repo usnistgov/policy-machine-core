@@ -15,7 +15,7 @@ import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GraphServiceTest {
 

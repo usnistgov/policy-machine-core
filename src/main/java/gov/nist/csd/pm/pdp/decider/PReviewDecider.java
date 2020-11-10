@@ -17,7 +17,8 @@ import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.U;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.UA;
 
 /**
  * An implementation of the Decider interface that uses an in memory NGAC graph

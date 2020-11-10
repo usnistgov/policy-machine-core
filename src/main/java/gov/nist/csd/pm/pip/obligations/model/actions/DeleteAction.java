@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pip.obligations.model.actions;
 
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.EvrNode;
 
 import java.util.List;

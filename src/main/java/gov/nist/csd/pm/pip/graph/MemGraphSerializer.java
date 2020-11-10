@@ -4,12 +4,10 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 
 import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
 public class MemGraphSerializer implements GraphSerializer {
 

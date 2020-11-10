@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.epp.events;
 
-import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 

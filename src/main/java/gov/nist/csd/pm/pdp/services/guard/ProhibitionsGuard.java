@@ -5,7 +5,6 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.List;

@@ -3,25 +3,14 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
-import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
-import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.obligations.model.*;
-import gov.nist.csd.pm.pip.obligations.model.actions.*;
-import gov.nist.csd.pm.pip.obligations.model.functions.Function;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
-import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
+import gov.nist.csd.pm.pip.obligations.model.Obligation;
+import gov.nist.csd.pm.pip.obligations.model.ResponsePattern;
+import gov.nist.csd.pm.pip.obligations.model.Rule;
 
-import java.util.*;
-
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
+import java.util.List;
 
 public class EPP {
 

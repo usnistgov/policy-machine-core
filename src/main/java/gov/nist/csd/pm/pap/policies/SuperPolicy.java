@@ -6,7 +6,8 @@ import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 import static gov.nist.csd.pm.operations.Operations.ALL_OPS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;

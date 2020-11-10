@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.pip.prohibitions.MemDBProhibitions;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 

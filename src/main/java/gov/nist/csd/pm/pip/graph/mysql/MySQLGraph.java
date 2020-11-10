@@ -1,8 +1,7 @@
 package gov.nist.csd.pm.pip.graph.mysql;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,13 +10,10 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.GraphAdmin;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLHelper;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
 
 import java.sql.*;
 import java.util.*;

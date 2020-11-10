@@ -1,8 +1,10 @@
 package gov.nist.csd.pm.pip.obligations.evr;
 
-import gov.nist.csd.pm.pip.obligations.model.*;
+import gov.nist.csd.pm.pip.obligations.model.Condition;
+import gov.nist.csd.pm.pip.obligations.model.EvrNode;
+import gov.nist.csd.pm.pip.obligations.model.NegatedCondition;
+import gov.nist.csd.pm.pip.obligations.model.ResponsePattern;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
-import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.audit;
 
-import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pdp.audit.model.Explain;
 
 /**
  * Auditor provides methods to audit an NGAC graph.

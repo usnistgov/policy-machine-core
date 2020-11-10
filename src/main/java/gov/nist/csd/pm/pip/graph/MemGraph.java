@@ -11,13 +11,12 @@ import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
 import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 import gov.nist.csd.pm.pip.graph.model.relationships.Relationship;
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
 /**
  * MemGraph is an in-memory implementation of the graph interface.  It stores the names of the nodes in a DAG structure.
