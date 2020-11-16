@@ -107,8 +107,8 @@ public class DAC {
      * There are a few necessary preconditions for this to run without exceptions:
      *  - All of the target types must be consistent (ether all OA/O or all UA/A)
      *  - Delegatee must either be a UA or U
-     *  - Delegator must have "create association" access right on delegatee
-     *  - Delegator must have "create association" and all given ops on all targets
+     *  - Delegator must have "create association" and "assign" access rights on delegatee
+     *  - Delegator must have "create association", "assign" and all given ops on all targets
      *
      * @param pdp the PDP for the graph
      * @param delegator the UserContext of the delegator
@@ -170,6 +170,10 @@ public class DAC {
             throw new PMException("Delegator must have the 'Create Association' Access Right on delegatee.");
         }
 
+        if (!delegateeOps.contains(Operations.ASSIGN)) {
+            throw new PMException("Delegator must have the 'Assign' Access Right on delegatee.");
+        }
+
         // check if delegator has all ops adn create association on ALL of the targets
         for (String targetName: targetNames) {
 //            OperationSet _targetOps = sourceAssociations.get(targetName);
@@ -182,6 +186,10 @@ public class DAC {
 
             if (!_targetOps.contains(Operations.CREATE_ASSOCIATION)) {
                 throw new PMException("Delegator must have the 'Create Association' Access Right on all of the targets.");
+            }
+
+            if (!_targetOps.contains(Operations.ASSIGN)) {
+                throw new PMException("Delegator must have the 'Assign' Access Right on all of the targets.");
             }
         }
 
@@ -202,6 +210,7 @@ public class DAC {
                 consentNodes.consent_group.getName()
         );
         graph.assign(delegateeName, delegationUA.getName());
+
 
         // create respective attribute over target (delegator_delegatee_delegation_UUID)
         Node delegationTargetA;
