@@ -72,8 +72,7 @@ public class DAC {
         GraphService graph = pdp.getGraphService(superUser);
         Obligations obligations = pdp.getObligationsService(superUser);
 
-        // Reset graph. Soon will be replaced with on boarding methods.
-        graph.reset(superUser);
+        // todo: on boarding methods
 
         //// Creating and Adding the DAC PC and Attributes
         if (DACname != null) {
@@ -242,6 +241,33 @@ public class DAC {
 
     // todo: add an over-ridden version of delegate which also takes into account prohibitions
 
+    public static void assign_owner (PDP pdp, String ownerName, UserContext superUser,
+                                        String... targetNames) throws PMException {
+        // super graph
+        GraphService graph = pdp.getGraphService(superUser);
+
+        // find owner's consent ua and consent oa
+        ConsentNodes consentNodesForOwner = findConsentNodes(graph, ownerName);
+        Node consent_ua = consentNodesForOwner.consent_container_ua;
+        Node consent_oa = consentNodesForOwner.consent_container_oa;
+
+        // assign each target to respective consent attr based on type
+        for (String target : targetNames) {
+            NodeType targetType = graph.getNode(target).getType();
+            switch (targetType) {
+                case O:
+                    graph.assign(target, consent_oa.getName());
+                    break;
+                case U:
+                    graph.assign(target, consent_ua.getName());
+                    break;
+                case OA:
+                case UA:
+                case PC:
+                    throw new PMException("Node must be of type O or U");
+            }
+        }
+    }
 
     /********************
      * Helper Functions *
@@ -311,22 +337,25 @@ public class DAC {
      * Under it a small class to group all of the nodes into one object
      */
     private static ConsentNodes findConsentNodes(Graph graph, String forUser) throws PMException {
+        // todo: find nodes using properties or name?
         ConsentNodes consentNodes = new ConsentNodes();
 
         Set<Node> all_nodes = graph.getNodes();
         all_nodes.stream().forEach((n) -> {
-            String consentAdminFor = n.getProperties().get("consent_admin for");
-            String consentGroupFor = n.getProperties().get("consent_group for");
-            String consentContainerOAFor = n.getProperties().get("consent_container_OA for");
-            String consentContainerUAFor = n.getProperties().get("consent_container_UA for");
-            if (consentAdminFor != null && consentAdminFor.equals(forUser)) {
-                consentNodes.consent_admin = n;
-            } else if (consentGroupFor != null && consentGroupFor.equals(forUser)) {
-                consentNodes.consent_group = n;
-            } else if (consentContainerOAFor != null && consentContainerOAFor.equals(forUser)) {
-                consentNodes.consent_container_oa = n;
-            } else if (consentContainerUAFor != null && consentContainerUAFor.equals(forUser)) {
-                consentNodes.consent_container_ua = n;
+            if (!consentNodes.all_found()) {
+                String consentAdminFor = n.getProperties().get("consent_admin for");
+                String consentGroupFor = n.getProperties().get("consent_group for");
+                String consentContainerOAFor = n.getProperties().get("consent_container_OA for");
+                String consentContainerUAFor = n.getProperties().get("consent_container_UA for");
+                if (consentAdminFor != null && consentAdminFor.equals(forUser)) {
+                    consentNodes.consent_admin = n;
+                } else if (consentGroupFor != null && consentGroupFor.equals(forUser)) {
+                    consentNodes.consent_group = n;
+                } else if (consentContainerOAFor != null && consentContainerOAFor.equals(forUser)) {
+                    consentNodes.consent_container_oa = n;
+                } else if (consentContainerUAFor != null && consentContainerUAFor.equals(forUser)) {
+                    consentNodes.consent_container_ua = n;
+                }
             }
         });
 
@@ -337,5 +366,12 @@ public class DAC {
         Node consent_group = null;
         Node consent_container_oa = null;
         Node consent_container_ua = null;
+
+        boolean all_found () {
+            return consent_admin != null &&
+                    consent_group != null &&
+                    consent_container_oa != null &&
+                    consent_container_ua != null;
+        }
     }
 }
