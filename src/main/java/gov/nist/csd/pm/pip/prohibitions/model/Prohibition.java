@@ -1,9 +1,10 @@
 package gov.nist.csd.pm.pip.prohibitions.model;
 
-import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Object representing a Prohibition.

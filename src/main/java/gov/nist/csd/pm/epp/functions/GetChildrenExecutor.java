@@ -6,7 +6,6 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 
 import java.util.ArrayList;

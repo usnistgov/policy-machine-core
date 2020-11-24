@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pip.graph.model.nodes;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Stores information needed for a node.

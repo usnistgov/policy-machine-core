@@ -6,7 +6,8 @@ import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 import static gov.nist.csd.pm.operations.Operations.ALL_OPS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
@@ -119,7 +120,7 @@ public class SuperPolicy {
         // check super o is assigned to super oa
         children = graph.getChildren(superOA.getName());
         if(!children.contains(superPolicyClassRep.getName())) {
-            graph.assign(superOA.getName(), superPolicyClassRep.getName());
+            graph.assign(superPolicyClassRep.getName(), superOA.getName());
         }
 
         // associate super_ua1 to super_oa and super_ua2 to super_ua1

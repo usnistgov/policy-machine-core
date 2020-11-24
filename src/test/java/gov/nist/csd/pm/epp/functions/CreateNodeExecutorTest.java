@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.epp.functions;
 
 import gov.nist.csd.pm.epp.FunctionEvaluator;
-import gov.nist.csd.pm.epp.events.AssignEvent;
 import gov.nist.csd.pm.epp.events.EventContext;
-import gov.nist.csd.pm.epp.events.ObjectAccessEvent;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
@@ -16,7 +14,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CreateNodeExecutorTest {
     private TestUtil.TestContext testCtx;

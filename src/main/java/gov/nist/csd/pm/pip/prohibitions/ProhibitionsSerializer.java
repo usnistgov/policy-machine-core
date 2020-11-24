@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;

@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pip.graph.model.relationships;
 
 import gov.nist.csd.pm.exceptions.PIPException;
-import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
 import java.io.Serializable;

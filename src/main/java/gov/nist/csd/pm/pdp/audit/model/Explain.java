@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.pdp.audit.model;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Explain {
     private Set<String>              permissions;

@@ -11,9 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static gov.nist.csd.pm.operations.Operations.*;
-import static gov.nist.csd.pm.operations.Operations.UPDATE_NODE;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
-import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class GraphGuard extends Guard {
 

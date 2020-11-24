@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.epp.EPP;
+import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -11,15 +11,14 @@ import gov.nist.csd.pm.pdp.services.guard.GraphGuard;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
-import gov.nist.csd.pm.pip.graph.model.relationships.Association;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
+import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 /**
  * GraphService provides methods to maintain an NGAC graph, while also ensuring any user interacting with the graph,

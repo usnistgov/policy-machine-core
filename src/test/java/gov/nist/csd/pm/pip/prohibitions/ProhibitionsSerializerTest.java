@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pip.prohibitions;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

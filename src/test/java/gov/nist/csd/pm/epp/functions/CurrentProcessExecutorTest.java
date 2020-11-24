@@ -7,11 +7,11 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
-import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CurrentProcessExecutorTest {
 

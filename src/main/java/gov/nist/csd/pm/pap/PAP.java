@@ -1,9 +1,6 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.obligations.Obligations;
-import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
 public class PAP {
 

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MySQLProhibitions implements Prohibitions {
 
@@ -25,7 +26,8 @@ public class MySQLProhibitions implements Prohibitions {
     private static final ObjectReader reader2 = new ObjectMapper().readerFor(OperationSet.class);
     private final MySQLConnection conn;
 
-    public MySQLProhibitions(MySQLConnection connection) {
+
+    public MySQLProhibitions(MySQLConnection connection) throws PIPException {
         this.conn = connection;
     }
 
@@ -272,6 +274,7 @@ public class MySQLProhibitions implements Prohibitions {
         ) {
             OperationSet operations_set = new OperationSet();
             List<Prohibition> prohibitions = new ArrayList<>();
+            List<Deny_obj_attr> containers = getAllContainers();
 
             while (rs.next()) {
                 int id                  = rs.getInt("deny_id");
@@ -292,30 +295,13 @@ public class MySQLProhibitions implements Prohibitions {
                         .setIntersection(is_intersection)
                         .build();
 
-                if (existsContainer(id)) {
+                //containers from getAllContainers()
+                List<Deny_obj_attr> containers_curr = containers.stream()
+                        .filter(container -> container.deny_id == id)
+                        .collect(Collectors.toList());
 
-                    List<Integer> object_attribute_id_c = new ArrayList<>();
-                    List<Integer> object_complement_c = new ArrayList<>();
-
-                    int object_attribute_id = 0;
-                    int object_complement = 0;
-                    try (Statement statement = con.createStatement();
-                         ResultSet rs_container = statement.executeQuery(MySQLHelper.SELECT_CONTAINER_DENY_ID_SIMPLE + id)){
-
-                        while (rs_container.next()) {
-
-                            object_complement = rs_container.getInt("object_complement");
-                            object_attribute_id = rs_container.getInt("object_attribute_id");
-                            object_attribute_id_c.add(object_attribute_id);
-                            object_complement_c.add(object_complement);
-                        }
-                    }
-
-                    for (int i=0; i < object_attribute_id_c.size(); i++) {
-                        p.addContainer(String.valueOf(object_attribute_id_c.get(i)), object_complement_c.get(i) ==1);
-                    }
-
-
+                for (Deny_obj_attr deny_obj_attr : containers_curr) {
+                    p.addContainer(String.valueOf(deny_obj_attr.obj_att_id), deny_obj_attr.obj_compl == 1);
                 }
                 prohibitions.add(p);
             }
@@ -323,6 +309,29 @@ public class MySQLProhibitions implements Prohibitions {
             return prohibitions;
         } catch (SQLException s) {
             throw new PIPException("prohibitions", s.getMessage());
+        }
+    }
+
+    public List<Deny_obj_attr> getAllContainers() throws PIPException {
+        try (
+                Connection con = this.conn.getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(MySQLHelper.SELECT_ALL_CONTAINERS)
+        ) {
+            List<Deny_obj_attr> containers = new ArrayList<>();
+            while (rs.next()) {
+                int deny_id = rs.getInt("deny_id");
+                int obj_att_id = rs.getInt("object_attribute_id");
+                int object_complement = rs.getInt("object_complement");
+
+                Deny_obj_attr container = new Deny_obj_attr(deny_id, obj_att_id, object_complement);
+                containers.add(container);
+            }
+            con.close();
+            return containers;
+
+        } catch (SQLException sqlException) {
+            throw new PIPException("prohibitions", sqlException.getMessage());
         }
     }
 
@@ -455,6 +464,42 @@ public class MySQLProhibitions implements Prohibitions {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new PIPException("prohibitions", e.getMessage());
+        }
+    }
+
+    public class Deny_obj_attr {
+        private int deny_id;
+        private int obj_att_id;
+        private int obj_compl;
+
+        public Deny_obj_attr(int a, int b, int c) {
+            this.deny_id = a;
+            this.obj_att_id = b;
+            this.obj_compl = c;
+        }
+
+        public int getDeny_id() {
+            return deny_id;
+        }
+
+        public void setDeny_id(int deny_id) {
+            this.deny_id = deny_id;
+        }
+
+        public int getObj_att_id() {
+            return obj_att_id;
+        }
+
+        public void setObj_att_id(int obj_att_id) {
+            this.obj_att_id = obj_att_id;
+        }
+
+        public int getObj_compl() {
+            return obj_compl;
+        }
+
+        public void setObj_compl(int obj_compl) {
+            this.obj_compl = obj_compl;
         }
     }
 }

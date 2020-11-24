@@ -164,9 +164,11 @@ INSERT INTO `node_type` (`node_type_id`, `name`, `description`) VALUES
 	(6, 'OS', 'Operation Set');
 /*!40000 ALTER TABLE `node_type` ENABLE KEYS */;
 INSERT INTO `association` (`association_id`, `start_node_id`, `end_node_id`, `operation_set`) VALUES
-    (1, 5, 1, '[\"*\"]'),
-    (2, 7, 2, '[\"*\"]'),
-    (3, 6, 2, '[\"*\"]');
+    (1, 2, 5, '[\"*\"]'),
+    (2, 2, 6, '[\"*\"]'),
+    (3, 2, 7, '[\"*\"]'),
+    (4, 2, 4, '[\"*\"]'),
+    (5, 4, 2, '[\"*\"]');
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

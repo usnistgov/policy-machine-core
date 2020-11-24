@@ -21,7 +21,6 @@ import java.util.List;
 
 import static gov.nist.csd.pm.operations.Operations.ALL_ADMIN_OPS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.U;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProhibitionsGuardTest {

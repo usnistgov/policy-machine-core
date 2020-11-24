@@ -10,7 +10,7 @@ public class ProhibitionsAdmin implements Prohibitions {
 
     private Prohibitions prohibitions;
 
-    public ProhibitionsAdmin(Prohibitions prohibitions) {
+    public ProhibitionsAdmin(Prohibitions prohibitions) throws PMException {
         this.prohibitions = prohibitions;
     }
 

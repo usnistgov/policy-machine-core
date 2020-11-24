@@ -1,11 +1,8 @@
 package gov.nist.csd.pm.operations;
 
-import com.google.gson.Gson;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.operations.Operations.*;
-import static gov.nist.csd.pm.operations.Operations.ALL_RESOURCE_OPS;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class OperationSet extends HashSet<String> {
     public OperationSet(){
