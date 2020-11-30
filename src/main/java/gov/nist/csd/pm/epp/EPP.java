@@ -3,14 +3,22 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.obligations.model.Obligation;
-import gov.nist.csd.pm.pip.obligations.model.ResponsePattern;
-import gov.nist.csd.pm.pip.obligations.model.Rule;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.obligations.model.*;
+import gov.nist.csd.pm.pip.obligations.model.actions.*;
+import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
+import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EPP {
 

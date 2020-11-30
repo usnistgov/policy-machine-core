@@ -64,13 +64,14 @@ public class DAC {
      *
      * @param DACname the name of the DAC PC, null if you want to use the default name
      * @param pdp PDP of the existing graph
+     * @param superUserContext UserContext of the super user
      * @return the DAC PC
      * @throws PMException if anything goes wrong
      */
-    public static Node configure (String DACname, PDP pdp, UserContext superUser) throws PMException {
+    public static Node configure (String DACname, PDP pdp, UserContext superUserContext) throws PMException {
 
-        GraphService graph = pdp.getGraphService(superUser);
-        Obligations obligations = pdp.getObligationsService(superUser);
+        GraphService graph = pdp.getGraphService(superUserContext);
+        Obligations obligations = pdp.getObligationsService(superUserContext);
 
         // todo: on boarding methods
 
@@ -92,7 +93,7 @@ public class DAC {
         //// Adding the consent obligation for user config
         // first add the function executor
         pdp.getEPP().addFunctionExecutor(new ConfigConsentFunctionExecutor());
-        obligations.add(getConsentObligation(superUser), true);
+        obligations.add(getConsentObligation(superUserContext), true);
 
 
         // return the DAC PC
@@ -313,7 +314,7 @@ public class DAC {
                 return graph.createNode (
                         name,
                         type,
-                        Node.toProperties("ngac_type", name),
+                        Node.toProperties("ngac_type", "DAC"),
                         DAC_PC_NAME
                 );
             }
@@ -323,8 +324,8 @@ public class DAC {
             // add ngac_type=DAC to properties
             String typeValue = DAC.getProperties().get("ngac_type");
             if (typeValue == null) {
-                DAC.addProperty("ngac_type", name);
-            } else if (!typeValue.equals(name)) {
+                DAC.addProperty("ngac_type", "DAC");
+            } else if (!typeValue.equals("DAC")) {
                 throw new PMException("Node cannot have property key of ngac_type");
             }
         }
