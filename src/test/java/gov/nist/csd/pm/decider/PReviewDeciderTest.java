@@ -738,7 +738,7 @@ class PReviewDeciderTest {
         graph.associate("ua3", "oa1", new OperationSet("read"));
 
         PReviewDecider decider = new PReviewDecider(graph, new OperationSet("read"));
-        assertFalse(decider.list("u1", "", "o1").isEmpty());
+        assertTrue(decider.list("u1", "", "o1").isEmpty());
     }
 
     private static Graph buildGraph() throws PMException {
