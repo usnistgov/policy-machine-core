@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.tx.memory;
+package gov.nist.csd.pm.pip.memory.tx;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;

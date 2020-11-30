@@ -5,7 +5,10 @@ import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
 public interface FunctionExecutor {
 
@@ -23,14 +26,15 @@ public interface FunctionExecutor {
 
     /**
      * Execute the function.
-     * @param obligationUser is the user that defined the obligation being executed.  It is this user that needs permissions
-     *                       to carry out the actions in the function.
+     * @param graph the graph
+     * @param prohibitions the prohibitions
+     * @param obligations the obligations
      * @param eventCtx the event that is being processed
-     * @param pdp the PDP to access the underlying policy data
      * @param function the function information
      * @param functionEvaluator a FunctionEvaluator to evaluate a nested functions
      * @return the object that the function is expected to return
      * @throws PMException if there is any error executing the function
      */
-    Object exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException;
+    Object exec(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                EventContext eventCtx, Function function, FunctionEvaluator functionEvaluator) throws PMException;
 }

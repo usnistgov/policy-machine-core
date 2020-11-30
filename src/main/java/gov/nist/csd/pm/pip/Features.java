@@ -2,16 +2,18 @@ package gov.nist.csd.pm.pip;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.tx.TxRunner;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
+import gov.nist.csd.pm.pip.tx.TxRunner;
 
-public interface PIP {
+public interface Features {
 
-    Graph getGraph() throws PMException;
+    Graph getGraph();
 
-    Prohibitions getProhibitions() throws PMException;
+    Prohibitions getProhibitions();
 
-    Obligations getObligations() throws PMException;
+    Obligations getObligations();
+
+    void runTx(TxRunner txRunner) throws PMException;
 
 }

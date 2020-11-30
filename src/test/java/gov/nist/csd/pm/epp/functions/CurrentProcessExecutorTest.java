@@ -6,6 +6,7 @@ import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,9 @@ class CurrentProcessExecutorTest {
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
-        String result = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        String result = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(result);
         assertEquals("1234", result);

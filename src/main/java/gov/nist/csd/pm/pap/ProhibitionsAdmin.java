@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -10,8 +11,8 @@ public class ProhibitionsAdmin implements Prohibitions {
 
     private Prohibitions prohibitions;
 
-    public ProhibitionsAdmin(Prohibitions prohibitions) {
-        this.prohibitions = prohibitions;
+    public ProhibitionsAdmin(Features pip) {
+        this.prohibitions = pip.getProhibitions();
     }
 
     @Override

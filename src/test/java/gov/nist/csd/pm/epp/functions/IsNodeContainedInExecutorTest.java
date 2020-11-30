@@ -6,6 +6,7 @@ import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,9 @@ class IsNodeContainedInExecutorTest {
                         )
                 )
         );
-        boolean isContained = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        boolean isContained = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+                eventContext, function, new FunctionEvaluator());
         assertTrue(isContained);
 
         function = new Function(executor.getFunctionName(),
@@ -53,7 +56,8 @@ class IsNodeContainedInExecutorTest {
                         )
                 )
         );
-        isContained = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        isContained = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+                eventContext, function, new FunctionEvaluator());
         assertFalse(isContained);
     }
 }

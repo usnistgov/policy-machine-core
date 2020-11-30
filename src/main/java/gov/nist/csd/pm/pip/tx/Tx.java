@@ -1,13 +1,26 @@
 package gov.nist.csd.pm.pip.tx;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.graph.Graph;
+import gov.nist.csd.pm.pip.obligations.Obligations;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
-public interface Tx {
+public abstract class Tx {
 
-    void lock();
+    public final Graph graph;
+    public final Prohibitions prohibitions;
+    public final Obligations obligations;
 
-    void unlock();
+    public Tx(Graph graph, Prohibitions prohibitions, Obligations obligations) {
+        this.graph = graph;
+        this.prohibitions = prohibitions;
+        this.obligations = obligations;
+    }
 
-    void runTx(TxRunner txRunner) throws PMException;
+    public abstract void runTx(TxRunner txRunner) throws PMException;
+
+    public abstract void commit() throws PMException;
+
+    public abstract void rollback() throws PMException;
 
 }

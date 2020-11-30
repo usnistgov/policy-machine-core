@@ -4,14 +4,19 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.services.GraphService;
+import gov.nist.csd.pm.pdp.services.ObligationsService;
+import gov.nist.csd.pm.pdp.services.ProhibitionsService;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.actions.*;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -58,35 +63,35 @@ public class ResponsePattern {
         this.actions.add(action);
     }
 
-    public void apply(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator, UserContext definingUser,
-                      EventContext eventCtx, Rule rule, String obligationLabel) throws PMException {
+    public void apply(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                      FunctionEvaluator functionEvaluator, EventContext eventCtx, Rule rule, String obligationLabel) throws PMException {
         // check the response condition
         ResponsePattern responsePattern = rule.getResponsePattern();
-        if(!checkCondition(functionEvaluator, definingUser, responsePattern.getCondition(), eventCtx, pdp) ||
-                !checkNegatedCondition(functionEvaluator, definingUser, responsePattern.getNegatedCondition(), eventCtx, pdp)) {
+        if(!checkCondition(graph, prohibitions, obligations, functionEvaluator, responsePattern.getCondition(), eventCtx) ||
+                !checkNegatedCondition(graph, prohibitions, obligations, functionEvaluator, responsePattern.getNegatedCondition(), eventCtx)) {
             return;
         }
 
         for(Action action : rule.getResponsePattern().getActions()) {
-            if(!checkCondition(functionEvaluator, definingUser, action.getCondition(), eventCtx, pdp)) {
+            if(!checkCondition(graph, prohibitions, obligations, functionEvaluator, action.getCondition(), eventCtx)) {
                 continue;
-            } else if(!checkNegatedCondition(functionEvaluator, definingUser, action.getNegatedCondition(), eventCtx, pdp)) {
+            } else if(!checkNegatedCondition(graph, prohibitions, obligations, functionEvaluator, action.getNegatedCondition(), eventCtx)) {
                 continue;
             }
 
-            applyAction(pdp, pap, functionEvaluator, definingUser, obligationLabel, eventCtx, action);
+            applyAction(graph, prohibitions, obligations, functionEvaluator, obligationLabel, eventCtx, action);
         }
     }
 
-    private boolean checkCondition(FunctionEvaluator functionEvaluator, UserContext definingUser,
-                                   Condition condition, EventContext eventCtx, PDP pdp) throws PMException {
+    private boolean checkCondition(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                   FunctionEvaluator functionEvaluator, Condition condition, EventContext eventCtx) throws PMException {
         if(condition == null) {
             return true;
         }
 
         List<Function> functions = condition.getCondition();
         for(Function f : functions) {
-            boolean result = functionEvaluator.evalBool(definingUser, eventCtx, pdp, f);
+            boolean result = functionEvaluator.evalBool(graph, prohibitions, obligations, eventCtx, f);
             if(!result) {
                 return false;
             }
@@ -98,15 +103,15 @@ public class ResponsePattern {
     /**
      * Return true if the condition is satisfied. A condition is satisfied if all the functions evaluate to false.
      */
-    private boolean checkNegatedCondition(FunctionEvaluator functionEvaluator, UserContext definingUser,
-                                          NegatedCondition condition, EventContext eventCtx, PDP pdp) throws PMException {
+    private boolean checkNegatedCondition(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                          FunctionEvaluator functionEvaluator, NegatedCondition condition, EventContext eventCtx) throws PMException {
         if(condition == null) {
             return true;
         }
 
         List<Function> functions = condition.getCondition();
         for(Function f : functions) {
-            boolean result = functionEvaluator.evalBool(definingUser, eventCtx, pdp, f);
+            boolean result = functionEvaluator.evalBool(graph, prohibitions, obligations, eventCtx, f);
             if(result) {
                 return false;
             }
@@ -115,47 +120,47 @@ public class ResponsePattern {
         return true;
     }
 
-    private void applyAction(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator, UserContext definingUser,
+    private void applyAction(Graph graph, Prohibitions prohibitions, Obligations obligations, FunctionEvaluator functionEvaluator,
                              String label, EventContext eventCtx, Action action) throws PMException {
         if (action == null) {
             return;
         }
 
         if(action instanceof AssignAction) {
-            applyAssignAction(pdp, pap, functionEvaluator, definingUser, eventCtx, (AssignAction) action);
+            applyAssignAction(graph, prohibitions, obligations, functionEvaluator, eventCtx, (AssignAction) action);
         } else if(action instanceof CreateAction) {
-            applyCreateAction(pdp, pap, functionEvaluator, definingUser, label, eventCtx, (CreateAction) action);
+            applyCreateAction(graph, prohibitions, obligations, functionEvaluator, label, eventCtx, (CreateAction) action);
         } else if(action instanceof DeleteAction) {
-            applyDeleteAction(pdp, pap, functionEvaluator, definingUser, eventCtx, (DeleteAction) action);
+            applyDeleteAction(graph, prohibitions, obligations, functionEvaluator, eventCtx, (DeleteAction) action);
         } else if(action instanceof DenyAction) {
-            applyDenyAction(pdp, pap, functionEvaluator, definingUser, eventCtx, (DenyAction) action);
+            applyDenyAction(graph, prohibitions, obligations, functionEvaluator, eventCtx, (DenyAction) action);
         } else if(action instanceof GrantAction) {
-            applyGrantAction(pdp, pap, functionEvaluator, definingUser, eventCtx, (GrantAction) action);
+            applyGrantAction(graph, prohibitions, obligations, functionEvaluator, eventCtx, (GrantAction) action);
         } else if(action instanceof FunctionAction) {
-            functionEvaluator.evalNode(definingUser, eventCtx, pdp, ((FunctionAction) action).getFunction());
+            functionEvaluator.evalObject(graph, prohibitions, obligations, eventCtx, ((FunctionAction) action).getFunction());
         }
     }
 
-    private void applyGrantAction(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                                  UserContext definingUser, EventContext eventCtx, GrantAction action) throws PMException {
+    private void applyGrantAction(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                  FunctionEvaluator functionEvaluator, EventContext eventCtx, GrantAction action) throws PMException {
         EvrNode subject = action.getSubject();
         List<String> operations = action.getOperations();
         EvrNode target = action.getTarget();
 
-        Node subjectNode = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, subject);
-        Node targetNode = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, target);
+        Node subjectNode = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, subject);
+        Node targetNode = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, target);
 
-        pap.getGraphAdmin().associate(subjectNode.getName(), targetNode.getName(), new OperationSet(operations));
+        graph.associate(subjectNode.getName(), targetNode.getName(), new OperationSet(operations));
     }
 
-    private void applyDenyAction(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                                 UserContext definingUser, EventContext eventCtx, DenyAction action) throws PMException {
+    private void applyDenyAction(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                 FunctionEvaluator functionEvaluator, EventContext eventCtx, DenyAction action) throws PMException {
         EvrNode subject = action.getSubject();
         List<String> operations = action.getOperations();
         DenyAction.Target target = action.getTarget();
 
-        String denySubject = toDenySubject(pdp, pap, functionEvaluator, definingUser, eventCtx, subject);
-        Map<String, Boolean> denyNodes = toDenyNodes(pdp, pap, functionEvaluator, definingUser, eventCtx, target);
+        String denySubject = toDenySubject(graph, prohibitions, obligations, functionEvaluator, eventCtx, subject);
+        Map<String, Boolean> denyNodes = toDenyNodes(graph, prohibitions, obligations, functionEvaluator, eventCtx, target);
 
         Prohibition.Builder builder = new Prohibition.Builder(action.getLabel(), denySubject, new OperationSet(operations))
                 .setIntersection(target.isIntersection());
@@ -165,20 +170,20 @@ public class ResponsePattern {
         }
 
         // add the prohibition to the PAP
-        pap.getProhibitionsAdmin().add(builder.build());
+        prohibitions.add(builder.build());
 
         // TODO this complement is ignored in the current Prohibition object
         boolean complement = target.isComplement();
     }
 
-    private Map<String, Boolean> toDenyNodes(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                                             UserContext definingUser, EventContext eventCtx, DenyAction.Target target) throws PMException {
+    private Map<String, Boolean> toDenyNodes(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                             FunctionEvaluator functionEvaluator, EventContext eventCtx, DenyAction.Target target) throws PMException {
         Map<String, Boolean> nodes = new HashMap<>();
         List<DenyAction.Target.Container> containers = target.getContainers();
         for(DenyAction.Target.Container container : containers) {
             if(container.getFunction() != null) {
                 Function function = container.getFunction();
-                Object result = functionEvaluator.evalObject(definingUser, eventCtx, pdp, function);
+                Object result = functionEvaluator.evalObject(graph, prohibitions, obligations, eventCtx, function);
 
                 if(!(result instanceof ContainerCondition)) {
                     throw new PMException("expected function to return a ContainerCondition but got " + result.getClass().getName());
@@ -187,8 +192,6 @@ public class ResponsePattern {
                 ContainerCondition cc = (ContainerCondition) result;
                 nodes.put(cc.getName(), cc.isComplement());
             } else {
-                Graph graph = pap.getGraphAdmin();
-
                 // get the node
                 Node node = graph.getNode(container.getName());
                 nodes.put(node.getName(), container.isComplement());
@@ -198,65 +201,66 @@ public class ResponsePattern {
         return nodes;
     }
 
-    private String toDenySubject(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                                 UserContext definingUser, EventContext eventCtx, EvrNode subject) throws PMException {
+    private String toDenySubject(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                 FunctionEvaluator functionEvaluator, EventContext eventCtx, EvrNode subject) throws PMException {
         String denySubject;
 
         if(subject.getFunction() != null) {
             Function function = subject.getFunction();
-            denySubject = functionEvaluator.evalString(definingUser, eventCtx, pdp, function);
+            denySubject = functionEvaluator.evalString(graph, prohibitions, obligations, eventCtx, function);
         } else if(subject.getProcess() != null) {
             denySubject = subject.getProcess().getValue();
         } else {
             if (subject.getName() != null) {
-                denySubject = pap.getGraphAdmin().getNode(subject.getName()).getName();
+                denySubject = graph.getNode(subject.getName()).getName();
             } else {
-                denySubject = pap.getGraphAdmin().getNode(NodeType.toNodeType(subject.getType()), subject.getProperties()).getName();
+                denySubject = graph.getNode(NodeType.toNodeType(subject.getType()), subject.getProperties()).getName();
             }
         }
 
         return denySubject;
     }
 
-    private void applyDeleteAction(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator, UserContext definingUser, EventContext eventCtx, DeleteAction action) throws PMException {
+    private void applyDeleteAction(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                   FunctionEvaluator functionEvaluator, EventContext eventCtx, DeleteAction action) throws PMException {
         List<EvrNode> nodes = action.getNodes();
         if (nodes != null) {
             for (EvrNode evrNode : nodes) {
-                Node node = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, evrNode);
-                pap.getGraphAdmin().deleteNode(node.getName());
+                Node node = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, evrNode);
+                graph.deleteNode(node.getName());
             }
         }
 
         AssignAction assignAction = action.getAssignments();
         if (assignAction != null) {
             for (AssignAction.Assignment assignment : assignAction.getAssignments()) {
-                Node what = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, assignment.getWhat());
-                Node where = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, assignment.getWhere());
-                pap.getGraphAdmin().deassign(what.getName(), where.getName());
+                Node what = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, assignment.getWhat());
+                Node where = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, assignment.getWhere());
+                graph.deassign(what.getName(), where.getName());
             }
         }
 
         List<GrantAction> associations = action.getAssociations();
         if (associations != null){
             for (GrantAction grantAction : associations) {
-                Node subject = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, grantAction.getSubject());
-                Node target = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, grantAction.getTarget());
-                pap.getGraphAdmin().dissociate(subject.getName(), target.getName());
+                Node subject = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, grantAction.getSubject());
+                Node target = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, grantAction.getTarget());
+                graph.dissociate(subject.getName(), target.getName());
             }
         }
 
-        List<String> prohibitions = action.getProhibitions();
+        List<String> actionProhibitions = action.getProhibitions();
         if (prohibitions != null) {
-            for (String label : prohibitions) {
-                pap.getProhibitionsAdmin().delete(label);
+            for (String label : actionProhibitions) {
+                prohibitions.delete(label);
             }
         }
 
         List<String> rules = action.getRules();
         if (rules != null) {
             for (String label : rules) {
-                List<Obligation> obligations = pap.getObligationsAdmin().getAll();
-                for (Obligation obligation : obligations) {
+                List<Obligation> allObligations = obligations.getAll();
+                for (Obligation obligation : allObligations) {
                     List<Rule> oblRules = obligation.getRules();
                     for (Rule rule : oblRules) {
                         if (rule.getLabel().equals(label)) {
@@ -268,27 +272,27 @@ public class ResponsePattern {
         }
     }
 
-    private Node toNode(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                        UserContext definingUser, EventContext eventCtx, EvrNode evrNode) throws PMException {
+    private Node toNode(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                        FunctionEvaluator functionEvaluator, EventContext eventCtx, EvrNode evrNode) throws PMException {
         Node node;
         if(evrNode.getFunction() != null) {
-            node = functionEvaluator.evalNode(definingUser, eventCtx, pdp, evrNode.getFunction());
+            node = functionEvaluator.evalNode(graph, prohibitions, obligations, eventCtx, evrNode.getFunction());
         } else {
             if (evrNode.getName() != null && !evrNode.getName().isEmpty()) {
-                node = pap.getGraphAdmin().getNode(evrNode.getName());
+                node = graph.getNode(evrNode.getName());
             } else {
-                node = pap.getGraphAdmin().getNode(NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
+                node = graph.getNode(NodeType.toNodeType(evrNode.getType()), evrNode.getProperties());
             }
         }
         return node;
     }
 
-    private void applyCreateAction(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                                   UserContext definingUser, String label, EventContext eventCtx, CreateAction action) throws PMException {
+    private void applyCreateAction(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                   FunctionEvaluator functionEvaluator, String label, EventContext eventCtx, CreateAction action) throws PMException {
         List<Rule> rules = action.getRules();
         if (rules != null) {
             for (Rule rule : rules) {
-                createRule(pap, label, eventCtx, rule);
+                createRule(graph, prohibitions, obligations, label, eventCtx, rule);
             }
         }
 
@@ -297,32 +301,33 @@ public class ResponsePattern {
             for (CreateAction.CreateNode createNode : createNodesList) {
                 EvrNode what = createNode.getWhat();
                 EvrNode where = createNode.getWhere();
-                Node whereNode = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, where);
-                pap.getGraphAdmin().createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
+                Node whereNode = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, where);
+                graph.createNode(what.getName(), NodeType.toNodeType(what.getType()), what.getProperties(), whereNode.getName());
             }
         }
     }
 
-    private void createRule(PAP pap, String obligationLabel, EventContext eventCtx, Rule rule) throws PMException {
+    private void createRule(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                            String obligationLabel, EventContext eventCtx, Rule rule) throws PMException {
         // add the rule to the obligation
-        Obligation obligation = pap.getObligationsAdmin().get(obligationLabel);
+        Obligation obligation = obligations.get(obligationLabel);
         List<Rule> rules = obligation.getRules();
         rules.add(rule);
         obligation.setRules(rules);
     }
 
-    private void applyAssignAction(PDP pdp, PAP pap, FunctionEvaluator functionEvaluator,
-                                   UserContext definingUser, EventContext eventCtx, AssignAction action) throws PMException {
+    private void applyAssignAction(Graph graph, Prohibitions prohibitions, Obligations obligations,
+                                   FunctionEvaluator functionEvaluator, EventContext eventCtx, AssignAction action) throws PMException {
         List<AssignAction.Assignment> assignments = action.getAssignments();
         if (assignments != null) {
             for (AssignAction.Assignment assignment : assignments) {
                 EvrNode what = assignment.getWhat();
                 EvrNode where = assignment.getWhere();
 
-                Node whatNode = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, what);
-                Node whereNode = toNode(pdp, pap, functionEvaluator, definingUser, eventCtx, where);
+                Node whatNode = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, what);
+                Node whereNode = toNode(graph, prohibitions, obligations, functionEvaluator, eventCtx, where);
 
-                pap.getGraphAdmin().assign(whatNode.getName(), whereNode.getName());
+                graph.assign(whatNode.getName(), whereNode.getName());
             }
         }
     }

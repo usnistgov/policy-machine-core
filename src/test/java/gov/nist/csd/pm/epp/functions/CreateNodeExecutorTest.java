@@ -42,7 +42,9 @@ class CreateNodeExecutorTest {
                                 new Arg("OA"),
                                 new Arg(new Function("to_props", Arrays.asList(new Arg("k=v"))))));
 
-        Node n = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        Node n = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(n);
         assertEquals("testNode", n.getName());

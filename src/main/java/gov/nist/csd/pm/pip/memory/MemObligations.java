@@ -1,5 +1,6 @@
-package gov.nist.csd.pm.pip.obligations;
+package gov.nist.csd.pm.pip.memory;
 
+import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 
 import java.util.ArrayList;

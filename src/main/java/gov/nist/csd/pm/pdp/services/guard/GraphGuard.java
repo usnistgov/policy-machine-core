@@ -3,8 +3,9 @@ package gov.nist.csd.pm.pdp.services.guard;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.Map;
@@ -12,18 +13,17 @@ import java.util.Set;
 
 import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.operations.Operations.UPDATE_NODE;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
-import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
+import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_PC_REP;
 
 public class GraphGuard extends Guard {
 
-    public GraphGuard(PAP pap, OperationSet resourceOps) {
-        super(pap, resourceOps);
+    public GraphGuard(Features pap, Decider decider) {
+        super(pap, decider);
     }
 
     public void checkCreatePolicyClass(UserContext userCtx) throws PMException {
         // check that the user can create a policy class
-        if (!hasPermissions(userCtx, pap.getGraphAdmin().getSuperPolicy().getSuperPolicyClassRep().getName(), CREATE_POLICY_CLASS)) {
+        if (!hasPermissions(userCtx, SUPER_PC_REP, CREATE_POLICY_CLASS)) {
             throw new PMAuthorizationException("unauthorized permissions to create a policy class");
         }
     }
@@ -58,7 +58,7 @@ public class GraphGuard extends Guard {
         }
 
         // check that the user can deassign from the node's parents
-        Set<String> parents = pap.getGraphAdmin().getParents(node);
+        Set<String> parents = pap.getGraph().getParents(node);
         for(String parent : parents) {
             if(!hasPermissions(userCtx, parent, DEASSIGN_FROM)) {
                 throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parent, DEASSIGN_FROM));
@@ -155,13 +155,13 @@ public class GraphGuard extends Guard {
     }
 
     public void checkToJson(UserContext userCtx) throws PMException {
-        if (!hasPermissions(userCtx, pap.getGraphAdmin().getSuperPolicy().getSuperPolicyClassRep().getName(), TO_JSON)) {
+        if (!hasPermissions(userCtx, SUPER_PC_REP, TO_JSON)) {
             throw new PMAuthorizationException("unauthorized permissions to serialize graph to json");
         }
     }
 
     public void checkFromJson(UserContext userCtx) throws PMException {
-        if (!hasPermissions(userCtx, pap.getGraphAdmin().getSuperPolicy().getSuperPolicyClassRep().getName(), FROM_JSON)) {
+        if (!hasPermissions(userCtx, SUPER_PC_REP, FROM_JSON)) {
             throw new PMAuthorizationException("unauthorized permissions to deserialize json to graph");
         }
     }

@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp.decider;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.operations.Operations;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.BreadthFirstSearcher;
@@ -11,7 +10,7 @@ import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import gov.nist.csd.pm.pip.memory.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 

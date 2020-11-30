@@ -1,8 +1,8 @@
-package gov.nist.csd.pm.pip.tx.memory.cmd.obligations;
+package gov.nist.csd.pm.pip.memory.tx.cmd.obligations;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.obligations.Obligations;
-import gov.nist.csd.pm.pip.tx.memory.cmd.TxCmd;
+import gov.nist.csd.pm.pip.memory.tx.cmd.TxCmd;
 
 public class SetEnableTxCmd implements TxCmd {
 

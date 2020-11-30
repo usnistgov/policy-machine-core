@@ -3,29 +3,29 @@ package gov.nist.csd.pm.pdp.services.guard;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.Arrays;
 import java.util.Set;
 
 import static gov.nist.csd.pm.operations.Operations.RESET;
+import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_PC_REP;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class Guard {
 
-    protected PAP pap;
+    protected Features pap;
     protected Decider decider;
-    private OperationSet resourceOps;
 
-    public Guard(PAP pap, OperationSet resourceOps) {
+    public Guard(Features pap, Decider decider) {
         this.pap = pap;
-        this.resourceOps = resourceOps;
-        this.decider = new PReviewDecider(pap.getGraphAdmin(), pap.getProhibitionsAdmin(), resourceOps);
+        this.decider = decider;
     }
 
     private void assertUserCtx(UserContext userCtx) throws PMException {
@@ -39,7 +39,7 @@ public class Guard {
         assertUserCtx(userCtx);
 
         // if checking the permissions on a PC, check the permissions on the rep node for the PC
-        Node node = pap.getGraphAdmin().getNode(target);
+        Node node = pap.getGraph().getNode(target);
         if (node.getType().equals(PC)) {
             if (!node.getProperties().containsKey(REP_PROPERTY)) {
                 throw new PMException("unable to check permissions for policy class " + node.getName() + ", rep property not set");
@@ -59,7 +59,7 @@ public class Guard {
 
     public void checkReset(UserContext userCtx) throws PMException {
         // check that the user can reset the graph
-        if (!hasPermissions(userCtx, pap.getGraphAdmin().getSuperPolicy().getSuperPolicyClassRep().getName(), RESET)) {
+        if (!hasPermissions(userCtx, SUPER_PC_REP, RESET)) {
             throw new PMAuthorizationException("unauthorized permissions to reset the prohibitions");
         }
     }

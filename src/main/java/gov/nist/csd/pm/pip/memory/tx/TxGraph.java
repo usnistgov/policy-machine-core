@@ -1,12 +1,12 @@
-package gov.nist.csd.pm.pip.tx.memory;
+package gov.nist.csd.pm.pip.memory.tx;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.tx.memory.cmd.*;
-import gov.nist.csd.pm.pip.tx.memory.cmd.graph.*;
+import gov.nist.csd.pm.pip.memory.tx.cmd.*;
+import gov.nist.csd.pm.pip.memory.tx.cmd.graph.*;
 
 import java.util.*;
 
@@ -61,7 +61,7 @@ public class TxGraph implements Graph {
 
         // check that the parents exist in the tx or target graph
         for (String parent : parents) {
-            if (!(nodes.containsKey(parent) && targetGraph.exists(parent))) {
+            if (!(nodes.containsKey(parent) || targetGraph.exists(parent))) {
                 throw new PMException("parent " + parent + " does not exist");
             }
         }

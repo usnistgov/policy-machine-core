@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pip.graph;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.memory.MemGraph;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -338,27 +339,5 @@ class MemGraphTest {
         node.setProperties(Node.toProperties("a", "b"));
         node = graph.getNode(node.getName());
         assertTrue(node.getProperties().isEmpty());
-    }
-
-    @Test
-    void testConcurrency() throws PMException, InterruptedException {
-        MemGraph graph = new MemGraph();
-        new Thread(() -> {access(graph, 1);}).start();
-        new Thread(() -> {access(graph, 2);}).start();
-        new Thread(() -> {access(graph, 3);}).start();
-        new Thread(() -> {access(graph, 4);}).start();
-        System.out.println(graph.getPolicyClasses());
-    }
-
-    private void access(MemGraph graph, int i) {
-        try {
-            graph.lock.lock();
-            graph.createPolicyClass("pc" + i, null);
-            Thread.sleep(2000);
-        } catch (PMException | InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            graph.lock.unlock();
-        }
     }
 }

@@ -5,22 +5,23 @@ import gov.nist.csd.pm.epp.events.AssignToEvent;
 import gov.nist.csd.pm.epp.events.DeassignEvent;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.GraphAdmin;
-import gov.nist.csd.pm.pap.ObligationsAdmin;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.ProhibitionsAdmin;
+import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
+import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.obligations.MemObligations;
+import gov.nist.csd.pm.pip.memory.MemObligations;
+import gov.nist.csd.pm.pip.memory.MemPIP;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.obligations.model.Rule;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import gov.nist.csd.pm.pip.memory.MemProhibitions;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,13 +45,14 @@ class EPPTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pdp = PDP.newPDP(
-                new PAP(
-                        new GraphAdmin(new MemGraph()),
-                        new ProhibitionsAdmin(new MemProhibitions()),
-                        new ObligationsAdmin(new MemObligations())),
+        OperationSet ops = new OperationSet("read", "write", "execute");
+        Features features = new MemPIP(new MemGraph(), new MemProhibitions(), new MemObligations());
+        PDP pdp = PDP.newPDP(
+                new MemPAP(features),
                 new EPPOptions(),
-                new OperationSet("read", "write", "execute"));
+                new PReviewDecider(features.getGraph(), features.getProhibitions(), ops),
+                new PReviewAuditor(features.getGraph(), ops)
+        );
         Graph graph = pdp.getGraphService(new UserContext("super"));
         pc1 = graph.createPolicyClass("pc1", null);
         oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
@@ -147,10 +149,14 @@ class EPPTest {
         Obligations obligations = new MemObligations();
         obligations.add(obligation, true);
 
+        OperationSet ops = new OperationSet("read", "write", "execute");
+        Features features = new MemPIP(graph, new MemProhibitions(), obligations);
         PDP pdp = PDP.newPDP(
-                new PAP(new GraphAdmin(graph), new ProhibitionsAdmin(new MemProhibitions()), new ObligationsAdmin(obligations)),
+                new MemPAP(features),
                 new EPPOptions(),
-                new OperationSet("read", "write", "execute"));
+                new PReviewDecider(features.getGraph(), features.getProhibitions(), ops),
+                new PReviewAuditor(features.getGraph(), ops)
+        );
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext("u1"), oa2, o1));
 
         assertTrue(graph.exists("new OA"));

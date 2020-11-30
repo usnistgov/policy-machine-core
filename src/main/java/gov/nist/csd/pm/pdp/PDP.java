@@ -3,13 +3,14 @@ package gov.nist.csd.pm.pdp;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.policies.SuperPolicy;
+import gov.nist.csd.pm.pdp.audit.Auditor;
+import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.*;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
+import gov.nist.csd.pm.pip.tx.TxRunner;
 
 public class PDP {
 
@@ -20,73 +21,62 @@ public class PDP {
      *
      * @return the new PDP instance
      */
-    public static PDP newPDP(PAP pap, EPPOptions eppOptions, OperationSet resourceOps) throws PMException {
+    public static PDP newPDP(Features pap, EPPOptions eppOptions, Decider decider, Auditor auditor) throws PMException {
         // create PDP
-        PDP pdp = new PDP(pap, resourceOps);
+        PDP pdp = new PDP(pap, decider, auditor);
         // create the EPP
         EPP epp = new EPP(pap, pdp, eppOptions);
         // set the PDPs EPP
         pdp.setEPP(epp);
-        // initialize PDP services which need the epp that was just set
-        pdp.initServices();
 
         return pdp;
     }
 
-    private PAP pap;
-    private OperationSet resourceOps;
-
+    private final Features pap;
     private EPP epp;
-    private GraphService graphService;
-    private ProhibitionsService prohibitionsService;
-    private AnalyticsService    analyticsService;
-    private ObligationsService obligationsService;
+    private Decider decider;
+    private Auditor auditor;
 
     /**
      * Create a new PDP instance given a Policy Administration Point and an optional set of FunctionExecutors to be
      * used by the EPP.
      * @param pap the Policy Administration Point that the PDP will use to change the graph.
-     * @param resourceOps the set of operations that the PDP will understand while traversing the graph.
      * @throws PMException if there is an error initializing the EPP.
      */
-    private PDP(PAP pap, OperationSet resourceOps) throws PMException {
+    private PDP(Features pap, Decider decider, Auditor auditor) throws PMException {
         this.pap = pap;
-        this.resourceOps = resourceOps;
+        this.decider = decider;
+        this.auditor = auditor;
     }
 
     private void setEPP(EPP epp) {
         this.epp = epp;
     }
 
-    private void initServices() throws PMException {
-        // initialize services
-        this.graphService = new GraphService(pap, this.epp, resourceOps);
-        this.prohibitionsService = new ProhibitionsService(pap, this.epp, resourceOps);
-        this.analyticsService = new AnalyticsService(pap, this.epp, resourceOps);
-        this.obligationsService = new ObligationsService(pap, this.epp, resourceOps);
-    }
-
     public EPP getEPP() {
         return epp;
     }
 
-    public Graph getGraphService(UserContext userCtx) {
-        graphService.setUserCtx(userCtx);
-        return graphService;
+    public GraphService getGraphService(UserContext userCtx) throws PMException {
+        return new GraphService(userCtx, pap, epp, decider, auditor);
     }
 
-    public Prohibitions getProhibitionsService(UserContext userCtx) {
-        prohibitionsService.setUserCtx(userCtx);
-        return prohibitionsService;
+    public ProhibitionsService getProhibitionsService(UserContext userCtx) {
+        return new ProhibitionsService(userCtx, pap, epp, decider, auditor);
+    }
+
+    public ObligationsService getObligationsService(UserContext userCtx) {
+        return new ObligationsService(userCtx, pap, epp, decider, auditor);
     }
 
     public AnalyticsService getAnalyticsService(UserContext userCtx) {
-        analyticsService.setUserCtx(userCtx);
-        return analyticsService;
+        return new AnalyticsService(userCtx, pap, epp, decider, auditor);
     }
 
-    public Obligations getObligationsService(UserContext userCtx) {
-        obligationsService.setUserCtx(userCtx);
-        return obligationsService;
+    public synchronized void runTx(UserContext userCtx, TxRunner txRunner) throws PMException {
+        GraphService graphService = new GraphService(userCtx, pap, epp, decider, auditor);
+        ProhibitionsService prohibitionsService = new ProhibitionsService(userCtx, pap, epp, decider, auditor);
+        ObligationsService obligationsService = new ObligationsService(userCtx, pap, epp, decider, auditor);
+        txRunner.run(graphService, prohibitionsService, obligationsService);
     }
 }

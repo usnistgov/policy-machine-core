@@ -1,7 +1,6 @@
-package gov.nist.csd.pm.pip.tx.memory.cmd;
+package gov.nist.csd.pm.pip.memory.tx.cmd;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.pip.graph.Graph;
 
 public interface TxCmd {
 

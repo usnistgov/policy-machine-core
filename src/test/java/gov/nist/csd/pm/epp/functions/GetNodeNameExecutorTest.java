@@ -36,7 +36,9 @@ class GetNodeNameExecutorTest {
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg(new Function("get_node", Arrays.asList(new Arg("oa1"), new Arg("OA"))))));
 
-        String name = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        String name = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(name);
         assertEquals("oa1", name);

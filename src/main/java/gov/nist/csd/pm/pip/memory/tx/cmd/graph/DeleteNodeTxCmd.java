@@ -1,9 +1,9 @@
-package gov.nist.csd.pm.pip.tx.memory.cmd.graph;
+package gov.nist.csd.pm.pip.memory.tx.cmd.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.tx.memory.cmd.TxCmd;
+import gov.nist.csd.pm.pip.memory.tx.cmd.TxCmd;
 
 import java.util.Set;
 

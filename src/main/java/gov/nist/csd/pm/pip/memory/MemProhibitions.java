@@ -1,6 +1,7 @@
-package gov.nist.csd.pm.pip.prohibitions;
+package gov.nist.csd.pm.pip.memory;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;

@@ -3,9 +3,10 @@ package gov.nist.csd.pm.pdp.services.guard;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.MemPAP;
+import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.List;
@@ -15,8 +16,8 @@ import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsGuard extends Guard {
 
-    public ProhibitionsGuard(PAP pap, OperationSet resourceOps) {
-        super(pap, resourceOps);
+    public ProhibitionsGuard(Features pap, Decider decider) {
+        super(pap, decider);
     }
 
     private void check(UserContext userCtx, Prohibition prohibition, String permission) throws PMException {
@@ -24,7 +25,7 @@ public class ProhibitionsGuard extends Guard {
         Map<String, Boolean> containers = prohibition.getContainers();
 
         // check prohibition subject
-        if (pap.getGraphAdmin().exists(subject)) {
+        if (pap.getGraph().exists(subject)) {
             if (!hasPermissions(userCtx, subject, permission)) {
                 throw new PMAuthorizationException(String.format("unauthorized permission %s on %s", permission, subject));
             }

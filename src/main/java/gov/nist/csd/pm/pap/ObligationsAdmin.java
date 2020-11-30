@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 
@@ -10,8 +11,8 @@ public class ObligationsAdmin implements Obligations {
 
     private Obligations obligations;
 
-    public ObligationsAdmin(Obligations obligations) {
-        this.obligations = obligations;
+    public ObligationsAdmin(Features pip) {
+        this.obligations = pip.getObligations();
     }
 
     @Override

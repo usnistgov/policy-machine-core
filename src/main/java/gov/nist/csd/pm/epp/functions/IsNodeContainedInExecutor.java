@@ -10,8 +10,10 @@ import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
 import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.functions.Arg;
 import gov.nist.csd.pm.pip.obligations.model.functions.Function;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +31,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
     }
 
     @Override
-    public Boolean exec(UserContext obligationUser, EventContext eventCtx, PDP pdp, Function function, FunctionEvaluator functionEvaluator) throws PMException {
+    public Boolean exec(Graph graph, Prohibitions prohibitions, Obligations obligations, EventContext eventCtx, Function function, FunctionEvaluator functionEvaluator) throws PMException {
         List< Arg > args = function.getArgs();
         if (args.size() != numParams()) {
             throw new PMException(getFunctionName() + " expected " + numParams() + " parameters but got " + args.size());
@@ -41,7 +43,7 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node childNode = functionEvaluator.evalNode(obligationUser, eventCtx, pdp, f);
+        Node childNode = functionEvaluator.evalNode(graph, prohibitions, obligations, eventCtx, f);
         if(childNode == null) {
             return false;
         }
@@ -52,12 +54,11 @@ public class IsNodeContainedInExecutor implements FunctionExecutor {
             throw new PMException(getFunctionName() + " expects two functions as parameters");
         }
 
-        Node parentNode = functionEvaluator.evalNode(obligationUser, eventCtx, pdp, f);
+        Node parentNode = functionEvaluator.evalNode(graph, prohibitions, obligations, eventCtx, f);
         if(parentNode == null) {
             return false;
         }
 
-        Graph graph = pdp.getGraphService(obligationUser);
         DepthFirstSearcher dfs = new DepthFirstSearcher(graph);
         Set<String> nodes = new HashSet<>();
         Visitor visitor = node -> {

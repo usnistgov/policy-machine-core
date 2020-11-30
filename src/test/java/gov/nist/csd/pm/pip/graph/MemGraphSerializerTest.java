@@ -2,16 +2,13 @@ package gov.nist.csd.pm.pip.graph;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.obligations.MemObligations;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import gov.nist.csd.pm.pip.memory.MemGraph;
+import gov.nist.csd.pm.pip.memory.MemGraphSerializer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.*;

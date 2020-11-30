@@ -15,6 +15,13 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class SuperPolicy {
 
+    public static final String SUPER_USER = "super";
+    public static final String SUPER_PC = "super_pc";
+    public static final String SUPER_PC_REP = "super_pc_rep";
+    public static final String SUPER_UA1 = "super_ua1";
+    public static final String SUPER_UA2 = "super_ua2";
+    public static final String SUPER_OA = "super_oa";
+
     private final Node superUser = new Node("super", U, Node.toProperties(NAMESPACE_PROPERTY, "super"));
     private Node superUA1;
     private Node superUA2;
