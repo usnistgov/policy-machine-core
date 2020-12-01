@@ -179,7 +179,6 @@ public class MemGraph implements Graph {
      */
     @Override
     public synchronized Node getNode(String name) throws PMException {
-
         Node node = nodes.get(name);
         if (node == null) {
             throw new PMException(String.format("a node with the name %s does not exist", name));
@@ -190,7 +189,6 @@ public class MemGraph implements Graph {
 
     @Override
     public synchronized Node getNode(NodeType type, Map<String, String> properties) throws PMException {
-
         Set<Node> search = search(type, properties);
         if (search.isEmpty()) {
             throw new PMException(String.format("a node matching the criteria (%s, %s) does not exist", type, properties));
@@ -209,7 +207,6 @@ public class MemGraph implements Graph {
      */
     @Override
     public synchronized Set<Node> search(NodeType type, Map<String, String> properties) {
-
         if (properties == null) {
             properties = new HashMap<>();
         }
@@ -251,7 +248,6 @@ public class MemGraph implements Graph {
      */
     @Override
     public synchronized Set<String> getChildren(String name) throws PMException {
-
         if (!exists(name)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
@@ -276,7 +272,6 @@ public class MemGraph implements Graph {
      */
     @Override
     public synchronized Set<String> getParents(String name) throws PMException {
-
         if (!exists(name)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
@@ -302,11 +297,12 @@ public class MemGraph implements Graph {
      * @throws PMException if the two types do not make a valid assignment.
      */
     @Override
-    public synchronized void assign(String child, String parent) throws PMException {if (!exists(child)) {
-        throw new PMException(String.format(NODE_NOT_FOUND_MSG, child));
-    } else if (!exists(parent)) {
-        throw new PMException(String.format(NODE_NOT_FOUND_MSG, parent));
-    }
+    public synchronized void assign(String child, String parent) throws PMException {
+        if (!exists(child)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, child));
+        } else if (!exists(parent)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, parent));
+        }
 
         if (graph.containsEdge(child, parent)) {
             throw new PMException(child + " is already assigned to" + parent);

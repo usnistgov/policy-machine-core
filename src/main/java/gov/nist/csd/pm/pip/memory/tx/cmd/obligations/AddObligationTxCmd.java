@@ -21,9 +21,4 @@ public class AddObligationTxCmd implements TxCmd {
     public void commit() throws PMException {
         this.obligations.add(obligation, enabled);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        this.obligations.delete(obligation.getLabel());
-    }
 }

@@ -22,9 +22,4 @@ public class CreatePolicyClassTxCmd implements TxCmd {
     public void commit() throws PMException {
         graph.createPolicyClass(name, properties);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        graph.deleteNode(name);
-    }
 }

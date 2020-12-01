@@ -92,7 +92,7 @@ rules:
                 properties:
                   k: v
               where:
-                name: oa1
+                name: oa2
                 type: OA
         - assign:
             - what:

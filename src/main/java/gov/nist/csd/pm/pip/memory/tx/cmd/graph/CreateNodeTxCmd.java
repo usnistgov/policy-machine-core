@@ -31,8 +31,4 @@ public class CreateNodeTxCmd implements TxCmd {
         graph.createNode(name, type, properties, initialParent, parents.toArray(new String[0]));
     }
 
-    @Override
-    public void rollback() throws PMException {
-        graph.deleteNode(name);
-    }
 }

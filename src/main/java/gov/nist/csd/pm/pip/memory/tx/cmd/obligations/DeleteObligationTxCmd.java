@@ -21,9 +21,4 @@ public class DeleteObligationTxCmd implements TxCmd {
         this.obligation = this.obligations.get(label);
         this.obligations.delete(label);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        this.obligations.add(this.obligation, this.obligation.isEnabled());
-    }
 }

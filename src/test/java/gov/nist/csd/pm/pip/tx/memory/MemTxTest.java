@@ -94,49 +94,6 @@ class MemTxTest {
     }
 
     @Test
-    void testThreads() throws PMException, InterruptedException {
-        Graph graph = new MemGraph();
-        Prohibitions prohibitions = new MemProhibitions();
-        Obligations obligations = new MemObligations();
-
-        new Thread(() -> {
-            Tx tx = new MemTx(graph, prohibitions, obligations);
-            try {
-                tx.runTx((g, p, o) -> {
-                    g.createPolicyClass("pc1", null);
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    g.createNode("oa1", OA, null, "pc1");
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        Thread.sleep(1000);
-        new Thread(() -> {
-            Tx tx = new MemTx(graph, prohibitions, obligations);
-            try {
-                tx.runTx((g, p, o) -> {
-                    g.deleteNode("oa1");
-                    g.deleteNode("pc1");
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        assertFalse(graph.exists("oa1"));
-        assertFalse(graph.exists("pc1"));
-    }
-
-    @Test
     void test3() throws InterruptedException, PMException {
         Graph graph = new MemGraph();
         Prohibitions prohibitions = new MemProhibitions();

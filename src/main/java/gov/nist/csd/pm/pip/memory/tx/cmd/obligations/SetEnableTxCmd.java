@@ -22,9 +22,4 @@ public class SetEnableTxCmd implements TxCmd {
         this.oldEnabled = obligations.get(label).isEnabled();
         this.obligations.setEnable(label, enabled);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        this.obligations.setEnable(label, oldEnabled);
-    }
 }

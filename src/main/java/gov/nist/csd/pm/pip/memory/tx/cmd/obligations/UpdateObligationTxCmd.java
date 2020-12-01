@@ -23,9 +23,4 @@ public class UpdateObligationTxCmd implements TxCmd {
         this.oldObligation = this.obligations.get(label);
         this.obligations.update(label, obligation);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        this.obligations.update(label, oldObligation);
-    }
 }

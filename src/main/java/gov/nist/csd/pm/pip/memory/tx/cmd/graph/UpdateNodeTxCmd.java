@@ -28,9 +28,4 @@ public class UpdateNodeTxCmd implements TxCmd {
         originalProperties = node.getProperties();
         graph.updateNode(name, properties);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        graph.updateNode(name, originalProperties);
-    }
 }

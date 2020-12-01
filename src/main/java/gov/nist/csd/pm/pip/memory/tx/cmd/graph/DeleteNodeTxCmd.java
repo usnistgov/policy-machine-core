@@ -25,11 +25,4 @@ public class DeleteNodeTxCmd implements TxCmd {
         parents = graph.getParents(name);
         graph.deleteNode(name);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        String initialParent = parents.iterator().next();
-        parents.remove(initialParent);
-        graph.createNode(node.getName(), node.getType(), node.getProperties(), initialParent, parents.toArray(new String[0]));
-    }
 }

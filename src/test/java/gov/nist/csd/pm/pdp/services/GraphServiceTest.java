@@ -30,6 +30,7 @@ class GraphServiceTest {
                 null,
                 new PReviewDecider(graph, prohibitions, ops),
                 new PReviewAuditor(graph, ops));
+        graph = pdp.getGraphService(new UserContext("super"));
 
         GraphService graphService = pdp.getGraphService(new UserContext("super"));
         Node test = graph.createPolicyClass("test", null);

@@ -24,8 +24,4 @@ public class AssociateTxCmd implements TxCmd {
         graph.associate(ua, target, operations);
     }
 
-    @Override
-    public void rollback() throws PMException {
-        graph.dissociate(ua, target);
-    }
 }

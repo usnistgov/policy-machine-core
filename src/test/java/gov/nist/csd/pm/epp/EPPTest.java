@@ -9,6 +9,7 @@ import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
+import gov.nist.csd.pm.pdp.services.GraphService;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.Graph;
@@ -47,7 +48,7 @@ class EPPTest {
     void setup() throws PMException {
         OperationSet ops = new OperationSet("read", "write", "execute");
         Features features = new MemPIP(new MemGraph(), new MemProhibitions(), new MemObligations());
-        PDP pdp = PDP.newPDP(
+        pdp = PDP.newPDP(
                 new MemPAP(features),
                 new EPPOptions(),
                 new PReviewDecider(features.getGraph(), features.getProhibitions(), ops),
@@ -118,7 +119,7 @@ class EPPTest {
         // check that the new OA was assigned to the oa1
         Set<String> parents = pdp.getGraphService(superCtx).getParents(newOA.getName());
         assertFalse(parents.isEmpty());
-        assertEquals(oa1.getName(), parents.iterator().next());
+        assertEquals("oa2" , parents.iterator().next());
 
         // check ua1 was associated with new OA
         Map<String, OperationSet> sourceAssociations = pdp.getGraphService(superCtx).getSourceAssociations(ua1.getName());
@@ -131,7 +132,22 @@ class EPPTest {
 
     @Test
     void testUserContainedIn() throws PMException, IOException {
-        Graph graph = new MemGraph();
+        InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
+        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+        Obligation obligation = new EVRParser().parse("super", yml);
+
+        Obligations obligations = new MemObligations();
+        obligations.add(obligation, true);
+
+        OperationSet ops = new OperationSet("read", "write", "execute");
+        Features features = new MemPIP(new MemGraph(), new MemProhibitions(), obligations);
+        PDP pdp = PDP.newPDP(
+                new MemPAP(features),
+                new EPPOptions(),
+                new PReviewDecider(features.getGraph(), features.getProhibitions(), ops),
+                new PReviewAuditor(features.getGraph(), ops)
+        );
+        GraphService graph = pdp.getGraphService(new UserContext("super"));
 
         graph.createPolicyClass("pc1", null);
         graph.createNode("oa1", OA, null, "pc1");
@@ -142,21 +158,6 @@ class EPPTest {
         graph.createNode("ua1-1", UA, null, "ua1");
         graph.createNode("u1", U, null, "ua1-1");
 
-        InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
-        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        Obligation obligation = new EVRParser().parse("super", yml);
-
-        Obligations obligations = new MemObligations();
-        obligations.add(obligation, true);
-
-        OperationSet ops = new OperationSet("read", "write", "execute");
-        Features features = new MemPIP(graph, new MemProhibitions(), obligations);
-        PDP pdp = PDP.newPDP(
-                new MemPAP(features),
-                new EPPOptions(),
-                new PReviewDecider(features.getGraph(), features.getProhibitions(), ops),
-                new PReviewAuditor(features.getGraph(), ops)
-        );
         pdp.getEPP().processEvent(new AssignToEvent(new UserContext("u1"), oa2, o1));
 
         assertTrue(graph.exists("new OA"));

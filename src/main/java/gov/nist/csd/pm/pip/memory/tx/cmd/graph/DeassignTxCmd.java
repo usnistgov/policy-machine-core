@@ -28,9 +28,4 @@ public class DeassignTxCmd implements TxCmd {
     public void commit() throws PMException {
         graph.deassign(child, parent);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        graph.assign(child, parent);
-    }
 }

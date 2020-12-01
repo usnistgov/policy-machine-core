@@ -38,9 +38,4 @@ public class DissociateTxCmd implements TxCmd {
         operations = assocs.get(target);
         graph.dissociate(ua, target);
     }
-
-    @Override
-    public void rollback() throws PMException {
-        graph.associate(ua, target, operations);
-    }
 }

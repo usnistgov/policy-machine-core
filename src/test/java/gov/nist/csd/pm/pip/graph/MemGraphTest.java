@@ -24,9 +24,9 @@ class MemGraphTest {
         Node pc = graph.createPolicyClass("pc", null);
         assertTrue(graph.getPolicyClasses().contains(pc.getName()));
         
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(null, null, null, "pc")),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(null, OA, null, "pc")),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode("name", null, null, "pc"))
+        assertAll(() -> assertThrows(PMException.class, () -> graph.createNode(null, null, null, "pc")),
+                () -> assertThrows(PMException.class, () -> graph.createNode(null, OA, null, "pc")),
+                () -> assertThrows(PMException.class, () -> graph.createNode("name", null, null, "pc"))
         );
         
         // add non pc
@@ -126,8 +126,8 @@ class MemGraphTest {
         Node child1Node = graph.createNode("child1", OA, null, "parent1");
         Node child2Node = graph.createNode("child2", OA, null, "parent1");
 
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.assign("1241124", "123442141")),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign("1", "12341234"))
+        assertAll(() -> assertThrows(PMException.class, () -> graph.assign("1241124", "123442141")),
+                () -> assertThrows(PMException.class, () -> graph.assign("1", "12341234"))
         );
 
         graph.assign(child1Node.getName(), child2Node.getName());
@@ -143,8 +143,8 @@ class MemGraphTest {
         Node parent1Node = graph.createPolicyClass("parent1", null);
         Node child1Node = graph.createNode("child1", OA, null, "parent1");
 
-        assertThrows(IllegalArgumentException.class, () -> graph.assign("", ""));
-        assertThrows(IllegalArgumentException.class, () -> graph.assign(child1Node.getName(), ""));
+        assertThrows(PMException.class, () -> graph.assign("", ""));
+        assertThrows(PMException.class, () -> graph.assign(child1Node.getName(), ""));
 
         graph.deassign(child1Node.getName(), parent1Node.getName());
 
