@@ -46,7 +46,7 @@ public class RBAC {
 
         // DAC PC todo: find default pc node's properties
         RBAC_PC_NODE = checkAndCreateRBACNode(graph, RBAC_PC_NAME, NodeType.PC);
-        Set<String> children = graph.getChildren(RBACname);
+        Set<String> children = graph.getChildren(RBAC_PC_NAME);
         for (String child: children) {
             Node childNode = graph.getNode(child);
             if (childNode.getType().equals(NodeType.UA)) {
@@ -109,11 +109,10 @@ public class RBAC {
     }
 
     // create role
-    public static Node deleteRole (PDP pdp, UserContext superUserContext,
+    public static void deleteRole (PDP pdp, UserContext superUserContext,
                                    String roleName) throws PMException {
         // find role node
         // todo: how to reassign children
-        return null;
     }
 
     // get user roles

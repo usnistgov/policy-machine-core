@@ -242,7 +242,7 @@ public class DAC {
 
     // todo: add an over-ridden version of delegate which also takes into account prohibitions
 
-    public static void assign_owner (PDP pdp, String ownerName, UserContext superUser,
+    public static void assign_owner (PDP pdp, UserContext superUser, String ownerName,
                                         String... targetNames) throws PMException {
         // super graph
         GraphService graph = pdp.getGraphService(superUser);
