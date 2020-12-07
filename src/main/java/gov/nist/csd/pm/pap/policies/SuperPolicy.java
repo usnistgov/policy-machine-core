@@ -50,6 +50,7 @@ public class SuperPolicy {
     }
 
     public void configure(Graph graph) throws PMException {
+
         String superPCRep = "super_pc_rep";
         if (!graph.exists("super_pc")) {
             Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", REP_PROPERTY, "super_pc_rep");
@@ -92,11 +93,16 @@ public class SuperPolicy {
         // check super ua1 is assigned to super pc
         Set<String> children = graph.getChildren(superPC.getName());
         if(!children.contains(superUA1.getName())) {
-            graph.assign(superUA1.getName(), superPC.getName());
+            if (!graph.getChildren("super_pc_default_UA").contains(superUA1.getName())) {
+                graph.assign(superUA1.getName(), superPC.getName());
+            }
         }
+
         // check super ua2 is assigned to super pc
         if(!children.contains(superUA2.getName())) {
-            graph.assign(superUA2.getName(), superPC.getName());
+            if (!graph.getChildren("super_pc_default_UA").contains(superUA2.getName())) {
+                graph.assign(superUA2.getName(), superPC.getName());
+            }
         }
 
         // check super user is assigned to super ua1
@@ -114,7 +120,9 @@ public class SuperPolicy {
         // check super oa is assigned to super pc
         children = graph.getChildren(superPC.getName());
         if(!children.contains(superOA.getName())) {
-            graph.assign(superOA.getName(), superPC.getName());
+            if (!graph.getChildren("super_pc_default_OA").contains(superOA.getName())) {
+                graph.assign(superOA.getName(), superPC.getName());
+            }
         }
 
         // check super o is assigned to super oa
@@ -144,7 +152,6 @@ public class SuperPolicy {
             if (!graph.exists(defaultUA)) {
                 graph.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, pc), pc);
             }
-
             // update pc node if necessary
             Node node = graph.getNode(pc);
             Map<String, String> props = node.getProperties();
@@ -153,6 +160,13 @@ public class SuperPolicy {
             props.put(REP_PROPERTY, rep);
             graph.updateNode(pc, props);
 
+            //remove potential parents of super uas
+            if (graph.getParents(superUA1.getName()).contains("super_pc_default_UA")) {
+                graph.deassign(superUA1.getName(), "super_pc_default_UA");
+            }
+            if (graph.getParents(superUA2.getName()).contains("super_pc_default_UA")) {
+                graph.deassign(superUA2.getName(), "super_pc_default_UA");
+            }
             // assign both super uas if not already
             if (!graph.isAssigned(superUA1.getName(), pc)) {
                 graph.assign(superUA1.getName(), pc);

@@ -2,7 +2,10 @@ package gov.nist.csd.pm.pdp.services;
 
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.GraphAdmin;
+import gov.nist.csd.pm.pap.ObligationsAdmin;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.ProhibitionsAdmin;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
@@ -50,15 +53,15 @@ public class Service {
         return this.pap;
     }
 
-    Graph getGraphAdmin() {
+    GraphAdmin getGraphAdmin() {
         return pap.getGraphAdmin();
     }
 
-    Prohibitions getProhibitionsAdmin() {
+    ProhibitionsAdmin getProhibitionsAdmin() {
         return pap.getProhibitionsAdmin();
     }
 
-    Obligations getObligationsAdmin() {
+    ObligationsAdmin getObligationsAdmin() {
         return pap.getObligationsAdmin();
     }
 
