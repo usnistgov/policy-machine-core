@@ -497,7 +497,6 @@ public class GraphService extends Service implements Graph {
                 }
             });
             getProhibitionsAdmin().getProhibitionsFor(node.getName()).forEach( el -> {
-                System.out.println(el.getName());
                 prohibitions_name.add(el.getName());
             });
         }
@@ -509,8 +508,8 @@ public class GraphService extends Service implements Graph {
             graph.deleteNode(name);
         }
         //setup Super policy in GraphAdmin + copy graph and graph copy
-        this.superPolicy = new SuperPolicy();
-        this.superPolicy.configure(graph);
+        superPolicy = new SuperPolicy();
+        superPolicy.configure(graph);
     }
 
     @Override

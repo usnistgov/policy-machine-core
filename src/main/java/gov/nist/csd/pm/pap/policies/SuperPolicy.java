@@ -50,7 +50,6 @@ public class SuperPolicy {
     }
 
     public void configure(Graph graph) throws PMException {
-
         String superPCRep = "super_pc_rep";
         if (!graph.exists("super_pc")) {
             Map<String, String> props = Node.toProperties(NAMESPACE_PROPERTY, "super", REP_PROPERTY, "super_pc_rep");
@@ -169,6 +168,7 @@ public class SuperPolicy {
             }
             // assign both super uas if not already
             if (!graph.isAssigned(superUA1.getName(), pc)) {
+                System.out.println("new assign super_ua1 to pc");
                 graph.assign(superUA1.getName(), pc);
             }
             if (!graph.isAssigned(superUA2.getName(), pc)) {

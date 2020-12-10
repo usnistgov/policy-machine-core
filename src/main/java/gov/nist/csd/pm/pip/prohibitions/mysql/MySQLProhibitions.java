@@ -95,6 +95,12 @@ public class MySQLProhibitions implements Prohibitions {
         }
     }
 
+    public String getNodeNameFromNodeID(int id) throws PIPException {
+        MySQLConnection connection = new MySQLConnection();
+        MySQLGraph mySQLGraph = new MySQLGraph(connection);
+        return mySQLGraph.getNodeNameFromId(id);
+    }
+
     public boolean existsContainer(int deny_id) throws PIPException{
         try (
                 Connection con = this.conn.getConnection();
@@ -238,8 +244,10 @@ public class MySQLProhibitions implements Prohibitions {
             for (Map.Entry<String,Boolean> container : prohibition.getContainers().entrySet()) {
                 pstmt.setInt(1, deny_id);
                 MySQLGraph graph = new MySQLGraph(this.conn);
-                if (graph.exists(graph.getNodeNameFromId(Integer.parseInt(container.getKey())))) {
-                    pstmt.setInt(2, Integer.parseInt(container.getKey()));
+                //if (graph.exists(graph.getNodeNameFromId(Integer.parseInt(container.getKey())))) {
+                if (graph.exists(container.getKey())) {
+
+                    pstmt.setInt(2, getNodeIdFromSubjectName(container.getKey()));
                     pstmt.setInt(3, container.getValue() ? 1 : 0);
                     pstmt.executeUpdate();
                 } else {
@@ -301,7 +309,7 @@ public class MySQLProhibitions implements Prohibitions {
                         .collect(Collectors.toList());
 
                 for (Deny_obj_attr deny_obj_attr : containers_curr) {
-                    p.addContainer(String.valueOf(deny_obj_attr.obj_att_id), deny_obj_attr.obj_compl == 1);
+                    p.addContainer(getNodeNameFromNodeID(deny_obj_attr.obj_att_id), deny_obj_attr.obj_compl == 1);
                 }
                 prohibitions.add(p);
             }

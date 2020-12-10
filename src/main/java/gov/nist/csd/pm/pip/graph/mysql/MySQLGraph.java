@@ -257,7 +257,7 @@ public class MySQLGraph implements Graph {
             throw new IllegalArgumentException("a null type was provided to the mysql graph when creating a node");
         }
         else if (exists(name)) {
-            throw new PIPException("graph", "You cannot create the policy class node. Another node with the name '" + name + "' already exists");
+            throw new PIPException("graph", "You cannot create the node. Another node with the name '" + name + "' already exists");
         }
 
         ResultSet rs_type = null;
