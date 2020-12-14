@@ -44,4 +44,5 @@ This is the workflow is where all protected resources must be specifically given
         3. Delegatee must either be a UA or U
         4. Delegator must have "create association" and "assign" access rights on delegatee
         5. Delegator must have "create association", "assign" and all given ops on all targets
-- Assign owner - adds the given object or user to the owner's "home folder".
+- Assign Owner - adds the given object or user to the owner's "home folder".
+- Get Assignees - Returns the objects/users that are assigned to the given user
