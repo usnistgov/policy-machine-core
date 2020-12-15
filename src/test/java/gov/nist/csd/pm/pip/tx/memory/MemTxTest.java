@@ -94,69 +94,6 @@ class MemTxTest {
     }
 
     @Test
-    void test3() throws InterruptedException, PMException {
-        Graph graph = new MemGraph();
-        Prohibitions prohibitions = new MemProhibitions();
-        Obligations obligations = new MemObligations();
-        MemPIP pip = new MemPIP(graph, prohibitions, obligations);
-        Tx memTx = new MemTx(graph, prohibitions, obligations);
-        new Thread(() -> {
-            System.out.println("in thread 1");
-            try {
-                pip.runTx((g, p, o) -> {
-                    System.out.println("in tx 1");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    g.createPolicyClass("pc1", null);
-                    System.out.println("end tx 1");
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        Thread.sleep(500);
-        new Thread(() -> {
-            System.out.println("in thread 2");
-            try {
-                pip.runTx((g, p, o) -> {
-                    System.out.println("in tx 2");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    g.deleteNode("pc1");
-                    System.out.println("end tx 2");
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        Thread.sleep(3000);
-        new Thread(() -> {
-            System.out.println("in thread 3");
-            try {
-                memTx.runTx((g, p, o) -> {
-                    System.out.println("in tx 3");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    g.createPolicyClass("pc1", null);
-                    System.out.println("end tx 3");
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        assertFalse(graph.exists("pc1"));
-    }
-
-    @Test
     void test5() throws PMException, InterruptedException {
         Graph graph = new MemGraph();
         Prohibitions prohibitions = new MemProhibitions();
