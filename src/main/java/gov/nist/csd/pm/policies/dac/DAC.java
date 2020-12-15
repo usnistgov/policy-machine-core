@@ -242,7 +242,7 @@ public class DAC {
 
     // todo: add an over-ridden version of delegate which also takes into account prohibitions
 
-    public static void assign_owner (PDP pdp, UserContext superUser, String ownerName,
+    public static void assignOwner (PDP pdp, UserContext superUser, String ownerName,
                                         String... targetNames) throws PMException {
         // super graph
         GraphService graph = pdp.getGraphService(superUser);
@@ -268,6 +268,22 @@ public class DAC {
                     throw new PMException("Node must be of type O or U");
             }
         }
+    }
+
+    public static Set<String> getAssignees (PDP pdp, UserContext superUser, String ownerName) throws PMException {
+        // super graph
+        GraphService graph = pdp.getGraphService(superUser);
+
+        // get consent nodes for user
+        ConsentNodes ownerConsentNodes = findConsentNodes(graph, ownerName);
+
+        // get children of consent UA and consent OA (essentially get whats in their home folder.)
+        Set<String> assignedUsers = graph.getChildren(ownerConsentNodes.consent_container_ua.getName());
+        Set<String> assignedObjects = graph.getChildren(ownerConsentNodes.consent_container_oa.getName());
+
+        // return combination of the two
+        assignedUsers.addAll(assignedObjects);
+        return assignedUsers;
     }
 
     /********************
@@ -359,6 +375,9 @@ public class DAC {
                 }
             }
         });
+
+        if (!consentNodes.all_found()) throw new PMException("Not all consent nodes for user: "
+                                                                + forUser + " could be found.");
 
         return consentNodes;
     }
