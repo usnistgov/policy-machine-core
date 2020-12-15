@@ -14,21 +14,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class MemObligations implements Obligations {
 
     private Map<String, Obligation> obligations;
-    public Lock lock;
 
     public MemObligations() {
         this.obligations = new HashMap<>();
-
-        ReadWriteLock lock = new ReentrantReadWriteLock();
-        this.lock = lock.writeLock();
-    }
-
-    public void lock() {
-        this.lock.lock();
-    }
-
-    public void unlock() {
-        this.lock.unlock();
     }
 
     @Override
