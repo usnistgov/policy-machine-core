@@ -196,9 +196,8 @@ public class DAC {
 
         //// Pre-conditions checked at this point, and the delegation can be created
         ConsentNodes consentNodes = findConsentNodes(graph, delegator.getUser());
-        if (consentNodes.consent_group == null || consentNodes.consent_container_oa == null ||
-                consentNodes.consent_container_ua == null) {
-            throw new PMException("Consent Nodes for user, " + delegator.getUser() + ", not properly created.");
+        if (!consentNodes.consent_found()) {
+            throw new PMException("Consent Nodes for user, " + delegator.getUser() + ", not properly created: ");
         }
 
         // create user attribute over delegatee (delegator_delegatee_delegation_UUID)
@@ -249,6 +248,9 @@ public class DAC {
 
         // find owner's consent ua and consent oa
         ConsentNodes consentNodesForOwner = findConsentNodes(graph, ownerName);
+        if (!consentNodesForOwner.all_found()) {
+            throw new PMException("Consent Nodes for user, " + ownerName + ", not properly created");
+        }
         Node consent_ua = consentNodesForOwner.consent_container_ua;
         Node consent_oa = consentNodesForOwner.consent_container_oa;
 
@@ -376,8 +378,7 @@ public class DAC {
             }
         });
 
-        if (!consentNodes.all_found()) throw new PMException("Not all consent nodes for user: "
-                                                                + forUser + " could be found.");
+
 
         return consentNodes;
     }
@@ -392,6 +393,22 @@ public class DAC {
                     consent_group != null &&
                     consent_container_oa != null &&
                     consent_container_ua != null;
+        }
+
+        boolean consent_found () {
+            return consent_group != null &&
+                    consent_container_oa != null &&
+                    consent_container_ua != null;
+        }
+
+        @Override
+        public String toString() {
+            return "ConsentNodes{" +
+                    "consent_admin=" + consent_admin +
+                    ", consent_group=" + consent_group +
+                    ", consent_container_oa=" + consent_container_oa +
+                    ", consent_container_ua=" + consent_container_ua +
+                    '}';
         }
     }
 }
