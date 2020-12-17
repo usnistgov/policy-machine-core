@@ -37,6 +37,7 @@ public class MemDBGraph implements Graph{
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
         if (copy_mem_graph != null) {
+            graph.createPolicyClass(name, properties);
             return copy_mem_graph.createPolicyClass(name, properties);
         }
         return graph.createPolicyClass(name, properties);

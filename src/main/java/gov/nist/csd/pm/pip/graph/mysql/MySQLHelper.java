@@ -36,6 +36,7 @@ public class MySQLHelper {
     public static final String SELECT_PROHIBITION_FROM_NAME = "SELECT deny_id, deny_name, subject_name, is_intersection, deny_operations from deny where deny_name =? ";
     public static final String SELECT_ALL_PROHIBITION = "SELECT deny_id, deny_name, subject_name, is_intersection, deny_operations from deny";
     public static final String SELECT_EXISTS_ID_NODE_ID = "SELECT node_id from node where name =?";
+    public static final String SELECT_EXISTS_NAME_NODE_ID = "SELECT name from node where node_id=?";
     public static final String SELECT_CONTAINER_DENY_ID = "SELECT object_attribute_id, object_complement from deny_obj_attribute where deny_id=? ";
     public static final String SELECT_CONTAINER_DENY_ID_SIMPLE = "SELECT object_attribute_id, object_complement from deny_obj_attribute where deny_id=";
     public static final String SELECT_ALL_CONTAINERS = "SELECT deny_id, object_attribute_id, object_complement from deny_obj_attribute";

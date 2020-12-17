@@ -457,6 +457,7 @@ public class GraphService extends Service implements Graph {
 
         Collection<Node> nodes = graph.getNodes();
         Set<String> names = new HashSet<>();
+        Set<String> prohibitions_name = new HashSet<>();
         for (Node node: nodes) {
             names.add(node.getName());
             if (node.getType() == UA || node.getType() == OA) {
@@ -469,7 +470,6 @@ public class GraphService extends Service implements Graph {
                 });
                 if (node.getType() == UA) {
                     graph.getSourceAssociations(node.getName()).keySet().forEach(el -> {
-
                         try {
                             graph.dissociate(node.getName(), el);
                         } catch (PMException pmException) {
@@ -496,11 +496,19 @@ public class GraphService extends Service implements Graph {
                     pmException.printStackTrace();
                 }
             });
+            getProhibitionsAdmin().getProhibitionsFor(node.getName()).forEach( el -> {
+                prohibitions_name.add(el.getName());
+            });
         }
+        for (String prohibition: prohibitions_name) {
+            getProhibitionsAdmin().delete(prohibition);
+        }
+
         for (String name : names) {
             graph.deleteNode(name);
         }
-        SuperPolicy superPolicy = new SuperPolicy();
+        //setup Super policy in GraphAdmin + copy graph and graph copy
+        superPolicy = new SuperPolicy();
         superPolicy.configure(graph);
     }
 

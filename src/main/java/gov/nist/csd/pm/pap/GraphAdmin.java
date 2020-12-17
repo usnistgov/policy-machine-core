@@ -47,21 +47,23 @@ public class GraphAdmin implements Graph {
 
         // create the pc node
         Node pcNode = graph.createPolicyClass(name, properties);
-
         // create the PC UA node
         Node pcUANode = graph.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
         // create the PC OA node
         Node pcOANode = graph.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
 
+        if (graph.exists(superPolicy.getSuperUserAttribute().getName())) {
+            // associate Super UA and PC UA
+            graph.associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
+            // associate Super UA and PC OA
+            graph.associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
 
-        // associate Super UA and PC UA
-        graph.associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
-        // associate Super UA and PC OA
-        graph.associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
-
+        }
         // create an OA that will represent the pc
-        graph.createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
-                superPolicy.getSuperObjectAttribute().getName());
+        if (graph.exists(superPolicy.getSuperObjectAttribute().getName())) {
+            graph.createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
+                    superPolicy.getSuperObjectAttribute().getName());
+        }
 
         return pcNode;
     }
