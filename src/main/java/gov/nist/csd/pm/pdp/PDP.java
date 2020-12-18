@@ -73,7 +73,7 @@ public class PDP {
         return new AnalyticsService(userCtx, pap, epp, decider, auditor);
     }
 
-    public synchronized void runTx(UserContext userCtx, TxRunner txRunner) throws PMException {
+    public void runTx(UserContext userCtx, TxRunner txRunner) throws PMException {
         GraphService graphService = new GraphService(userCtx, pap, epp, decider, auditor);
         ProhibitionsService prohibitionsService = new ProhibitionsService(userCtx, pap, epp, decider, auditor);
         ObligationsService obligationsService = new ObligationsService(userCtx, pap, epp, decider, auditor);

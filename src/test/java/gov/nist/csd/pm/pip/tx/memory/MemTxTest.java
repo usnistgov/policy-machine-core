@@ -133,7 +133,7 @@ class MemTxTest {
     @Test
     void test6() throws InterruptedException, PMException {
         Graph graph = new MemGraph();
-        new Thread(() -> {
+        Thread t1 = new Thread(() -> {
             try {
                 synchronized (graph) {
                     Thread.sleep(2000);
@@ -142,16 +142,22 @@ class MemTxTest {
             } catch (PMException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }).start();
-        Thread.sleep(500);
-        new Thread(() -> {
+        });
+        Thread t2 = new Thread(() -> {
             try {
                 graph.createNode("oa1", OA, null, "pc1");
             } catch (PMException e) {
                 e.printStackTrace();
             }
-        }).start();
-        Thread.sleep(2500);
+        });
+
+
+        t1.start();
+        t2.start();
+
+        t1.join();
+        t2.join();
+
         assertTrue(graph.exists("oa1"));
         assertTrue(graph.exists("pc1"));
     }
@@ -162,7 +168,7 @@ class MemTxTest {
         Graph graph = new MemGraph();
         MemTx tx = new MemTx(graph, new MemProhibitions(), new MemObligations());
         graph.createPolicyClass("pc1", null);
-        new Thread(() -> {
+        Thread t1 = new Thread(() -> {
             try {
                 tx.runTx((g, p, o) -> {
                     try {
@@ -175,16 +181,21 @@ class MemTxTest {
             } catch (PMException e) {
                 threw = true;
             }
-        }).start();
-        Thread.sleep(500);
-        new Thread(() -> {
+        });
+        Thread t2 = new Thread(() -> {
             try {
                 graph.createNode("oa1", OA, null, "pc1");
             } catch (PMException e) {
                 e.printStackTrace();
             }
-        }).start();
-        Thread.sleep(2500);
+        });
+
+        t1.start();
+        t2.start();
+
+        t1.join();
+        t2.join();
+
         assertTrue(threw);
     }
 
@@ -193,7 +204,7 @@ class MemTxTest {
         Graph graph = new MemGraph();
         MemTx tx = new MemTx(graph, new MemProhibitions(), new MemObligations());
         graph.createPolicyClass("pc1", null);
-        new Thread(() -> {
+        Thread t1 = new Thread(() -> {
             try {
                 tx.runTx((g, p, o) -> {
                     try {
@@ -206,16 +217,21 @@ class MemTxTest {
             } catch (PMException e) {
                 threw = true;
             }
-        }).start();
-        Thread.sleep(500);
-        new Thread(() -> {
+        });
+        Thread t2 = new Thread(() -> {
             try {
                 graph.createPolicyClass("pc2", null);
             } catch (PMException e) {
                 e.printStackTrace();
             }
-        }).start();
-        Thread.sleep(3000);
+        });
+
+        t1.start();
+        t2.start();
+
+        t1.join();
+        t2.join();
+
         assertTrue(graph.isAssigned("oa1", "pc2"));
     }
 }
