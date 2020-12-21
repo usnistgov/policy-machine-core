@@ -37,6 +37,10 @@ public class FunctionEvaluator {
         this.funExecs.put(executor.getFunctionName(), executor);
     }
 
+    public void removeFunctionExecutor(FunctionExecutor executor) {
+        this.funExecs.remove(executor.getFunctionName());
+    }
+
     public FunctionExecutor getFunctionExecutor(String name) throws PMException {
         if (!funExecs.containsKey(name)) {
             throw new PMException(name + " is not a recognized function");

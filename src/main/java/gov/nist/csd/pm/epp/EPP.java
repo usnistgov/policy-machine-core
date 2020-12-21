@@ -29,6 +29,14 @@ public class EPP {
         }
     }
 
+    public void addFunctionExecutor(FunctionExecutor executor) {
+        this.functionEvaluator.addFunctionExecutor(executor);
+    }
+
+    public void removeFunctionExecutor(FunctionExecutor executor) {
+        this.functionEvaluator.removeFunctionExecutor(executor);
+    }
+
     public PAP getPAP() {
         return pap;
     }
