@@ -20,6 +20,7 @@ public class TxProhibitions implements Prohibitions {
     public TxProhibitions(Prohibitions prohibitions) {
         this.targetProhibitions = prohibitions;
         this.cmds = new ArrayList<>();
+        this.prohibitions = new ArrayList<>();
     }
 
     @Override
