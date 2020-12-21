@@ -8,7 +8,7 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.guard.GraphGuard;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -27,7 +27,7 @@ public class GraphService extends Service implements Graph {
     private Graph graph;
     private GraphGuard guard;
 
-    public GraphService(UserContext userCtx, Features pap, EPP epp, Decider decider, Auditor auditor) throws PMException {
+    public GraphService(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) throws PMException {
         super(userCtx, pap, epp, decider, auditor);
         this.graph = pap.getGraph();
         this.guard = new GraphGuard(pap, decider);

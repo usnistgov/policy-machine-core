@@ -39,6 +39,17 @@ public class Prohibition {
         this.intersection = intersection;
     }
 
+    public Prohibition(Prohibition prohibition) {
+        this.name = prohibition.getName();
+        this.subject = prohibition.getSubject();
+        this.containers = new HashMap<>();
+        for (String cont : prohibition.getContainers().keySet()) {
+            this.containers.put(cont, prohibition.getContainers().get(cont));
+        }
+        this.operations = prohibition.getOperations();
+        this.intersection = prohibition.isIntersection();
+    }
+
     public String getSubject() {
         return subject;
     }
@@ -67,7 +78,7 @@ public class Prohibition {
         this.name = name;
     }
 
-    public Set<String> getOperations() {
+    public OperationSet getOperations() {
         return operations;
     }
 

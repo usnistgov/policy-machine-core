@@ -30,9 +30,8 @@ class GraphServiceTest {
                 null,
                 new PReviewDecider(graph, prohibitions, ops),
                 new PReviewAuditor(graph, ops));
-        graph = pdp.getGraphService(new UserContext("super"));
+        graph = pdp.withUser(new UserContext("super")).getGraph();
 
-        GraphService graphService = pdp.getGraphService(new UserContext("super"));
         Node test = graph.createPolicyClass("test", null);
         String defUA = test.getProperties().get("default_ua");
         String defOA = test.getProperties().get("default_oa");

@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -20,11 +20,11 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class GraphAdmin implements Graph {
 
-    private Features pip;
+    private FunctionalEntity pip;
     private Graph graph;
     private SuperPolicy superPolicy;
 
-    public GraphAdmin(Features pip) throws PMException {
+    public GraphAdmin(FunctionalEntity pip) throws PMException {
         this.pip = pip;
         this.graph = pip.getGraph();
         this.superPolicy = new SuperPolicy();

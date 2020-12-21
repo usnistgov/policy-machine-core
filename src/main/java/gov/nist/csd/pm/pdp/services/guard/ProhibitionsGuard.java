@@ -2,11 +2,9 @@ package gov.nist.csd.pm.pdp.services.guard;
 
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.List;
@@ -16,7 +14,7 @@ import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsGuard extends Guard {
 
-    public ProhibitionsGuard(Features pap, Decider decider) {
+    public ProhibitionsGuard(FunctionalEntity pap, Decider decider) {
         super(pap, decider);
     }
 

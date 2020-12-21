@@ -33,7 +33,8 @@ class CurrentUserExecutorTest {
         Function function = new Function(executor.getFunctionName(), null);
 
         UserContext superUser = new UserContext("super");
-        Node userNode = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        Node userNode = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
 
         assertNotNull(userNode);

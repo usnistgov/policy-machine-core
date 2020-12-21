@@ -4,12 +4,6 @@ import gov.nist.csd.pm.epp.FunctionEvaluator;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.services.GraphService;
-import gov.nist.csd.pm.pdp.services.ObligationsService;
-import gov.nist.csd.pm.pdp.services.ProhibitionsService;
-import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.Features;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -314,6 +308,7 @@ public class ResponsePattern {
         List<Rule> rules = obligation.getRules();
         rules.add(rule);
         obligation.setRules(rules);
+        obligations.update(obligationLabel, obligation);
     }
 
     private void applyAssignAction(Graph graph, Prohibitions prohibitions, Obligations obligations,

@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.guard.ProhibitionsGuard;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -16,7 +15,7 @@ public class ProhibitionsService extends Service implements Prohibitions {
 
     private ProhibitionsGuard guard;
 
-    public ProhibitionsService(UserContext userCtx, Features pap, EPP epp, Decider decider, Auditor auditor) {
+    public ProhibitionsService(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
         super(userCtx, pap, epp, decider, auditor);
 
         this.guard = new ProhibitionsGuard(pap, decider);

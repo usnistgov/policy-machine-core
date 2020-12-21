@@ -32,7 +32,8 @@ class ParentOfAssignExecutorTest {
         Function function = new Function(executor.getFunctionName(), null);
 
         UserContext superUser = new UserContext("super");
-        Node node = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        Node node = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
 
         assertNotNull(node);

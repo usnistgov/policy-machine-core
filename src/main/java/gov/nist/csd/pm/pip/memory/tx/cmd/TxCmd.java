@@ -5,4 +5,5 @@ import gov.nist.csd.pm.exceptions.PMException;
 public interface TxCmd {
 
     void commit() throws PMException;
+
 }

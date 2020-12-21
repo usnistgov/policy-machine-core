@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.pdp.services;
 
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.decider.Decider;
-import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
@@ -16,7 +15,7 @@ import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
  */
 public class Service {
 
-    private Features pap;
+    private FunctionalEntity pap;
     private EPP epp;
     SuperPolicy superPolicy;
     UserContext userCtx;
@@ -28,7 +27,7 @@ public class Service {
      * @param pap the Policy Administration Point
      * @param epp the Event Processing Point
      */
-    Service(UserContext userCtx, Features pap, EPP epp, Decider decider, Auditor auditor) {
+    Service(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
         this.userCtx = userCtx;
         this.pap = pap;
         this.epp = epp;
@@ -46,19 +45,19 @@ public class Service {
         return this.epp;
     }
 
-    Features getPAP() {
+    FunctionalEntity getPAP() {
         return this.pap;
     }
 
-    Graph getGraphAdmin() {
+    Graph getGraphAdmin() throws PMException {
         return pap.getGraph();
     }
 
-    Prohibitions getProhibitionsAdmin() {
+    Prohibitions getProhibitionsAdmin() throws PMException {
         return pap.getProhibitions();
     }
 
-    Obligations getObligationsAdmin() {
+    Obligations getObligationsAdmin() throws PMException {
         return pap.getObligations();
     }
 

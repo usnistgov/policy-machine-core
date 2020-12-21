@@ -42,7 +42,8 @@ class IsNodeContainedInExecutorTest {
                 )
         );
         UserContext superUser = new UserContext("super");
-        boolean isContained = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        boolean isContained = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
         assertTrue(isContained);
 
@@ -56,7 +57,8 @@ class IsNodeContainedInExecutorTest {
                         )
                 )
         );
-        isContained = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        isContained = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
         assertFalse(isContained);
     }

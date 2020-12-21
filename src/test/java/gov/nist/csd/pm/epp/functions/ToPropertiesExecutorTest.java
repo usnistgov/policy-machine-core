@@ -36,7 +36,8 @@ class ToPropertiesExecutorTest {
         Function function = new Function(executor.getFunctionName(), Arrays.asList(new Arg("k=v"), new Arg("k1=v1"), new Arg("k2=v2")));
 
         UserContext superUser = new UserContext("super");
-        Map props = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        Map props = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
 
         assertNotNull(props);

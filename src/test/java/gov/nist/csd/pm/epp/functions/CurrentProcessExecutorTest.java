@@ -32,7 +32,8 @@ class CurrentProcessExecutorTest {
         Function function = new Function(executor.getFunctionName(), null);
 
         UserContext superUser = new UserContext("super");
-        String result = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        String result = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
 
         assertNotNull(result);

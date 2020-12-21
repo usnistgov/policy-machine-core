@@ -39,7 +39,8 @@ class GetChildrenExecutorTest {
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
         UserContext superUser = new UserContext("super");
-        List<String> children = executor.exec(pdp.getGraphService(superUser), pdp.getProhibitionsService(superUser), pdp.getObligationsService(superUser),
+        List<String> children = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
                 eventContext, function, new FunctionEvaluator());
 
         assertNotNull(children);

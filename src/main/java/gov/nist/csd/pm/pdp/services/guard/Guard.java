@@ -2,12 +2,9 @@ package gov.nist.csd.pm.pdp.services.guard;
 
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.decider.Decider;
-import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.Arrays;
@@ -20,10 +17,10 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class Guard {
 
-    protected Features pap;
+    protected FunctionalEntity pap;
     protected Decider decider;
 
-    public Guard(Features pap, Decider decider) {
+    public Guard(FunctionalEntity pap, Decider decider) {
         this.pap = pap;
         this.decider = decider;
     }

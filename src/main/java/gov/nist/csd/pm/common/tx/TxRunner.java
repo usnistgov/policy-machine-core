@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.tx;
+package gov.nist.csd.pm.common.tx;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;

@@ -4,22 +4,19 @@ import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.services.GraphService;
-import gov.nist.csd.pm.pdp.services.ObligationsService;
-import gov.nist.csd.pm.pdp.services.ProhibitionsService;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.Features;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.obligations.model.*;
 
 import java.util.*;
 
 public class EPP {
 
-    private Features pap;
+    private FunctionalEntity pap;
     private PDP pdp;
     private FunctionEvaluator functionEvaluator;
 
-    public EPP(Features pap, PDP pdp, EPPOptions eppOptions) throws PMException {
+    public EPP(FunctionalEntity pap, PDP pdp, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
         this.pdp = pdp;
         this.functionEvaluator = new FunctionEvaluator();
@@ -43,7 +40,7 @@ public class EPP {
 
             UserContext definingUser = new UserContext(obligation.getUser());
 
-            pdp.runTx(definingUser, (g, p, o) -> {
+            pdp.withUser(definingUser).runTx((g, p, o) -> {
                 List<Rule> rules = obligation.getRules();
                 for(Rule rule : rules) {
                     if(!eventCtx.matchesPattern(rule.getEventPattern(), g)) {

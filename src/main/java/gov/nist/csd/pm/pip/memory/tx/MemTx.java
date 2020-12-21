@@ -4,8 +4,8 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
-import gov.nist.csd.pm.pip.tx.Tx;
-import gov.nist.csd.pm.pip.tx.TxRunner;
+import gov.nist.csd.pm.common.tx.Tx;
+import gov.nist.csd.pm.common.tx.TxRunner;
 
 public class MemTx extends Tx {
 
@@ -16,7 +16,7 @@ public class MemTx extends Tx {
     public MemTx(Graph graph, Prohibitions prohibitions, Obligations obligations) {
         super(graph, prohibitions, obligations);
         this.txGraph = new TxGraph(graph);
-        this.txProhibitions = new TxProhibitions();
+        this.txProhibitions = new TxProhibitions(prohibitions);
         this.txObligations = new TxObligations(obligations);
     }
 
@@ -24,11 +24,12 @@ public class MemTx extends Tx {
     public void runTx(TxRunner txRunner) throws PMException {
         try {
             txRunner.run(txGraph, txProhibitions, txObligations);
-            commit();
         } catch (PMException e) {
             rollback();
             throw e;
         }
+
+        commit();
     }
 
     public void commit() throws PMException {
@@ -50,12 +51,12 @@ public class MemTx extends Tx {
 
     public void rollback() {
         // rollback graph
-        this.txGraph = new TxGraph(graph);
+        txGraph = new TxGraph(graph);
 
         // rollback prohibitions
-        this.txProhibitions = new TxProhibitions();
+        txProhibitions = new TxProhibitions(prohibitions);
 
         // rollback obligations
-        this.txObligations = new TxObligations(obligations);
+        txObligations = new TxObligations(obligations);
     }
 }

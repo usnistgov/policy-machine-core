@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.tx.memory;
+package gov.nist.csd.pm.common.tx.memory;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
@@ -14,13 +14,14 @@ import gov.nist.csd.pm.pip.memory.MemPIP;
 import gov.nist.csd.pm.pip.memory.tx.MemTx;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.memory.MemProhibitions;
+import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
-import gov.nist.csd.pm.pip.tx.Tx;
+import gov.nist.csd.pm.common.tx.Tx;
+import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.OA;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MemTxTest {
 
@@ -34,7 +35,6 @@ class MemTxTest {
         new Thread(() -> {
             try {
                 tx.runTx((g, p, o) -> {
-                    System.out.println("in tx1");
                     g.createPolicyClass("txpc1", null);
                     try {
                         Thread.sleep(3000);
@@ -50,7 +50,6 @@ class MemTxTest {
         new Thread(() -> {
             try {
                 tx2.runTx((g, p, o) -> {
-                    System.out.println("in tx2");
                     g.createPolicyClass("txpc2", null);
                 });
                 tx2.commit();
@@ -59,7 +58,6 @@ class MemTxTest {
             }
         }).start();
         Thread.sleep(4000);
-        System.out.println(graph.getPolicyClasses());
     }
 
     @Test
@@ -77,6 +75,15 @@ class MemTxTest {
             // exception expected
         }
         assertFalse(graph.exists("pc1"));
+
+        tx.runTx((g, p, o) -> {
+            Prohibition prohibition = new Prohibition.Builder("testp", "u1", new OperationSet("read"))
+                    .setIntersection(true)
+                    .addContainer("oa1", true)
+                    .addContainer("oa2", false)
+                    .build();
+            p.add(prohibition);
+        });
     }
 
     @Test
@@ -88,9 +95,22 @@ class MemTxTest {
         tx.runTx((g, p , o) -> {
             g.createPolicyClass("pc1", null);
             g.createNode("oa1", OA, null, "pc1");
+
+            Prohibition prohibition = new Prohibition.Builder("testp", "u1", new OperationSet("read"))
+                    .setIntersection(true)
+                    .addContainer("oa1", true)
+                    .addContainer("oa2", false)
+                    .build();
+            p.add(prohibition);
+
+            Obligation obligation = new Obligation("super");
+            obligation.setLabel("label");
+            o.add(obligation, true);
         });
         assertTrue(graph.exists("pc1"));
         assertTrue(graph.exists("oa1"));
+        assertNotNull(prohibitions.get("testp"));
+        assertNotNull(obligations.get("label"));
     }
 
     @Test
@@ -120,7 +140,7 @@ class MemTxTest {
         Thread.sleep(500);
         new Thread(()-> {
             try {
-                pdp.runTx(new UserContext("super"), (g, p , o) -> {
+                pdp.withUser(new UserContext("super")).runTx((g, p , o) -> {
                     g.deleteNode("pc1");
                 });
             } catch (PMException e) {
