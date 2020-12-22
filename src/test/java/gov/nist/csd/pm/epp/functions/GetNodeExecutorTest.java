@@ -36,7 +36,10 @@ class GetNodeExecutorTest {
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
-        Node node = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        Node node = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(node);
         assertEquals(testCtx.getOa1(), node);

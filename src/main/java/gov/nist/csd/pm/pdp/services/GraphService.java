@@ -5,17 +5,16 @@ import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.audit.Auditor;
+import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.guard.GraphGuard;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
-import gov.nist.csd.pm.pip.graph.model.relationships.Association;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
 
@@ -28,10 +27,10 @@ public class GraphService extends Service implements Graph {
     private Graph graph;
     private GraphGuard guard;
 
-    public GraphService(PAP pap, EPP epp, OperationSet resourceOps) throws PMException {
-        super(pap, epp, resourceOps);
-        this.graph = pap.getGraphAdmin();
-        this.guard = new GraphGuard(pap, resourceOps);
+    public GraphService(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) throws PMException {
+        super(userCtx, pap, epp, decider, auditor);
+        this.graph = pap.getGraph();
+        this.guard = new GraphGuard(pap, decider);
     }
 
     @Override
@@ -61,8 +60,6 @@ public class GraphService extends Service implements Graph {
      * @param initialParent the name of the node to assign the new node to.
      * @param additionalParents 0 or more node names to assign the new node to.
      * @return the new node.
-     * @throws IllegalArgumentException if the name is null or empty.
-     * @throws IllegalArgumentException if the type is null.
      */
     @Override
     public Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... additionalParents) throws PMException {

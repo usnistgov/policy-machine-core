@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pdp.policy;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.memory.MemGraph;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

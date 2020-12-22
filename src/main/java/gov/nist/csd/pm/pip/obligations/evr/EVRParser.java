@@ -9,7 +9,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.util.*;
 
 public class EVRParser {
-    
+
     public static <T> T getObject(Object o, Class<T> type) throws EVRException {
         if(!type.isInstance(o)) {
             throw new EVRException("expected " + type + " got " + o.getClass() + " at \"" + o + "\"");

@@ -1,6 +1,7 @@
-package gov.nist.csd.pm.pip.prohibitions;
+package gov.nist.csd.pm.pip.memory;
 
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
@@ -15,6 +16,7 @@ public class MemProhibitions implements Prohibitions {
     public MemProhibitions() {
         this.prohibitions = new HashMap<>();
     }
+
 
     /**
      * Add the provided prohibition to the list of prohibitions. The prohibition name cannot be null or empty.
@@ -37,6 +39,7 @@ public class MemProhibitions implements Prohibitions {
             throw new IllegalArgumentException("a null subject was provided when creating a prohibition");
         }
 
+        prohibition = new Prohibition(prohibition);
         String subject = prohibition.getSubject();
         List<Prohibition> exPros = this.prohibitions.getOrDefault(subject, new ArrayList<>());
         exPros.add(prohibition);
@@ -49,8 +52,10 @@ public class MemProhibitions implements Prohibitions {
     @Override
     public List<Prohibition> getAll() {
         List<Prohibition> pros = new ArrayList<>();
-        for(List<Prohibition> p : prohibitions.values()) {
-            pros.addAll(p);
+        for(List<Prohibition> pList : prohibitions.values()) {
+            for (Prohibition p : pList) {
+                pros.add(new Prohibition(p));
+            }
         }
         return pros;
     }
@@ -64,7 +69,7 @@ public class MemProhibitions implements Prohibitions {
         for (List<Prohibition> ps : prohibitions.values()) {
             for(Prohibition p : ps) {
                 if(p.getName().equalsIgnoreCase(prohibitionName)) {
-                    return p;
+                    return new Prohibition(p);
                 }
             }
         }
@@ -78,7 +83,12 @@ public class MemProhibitions implements Prohibitions {
      */
     @Override
     public List<Prohibition> getProhibitionsFor(String subject) {
-        return prohibitions.getOrDefault(subject, new ArrayList<>());
+        List<Prohibition> pros = prohibitions.getOrDefault(subject, new ArrayList<>());
+        List<Prohibition> ret = new ArrayList<>();
+        for (Prohibition p : pros) {
+            ret.add(new Prohibition(p));
+        }
+        return ret;
     }
 
     /**
@@ -98,10 +108,10 @@ public class MemProhibitions implements Prohibitions {
 
         // set the name of the object to the provided prohibition name
         prohibition.setName(prohibitionName);
-        // delete the prohibition
+        // delete the old prohibition
         delete(prohibition.getName());
         // add the updated prohibition
-        add(prohibition);
+        add(new Prohibition(prohibition));
     }
 
     /**

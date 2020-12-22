@@ -1,5 +1,6 @@
-package gov.nist.csd.pm.pip.obligations;
+package gov.nist.csd.pm.pip.memory;
 
+import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 
 import java.util.ArrayList;
@@ -18,17 +19,22 @@ public class MemObligations implements Obligations {
     @Override
     public void add(Obligation obligation, boolean enable) {
         obligation.setEnabled(true);
-        obligations.put(obligation.getLabel(), obligation);
+        obligations.put(obligation.getLabel(), new Obligation(obligation));
     }
 
     @Override
     public Obligation get(String label) {
-        return obligations.get(label);
+        Obligation obligation = obligations.get(label);
+        return obligation != null ? new Obligation(obligation) : null;
     }
 
     @Override
     public List<Obligation> getAll() {
-        return new ArrayList<>(obligations.values());
+        ArrayList<Obligation> all = new ArrayList<>();
+        for (String label : obligations.keySet()) {
+            all.add(get(label));
+        }
+        return all;
     }
 
     @Override
@@ -41,7 +47,7 @@ public class MemObligations implements Obligations {
             obligation.setLabel(label);
         }
 
-        obligations.put(obligation.getLabel(), obligation);
+        obligations.put(obligation.getLabel(), new Obligation(obligation));
     }
 
     @Override

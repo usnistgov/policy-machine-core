@@ -3,26 +3,32 @@ package gov.nist.csd.pm.epp.functions;
 import gov.nist.csd.pm.epp.EPPOptions;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.GraphAdmin;
-import gov.nist.csd.pm.pap.ObligationsAdmin;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.ProhibitionsAdmin;
+import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
+import gov.nist.csd.pm.pdp.decider.PReviewDecider;
+import gov.nist.csd.pm.pdp.services.GraphService;
 import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.obligations.MemObligations;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import gov.nist.csd.pm.pip.memory.MemObligations;
+import gov.nist.csd.pm.pip.memory.MemPIP;
+import gov.nist.csd.pm.pip.memory.MemProhibitions;
 
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
+        OperationSet ops = new OperationSet("read", "write", "execute");
+        FunctionalEntity functionalEntity = new MemPIP(new MemGraph(), new MemProhibitions(), new MemObligations());
         PDP pdp = PDP.newPDP(
-                new PAP(new GraphAdmin(new MemGraph()), new ProhibitionsAdmin(new MemProhibitions()), new ObligationsAdmin(new MemObligations())),
+                new MemPAP(functionalEntity),
                 new EPPOptions(),
-                new OperationSet("read", "write", "execute"));
-        Graph graph = pdp.getGraphService(new UserContext("super"));
+                new PReviewDecider(functionalEntity.getGraph(), functionalEntity.getProhibitions(), ops),
+                new PReviewAuditor(functionalEntity.getGraph(), ops)
+        );
+        Graph graph = pdp.withUser(new UserContext("super")).getGraph();
         Node pc1 = graph.createPolicyClass("pc1", null);
         Node oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
         Node o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());

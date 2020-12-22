@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -19,11 +20,13 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class GraphAdmin implements Graph {
 
+    private FunctionalEntity pip;
     private Graph graph;
     private SuperPolicy superPolicy;
 
-    public GraphAdmin(Graph graph) throws PMException {
-        this.graph = graph;
+    public GraphAdmin(FunctionalEntity pip) throws PMException {
+        this.pip = pip;
+        this.graph = pip.getGraph();
         this.superPolicy = new SuperPolicy();
         this.superPolicy.configure(this.graph);
     }
@@ -34,38 +37,45 @@ public class GraphAdmin implements Graph {
 
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        if (properties == null) {
-            properties = new HashMap<>();
+        Map<String, String> nodeProps = new HashMap<>();
+        if (properties != null) {
+            nodeProps.putAll(properties);
         }
 
         String rep = name + "_rep";
         String defaultUA = name + "_default_UA";
         String defaultOA = name + "_default_OA";
 
-        properties.putAll(Node.toProperties("default_ua", defaultUA, "default_oa", defaultOA,
+        nodeProps.putAll(Node.toProperties("default_ua", defaultUA, "default_oa", defaultOA,
                 REP_PROPERTY, rep));
 
-        // create the pc node
-        Node pcNode = graph.createPolicyClass(name, properties);
+        Node pcNode = new Node();
+        pip.runTx((g, p, o) -> {
+            // create the pc node
+            Node node = g.createPolicyClass(name, nodeProps);
+            pcNode.setName(node.getName());
+            pcNode.setType(node.getType());
+            pcNode.setProperties(node.getProperties());
 
-        // create the PC UA node
-        Node pcUANode = graph.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
-        // create the PC OA node
-        Node pcOANode = graph.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
+            // create the PC UA node
+            Node pcUANode = g.createNode(defaultUA, UA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
+            // create the PC OA node
+            Node pcOANode = g.createNode(defaultOA, OA, Node.toProperties(NAMESPACE_PROPERTY, name), pcNode.getName());
 
-        // assign Super U to PC UA
-        // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
-        // assign superUA and superUA2 to PC
-        graph.assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
-        graph.assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
-        // associate Super UA and PC UA
-        graph.associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
-        // associate Super UA and PC OA
-        graph.associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
+            // assign Super U to PC UA
+            // getPAP().getGraphPAP().assign(superPolicy.getSuperU().getID(), pcUANode.getID());
+            // assign superUA and superUA2 to PC
+            g.assign(superPolicy.getSuperUserAttribute().getName(), pcNode.getName());
+            g.assign(superPolicy.getSuperUserAttribute2().getName(), pcNode.getName());
+            // associate Super UA and PC UA
+            g.associate(superPolicy.getSuperUserAttribute().getName(), pcUANode.getName(), new OperationSet(ALL_OPS));
+            // associate Super UA and PC OA
+            g.associate(superPolicy.getSuperUserAttribute().getName(), pcOANode.getName(), new OperationSet(ALL_OPS));
 
-        // create an OA that will represent the pc
-        graph.createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
-                superPolicy.getSuperObjectAttribute().getName());
+            // create an OA that will represent the pc
+            g.createNode(rep, OA, Node.toProperties("pc", String.valueOf(name)),
+                    superPolicy.getSuperObjectAttribute().getName());
+        });
 
         return pcNode;
     }
@@ -82,29 +92,39 @@ public class GraphAdmin implements Graph {
 
         // instantiate the properties map if it's null
         // if this node is a user, hash the password if present in the properties
-        if(properties == null) {
-            properties = new HashMap<>();
+        Map<String, String> nodeProps = new HashMap<>();
+        if (properties != null) {
+            nodeProps.putAll(properties);
         }
 
         NodeType defaultType = (type == OA || type == O) ? OA : UA;
 
-        // if the parent is a PC get the PC default
-        Node parentNode = graph.getNode(initialParent);
-        if (parentNode.getType().equals(PC)) {
-            initialParent = getPolicyClassDefault(parentNode.getName(), defaultType);
-        }
-
-        for (int i = 0; i < additionalParents.length; i++) {
-            String parent = additionalParents[i];
-
-            // if the parent is a PC get the PC default attribute
-            Node additionalParentNode = graph.getNode(parent);
-            if (additionalParentNode.getType().equals(PC)) {
-                additionalParents[i] = getPolicyClassDefault(additionalParentNode.getName(), defaultType);
+        Node node = new Node();
+        pip.runTx((g, p, o) -> {
+            // if the parent is a PC get the PC default
+            Node parentNode = g.getNode(initialParent);
+            String pcInitParent = null;
+            if (parentNode.getType().equals(PC)) {
+                pcInitParent = getPolicyClassDefault(parentNode.getName(), defaultType);
             }
-        }
 
-        return graph.createNode(name, type, properties, initialParent, additionalParents);
+            for (int i = 0; i < additionalParents.length; i++) {
+                String parent = additionalParents[i];
+
+                // if the parent is a PC get the PC default attribute
+                Node additionalParentNode = g.getNode(parent);
+                if (additionalParentNode.getType().equals(PC)) {
+                    additionalParents[i] = getPolicyClassDefault(additionalParentNode.getName(), defaultType);
+                }
+            }
+
+            Node n = g.createNode(name, type, properties, (pcInitParent == null) ? initialParent : pcInitParent, additionalParents);
+            node.setName(n.getName());
+            node.setType(n.getType());
+            node.setProperties(n.getProperties());
+        });
+
+        return node;
     }
 
     public String getPolicyClassDefault(String pc, NodeType type) {
@@ -112,7 +132,7 @@ public class GraphAdmin implements Graph {
     }
 
     @Override
-    public void updateNode(String name, Map<String, String> properties) throws PMException {
+    public synchronized void updateNode(String name, Map<String, String> properties) throws PMException {
         graph.updateNode(name, properties);
     }
 

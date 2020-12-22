@@ -1,9 +1,10 @@
-package gov.nist.csd.pm.pip.graph;
+package gov.nist.csd.pm.pip.memory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
@@ -14,6 +15,11 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
@@ -29,6 +35,7 @@ public class MemGraph implements Graph {
     protected HashSet<String>                     pcs;
     protected HashMap<String, Node>               nodes;
 
+
     /**
      * Default constructor to create an empty graph in memory.
      */
@@ -39,12 +46,11 @@ public class MemGraph implements Graph {
     }
 
     @Override
-    public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
+    public synchronized Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
         if (name == null) {
-            throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
-        }
-        else if (exists(name)) {
-            throw new IllegalArgumentException("the name " + name + " already exists in the graph");
+            throw new PMException("no name was provided when creating a node in the in-memory graph");
+        } else if (exists(name)) {
+            throw new PMException("the name " + name + " already exists in the graph");
         }
 
         // add the pc's name to the pc set and to the graph
@@ -62,29 +68,24 @@ public class MemGraph implements Graph {
      * Create a node in the in-memory graph.
      *
      * @return the Node that was created.
-     * @throws IllegalArgumentException when the provided name is null.
-     * @throws IllegalArgumentException when the provided name already exists in the graph.
-     * @throws IllegalArgumentException when the provided type is null.
-     * @throws IllegalArgumentException when an initial parent is not provided.
+     * @throws PMException when the provided name is null.
+     * @throws PMException when the provided name already exists in the graph.
+     * @throws PMException when the provided type is null.
+     * @throws PMException when an initial parent is not provided.
      */
 
     @Override
-    public Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String... additionalParents) throws PMException {
-        //check for null values
+    public synchronized Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String... additionalParents) throws PMException {//check for null values
         if (type == PC) {
             throw new PMException("use createPolicyClass to create a policy class node");
-        }
-        else if (name == null) {
-            throw new IllegalArgumentException("no name was provided when creating a node in the in-memory graph");
-        }
-        else if (exists(name)) {
-            throw new IllegalArgumentException("the name " + name + " already exists in the graph");
-        }
-        else if (type == null) {
-            throw new IllegalArgumentException("a null type was provided to the in memory graph when creating a node");
-        }
-        else if (initialParent == null) {
-            throw new IllegalArgumentException("must specify an initial parent when creating a non policy class node");
+        } else if (name == null) {
+            throw new PMException("no name was provided when creating a node in the in-memory graph");
+        } else if (exists(name)) {
+            throw new PMException("the name " + name + " already exists in the graph");
+        } else if (type == null) {
+            throw new PMException("a null type was provided to the in memory graph when creating a node");
+        } else if (initialParent == null) {
+            throw new PMException("must specify an initial parent when creating a non policy class node");
         }
 
         // add the vertex to the graph
@@ -115,8 +116,7 @@ public class MemGraph implements Graph {
      * @throws PMException if the given node name does not exist in the graph.
      */
     @Override
-    public void updateNode(String name, Map<String, String> properties) throws PMException {
-        Node existingNode = nodes.get(name);
+    public synchronized void updateNode(String name, Map<String, String> properties) throws PMException {Node existingNode = nodes.get(name);
         if (existingNode == null) {
             throw new PMException(String.format("node with the name %s could not be found to update", name));
         }
@@ -137,7 +137,7 @@ public class MemGraph implements Graph {
      * @param name the name of the node to delete.
      */
     @Override
-    public void deleteNode(String name) throws PMException {
+    public synchronized void deleteNode(String name) throws PMException {
         if (graph.incomingEdgesOf(name).size() != 0) {
             throw new PMException("cannot delete " + name + ", nodes are still assigned to it");
         }
@@ -151,18 +151,23 @@ public class MemGraph implements Graph {
     }
 
     @Override
-    public boolean exists(String name) {
+    public synchronized boolean exists(String name) {
         return graph.containsVertex(name);
     }
 
     @Override
-    public Set<String> getPolicyClasses() {
-        return pcs;
+    public synchronized Set<String> getPolicyClasses() {
+        return new HashSet<>(pcs);
     }
 
     @Override
-    public Set<Node> getNodes() {
-        return new HashSet<>(nodes.values());
+    public synchronized Set<Node> getNodes() {
+        Collection<Node> nodes = this.nodes.values();
+        Set<Node> nodeSet = new HashSet<>();
+        for (Node node : nodes) {
+            nodeSet.add(new Node(node));
+        }
+        return nodeSet;
     }
 
     /**
@@ -173,23 +178,23 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided name does not exist in the graph.
      */
     @Override
-    public Node getNode(String name) throws PMException {
+    public synchronized Node getNode(String name) throws PMException {
         Node node = nodes.get(name);
         if (node == null) {
             throw new PMException(String.format("a node with the name %s does not exist", name));
         }
 
-        return node;
+        return new Node(node);
     }
 
     @Override
-    public Node getNode(NodeType type, Map<String, String> properties) throws PMException {
+    public synchronized Node getNode(NodeType type, Map<String, String> properties) throws PMException {
         Set<Node> search = search(type, properties);
         if (search.isEmpty()) {
             throw new PMException(String.format("a node matching the criteria (%s, %s) does not exist", type, properties));
         }
 
-        return search.iterator().next();
+        return new Node(search.iterator().next());
     }
 
     /**
@@ -201,7 +206,7 @@ public class MemGraph implements Graph {
      * @return the set of nodes that match the given parameters.
      */
     @Override
-    public Set<Node> search(NodeType type, Map<String, String> properties) {
+    public synchronized Set<Node> search(NodeType type, Map<String, String> properties) {
         if (properties == null) {
             properties = new HashMap<>();
         }
@@ -227,7 +232,7 @@ public class MemGraph implements Graph {
             }
 
             if (add) {
-                results.add(node);
+                results.add(new Node(node));
             }
         }
 
@@ -242,7 +247,7 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided name does not exist in the graph.
      */
     @Override
-    public Set<String> getChildren(String name) throws PMException {
+    public synchronized Set<String> getChildren(String name) throws PMException {
         if (!exists(name)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
@@ -266,7 +271,7 @@ public class MemGraph implements Graph {
      * @throws PMException if the provided name does not exist in the graph.
      */
     @Override
-    public Set<String> getParents(String name) throws PMException {
+    public synchronized Set<String> getParents(String name) throws PMException {
         if (!exists(name)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, name));
         }
@@ -285,19 +290,18 @@ public class MemGraph implements Graph {
     /**
      * Assign the child node to the parent node. Both nodes must exist and both types must make a valid assignment.
      *
-     * @throws IllegalArgumentException if the child node context is null.
-     * @throws IllegalArgumentException if the parent node context is null.
-     * @throws IllegalArgumentException if the child node does not exist in the graph.
-     * @throws IllegalArgumentException if the parent node does not exist in the graph.
+     * @throws PMException if the child node context is null.
+     * @throws PMException if the parent node context is null.
+     * @throws PMException if the child node does not exist in the graph.
+     * @throws PMException if the parent node does not exist in the graph.
      * @throws PMException if the two types do not make a valid assignment.
      */
     @Override
-    public void assign(String child, String parent) throws PMException {
+    public synchronized void assign(String child, String parent) throws PMException {
         if (!exists(child)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, child));
-        }
-        else if (!exists(parent)) {
-            throw new IllegalArgumentException(String.format(NODE_NOT_FOUND_MSG, parent));
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, child));
+        } else if (!exists(parent)) {
+            throw new PMException(String.format(NODE_NOT_FOUND_MSG, parent));
         }
 
         if (graph.containsEdge(child, parent)) {
@@ -315,16 +319,16 @@ public class MemGraph implements Graph {
     /**
      * Deassign the child node from the parent node.
      *
-     * @throws IllegalArgumentException if the child node context is null.
-     * @throws IllegalArgumentException if the parent node context is null.
+     * @throws PMException if the child node context is null.
+     * @throws PMException if the parent node context is null.
      */
     @Override
-    public void deassign(String child, String parent) {
+    public synchronized void deassign(String child, String parent) {
         graph.removeEdge(new Assignment(child, parent));
     }
 
     @Override
-    public boolean isAssigned(String child, String parent) throws PMException {
+    public synchronized boolean isAssigned(String child, String parent) throws PMException {
         return graph.containsEdge(new Assignment(child, parent));
     }
 
@@ -336,11 +340,10 @@ public class MemGraph implements Graph {
      * @throws PMException              if the target node does not exist in the graph.
      */
     @Override
-    public void associate(String ua, String target, OperationSet operations) throws PMException {
+    public synchronized void associate(String ua, String target, OperationSet operations) throws PMException {
         if (!exists(ua)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, ua));
-        }
-        else if (!exists(target)) {
+        } else if (!exists(target)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, target));
         }
 
@@ -356,8 +359,7 @@ public class MemGraph implements Graph {
         Relationship edge = graph.getEdge(ua, target);
         if (edge == null || edge instanceof Assignment) {
             graph.addEdge(ua, target, new Association(ua, target, operations));
-        }
-        else if (edge instanceof Association) {
+        } else if (edge instanceof Association) {
             Association assoc = (Association) graph.getEdge(ua, target);
             assoc.setOperations(operations);
         }
@@ -367,7 +369,7 @@ public class MemGraph implements Graph {
      * Dissociate the user attribute node from the target node.  If an association does not exist, nothing happens.
      */
     @Override
-    public void dissociate(String ua, String target) {
+    public synchronized void dissociate(String ua, String target) {
         graph.removeEdge(new Association(ua, target));
     }
 
@@ -379,7 +381,7 @@ public class MemGraph implements Graph {
      * @throws PMException if the given name does not exist in the graph.
      */
     @Override
-    public Map<String, OperationSet> getSourceAssociations(String source) throws PMException {
+    public synchronized Map<String, OperationSet> getSourceAssociations(String source) throws PMException {
         if (!exists(source)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, source));
         }
@@ -403,7 +405,7 @@ public class MemGraph implements Graph {
      * @throws PMException if the given name does not exist in the graph.
      */
     @Override
-    public Map<String, OperationSet> getTargetAssociations(String target) throws PMException {
+    public synchronized Map<String, OperationSet> getTargetAssociations(String target) throws PMException {
         if (!exists(target)) {
             throw new PMException(String.format(NODE_NOT_FOUND_MSG, target));
         }
@@ -420,7 +422,7 @@ public class MemGraph implements Graph {
     }
 
     @Override
-    public String toJson() throws PMException {
+    public synchronized String toJson() throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         Collection<Node> nodes = this.getNodes();
@@ -446,9 +448,7 @@ public class MemGraph implements Graph {
     }
 
     @Override
-    public void fromJson(String json) throws PMException {
-        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
-
+    public synchronized void fromJson(String json) throws PMException {JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
         Collection<Node> nodes = jsonGraph.getNodes();
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {

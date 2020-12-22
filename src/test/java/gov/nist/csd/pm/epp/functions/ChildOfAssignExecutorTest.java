@@ -30,7 +30,10 @@ class ChildOfAssignExecutorTest {
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
-        Node node = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        Node node = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(node);
         assertEquals(testCtx.getO1(), node);

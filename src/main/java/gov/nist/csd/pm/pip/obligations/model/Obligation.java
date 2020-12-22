@@ -15,6 +15,14 @@ public class Obligation {
         this.rules = new ArrayList<>();
     }
 
+    public Obligation(Obligation obligation) {
+        this.user = obligation.user;
+        this.enabled = obligation.enabled;
+        this.label = obligation.label;
+        this.rules = obligation.rules;
+        this.source = obligation.source;
+    }
+
     public String getUser() {
         return user;
     }

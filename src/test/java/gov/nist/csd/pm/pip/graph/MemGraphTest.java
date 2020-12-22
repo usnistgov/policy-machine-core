@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pip.graph;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.memory.MemGraph;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -23,9 +24,9 @@ class MemGraphTest {
         Node pc = graph.createPolicyClass("pc", null);
         assertTrue(graph.getPolicyClasses().contains(pc.getName()));
         
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(null, null, null, "pc")),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode(null, OA, null, "pc")),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.createNode("name", null, null, "pc"))
+        assertAll(() -> assertThrows(PMException.class, () -> graph.createNode(null, null, null, "pc")),
+                () -> assertThrows(PMException.class, () -> graph.createNode(null, OA, null, "pc")),
+                () -> assertThrows(PMException.class, () -> graph.createNode("name", null, null, "pc"))
         );
         
         // add non pc
@@ -125,8 +126,8 @@ class MemGraphTest {
         Node child1Node = graph.createNode("child1", OA, null, "parent1");
         Node child2Node = graph.createNode("child2", OA, null, "parent1");
 
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> graph.assign("1241124", "123442141")),
-                () -> assertThrows(IllegalArgumentException.class, () -> graph.assign("1", "12341234"))
+        assertAll(() -> assertThrows(PMException.class, () -> graph.assign("1241124", "123442141")),
+                () -> assertThrows(PMException.class, () -> graph.assign("1", "12341234"))
         );
 
         graph.assign(child1Node.getName(), child2Node.getName());
@@ -142,8 +143,8 @@ class MemGraphTest {
         Node parent1Node = graph.createPolicyClass("parent1", null);
         Node child1Node = graph.createNode("child1", OA, null, "parent1");
 
-        assertThrows(IllegalArgumentException.class, () -> graph.assign("", ""));
-        assertThrows(IllegalArgumentException.class, () -> graph.assign(child1Node.getName(), ""));
+        assertThrows(PMException.class, () -> graph.assign("", ""));
+        assertThrows(PMException.class, () -> graph.assign(child1Node.getName(), ""));
 
         graph.deassign(child1Node.getName(), parent1Node.getName());
 
@@ -302,5 +303,41 @@ class MemGraphTest {
 
         assertFalse(graph.isAssigned("ua2", "ua1"));
         assertTrue(graph.getSourceAssociations("ua2").containsKey("ua1"));
+    }
+
+    @Test
+    void testGetPolicyClassesUpdatesNodes() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua1");
+        graph.createNode("u1", U, null, "ua2");
+        graph.associate("ua2", "ua1", new OperationSet("r"));
+        graph.dissociate("ua2", "ua1");
+
+        Set<String> pcs = graph.getPolicyClasses();
+        pcs.add("test");
+
+        pcs = graph.getPolicyClasses();
+        assertFalse(pcs.contains("test"));
+    }
+
+    @Test
+    void testGetNodesUpdatesNodes() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("ua1", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua1");
+        graph.createNode("u1", U, null, "ua2");
+        graph.associate("ua2", "ua1", new OperationSet("r"));
+        graph.dissociate("ua2", "ua1");
+
+        Set<Node> nodes = graph.getNodes();
+        Node node = nodes.iterator().next();
+        assertTrue(node.getProperties().isEmpty());
+
+        node.setProperties(Node.toProperties("a", "b"));
+        node = graph.getNode(node.getName());
+        assertTrue(node.getProperties().isEmpty());
     }
 }

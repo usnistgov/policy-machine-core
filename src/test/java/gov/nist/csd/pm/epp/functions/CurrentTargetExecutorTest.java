@@ -32,7 +32,10 @@ class CurrentTargetExecutorTest {
         PDP pdp = testCtx.getPdp();
         Function function = new Function(executor.getFunctionName(), null);
 
-        Node target = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        Node target = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(target);
         assertEquals(testCtx.getO1(), target);

@@ -3,33 +3,20 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
-import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
-import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.obligations.model.*;
-import gov.nist.csd.pm.pip.obligations.model.actions.*;
-import gov.nist.csd.pm.pip.obligations.model.functions.Function;
-import gov.nist.csd.pm.pip.prohibitions.model.ContainerCondition;
-import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-
 public class EPP {
 
-    private PAP pap;
+    private FunctionalEntity pap;
     private PDP pdp;
     private FunctionEvaluator functionEvaluator;
 
-    public EPP(PAP pap, PDP pdp, EPPOptions eppOptions) throws PMException {
+    public EPP(FunctionalEntity pap, PDP pdp, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
         this.pdp = pdp;
         this.functionEvaluator = new FunctionEvaluator();
@@ -39,13 +26,13 @@ public class EPP {
             }
         }
     }
-    
+
     public PDP getPDP() {
         return pdp;
     }
 
-    public void processEvent(EventContext eventCtx) throws PMException {
-        List<Obligation> obligations = pap.getObligationsAdmin().getAll();
+    public synchronized void processEvent(EventContext eventCtx) throws PMException {
+        List<Obligation> obligations = pap.getObligations().getAll();
         for(Obligation obligation : obligations) {
             if (!obligation.isEnabled()) {
                 continue;
@@ -53,15 +40,17 @@ public class EPP {
 
             UserContext definingUser = new UserContext(obligation.getUser());
 
-            List<Rule> rules = obligation.getRules();
-            for(Rule rule : rules) {
-                if(!eventCtx.matchesPattern(rule.getEventPattern(), pap.getGraphAdmin())) {
-                    continue;
-                }
+            pdp.withUser(definingUser).runTx((g, p, o) -> {
+                List<Rule> rules = obligation.getRules();
+                for(Rule rule : rules) {
+                    if(!eventCtx.matchesPattern(rule.getEventPattern(), g)) {
+                        continue;
+                    }
 
-                ResponsePattern responsePattern = rule.getResponsePattern();
-                responsePattern.apply(pdp, pap, functionEvaluator, definingUser, eventCtx, rule, obligation.getLabel());
-            }
+                    ResponsePattern responsePattern = rule.getResponsePattern();
+                    responsePattern.apply(g, p, o, functionEvaluator, eventCtx, rule, obligation.getLabel());
+                }
+            });
         }
     }
 }

@@ -3,11 +3,10 @@ package gov.nist.csd.pm.pdp.services;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.audit.Auditor;
-import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.*;
@@ -17,8 +16,8 @@ import java.util.*;
  */
 public class AnalyticsService extends Service {
 
-    public AnalyticsService(PAP pap, EPP epp, OperationSet resourceOps) {
-        super(pap, epp, resourceOps);
+    public AnalyticsService(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
+        super(userCtx, pap, epp, decider, auditor);
     }
 
     /**
@@ -227,7 +226,6 @@ public class AnalyticsService extends Service {
     }
 
     public Explain explain(String user, String target) throws PMException {
-        Auditor auditor = new PReviewAuditor(getGraphAdmin(), getResourceOps());
-        return auditor.explain(user, target);
+        return getAuditor().explain(user, target);
     }
 }

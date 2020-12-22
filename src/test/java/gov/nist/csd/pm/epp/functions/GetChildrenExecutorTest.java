@@ -38,7 +38,10 @@ class GetChildrenExecutorTest {
         Function function = new Function(executor.getFunctionName(),
                 Arrays.asList(new Arg("oa1"), new Arg("OA")));
 
-        List<String> children = executor.exec(new UserContext("super"), eventContext, pdp, function, new FunctionEvaluator());
+        UserContext superUser = new UserContext("super");
+        List<String> children = executor.exec(pdp.withUser(superUser).getGraph(), pdp.withUser(superUser).getProhibitions(),
+                pdp.withUser(superUser).getObligations(),
+                eventContext, function, new FunctionEvaluator());
 
         assertNotNull(children);
         assertEquals(Arrays.asList(testCtx.getO1().getName()), children);

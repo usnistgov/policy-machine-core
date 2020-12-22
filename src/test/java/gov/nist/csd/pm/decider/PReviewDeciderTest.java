@@ -5,9 +5,9 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.graph.MemGraph;
+import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.prohibitions.MemProhibitions;
+import gov.nist.csd.pm.pip.memory.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.Test;
@@ -719,6 +719,26 @@ class PReviewDeciderTest {
         list = decider.list("u1", "", "o1");
         assertFalse(list.containsAll(ADMIN_OPS));
         assertTrue(list.containsAll(RWE));
+    }
+
+    @Test
+    void testPermissionsInOnlyOnePC() throws PMException {
+        Graph graph = new MemGraph();
+        graph.createPolicyClass("pc1", null);
+        graph.createPolicyClass("pc2", null);
+        graph.createNode("ua3", UA, null, "pc1");
+        graph.createNode("ua2", UA, null, "ua3");
+        graph.createNode("u1", UA, null, "ua2");
+
+        graph.createNode("oa1", UA, null, "pc1");
+        graph.createNode("oa3", UA, null, "pc2");
+        graph.assign("oa3", "oa1");
+        graph.createNode("o1", UA, null, "oa3");
+
+        graph.associate("ua3", "oa1", new OperationSet("read"));
+
+        PReviewDecider decider = new PReviewDecider(graph, new OperationSet("read"));
+        assertTrue(decider.list("u1", "", "o1").isEmpty());
     }
 
     private static Graph buildGraph() throws PMException {
