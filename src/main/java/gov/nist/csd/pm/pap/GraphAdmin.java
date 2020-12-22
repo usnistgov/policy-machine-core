@@ -35,6 +35,10 @@ public class GraphAdmin implements Graph {
         return superPolicy;
     }
 
+    public static String getPolicyClassDefault(String pcName, NodeType type) {
+        return pcName + "_default_" + type.toString();
+    }
+
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PMException {
         Map<String, String> nodeProps = new HashMap<>();
@@ -43,8 +47,8 @@ public class GraphAdmin implements Graph {
         }
 
         String rep = name + "_rep";
-        String defaultUA = name + "_default_UA";
-        String defaultOA = name + "_default_OA";
+        String defaultUA = getPolicyClassDefault(name, UA);
+        String defaultOA = getPolicyClassDefault(name, OA);
 
         nodeProps.putAll(Node.toProperties("default_ua", defaultUA, "default_oa", defaultOA,
                 REP_PROPERTY, rep));
@@ -125,10 +129,6 @@ public class GraphAdmin implements Graph {
         });
 
         return node;
-    }
-
-    public String getPolicyClassDefault(String pc, NodeType type) {
-        return pc + "_default_" + type.toString();
     }
 
     @Override
