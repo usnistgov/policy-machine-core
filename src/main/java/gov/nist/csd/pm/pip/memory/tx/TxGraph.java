@@ -66,8 +66,6 @@ public class TxGraph implements Graph {
             }
         }
 
-        assignments.put(name, parents);
-
         cmds.add(new CreateNodeTxCmd(targetGraph, name, type, properties, parents));
 
         return node;
