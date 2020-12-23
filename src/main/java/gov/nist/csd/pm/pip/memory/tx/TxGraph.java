@@ -16,6 +16,7 @@ public class TxGraph implements Graph {
     private Graph targetGraph;
     private Map<String, Node> nodes;
     private Set<Node> pcs;
+    private Map<String, Set<String>> createNodeParents;
     private Map<String, Set<String>> assignments;
     private Map<String, Map<String, OperationSet>> associations;
     private List<TxCmd> cmds;
@@ -24,6 +25,7 @@ public class TxGraph implements Graph {
         targetGraph = graph;
         nodes = new HashMap<>();
         pcs = new HashSet<>();
+        createNodeParents = new HashMap<>();
         assignments = new HashMap<>();
         associations = new HashMap<>();
         cmds = new ArrayList<>();
@@ -66,7 +68,7 @@ public class TxGraph implements Graph {
             }
         }
 
-        assignments.put(name, parents);
+        createNodeParents.put(name, parents);
 
         cmds.add(new CreateNodeTxCmd(targetGraph, name, type, properties, parents));
 
