@@ -46,7 +46,10 @@ public class EventContext {
     }
 
     public boolean matchesPattern(EventPattern pattern, Graph graph) throws PMException {
-        if(pattern.getOperations() != null &&
+        // if the pattern given is not an EventPattern it is not a built in event and does not match
+        if (!pattern.getClass().equals(EventPattern.class)) {
+            return false;
+        } else if(pattern.getOperations() != null &&
                 !pattern.getOperations().contains(event)) {
             return false;
         }
