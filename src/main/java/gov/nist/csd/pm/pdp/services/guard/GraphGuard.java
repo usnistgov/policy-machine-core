@@ -104,7 +104,7 @@ public class GraphGuard extends Guard {
         Set<String> parents = pap.getGraph().getParents(node);
         for(String parent : parents) {
             if(!hasPermissions(userCtx, parent, op)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", op, DEASSIGN_FROM));
+                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parent, op));
             }
         }
     }
