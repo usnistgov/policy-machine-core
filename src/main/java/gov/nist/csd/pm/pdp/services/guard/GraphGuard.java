@@ -52,14 +52,14 @@ public class GraphGuard extends Guard {
         // check that the user has the permission to assign to the parent node
         if (!hasPermissions(userCtx, initialParent, op)) {
             // if the user cannot assign to the parent node, delete the newly created node
-            throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node %s", ASSIGN_TO, initialParent));
+            throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node %s", op, initialParent));
         }
 
         // check any additional parents
         for (String parent : additionalParents) {
             if (!hasPermissions(userCtx, parent, op)) {
                 // if the user cannot assign to the parent node, delete the newly created node
-                throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on %s", ASSIGN_TO, parent));
+                throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on %s", op, parent));
             }
         }
     }
@@ -97,14 +97,14 @@ public class GraphGuard extends Guard {
 
         // check the user can delete the node
         if (!hasPermissions(userCtx, node, DELETE_NODE)) {
-            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", node, DEASSIGN));
+            throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", node, DELETE_NODE));
         }
 
         // check that the user can delete the node from the node's parents
         Set<String> parents = pap.getGraph().getParents(node);
         for(String parent : parents) {
             if(!hasPermissions(userCtx, parent, op)) {
-                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parent, DEASSIGN_FROM));
+                throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", op, DEASSIGN_FROM));
             }
         }
     }
