@@ -209,7 +209,7 @@ public class TxGraph implements Graph {
         // get children from the target graph
         Set<String> children = new HashSet<>();
         if (targetGraph.exists(name)) {
-            targetGraph.getChildren(name);
+            children.addAll(targetGraph.getChildren(name));
         }
 
         // add the children from the tx
@@ -241,7 +241,7 @@ public class TxGraph implements Graph {
         // get children from the target graph
         Set<String> parents = new HashSet<>();
         if (targetGraph.exists(name)) {
-            targetGraph.getParents(name);
+            parents.addAll(targetGraph.getParents(name));
         }
 
         // add the children from the tx
