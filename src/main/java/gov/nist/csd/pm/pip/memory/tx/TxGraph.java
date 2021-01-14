@@ -207,7 +207,11 @@ public class TxGraph implements Graph {
     @Override
     public Set<String> getChildren(String name) throws PMException {
         // get children from the target graph
-        Set<String> children = targetGraph.getChildren(name);
+        Set<String> children = new HashSet<>();
+        if (targetGraph.exists(name)) {
+            targetGraph.getChildren(name);
+        }
+
         // add the children from the tx
         for (String child : assignments.keySet()) {
             Set<String> parents = assignments.getOrDefault(child, new HashSet<>());
@@ -235,7 +239,11 @@ public class TxGraph implements Graph {
     @Override
     public Set<String> getParents(String name) throws PMException {
         // get children from the target graph
-        Set<String> parents = targetGraph.getParents(name);
+        Set<String> parents = new HashSet<>();
+        if (targetGraph.exists(name)) {
+            targetGraph.getParents(name);
+        }
+
         // add the children from the tx
         parents.addAll(assignments.getOrDefault(name, new HashSet<>()));
         // remove and deassigns
