@@ -15,6 +15,7 @@ import java.util.Set;
 import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.operations.Operations.UPDATE_NODE;
 import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_PC_REP;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
 public class GraphGuard extends Guard {
 
@@ -72,9 +73,13 @@ public class GraphGuard extends Guard {
     }
 
     public void checkDeleteNode(UserContext userCtx, NodeType nodeType, String node) throws PMException {
-        // check that the user can create a policy class
-        if (!hasPermissions(userCtx, SUPER_PC_REP, DELETE_POLICY_CLASS)) {
-            throw new PMAuthorizationException("unauthorized permissions to delete a policy class");
+        // check that the user can delete a policy class if that is the type
+        if (nodeType == PC) {
+            if (!hasPermissions(userCtx, SUPER_PC_REP, DELETE_POLICY_CLASS)) {
+                throw new PMAuthorizationException("unauthorized permissions to delete a policy class");
+            } else {
+                return;
+            }
         }
 
         String op;
