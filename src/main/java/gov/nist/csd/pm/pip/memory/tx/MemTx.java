@@ -24,12 +24,11 @@ public class MemTx extends Tx {
     public void runTx(TxRunner txRunner) throws PMException {
         try {
             txRunner.run(txGraph, txProhibitions, txObligations);
+            commit();
         } catch (PMException e) {
             rollback();
             throw e;
         }
-
-        commit();
     }
 
     public void commit() throws PMException {

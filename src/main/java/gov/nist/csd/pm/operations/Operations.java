@@ -26,6 +26,12 @@ public class Operations {
     public static final String CREATE_OBJECT              = "create object";
     public static final String CREATE_OBJECT_ATTRIBUTE    = "create object attribute";
     public static final String CREATE_USER_ATTRIBUTE      = "create user attribute";
+    public static final String CREATE_USER                = "create user";
+    public static final String DELETE_OBJECT              = "delete object";
+    public static final String DELETE_OBJECT_ATTRIBUTE    = "delete object attribute";
+    public static final String DELETE_USER_ATTRIBUTE      = "delete user attribute";
+    public static final String DELETE_USER                = "delete user";
+    public static final String DELETE_POLICY_CLASS        = "delete policy class";
     public static final String DEASSIGN                   = "deassign";
     public static final String DEASSIGN_FROM              = "deassign from";
     public static final String CREATE_ASSOCIATION         = "create association";
@@ -69,6 +75,12 @@ public class Operations {
             CREATE_OBJECT,
             CREATE_OBJECT_ATTRIBUTE,
             CREATE_USER_ATTRIBUTE,
+            CREATE_USER,
+            DELETE_OBJECT,
+            DELETE_OBJECT_ATTRIBUTE,
+            DELETE_USER_ATTRIBUTE,
+            DELETE_POLICY_CLASS,
+            DELETE_USER,
             DEASSIGN,
             DEASSIGN_FROM,
             CREATE_ASSOCIATION,

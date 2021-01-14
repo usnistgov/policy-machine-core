@@ -21,6 +21,8 @@ public class EventContext {
     public static final String ASSIGN_EVENT = "assign";
     public static final String DEASSIGN_FROM_EVENT = "deassign from";
     public static final String DEASSIGN_EVENT = "deassign";
+    public static final String CREATE_NODE_EVENT = "create node";
+    public static final String DELETE_NODE_EVENT = "delete node";
     public static final String ACCESS_DENIED_EVENT = "access denied";
 
     private UserContext userCtx;
