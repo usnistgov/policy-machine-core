@@ -72,18 +72,18 @@ class GraphGuardTest {
 
         @Test
         void testSuper() {
-            assertDoesNotThrow(() -> guard.checkCreateNode(superCtx, "oa1", new String[]{"oa2", "pc1_default_OA"}));
+            assertDoesNotThrow(() -> guard.checkCreateNode(superCtx, OA, "oa1", new String[]{"oa2", "pc1_default_OA"}));
         }
 
         @Test
         void testU2CreateNode() {
-            assertDoesNotThrow(() -> guard.checkCreateNode(u2Ctx, "oa1", new String[]{"oa2"}));
+            assertDoesNotThrow(() -> guard.checkCreateNode(u2Ctx, OA, "oa1", new String[]{"oa2"}));
         }
 
         @Test
         void testU1CreateNodeError() {
             assertThrows(PMException.class,
-                    () -> guard.checkCreateNode(u1Ctx, "oa1", null));
+                    () -> guard.checkCreateNode(u1Ctx, OA, "oa1", null));
         }
 
     }
@@ -119,22 +119,22 @@ class GraphGuardTest {
 
         @Test
         void testSuper() {
-            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, "oa1"));
-            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, "pc1"));
-            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, "ua1"));
-            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, "u1"));
-            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, "o1"));
+            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, OA, "oa1"));
+            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, PC, "pc1"));
+            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, UA, "ua1"));
+            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, U, "u1"));
+            assertDoesNotThrow(() -> guard.checkDeleteNode(superCtx, O, "o1"));
 
         }
 
         @Test
         void testU2UpdateOA1() {
-            assertThrows(PMException.class, () -> guard.checkDeleteNode(u2Ctx, "oa1"));
+            assertThrows(PMException.class, () -> guard.checkDeleteNode(u2Ctx, OA, "oa1"));
         }
 
         @Test
         void testU1UpdateOA1Error() {
-            assertThrows(PMException.class, () -> guard.checkDeleteNode(u1Ctx, "oa1"));
+            assertThrows(PMException.class, () -> guard.checkDeleteNode(u1Ctx, OA, "oa1"));
         }
 
 

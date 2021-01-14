@@ -17,8 +17,7 @@ public enum NodeType implements Serializable {
     UA("UA"),
     U("U"),
     O("O"),
-    PC("PC"),
-    OS("OS");
+    PC("PC");
 
     private String label;
 
@@ -52,8 +51,6 @@ public enum NodeType implements Serializable {
                 return NodeType.O;
             case "PC":
                 return NodeType.PC;
-            case "OS":
-                return NodeType.OS;
             default:
                 return null;
         }

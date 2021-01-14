@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
+import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,16 +29,35 @@ public class GraphGuard extends Guard {
         }
     }
 
-    public void checkCreateNode(UserContext userCtx, String initialParent, String[] additionalParents) throws PMException {
+    public void checkCreateNode(UserContext userCtx, NodeType nodeType,
+                                String initialParent, String[] additionalParents) throws PMException {
+        String op;
+        switch (nodeType) {
+            case OA:
+                op = CREATE_OBJECT_ATTRIBUTE;
+                break;
+            case UA:
+                op = CREATE_USER_ATTRIBUTE;
+                break;
+            case O:
+                op = CREATE_OBJECT;
+                break;
+            case U:
+                op = CREATE_USER;
+                break;
+            default:
+                op = CREATE_POLICY_CLASS;
+        }
+
         // check that the user has the permission to assign to the parent node
-        if (!hasPermissions(userCtx, initialParent, ASSIGN_TO)) {
+        if (!hasPermissions(userCtx, initialParent, op)) {
             // if the user cannot assign to the parent node, delete the newly created node
             throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on node %s", ASSIGN_TO, initialParent));
         }
 
-        // check any additional parents before assigning
+        // check any additional parents
         for (String parent : additionalParents) {
-            if (!hasPermissions(userCtx, parent, ASSIGN_TO)) {
+            if (!hasPermissions(userCtx, parent, op)) {
                 // if the user cannot assign to the parent node, delete the newly created node
                 throw new PMAuthorizationException(String.format("unauthorized permission \"%s\" on %s", ASSIGN_TO, parent));
             }
@@ -51,16 +71,39 @@ public class GraphGuard extends Guard {
         }
     }
 
-    public void checkDeleteNode(UserContext userCtx, String node) throws PMException {
-        // check the user can deassign the node
-        if (!hasPermissions(userCtx, node, DEASSIGN)) {
+    public void checkDeleteNode(UserContext userCtx, NodeType nodeType, String node) throws PMException {
+        // check that the user can create a policy class
+        if (!hasPermissions(userCtx, SUPER_PC_REP, DELETE_POLICY_CLASS)) {
+            throw new PMAuthorizationException("unauthorized permissions to delete a policy class");
+        }
+
+        String op;
+        switch (nodeType) {
+            case OA:
+                op = DELETE_OBJECT_ATTRIBUTE;
+                break;
+            case UA:
+                op = DELETE_USER_ATTRIBUTE;
+                break;
+            case O:
+                op = DELETE_OBJECT;
+                break;
+            case U:
+                op = DELETE_USER;
+                break;
+            default:
+                op = DELETE_POLICY_CLASS;
+        }
+
+        // check the user can delete the node
+        if (!hasPermissions(userCtx, node, DELETE_NODE)) {
             throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", node, DEASSIGN));
         }
 
-        // check that the user can deassign from the node's parents
+        // check that the user can delete the node from the node's parents
         Set<String> parents = pap.getGraph().getParents(node);
         for(String parent : parents) {
-            if(!hasPermissions(userCtx, parent, DEASSIGN_FROM)) {
+            if(!hasPermissions(userCtx, parent, op)) {
                 throw new PMAuthorizationException(String.format("unauthorized permissions on %s: %s", parent, DEASSIGN_FROM));
             }
         }

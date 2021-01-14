@@ -64,27 +64,15 @@ public class GraphService extends Service implements Graph {
     @Override
     public Node createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... additionalParents) throws PMException {
         // check that the user can create the node in each of the parents
-        guard.checkCreateNode(userCtx, initialParent, additionalParents);
+        guard.checkCreateNode(userCtx, type, initialParent, additionalParents);
 
         //create the node
         Node node = graph.createNode(name, type, properties, initialParent, additionalParents);
 
         // process the event
-        processCreateNodeEvent(node, initialParent, additionalParents);
+        getEPP().processEvent(new CreateNodeEvent(userCtx, node, initialParent, additionalParents));
 
         return node;
-    }
-
-    private void processCreateNodeEvent (Node node, String initialParent, String[] additionalParents) throws PMException {
-        // process event for initial parent
-        Node parentNode = graph.getNode(initialParent);
-        getEPP().processEvent(new AssignToEvent(userCtx, parentNode, node));
-
-        // process event for any additional parents
-        for (String parent : additionalParents) {
-            parentNode = graph.getNode(parent);
-            getEPP().processEvent(new AssignToEvent(userCtx, parentNode, node));
-        }
     }
 
     /**
@@ -113,15 +101,15 @@ public class GraphService extends Service implements Graph {
      * @throws PMAuthorizationException if the user is not authorized to delete the node.
      */
     public void deleteNode(String name) throws PMException {
+        Node node = graph.getNode(name);
+
         // check that the user can delete the node
-        guard.checkDeleteNode(userCtx, name);
+        guard.checkDeleteNode(userCtx, node.getType(), name);
 
         // check that the node does not have any children
         if (graph.getChildren(name).size() != 0) {
             throw new PMException("cannot delete " + name + ", nodes are still assigned to it");
         }
-
-        Node node = graph.getNode(name);
 
         // if it's a PC, delete the rep
         if (node.getType().equals(PC)) {
@@ -130,17 +118,14 @@ public class GraphService extends Service implements Graph {
             }
         }
 
+        // get the
+        Set<String> parents = graph.getParents(name);
+
         // delete the node
         graph.deleteNode(name);
 
-        // process the delete event
-        Set<String> parents = graph.getParents(name);
-        for(String parent : parents) {
-            Node parentNode = graph.getNode(parent);
-
-            getEPP().processEvent(new DeassignEvent(userCtx, node, parentNode));
-            getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, node));
-        }
+        // process the delete node event
+        getEPP().processEvent(new DeleteNodeEvent(userCtx, node, parents));
     }
 
     /**
