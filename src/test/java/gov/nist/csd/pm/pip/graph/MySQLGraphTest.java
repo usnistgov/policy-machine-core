@@ -24,6 +24,8 @@ public class MySQLGraphTest {
     void init() throws Exception {
         MySQLConnection connection = new MySQLConnection();
         this.graph = new MySQLGraph(connection);
+        this.graph.deleteAll();
+        this.graph = new MySQLGraph(connection);
     }
 
     @Test
@@ -71,11 +73,10 @@ public class MySQLGraphTest {
         Node node = graph.createPolicyClass("node test 4", Node.toProperties("namespace", "test"));
         graph.deleteNode(node.getName());
 
-        assertThrows(IllegalArgumentException.class, () -> graph.getNode(node.getName()));
-
         // deleted from the graph
         assertFalse(graph.exists(node.getName()));
 
+        graph.createPolicyClass("new pc", null);
         // deleted from list of policies
         assertFalse(graph.getPolicyClasses().contains(node.getName()));
 
@@ -84,6 +85,7 @@ public class MySQLGraphTest {
 
     @Test
     void testExists() throws PIPException {
+        graph.createPolicyClass("pc1", null);
         Node oa1 = graph.createNode("OA 5", OA,null, "pc1");
         Node oa = graph.createNode("oa 6", OA, null, oa1.getName());
 
@@ -94,9 +96,7 @@ public class MySQLGraphTest {
     @Test
     void testGetPolicies() throws PIPException {
 
-        //getPolicyClass should not be empty since we have the super_pc node
-        //assertTrue(graph.getPolicyClasses().isEmpty());
-
+        graph.createPolicyClass("pc1", null);
         int total = graph.getPolicyClasses().size();
         graph.createPolicyClass("nodePC7", null);
         graph.createPolicyClass("nodePC8", null);
@@ -286,8 +286,6 @@ public class MySQLGraphTest {
 
     @Test
     void testGetNode() throws PIPException {
-        assertThrows(IllegalArgumentException.class, () -> graph.getNode("Not an existing node"));
-
         Node node = graph.createPolicyClass("pc 44", null);
         node = graph.getNode(node.getName());
         assertEquals("pc 44", node.getName());
@@ -351,9 +349,9 @@ public class MySQLGraphTest {
     "}";
     @Test
     void testToJson() throws PMException {
-        if (!graph.exists("new node")) {
-            graph.createNode("new node", UA, Node.toProperties("namespace", "super"), "super_ua1");
-        }
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("new node", UA, Node.toProperties("namespace", "super"), "pc1");
+
         MySQLGraph.JsonGraph jsonGraph = new Gson().fromJson(json, MySQLGraph.JsonGraph.class);
 
         assertThrows(NoSuchElementException.class, () -> jsonGraph.getNodes().stream().filter(node ->
@@ -362,14 +360,13 @@ public class MySQLGraphTest {
 
     @Test
     void testFromJson() throws PMException {
-        if (!graph.exists("new node")) {
-            graph.createNode("new node", UA, Node.toProperties("namespace", "super"), "super_ua1");
-        }
+        graph.createPolicyClass("pc1", null);
+        graph.createNode("new node", UA, Node.toProperties("namespace", "super"), "pc1");
 
         String json2 = graph.toJson();
         assertTrue(json2.contains("\"name\": \"new node\""));
         String assign = "\"new node\",\n" +
-                "      \"super_ua1\"";
+                "      \"pc1\"";
         /*String associate = "      \"source\": \"sample UA\",\n" +
                 "      \"target\": \"sample UA2\",\n" +
                 "      \"operations\": [\n" +

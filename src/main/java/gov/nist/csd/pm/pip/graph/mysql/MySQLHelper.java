@@ -15,6 +15,10 @@ public class MySQLHelper {
     public static final String SELECT_NODE_ID_NAME_FROM_NODE = "select count(*) AS total from node where name = ?";
     public static final String SELECT_ALL_FROM_NODE = "SELECT node_id, name, node_type_id, node_property from node";
     public static final String SELECT_ALL_FROM_NAME = "SELECT node_id, name, node_type_id, node_property from node where name = ?";
+    public static final String DELETE_DENYS = "DELETE from deny";
+    public static final String DELETE_ASSOCIATIONS = "DELETE from association";
+    public static final String DELETE_ASSIGNMENTS = " DELETE from assignment ";
+    public static final String DELETE_NODES = "DELETE from node;";
 
     public static final String SELECT_START_NODE_ID = "SELECT start_node_id from assignment where end_node_id=";
     public static final String SELECT_END_NODE_ID = "SELECT end_node_id from assignment where start_node_id=";

@@ -25,8 +25,8 @@ import java.text.NumberFormat;
 public class MySQLConnection {
 
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
-    //private static final String DB_URL = "jdbc:mysql://localhost:3306/policydb_core";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/policydb_core?profileSQL=true";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/policydb_core";
+    //private static final String DB_URL = "jdbc:mysql://localhost:3306/policydb_core?profileSQL=true";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "pmAdmin";
 
@@ -56,8 +56,9 @@ public class MySQLConnection {
             System.out.println(graph.getChildren("super_ua2"));
             System.out.println(graph.getNodes());
             System.out.print("retrieving graph data takes " + formatter.format((end2 - start2) / 1000d) + " seconds"+ "\n");
-            System.out.println(graph.getNode("super_ua2"));
+            System.out.println(graph.getNode("not an node"));
             System.out.println(graph.getChildren("super_pc"));
+            System.out.println(graph.getNodes());
             long end3 = System.currentTimeMillis();
             System.out.print("retrieving graph service " + formatter.format((end3 - start3) / 1000d) + " seconds"+ "\n");
 

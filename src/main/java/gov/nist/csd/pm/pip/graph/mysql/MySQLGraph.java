@@ -1112,6 +1112,24 @@ public class MySQLGraph implements Graph {
         return gson.toJson(new JsonGraph(nodes, jsonAssignments, jsonAssociations));
     }
 
+    public void deleteAll() throws PIPException {
+        try (
+                Connection con = this.conn.getConnection();
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.DELETE_DENYS);
+                PreparedStatement ps2 = con.prepareStatement(MySQLHelper.DELETE_ASSIGNMENTS);
+                PreparedStatement ps3 = con.prepareStatement(MySQLHelper.DELETE_ASSOCIATIONS);
+                PreparedStatement ps4 = con.prepareStatement(MySQLHelper.DELETE_NODES)
+        ){
+
+            ps.executeUpdate();
+            ps2.executeUpdate();
+            ps3.executeUpdate();
+            ps4.executeUpdate();
+        } catch (SQLException e) {
+            throw new PIPException("graph", e.getMessage());
+        }
+    }
+
     public static class JsonGraph {
         Collection<Node> nodes;
         Set<String[]>  assignments;
