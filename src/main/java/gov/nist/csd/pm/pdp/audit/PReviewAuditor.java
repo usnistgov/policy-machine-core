@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pdp.audit;
 
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.audit.model.Path;
 import gov.nist.csd.pm.pdp.audit.model.PolicyClass;
-import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.pip.graph.dag.searcher.DepthFirstSearcher;
@@ -12,12 +12,10 @@ import gov.nist.csd.pm.pip.graph.dag.searcher.Direction;
 import gov.nist.csd.pm.pip.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
-import javax.annotation.processing.SupportedSourceVersion;
 import java.util.*;
 
 import static gov.nist.csd.pm.operations.Operations.*;
-import static gov.nist.csd.pm.operations.Operations.ALL_RESOURCE_OPS;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
+import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
 public class PReviewAuditor implements Auditor {
 

@@ -8,7 +8,13 @@ import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.obligations.model.*;
 
-import java.util.*;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.services.UserContext;
+import gov.nist.csd.pm.pip.obligations.model.Obligation;
+import gov.nist.csd.pm.pip.obligations.model.ResponsePattern;
+import gov.nist.csd.pm.pip.obligations.model.Rule;
+
+import java.util.List;
 
 public class EPP {
 
@@ -27,6 +33,14 @@ public class EPP {
         }
     }
 
+    public void addFunctionExecutor(FunctionExecutor executor) {
+        this.functionEvaluator.addFunctionExecutor(executor);
+    }
+
+    public void removeFunctionExecutor(FunctionExecutor executor) {
+        this.functionEvaluator.removeFunctionExecutor(executor);
+    }
+    
     public PDP getPDP() {
         return pdp;
     }

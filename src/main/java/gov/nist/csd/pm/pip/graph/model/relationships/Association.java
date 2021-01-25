@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pip.graph.model.relationships;
 
-import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
@@ -52,9 +52,9 @@ public class Association extends Relationship implements Serializable {
      * @param uaType     the type of the source node in the association. This should always be a user Attribute,
      *                   so an InvalidAssociationException will be thrown if it's not.
      * @param targetType the type of the target node. This can be either an Object Attribute or a user attribute.
-     * @throws PMException if the provided types do not make a valid Association under NGAC
+     * @throws PIPException if the provided types do not make a valid Association under NGAC
      */
-    public static void checkAssociation(NodeType uaType, NodeType targetType) throws PMException {
+    public static void checkAssociation(NodeType uaType, NodeType targetType) throws PIPException {
         NodeType[] check = validAssociations.get(uaType);
         for (NodeType nt : check) {
             if (nt.equals(targetType)) {
@@ -62,7 +62,7 @@ public class Association extends Relationship implements Serializable {
             }
         }
 
-        throw new PMException(String.format("cannot associate a node of type %s to a node of type %s", uaType, targetType));
+        throw new PIPException(String.format("cannot associate a node of type %s to a node of type %s", uaType, targetType));
     }
 
     @Override

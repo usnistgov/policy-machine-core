@@ -204,7 +204,7 @@ public interface Graph {
      * contain the source node names and the operations of each association.
      *
      * @param target the name of the target node.
-     * @return a Map of the source Ids and the operations for each association.
+     * @return a Map of the source names and the operations for each association.
      * @throws PMException if there is an retrieving the associations of the target node from the graph.
      */
     Map<String, OperationSet> getTargetAssociations(String target) throws PMException;

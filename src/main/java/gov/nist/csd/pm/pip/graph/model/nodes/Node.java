@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pip.graph.model.nodes;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Stores information needed for a node.
@@ -12,6 +11,7 @@ public class Node implements Serializable {
     private String              name;
     private NodeType            type;
     private Map<String, String> properties;
+    private long                id;
 
     public Node() {
         this.properties = new HashMap<>();
@@ -34,28 +34,11 @@ public class Node implements Serializable {
         this.type = type;
     }
 
-    public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("a node can not have a null or empty name");
-        }
-
+    public Node(long id, String name, NodeType type, Map<String, String> properties) {
         this.name = name;
-    }
-
-    public void setType(NodeType type) {
-        if (type == null) {
-            throw new IllegalArgumentException("a type cannot be null");
-        }
-
         this.type = type;
-    }
-
-    public void setProperties(Map<String, String> properties) {
-        if (properties == null) {
-            properties = new HashMap<>();
-        }
-
-        this.properties = properties;
+        this.properties = properties == null ? new HashMap<>() : properties;
+        this.id= id;
     }
 
     public Node addProperty(String key, String value) {
@@ -78,6 +61,22 @@ public class Node implements Serializable {
     public Map<String, String> getProperties() {
         return properties;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(NodeType type) {
+        this.type = type;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    public long getId() { return id; }
+
+    public void setId(long id) { this.id = id; }
 
     /**
      * Two nodes are equal if their IDs are the same.

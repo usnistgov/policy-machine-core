@@ -1,22 +1,26 @@
 package gov.nist.csd.pm.pdp.services;
 
-import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.epp.EPP;
+import gov.nist.csd.pm.epp.events.*;
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.pap.policies.SuperPolicy;
 import gov.nist.csd.pm.pdp.services.guard.GraphGuard;
 import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.*;
+import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 /**
  * GraphService provides methods to maintain an NGAC graph, while also ensuring any user interacting with the graph,
@@ -126,6 +130,17 @@ public class GraphService extends Service implements Graph {
 
         // process the delete node event
         getEPP().processEvent(new DeleteNodeEvent(userCtx, node, parents));
+/*        // process the delete event
+        Set<String> parents = graph.getParents(name);
+        for(String parent : parents) {
+            Node parentNode = graph.getNode(parent);
+
+            getEPP().processEvent(new DeassignEvent(userCtx, node, parentNode));
+            getEPP().processEvent(new DeassignFromEvent(userCtx, parentNode, node));
+        }
+
+        // delete the node
+        graph.deleteNode(name);*/
     }
 
     /**
@@ -163,6 +178,10 @@ public class GraphService extends Service implements Graph {
      */
     public Set<String> getPolicyClasses() throws PMException {
         return graph.getPolicyClasses();
+    }
+
+    public String getPolicyClassDefault(String pc, NodeType type) {
+        return pc + "_default_" + type.toString();
     }
 
     /**
@@ -381,6 +400,7 @@ public class GraphService extends Service implements Graph {
     @Override
     public Set<Node> search(NodeType type, Map<String, String> properties) throws PMException {
         Set<Node> search = graph.search(type, properties);
+        //System.out.println(search);
         guard.filterNodes(userCtx, search);
         return search;
     }
@@ -433,11 +453,58 @@ public class GraphService extends Service implements Graph {
 
         Collection<Node> nodes = graph.getNodes();
         Set<String> names = new HashSet<>();
+        Set<String> prohibitions_name = new HashSet<>();
         for (Node node: nodes) {
             names.add(node.getName());
+            if (node.getType() == UA || node.getType() == OA) {
+                graph.getTargetAssociations(node.getName()).keySet().forEach(el -> {
+                    try {
+                        graph.dissociate(el, node.getName());
+                    } catch (PMException pmException) {
+                        pmException.printStackTrace();
+                    }
+                });
+                if (node.getType() == UA) {
+                    graph.getSourceAssociations(node.getName()).keySet().forEach(el -> {
+                        try {
+                            graph.dissociate(node.getName(), el);
+                        } catch (PMException pmException) {
+                            pmException.printStackTrace();
+                        }
+                    });
+                }
+            }
+            graph.getChildren(node.getName()).forEach(el -> {
+                try {
+                    if (graph.isAssigned(el, node.getName())) {
+                        graph.deassign(el, node.getName());
+                    }
+                } catch (PMException pmException) {
+                    pmException.printStackTrace();
+                }
+            });
+            graph.getParents(node.getName()).forEach(el -> {
+                try {
+                    if (graph.isAssigned(node.getName(), el)) {
+                        graph.deassign(node.getName(), el);
+                    }
+                } catch (PMException pmException) {
+                    pmException.printStackTrace();
+                }
+            });
+            getProhibitionsAdmin().getProhibitionsFor(node.getName()).forEach( el -> {
+                prohibitions_name.add(el.getName());
+            });
         }
+        for (String prohibition: prohibitions_name) {
+            getProhibitionsAdmin().delete(prohibition);
+        }
+
         for (String name : names) {
             graph.deleteNode(name);
         }
+        //setup Super policy in GraphAdmin + copy graph and graph copy
+        superPolicy = new SuperPolicy();
+        superPolicy.configure(graph);
     }
 }

@@ -9,6 +9,9 @@ import gov.nist.csd.pm.pdp.services.*;
 import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.memory.tx.MemTx;
+import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.services.*;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.common.tx.TxRunner;
@@ -29,7 +32,8 @@ public class PDP {
         EPP epp = new EPP(pap, pdp, eppOptions);
         // set the PDPs EPP
         pdp.setEPP(epp);
-
+        // initialize PDP services which need the epp that was just set
+        //pdp.initServices();
         return pdp;
     }
 
@@ -58,6 +62,8 @@ public class PDP {
         return epp;
     }
 
+    //add graphService && obligationService
+
     public WithUser withUser(UserContext userCtx) {
         return new WithUser(userCtx, pap, epp, decider, auditor);
     }
@@ -69,6 +75,8 @@ public class PDP {
         private EPP epp;
         private Decider decider;
         private Auditor auditor;
+        private AnalyticsService    analyticsService;
+
 
         public WithUser(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
             this.userCtx = userCtx;
@@ -76,6 +84,20 @@ public class PDP {
             this.epp = epp;
             this.decider = decider;
             this.auditor = auditor;
+        }
+
+        public WithUser(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor, AnalyticsService analyticsService) {
+            this.userCtx = userCtx;
+            this.pap = pap;
+            this.epp = epp;
+            this.decider = decider;
+            this.auditor = auditor;
+            this.analyticsService = analyticsService;
+        }
+
+        public AnalyticsService getAnalyticsService(UserContext userCtx) {
+            analyticsService.setUserCtx(userCtx);
+            return analyticsService;
         }
 
         @Override
@@ -103,8 +125,6 @@ public class PDP {
         }
     }
 
-
-
     /**
      * pdp.TxBuilder.withUser("bob").runTx(() -> {})
      * pap.TxBuilder.runTx(() -> {}, "bob")
@@ -119,7 +139,5 @@ public class PDP {
      *
      * pdp.withUser().runTx()
      */
-
-
 
 }

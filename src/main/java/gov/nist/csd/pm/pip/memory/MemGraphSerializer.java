@@ -10,7 +10,6 @@ import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
 public class MemGraphSerializer implements GraphSerializer {
 

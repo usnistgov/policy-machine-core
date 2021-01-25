@@ -17,6 +17,7 @@ import static gov.nist.csd.pm.operations.Operations.UPDATE_NODE;
 import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_PC_REP;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
+
 public class GraphGuard extends Guard {
 
     public GraphGuard(FunctionalEntity pap, Decider decider) {

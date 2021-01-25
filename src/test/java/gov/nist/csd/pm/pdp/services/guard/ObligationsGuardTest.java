@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.operations.Operations.ALL_ADMIN_OPS;
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.U;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ObligationsGuardTest {
 

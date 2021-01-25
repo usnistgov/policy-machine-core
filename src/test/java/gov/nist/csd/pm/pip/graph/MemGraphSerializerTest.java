@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MemGraphSerializerTest {
 

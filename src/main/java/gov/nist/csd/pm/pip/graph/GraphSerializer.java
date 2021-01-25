@@ -1,17 +1,6 @@
 package gov.nist.csd.pm.pip.graph;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.graph.model.relationships.Assignment;
-import gov.nist.csd.pm.pip.graph.model.relationships.Association;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 
 /**
  * GraphSerializer is a supplemental way of serializing a Graph object. The format is as follows:
@@ -26,6 +15,7 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
  * # operations are space separated
  * assoc ua1 oa1 read write
  */
+
 public interface GraphSerializer {
 
     String serialize() throws PMException;
@@ -33,3 +23,5 @@ public interface GraphSerializer {
     Graph deserialize(String s) throws PMException;
 
 }
+
+

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.epp.events.*;
+import gov.nist.csd.pm.epp.events.EventContext;
 import gov.nist.csd.pm.epp.functions.*;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
@@ -12,7 +12,9 @@ import gov.nist.csd.pm.pip.obligations.model.functions.Function;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FunctionEvaluator {
 
@@ -37,6 +39,10 @@ public class FunctionEvaluator {
 
     public void addFunctionExecutor(FunctionExecutor executor) {
         this.funExecs.put(executor.getFunctionName(), executor);
+    }
+
+    public void removeFunctionExecutor(FunctionExecutor executor) {
+        this.funExecs.remove(executor.getFunctionName());
     }
 
     public FunctionExecutor getFunctionExecutor(String name) throws PMException {

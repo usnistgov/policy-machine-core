@@ -1,13 +1,14 @@
 package gov.nist.csd.pm.pdp.audit;
 
+import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.audit.model.Path;
 import gov.nist.csd.pm.pdp.audit.model.PolicyClass;
-import gov.nist.csd.pm.exceptions.PMException;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

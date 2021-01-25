@@ -2,7 +2,9 @@ package gov.nist.csd.pm.pdp.services.guard;
 
 import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.decider.Decider;
+import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
@@ -19,6 +21,7 @@ public class Guard {
 
     protected FunctionalEntity pap;
     protected Decider decider;
+    private OperationSet resourceOps;
 
     public Guard(FunctionalEntity pap, Decider decider) {
         this.pap = pap;
@@ -61,4 +64,14 @@ public class Guard {
         }
     }
 
+    public OperationSet getResourceOps() {
+        return resourceOps;
+    }
+
+    public void setResourceOps(OperationSet resourceOps) {
+        this.resourceOps = resourceOps;
+        if (decider instanceof PReviewDecider) {
+            ((PReviewDecider) decider).setResourceOps(resourceOps);
+        }
+    }
 }

@@ -41,6 +41,10 @@ public class Service {
         return userCtx;
     }
 
+    public void setUserCtx(UserContext userCtx) {
+        this.userCtx = userCtx;
+    }
+
     EPP getEPP() {
         return this.epp;
     }
@@ -59,6 +63,7 @@ public class Service {
 
     Obligations getObligationsAdmin() throws PMException {
         return pap.getObligations();
+
     }
 
     public Decider getDecider() {

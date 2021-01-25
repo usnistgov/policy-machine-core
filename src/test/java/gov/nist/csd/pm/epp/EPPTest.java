@@ -30,7 +30,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
 import static org.junit.jupiter.api.Assertions.*;
