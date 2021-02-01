@@ -8,8 +8,8 @@ jobs:
       - image: circleci/openjdk:8-jdk-stretch
       - image: pmmaster1docker/policydb_core:1.0.0
         auth:
-         username: ${{USERNAME}}
-         password: ${{PASSWORD}}
+         username: ${USERNAME}
+         password: ${PASSWORD}
     steps:
       - checkout # check out source code to working directory
       - run: mvn dependency:go-offline # gets the project dependencies
