@@ -121,6 +121,10 @@ public class MySQLProhibitionsTest {
 
     @Test
     void update() throws PIPException{
+        if (!graph.exists("new PC")) {
+            graph.createPolicyClass("new PC", null);
+        }
+
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test", "newSubject test", new OperationSet("read"))
                 .addContainer("new PC", true)
                 .build();
