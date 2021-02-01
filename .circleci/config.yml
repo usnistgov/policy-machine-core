@@ -6,7 +6,7 @@ jobs:
 
     docker:
       - image: circleci/openjdk:8-jdk-stretch
-      - image: pmmaster1docker/policydb_core
+      - image: pmmaster1docker/policydb_core:1.0.0
         auth:
          username: ${{USERNAME}}
          password: ${{PASSWORD}}
