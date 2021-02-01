@@ -29,6 +29,15 @@ public class MySQLProhibitionsTest {
             graph.createNode("new node", NodeType.OA, null, "new PC");
         }
 
+        Prohibition p1 = new Prohibition.Builder("prohibition 1", "super_u", new OperationSet("read"))
+                .setIntersection(false)
+                .addContainer("new PC", true)
+                .build();
+
+        if (!mySQLProhibitions.exists(p1.getName())) {
+            mySQLProhibitions.add(p1);
+        }
+
         Prohibition prohibition = new Prohibition.Builder("prohibition 2", "super_u", new OperationSet("read"))
                 .setIntersection(false)
                 .addContainer("new PC", true)
@@ -122,7 +131,7 @@ public class MySQLProhibitionsTest {
 
         Prohibition prohibition2 = new Prohibition.Builder("new prohibition update2", "newSubject update", new OperationSet("new op"))
                 .setIntersection(true)
-                .addContainer("super_default_UA", false)
+                .addContainer("super_u", false)
                 .build();
 
         if (!mySQLProhibitions.exists(prohibition2.getName())) {
@@ -133,8 +142,8 @@ public class MySQLProhibitionsTest {
             assertEquals("new prohibition update2", prohibition.getName());
             assertEquals("newSubject update", prohibition.getSubject());
             assertEquals(new OperationSet("new op"), prohibition.getOperations());
-            assertTrue(prohibition.getContainers().containsKey("super_default_UA"));
-            assertFalse(prohibition.getContainers().get("super_default_UA"));
+            assertTrue(prohibition.getContainers().containsKey("super_u"));
+            assertFalse(prohibition.getContainers().get("super_u"));
         }
     }
 
