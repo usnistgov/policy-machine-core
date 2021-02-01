@@ -6,11 +6,10 @@ jobs:
 
     docker:
       - image: circleci/openjdk:8-jdk-stretch
-
       - image: pmmaster1docker/policydb_core
-        #auth:
-         # username: mydockerhub-user
-          #password: $DOCKERHUB_PASSWORD 
+        auth:
+         username: ${{USERNAME}}
+         password: ${{PASSWORD}}
     steps:
       - checkout # check out source code to working directory
       - run: mvn dependency:go-offline # gets the project dependencies
