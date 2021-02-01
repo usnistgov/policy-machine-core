@@ -34,7 +34,9 @@ public class MySQLProhibitionsTest {
                 .addContainer("new PC", true)
                 .build();
 
-        mySQLProhibitions.add(prohibition);
+        if (!mySQLProhibitions.exists(prohibition.getName())) {
+            mySQLProhibitions.add(prohibition);
+        }
 
         Prohibition prohibition_test = mySQLProhibitions.get("prohibition 1");
         assertEquals("prohibition 1", prohibition_test.getName());
@@ -42,7 +44,7 @@ public class MySQLProhibitionsTest {
         assertFalse(prohibition_test.isIntersection());
         assertEquals(new OperationSet("read"), prohibition_test.getOperations());
         assertTrue(prohibition.getContainers().containsKey("new PC"));
-        assertTrue(prohibition.getContainers().get("2"));
+        assertTrue(prohibition.getContainers().get("new PC"));
     }
 
     @Test
@@ -72,75 +74,89 @@ public class MySQLProhibitionsTest {
 
         Prohibition p = new Prohibition.Builder("new prohibition", "test subject", new OperationSet("read", "write"))
                 .build();
-        mySQLProhibitions.add(p);
-        list_prohibitions = mySQLProhibitions.getAll();
-        assertEquals(sizeTot+1, list_prohibitions.size());
+        if (!mySQLProhibitions.exists(p.getName())) {
+            mySQLProhibitions.add(p);
+            list_prohibitions = mySQLProhibitions.getAll();
+            assertEquals(sizeTot+1, list_prohibitions.size());
+        } else {
+            assertEquals(sizeTot, list_prohibitions.size());
+        }
+
     }
 
     @Test
     void get() throws PIPException{
         assertThrows(PIPException.class, () -> mySQLProhibitions.get("unknown prohibition"));
 
-        Prohibition prohibition = mySQLProhibitions.get("prohibition 1");
-        assertEquals("prohibition 1", prohibition.getName());
-        assertEquals("super_u", prohibition.getSubject());
-        assertFalse(prohibition.isIntersection());
-        assertEquals(prohibition.getOperations(), new OperationSet("read"));
+        Prohibition prohibition = mySQLProhibitions.get("new prohibition");
+        assertEquals("new prohibition", prohibition.getName());
+        assertEquals("test subject", prohibition.getSubject());
 
-        assertTrue(prohibition.getContainers().containsKey("2"));
-        assertTrue(prohibition.getContainers().get("2"));
+        assertFalse(prohibition.isIntersection());
+        assertEquals(prohibition.getOperations(), new OperationSet("read", "write"));
     }
 
     @Test
     void getProhibitionsFor() throws PIPException{
-        MySQLProhibitions prohibitions = new MySQLProhibitions(new MySQLConnection());
 
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test 106", "2", new OperationSet("read"))
                 .setIntersection(false)
-                .addContainer("3", true)
+                .addContainer("super_ua1", true)
                 .build();
-        prohibitions.add(prohibitionTest);
-        assertEquals(1, prohibitions.getProhibitionsFor("2").size());
+        if (!mySQLProhibitions.exists(prohibitionTest.getName())) {
+            mySQLProhibitions.add(prohibitionTest);
+        }
+        assertEquals(1, mySQLProhibitions.getProhibitionsFor("2").size());
 
     }
 
     @Test
     void update() throws PIPException{
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test", "newSubject test", new OperationSet("read"))
-                .addContainer("5", true)
+                .addContainer("super_ua2", true)
                 .build();
-        mySQLProhibitions.add(prohibitionTest);
-
+        if (!mySQLProhibitions.exists(prohibitionTest.getName())) {
+            mySQLProhibitions.add(prohibitionTest);
+        }
         Prohibition prohibition = mySQLProhibitions.get("new prohibition test");
 
-        Prohibition newProhibition = new Prohibition.Builder("new prohibition update", "newSubject update", new OperationSet("new op"))
+        Prohibition prohibition2 = new Prohibition.Builder("new prohibition update2", "newSubject update", new OperationSet("new op"))
                 .setIntersection(true)
-                .addContainer("4", false)
+                .addContainer("super_default_UA", false)
                 .build();
 
-        mySQLProhibitions.update(prohibition.getName(), newProhibition);
+        if (!mySQLProhibitions.exists(prohibition2.getName())) {
+            mySQLProhibitions.update(prohibition.getName(), prohibition2);
 
-        prohibition = mySQLProhibitions.get("new prohibition update");
-        assertTrue(prohibition.isIntersection());
-        assertEquals("new prohibition update", prohibition.getName());
-        assertEquals("newSubject update", prohibition.getSubject());
-        assertEquals(new OperationSet("new op"), prohibition.getOperations());
-        assertTrue(prohibition.getContainers().containsKey("4"));
-        assertFalse(prohibition.getContainers().get("4"));
+            prohibition = mySQLProhibitions.get("new prohibition update");
+            assertTrue(prohibition.isIntersection());
+            assertEquals("new prohibition update2", prohibition.getName());
+            assertEquals("newSubject update", prohibition.getSubject());
+            assertEquals(new OperationSet("new op"), prohibition.getOperations());
+            assertTrue(prohibition.getContainers().containsKey("super_default_UA"));
+            assertFalse(prohibition.getContainers().get("super_default_UA"));
+        }
     }
 
     @Test
-    void delete() throws PIPException{
+    void delete() throws PIPException {
         Prohibition p = new Prohibition.Builder("new prohibition to be deleted", "new subject", new OperationSet("read", "write"))
                 .build();
 
-        mySQLProhibitions.add(p);
         List<Prohibition> list_prohibitions = mySQLProhibitions.getAll();
-
         int sizeTot = list_prohibitions.size();
 
-        mySQLProhibitions.delete("new prohibition to be deleted");
-        assertEquals(sizeTot -1, mySQLProhibitions.getAll().size());
+        if (!mySQLProhibitions.exists(p.getName())) {
+            mySQLProhibitions.add(p);
+
+            list_prohibitions = mySQLProhibitions.getAll();
+            sizeTot = list_prohibitions.size();
+
+            mySQLProhibitions.delete(p.getName());
+            assertEquals(sizeTot-1, mySQLProhibitions.getAll().size());
+        } else {
+            assertEquals(sizeTot, mySQLProhibitions.getAll().size());
+        }
     }
 
 }
