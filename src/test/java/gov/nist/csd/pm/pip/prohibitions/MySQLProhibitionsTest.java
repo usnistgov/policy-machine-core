@@ -119,7 +119,7 @@ public class MySQLProhibitionsTest {
 
     }
 
-    @Test
+    //@Test
     void update() throws PIPException{
         if (!graph.exists("new PC")) {
             graph.createPolicyClass("new PC", null);
