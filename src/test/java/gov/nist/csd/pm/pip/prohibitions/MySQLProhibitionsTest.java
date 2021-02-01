@@ -131,7 +131,7 @@ public class MySQLProhibitionsTest {
 
         Prohibition prohibition2 = new Prohibition.Builder("new prohibition update2", "newSubject update", new OperationSet("new op"))
                 .setIntersection(true)
-                .addContainer("super_u", false)
+                .addContainer("super_ua", false)
                 .build();
 
         if (!mySQLProhibitions.exists(prohibition2.getName())) {
@@ -142,8 +142,8 @@ public class MySQLProhibitionsTest {
             assertEquals("new prohibition update2", prohibition.getName());
             assertEquals("newSubject update", prohibition.getSubject());
             assertEquals(new OperationSet("new op"), prohibition.getOperations());
-            assertTrue(prohibition.getContainers().containsKey("super_u"));
-            assertFalse(prohibition.getContainers().get("super_u"));
+            assertTrue(prohibition.getContainers().containsKey("super_ua"));
+            assertFalse(prohibition.getContainers().get("super_ua"));
         }
     }
 
