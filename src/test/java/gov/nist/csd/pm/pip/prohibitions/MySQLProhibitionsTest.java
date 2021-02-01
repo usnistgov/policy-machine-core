@@ -123,6 +123,9 @@ public class MySQLProhibitionsTest {
     void update() throws PIPException{
         if (!graph.exists("new PC")) {
             graph.createPolicyClass("new PC", null);
+            if (!graph.exists("oa1")) {
+            graph.createNode("oa1", NodeType.OA, null, "new PC");
+            }
         }
 
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test", "newSubject test", new OperationSet("read"))
@@ -135,7 +138,7 @@ public class MySQLProhibitionsTest {
 
         Prohibition prohibition2 = new Prohibition.Builder("new prohibition update2", "newSubject update", new OperationSet("new op"))
                 .setIntersection(true)
-                .addContainer("super_pc", false)
+                .addContainer("oa1", false)
                 .build();
 
         if (!mySQLProhibitions.exists(prohibition2.getName())) {
@@ -146,8 +149,8 @@ public class MySQLProhibitionsTest {
             assertEquals("new prohibition update2", prohibition.getName());
             assertEquals("newSubject update", prohibition.getSubject());
             assertEquals(new OperationSet("new op"), prohibition.getOperations());
-            assertTrue(prohibition.getContainers().containsKey("super_pc"));
-            assertFalse(prohibition.getContainers().get("super_pc"));
+            assertTrue(prohibition.getContainers().containsKey("oa1"));
+            assertFalse(prohibition.getContainers().get("oa1"));
         }
     }
 
