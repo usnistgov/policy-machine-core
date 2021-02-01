@@ -122,7 +122,7 @@ public class MySQLProhibitionsTest {
     @Test
     void update() throws PIPException{
         Prohibition prohibitionTest = new Prohibition.Builder("new prohibition test", "newSubject test", new OperationSet("read"))
-                .addContainer("super_ua2", true)
+                .addContainer("new PC", true)
                 .build();
         if (!mySQLProhibitions.exists(prohibitionTest.getName())) {
             mySQLProhibitions.add(prohibitionTest);
@@ -131,7 +131,7 @@ public class MySQLProhibitionsTest {
 
         Prohibition prohibition2 = new Prohibition.Builder("new prohibition update2", "newSubject update", new OperationSet("new op"))
                 .setIntersection(true)
-                .addContainer("super_ua", false)
+                .addContainer("super_pc", false)
                 .build();
 
         if (!mySQLProhibitions.exists(prohibition2.getName())) {
@@ -142,8 +142,8 @@ public class MySQLProhibitionsTest {
             assertEquals("new prohibition update2", prohibition.getName());
             assertEquals("newSubject update", prohibition.getSubject());
             assertEquals(new OperationSet("new op"), prohibition.getOperations());
-            assertTrue(prohibition.getContainers().containsKey("super_ua"));
-            assertFalse(prohibition.getContainers().get("super_ua"));
+            assertTrue(prohibition.getContainers().containsKey("super_pc"));
+            assertFalse(prohibition.getContainers().get("super_pc"));
         }
     }
 
