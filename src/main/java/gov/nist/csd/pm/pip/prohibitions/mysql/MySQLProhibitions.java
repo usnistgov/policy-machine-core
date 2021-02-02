@@ -440,8 +440,15 @@ public class MySQLProhibitions implements Prohibitions {
             //adding new container
             for (Map.Entry<String,Boolean> entry : prohibition.getContainers().entrySet()) {
                 psCont.setInt(1, getProhibitionIdByProhibitionName(prohibition.getName()));
-                psCont.setString(2, entry.getKey());
-                psCont.setBoolean(3, entry.getValue());
+                MySQLGraph graph = new MySQLGraph(this.conn);
+                //if (graph.exists(graph.getNodeNameFromId(Integer.parseInt(container.getKey())))) {
+                if (graph.exists(entry.getKey())) {
+                    psCont.setInt(2, getNodeIdFromSubjectName(entry.getKey()));
+                    psCont.setInt(3, entry.getValue() ? 1 : 0);
+                }
+                else {
+                    throw new PIPException("prohibitions", "The object attribute "+entry.getKey()+" does not exist in the graph");
+                }
                 psCont.executeUpdate();
             }
         } catch (SQLException s) {
