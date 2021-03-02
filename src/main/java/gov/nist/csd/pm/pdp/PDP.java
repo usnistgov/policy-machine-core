@@ -41,6 +41,8 @@ public class PDP {
     private EPP epp;
     private Decider decider;
     private Auditor auditor;
+    private OperationSet resourceOps;
+
 
     /**
      * Create a new PDP instance given a Policy Administration Point and an optional set of FunctionExecutors to be
@@ -62,7 +64,35 @@ public class PDP {
         return epp;
     }
 
-    //add graphService && obligationService
+    public OperationSet getResourceOps() throws PMException{
+        return resourceOps;
+    }
+
+    public void setResourceOps(OperationSet resourceOps)  throws PMException {
+        this.resourceOps = resourceOps;
+    }
+
+    public void addResourceOps (String... ops) throws PMException {
+        OperationSet resourceOperations = getResourceOps();
+        String[] newOps = ops;
+        for (String op: newOps) {
+            if (!resourceOperations.contains(op)) {
+                resourceOperations.add(op);
+            }
+        }
+        setResourceOps(resourceOperations);
+    }
+
+    public void deleteResourceOps (String... ops) throws PMException {
+        OperationSet resourceOperations = getResourceOps();
+        String[] newOps = ops;
+        for (String op: newOps) {
+            if (resourceOperations.contains(op)) {
+                resourceOperations.remove(op);
+            }
+        }
+        setResourceOps(resourceOperations);
+    }
 
     public WithUser withUser(UserContext userCtx) {
         return new WithUser(userCtx, pap, epp, decider, auditor);
