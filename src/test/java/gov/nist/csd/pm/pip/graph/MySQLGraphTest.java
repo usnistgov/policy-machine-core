@@ -30,7 +30,6 @@ public class MySQLGraphTest {
 
     @Test
     void testCreateNode() throws PIPException {
-
         Node pc = graph.createPolicyClass( "pc1", null);
         assertTrue(graph.getPolicyClasses().contains(pc.getName()));
 
