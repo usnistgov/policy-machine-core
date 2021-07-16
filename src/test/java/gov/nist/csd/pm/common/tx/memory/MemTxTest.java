@@ -114,44 +114,7 @@ class MemTxTest {
     }
 
     @Test
-    void test5() throws PMException, InterruptedException {
-        Graph graph = new MemGraph();
-        Prohibitions prohibitions = new MemProhibitions();
-        Obligations obligations = new MemObligations();
-        MemPIP pip = new MemPIP(graph, prohibitions, obligations);
-        MemPAP pap = new MemPAP(pip);
-        OperationSet ops = new OperationSet("read");
-        PDP pdp = PDP.newPDP(pap, null, new PReviewDecider(graph, prohibitions, ops), new PReviewAuditor(graph, ops));
-
-        new Thread(()-> {
-            try {
-                pap.runTx((g, p , o) -> {
-                    try {
-                        Thread.sleep(4000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    g.createPolicyClass("pc1", null);
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        Thread.sleep(500);
-        new Thread(()-> {
-            try {
-                pdp.withUser(new UserContext("super")).runTx((g, p , o) -> {
-                    g.deleteNode("pc1");
-                });
-            } catch (PMException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        assertFalse(graph.exists("pc1"));
-    }
-
-    @Test
-    void test6() throws InterruptedException, PMException {
+    void testSyncCreateNode() throws InterruptedException, PMException {
         Graph graph = new MemGraph();
         Thread t1 = new Thread(() -> {
             try {
@@ -184,7 +147,7 @@ class MemTxTest {
 
     private boolean threw = false;
     @Test
-    void test7() throws InterruptedException, PMException {
+    void testExceptionWhenCreatingSameNode() throws InterruptedException, PMException {
         Graph graph = new MemGraph();
         MemTx tx = new MemTx(graph, new MemProhibitions(), new MemObligations());
         graph.createPolicyClass("pc1", null);
@@ -220,7 +183,7 @@ class MemTxTest {
     }
 
     @Test
-    void test8() throws PMException, InterruptedException {
+    void testConcurrentCreateNode() throws PMException, InterruptedException {
         Graph graph = new MemGraph();
         MemTx tx = new MemTx(graph, new MemProhibitions(), new MemObligations());
         graph.createPolicyClass("pc1", null);
