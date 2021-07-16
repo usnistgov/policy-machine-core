@@ -387,8 +387,9 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public boolean exists(String name) throws PIPException {
-        try (            Connection con = this.conn.getConnection();
-                         PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_ID_NAME_FROM_NODE)
+        try (
+                Connection con = this.conn.getConnection();
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_ID_NAME_FROM_NODE)
         ){
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
@@ -432,7 +433,7 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public Set<Node> getNodes() throws PIPException {
-        Node node = null;
+        Node node;
         Set<Node> nodes = new HashSet<>();
         HashMap<Long, String> nodeType = getNodeType();
 
@@ -521,7 +522,7 @@ public class MySQLGraph implements Graph {
         }
     }
 
-        /**
+    /**
      * Search the graph for nodes matching the given parameters. A node must
      * contain all properties provided to be returned.
      * To get all the nodes that have a specific property key with any value use "*" as the value in the parameter.
@@ -1050,7 +1051,7 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public void fromJson(String json) throws PMException {
-       JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
         Collection<Node> nodes = jsonGraph.getNodes().stream().filter(
                 node -> !node.getName().equalsIgnoreCase("super_pc")
                         && !node.getName().equalsIgnoreCase("super_ua1")

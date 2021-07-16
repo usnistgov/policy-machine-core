@@ -26,9 +26,6 @@ public class MySQLGraphTest {
 
     @BeforeEach
     void init() throws Exception {
-        // initialize database connection with h2 in memory database
-        conn = DriverManager.getConnection("jdbc:h2:~/policydb_core", "sa", "");
-
         // load the policydb_core sql script
         InputStream resourceAsStream = getClass().getResourceAsStream("/mysql/policydb_core.sql");
         if (resourceAsStream == null) {
@@ -37,12 +34,16 @@ public class MySQLGraphTest {
 
         // execute the sql script against the in memory database
         String sql = new String(resourceAsStream.readAllBytes());
-        try(Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
+        String[] split = sql.split(";");
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
+             Statement stmt = conn.createStatement()) {
+            for (String s : split) {
+                stmt.executeUpdate(s);
+            }
         }
 
         // create a new MySQLGraph with the connection
-        MySQLConnection connection = new MySQLConnection(conn.getMetaData().getURL(), "sa", "");
+        MySQLConnection connection = new MySQLConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
         this.graph = new MySQLGraph(connection);
     }
 
@@ -266,8 +267,8 @@ public class MySQLGraphTest {
         graph.createNode("oa 35", OA, Node.toProperties("specific key 1", "specific value 1"), "pc 33");
 
         Map<String, String> map = new HashMap<>();
-                            map.put("specific key 1", "specific value 1");
-                            map.put("specific key 2", "specific value 2");
+        map.put("specific key 1", "specific value 1");
+        map.put("specific key 2", "specific value 2");
         graph.createNode("oa 36", OA, map, "pc 33");
 
         // complete search
@@ -316,59 +317,59 @@ public class MySQLGraphTest {
 
     String json = "{" +
             "\"nodes\": [" +
-                    "{" +
-                        "\"name\": \"sample PC\", " +
-                        "\"type\": \"PC\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_sample\"\n" +
-                        "}" +
-                    "}," +
-                    "{" +
-                        "\"name\": \"sample UA\", " +
-                        "\"type\": \"UA\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_ua\"\n" +
-                        "}" +
-                    "}," +
-                    "{" +
-                        "\"name\": \"sample OA\", " +
-                        "\"type\": \"OA\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_oa\"\n" +
-                        "}" +
-                    "}," +
-                    "{" +
-                        "\"name\": \"sample UA2\", " +
-                        "\"type\": \"UA\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_ua2\"\n" +
-                        "}" +
-                    "}" +
+            "{" +
+            "\"name\": \"sample PC\", " +
+            "\"type\": \"PC\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_sample\"\n" +
+            "}" +
+            "}," +
+            "{" +
+            "\"name\": \"sample UA\", " +
+            "\"type\": \"UA\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_ua\"\n" +
+            "}" +
+            "}," +
+            "{" +
+            "\"name\": \"sample OA\", " +
+            "\"type\": \"OA\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_oa\"\n" +
+            "}" +
+            "}," +
+            "{" +
+            "\"name\": \"sample UA2\", " +
+            "\"type\": \"UA\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_ua2\"\n" +
+            "}" +
+            "}" +
             "]," +
             "\"assignments\": [" +
-                    "[" +
-                        "\"sample UA\"," +
-                        "\"sample PC\"" +
-                    "]," +
-                    "[" +
-                        "\"sample OA\"," +
-                        "\"sample PC\"" +
-                    "]," +
-                    "[" +
-                        "\"sample UA2\"," +
-                        "\"sample PC\"" +
-                    "]" +
+            "[" +
+            "\"sample UA\"," +
+            "\"sample PC\"" +
+            "]," +
+            "[" +
+            "\"sample OA\"," +
+            "\"sample PC\"" +
+            "]," +
+            "[" +
+            "\"sample UA2\"," +
+            "\"sample PC\"" +
+            "]" +
             "]," +
             "\"associations\": [" +
-                    "{" +
-                        "\"source\": \"sample UA\"," +
-                        "\"target\": \"sample UA2\", " +
-                        "\"operations\": [" +
-                        "\"*\"" +
-                        "]" +
-                    "}" +
+            "{" +
+            "\"source\": \"sample UA\"," +
+            "\"target\": \"sample UA2\", " +
+            "\"operations\": [" +
+            "\"*\"" +
             "]" +
-    "}";
+            "}" +
+            "]" +
+            "}";
     @Test
     void testToJson() throws PMException {
         graph.createPolicyClass("pc1", null);
