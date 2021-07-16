@@ -1,13 +1,9 @@
-package gov.nist.csd.pm.pip.prohibitions;
+package gov.nist.csd.pm.pip.mysql;
 
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.policies.SuperPolicy;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
-import gov.nist.csd.pm.pip.prohibitions.mysql.MySQLProhibitions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,24 +11,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLProhibitionsTest {
 
-    private MySQLGraph graph = new MySQLGraph(new MySQLConnection());
-    private MySQLProhibitions mySQLProhibitions = new MySQLProhibitions(new MySQLConnection());
+    private MySQLGraph graph;
+    private MySQLProhibitions prohibitions;
 
     @BeforeEach
     void setup() throws PMException {
-        //clear the prohibitions
-        for (Prohibition p: mySQLProhibitions.getAll()) {
-            mySQLProhibitions.delete(p.getName());
-        }
+        /*DBConfigurationBuilder config = DBConfigurationBuilder.newBuilder();
+        config.setPort(0);
+        DB db = DB.newEmbeddedDB(config.build());
+        db.start();
+        db.source("mysql/policydb_core.sql", "policydb_core");
 
-        //clear the graph and add setup configuration
-        graph.deleteAll();
-        SuperPolicy superPolicy = new SuperPolicy();
-        superPolicy.configure(graph);
-        System.out.println(graph.getNodes());
-    }
+        MySQLConnection connection = new MySQLConnection(config.getURL("policydb_core"));
 
-    public MySQLProhibitionsTest() throws PIPException {
+        this.graph = new MySQLGraph(connection);
+        this.prohibitions = new MySQLProhibitions(connection);*/
     }
 
     @Test
@@ -43,9 +36,9 @@ public class MySQLProhibitionsTest {
                 .addContainer("super_pc", true)
                 .build();
 
-        mySQLProhibitions.add(p1);
+        prohibitions.add(p1);
 
-        Prohibition prohibition = mySQLProhibitions.get(p1.getName());
+        Prohibition prohibition = prohibitions.get(p1.getName());
         assertEquals(p1.getName(), prohibition.getName());
         assertEquals(p1.getSubject(), prohibition.getSubject());
         assertEquals(p1.isIntersection(), prohibition.isIntersection());
@@ -57,7 +50,7 @@ public class MySQLProhibitionsTest {
     void addException() throws PIPException {
         Prohibition p3 = new Prohibition.Builder("prohibition 1", "super", new OperationSet("read"))
                 .build();
-        mySQLProhibitions.add(p3);
+        prohibitions.add(p3);
 
         //a null prohibition - a null or empty name - a null or empty subject
         Prohibition p = null;
@@ -70,23 +63,23 @@ public class MySQLProhibitionsTest {
                 .addContainer("10", true)
                 .build();
 
-        assertThrows(IllegalArgumentException.class, () -> mySQLProhibitions.add(p));
-        assertThrows(IllegalArgumentException.class, () -> mySQLProhibitions.add(p1));
-        assertThrows(IllegalArgumentException.class, () -> mySQLProhibitions.add(p2));
-        assertThrows(PIPException.class, () -> mySQLProhibitions.add(p3_sameName));
+        assertThrows(IllegalArgumentException.class, () -> prohibitions.add(p));
+        assertThrows(IllegalArgumentException.class, () -> prohibitions.add(p1));
+        assertThrows(IllegalArgumentException.class, () -> prohibitions.add(p2));
+        assertThrows(PIPException.class, () -> prohibitions.add(p3_sameName));
 
     }
 
     @Test
     void getAll() throws PIPException{
         //sizeTot is 0 since we cleared all the prohibitions
-        int sizeTot = mySQLProhibitions.getAll().size();
+        int sizeTot = prohibitions.getAll().size();
 
         Prohibition p = new Prohibition.Builder("prohibition1", "subject", new OperationSet("read"))
                 .build();
-            mySQLProhibitions.add(p);
+            prohibitions.add(p);
 
-            assertEquals(sizeTot+1, mySQLProhibitions.getAll().size());
+            assertEquals(sizeTot+1, prohibitions.getAll().size());
     }
 
     @Test
@@ -95,8 +88,8 @@ public class MySQLProhibitionsTest {
                 .addContainer("super_pc", true)
                 .build();
 
-        mySQLProhibitions.add(p);
-        Prohibition prohibition = mySQLProhibitions.get(p.getName());
+        prohibitions.add(p);
+        Prohibition prohibition = prohibitions.get(p.getName());
         assertEquals(p.getName(), prohibition.getName());
         assertEquals(p.getSubject(), prohibition.getSubject());
         assertEquals(p.getOperations(), prohibition.getOperations());
@@ -106,7 +99,7 @@ public class MySQLProhibitionsTest {
 
     @Test
     void getException() throws PIPException{
-        assertThrows(PIPException.class, () -> mySQLProhibitions.get("unknown prohibition"));
+        assertThrows(PIPException.class, () -> prohibitions.get("unknown prohibition"));
     }
 
     @Test
@@ -121,10 +114,10 @@ public class MySQLProhibitionsTest {
                 .setIntersection(false)
                 .build();
 
-        mySQLProhibitions.add(prohibition);
-        mySQLProhibitions.add(prohibition2);
+        prohibitions.add(prohibition);
+        prohibitions.add(prohibition2);
         System.out.println(prohibition.getSubject());
-        assertEquals(2, mySQLProhibitions.getProhibitionsFor("subject").size());
+        assertEquals(2, prohibitions.getProhibitionsFor("subject").size());
 
     }
 
@@ -134,8 +127,8 @@ public class MySQLProhibitionsTest {
                 .setIntersection(false)
                 .build();
 
-        mySQLProhibitions.add(prohibition);
-        Prohibition prohibition_get = mySQLProhibitions.get(prohibition.getName());
+        prohibitions.add(prohibition);
+        Prohibition prohibition_get = prohibitions.get(prohibition.getName());
 
         //prohibition2 is used in order to update prohibition
         Prohibition prohibition2 = new Prohibition.Builder("prohibition update", "super_oa", new OperationSet("read", "write"))
@@ -144,9 +137,9 @@ public class MySQLProhibitionsTest {
                 .build();
 
         //prohibition has now the same values as prohibition2
-        mySQLProhibitions.update(prohibition.getName(), prohibition2);
+        prohibitions.update(prohibition.getName(), prohibition2);
 
-        prohibition = mySQLProhibitions.get(prohibition2.getName());
+        prohibition = prohibitions.get(prohibition2.getName());
         assertEquals(prohibition.isIntersection(), prohibition2.isIntersection());
         assertEquals(prohibition.getName(), prohibition2.getName());
         assertEquals(prohibition.getSubject(), prohibition2.getSubject());
@@ -161,7 +154,7 @@ public class MySQLProhibitionsTest {
                 .setIntersection(false)
                 .build();
 
-        mySQLProhibitions.add(prohibition);
+        prohibitions.add(prohibition);
         //a null prohibition - a null or empty name - an already existing name
         Prohibition p = null;
         Prohibition p1 = new Prohibition.Builder("", "subject", new OperationSet("read"))
@@ -170,9 +163,9 @@ public class MySQLProhibitionsTest {
         Prohibition p2 = new Prohibition.Builder("prohibition", "super_u", new OperationSet("read"))
                 .build();
 
-        assertThrows(IllegalArgumentException.class,() -> mySQLProhibitions.update(prohibition.getName(), p));
-        assertThrows(IllegalArgumentException.class,() -> mySQLProhibitions.update(prohibition.getName(), p1));
-        assertThrows(PIPException.class,() -> mySQLProhibitions.update(prohibition.getName(), p2));
+        assertThrows(IllegalArgumentException.class,() -> prohibitions.update(prohibition.getName(), p));
+        assertThrows(IllegalArgumentException.class,() -> prohibitions.update(prohibition.getName(), p1));
+        assertThrows(PIPException.class,() -> prohibitions.update(prohibition.getName(), p2));
     }
 
     @Test
@@ -180,16 +173,16 @@ public class MySQLProhibitionsTest {
         Prohibition p = new Prohibition.Builder("new prohibition to be deleted", "new subject", new OperationSet("read"))
                 .build();
 
-        mySQLProhibitions.add(p);
-        int sizeTot = mySQLProhibitions.getAll().size();
-        mySQLProhibitions.delete(p.getName());
+        prohibitions.add(p);
+        int sizeTot = prohibitions.getAll().size();
+        prohibitions.delete(p.getName());
 
-        assertEquals(sizeTot-1, mySQLProhibitions.getAll().size());
+        assertEquals(sizeTot-1, prohibitions.getAll().size());
     }
 
     @Test
     void deleteException() throws PIPException {
-        assertThrows(PIPException.class, () -> mySQLProhibitions.delete("a prohibition that do not exist"));
+        assertThrows(PIPException.class, () -> prohibitions.delete("a prohibition that do not exist"));
     }
 
 }

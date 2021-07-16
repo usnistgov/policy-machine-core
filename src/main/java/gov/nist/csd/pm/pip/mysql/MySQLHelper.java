@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.graph.mysql;
+package gov.nist.csd.pm.pip.mysql;
 
 public class MySQLHelper {
 

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.prohibitions.mysql;
+package gov.nist.csd.pm.pip.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,9 +7,6 @@ import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLHelper;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -96,8 +93,7 @@ public class MySQLProhibitions implements Prohibitions {
     }
 
     public String getNodeNameFromNodeID(int id) throws PIPException {
-        MySQLConnection connection = new MySQLConnection();
-        MySQLGraph mySQLGraph = new MySQLGraph(connection);
+        MySQLGraph mySQLGraph = new MySQLGraph(conn);
         return mySQLGraph.getNodeNameFromId(id);
     }
 
@@ -138,7 +134,7 @@ public class MySQLProhibitions implements Prohibitions {
     }
 
     public int getTypeByNodeId (int node_id) throws PIPException {
-        MySQLGraph graph = new MySQLGraph(new MySQLConnection());
+        MySQLGraph graph = new MySQLGraph(conn);
 
         if (graph.exists(graph.getNodeNameFromId(node_id))) {
 

@@ -1,12 +1,14 @@
-package gov.nist.csd.pm.pip.prohibitions;
+package gov.nist.csd.pm.pip.mysql;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pip.memory.MemProhibitions;
+import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
+import gov.nist.csd.pm.pip.prohibitions.ProhibitionsSerializer;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.List;
 
-public class MemDBProhibitions implements Prohibitions{
+public class MemDBProhibitions implements Prohibitions {
 
     private Prohibitions prohibitions;
     private Prohibitions copy_prohibitions;

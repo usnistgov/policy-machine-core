@@ -1,15 +1,19 @@
-package gov.nist.csd.pm.pip.graph;
+package gov.nist.csd.pm.pip.mysql;
 
 import com.google.gson.Gson;
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
@@ -17,15 +21,34 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLGraphTest {
 
-
+    private Connection conn;
     private MySQLGraph graph;
 
     @BeforeEach
     void init() throws Exception {
-        MySQLConnection connection = new MySQLConnection();
+        // initialize database connection with h2 in memory database
+        conn = DriverManager.getConnection("jdbc:h2:~/policydb_core", "sa", "");
+
+        // load the policydb_core sql script
+        InputStream resourceAsStream = getClass().getResourceAsStream("/mysql/policydb_core.sql");
+        if (resourceAsStream == null) {
+            throw new Exception("could not read contents of policydb_core.sql");
+        }
+
+        // execute the sql script against the in memory database
+        String sql = new String(resourceAsStream.readAllBytes());
+        try(Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+        }
+
+        // create a new MySQLGraph with the connection
+        MySQLConnection connection = new MySQLConnection(conn.getMetaData().getURL(), "sa", "");
         this.graph = new MySQLGraph(connection);
-        this.graph.deleteAll();
-        this.graph = new MySQLGraph(connection);
+    }
+
+    @AfterEach
+    void cleanup() throws SQLException {
+        conn.close();
     }
 
     @Test
@@ -48,7 +71,7 @@ public class MySQLGraphTest {
         assertEquals(OA, node.getType());
     }
 
-    //@Test
+    @Test
     void testUpdateNode() throws PIPException {
         //We use the same method with the ID so we keep the exception
         // create another method getNode from id to retrieve the proper node before updating it with the proper values
