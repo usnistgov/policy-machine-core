@@ -76,6 +76,16 @@ public interface Decider {
      * @return a map of the users that have access to the target node and the permissions each have on it
      */
     Map<String, Set<String>> generateACL(String target, String process) throws PMException;
+
+    /**
+     * Return the policy classes the targets are assigned to and the permissions the subject has in each.
+     * @param subject the subject of the request.
+     * @param process the process if applicable.
+     * @param targets the target nodes.
+     * @return the policy classes the targets are assigned to and the permissions the subject has in each.
+     * @throws PMException
+     */
+    Map<String, Map<String, Set<String>>> getPolicyClassPermissions(String subject, String process, String ... targets) throws PMException;
 }
 
 

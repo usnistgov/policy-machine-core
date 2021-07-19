@@ -147,6 +147,26 @@ public class PReviewDecider implements Decider {
         return acl;
     }
 
+    @Override
+    public Map<String, Map<String, Set<String>>> getPolicyClassPermissions(String subject, String process, String... targets) throws PMException {
+        Map<String, Map<String, Set<String>>> pcPerms = new HashMap<>();
+
+        // traverse the user side of the graph to get the associations
+        UserContext userCtx = processUserDAG(subject, process);
+        if (userCtx.getBorderTargets().isEmpty()) {
+            return pcPerms;
+        }
+
+        for (String target : targets) {
+            // traverse the target side of the graph to get permissions per policy class
+            TargetContext targetCtx = processTargetDAG(target, userCtx);
+
+            pcPerms.put(target, targetCtx.getPcSet());
+        }
+
+        return pcPerms;
+    }
+
     private Set<String> resolvePermissions(UserContext userContext, TargetContext targetCtx, String target) {
         Set<String> allowed = resolveAllowedPermissions(targetCtx);
 
