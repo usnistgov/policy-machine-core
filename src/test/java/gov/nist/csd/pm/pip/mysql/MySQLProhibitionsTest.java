@@ -128,7 +128,6 @@ public class MySQLProhibitionsTest {
 
         prohibitions.add(prohibition);
         prohibitions.add(prohibition2);
-        System.out.println(prohibition.getSubject());
         assertEquals(2, prohibitions.getProhibitionsFor("subject").size());
 
     }
