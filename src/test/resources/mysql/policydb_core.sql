@@ -46,7 +46,7 @@ CREATE TABLE `association` (
                                `association_id` int NOT NULL AUTO_INCREMENT,
                                `start_node_id` int NOT NULL,
                                `end_node_id` int NOT NULL,
-                               `operation_set` json NOT NULL,
+                               `operation_set` varchar NOT NULL,
                                PRIMARY KEY (`association_id`),
                                CONSTRAINT `FK_end_node_id` FOREIGN KEY (`end_node_id`) REFERENCES `node` (`node_id`),
                                CONSTRAINT `FK_start_node_id` FOREIGN KEY (`start_node_id`) REFERENCES `node` (`node_id`)
@@ -70,7 +70,7 @@ CREATE TABLE `deny` (
                         `user_attribute_id` int DEFAULT NULL,
                         `process_id` varchar(60) DEFAULT NULL,
                         `is_intersection` int NOT NULL,
-                        `deny_operations` json NOT NULL,
+                        `deny_operations` varchar NOT NULL,
                         PRIMARY KEY (`deny_id`),
                         UNIQUE KEY `deny_name` (`deny_name`),
                         UNIQUE KEY `deny_type_id` (`deny_type_id`,`user_attribute_id`),

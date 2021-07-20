@@ -7,30 +7,42 @@ import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLProhibitionsTest {
 
-    private MySQLGraph graph;
     private MySQLProhibitions prohibitions;
 
     @BeforeEach
-    void setup() throws PMException {
-        /*DBConfigurationBuilder config = DBConfigurationBuilder.newBuilder();
-        config.setPort(0);
-        DB db = DB.newEmbeddedDB(config.build());
-        db.start();
-        db.source("mysql/policydb_core.sql", "policydb_core");
+    void setup() throws Exception {
+        // load the policydb_core sql script
+        InputStream resourceAsStream = getClass().getResourceAsStream("/mysql/policydb_core.sql");
+        if (resourceAsStream == null) {
+            throw new Exception("could not read contents of policydb_core.sql");
+        }
 
-        MySQLConnection connection = new MySQLConnection(config.getURL("policydb_core"));
+        // execute the sql script against the in memory database
+        String sql = new String(resourceAsStream.readAllBytes());
+        String[] split = sql.split(";");
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
+             Statement stmt = conn.createStatement()) {
+            for (String s : split) {
+                stmt.executeUpdate(s);
+            }
+        }
 
-        this.graph = new MySQLGraph(connection);
-        this.prohibitions = new MySQLProhibitions(connection);*/
+        // create a new MySQLGraph with the connection
+        MySQLConnection connection = new MySQLConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
+        this.prohibitions = new MySQLProhibitions(connection);
     }
 
     @Test
     void add() throws PIPException {
-
         Prohibition p1 = new Prohibition.Builder("prohibition 1", "super_u", new OperationSet("read"))
                 .setIntersection(false)
                 .addContainer("super_pc", true)

@@ -78,7 +78,6 @@ public class MySQLGraph implements Graph {
             nodes = all_nodes.stream()
                     .filter(node_k -> node_k.getId() == id)
                     .collect(Collectors.toList());
-            //nodes.forEach(System.out::println);
             if (nodes.size() >= 1) {
                 return nodes.get(0).getName();
             }
@@ -314,15 +313,7 @@ public class MySQLGraph implements Graph {
 
     @Override
     public void updateNode (String name, Map<String, String> properties) throws PIPException {
-        //method not stable
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("no name was provided when updating a node in the mysql graph");
-        }
-        else if (!exists(name)) {
-            throw new PIPException("graph", "node with the name "+ name+ "could not be found to update");
-        }
-
-        Node node = getNode(name);
+        throw new PIPException("not yet implemented");
     }
 
     public void updateNode(long id, String name, Map<String, String> properties) throws PIPException {
@@ -366,11 +357,6 @@ public class MySQLGraph implements Graph {
 
             ps.setString(1, name);
             ps.executeUpdate();
-            //TODO : Handle the case if no node got deleted
- /*         int i = ps.executeUpdate();
-            if (i == 0) {
-                throw new PMException("The node you want to delete does not exist");
-            }*/
         } catch (SQLException e) {
             throw new PIPException("graph", e.getMessage());
         }

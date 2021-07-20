@@ -67,25 +67,6 @@ public class MySQLGraphTest {
     }
 
     @Test
-    void testUpdateNode() throws PIPException {
-        //We use the same method with the ID so we keep the exception
-        // create another method getNode from id to retrieve the proper node before updating it with the proper values
-
-        Node node = graph.createPolicyClass("node PC 3", Node.toProperties("namespace", "test"));
-
-        // node not found
-        assertThrows(IllegalArgumentException.class, () -> graph.updateNode(123,"not an existing node", null));
-
-        // update name
-        graph.updateNode(node.getId(), "updated name 3", null);
-        assertEquals(graph.getNode(node.getName()).getName(), "updated name 3");
-
-        // update properties
-        graph.updateNode(node.getId(), "updated name 3", Node.toProperties("newKey", "newValue"));
-        assertEquals(graph.getNode(node.getName()).getProperties().get("newKey"), "newValue");
-    }
-
-    @Test
     void testDeleteNode() throws PIPException {
         Node node = graph.createPolicyClass("node test 4", Node.toProperties("namespace", "test"));
         graph.deleteNode(node.getName());
