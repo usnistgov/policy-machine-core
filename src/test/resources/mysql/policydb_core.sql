@@ -23,13 +23,13 @@ CREATE TABLE `node` (
                         `node_id` int NOT NULL AUTO_INCREMENT,
                         `node_type_id` int NOT NULL,
                         `name` varchar(60) DEFAULT NULL,
-                        `node_property` json DEFAULT NULL,
+                        `node_property` varchar DEFAULT NULL,
                         PRIMARY KEY (`node_id`),
                         UNIQUE KEY `name` (`name`),
                         CONSTRAINT `fk_node_type_id` FOREIGN KEY (`node_type_id`) REFERENCES `node_type` (`node_type_id`)
 );
 
-INSERT INTO `node` VALUES (1,5,'super_pc','{\"rep\": \"super_pc_rep\", \"namespace\": \"super\", \"default_oa\": \"super_pc_default_OA\", \"default_ua\": \"super_pc_default_UA\"}'),(2,2,'super_ua1','{\"namespace\": \"super\"}'),(3,3,'super','{\"namespace\": \"super\"}'),(4,2,'super_ua2','{\"namespace\": \"super\"}'),(5,1,'super_oa','{\"namespace\": \"super\"}'),(6,2,'super_pc_default_UA','{\"namespace\": \"super_pc\"}'),(7,1,'super_pc_default_OA','{\"namespace\": \"super_pc\"}'),(8,1,'super_pc_rep','{\"pc\": \"super_pc\", \"namespace\": \"super_pc\"}'),(9,4,'super_o','{\"namespace\": \"super\"}');
+INSERT INTO `node` VALUES (1,5,'super_pc','{"rep": "super_pc_rep", "namespace": "super", "default_oa": "super_pc_default_OA", "default_ua": "super_pc_default_UA"}'),(2,2,'super_ua1','{"namespace": "super"}'),(3,3,'super','{"namespace": "super"}'),(4,2,'super_ua2','{"namespace": "super"}'),(5,1,'super_oa','{"namespace": "super"}'),(6,2,'super_pc_default_UA','{"namespace": "super_pc"}'),(7,1,'super_pc_default_OA','{"namespace": "super_pc"}'),(8,1,'super_pc_rep','{"pc": "super_pc", "namespace": "super_pc"}'),(9,4,'super_o','{"namespace": "super"}');
 
 CREATE TABLE `assignment` (
                               `assignment_id` int NOT NULL AUTO_INCREMENT,
@@ -52,7 +52,7 @@ CREATE TABLE `association` (
                                CONSTRAINT `FK_start_node_id` FOREIGN KEY (`start_node_id`) REFERENCES `node` (`node_id`)
 );
 
-INSERT INTO `association` VALUES (1,2,5,'[\"*\"]'),(2,2,6,'[\"*\"]'),(3,2,7,'[\"*\"]'),(4,2,4,'[\"*\"]'),(5,4,2,'[\"*\"]');
+INSERT INTO `association` VALUES (1,2,5,'["*"]'),(2,2,6,'["*"]'),(3,2,7,'["*"]'),(4,2,4,'["*"]'),(5,4,2,'["*"]');
 
 CREATE TABLE `deny_type` (
                              `deny_type_id` int NOT NULL,

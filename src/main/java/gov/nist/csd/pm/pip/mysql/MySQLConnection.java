@@ -28,6 +28,7 @@ public class MySQLConnection {
     private String user;
     private String pass;
 
+
     public MySQLConnection(String url, String user, String pass) {
         this.url = url;
         this.user = user;

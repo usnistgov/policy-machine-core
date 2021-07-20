@@ -36,7 +36,6 @@ public class MySQLGraph implements Graph {
         nodeType.put((long) 3, "U");
         nodeType.put((long) 4, "O");
         nodeType.put((long) 5, "PC");
-        nodeType.put((long) 6, "OS");
         return nodeType;
     }
 
@@ -91,7 +90,6 @@ public class MySQLGraph implements Graph {
 
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PIPException {
-
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a policy class in the mysql graph");
         }

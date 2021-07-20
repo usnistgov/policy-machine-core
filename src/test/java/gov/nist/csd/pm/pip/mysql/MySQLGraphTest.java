@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLGraphTest {
 
-    private Connection conn;
     private MySQLGraph graph;
 
     @BeforeEach
@@ -45,11 +44,6 @@ public class MySQLGraphTest {
         // create a new MySQLGraph with the connection
         MySQLConnection connection = new MySQLConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
         this.graph = new MySQLGraph(connection);
-    }
-
-    @AfterEach
-    void cleanup() throws SQLException {
-        conn.close();
     }
 
     @Test
