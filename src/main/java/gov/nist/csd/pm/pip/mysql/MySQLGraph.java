@@ -995,19 +995,7 @@ public class MySQLGraph implements Graph {
     public String toJson() throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        Collection<Node> nodes = this.getNodes().stream().filter(
-                node -> !node.getName().equalsIgnoreCase("super_pc")
-                        && !node.getName().equalsIgnoreCase("super_ua1")
-                        && !node.getName().equalsIgnoreCase("super_ua2")
-                        && !node.getName().equalsIgnoreCase("super_oa")
-                        && !node.getName().equalsIgnoreCase("super")
-                        && !node.getName().equalsIgnoreCase("super_pc_default_UA")
-                        && !node.getName().equalsIgnoreCase("super_pc_default_OA")
-                        && !node.getName().equalsIgnoreCase("super_pc_rep")
-                        && !node.getName().contains("_default_UA")
-                        && !node.getName().contains("_default_OA")
-                        && !node.getName().contains("_rep"))
-                .collect(Collectors.toList());
+        Set<Node> nodes = getNodes();
         HashSet<String[]> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
 
@@ -1036,16 +1024,7 @@ public class MySQLGraph implements Graph {
     @Override
     public void fromJson(String json) throws PMException {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
-        Collection<Node> nodes = jsonGraph.getNodes().stream().filter(
-                node -> !node.getName().equalsIgnoreCase("super_pc")
-                        && !node.getName().equalsIgnoreCase("super_ua1")
-                        && !node.getName().equalsIgnoreCase("super_ua2")
-                        && !node.getName().equalsIgnoreCase("super_oa")
-                        && !node.getName().equalsIgnoreCase("super")
-                        && !node.getName().equalsIgnoreCase("super_pc_default_UA")
-                        && !node.getName().equalsIgnoreCase("super_pc_default_OA")
-                        && !node.getName().equalsIgnoreCase("super_pc_rep"))
-                .collect(Collectors.toList());
+        Set<Node> nodes = getNodes();
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
                 //GraphAdmin graphAdmin = new GraphAdmin(this);
