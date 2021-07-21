@@ -452,23 +452,10 @@ public class MemGraph implements Graph {
     public synchronized String toJson() throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        Collection<Node> nodes = this.getNodes().stream().filter(
-                node -> !node.getName().equalsIgnoreCase("super_pc")
-                        && !node.getName().equalsIgnoreCase("super_ua1")
-                        && !node.getName().equalsIgnoreCase("super_ua2")
-                        && !node.getName().equalsIgnoreCase("super_oa")
-                        && !node.getName().equalsIgnoreCase("super")
-                        && !node.getName().equalsIgnoreCase("super_pc_default_UA")
-                        && !node.getName().equalsIgnoreCase("super_pc_default_OA")
-                        && !node.getName().equalsIgnoreCase("super_pc_rep")
-                        && !node.getName().contains("_default_UA")
-                        && !node.getName().contains("_default_OA")
-                        && !node.getName().contains("_rep"))
-                .collect(Collectors.toList());
+        Set<Node> nodes = this.getNodes();
         HashSet<String[]> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
-
             Set<String> parents = this.getParents(node.getName());
 
             for (String parent : parents) {
@@ -489,81 +476,67 @@ public class MemGraph implements Graph {
 
     @Override
     public synchronized void fromJson(String json) throws PMException {
-            JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
-
-            Collection<Node> nodes = jsonGraph.getNodes().stream().filter(
-                    node -> !node.getName().equalsIgnoreCase("super_pc")
-                            && !node.getName().equalsIgnoreCase("super_ua1")
-                            && !node.getName().equalsIgnoreCase("super_ua2")
-                            && !node.getName().equalsIgnoreCase("super_oa")
-                            && !node.getName().equalsIgnoreCase("super")
-                            && !node.getName().equalsIgnoreCase("super_pc_default_UA")
-                            && !node.getName().equalsIgnoreCase("super_pc_default_OA")
-                            && !node.getName().equalsIgnoreCase("super_pc_rep"))
-                    .collect(Collectors.toList());
-            for (Node node : nodes) {
-                if (node.getType().equals(PC)) {
-                    //use createpolicyClass from GraphService/ GraphAdmin instead of the class method
-                    this.createPolicyClass(node.getName(), node.getProperties());
-                } else {
-                /*this.graph.addVertex(node.getName());
-                this.nodes.put(node.getName(), node);*/
-                    this.createNode(node.getName(), node.getType(), node.getProperties());
-                }
-            }
-
-            List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
-            for (String[] assignment : assignments) {
-                if (assignment.length != 2) {
-                    throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
-                }
-
-                String source = assignment[0];
-                String target = assignment[1];
-
-                this.assign(source, target);
-            }
-
-            Set<JsonAssociation> associations = jsonGraph.getAssociations();
-            for (JsonAssociation association : associations) {
-                String ua = association.getSource();
-                String target = association.getTarget();
-                this.associate(ua, target, new OperationSet(association.getOperations()));
+        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+        Collection<Node> nodes = jsonGraph.getNodes();
+        for (Node node : nodes) {
+            if (node.getType().equals(PC)) {
+                this.createPolicyClass(node.getName(), node.getProperties());
+            } else {
+                this.createNode(node.getName(), node.getType(), node.getProperties());
             }
         }
 
-        public void fromJson_with_config (String json) throws PMException {
-            JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
-
-            Collection<Node> nodes = jsonGraph.getNodes();
-            for (Node node : nodes) {
-                if (node.getType().equals(PC)) {
-                    this.createPolicyClass(node.getName(), node.getProperties());
-                } else {
-                    this.createNode(node.getName(), node.getType(), node.getProperties());
-                }
+        List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
+        for (String[] assignment : assignments) {
+            if (assignment.length != 2) {
+                throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
             }
 
-            List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
-            for (String[] assignment : assignments) {
-                if (assignment.length != 2) {
-                    throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
-                }
+            String source = assignment[0];
+            String target = assignment[1];
 
-                String source = assignment[0];
-                String target = assignment[1];
+            this.assign(source, target);
+        }
 
-                this.assign(source, target);
-            }
+        Set<JsonAssociation> associations = jsonGraph.getAssociations();
+        for (JsonAssociation association : associations) {
+            String ua = association.getSource();
+            String target = association.getTarget();
+            this.associate(ua, target, new OperationSet(association.getOperations()));
+        }
+    }
 
-            Set<JsonAssociation> associations = jsonGraph.getAssociations();
-            for (JsonAssociation association : associations) {
-                String ua = association.getSource();
-                String target = association.getTarget();
-                this.associate(ua, target, new OperationSet(association.getOperations()));
+    public void fromJson_with_config (String json) throws PMException {
+        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+
+        Collection<Node> nodes = jsonGraph.getNodes();
+        for (Node node : nodes) {
+            if (node.getType().equals(PC)) {
+                this.createPolicyClass(node.getName(), node.getProperties());
+            } else {
+                this.createNode(node.getName(), node.getType(), node.getProperties());
             }
         }
 
+        List<String[]> assignments = new ArrayList<>(jsonGraph.getAssignments());
+        for (String[] assignment : assignments) {
+            if (assignment.length != 2) {
+                throw new PMException("invalid assignment (format=[child, parent]): " + Arrays.toString(assignment));
+            }
+
+            String source = assignment[0];
+            String target = assignment[1];
+
+            this.assign(source, target);
+        }
+
+        Set<JsonAssociation> associations = jsonGraph.getAssociations();
+        for (JsonAssociation association : associations) {
+            String ua = association.getSource();
+            String target = association.getTarget();
+            this.associate(ua, target, new OperationSet(association.getOperations()));
+        }
+    }
 
     private static class JsonGraph {
         Collection<Node> nodes;
