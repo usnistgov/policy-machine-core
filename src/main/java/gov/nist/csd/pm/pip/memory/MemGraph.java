@@ -452,7 +452,7 @@ public class MemGraph implements Graph {
     public synchronized String toJson() throws PMException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        Set<Node> nodes = getNodes();
+        Set<Node> nodes = this.getNodes();
         HashSet<String[]> jsonAssignments = new HashSet<>();
         HashSet<JsonAssociation> jsonAssociations = new HashSet<>();
         for (Node node : nodes) {
@@ -477,8 +477,7 @@ public class MemGraph implements Graph {
     @Override
     public synchronized void fromJson(String json) throws PMException {
         JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
-        Set<Node> nodes = getNodes();
-
+        Collection<Node> nodes = jsonGraph.getNodes();
         for (Node node : nodes) {
             if (node.getType().equals(PC)) {
                 this.createPolicyClass(node.getName(), node.getProperties());
