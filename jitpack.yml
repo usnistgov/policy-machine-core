@@ -1,2 +1,3 @@
-jdk:
-  - openjdk16
+before_install:
+  - sdk install java -version 16.ea.21-open
+  - sdk use java -version 16.ea.21-open
