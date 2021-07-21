@@ -194,12 +194,7 @@ public class MemGraph implements Graph {
 
     @Override
     public synchronized Set<Node> getNodes() {
-        Collection<Node> nodes = this.nodes.values();
-        Set<Node> nodeSet = new HashSet<>();
-        for (Node node : nodes) {
-            nodeSet.add(new Node(node));
-        }
-        return nodeSet;
+        return this.nodes.values().stream().map(Node::new).collect(Collectors.toSet());
     }
 
     /**

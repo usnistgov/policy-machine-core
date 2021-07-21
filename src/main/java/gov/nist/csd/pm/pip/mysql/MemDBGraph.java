@@ -1,16 +1,16 @@
-package gov.nist.csd.pm.pip.graph;
+package gov.nist.csd.pm.pip.mysql;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
+import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
 import gov.nist.csd.pm.pip.memory.MemGraph;
 
 import java.util.Map;
 import java.util.Set;
 
-public class MemDBGraph implements Graph{
+public class MemDBGraph implements Graph {
 
     private Graph graph;
     private Graph copy_mem_graph;

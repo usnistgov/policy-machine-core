@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pip.graph.mysql;
+package gov.nist.csd.pm.pip.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,6 @@ import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.GraphAdmin;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -37,7 +36,6 @@ public class MySQLGraph implements Graph {
         nodeType.put((long) 3, "U");
         nodeType.put((long) 4, "O");
         nodeType.put((long) 5, "PC");
-        nodeType.put((long) 6, "OS");
         return nodeType;
     }
 
@@ -80,7 +78,6 @@ public class MySQLGraph implements Graph {
             nodes = all_nodes.stream()
                     .filter(node_k -> node_k.getId() == id)
                     .collect(Collectors.toList());
-            //nodes.forEach(System.out::println);
             if (nodes.size() >= 1) {
                 return nodes.get(0).getName();
             }
@@ -92,7 +89,6 @@ public class MySQLGraph implements Graph {
 
     @Override
     public Node createPolicyClass(String name, Map<String, String> properties) throws PIPException {
-
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("no name was provided when creating a policy class in the mysql graph");
         }
@@ -317,15 +313,7 @@ public class MySQLGraph implements Graph {
 
     @Override
     public void updateNode (String name, Map<String, String> properties) throws PIPException {
-        //method not stable
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("no name was provided when updating a node in the mysql graph");
-        }
-        else if (!exists(name)) {
-            throw new PIPException("graph", "node with the name "+ name+ "could not be found to update");
-        }
-
-        Node node = getNode(name);
+        throw new PIPException("not yet implemented");
     }
 
     public void updateNode(long id, String name, Map<String, String> properties) throws PIPException {
@@ -369,11 +357,6 @@ public class MySQLGraph implements Graph {
 
             ps.setString(1, name);
             ps.executeUpdate();
-            //TODO : Handle the case if no node got deleted
- /*         int i = ps.executeUpdate();
-            if (i == 0) {
-                throw new PMException("The node you want to delete does not exist");
-            }*/
         } catch (SQLException e) {
             throw new PIPException("graph", e.getMessage());
         }
@@ -388,8 +371,9 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public boolean exists(String name) throws PIPException {
-        try (            Connection con = this.conn.getConnection();
-                         PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_ID_NAME_FROM_NODE)
+        try (
+                Connection con = this.conn.getConnection();
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.SELECT_NODE_ID_NAME_FROM_NODE)
         ){
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
@@ -433,7 +417,7 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public Set<Node> getNodes() throws PIPException {
-        Node node = null;
+        Node node;
         Set<Node> nodes = new HashSet<>();
         HashMap<Long, String> nodeType = getNodeType();
 
@@ -522,7 +506,7 @@ public class MySQLGraph implements Graph {
         }
     }
 
-        /**
+    /**
      * Search the graph for nodes matching the given parameters. A node must
      * contain all properties provided to be returned.
      * To get all the nodes that have a specific property key with any value use "*" as the value in the parameter.
@@ -1051,7 +1035,7 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public void fromJson(String json) throws PMException {
-       JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
+        JsonGraph jsonGraph = new Gson().fromJson(json, JsonGraph.class);
         Collection<Node> nodes = jsonGraph.getNodes().stream().filter(
                 node -> !node.getName().equalsIgnoreCase("super_pc")
                         && !node.getName().equalsIgnoreCase("super_ua1")

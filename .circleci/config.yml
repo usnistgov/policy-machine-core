@@ -5,11 +5,7 @@ jobs:
     working_directory: ~/policy-machine-core
 
     docker:
-      - image: circleci/openjdk:8-jdk-stretch
-      - image: pmmaster1docker/policydb:latest
-        auth:
-         username: ${USERNAME}
-         password: ${PASSWORD}
+      - image: cimg/openjdk:16.0.1
         
     steps:
       - checkout # check out source code to working directory

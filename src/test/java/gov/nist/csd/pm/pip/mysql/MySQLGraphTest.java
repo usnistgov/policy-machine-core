@@ -1,15 +1,19 @@
-package gov.nist.csd.pm.pip.graph;
+package gov.nist.csd.pm.pip.mysql;
 
 import com.google.gson.Gson;
 import gov.nist.csd.pm.exceptions.PIPException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLConnection;
-import gov.nist.csd.pm.pip.graph.mysql.MySQLGraph;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
@@ -17,20 +21,33 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLGraphTest {
 
-
     private MySQLGraph graph;
 
     @BeforeEach
     void init() throws Exception {
-        MySQLConnection connection = new MySQLConnection();
-        this.graph = new MySQLGraph(connection);
-        this.graph.deleteAll();
+        // load the policydb_core sql script
+        InputStream resourceAsStream = getClass().getResourceAsStream("/mysql/policydb_core.sql");
+        if (resourceAsStream == null) {
+            throw new Exception("could not read contents of policydb_core.sql");
+        }
+
+        // execute the sql script against the in memory database
+        String sql = new String(resourceAsStream.readAllBytes());
+        String[] split = sql.split(";");
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
+             Statement stmt = conn.createStatement()) {
+            for (String s : split) {
+                stmt.executeUpdate(s);
+            }
+        }
+
+        // create a new MySQLGraph with the connection
+        MySQLConnection connection = new MySQLConnection("jdbc:h2:~/policydb_core;MODE=MySQL", "sa", "");
         this.graph = new MySQLGraph(connection);
     }
 
     @Test
     void testCreateNode() throws PIPException {
-
         Node pc = graph.createPolicyClass( "pc1", null);
         assertTrue(graph.getPolicyClasses().contains(pc.getName()));
 
@@ -47,25 +64,6 @@ public class MySQLGraphTest {
         node = graph.getNode(node.getName());
         assertEquals("oa2", node.getName());
         assertEquals(OA, node.getType());
-    }
-
-    //@Test
-    void testUpdateNode() throws PIPException {
-        //We use the same method with the ID so we keep the exception
-        // create another method getNode from id to retrieve the proper node before updating it with the proper values
-
-        Node node = graph.createPolicyClass("node PC 3", Node.toProperties("namespace", "test"));
-
-        // node not found
-        assertThrows(IllegalArgumentException.class, () -> graph.updateNode(123,"not an existing node", null));
-
-        // update name
-        graph.updateNode(node.getId(), "updated name 3", null);
-        assertEquals(graph.getNode(node.getName()).getName(), "updated name 3");
-
-        // update properties
-        graph.updateNode(node.getId(), "updated name 3", Node.toProperties("newKey", "newValue"));
-        assertEquals(graph.getNode(node.getName()).getProperties().get("newKey"), "newValue");
     }
 
     @Test
@@ -244,8 +242,8 @@ public class MySQLGraphTest {
         graph.createNode("oa 35", OA, Node.toProperties("specific key 1", "specific value 1"), "pc 33");
 
         Map<String, String> map = new HashMap<>();
-                            map.put("specific key 1", "specific value 1");
-                            map.put("specific key 2", "specific value 2");
+        map.put("specific key 1", "specific value 1");
+        map.put("specific key 2", "specific value 2");
         graph.createNode("oa 36", OA, map, "pc 33");
 
         // complete search
@@ -294,59 +292,59 @@ public class MySQLGraphTest {
 
     String json = "{" +
             "\"nodes\": [" +
-                    "{" +
-                        "\"name\": \"sample PC\", " +
-                        "\"type\": \"PC\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_sample\"\n" +
-                        "}" +
-                    "}," +
-                    "{" +
-                        "\"name\": \"sample UA\", " +
-                        "\"type\": \"UA\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_ua\"\n" +
-                        "}" +
-                    "}," +
-                    "{" +
-                        "\"name\": \"sample OA\", " +
-                        "\"type\": \"OA\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_oa\"\n" +
-                        "}" +
-                    "}," +
-                    "{" +
-                        "\"name\": \"sample UA2\", " +
-                        "\"type\": \"UA\", " +
-                        "\"properties\": {" +
-                        "\"namespace\": \"super_ua2\"\n" +
-                        "}" +
-                    "}" +
+            "{" +
+            "\"name\": \"sample PC\", " +
+            "\"type\": \"PC\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_sample\"\n" +
+            "}" +
+            "}," +
+            "{" +
+            "\"name\": \"sample UA\", " +
+            "\"type\": \"UA\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_ua\"\n" +
+            "}" +
+            "}," +
+            "{" +
+            "\"name\": \"sample OA\", " +
+            "\"type\": \"OA\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_oa\"\n" +
+            "}" +
+            "}," +
+            "{" +
+            "\"name\": \"sample UA2\", " +
+            "\"type\": \"UA\", " +
+            "\"properties\": {" +
+            "\"namespace\": \"super_ua2\"\n" +
+            "}" +
+            "}" +
             "]," +
             "\"assignments\": [" +
-                    "[" +
-                        "\"sample UA\"," +
-                        "\"sample PC\"" +
-                    "]," +
-                    "[" +
-                        "\"sample OA\"," +
-                        "\"sample PC\"" +
-                    "]," +
-                    "[" +
-                        "\"sample UA2\"," +
-                        "\"sample PC\"" +
-                    "]" +
+            "[" +
+            "\"sample UA\"," +
+            "\"sample PC\"" +
+            "]," +
+            "[" +
+            "\"sample OA\"," +
+            "\"sample PC\"" +
+            "]," +
+            "[" +
+            "\"sample UA2\"," +
+            "\"sample PC\"" +
+            "]" +
             "]," +
             "\"associations\": [" +
-                    "{" +
-                        "\"source\": \"sample UA\"," +
-                        "\"target\": \"sample UA2\", " +
-                        "\"operations\": [" +
-                        "\"*\"" +
-                        "]" +
-                    "}" +
+            "{" +
+            "\"source\": \"sample UA\"," +
+            "\"target\": \"sample UA2\", " +
+            "\"operations\": [" +
+            "\"*\"" +
             "]" +
-    "}";
+            "}" +
+            "]" +
+            "}";
     @Test
     void testToJson() throws PMException {
         graph.createPolicyClass("pc1", null);
