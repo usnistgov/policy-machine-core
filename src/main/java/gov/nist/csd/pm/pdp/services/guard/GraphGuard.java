@@ -5,7 +5,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 
@@ -20,7 +20,7 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;
 
 public class GraphGuard extends Guard {
 
-    public GraphGuard(FunctionalEntity pap, Decider decider) {
+    public GraphGuard(PolicyStore pap, Decider decider) {
         super(pap, decider);
     }
 

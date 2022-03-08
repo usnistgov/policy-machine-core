@@ -6,7 +6,7 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.Arrays;
@@ -19,11 +19,11 @@ import static gov.nist.csd.pm.pip.graph.model.nodes.Properties.REP_PROPERTY;
 
 public class Guard {
 
-    protected FunctionalEntity pap;
+    protected PolicyStore pap;
     protected Decider decider;
     private OperationSet resourceOps;
 
-    public Guard(FunctionalEntity pap, Decider decider) {
+    public Guard(PolicyStore pap, Decider decider) {
         this.pap = pap;
         this.decider = decider;
     }

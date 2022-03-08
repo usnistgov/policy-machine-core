@@ -7,26 +7,25 @@ import gov.nist.csd.pm.pap.MemPAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
 import gov.nist.csd.pm.pdp.decider.PReviewDecider;
-import gov.nist.csd.pm.pdp.services.GraphService;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
 import gov.nist.csd.pm.pip.memory.MemObligations;
-import gov.nist.csd.pm.pip.memory.MemPIP;
+import gov.nist.csd.pm.pip.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pip.memory.MemProhibitions;
 
 class TestUtil {
     static TestContext getTestCtx() throws PMException {
         OperationSet ops = new OperationSet("read", "write", "execute");
-        FunctionalEntity functionalEntity = new MemPIP(new MemGraph(), new MemProhibitions(), new MemObligations());
+        PolicyStore policyStore = new MemoryPolicyStore();
         PDP pdp = PDP.newPDP(
-                new MemPAP(functionalEntity),
+                new MemPAP(policyStore),
                 new EPPOptions(),
-                new PReviewDecider(functionalEntity.getGraph(), functionalEntity.getProhibitions(), ops),
-                new PReviewAuditor(functionalEntity.getGraph(), ops)
+                new PReviewDecider(policyStore.getGraph(), policyStore.getProhibitions(), ops),
+                new PReviewAuditor(policyStore.getGraph(), ops)
         );
         Graph graph = pdp.withUser(new UserContext("super")).getGraph();
         Node pc1 = graph.createPolicyClass("pc1", null);

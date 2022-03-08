@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
@@ -11,7 +11,7 @@ public class ProhibitionsAdmin implements Prohibitions {
 
     private Prohibitions prohibitions;
 
-    public ProhibitionsAdmin(FunctionalEntity pip) throws PMException {
+    public ProhibitionsAdmin(PolicyStore pip) throws PMException {
         this.prohibitions = pip.getProhibitions();
     }
 

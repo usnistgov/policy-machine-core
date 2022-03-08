@@ -2,11 +2,9 @@ package gov.nist.csd.pm.pip.memory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import gov.nist.csd.pm.common.FunctionalEntity;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 
-import gov.nist.csd.pm.pap.GraphAdmin;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
@@ -17,10 +15,6 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.PC;

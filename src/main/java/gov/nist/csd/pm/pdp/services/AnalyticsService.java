@@ -6,7 +6,7 @@ import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.audit.model.Explain;
 import gov.nist.csd.pm.pdp.decider.Decider;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 
 import java.util.*;
@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class AnalyticsService extends Service {
 
-    public AnalyticsService(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
+    public AnalyticsService(UserContext userCtx, PolicyStore pap, EPP epp, Decider decider, Auditor auditor) {
         super(userCtx, pap, epp, decider, auditor);
     }
 

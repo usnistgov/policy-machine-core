@@ -5,11 +5,8 @@ import gov.nist.csd.pm.epp.functions.FunctionExecutor;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.FunctionalEntity;
-import gov.nist.csd.pm.pip.obligations.model.*;
+import gov.nist.csd.pm.common.PolicyStore;
 
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.obligations.model.Obligation;
 import gov.nist.csd.pm.pip.obligations.model.ResponsePattern;
 import gov.nist.csd.pm.pip.obligations.model.Rule;
@@ -18,11 +15,11 @@ import java.util.List;
 
 public class EPP {
 
-    private FunctionalEntity pap;
+    private PolicyStore pap;
     private PDP pdp;
     private FunctionEvaluator functionEvaluator;
 
-    public EPP(FunctionalEntity pap, PDP pdp, EPPOptions eppOptions) throws PMException {
+    public EPP(PolicyStore pap, PDP pdp, EPPOptions eppOptions) throws PMException {
         this.pap = pap;
         this.pdp = pdp;
         this.functionEvaluator = new FunctionEvaluator();

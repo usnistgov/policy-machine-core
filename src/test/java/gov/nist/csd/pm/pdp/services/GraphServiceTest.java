@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp.services;
 
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
 import gov.nist.csd.pm.pap.MemPAP;
@@ -10,7 +11,7 @@ import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.graph.model.nodes.Node;
 import gov.nist.csd.pm.pip.memory.MemObligations;
-import gov.nist.csd.pm.pip.memory.MemPIP;
+import gov.nist.csd.pm.pip.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pip.memory.MemProhibitions;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import org.junit.jupiter.api.Test;
@@ -22,15 +23,14 @@ class GraphServiceTest {
 
     @Test
     void testPolicyClassReps() throws PMException {
-        Graph graph = new MemGraph();
-        Prohibitions prohibitions = new MemProhibitions();
         OperationSet ops = new OperationSet("read", "write", "execute");
+        PolicyStore policyStore = new MemoryPolicyStore();
         PDP pdp = PDP.newPDP(
-                new MemPAP(new MemPIP(graph, prohibitions, new MemObligations())),
+                new MemPAP(policyStore),
                 null,
-                new PReviewDecider(graph, prohibitions, ops),
-                new PReviewAuditor(graph, ops));
-        graph = pdp.withUser(new UserContext("super")).getGraph();
+                new PReviewDecider(policyStore.getGraph(), policyStore.getProhibitions(), ops),
+                new PReviewAuditor(policyStore.getGraph(), ops));
+        Graph graph = pdp.withUser(new UserContext("super")).getGraph();
 
         Node test = graph.createPolicyClass("test", null);
         String defUA = test.getProperties().get("default_ua");

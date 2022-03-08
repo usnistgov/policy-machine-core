@@ -4,14 +4,14 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 
 import static gov.nist.csd.pm.operations.Operations.*;
 import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_OA;
 
 public class ObligationsGuard extends Guard {
 
-    public ObligationsGuard(FunctionalEntity pap, Decider decider) {
+    public ObligationsGuard(PolicyStore pap, Decider decider) {
         super(pap, decider);
     }
 

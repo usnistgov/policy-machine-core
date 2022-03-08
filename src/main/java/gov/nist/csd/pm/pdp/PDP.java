@@ -6,12 +6,10 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.*;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.memory.tx.MemTx;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.services.*;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.common.tx.TxRunner;
@@ -25,7 +23,7 @@ public class PDP {
      *
      * @return the new PDP instance
      */
-    public static PDP newPDP(FunctionalEntity pap, EPPOptions eppOptions, Decider decider, Auditor auditor) throws PMException {
+    public static PDP newPDP(PolicyStore pap, EPPOptions eppOptions, Decider decider, Auditor auditor) throws PMException {
         // create PDP
         PDP pdp = new PDP(pap, decider, auditor);
         // create the EPP
@@ -37,7 +35,7 @@ public class PDP {
         return pdp;
     }
 
-    private final FunctionalEntity pap;
+    private final PolicyStore pap;
     private EPP epp;
     private Decider decider;
     private Auditor auditor;
@@ -50,7 +48,7 @@ public class PDP {
      * @param pap the Policy Administration Point that the PDP will use to change the graph.
      * @throws PMException if there is an error initializing the EPP.
      */
-    private PDP(FunctionalEntity pap, Decider decider, Auditor auditor) throws PMException {
+    private PDP(PolicyStore pap, Decider decider, Auditor auditor) throws PMException {
         this.pap = pap;
         this.decider = decider;
         this.auditor = auditor;
@@ -98,17 +96,17 @@ public class PDP {
         return new WithUser(userCtx, pap, epp, decider, auditor);
     }
 
-    public static class WithUser implements FunctionalEntity {
+    public static class WithUser implements PolicyStore {
 
         private UserContext userCtx;
-        private FunctionalEntity pap;
+        private PolicyStore pap;
         private EPP epp;
         private Decider decider;
         private Auditor auditor;
         private AnalyticsService    analyticsService;
 
 
-        public WithUser(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
+        public WithUser(UserContext userCtx, PolicyStore pap, EPP epp, Decider decider, Auditor auditor) {
             this.userCtx = userCtx;
             this.pap = pap;
             this.epp = epp;
@@ -116,7 +114,7 @@ public class PDP {
             this.auditor = auditor;
         }
 
-        public WithUser(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor, AnalyticsService analyticsService) {
+        public WithUser(UserContext userCtx, PolicyStore pap, EPP epp, Decider decider, Auditor auditor, AnalyticsService analyticsService) {
             this.userCtx = userCtx;
             this.pap = pap;
             this.epp = epp;

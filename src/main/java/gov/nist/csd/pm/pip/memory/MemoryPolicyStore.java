@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pip.memory;
 
 import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
@@ -9,16 +9,16 @@ import gov.nist.csd.pm.common.tx.Tx;
 import gov.nist.csd.pm.common.tx.TxRunner;
 import gov.nist.csd.pm.pip.memory.tx.MemTx;
 
-public class MemPIP implements FunctionalEntity {
+public class MemoryPolicyStore implements PolicyStore {
 
     private final Graph graph;
     private final Prohibitions prohibitions;
     private final Obligations obligations;
 
-    public MemPIP(Graph graph, Prohibitions prohibitions, Obligations obligations) {
-        this.graph = graph;
-        this.prohibitions = prohibitions;
-        this.obligations = obligations;
+    public MemoryPolicyStore() {
+        this.graph = new MemGraph();
+        this.prohibitions = new MemProhibitions();
+        this.obligations = new MemObligations();
     }
 
     @Override

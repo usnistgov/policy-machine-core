@@ -2,15 +2,9 @@ package gov.nist.csd.pm.common.tx.memory;
 
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.MemPAP;
-import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
-import gov.nist.csd.pm.pdp.decider.PReviewDecider;
-import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.memory.MemObligations;
-import gov.nist.csd.pm.pip.memory.MemPIP;
 import gov.nist.csd.pm.pip.memory.tx.MemTx;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.memory.MemProhibitions;

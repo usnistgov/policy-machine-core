@@ -5,7 +5,7 @@ import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.audit.Auditor;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pap.policies.SuperPolicy;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
@@ -15,7 +15,7 @@ import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
  */
 public class Service {
 
-    private FunctionalEntity pap;
+    private PolicyStore pap;
     private EPP epp;
     SuperPolicy superPolicy;
     UserContext userCtx;
@@ -27,7 +27,7 @@ public class Service {
      * @param pap the Policy Administration Point
      * @param epp the Event Processing Point
      */
-    Service(UserContext userCtx, FunctionalEntity pap, EPP epp, Decider decider, Auditor auditor) {
+    Service(UserContext userCtx, PolicyStore pap, EPP epp, Decider decider, Auditor auditor) {
         this.userCtx = userCtx;
         this.pap = pap;
         this.epp = epp;
@@ -49,7 +49,7 @@ public class Service {
         return this.epp;
     }
 
-    FunctionalEntity getPAP() {
+    PolicyStore getPAP() {
         return this.pap;
     }
 

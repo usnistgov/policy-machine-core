@@ -4,7 +4,7 @@ import gov.nist.csd.pm.exceptions.PMAuthorizationException;
 import gov.nist.csd.pm.exceptions.PMException;
 import gov.nist.csd.pm.pdp.decider.Decider;
 import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.FunctionalEntity;
+import gov.nist.csd.pm.common.PolicyStore;
 import gov.nist.csd.pm.pip.prohibitions.model.Prohibition;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import static gov.nist.csd.pm.operations.Operations.*;
 
 public class ProhibitionsGuard extends Guard {
 
-    public ProhibitionsGuard(FunctionalEntity pap, Decider decider) {
+    public ProhibitionsGuard(PolicyStore pap, Decider decider) {
         super(pap, decider);
     }
 

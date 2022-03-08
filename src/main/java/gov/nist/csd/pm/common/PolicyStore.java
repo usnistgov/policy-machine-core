@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pip.obligations.Obligations;
 import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
 import gov.nist.csd.pm.common.tx.TxRunner;
 
-public interface FunctionalEntity {
+public interface PolicyStore {
 
     Graph getGraph() throws PMException;
 

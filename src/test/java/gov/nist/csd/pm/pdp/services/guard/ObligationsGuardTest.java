@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pdp.services.UserContext;
 import gov.nist.csd.pm.pip.graph.Graph;
 import gov.nist.csd.pm.pip.memory.MemGraph;
 import gov.nist.csd.pm.pip.memory.MemObligations;
-import gov.nist.csd.pm.pip.memory.MemPIP;
+import gov.nist.csd.pm.pip.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pip.memory.MemProhibitions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +27,7 @@ class ObligationsGuardTest {
 
     @BeforeEach
     void setUp() throws PMException {
-        MemPAP pap = new MemPAP(new MemPIP(new MemGraph(), new MemProhibitions(), new MemObligations()));
+        MemPAP pap = new MemPAP(new MemoryPolicyStore());
 
         // create graph
         Graph graph = pap.getGraph();
