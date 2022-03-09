@@ -1,40 +1,132 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.exceptions.PMException;
+import gov.nist.csd.pm.pap.store.PolicyStore;
+import gov.nist.csd.pm.pap.store.PolicyStoreConnection;
+import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
+import gov.nist.csd.pm.policy.author.*;
+import gov.nist.csd.pm.policy.author.pal.PALExecutable;
+import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
+import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.tx.Transactional;
 
-public class PAP {
+import java.util.ArrayList;
+import java.util.List;
 
-    private GraphAdmin        graphAdmin;
-    private ProhibitionsAdmin prohibitionsAdmin;
-    private ObligationsAdmin  obligationsAdmin;
+import static gov.nist.csd.pm.pap.policies.SuperPolicy.configureSuperPolicy;
 
-    public PAP(GraphAdmin graphAdmin, ProhibitionsAdmin prohibitionsAdmin, ObligationsAdmin obligationsAdmin) throws PMException {
-        this.graphAdmin = graphAdmin;
-        this.prohibitionsAdmin = prohibitionsAdmin;
-        this.obligationsAdmin = obligationsAdmin;
+public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Transactional, PALExecutable {
+
+    protected PolicyStoreConnection policyStore;
+    protected Graph graph;
+    protected Prohibitions prohibitions;
+    protected Obligations obligations;
+    protected PAL pal;
+    protected List<PolicyEventListener> listeners;
+
+    protected PAP() {}
+
+    protected PAP(PolicyStoreConnection policyStoreConnection) throws PMException {
+        init(policyStoreConnection);
     }
 
-    public GraphAdmin getGraphAdmin() {
-        return graphAdmin;
+    protected void init(PolicyStoreConnection policyStoreConnection) throws PMException {
+        this.policyStore = policyStoreConnection;
+        configureSuperPolicy(this.policyStore.graph());
+        this.listeners = new ArrayList<>();
+
+        this.graph = new Graph(
+                this.policyStore,
+                listeners
+        );
+
+        this.prohibitions = new Prohibitions(
+                this.policyStore,
+                listeners
+        );
+
+        this.obligations = new Obligations(
+                this.policyStore,
+                listeners
+        );
+
+        this.pal = new PAL(
+                this.policyStore,
+                listeners
+        );
     }
 
-    public void setGraphAdmin(GraphAdmin graphAdmin) {
-        this.graphAdmin = graphAdmin;
+    @Override
+    public GraphAuthor graph() {
+        return graph;
     }
 
-    public ProhibitionsAdmin getProhibitionsAdmin() {
-        return prohibitionsAdmin;
+    @Override
+    public ProhibitionsAuthor prohibitions() {
+        return prohibitions;
     }
 
-    public void setProhibitionsAdmin(ProhibitionsAdmin prohibitionsAdmin) {
-        this.prohibitionsAdmin = prohibitionsAdmin;
+    @Override
+    public ObligationsAuthor obligations() {
+        return obligations;
     }
 
-    public ObligationsAdmin getObligationsAdmin() {
-        return obligationsAdmin;
+    @Override
+    public PALAuthor pal() {
+        return pal;
     }
 
-    public void setObligationsAdmin(ObligationsAdmin obligationsAdmin) {
-        this.obligationsAdmin = obligationsAdmin;
+    @Override
+    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+        this.listeners.add(listener);
+
+        if (sync) {
+            listener.handlePolicyEvent(policyStore.policySync());
+        }
+    }
+
+    @Override
+    public void removeEventListener(PolicyEventListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    @Override
+    public void emitEvent(PolicyEvent event) throws PMException {
+        for (PolicyEventListener listener : listeners) {
+            listener.handlePolicyEvent(event);
+        }
+    }
+
+    @Override
+    public void beginTx() throws PMException {
+        policyStore.beginTx();
+
+        emitEvent(new BeginTxEvent());
+    }
+
+    @Override
+    public void commit() throws PMException {
+        policyStore.commit();
+
+        emitEvent(new CommitTxEvent());
+    }
+
+    @Override
+    public void rollback() throws PMException {
+        policyStore.rollback();
+
+        emitEvent(new RollbackTxEvent());
+    }
+
+    @Override
+    public List<PALStatement> compile(String input) throws PMException {
+        return new PALExecutor(this).compile(input);
+    }
+
+    @Override
+    public void execute(UserContext author, String input) throws PMException {
+        new PALExecutor(this).execute(author, input);
     }
 }

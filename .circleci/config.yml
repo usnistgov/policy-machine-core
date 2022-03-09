@@ -1,12 +1,8 @@
 version: 2
 jobs:
   build:
-
     working_directory: ~/policy-machine-core
-
-    docker:
-      - image: cimg/openjdk:16.0.1
-        
+    machine: true
     steps:
       - checkout # check out source code to working directory
       - run: mvn dependency:go-offline # gets the project dependencies

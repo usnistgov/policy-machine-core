@@ -1,0 +1,14 @@
+package gov.nist.csd.pm.policy.events;
+
+public class DeleteNodeEvent extends PolicyEvent {
+
+    private final String name;
+
+    public DeleteNodeEvent(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
