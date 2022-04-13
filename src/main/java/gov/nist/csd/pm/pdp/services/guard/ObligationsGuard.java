@@ -18,35 +18,35 @@ public class ObligationsGuard extends Guard {
     public void checkAdd(UserContext userCtx) throws PMException {
         // check that the user can create a policy class
         if (!hasPermissions(userCtx, SUPER_OA, ADD_OBLIGATION)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+            throw new PMAuthorizationException("unauthorized permissions to add an obligation");
         }
     }
 
     public void checkGet(UserContext userCtx) throws PMException {
         // check that the user can create a policy class
         if (!hasPermissions(userCtx, SUPER_OA, GET_OBLIGATION)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+            throw new PMAuthorizationException("unauthorized permissions to get obligation");
         }
     }
 
     public void checkUpdate(UserContext userCtx) throws PMException {
         // check that the user can create a policy class
         if (!hasPermissions(userCtx, SUPER_OA, UPDATE_OBLIGATION)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+            throw new PMAuthorizationException("unauthorized permissions to update obligation");
         }
     }
 
     public void checkDelete(UserContext userCtx) throws PMException {
         // check that the user can create a policy class
         if (!hasPermissions(userCtx, SUPER_OA, DELETE_OBLIGATION)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+            throw new PMAuthorizationException("unauthorized permissions to delete obligation");
         }
     }
 
     public void checkEnable(UserContext userCtx) throws PMException {
         // check that the user can create a policy class
         if (!hasPermissions(userCtx, SUPER_OA, ENABLE_OBLIGATION)) {
-            throw new PMAuthorizationException("unauthorized permissions to create a policy class");
+            throw new PMAuthorizationException("unauthorized permissions to enable obligation");
         }
     }
 }
