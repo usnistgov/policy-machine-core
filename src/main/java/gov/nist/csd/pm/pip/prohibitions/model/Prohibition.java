@@ -17,6 +17,8 @@ public class Prohibition {
     private OperationSet operations;
     private boolean      intersection;
 
+    public Prohibition() {
+    }
     private Prohibition(String name, String subject, Map<String, Boolean> containers, OperationSet operations, boolean intersection) {
         if (subject == null) {
             throw new IllegalArgumentException("Prohibition subject cannot be null");
