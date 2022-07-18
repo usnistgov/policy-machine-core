@@ -14,6 +14,8 @@ public class EvrNode {
     public EvrNode(Function function) {
         this.function = function;
     }
+    public EvrNode() {
+    }
 
     public EvrNode(String name, String type, Map<String, String> properties) {
         this.name = name;
