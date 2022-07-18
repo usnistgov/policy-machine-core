@@ -15,6 +15,10 @@ public class Obligation {
         this.rules = new ArrayList<>();
     }
 
+    public Obligation() {
+        this.rules = new ArrayList<>();
+    }
+
     public String getUser() {
         return user;
     }
