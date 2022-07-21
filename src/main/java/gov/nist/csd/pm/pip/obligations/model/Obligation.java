@@ -23,6 +23,10 @@ public class Obligation {
         this.source = obligation.source;
     }
 
+    public Obligation() {
+        this.rules = new ArrayList<>();
+    }
+
     public String getUser() {
         return user;
     }
