@@ -993,7 +993,7 @@ public class MySQLGraph implements Graph {
      */
     @Override
     public String toJson() throws PMException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
         Set<Node> nodes = getNodes();
         HashSet<String[]> jsonAssignments = new HashSet<>();

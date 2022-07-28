@@ -444,7 +444,7 @@ public class MemGraph implements Graph {
 
     @Override
     public synchronized String toJson() throws PMException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
         Set<Node> nodes = this.getNodes();
         HashSet<String[]> jsonAssignments = new HashSet<>();
