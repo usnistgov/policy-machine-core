@@ -313,7 +313,28 @@ public class MySQLGraph implements Graph {
 
     @Override
     public void updateNode (String name, Map<String, String> properties) throws PIPException {
-        throw new PIPException("not yet implemented");
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no name was provided when updating the node in the mysql graph");
+        }
+        else if (!exists(name)) {
+            throw new PIPException("graph", "node with the name "+ name+ "could not be found to update");
+        }
+
+        try (
+                Connection con = this.conn.getConnection();
+                PreparedStatement ps = con.prepareStatement(MySQLHelper.UPDATE_NODE_PROPS)
+        ){
+            try {
+                ps.setString(1, toJSON(properties));
+            } catch (JsonProcessingException j) {
+                throw new PIPException("graph", j.getMessage());
+            }
+            ps.setString(2, name);
+            ps.executeUpdate();
+
+        } catch (SQLException s) {
+            throw new PIPException("graph", s.getMessage());
+        }
     }
 
     public void updateNode(long id, String name, Map<String, String> properties) throws PIPException {

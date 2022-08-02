@@ -142,7 +142,10 @@ public class MemGraph implements Graph {
      * @throws PMException if the given node name does not exist in the graph.
      */
     @Override
-    public synchronized void updateNode(String name, Map<String, String> properties) throws PMException {Node existingNode = nodes.get(name);
+    public synchronized void updateNode(String name, Map<String, String> properties) throws PMException {
+
+        Node existingNode = nodes.get(name);
+
         if (existingNode == null) {
             throw new PMException(String.format("node with the name %s could not be found to update", name));
         }

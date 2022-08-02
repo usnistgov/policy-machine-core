@@ -11,6 +11,7 @@ public class MySQLHelper {
 
     public static final String INSERT_NODE = "INSERT INTO policydb_core.node(node_type_id, name, node_property) VALUES(?,?,?)";
     public static final String UPDATE_NODE = "UPDATE policydb_core.node SET name = ?, node_property = ? WHERE node_id = ?";
+    public static final String UPDATE_NODE_PROPS = "UPDATE policydb_core.node SET node_property = ? WHERE name = ?";
     public static final String DELETE_NODE = "DELETE from policydb_core.node where name=?";
     public static final String SELECT_NODE_ID_NAME_FROM_NODE = "select count(*) AS total from policydb_core.node where name = ?";
     public static final String SELECT_ALL_FROM_NODE = "SELECT node_id, name, node_type_id, node_property from policydb_core.node";

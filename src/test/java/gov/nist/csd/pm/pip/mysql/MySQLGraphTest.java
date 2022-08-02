@@ -372,4 +372,24 @@ public class MySQLGraphTest {
                 "      ]";*/
         assertTrue(json2.contains(assign));
     }
+
+    @Test
+    void testUpdateNode() throws PIPException {
+
+        Node pc = graph.createPolicyClass("node", Node.toProperties("namespace", "test"));
+
+        Node n1 = graph.createNode("nodeUpdate", UA, Node.toProperties("namespace specific", "test specific"), "node");
+
+        // node not found
+        assertThrows(PIPException.class, () -> graph.updateNode("newNodeName", null));
+        assertThrows(IllegalArgumentException.class, () -> graph.updateNode("", null));
+        assertThrows(IllegalArgumentException.class, () -> graph.updateNode(null, null));
+
+        // update properties
+        graph.updateNode("node", Node.toProperties("newKey", "newValue"));
+        assertEquals(graph.getNode(pc.getName()).getProperties().get("newKey"), "newValue");
+        assertEquals(graph.getNode(n1.getName()).getProperties().get("namespace specific"), "test specific");
+        graph.updateNode(n1.getName(), Node.toProperties("namespace specific", "updated"));
+        assertEquals(graph.getNode(n1.getName()).getProperties().get("namespace specific"), "updated");
+    }
 }
