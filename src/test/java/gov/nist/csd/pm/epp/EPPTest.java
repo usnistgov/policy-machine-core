@@ -1,166 +1,140 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.epp.events.AssignEvent;
-import gov.nist.csd.pm.epp.events.AssignToEvent;
-import gov.nist.csd.pm.epp.events.DeassignEvent;
-import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pap.MemPAP;
+import gov.nist.csd.pm.pdp.reviewer.MemoryPolicyReviewer;
+import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
+import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
+import gov.nist.csd.pm.policy.author.pal.statement.CreateUserOrObjectStatement;
+import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
+import gov.nist.csd.pm.policy.events.CreateObjectEvent;
+import gov.nist.csd.pm.policy.events.EventContext;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.audit.PReviewAuditor;
-import gov.nist.csd.pm.pdp.decider.PReviewDecider;
-import gov.nist.csd.pm.pdp.services.UserContext;
-import gov.nist.csd.pm.common.PolicyStore;
-import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.memory.MemGraph;
-import gov.nist.csd.pm.pip.graph.model.nodes.Node;
-import gov.nist.csd.pm.pip.graph.model.nodes.NodeType;
-import gov.nist.csd.pm.pip.memory.MemObligations;
-import gov.nist.csd.pm.pip.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pip.obligations.Obligations;
-import gov.nist.csd.pm.pip.obligations.evr.EVRParser;
-import gov.nist.csd.pm.pip.obligations.model.Obligation;
-import gov.nist.csd.pm.pip.obligations.model.Rule;
-import gov.nist.csd.pm.pip.memory.MemProhibitions;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.BeforeEach;
+import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
+import gov.nist.csd.pm.policy.model.obligation.Response;
+import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
+import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.HashMap;
 
-import static gov.nist.csd.pm.pip.graph.model.nodes.NodeType.*;
+import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_OA;
+import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.obligation.event.Performs.events;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EPPTest {
 
-    private PDP pdp;
-    private Node u1;
-    private Node ua1;
-    private Node o1;
-    private Node oa1;
-    private Node pc1;
+    @Test
+    void test() throws PMException {
+        PAP pap = new MemoryPAP();
+        PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+        EPP epp = new EPP(pdp, pap);
 
-    @BeforeEach
-    void setup() throws PMException {
-        OperationSet ops = new OperationSet("read", "write", "execute");
-        PolicyStore policyStore = new MemoryPolicyStore();
-        pdp = PDP.newPDP(
-                new MemPAP(policyStore),
-                new EPPOptions(),
-                new PReviewDecider(policyStore.getGraph(), policyStore.getProhibitions(), ops),
-                new PReviewAuditor(policyStore.getGraph(), ops)
-        );
-        Graph graph = pdp.withUser(new UserContext("super")).getGraph();
-        pc1 = graph.createPolicyClass("pc1", null);
-        oa1 = graph.createNode("oa1", NodeType.OA, null, pc1.getName());
-        graph.createNode("oa2", NodeType.OA, null, pc1.getName());
-        o1 = graph.createNode("o1", NodeType.O, null, oa1.getName());
-        ua1 = graph.createNode("ua1", NodeType.UA, null, pc1.getName());
-        u1 = graph.createNode("u1", NodeType.U, null, ua1.getName());
+        pap.graph().createPolicyClass("pc1", noprops());
+        pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
 
-        graph.associate(ua1.getName(), oa1.getName(), new OperationSet("read", "write"));
+        String pal = """
+                create obligation 'test' {
+                    create rule 'rule1'
+                    when any user
+                    performs 'create_object_attribute'
+                    on 'oa1'
+                    do(evtCtx) {
+                        create policy class 'pc2';
+                    }
+                }
+                """;
+        new PALExecutor(pap).execute(new UserContext(SUPER_USER), pal);
+
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("oa1"));
+
+        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", noprops(), "oa1"));
+
+        assertTrue(pap.graph().nodeExists("pc2"));
+
     }
 
     @Test
-    void TestEvent() throws PMException, IOException {
-        InputStream is = getClass().getClassLoader().getResourceAsStream("epp/event_test.yml");
-        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        Obligation obligation = new EVRParser()
-                .parse("super", yml);
+    void testAccessingEventContextInResponse() throws PMException {
+        PAP pap = new MemoryPAP();
+        PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+        EPP epp = new EPP(pdp, pap);
 
-        UserContext superCtx = new UserContext("super");
-        pdp.withUser(superCtx).getObligations().add(obligation, true);
+        pap.graph().createPolicyClass("pc1", noprops());
+        pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
 
-        // test u1 assign to
-        pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
-        Node node = pdp.withUser(superCtx).getGraph().getNode("u1 assign to success");
-        assertTrue(node.getProperties().containsKey("prop1"));
-        assertTrue(node.getProperties().get("prop1").equalsIgnoreCase("val1"));
+        String pal = """
+                create obligation 'test' {
+                    create rule 'rule1'
+                    when any user
+                    performs 'create_object_attribute'
+                    on 'oa1'
+                    do(evtCtx) {
+                        create policy class evtCtx['eventName'];
+                        let target = evtCtx['target'];
+                        
+                        let event = evtCtx['event'];
+                        create policy class concat([event['name'], '_test']);
+                        set properties of event['name'] to {'key': target};
+                        
+                        let userCtx = evtCtx['userCtx'];
+                        create policy class concat([userCtx['user'], '_test']);
+                    }
+                }
+                """;
+        new PALExecutor(pap).execute(new UserContext(SUPER_USER), pal);
 
-        // test anyUser assign
-        pdp.getEPP().processEvent(new AssignEvent(new UserContext(u1.getName(), "123"), o1, oa1));
-        node = pdp.withUser(superCtx).getGraph().getNode("anyUser assign success");
+        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", noprops(), "oa1"));
 
-        // test anyUser in list deassign
-        pdp.getEPP().processEvent(new DeassignEvent(new UserContext(u1.getName(),"123"), o1, oa1));
-        node = pdp.withUser(superCtx).getGraph().getNode("anyUser in list deassign success");
+        assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(
+                "super_pc", "pc1", "create_object_attribute", "oa2_test", "super_test"
+        )));
     }
 
     @Test
-    void TestResponse() throws PMException, IOException {
-        InputStream is = getClass().getClassLoader().getResourceAsStream("epp/response_test.yml");
-        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        UserContext superCtx = new UserContext("super");
+    void testErrorInEPPResponse() throws PMException {
+        PAP pap = new MemoryPAP();
+        PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+        EPP epp = new EPP(pdp, pap);
 
-        Obligation obligation = new EVRParser().parse(superCtx.getUser(), yml);
-        pdp.withUser(superCtx).getObligations().add(obligation, true);
+        pdp.runTx(new UserContext(SUPER_USER), (policy) -> {
+            policy.graph().createPolicyClass("pc1", noprops());
+            policy.graph().createUserAttribute("ua1", noprops(), Naming.baseUserAttribute("pc1"));
+            policy.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
+            policy.graph().createUser("u1", noprops(), "ua1");
+            policy.graph().createObject("o1", noprops(), "oa1");
+            policy.graph().associate("ua1", SUPER_OA, new AccessRightSet(CREATE_OBLIGATION));
+            policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
+        });
 
-        pdp.getEPP().processEvent(new AssignToEvent(new UserContext(u1.getName(), "123"), oa1, o1));
+        pdp.runTx(new UserContext("u1"), (policy) -> {
+            policy.obligations().create(new UserContext("u1"), "test",
+                    new Rule("rule1",
+                            new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
+                            new Response(new UserContext("u1"),
+                                    new CreateUserOrObjectStatement(new Expression(new Literal("o2")), NodeType.O, new Expression(new Literal("oa1"))),
+                                    new CreatePolicyStatement(new Expression(new Literal("pc2"))))
+                    )
+            );
+        });
 
-        // check that the rule was created
-        Obligation o = pdp.withUser(superCtx).getObligations().get("test");
-        List<Rule> rules = o.getRules();
-        boolean found = false;
-        for (Rule r : rules) {
-            if (r.getLabel().equals("created rule")) {
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found);
+        assertThrows(PMRuntimeException.class, () -> epp.handlePolicyEvent(new EventContext(new UserContext(SUPER_USER), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"))));
 
-        // check that the new OA was created
-        Node newOA = pdp.withUser(superCtx).getGraph().getNode("new OA");
-
-        // check that the new OA was assigned to the oa1
-        Set<String> parents = pdp.withUser(superCtx).getGraph().getParents(newOA.getName());
-        assertFalse(parents.isEmpty());
-        assertEquals("oa2" , parents.iterator().next());
-
-        // check ua1 was associated with new OA
-        Map<String, OperationSet> sourceAssociations = pdp.withUser(superCtx).getGraph().getSourceAssociations(ua1.getName());
-        assertTrue(sourceAssociations.containsKey(newOA.getName()));
-
-        // check that the deny was created
-        // an exception is thrown if one doesnt exist
-        pdp.withUser(superCtx).getProhibitions().get("deny");
-    }
-
-    @Test
-    void testUserContainedIn() throws PMException, IOException {
-        PolicyStore policyStore = new MemoryPolicyStore();
-
-        InputStream is = getClass().getClassLoader().getResourceAsStream("epp/UserContainedIn.yml");
-        String yml = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-        Obligation obligation = new EVRParser().parse("super", yml);
-
-        policyStore.getObligations().add(obligation, true);
-
-        OperationSet ops = new OperationSet("read", "write", "execute");
-        PDP pdp = PDP.newPDP(
-                new MemPAP(policyStore),
-                new EPPOptions(),
-                new PReviewDecider(policyStore.getGraph(), policyStore.getProhibitions(), ops),
-                new PReviewAuditor(policyStore.getGraph(), ops)
-        );
-        Graph graph = pdp.withUser(new UserContext("super")).getGraph();
-
-        graph.createPolicyClass("pc1", null);
-        graph.createNode("oa1", OA, null, "pc1");
-        Node oa2 = graph.createNode("oa2", OA, null, "pc1");
-        Node o1 = graph.createNode("o1", OA, null, "oa1");
-
-        graph.createNode("ua1", UA, null, "pc1");
-        graph.createNode("ua1-1", UA, null, "ua1");
-        graph.createNode("u1", U, null, "ua1-1");
-
-        pdp.getEPP().processEvent(new AssignToEvent(new UserContext("u1"), oa2, o1));
-
-        assertTrue(graph.exists("new OA"));
+        assertFalse(pap.graph().nodeExists("o2"));
+        assertFalse(pap.graph().nodeExists("pc2"));
     }
 }

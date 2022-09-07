@@ -1,171 +1,110 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.epp.EPPOptions;
-import gov.nist.csd.pm.exceptions.PMException;
-import gov.nist.csd.pm.pdp.audit.Auditor;
-import gov.nist.csd.pm.pdp.decider.Decider;
-import gov.nist.csd.pm.pdp.services.*;
-import gov.nist.csd.pm.common.PolicyStore;
-import gov.nist.csd.pm.pip.graph.Graph;
-import gov.nist.csd.pm.pip.memory.tx.MemTx;
-import gov.nist.csd.pm.operations.OperationSet;
-import gov.nist.csd.pm.pip.obligations.Obligations;
-import gov.nist.csd.pm.pip.prohibitions.Prohibitions;
-import gov.nist.csd.pm.common.tx.TxRunner;
+import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
+import gov.nist.csd.pm.policy.author.*;
+import gov.nist.csd.pm.policy.author.pal.PALExecutable;
+import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
+import gov.nist.csd.pm.policy.events.PolicyEventListener;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.policy.tx.TxRunner;
 
-public class PDP {
+import java.util.ArrayList;
+import java.util.List;
 
-    /**
-     * Factory method to create a new PDP and EPP, while abstracting the initialization process. A PDP needs an EPP, and
-     * vice versa. These steps need to occur each time a new PDP/EPP is created. The order of each step matters inorder to
-     * avoid any race conditions. The EPP is accessible via the PDP's getEPP method.
-     *
-     * @return the new PDP instance
-     */
-    public static PDP newPDP(PolicyStore pap, EPPOptions eppOptions, Decider decider, Auditor auditor) throws PMException {
-        // create PDP
-        PDP pdp = new PDP(pap, decider, auditor);
-        // create the EPP
-        EPP epp = new EPP(pap, pdp, eppOptions);
-        // set the PDPs EPP
-        pdp.setEPP(epp);
-        // initialize PDP services which need the epp that was just set
-        //pdp.initServices();
-        return pdp;
-    }
+public class PDP implements PolicyEventEmitter {
 
-    private final PolicyStore pap;
-    private EPP epp;
-    private Decider decider;
-    private Auditor auditor;
-    private OperationSet resourceOps;
+    private final PAP pap;
+    private final List<PolicyEventListener> eventListeners;
 
+    private final PolicyReviewer policyReviewer;
 
-    /**
-     * Create a new PDP instance given a Policy Administration Point and an optional set of FunctionExecutors to be
-     * used by the EPP.
-     * @param pap the Policy Administration Point that the PDP will use to change the graph.
-     * @throws PMException if there is an error initializing the EPP.
-     */
-    private PDP(PolicyStore pap, Decider decider, Auditor auditor) throws PMException {
+    public PDP(PAP pap, PolicyReviewer policyReviewer) throws PMException {
         this.pap = pap;
-        this.decider = decider;
-        this.auditor = auditor;
+        this.eventListeners = new ArrayList<>();
+        this.policyReviewer = policyReviewer;
+
+        this.pap.addEventListener(this.policyReviewer, true);
     }
 
-    private void setEPP(EPP epp) {
-        this.epp = epp;
+    public PolicyReviewer policyReviewer() {
+        return this.policyReviewer;
     }
 
-    public EPP getEPP() {
-        return epp;
+    public synchronized void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
+        TxRunner.runTx(pap, () -> {
+            PDPTx pdpTx = new PDPTx(userCtx, pap, policyReviewer, eventListeners);
+            txRunner.run(pdpTx);
+        });
     }
 
-    public OperationSet getResourceOps() throws PMException{
-        return resourceOps;
+    @Override
+    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+        eventListeners.add(listener);
     }
 
-    public void setResourceOps(OperationSet resourceOps)  throws PMException {
-        this.resourceOps = resourceOps;
+    @Override
+    public void removeEventListener(PolicyEventListener listener) {
+        eventListeners.remove(listener);
     }
 
-    public void addResourceOps (String... ops) throws PMException {
-        OperationSet resourceOperations = getResourceOps();
-        String[] newOps = ops;
-        for (String op: newOps) {
-            if (!resourceOperations.contains(op)) {
-                resourceOperations.add(op);
-            }
+    @Override
+    public void emitEvent(PolicyEvent event) throws PMException {
+        for (PolicyEventListener listener : eventListeners) {
+            listener.handlePolicyEvent(event);
         }
-        setResourceOps(resourceOperations);
     }
 
-    public void deleteResourceOps (String... ops) throws PMException {
-        OperationSet resourceOperations = getResourceOps();
-        String[] newOps = ops;
-        for (String op: newOps) {
-            if (resourceOperations.contains(op)) {
-                resourceOperations.remove(op);
-            }
-        }
-        setResourceOps(resourceOperations);
+    public interface PDPTxRunner {
+        void run(PDPTx policy) throws PMException;
     }
 
-    public WithUser withUser(UserContext userCtx) {
-        return new WithUser(userCtx, pap, epp, decider, auditor);
-    }
+    public static class PDPTx extends PolicyAuthor implements PALExecutable {
 
-    public static class WithUser implements PolicyStore {
+        private final UserContext userCtx;
+        private final List<PolicyEventListener> epps;
+        private final PAP pap;
+        private final PolicyReviewer policyReviewer;
 
-        private UserContext userCtx;
-        private PolicyStore pap;
-        private EPP epp;
-        private Decider decider;
-        private Auditor auditor;
-        private AnalyticsService    analyticsService;
-
-
-        public WithUser(UserContext userCtx, PolicyStore pap, EPP epp, Decider decider, Auditor auditor) {
+        public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<PolicyEventListener> epps) {
             this.userCtx = userCtx;
             this.pap = pap;
-            this.epp = epp;
-            this.decider = decider;
-            this.auditor = auditor;
-        }
-
-        public WithUser(UserContext userCtx, PolicyStore pap, EPP epp, Decider decider, Auditor auditor, AnalyticsService analyticsService) {
-            this.userCtx = userCtx;
-            this.pap = pap;
-            this.epp = epp;
-            this.decider = decider;
-            this.auditor = auditor;
-            this.analyticsService = analyticsService;
-        }
-
-        public AnalyticsService getAnalyticsService(UserContext userCtx) {
-            analyticsService.setUserCtx(userCtx);
-            return analyticsService;
+            this.epps = epps;
+            this.policyReviewer = policyReviewer;
         }
 
         @Override
-        public Graph getGraph() throws PMException {
-            return new GraphService(userCtx, pap, epp, decider, auditor);
+        public GraphAuthor graph() {
+            return new Graph(userCtx, pap, policyReviewer, epps);
         }
 
         @Override
-        public Prohibitions getProhibitions() {
-            return new ProhibitionsService(userCtx, pap, epp, decider, auditor);
+        public ProhibitionsAuthor prohibitions() {
+            return new Prohibitions(userCtx, pap, policyReviewer, epps);
         }
 
         @Override
-        public Obligations getObligations() {
-            return new ObligationsService(userCtx, pap, epp, decider, auditor);
+        public ObligationsAuthor obligations() {
+            return new Obligations(userCtx, pap, policyReviewer, epps);
         }
 
         @Override
-        public void runTx(TxRunner txRunner) throws PMException {
-            GraphService graphService = new GraphService(userCtx, pap, epp, decider, auditor);
-            ProhibitionsService prohibitionsService = new ProhibitionsService(userCtx, pap, epp, decider, auditor);
-            ObligationsService obligationsService = new ObligationsService(userCtx, pap, epp, decider, auditor);
-            MemTx tx = new MemTx(graphService, prohibitionsService, obligationsService);
-            tx.runTx(txRunner);
+        public PALAuthor pal() {
+            return new PAL(userCtx, pap, policyReviewer, epps);
+        }
+
+        @Override
+        public List<PALStatement> compile(String input) throws PMException {
+            return new PALExecutor(this).compile(input);
+        }
+
+        @Override
+        public void execute(UserContext author, String input) throws PMException {
+            new PALExecutor(this).execute(author, input);
         }
     }
-
-    /**
-     * pdp.TxBuilder.withUser("bob").runTx(() -> {})
-     * pap.TxBuilder.runTx(() -> {}, "bob")
-     * pdp.tx((g,p,o)->{
-     *
-     * }).run()
-     * pdp.tx((g,p,o)->{
-     *
-     * })
-     * .withUser()
-     * .run();
-     *
-     * pdp.withUser().runTx()
-     */
-
 }

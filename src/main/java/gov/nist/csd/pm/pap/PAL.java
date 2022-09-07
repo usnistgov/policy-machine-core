@@ -1,0 +1,98 @@
+package gov.nist.csd.pm.pap;
+
+import gov.nist.csd.pm.pap.store.PALStore;
+import gov.nist.csd.pm.pap.store.PolicyStore;
+import gov.nist.csd.pm.policy.author.PALAuthor;
+import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.exceptions.ConstantAlreadyDefinedException;
+import gov.nist.csd.pm.policy.exceptions.FunctionAlreadyDefinedException;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.author.pal.PALContext;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+
+import java.util.List;
+import java.util.Map;
+
+class PAL implements PALAuthor, PolicyEventEmitter {
+
+    private final PolicyStore store;
+    private final List<PolicyEventListener> listeners;
+
+    public PAL(PolicyStore store, List<PolicyEventListener> listeners) {
+        this.store = store;
+
+        this.listeners = listeners;
+    }
+
+    @Override
+    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
+        if (getFunctions().containsKey(functionDefinitionStatement.getFunctionName())) {
+            throw new FunctionAlreadyDefinedException(functionDefinitionStatement.getFunctionName());
+        }
+
+        this.store.pal().addFunction(functionDefinitionStatement);
+
+        emitEvent(new AddFunctionEvent(functionDefinitionStatement));
+    }
+
+    @Override
+    public void removeFunction(String functionName) throws PMException {
+        this.store.pal().removeFunction(functionName);
+
+        emitEvent(new RemoveFunctionEvent(functionName));
+    }
+
+    @Override
+    public Map<String, FunctionDefinitionStatement> getFunctions() throws PMException {
+        return this.store.pal().getFunctions();
+    }
+
+    @Override
+    public void addConstant(String constantName, Value constantValue) throws PMException {
+        if (getConstants().containsKey(constantName)) {
+            throw new ConstantAlreadyDefinedException(constantName);
+        }
+
+        this.store.pal().addConstant(constantName, constantValue);
+
+        emitEvent(new AddConstantEvent(constantName, constantValue));
+    }
+
+    @Override
+    public void removeConstant(String constName) throws PMException {
+        this.store.pal().removeConstant(constName);
+
+        emitEvent(new RemoveConstantEvent(constName));
+    }
+
+    @Override
+    public Map<String, Value> getConstants() throws PMException {
+        return this.store.pal().getConstants();
+    }
+
+    @Override
+    public PALContext getContext() throws PMException {
+        return this.store.pal().getContext();
+    }
+
+
+    @Override
+    public void addEventListener(PolicyEventListener listener, boolean sync) {
+        // listeners are added by the PAP
+    }
+
+    @Override
+    public void removeEventListener(PolicyEventListener listener) {
+        // listeners are removed by the PAP
+    }
+
+    @Override
+    public void emitEvent(PolicyEvent event) throws PMException {
+        for (PolicyEventListener listener : listeners) {
+            listener.handlePolicyEvent(event);
+        }
+    }
+}

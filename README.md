@@ -233,10 +233,10 @@ prohibitionsService.add(prohibition);
 
 // get the permissions for u1 on newNode
 userCtx = new UserContext(u1.getName(), "");
-AnalyticsService analyticsService = pdp.getAnalyticsService(userCtx);
+AnalyticsService analyticsDecider = pdp.getAnalyticsService(userCtx);
 
 // permissions should be [read, assign]
-Set<String> permissions = analyticsService.getPermissions(newNode.getName());
+Set<String> permissions = analyticsDecider.getPermissions(newNode.getName());
 ```
 
 ### Event Processing Point (EPP)
@@ -305,8 +305,8 @@ pdp.getEPP().processEvent(new AssignToEvent(oa1, o1), userID, processID);
 #### Custom Events
 Custom events can be done in four steps:
 
-1. Extend the [EventPattern](src/main/java/gov/nist/csd/pm/pip/obligations/model/EventPattern.java) class. 
-2. Implement the [EventParser](src/main/java/gov/nist/csd/pm/pip/obligations/evr/EventParser.java) interface in order to parse the yaml of the custom event.
+1. Extend the [EventPattern](src/main/java/gov/nist/csd/pm/policy/model/obligations/model/EventPattern.java) class. 
+2. Implement the [EventParser](src/main/java/gov/nist/csd/pm/policy/model/obligations/evr/EventParser.java) interface in order to parse the yaml of the custom event.
 3. Pass the EventParser implementation to the `EVRParser` constructor.  
 4. Extend the [EventContext](src/main/java/gov/nist/csd/pm/epp/events/EventContext.java) class and override the
 `matchesPattern` method.
@@ -427,9 +427,9 @@ Custom events can be done in four steps:
 #### Custom Responses
 Custom responses can be done in four steps:
 
-1. Extend the [ResponsePattern](src/main/java/gov/nist/csd/pm/pip/obligations/model/ResponsePattern.java) class and override 
+1. Extend the [ResponsePattern](src/main/java/gov/nist/csd/pm/policy/model/obligations/model/ResponsePattern.java) class and override 
 the `apply` method.
-2. Implement the [ResponseParser](src/main/java/gov/nist/csd/pm/pip/obligations/evr/ResponseParser.java) interface in order to parse the yaml of the custom response.
+2. Implement the [ResponseParser](src/main/java/gov/nist/csd/pm/policy/model/obligations/evr/ResponseParser.java) interface in order to parse the yaml of the custom response.
 3. Pass the ResponseParser implementation to the `EVRParser` constructor.
 
 #### Example
