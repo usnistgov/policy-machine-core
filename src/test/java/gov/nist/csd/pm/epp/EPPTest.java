@@ -7,9 +7,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.CreateUserOrObjectStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
-import gov.nist.csd.pm.policy.events.CreateObjectEvent;
 import gov.nist.csd.pm.policy.events.EventContext;
-import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -57,7 +55,7 @@ class EPPTest {
                     }
                 }
                 """;
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), pal);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), pal);
 
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -96,7 +94,7 @@ class EPPTest {
                     }
                 }
                 """;
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), pal);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), pal);
 
         pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", noprops(), "oa1"));
 

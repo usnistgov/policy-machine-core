@@ -39,7 +39,7 @@ public class ObligationTest {
                 }
                 """;
         new PALExecutor(pap)
-                .execute(new UserContext(SUPER_USER), input);
+                .compileAndExecutePAL(new UserContext(SUPER_USER), input);
         Obligation obligation1 = pap.obligations().get("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
         assertEquals(1, obligation1.getRules().size());

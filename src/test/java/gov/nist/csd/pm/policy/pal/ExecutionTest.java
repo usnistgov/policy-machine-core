@@ -50,7 +50,7 @@ public class ExecutionTest {
                 associate 'ua2' and 'oa2' with access rights [read, write];
                 associate 'ua3' and 'oa3' with access rights [read, write];
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
 
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -89,7 +89,7 @@ public class ExecutionTest {
                 """
                 deassign 'u1' from ['ua1', 'ua2'];
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
         assertFalse(pap.graph().getChildren("ua1").contains("u1"));
         assertFalse(pap.graph().getChildren("ua2").contains("u1"));
@@ -98,14 +98,14 @@ public class ExecutionTest {
                 """
                 delete user 'u1';
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("u1"));
 
         input =
                 """
                 deassign 'o1' from 'oa1';
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().getParents("oa1").contains("oa1"));
         assertFalse(pap.graph().getChildren("oa1").contains("o1"));
 
@@ -113,7 +113,7 @@ public class ExecutionTest {
                 """
                 delete object 'o1';
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("o1"));
 
         input =
@@ -122,7 +122,7 @@ public class ExecutionTest {
                 delete user attribute 'ua2';
                 delete user attribute 'ua3';
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("ua1"));
         assertFalse(pap.graph().nodeExists("ua2"));
         assertFalse(pap.graph().nodeExists("ua3"));
@@ -134,7 +134,7 @@ public class ExecutionTest {
                 delete object attribute 'oa2';
                 delete object attribute 'oa3';
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("oa1"));
         assertFalse(pap.graph().nodeExists("oa2"));
         assertFalse(pap.graph().nodeExists("oa3"));
@@ -143,7 +143,7 @@ public class ExecutionTest {
                 """
                 delete policy class 'pc1';
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
     }
 
@@ -160,7 +160,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
 
         input = """
@@ -175,7 +175,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
 
@@ -193,7 +193,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
         assertFalse(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
@@ -210,7 +210,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
     }
@@ -224,7 +224,7 @@ public class ExecutionTest {
                     create policy class x;
                 }
                 """;
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
@@ -237,7 +237,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
@@ -251,7 +251,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
@@ -266,7 +266,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
         assertFalse(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
@@ -281,7 +281,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
         assertFalse(pap.graph().nodeExists("pc2"));
         assertFalse(pap.graph().nodeExists("pc3"));
@@ -300,7 +300,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
@@ -317,7 +317,7 @@ public class ExecutionTest {
                 """;
         PAP pap = new MemoryPAP();
         PALExecutor pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
 
         String input1 = """
@@ -329,7 +329,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         PALExecutor pal1 = new PALExecutor(pap);
-        assertThrows(IllegalStateException.class, () -> pal1.execute(new UserContext(SUPER_USER), input1));
+        assertThrows(IllegalStateException.class, () -> pal1.compileAndExecutePAL(new UserContext(SUPER_USER), input1));
 
         input = """
                 let x = 'hello';
@@ -342,7 +342,7 @@ public class ExecutionTest {
                 """;
         pap = new MemoryPAP();
         pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("hello world"));
     }
 
@@ -355,7 +355,7 @@ public class ExecutionTest {
                 """;
         MemoryPAP pap = new MemoryPAP();
         PALExecutor pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("hello world"));
 
         PAP pap1 = new MemoryPAP();
@@ -366,7 +366,7 @@ public class ExecutionTest {
                 a = 'test';
                 create policy class b;
                 """;
-        pal1.execute(new UserContext(SUPER_USER), input1);
+        pal1.compileAndExecutePAL(new UserContext(SUPER_USER), input1);
         assertFalse(pap.graph().nodeExists("test"));
     }
 
@@ -379,7 +379,7 @@ public class ExecutionTest {
                 """;
         PAP pap = new MemoryPAP();
         PALExecutor pal = new PALExecutor(pap);
-        pal.execute(new UserContext(SUPER_USER), input);
+        pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().getPolicyClasses().contains("v1"));
     }
 }

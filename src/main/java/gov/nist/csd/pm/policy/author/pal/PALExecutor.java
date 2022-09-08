@@ -32,7 +32,7 @@ public class PALExecutor implements PALExecutable{
     }
 
     @Override
-    public List<PALStatement> compile(String input) throws PMException {
+    public List<PALStatement> compilePAL(String input) throws PMException {
         PALLexer lexer = new PALLexer(CharStreams.fromString(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PALParser parser = new PALParser(tokens);
@@ -78,8 +78,8 @@ public class PALExecutor implements PALExecutable{
     }
 
     @Override
-    public void execute(UserContext author, String input) throws PMException {
-        List<PALStatement> statements = compile(input);
+    public void compileAndExecutePAL(UserContext author, String input) throws PMException {
+        List<PALStatement> statements = compilePAL(input);
 
         ExecutionContext ctx = new ExecutionContext(author);
 

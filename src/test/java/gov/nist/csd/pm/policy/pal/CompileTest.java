@@ -172,7 +172,7 @@ public class CompileTest {
     }
 
     private List<PALStatement> test(String pal, PolicyAuthor policyAuthor) throws PMException {
-        return new PALExecutor(policyAuthor).compile(pal);
+        return new PALExecutor(policyAuthor).compilePAL(pal);
     }
 
     @Test

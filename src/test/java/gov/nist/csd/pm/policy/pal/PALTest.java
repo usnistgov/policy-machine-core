@@ -20,7 +20,7 @@ class PALTest {
                 create policy class x;
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("helloworld"));
     }
 
@@ -48,7 +48,7 @@ class PALTest {
                 create policy class a8;
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         // 5 accounts for super policy class
         assertEquals(5, pap.graph().getPolicyClasses().size());
     }
@@ -59,7 +59,7 @@ class PALTest {
                 create policy class 'pc1';
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
     }
 
@@ -71,7 +71,7 @@ class PALTest {
                 create object attribute 'oa1' assign to 'pc1';
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("ua1"));
         assertTrue(pap.graph().getParents("ua1").contains("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -90,7 +90,7 @@ class PALTest {
                 create object 'o1' assign to 'oa1';
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("u1"));
         assertTrue(pap.graph().getParents("u1").contains("ua1"));
         assertTrue(pap.graph().nodeExists("o1"));
@@ -107,7 +107,7 @@ class PALTest {
                 set properties of 'ua1' to {'key': 'value'};
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertEquals("value", pap.graph().getNode("ua1").getProperties().get("key"));
     }
 
@@ -121,7 +121,7 @@ class PALTest {
                 assign 'ua1' to ['ua2', 'ua3'];
                 """;
         MemoryPAP pap = new MemoryPAP();
-        new PALExecutor(pap).execute(new UserContext(SUPER_USER), input);
+        new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().getParents("ua1").contains("ua2"));
         assertTrue(pap.graph().getParents("ua1").contains("ua3"));
     }
