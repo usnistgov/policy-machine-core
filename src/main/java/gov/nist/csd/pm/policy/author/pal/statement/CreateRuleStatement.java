@@ -12,29 +12,28 @@ import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class CreateRuleStatement extends PALStatement {
 
-    private final Expression name;
+    private final Expression label;
     private final SubjectClause subjectClause;
     private final PerformsClause performsClause;
     private final OnClause onClause;
     private final ResponseBlock responseBlock;
 
-    public CreateRuleStatement(Expression name, SubjectClause subjectClause,
+    public CreateRuleStatement(Expression label, SubjectClause subjectClause,
                                PerformsClause performsClause, OnClause onClause, ResponseBlock responseBlock) {
-        this.name = name;
+        this.label = label;
         this.subjectClause = subjectClause;
         this.performsClause = performsClause;
         this.onClause = onClause;
         this.responseBlock = responseBlock;
     }
 
-    public Expression getName() {
-        return name;
+    public Expression getLabel() {
+        return label;
     }
 
     public SubjectClause getSubjectClause() {
@@ -55,25 +54,23 @@ public class CreateRuleStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        Value nameValue = name.execute(ctx, policyAuthor);
+        Value nameValue = label.execute(ctx, policyAuthor);
 
         EventSubject subject;
         if (subjectClause.type == SubjectType.USER || subjectClause.type == SubjectType.USERS) {
             List<String> subjectValues = new ArrayList<>();
-            for (Expression expr : subjectClause.exprs) {
-                subjectValues.add(expr.execute(ctx, policyAuthor).getStringValue());
-            }
+            subjectValues.add(subjectClause.expr.execute(ctx, policyAuthor).getStringValue());
             subject = EventSubject.users(subjectValues.toArray(new String[]{}));
         } else if (subjectClause.type == SubjectType.ANY_USER) {
             subject = EventSubject.anyUser();
         } else if (subjectClause.type == SubjectType.USER_ATTR) {
             subject = EventSubject.anyUserWithAttribute(
-                    subjectClause.exprs.get(0).execute(ctx, policyAuthor).getStringValue()
+                    subjectClause.expr.execute(ctx, policyAuthor).getStringValue()
             );
         } else {
             // process
             subject = EventSubject.process(
-                    subjectClause.exprs.get(0).execute(ctx, policyAuthor).getStringValue()
+                    subjectClause.expr.execute(ctx, policyAuthor).getStringValue()
             );
         }
 
@@ -117,23 +114,50 @@ public class CreateRuleStatement extends PALStatement {
                         performs,
                         target
                 ),
-                new Response(responseBlock.evtCtxVar, ctx.copy(), responseBlock.getResponseBlock())
+                new Response(responseBlock.evtCtxVar, ctx.copy(), responseBlock.getStatements())
         );
 
         return new Value(rule);
     }
 
     @Override
+    public String toString(int indent) {
+        return format(
+                indent,
+                "\n%s%s%s%s%s",
+                format(indent, "create rule %s\n", label.toString(indent)),
+                format(indent, "%s\n", subjectClause.toString()),
+                format(indent, "%s", performsClause.toString()),
+                format(indent, "%s", onClause.toString()),
+                format(indent, "\n%s", responseBlockToString(indent))
+        );
+    }
+
+    private String responseBlockToString(int indent) {
+        String stmtsStr = "";
+        for (PALStatement stmt : responseBlock.statements) {
+            stmtsStr += stmt.toString(indent + 1) + "\n";
+        }
+
+        return format(
+                indent,
+                format(indent, "do(%s)", responseBlock.evtCtxVar),
+                format(indent, "{\n%s\n}", stmtsStr)
+        );
+    }
+
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateRuleStatement that = (CreateRuleStatement) o;
-        return Objects.equals(name, that.name) && Objects.equals(subjectClause, that.subjectClause) && Objects.equals(performsClause, that.performsClause) && Objects.equals(onClause, that.onClause) && Objects.equals(responseBlock, that.responseBlock);
+        return Objects.equals(label, that.label) && Objects.equals(subjectClause, that.subjectClause) && Objects.equals(performsClause, that.performsClause) && Objects.equals(onClause, that.onClause) && Objects.equals(responseBlock, that.responseBlock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, subjectClause, performsClause, onClause, responseBlock);
+        return Objects.hash(label, subjectClause, performsClause, onClause, responseBlock);
     }
 
     public enum SubjectType {
@@ -146,21 +170,36 @@ public class CreateRuleStatement extends PALStatement {
 
     public static class SubjectClause {
         private SubjectType type;
-        private List<Expression> exprs;
+        private Expression expr;
 
-        public SubjectClause() {}
+        public SubjectClause() {
+        }
 
-        public SubjectClause(SubjectType type, Expression ... exprs) {
+        public SubjectClause(SubjectType type, Expression expr) {
             this.type = type;
-            this.exprs = Arrays.asList(exprs);
+            this.expr = expr;
+        }
+
+        public SubjectClause(SubjectType type) {
+            this.type = type;
         }
 
         public SubjectType getType() {
             return type;
         }
 
-        public List<Expression> getExprs() {
-            return exprs;
+        @Override
+        public String toString() {
+            String s = "when ";
+            switch (type) {
+                case ANY_USER -> s += "any user";
+                case USER_ATTR -> s += "any user with attribute " + expr;
+                case USERS -> s += "users " + expr;
+                case USER -> s += "user " + expr;
+                case PROCESS -> s += "process " + expr;
+            }
+
+            return s;
         }
     }
 
@@ -174,6 +213,11 @@ public class CreateRuleStatement extends PALStatement {
         public Expression getEvents() {
             return events;
         }
+
+        @Override
+        public String toString() {
+            return "performs " + events.toString(0);
+        }
     }
 
     public enum TargetType {
@@ -185,6 +229,11 @@ public class CreateRuleStatement extends PALStatement {
 
         private final Expression expr;
         private final TargetType onClauseType;
+
+        public OnClause() {
+            expr = null;
+            onClauseType = null;
+        }
 
         public OnClause(Expression expr, TargetType onClauseType) {
             this.expr = expr;
@@ -206,23 +255,40 @@ public class CreateRuleStatement extends PALStatement {
         public boolean isAnyOfSet() {
             return onClauseType == TargetType.ANY_OF_SET;
         }
+
+        @Override
+        public String toString() {
+            if (expr == null || onClauseType == null) {
+                return "";
+            }
+
+            String s = "\non ";
+            switch (onClauseType) {
+                case POLICY_ELEMENT -> s += expr;
+                case ANY_POLICY_ELEMENT -> s += "any policy element";
+                case ANY_CONTAINED_IN -> s += "any policy element in " + expr;
+                case ANY_OF_SET -> s += "any policy element of " + expr;
+            }
+
+            return s;
+        }
     }
 
     public static class ResponseBlock {
         private final String evtCtxVar;
-        private final List<PALStatement> responseBlock;
+        private final List<PALStatement> statements;
 
-        public ResponseBlock(String evtCtxVar, List<PALStatement> responseBlock) {
+        public ResponseBlock(String evtCtxVar, List<PALStatement> statements) {
             this.evtCtxVar = evtCtxVar;
-            this.responseBlock = responseBlock;
+            this.statements = statements;
         }
 
         public String getEvtCtxVar() {
             return evtCtxVar;
         }
 
-        public List<PALStatement> getResponseBlock() {
-            return responseBlock;
+        public List<PALStatement> getStatements() {
+            return statements;
         }
     }
 }

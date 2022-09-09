@@ -47,6 +47,14 @@ public class DeassignStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        return format(indent, "deassign %s from %s;",
+                child.toString(indent),
+                deassignFrom.toString(indent)
+        );
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

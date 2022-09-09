@@ -10,4 +10,9 @@ public class ContinueStatement extends PALStatement {
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         return Value.continueValue();
     }
+
+    @Override
+    public String toString(int indent) {
+        return format(indent, "continue;");
+    }
 }

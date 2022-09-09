@@ -50,9 +50,15 @@ public class MapLiteral {
 
     @Override
     public String toString() {
-        return "MapLiteral{" +
-                "map=" + map +
-                ", type=" + type +
-                '}';
+        String s = "";
+        for (Expression k : map.keySet()) {
+            if (!s.isEmpty()) {
+                s += ", ";
+            }
+
+            s += k.toString() + ": " + map.get(k).toString(0);
+        }
+
+        return String.format("{%s}", s);
     }
 }

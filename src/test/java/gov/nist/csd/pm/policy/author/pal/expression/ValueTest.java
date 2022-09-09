@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.pal.model.expression;
+package gov.nist.csd.pm.policy.author.pal.expression;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;

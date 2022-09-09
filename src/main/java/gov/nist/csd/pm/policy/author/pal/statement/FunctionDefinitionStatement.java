@@ -80,6 +80,42 @@ public class FunctionDefinitionStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        String argsStr = serializeFormalArgs();
+        String bodyStr = serializeFunctionBody(indent+1);
+
+        return format(
+                indent,
+                "function %s(%s) %s {\n%s\n}",
+                functionName,
+                argsStr,
+                returnType.toString(),
+                bodyStr
+        );
+    }
+
+    private String serializeFunctionBody(int indent) {
+        String pal = "";
+        for (PALStatement stmt : body) {
+            pal += stmt.toString(indent) + "\n";
+        }
+
+        return pal;
+    }
+
+    private String serializeFormalArgs() {
+        String pal = "";
+        for (FormalArgument formalArgument : args) {
+            if (!pal.isEmpty()) {
+                pal += ", ";
+            }
+
+            pal += formalArgument.type().toString() + " " + formalArgument.name();
+        }
+        return pal;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

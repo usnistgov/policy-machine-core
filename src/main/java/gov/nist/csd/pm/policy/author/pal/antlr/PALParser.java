@@ -2632,7 +2632,7 @@ public class PALParser extends Parser {
 	}
 
 	public static class CreateRuleStmtContext extends ParserRuleContext {
-		public ExpressionContext name;
+		public ExpressionContext label;
 		public ExpressionContext performsClause;
 		public TerminalNode CREATE() { return getToken(PALParser.CREATE, 0); }
 		public TerminalNode RULE() { return getToken(PALParser.RULE, 0); }
@@ -2685,7 +2685,7 @@ public class PALParser extends Parser {
 			setState(345);
 			match(RULE);
 			setState(346);
-			((CreateRuleStmtContext)_localctx).name = expression();
+			((CreateRuleStmtContext)_localctx).label = expression();
 			setState(347);
 			match(WHEN);
 			setState(348);

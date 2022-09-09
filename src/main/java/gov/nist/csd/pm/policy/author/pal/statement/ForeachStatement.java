@@ -84,6 +84,24 @@ public class ForeachStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        return format(indent, "foreach %s in %s {\n%s\n}",
+                (valueVarName != null ? String.format("%s, %s", varName, valueVarName) : varName),
+                iter.toString(indent),
+                blockToString(indent+1)
+        );
+    }
+
+    private String blockToString(int indent) {
+        String s = "";
+        for (PALStatement stmt : block) {
+            s += stmt.toString(indent) + "\n";
+        }
+
+        return s;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

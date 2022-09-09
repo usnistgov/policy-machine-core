@@ -10,5 +10,6 @@ public interface PALExecutable {
 
     List<PALStatement> compilePAL(String input) throws PMException;
     void compileAndExecutePAL(UserContext author, String input) throws PMException;
+    String toPAL() throws PMException;
 
 }

@@ -10,4 +10,9 @@ public class BreakStatement extends PALStatement {
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         return Value.breakValue();
     }
+
+    @Override
+    public String toString(int indent) {
+        return format(indent, "break;");
+    }
 }

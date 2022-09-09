@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.pal;
+package gov.nist.csd.pm.policy.author.pal;
 
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
@@ -374,6 +374,16 @@ public class CompileTest {
                 )
         );
         assertEquals(expected, stmt);
+    }
+
+    @Test
+    void testScopeOrder() throws PMException {
+        String pal = """
+                let x = 'hello';
+                create policy class concat([x, ' ', y]);
+                let y = 'world';
+                """;
+        assertThrows(PALCompilationException.class, () -> new MemoryPAP().compilePAL(pal));
     }
 
 }

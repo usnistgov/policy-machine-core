@@ -127,4 +127,9 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
     public void compileAndExecutePAL(UserContext author, String input) throws PMException {
         new PALExecutor(this).compileAndExecutePAL(author, input);
     }
+
+    @Override
+    public String toPAL() throws PMException {
+        return new PALExecutor(this).toPAL();
+    }
 }

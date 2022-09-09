@@ -21,7 +21,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
 
     @Override
     public CreateRuleStatement visitCreateRuleStmt(PALParser.CreateRuleStmtContext ctx) {
-        Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
+        Expression name = Expression.compile(visitorCtx, ctx.label, Type.string());
 
         CreateRuleStatement.SubjectClause subjectClause = getSubjectClause(ctx.subjectClause());
         CreateRuleStatement.PerformsClause performsClause = getPerformsClause(ctx.performsClause);
@@ -95,7 +95,6 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         if (ctx instanceof PALParser.AnyUserSubjectContext) {
             type = CreateRuleStatement.SubjectType.ANY_USER;
             return new CreateRuleStatement.SubjectClause(type);
-
         } else if (ctx instanceof PALParser.UserSubjectContext userSubjectCtx) {
             type = CreateRuleStatement.SubjectType.USER;
             expr = Expression.compile(visitorCtx, userSubjectCtx.user, Type.string());

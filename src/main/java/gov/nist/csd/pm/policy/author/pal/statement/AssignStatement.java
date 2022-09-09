@@ -47,6 +47,11 @@ public class AssignStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        return format(indent, "assign %s to %s;", child.toString(indent), assignTo.toString(indent));
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

@@ -110,7 +110,7 @@ deleteStmt: DELETE deleteType name=expression SEMI_COLON ;
 createObligationStmt:
     OBLIGATION label=expression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
 createRuleStmt:
-    CREATE RULE name=expression
+    CREATE RULE label=expression
     WHEN subjectClause
     PERFORMS performsClause=expression
     (ON onClause)?

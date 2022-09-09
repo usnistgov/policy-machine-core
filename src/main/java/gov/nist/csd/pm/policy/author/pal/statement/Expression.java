@@ -119,13 +119,13 @@ public class Expression extends PALStatement {
     }
 
     @Override
-    public String toString() {
+    public String toString(int indent) {
         if (isFunctionCall) {
-            return functionCall.toString();
+            return functionCall.toString(indent);
         } else if (isLiteral) {
-            return literal.toString();
+            return literal.toString(indent);
         } else {
-            return variableReference.toString();
+            return variableReference.toString(indent);
         }
     }
 

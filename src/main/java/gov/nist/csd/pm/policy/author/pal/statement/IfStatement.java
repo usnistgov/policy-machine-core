@@ -52,6 +52,46 @@ public class IfStatement extends PALStatement {
         return executeBlock(ctx, policyAuthor, elseBlock);
     }
 
+    @Override
+    public String toString(int indent) {
+        return format(
+                indent,
+                "%s%s%s",
+                ifBlockToString(indent),
+                elseIfBlockToString(indent),
+                elseBlockToString(indent)
+        );
+    }
+
+    private String elseBlockToString(int indent) {
+        if (!elseBlock.isEmpty()) {
+            return "";
+        }
+        return format(indent, "else {\n%s\n}\n", blockToString(indent, elseBlock));
+    }
+
+    private String elseIfBlockToString(int indent) {
+        String s = "";
+        for (ConditionalBlock b : ifElseBlocks) {
+            s += format(indent, " else if %s {\n%s\n}\n", b.condition.toString(indent), blockToString(indent, b.block));
+        }
+
+        return s;
+    }
+
+    private String ifBlockToString(int indent) {
+        return format(indent, "if %s {\n%s\n}\n", ifBlock.condition.toString(indent), blockToString(indent, ifBlock.block));
+    }
+
+    private String blockToString(int indent, List<PALStatement> stmts) {
+        String s = "";
+        indent++;
+        for (PALStatement stmt : stmts) {
+            s += stmt.toString(indent) + "\n";
+        }
+        return s;
+    }
+
     private Value executeBlock(ExecutionContext ctx, PolicyAuthor policyAuthor, List<PALStatement> block) throws PMException {
         ExecutionContext copy = ctx.copy();
         Value value = executeStatementBlock(copy, policyAuthor, block);

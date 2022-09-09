@@ -28,15 +28,32 @@ public class DeleteStatement extends PALStatement {
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         String name = expression.execute(ctx, policyAuthor).getStringValue();
-        if (type == Type.NODE) {
-            policyAuthor.graph().deleteNode(name);
-        } else if (type == Type.PROHIBITION) {
+        if (type == Type.PROHIBITION) {
             policyAuthor.prohibitions().delete(name);
         } else if (type == Type.OBLIGATION) {
             policyAuthor.obligations().delete(name);
+        } else {
+            policyAuthor.graph().deleteNode(name);
         }
 
         return new Value();
+    }
+
+    @Override
+    public String toString(int indent) {
+        String s = "delete %s %s";
+        String typeStr = "";
+        switch (type) {
+            case PROHIBITION -> typeStr = "prohibition";
+            case OBLIGATION -> typeStr = "obligation";
+            case POLICY_CLASS -> typeStr = "policy class";
+            case OBJECT_ATTRIBUTE -> typeStr = "object attribute";
+            case USER_ATTRIBUTE -> typeStr = "user attribute";
+            case OBJECT -> typeStr = "object";
+            case USER -> typeStr = "user";
+        }
+
+        return format(indent, s, typeStr, expression.toString(indent));
     }
 
     @Override
@@ -53,7 +70,11 @@ public class DeleteStatement extends PALStatement {
     }
 
     public enum Type {
-        NODE,
+        POLICY_CLASS,
+        OBJECT_ATTRIBUTE,
+        USER_ATTRIBUTE,
+        OBJECT,
+        USER,
         PROHIBITION,
         OBLIGATION
     }

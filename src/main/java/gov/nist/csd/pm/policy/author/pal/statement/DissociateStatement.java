@@ -28,11 +28,16 @@ public class DissociateStatement extends PALStatement {
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         String ua = uaExpr.execute(ctx, policyAuthor).getStringValue();
-        String target = uaExpr.execute(ctx, policyAuthor).getStringValue();
+        String target = targetExpr.execute(ctx, policyAuthor).getStringValue();
 
         policyAuthor.graph().dissociate(ua, target);
 
         return new Value();
+    }
+
+    @Override
+    public String toString(int indent) {
+        return format(indent, "dissociate %s and %s", uaExpr.toString(indent), targetExpr.toString(indent));
     }
 
     @Override

@@ -67,6 +67,23 @@ public class FunctionStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        return format(indent, "%s(%s)", functionName, argsToString());
+    }
+
+    private String argsToString() {
+        String s = "";
+        for (Expression arg : actualArgs) {
+            if (!s.isEmpty()) {
+                s += ", ";
+            }
+            s += arg;
+        }
+
+        return s;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -80,11 +97,4 @@ public class FunctionStatement extends PALStatement {
         return Objects.hash(functionName, actualArgs);
     }
 
-    @Override
-    public String toString() {
-        return "FunctionStatement{" +
-                "functionName='" + functionName + '\'' +
-                ", actualArgs=" + actualArgs +
-                '}';
-    }
 }

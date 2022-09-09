@@ -38,9 +38,6 @@ public class MapEntryReference {
 
     @Override
     public String toString() {
-        return "MapEntryReference{" +
-                "map=" + map +
-                ", key=" + key +
-                '}';
+        return String.format("%s[%s]", map, key);
     }
 }

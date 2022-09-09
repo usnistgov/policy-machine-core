@@ -50,9 +50,14 @@ public class ArrayLiteral {
 
     @Override
     public String toString() {
-        return "ArrayLiteral{" +
-                "array=" + array +
-                ", type=" + type +
-                '}';
+        String s = "";
+        for (Expression expression : array) {
+            if (!s.isEmpty()) {
+                s += ", ";
+            }
+
+            s += expression.toString(0);
+        }
+        return String.format("[%s]", s);
     }
 }

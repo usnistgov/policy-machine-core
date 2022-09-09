@@ -44,6 +44,11 @@ public class DeleteRuleStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        return format(indent, "delete rule %s from obligation %s;", ruleExpr.toString(indent), oblExpr.toString(indent));
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

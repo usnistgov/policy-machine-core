@@ -48,6 +48,21 @@ public class CreateObligationStatement extends PALStatement {
     }
 
     @Override
+    public String toString(int indent) {
+        return format(indent, "create obligation %s {\n%s\n}", labelExpr.toString(indent), rulesToString(indent));
+    }
+
+    private String rulesToString(int indent) {
+        String rules = "";
+        indent++;
+        for (CreateRuleStatement stmt : ruleStmts) {
+            rules += format(indent, "%s\n", stmt.toString(indent));
+        }
+
+        return rules;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
