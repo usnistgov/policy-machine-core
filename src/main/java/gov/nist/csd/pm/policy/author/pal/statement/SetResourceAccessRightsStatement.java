@@ -26,7 +26,7 @@ public class SetResourceAccessRightsStatement extends PALStatement{
     }
 
     @Override
-    public String toString(int indent) {
+    public String toString() {
         String ars = "";
         for (String ar : accessRightSet) {
             if (!ars.isEmpty()) {
@@ -35,6 +35,6 @@ public class SetResourceAccessRightsStatement extends PALStatement{
 
             ars += String.format("'%s'", ar);
         }
-        return format(indent, "set resource access rights [%s];", ars);
+        return String.format("set resource access rights [%s];", ars);
     }
 }

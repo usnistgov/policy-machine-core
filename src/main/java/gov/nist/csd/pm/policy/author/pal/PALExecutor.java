@@ -99,7 +99,6 @@ public class PALExecutor implements PALExecutable{
         Map<String, FunctionDefinitionStatement> predefinedFunctions = predefinedCtx.getFunctions();
         Map<String, Value> predefinedConstants = predefinedCtx.getConstants();
 
-
         Map<String, FunctionDefinitionStatement> topLevelFunctions = ctx.getFunctions();
         for (String funcName : topLevelFunctions.keySet()) {
             if (predefinedFunctions.containsKey(funcName)) {
@@ -168,6 +167,7 @@ public class PALExecutor implements PALExecutable{
 
     @Override
     public String toPAL() throws PMException {
-        return new PALSerializer(policy).toPAL();
+        String pal = new PALSerializer(policy).toPAL();
+        return PALFormatter.format(pal);
     }
 }

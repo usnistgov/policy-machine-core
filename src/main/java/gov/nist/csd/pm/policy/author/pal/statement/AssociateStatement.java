@@ -53,9 +53,9 @@ public class AssociateStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "associate %s and %s with access rights %s;",
-                ua.toString(indent), target.toString(indent), accessRights.toString(indent));
+    public String toString() {
+        return String.format("associate %s and %s with access rights %s;",
+                ua, target, accessRights);
     }
 
     @Override

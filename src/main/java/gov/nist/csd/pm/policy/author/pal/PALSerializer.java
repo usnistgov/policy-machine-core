@@ -3,19 +3,13 @@ package gov.nist.csd.pm.policy.author.pal;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.author.pal.statement.AssignStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
-import static gov.nist.csd.pm.policy.author.pal.PALFormatter.format;
 
 class PALSerializer {
 
@@ -28,14 +22,21 @@ class PALSerializer {
                 function testFunc() void {
                     let x = 'hello world';
                     create policy class x;
+                    
+                    foreach x in ['a', 'b'] {
+                        create policy class x;
+                    }
+                    
                     create obligation 'o1' {
                         create rule 'rule1'
                         when any user
                         performs 'event'
+                        on any policy element
                         do(evtCtx) {
-                            foreach x in ['a', 'b'] {
+                            foreach x in ['c', 'd'] {
                                 create policy class x;
                             }
+
                             create policy class test;
                         }
                     }
@@ -74,18 +75,17 @@ class PALSerializer {
         // obligations
 
 
-        pal = String.format(pal, constants, functions, "", "", "");
-        return format(pal);
+        return String.format(pal, constants, functions, "", "", "");
     }
 
     private String serializeFunctions() throws PMException {
-        String pal = "";
+        StringBuilder pal = new StringBuilder();
         Map<String, FunctionDefinitionStatement> functions = policy.pal().getFunctions();
         for (String funcName : functions.keySet()) {
-            pal += "\n" + functions.get(funcName).toString(0) + "\n";
+            pal.append("\n").append(functions.get(funcName).toString()).append("\n");
         }
 
-        return pal;
+        return pal.toString();
     }
 
     private String serializeConstants() throws PMException {

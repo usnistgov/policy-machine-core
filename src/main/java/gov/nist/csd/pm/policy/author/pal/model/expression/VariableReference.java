@@ -106,7 +106,7 @@ public class VariableReference extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
+    public String toString() {
         if (isID) {
             return id;
         } else {

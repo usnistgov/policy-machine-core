@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.author.pal.model.function.FunctionReturnStmt;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionReturnStmt;
 
 import java.util.ArrayList;
 import java.util.HashSet;

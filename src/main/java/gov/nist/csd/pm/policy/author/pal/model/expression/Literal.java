@@ -143,7 +143,7 @@ public class Literal extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
+    public String toString() {
         if (isStringLiteral) {
             return String.format("'%s'", getStringLiteral());
         } else if (isBooleanLiteral) {

@@ -42,8 +42,8 @@ public class SetNodePropertiesStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "set properties of %s to %s;", nameExpr.toString(indent), propertiesExpr.toString(indent));
+    public String toString() {
+        return String.format("set properties of %s to %s;", nameExpr, propertiesExpr);
     }
 
     @Override

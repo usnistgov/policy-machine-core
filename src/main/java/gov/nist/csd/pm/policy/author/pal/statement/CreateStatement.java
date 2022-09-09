@@ -25,8 +25,8 @@ public class CreateStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return statement.toString(indent);
+    public String toString() {
+        return statement.toString();
     }
 
     @Override

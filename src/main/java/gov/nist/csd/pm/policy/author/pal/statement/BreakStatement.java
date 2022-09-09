@@ -12,7 +12,7 @@ public class BreakStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "break;");
+    public String toString() {
+        return "break;";
     }
 }

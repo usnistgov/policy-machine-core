@@ -47,10 +47,10 @@ public class DeassignStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "deassign %s from %s;",
-                child.toString(indent),
-                deassignFrom.toString(indent)
+    public String toString() {
+        return String.format("deassign %s from %s;",
+                child,
+                deassignFrom
         );
     }
 

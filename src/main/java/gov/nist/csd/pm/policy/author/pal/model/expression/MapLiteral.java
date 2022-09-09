@@ -50,13 +50,13 @@ public class MapLiteral {
 
     @Override
     public String toString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Expression k : map.keySet()) {
-            if (!s.isEmpty()) {
-                s += ", ";
+            if (s.length() > 0) {
+                s.append(", ");
             }
 
-            s += k.toString() + ": " + map.get(k).toString(0);
+            s.append(k.toString()).append(": ").append(map.get(k));
         }
 
         return String.format("{%s}", s);

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
+
 public class CreateRuleStatement extends PALStatement {
 
     private final Expression label;
@@ -121,31 +123,13 @@ public class CreateRuleStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(
-                indent,
-                "\n%s%s%s%s%s",
-                format(indent, "create rule %s\n", label.toString(indent)),
-                format(indent, "%s\n", subjectClause.toString()),
-                format(indent, "%s", performsClause.toString()),
-                format(indent, "%s", onClause.toString()),
-                format(indent, "\n%s", responseBlockToString(indent))
+    public String toString() {
+        return String.format(
+                "create rule %s %s %s %s do(%s) {%s}",
+                label, subjectClause, performsClause, onClause, responseBlock.evtCtxVar,
+                statementsToString(responseBlock.statements)
         );
     }
-
-    private String responseBlockToString(int indent) {
-        String stmtsStr = "";
-        for (PALStatement stmt : responseBlock.statements) {
-            stmtsStr += stmt.toString(indent + 1) + "\n";
-        }
-
-        return format(
-                indent,
-                format(indent, "do(%s)", responseBlock.evtCtxVar),
-                format(indent, "{\n%s\n}", stmtsStr)
-        );
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -216,7 +200,7 @@ public class CreateRuleStatement extends PALStatement {
 
         @Override
         public String toString() {
-            return "performs " + events.toString(0);
+            return "performs " + events.toString();
         }
     }
 
@@ -258,11 +242,11 @@ public class CreateRuleStatement extends PALStatement {
 
         @Override
         public String toString() {
-            if (expr == null || onClauseType == null) {
+            if (expr == null && onClauseType == null) {
                 return "";
             }
 
-            String s = "\non ";
+            String s = "on ";
             switch (onClauseType) {
                 case POLICY_ELEMENT -> s += expr;
                 case ANY_POLICY_ELEMENT -> s += "any policy element";

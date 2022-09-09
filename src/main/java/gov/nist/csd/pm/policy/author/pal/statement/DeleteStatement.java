@@ -40,8 +40,7 @@ public class DeleteStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        String s = "delete %s %s";
+    public String toString() {
         String typeStr = "";
         switch (type) {
             case PROHIBITION -> typeStr = "prohibition";
@@ -53,7 +52,7 @@ public class DeleteStatement extends PALStatement {
             case USER -> typeStr = "user";
         }
 
-        return format(indent, s, typeStr, expression.toString(indent));
+        return String.format("delete %s %s;", typeStr, expression);
     }
 
     @Override

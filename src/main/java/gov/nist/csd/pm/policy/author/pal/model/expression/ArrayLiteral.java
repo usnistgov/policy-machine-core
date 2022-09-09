@@ -50,13 +50,13 @@ public class ArrayLiteral {
 
     @Override
     public String toString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Expression expression : array) {
-            if (!s.isEmpty()) {
-                s += ", ";
+            if (s.length() > 0) {
+                s.append(", ");
             }
 
-            s += expression.toString(0);
+            s.append(expression.toString());
         }
         return String.format("[%s]", s);
     }

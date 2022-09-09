@@ -36,8 +36,8 @@ public class DissociateStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "dissociate %s and %s", uaExpr.toString(indent), targetExpr.toString(indent));
+    public String toString() {
+        return String.format("dissociate %s and %s;", uaExpr, targetExpr);
     }
 
     @Override

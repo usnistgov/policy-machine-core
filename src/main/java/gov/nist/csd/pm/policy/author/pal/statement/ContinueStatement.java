@@ -12,7 +12,7 @@ public class ContinueStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "continue;");
+    public String toString() {
+        return "continue;";
     }
 }

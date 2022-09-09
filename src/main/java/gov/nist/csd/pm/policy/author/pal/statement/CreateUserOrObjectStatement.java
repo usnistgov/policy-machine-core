@@ -80,12 +80,12 @@ public class CreateUserOrObjectStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent,
+    public String toString() {
+        return String.format(
                 "create %s %s assign to %s;",
                 (type == O ? "object " : "user "),
-                name.toString(indent),
-                assignTo.toString(indent)
+                name,
+                assignTo
         );
     }
 

@@ -79,11 +79,11 @@ public class CreateAttrStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "create %s %s assign to %s;",
+    public String toString() {
+        return String.format("create %s %s assign to %s;",
                 (type == OA ? "object attribute " : "user attribute "),
-                name.toString(indent),
-                assignTo.toString(indent)
+                name,
+                assignTo
         );
     }
 

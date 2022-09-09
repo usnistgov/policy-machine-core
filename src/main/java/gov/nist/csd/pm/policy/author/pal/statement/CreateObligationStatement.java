@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
+
 public class CreateObligationStatement extends PALStatement {
 
     private final Expression labelExpr;
@@ -48,18 +50,8 @@ public class CreateObligationStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "create obligation %s {\n%s\n}", labelExpr.toString(indent), rulesToString(indent));
-    }
-
-    private String rulesToString(int indent) {
-        String rules = "";
-        indent++;
-        for (CreateRuleStatement stmt : ruleStmts) {
-            rules += format(indent, "%s\n", stmt.toString(indent));
-        }
-
-        return rules;
+    public String toString() {
+        return String.format("create obligation %s {%s}", labelExpr, statementsToString(ruleStmts));
     }
 
     @Override

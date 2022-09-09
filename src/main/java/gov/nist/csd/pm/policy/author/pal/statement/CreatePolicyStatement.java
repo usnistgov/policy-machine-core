@@ -42,7 +42,7 @@ public class CreatePolicyStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "create policy class %s;", name.toString(indent));
+    public String toString() {
+        return String.format("create policy class %s;", name);
     }
 }

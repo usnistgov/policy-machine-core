@@ -47,8 +47,8 @@ public class AssignStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "assign %s to %s;", child.toString(indent), assignTo.toString(indent));
+    public String toString() {
+        return String.format("assign %s to %s;", child, assignTo);
     }
 
     @Override

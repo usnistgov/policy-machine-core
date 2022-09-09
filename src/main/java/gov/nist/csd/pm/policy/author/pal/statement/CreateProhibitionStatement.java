@@ -87,7 +87,7 @@ public class CreateProhibitionStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
+    public String toString() {
         String subjectStr = "";
         switch (subjectType) {
             case USER_ATTRIBUTE -> subjectStr = "user attribute ";
@@ -95,18 +95,12 @@ public class CreateProhibitionStatement extends PALStatement {
             case PROCESS -> subjectStr = "process ";
         }
 
-        String arStr = "access rights " + accessRights.toString(indent);
-
-        String containerStr = "on " + (isIntersection ? "intersection" : "union") + " of ";
+        StringBuilder containerStr = new StringBuilder("on " + (isIntersection ? "intersection" : "union") + " of ");
         for (Container c : containers) {
-            containerStr += c;
+            containerStr.append(c);
         }
 
-        return format(
-                indent,
-                format(indent, "create prohibition %s\n", label.toString(indent)),
-                format(indent, "deny %s access rights %s on %s;", subjectStr, arStr, containerStr)
-        );
+        return String.format("create prohibition %s deny %s access rights %s on %s;", label, subjectStr, accessRights, containerStr);
     }
 
     @Override

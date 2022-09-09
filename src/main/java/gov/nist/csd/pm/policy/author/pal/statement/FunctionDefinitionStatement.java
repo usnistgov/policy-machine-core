@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
+
 public class FunctionDefinitionStatement extends PALStatement {
 
     public static String name(String name) {
@@ -80,27 +82,16 @@ public class FunctionDefinitionStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
+    public String toString() {
         String argsStr = serializeFormalArgs();
-        String bodyStr = serializeFunctionBody(indent+1);
 
-        return format(
-                indent,
-                "function %s(%s) %s {\n%s\n}",
+        return String.format(
+                "function %s(%s) %s {%s}",
                 functionName,
                 argsStr,
                 returnType.toString(),
-                bodyStr
+                statementsToString(body)
         );
-    }
-
-    private String serializeFunctionBody(int indent) {
-        String pal = "";
-        for (PALStatement stmt : body) {
-            pal += stmt.toString(indent) + "\n";
-        }
-
-        return pal;
     }
 
     private String serializeFormalArgs() {

@@ -67,20 +67,20 @@ public class FunctionStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(indent, "%s(%s)", functionName, argsToString());
+    public String toString() {
+        return String.format("%s(%s)", functionName, argsToString());
     }
 
     private String argsToString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Expression arg : actualArgs) {
-            if (!s.isEmpty()) {
-                s += ", ";
+            if (s.length() > 0) {
+                s.append(", ");
             }
-            s += arg;
+            s.append(arg);
         }
 
-        return s;
+        return s.toString();
     }
 
     @Override

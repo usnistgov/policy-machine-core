@@ -74,10 +74,6 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         } else if (onClauseCtx instanceof PALParser.AnyOfSetContext anyOfSetContext) {
             expr = Expression.compile(visitorCtx, anyOfSetContext.expression(), Type.array(Type.any()));
             onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
-        } else if (onClauseCtx == null) {
-            onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
-        } else {
-            visitorCtx.errorLog().addError(onClauseCtx, "unknown ON clause");
         }
 
         return new CreateRuleStatement.OnClause(expr, onClauseType);

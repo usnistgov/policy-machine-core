@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.author.pal.PALExecutor.executeStatementBlock;
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 
 public class IfStatement extends PALStatement {
 
@@ -53,43 +54,33 @@ public class IfStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
-        return format(
-                indent,
+    public String toString() {
+        return String.format(
                 "%s%s%s",
-                ifBlockToString(indent),
-                elseIfBlockToString(indent),
-                elseBlockToString(indent)
+                ifBlockToString(),
+                elseIfBlockToString(),
+                elseBlockToString()
         );
     }
 
-    private String elseBlockToString(int indent) {
+    private String elseBlockToString() {
         if (!elseBlock.isEmpty()) {
             return "";
         }
-        return format(indent, "else {\n%s\n}\n", blockToString(indent, elseBlock));
+        return String.format("else {%s}", statementsToString(elseBlock));
     }
 
-    private String elseIfBlockToString(int indent) {
-        String s = "";
+    private String elseIfBlockToString() {
+        StringBuilder s = new StringBuilder();
         for (ConditionalBlock b : ifElseBlocks) {
-            s += format(indent, " else if %s {\n%s\n}\n", b.condition.toString(indent), blockToString(indent, b.block));
+            s.append(String.format(" else if %s {%s} ", b.condition, statementsToString(b.block)));
         }
 
-        return s;
+        return s.toString();
     }
 
-    private String ifBlockToString(int indent) {
-        return format(indent, "if %s {\n%s\n}\n", ifBlock.condition.toString(indent), blockToString(indent, ifBlock.block));
-    }
-
-    private String blockToString(int indent, List<PALStatement> stmts) {
-        String s = "";
-        indent++;
-        for (PALStatement stmt : stmts) {
-            s += stmt.toString(indent) + "\n";
-        }
-        return s;
+    private String ifBlockToString() {
+        return String.format("if %s {%s}", ifBlock.condition, statementsToString(ifBlock.block));
     }
 
     private Value executeBlock(ExecutionContext ctx, PolicyAuthor policyAuthor, List<PALStatement> block) throws PMException {

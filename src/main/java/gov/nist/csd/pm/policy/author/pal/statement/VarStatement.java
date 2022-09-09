@@ -40,7 +40,7 @@ public class VarStatement extends PALStatement {
     }
 
     @Override
-    public String toString(int indent) {
+    public String toString() {
         String s = "";
         if (isConst) {
             s = "const ";
@@ -48,7 +48,7 @@ public class VarStatement extends PALStatement {
             s = "let ";
         }
 
-        return format(indent, "%s%s = %s;", s, varName, expression.toString(indent));
+        return String.format("%s%s = %s;", s, varName, expression);
     }
 
     @Override
