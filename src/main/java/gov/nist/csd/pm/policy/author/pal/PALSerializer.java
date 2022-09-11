@@ -59,7 +59,7 @@ class PALSerializer {
     }
 
     String toPAL() throws PMException {
-        String pal = "%s\n%s\n%s\n%s\n%s";
+        String pal = "%s%s%s%s%s";
 
         String constants = serializeConstants();
         String functions = serializeFunctions();
