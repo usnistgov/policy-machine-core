@@ -274,15 +274,13 @@ public class CompileTest {
 
         stmt = statements.get(0);
         Type evtCtxType = Type.map(Type.string(), Type.any());
-        PALStatement expected = new CreateStatement(
-                new CreatePolicyStatement(
-                        new Expression(
-                                new VariableReference(
-                                        new MapEntryReference(
-                                                new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("eventName"))
-                                        ),
-                                        Type.any()
-                                )
+        PALStatement expected = new CreatePolicyStatement(
+                new Expression(
+                        new VariableReference(
+                                new MapEntryReference(
+                                        new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("eventName"))
+                                ),
+                                Type.any()
                         )
                 )
         );
@@ -317,19 +315,17 @@ public class CompileTest {
         assertEquals(expected, stmt);
 
         stmt = statements.get(3);
-        expected = new CreateStatement(
-                new CreatePolicyStatement(
-                        new Expression(
-                                new FunctionStatement(
-                                        "concat",
-                                        Arrays.asList(new Expression(new Literal(new ArrayLiteral(
-                                                new Expression[]{
-                                                        new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
-                                                        new Expression(new Literal("_test"))
-                                                },
-                                                Type.string()
-                                        )))))
-                        )
+        expected = new CreatePolicyStatement(
+                new Expression(
+                        new FunctionStatement(
+                                "concat",
+                                Arrays.asList(new Expression(new Literal(new ArrayLiteral(
+                                        new Expression[]{
+                                                new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                                                new Expression(new Literal("_test"))
+                                        },
+                                        Type.string()
+                                )))))
                 )
         );
         assertEquals(expected, stmt);
@@ -344,40 +340,38 @@ public class CompileTest {
         assertEquals(expected, stmt);
 
         stmt = statements.get(5);
-        expected = new CreateStatement(
-                new CreatePolicyStatement(
-                        new Expression(
-                                new FunctionStatement(
-                                        "concat",
-                                        Arrays.asList(new Expression(new Literal(new ArrayLiteral(
-                                                new Expression[]{
-                                                        new Expression(
-                                                                new VariableReference(
-                                                                        new MapEntryReference(
-                                                                                new VariableReference(
-                                                                                        new MapEntryReference(
-                                                                                                new VariableReference("evtCtx", Type.map(Type.string(), Type.any())),
-                                                                                                new Expression(new Literal("userCtx"))
-                                                                                        ),
-                                                                                        Type.any()
+        expected = new CreatePolicyStatement(
+                new Expression(
+                        new FunctionStatement(
+                                "concat",
+                                Arrays.asList(new Expression(new Literal(new ArrayLiteral(
+                                        new Expression[]{
+                                                new Expression(
+                                                        new VariableReference(
+                                                                new MapEntryReference(
+                                                                        new VariableReference(
+                                                                                new MapEntryReference(
+                                                                                        new VariableReference("evtCtx", Type.map(Type.string(), Type.any())),
+                                                                                        new Expression(new Literal("userCtx"))
                                                                                 ),
-                                                                                new Expression(new Literal("user"))
+                                                                                Type.any()
                                                                         ),
-                                                                        Type.any()
-                                                                )
-                                                        ),
-                                                        new Expression(new Literal("_test"))
-                                                },
-                                                Type.any()
-                                        )))))
-                        )
+                                                                        new Expression(new Literal("user"))
+                                                                ),
+                                                                Type.any()
+                                                        )
+                                                ),
+                                                new Expression(new Literal("_test"))
+                                        },
+                                        Type.any()
+                                )))))
                 )
         );
         assertEquals(expected, stmt);
     }
 
     @Test
-    void testScopeOrder() throws PMException {
+    void testScopeOrder() {
         String pal = """
                 let x = 'hello';
                 create policy class concat([x, ' ', y]);

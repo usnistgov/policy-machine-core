@@ -338,16 +338,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitNodeType(PALParser.NodeTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#createStmt}.
-	 * @param ctx the parse tree
-	 */
-	void enterCreateStmt(PALParser.CreateStmtContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#createStmt}.
-	 * @param ctx the parse tree
-	 */
-	void exitCreateStmt(PALParser.CreateStmtContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link PALParser#createPolicyStmt}.
 	 * @param ctx the parse tree
 	 */

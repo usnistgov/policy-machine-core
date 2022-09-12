@@ -11,7 +11,11 @@ stmt: (
     | continueStmt
     | funcCallStmt
     | ifStmt
-    | createStmt
+    | createPolicyStmt
+    | createAttrStmt
+    | createUserOrObjectStmt
+    | createObligationStmt
+    | createProhibitionStmt
     | setNodePropsStmt
     | assignStmt
     | deassignStmt
@@ -86,16 +90,9 @@ deleteType:
 nodeType:
     (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
-createStmt:
-    CREATE (createPolicyStmt
-            | createAttrStmt
-            | createUserOrObjectStmt
-            | createObligationStmt
-            | createProhibitionStmt) ;
-
-createPolicyStmt: POLICY_CLASS name=expression SEMI_COLON ;
-createAttrStmt: (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression ASSIGN_TO assignTo=expression SEMI_COLON ;
-createUserOrObjectStmt: (USER | OBJECT) name=expression ASSIGN_TO assignTo=expression SEMI_COLON ;
+createPolicyStmt: CREATE POLICY_CLASS name=expression SEMI_COLON ;
+createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression ASSIGN_TO assignTo=expression SEMI_COLON ;
+createUserOrObjectStmt: CREATE (USER | OBJECT) name=expression ASSIGN_TO assignTo=expression SEMI_COLON ;
 
 setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression SEMI_COLON ;
 
@@ -108,7 +105,7 @@ dissociateStmt: DISSOCIATE ua=expression AND target=expression SEMI_COLON ;
 deleteStmt: DELETE deleteType name=expression SEMI_COLON ;
 
 createObligationStmt:
-    OBLIGATION label=expression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
+    CREATE OBLIGATION label=expression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
 createRuleStmt:
     CREATE RULE label=expression
     WHEN subjectClause
@@ -141,7 +138,7 @@ deleteRuleStmt:
     DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression SEMI_COLON ;
 
 createProhibitionStmt:
-    PROHIBITION label=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
+    CREATE PROHIBITION label=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
     ACCESS_RIGHTS accessRights=accessRightArray
     ON (INTERSECTION|UNION) OF containers=prohibitionContainerList
     SEMI_COLON ;

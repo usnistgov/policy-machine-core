@@ -30,9 +30,21 @@ public class StatementVisitor extends PALBaseVisitor<PALStatement> {
         } else if (ctx.ifStmt() != null) {
             return new IfStmtVisitor(visitorCtx)
                     .visitIfStmt(ctx.ifStmt());
-        } else if (ctx.createStmt() != null) {
-            return new CreateStmtVisitor(visitorCtx)
-                    .visitCreateStmt(ctx.createStmt());
+        } else if (ctx.createAttrStmt() != null) {
+            return new CreateAttrStmtVisitor(visitorCtx)
+                    .visitCreateAttrStmt(ctx.createAttrStmt());
+        } else if (ctx.createPolicyStmt() != null) {
+            return new CreatePolicyStmtVisitor(visitorCtx)
+                    .visitCreatePolicyStmt(ctx.createPolicyStmt());
+        } else if (ctx.createUserOrObjectStmt() != null) {
+            return new CreateUserOrObjectStmtVisitor(visitorCtx)
+                    .visitCreateUserOrObjectStmt(ctx.createUserOrObjectStmt());
+        } else if (ctx.createProhibitionStmt() != null) {
+            return new CreateProhibitionStmtVisitor(visitorCtx)
+                    .visitCreateProhibitionStmt(ctx.createProhibitionStmt());
+        } else if (ctx.createObligationStmt() != null) {
+            return new CreateObligationStmtVisitor(visitorCtx)
+                    .visitCreateObligationStmt(ctx.createObligationStmt());
         } else if (ctx.setNodePropsStmt() != null) {
             return new SetNodePropertiesStmtVisitor(visitorCtx)
                     .visitSetNodePropsStmt(ctx.setNodePropsStmt());

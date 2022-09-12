@@ -64,7 +64,7 @@ public class IfStatement extends PALStatement {
     }
 
     private String elseBlockToString() {
-        if (!elseBlock.isEmpty()) {
+        if (elseBlock.isEmpty()) {
             return "";
         }
         return String.format("else {%s}", statementsToString(elseBlock));

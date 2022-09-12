@@ -8,7 +8,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 import java.util.Scanner;
@@ -16,6 +15,7 @@ import java.util.Scanner;
 public class PALFormatter extends PALBaseVisitor<String> {
 
     private static final String SPACES = "    ";
+    public static final String NEW_LINE = "\n";
 
     private int indentLevel;
 
@@ -32,7 +32,25 @@ public class PALFormatter extends PALBaseVisitor<String> {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PALParser parser = new PALParser(tokens);
 
-        return new PALFormatter().visitPal(parser.pal());
+        String formatted = new PALFormatter().visitPal(parser.pal());
+
+        // last step is to remove any blank lines
+        return removeEmptyLines(formatted);
+    }
+
+    private static String removeEmptyLines(String formatted) {
+        StringBuilder ret = new StringBuilder();
+        Scanner sc = new Scanner(formatted);
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            ret.append(line).append(NEW_LINE);
+        }
+
+        return ret.toString();
     }
 
     public static String getText(ParserRuleContext ctx) {
@@ -78,8 +96,16 @@ public class PALFormatter extends PALBaseVisitor<String> {
             return visitFuncCallStmt(ctx.funcCallStmt());
         } else if (ctx.ifStmt() != null) {
             return visitIfStmt(ctx.ifStmt());
-        } else if (ctx.createStmt() != null) {
-            return visitCreateStmt(ctx.createStmt());
+        } else if (ctx.createAttrStmt() != null) {
+            return visitCreateAttrStmt(ctx.createAttrStmt());
+        } else if (ctx.createPolicyStmt() != null) {
+            return visitCreatePolicyStmt(ctx.createPolicyStmt());
+        } else if (ctx.createUserOrObjectStmt() != null) {
+            return visitCreateUserOrObjectStmt(ctx.createUserOrObjectStmt());
+        } else if (ctx.createProhibitionStmt() != null) {
+            return visitCreateProhibitionStmt(ctx.createProhibitionStmt());
+        } else if (ctx.createObligationStmt() != null) {
+            return visitCreateObligationStmt(ctx.createObligationStmt());
         } else if (ctx.setNodePropsStmt() != null) {
             return visitSetNodePropsStmt(ctx.setNodePropsStmt());
         } else if (ctx.assignStmt() != null) {
@@ -107,14 +133,14 @@ public class PALFormatter extends PALBaseVisitor<String> {
         return getText(ctx);
     }
 
-    private String newLineAfterSemiColon(ParserRuleContext ctx) {
+    private String formatStmt(ParserRuleContext ctx) {
         String text = getText(ctx);
-        return text + "\n";
+        return indent() + text + NEW_LINE;
     }
 
     @Override
     public String visitVarStmt(PALParser.VarStmtContext ctx) {
-        return indent() + newLineAfterSemiColon(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
@@ -124,418 +150,273 @@ public class PALFormatter extends PALBaseVisitor<String> {
         PALParser.FuncBodyContext funcBodyCtx = ctx.funcBody();
         int openCurlyIndex = funcBodyCtx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         int closeCurlyIndex = funcBodyCtx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
-        String signature = indent() + (text.substring(0, openCurlyIndex + 1)) + "\n";
+        String signature = indent() + (text.substring(0, openCurlyIndex + 1)) + NEW_LINE;
 
-        indentLevel++;
-        StringBuilder body = new StringBuilder();
-        List<PALParser.StmtContext> bodyStmtCtxs = funcBodyCtx.stmt();
-        for (PALParser.StmtContext stmtCtx : bodyStmtCtxs) {
-            body.append(visitStmt(stmtCtx));
-        }
-        indentLevel--;
+        String body = visitStmts(funcBodyCtx.stmt());
 
-        String close = "\n" + indent() + text.substring(closeCurlyIndex) + "\n";
+        String close = "\n" + indent() + text.substring(closeCurlyIndex) + NEW_LINE;
 
         return signature + body + close;
     }
 
-    @Override
-    public String visitFormalArgList(PALParser.FormalArgListContext ctx) {
-        return super.visitFormalArgList(ctx);
-    }
+    private String visitStmts(List<PALParser.StmtContext> stmts) {
+        indentLevel++;
+        StringBuilder body = new StringBuilder();
+        for (PALParser.StmtContext stmtCtx : stmts) {
+            body.append(visitStmt(stmtCtx));
+        }
+        indentLevel--;
 
-    @Override
-    public String visitFormalArg(PALParser.FormalArgContext ctx) {
-        return super.visitFormalArg(ctx);
-    }
-
-    @Override
-    public String visitFormalArgType(PALParser.FormalArgTypeContext ctx) {
-        return super.visitFormalArgType(ctx);
+        return body.toString();
     }
 
     @Override
     public String visitFuncReturnStmt(PALParser.FuncReturnStmtContext ctx) {
-        return super.visitFuncReturnStmt(ctx);
+        return formatStmt(ctx);
     }
-
-    @Override
-    public String visitVarReturnType(PALParser.VarReturnTypeContext ctx) {
-        return super.visitVarReturnType(ctx);
-    }
-
-    @Override
-    public String visitVoidReturnType(PALParser.VoidReturnTypeContext ctx) {
-        return super.visitVoidReturnType(ctx);
-    }
-
-    @Override
-    public String visitFuncBody(PALParser.FuncBodyContext ctx) {
-        return super.visitFuncBody(ctx);
-    }
-
+    
     @Override
     public String visitForeachStmt(PALParser.ForeachStmtContext ctx) {
-        return super.visitForeachStmt(ctx);
+        String text = getText(ctx);
+        int stmtStartIndex = ctx.start.getStartIndex();
+        PALParser.StmtBlockContext forStmtsCtx = ctx.stmtBlock();
+        int openCurlyIndex = forStmtsCtx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
+        int closeCurlyIndex = forStmtsCtx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
+        String forloop = indent() + (text.substring(0, openCurlyIndex + 1)) + NEW_LINE;
+
+        String body = visitStmts(ctx.stmtBlock().stmt());
+
+        String close = "\n" + indent() + text.substring(closeCurlyIndex) + NEW_LINE;
+
+        return forloop + body + close;
     }
 
     @Override
     public String visitBreakStmt(PALParser.BreakStmtContext ctx) {
-        return super.visitBreakStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitContinueStmt(PALParser.ContinueStmtContext ctx) {
-        return super.visitContinueStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitFuncCallStmt(PALParser.FuncCallStmtContext ctx) {
-        return super.visitFuncCallStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitIfStmt(PALParser.IfStmtContext ctx) {
-        return super.visitIfStmt(ctx);
+        String text = getText(ctx);
+        int startIndex = ctx.start.getStartIndex();
+        int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
+        String ifStr = indent() + text.substring(0, openCurlyIndex);
+
+        String ifStmtBlock = visitStmtBlock(ctx.stmtBlock());
+
+        StringBuilder elseIfStmtBlock = new StringBuilder();
+        for (PALParser.ElseIfStmtContext elseIfStmtCtx : ctx.elseIfStmt()) {
+            elseIfStmtBlock.append(visitElseIfStmt(elseIfStmtCtx));
+        }
+
+        String elseStmtBlock = visitElseStmt(ctx.elseStmt());
+
+        return ifStr + ifStmtBlock + elseIfStmtBlock + elseStmtBlock;
     }
 
     @Override
     public String visitElseIfStmt(PALParser.ElseIfStmtContext ctx) {
-        return super.visitElseIfStmt(ctx);
+        if (ctx == null) {
+            return "";
+        }
+
+        String text = getText(ctx);
+        int startIndex = ctx.start.getStartIndex();
+        int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
+        String ifStr = text.substring(0, openCurlyIndex);
+
+        String stmtBlock = visitStmtBlock(ctx.stmtBlock());
+
+        return ifStr + stmtBlock;
     }
 
     @Override
     public String visitElseStmt(PALParser.ElseStmtContext ctx) {
-        return super.visitElseStmt(ctx);
-    }
+        if (ctx == null) {
+            return "";
+        }
 
-    @Override
-    public String visitStringType(PALParser.StringTypeContext ctx) {
-        return super.visitStringType(ctx);
-    }
+        String text = getText(ctx);
+        int startIndex = ctx.start.getStartIndex();
+        int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
+        String elseStr = text.substring(0, openCurlyIndex);
 
-    @Override
-    public String visitBooleanType(PALParser.BooleanTypeContext ctx) {
-        return super.visitBooleanType(ctx);
-    }
+        String stmtBlock = visitStmtBlock(ctx.stmtBlock());
 
-    @Override
-    public String visitArrayVarType(PALParser.ArrayVarTypeContext ctx) {
-        return super.visitArrayVarType(ctx);
-    }
-
-    @Override
-    public String visitMapVarType(PALParser.MapVarTypeContext ctx) {
-        return super.visitMapVarType(ctx);
-    }
-
-    @Override
-    public String visitAnyType(PALParser.AnyTypeContext ctx) {
-        return super.visitAnyType(ctx);
-    }
-
-    @Override
-    public String visitMapType(PALParser.MapTypeContext ctx) {
-        return super.visitMapType(ctx);
-    }
-
-    @Override
-    public String visitArrayType(PALParser.ArrayTypeContext ctx) {
-        return super.visitArrayType(ctx);
+        return elseStr + stmtBlock + NEW_LINE;
     }
 
     @Override
     public String visitStmtBlock(PALParser.StmtBlockContext ctx) {
-        return super.visitStmtBlock(ctx);
-    }
+        StringBuilder block = new StringBuilder();
 
-    @Override
-    public String visitDeleteNode(PALParser.DeleteNodeContext ctx) {
-        return super.visitDeleteNode(ctx);
-    }
+        indentLevel++;
+        for (PALParser.StmtContext stmtCtx : ctx.stmt()) {
+            block.append(visitStmt(stmtCtx));
+        }
+        indentLevel--;
 
-    @Override
-    public String visitDeleteObligation(PALParser.DeleteObligationContext ctx) {
-        return super.visitDeleteObligation(ctx);
-    }
-
-    @Override
-    public String visitDeleteProhibition(PALParser.DeleteProhibitionContext ctx) {
-        return super.visitDeleteProhibition(ctx);
-    }
-
-    @Override
-    public String visitNodeType(PALParser.NodeTypeContext ctx) {
-        return super.visitNodeType(ctx);
-    }
-
-    @Override
-    public String visitCreateStmt(PALParser.CreateStmtContext ctx) {
-        return super.visitCreateStmt(ctx);
+        return "{" + NEW_LINE + block + indent() + "}";
     }
 
     @Override
     public String visitCreatePolicyStmt(PALParser.CreatePolicyStmtContext ctx) {
-        return super.visitCreatePolicyStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitCreateAttrStmt(PALParser.CreateAttrStmtContext ctx) {
-        return super.visitCreateAttrStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitCreateUserOrObjectStmt(PALParser.CreateUserOrObjectStmtContext ctx) {
-        return super.visitCreateUserOrObjectStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitSetNodePropsStmt(PALParser.SetNodePropsStmtContext ctx) {
-        return super.visitSetNodePropsStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitAssignStmt(PALParser.AssignStmtContext ctx) {
-        return super.visitAssignStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitDeassignStmt(PALParser.DeassignStmtContext ctx) {
-        return super.visitDeassignStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitAssociateStmt(PALParser.AssociateStmtContext ctx) {
-        return super.visitAssociateStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitDissociateStmt(PALParser.DissociateStmtContext ctx) {
-        return super.visitDissociateStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitDeleteStmt(PALParser.DeleteStmtContext ctx) {
-        return super.visitDeleteStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitCreateObligationStmt(PALParser.CreateObligationStmtContext ctx) {
-        return super.visitCreateObligationStmt(ctx);
+        String text = getText(ctx);
+        int stmtStartIndex = ctx.start.getStartIndex();
+        int openCurlyIndex = ctx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
+        int closeCurlyIndex = ctx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
+        String create = indent() + (text.substring(0, openCurlyIndex + 1)) + NEW_LINE;
+
+        StringBuilder body = new StringBuilder();
+        List<PALParser.CreateRuleStmtContext> createRuleStmts = ctx.createRuleStmt();
+        indentLevel++;
+        for (PALParser.CreateRuleStmtContext createRuleStmtCtx : createRuleStmts) {
+            body.append(visitCreateRuleStmt(createRuleStmtCtx));
+        }
+        indentLevel--;
+
+        String close = "\n" + indent() + text.substring(closeCurlyIndex) + NEW_LINE;
+
+        return create + body + close;
     }
 
     @Override
     public String visitCreateRuleStmt(PALParser.CreateRuleStmtContext ctx) {
-        return super.visitCreateRuleStmt(ctx);
-    }
+        String text = getText(ctx);
+        int stmtStartIndex = ctx.start.getStartIndex();
+        int whenIndex = ctx.WHEN().getSymbol().getStartIndex() - stmtStartIndex;
+        String create = indent() + (text.substring(0, whenIndex)) + NEW_LINE;
 
-    @Override
-    public String visitAnyUserSubject(PALParser.AnyUserSubjectContext ctx) {
-        return super.visitAnyUserSubject(ctx);
-    }
+        int performsIndex = ctx.PERFORMS().getSymbol().getStartIndex() - stmtStartIndex;
+        String when = indent() + (text.substring(whenIndex, performsIndex)) + NEW_LINE;
 
-    @Override
-    public String visitUserSubject(PALParser.UserSubjectContext ctx) {
-        return super.visitUserSubject(ctx);
-    }
+        int doIndex = ctx.response().DO().getSymbol().getStartIndex() - stmtStartIndex;
+        String performs = "";
+        String on = "";
+        int performsEndIndex = 0;
+        if (ctx.ON() != null) {
+            int onIndex = ctx.ON().getSymbol().getStartIndex() - stmtStartIndex;
+            performsEndIndex = onIndex;
+            on = indent() + (text.substring(onIndex, doIndex)) + NEW_LINE;
+        } else {
+            performsEndIndex = doIndex;
+        }
 
-    @Override
-    public String visitUsersListSubject(PALParser.UsersListSubjectContext ctx) {
-        return super.visitUsersListSubject(ctx);
-    }
+        performs = indent() + (text.substring(performsIndex, performsEndIndex)) + NEW_LINE;
 
-    @Override
-    public String visitUserAttrSubject(PALParser.UserAttrSubjectContext ctx) {
-        return super.visitUserAttrSubject(ctx);
-    }
+        String response = visitResponse(ctx.response());
 
-    @Override
-    public String visitProcessSubject(PALParser.ProcessSubjectContext ctx) {
-        return super.visitProcessSubject(ctx);
-    }
-
-    @Override
-    public String visitPolicyElement(PALParser.PolicyElementContext ctx) {
-        return super.visitPolicyElement(ctx);
-    }
-
-    @Override
-    public String visitAnyPolicyElement(PALParser.AnyPolicyElementContext ctx) {
-        return super.visitAnyPolicyElement(ctx);
-    }
-
-    @Override
-    public String visitAnyContainedIn(PALParser.AnyContainedInContext ctx) {
-        return super.visitAnyContainedIn(ctx);
-    }
-
-    @Override
-    public String visitAnyOfSet(PALParser.AnyOfSetContext ctx) {
-        return super.visitAnyOfSet(ctx);
-    }
-
-    @Override
-    public String visitAnyPe(PALParser.AnyPeContext ctx) {
-        return super.visitAnyPe(ctx);
+        return create + when + performs + on + response;
     }
 
     @Override
     public String visitResponse(PALParser.ResponseContext ctx) {
-        return super.visitResponse(ctx);
+        String text = getText(ctx);
+
+        int start = ctx.start.getStartIndex();
+        int closeParenIndex = (ctx.CLOSE_PAREN().getSymbol().getStartIndex() + 1) - start;
+        String doStr = indent() + text.substring(0, closeParenIndex) + " ";
+
+        String response = visitResponseBlock(ctx.responseBlock());
+
+        return doStr + response;
     }
 
     @Override
     public String visitResponseBlock(PALParser.ResponseBlockContext ctx) {
-        return super.visitResponseBlock(ctx);
+        indentLevel++;
+        String responseBlock = visitResponseStmts(ctx.responseStmts());
+        indentLevel--;
+
+        return "{" + NEW_LINE + responseBlock + indent() + "}" + NEW_LINE;
     }
 
     @Override
     public String visitResponseStmts(PALParser.ResponseStmtsContext ctx) {
-        return super.visitResponseStmts(ctx);
+        StringBuilder stmts = new StringBuilder();
+        for (PALParser.ResponseStmtContext stmtCtx : ctx.responseStmt()) {
+            stmts.append(visitResponseStmt(stmtCtx)).append(NEW_LINE);
+        }
+        return stmts.toString();
     }
 
     @Override
     public String visitResponseStmt(PALParser.ResponseStmtContext ctx) {
-        return super.visitResponseStmt(ctx);
+        if (ctx.stmt() != null) {
+            return visitStmt(ctx.stmt());
+        } else {
+            return visitCreateRuleStmt(ctx.createRuleStmt());
+        }
     }
 
     @Override
     public String visitDeleteRuleStmt(PALParser.DeleteRuleStmtContext ctx) {
-        return super.visitDeleteRuleStmt(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitCreateProhibitionStmt(PALParser.CreateProhibitionStmtContext ctx) {
-        return super.visitCreateProhibitionStmt(ctx);
-    }
-
-    @Override
-    public String visitProhibitionContainerList(PALParser.ProhibitionContainerListContext ctx) {
-        return super.visitProhibitionContainerList(ctx);
-    }
-
-    @Override
-    public String visitProhibitionContainerExpression(PALParser.ProhibitionContainerExpressionContext ctx) {
-        return super.visitProhibitionContainerExpression(ctx);
+        return formatStmt(ctx);
     }
 
     @Override
     public String visitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx) {
-        return super.visitSetResourceAccessRightsStmt(ctx);
-    }
-
-    @Override
-    public String visitVariableReference(PALParser.VariableReferenceContext ctx) {
-        return super.visitVariableReference(ctx);
-    }
-
-    @Override
-    public String visitFunctionCall(PALParser.FunctionCallContext ctx) {
-        return super.visitFunctionCall(ctx);
-    }
-
-    @Override
-    public String visitLiteralExpr(PALParser.LiteralExprContext ctx) {
-        return super.visitLiteralExpr(ctx);
-    }
-
-    @Override
-    public String visitArray(PALParser.ArrayContext ctx) {
-        return super.visitArray(ctx);
-    }
-
-    @Override
-    public String visitAccessRightArray(PALParser.AccessRightArrayContext ctx) {
-        return super.visitAccessRightArray(ctx);
-    }
-
-    @Override
-    public String visitAccessRight(PALParser.AccessRightContext ctx) {
-        return super.visitAccessRight(ctx);
-    }
-
-    @Override
-    public String visitMap(PALParser.MapContext ctx) {
-        return super.visitMap(ctx);
-    }
-
-    @Override
-    public String visitMapEntry(PALParser.MapEntryContext ctx) {
-        return super.visitMapEntry(ctx);
-    }
-
-    @Override
-    public String visitMapEntryRef(PALParser.MapEntryRefContext ctx) {
-        return super.visitMapEntryRef(ctx);
-    }
-
-    @Override
-    public String visitStringLiteral(PALParser.StringLiteralContext ctx) {
-        return super.visitStringLiteral(ctx);
-    }
-
-    @Override
-    public String visitBooleanLiteral(PALParser.BooleanLiteralContext ctx) {
-        return super.visitBooleanLiteral(ctx);
-    }
-
-    @Override
-    public String visitArrayLiteral(PALParser.ArrayLiteralContext ctx) {
-        return super.visitArrayLiteral(ctx);
-    }
-
-    @Override
-    public String visitMapLiteral(PALParser.MapLiteralContext ctx) {
-        return super.visitMapLiteral(ctx);
-    }
-
-    @Override
-    public String visitReferenceByID(PALParser.ReferenceByIDContext ctx) {
-        return super.visitReferenceByID(ctx);
-    }
-
-    @Override
-    public String visitMapEntryReference(PALParser.MapEntryReferenceContext ctx) {
-        return super.visitMapEntryReference(ctx);
-    }
-
-    @Override
-    public String visitFuncCall(PALParser.FuncCallContext ctx) {
-        return super.visitFuncCall(ctx);
-    }
-
-    @Override
-    public String visitFuncCallArgs(PALParser.FuncCallArgsContext ctx) {
-        return super.visitFuncCallArgs(ctx);
-    }
-
-    private String formatNewLines(String text) {
-        text = text.replaceAll("\\{", "\\{\n");
-        text = text.replaceAll("}", "}\n");
-        text = text.replaceAll(";", ";\n");
-        return text;
-    }
-
-    private String formatIndents(String text) {
-        StringBuilder formatted = new StringBuilder();
-        int indentCount = 0;
-        Scanner sc = new Scanner(text);
-        while (sc.hasNextLine()) {
-            String line = sc.nextLine();
-
-            if (line.endsWith("{")) {
-                formatted.append(SPACES.repeat(indentCount));
-                indentCount++;
-            } else if (line.startsWith("}")){
-                indentCount--;
-                formatted.append(SPACES.repeat(indentCount));
-            } else {
-                formatted.append(SPACES.repeat(indentCount));
-            }
-
-            formatted.append(line).append("\n");
-        }
-
-        return formatted.toString();
+        return formatStmt(ctx);
     }
 }

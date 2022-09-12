@@ -207,12 +207,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNodeType(PALParser.NodeTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#createStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreateStmt(PALParser.CreateStmtContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link PALParser#createPolicyStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

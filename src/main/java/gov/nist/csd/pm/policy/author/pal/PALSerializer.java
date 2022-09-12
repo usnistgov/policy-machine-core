@@ -20,11 +20,19 @@ class PALSerializer {
                 const test = 'test';
                 
                 function testFunc() void {
+                    if equals('1', '2') {
+                        create policy class test;
+                    } else if equals('3', '4') {
+                        create policy class test;
+                    } else {
+                        create policy class test;
+                    }
+                
                     let x = 'hello world';
                     create policy class x;
                     
-                    foreach x in ['a', 'b'] {
-                        create policy class x;
+                    foreach y in ['a', 'b'] {
+                        create policy class y;
                     }
                     
                     create obligation 'o1' {
@@ -33,11 +41,9 @@ class PALSerializer {
                         performs 'event'
                         on any policy element
                         do(evtCtx) {
-                            foreach x in ['c', 'd'] {
+                            foreach y in ['c', 'd'] {
                                 create policy class x;
                             }
-
-                            create policy class test;
                         }
                     }
                 }
