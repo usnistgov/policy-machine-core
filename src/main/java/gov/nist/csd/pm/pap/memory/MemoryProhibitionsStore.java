@@ -83,7 +83,7 @@ class MemoryProhibitionsStore extends ProhibitionsStore {
         return retProhibitions;
     }
     @Override
-    public synchronized List<Prohibition> withSubject(String subject) {
+    public synchronized List<Prohibition> getWithSubject(String subject) {
         List<Prohibition> subjectPros = prohibitions.get(subject);
         if (subjectPros == null) {
             return new ArrayList<>();

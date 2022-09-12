@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.mysql.MysqlPAP;
-import gov.nist.csd.pm.pap.mysql.MysqlPolicyException;
 import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
@@ -1169,7 +1168,7 @@ class PAPTest {
                         new ContainerCondition("oa3", true),
                         new ContainerCondition("oa4", false));
 
-                List<Prohibition> prohibitions = pap.prohibitions().withSubject("subject");
+                List<Prohibition> prohibitions = pap.prohibitions().getWithSubject("subject");
                 assertEquals(2, prohibitions.size());
                 checkProhibitions(prohibitions);
             });

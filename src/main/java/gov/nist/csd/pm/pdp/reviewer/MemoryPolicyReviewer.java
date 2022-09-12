@@ -171,7 +171,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         final Map<String, AccessRightSet> borderTargets = new HashMap<>();
         final Set<String> prohibitionTargets = new HashSet<>();
         // initialize with the prohibitions or the provided process
-        final Set<Prohibition> reachedProhibitions = new HashSet<>(policy.prohibitions().withSubject(process));
+        final Set<Prohibition> reachedProhibitions = new HashSet<>(policy.prohibitions().getWithSubject(process));
 
         // get the associations for the subject, it the subject is a user, nothing will be returned
         // this is only when a UA is the subject
@@ -179,7 +179,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         collectAssociations(subjectAssociations, borderTargets);
 
         Visitor visitor = node -> {
-            List<Prohibition> subjectProhibitions = policy.prohibitions().withSubject(node);
+            List<Prohibition> subjectProhibitions = policy.prohibitions().getWithSubject(node);
             reachedProhibitions.addAll(subjectProhibitions);
             for (Prohibition prohibition : subjectProhibitions) {
                 List<ContainerCondition> containers = prohibition.getContainers();

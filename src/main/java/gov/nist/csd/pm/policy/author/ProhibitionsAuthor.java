@@ -46,7 +46,7 @@ public interface ProhibitionsAuthor {
     void delete(String label) throws PMException;
 
     Map<String, List<Prohibition>> getAll() throws PMException;
-    List<Prohibition> withSubject(String subject) throws PMException;
+    List<Prohibition> getWithSubject(String subject) throws PMException;
     Prohibition get(String label) throws PMException;
 
 }

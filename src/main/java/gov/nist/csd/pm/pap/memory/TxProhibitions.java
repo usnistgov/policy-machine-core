@@ -46,8 +46,8 @@ class TxProhibitions extends ProhibitionsStore implements PolicyEventEmitter {
     }
 
     @Override
-    public List<Prohibition> withSubject(String subject) throws PMException {
-        return store.withSubject(subject);
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
+        return store.getWithSubject(subject);
     }
 
     @Override

@@ -109,8 +109,8 @@ class Prohibitions implements ProhibitionsAuthor, PolicyEventEmitter {
     }
 
     @Override
-    public List<Prohibition> withSubject(String subject) throws PMException {
-        return store.prohibitions().withSubject(subject);
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
+        return store.prohibitions().getWithSubject(subject);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
@@ -85,8 +84,8 @@ class Prohibitions implements ProhibitionsAuthor, PolicyEventEmitter {
     }
 
     @Override
-    public List<Prohibition> withSubject(String subject) throws PMException {
-        return adjudicator.prohibitions().withSubject(subject);
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
+        return adjudicator.prohibitions().getWithSubject(subject);
     }
 
     @Override

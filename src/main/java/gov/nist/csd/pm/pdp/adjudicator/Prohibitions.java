@@ -91,8 +91,8 @@ public class Prohibitions implements ProhibitionsAuthor {
     }
 
     @Override
-    public List<Prohibition> withSubject(String subject) throws PMException {
-        return filterProhibitions(pap.prohibitions().withSubject(subject));
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
+        return filterProhibitions(pap.prohibitions().getWithSubject(subject));
     }
 
     private List<Prohibition> filterProhibitions(List<Prohibition> prohibitions) {
