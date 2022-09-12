@@ -199,7 +199,7 @@ class MysqlProhibitionsStore extends ProhibitionsStore {
     }
 
     @Override
-    public List<Prohibition> withSubject(String subject) throws MysqlPolicyException {
+    public List<Prohibition> getWithSubject(String subject) throws MysqlPolicyException {
         String sql = """
                 select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection 
                 from prohibition 

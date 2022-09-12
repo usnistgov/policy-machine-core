@@ -132,13 +132,13 @@ class MemoryPolicyStoreTest {
         memoryPolicyStore.graph().createUserAttribute("ua1", null, "pc1");
         memoryPolicyStore.graph().createObjectAttribute("oa1", null, "pc1");
         memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        List<Prohibition> prohibitions = memoryPolicyStore.prohibitions().withSubject("ua1");
+        List<Prohibition> prohibitions = memoryPolicyStore.prohibitions().getWithSubject("ua1");
         prohibitions.clear();
         assertEquals(1, memoryPolicyStore.prohibitions().getAll().size());
-        prohibitions = memoryPolicyStore.prohibitions().withSubject("ua1");
+        prohibitions = memoryPolicyStore.prohibitions().getWithSubject("ua1");
         Prohibition p = prohibitions.get(0);
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().withSubject("ua1").get(0);
+        Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
         assertEquals("ua1", actual.getSubject().name());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
