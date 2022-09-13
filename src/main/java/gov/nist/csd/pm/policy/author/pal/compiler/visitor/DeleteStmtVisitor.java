@@ -3,6 +3,7 @@ package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.author.pal.statement.DeleteStatement;
@@ -43,7 +44,7 @@ public class DeleteStmtVisitor extends PALBaseVisitor<DeleteStatement> {
                     ctx,
                     "invalid delete statement"
             );
-            return new DeleteStatement(DeleteStatement.Type.POLICY_CLASS, new Expression(ctx.getText()));
+            return new DeleteStatement(DeleteStatement.Type.POLICY_CLASS, new Expression(new Literal("")));
         }
     }
 }

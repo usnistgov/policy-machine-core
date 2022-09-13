@@ -234,7 +234,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
         int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
-        String ifStr = text.substring(0, openCurlyIndex);
+        String ifStr = " " + text.substring(0, openCurlyIndex);
 
         String stmtBlock = visitStmtBlock(ctx.stmtBlock());
 
@@ -250,7 +250,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
         int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
-        String elseStr = text.substring(0, openCurlyIndex);
+        String elseStr = " " + text.substring(0, openCurlyIndex);
 
         String stmtBlock = visitStmtBlock(ctx.stmtBlock());
 

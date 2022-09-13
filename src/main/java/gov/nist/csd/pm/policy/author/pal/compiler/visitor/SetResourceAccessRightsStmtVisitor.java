@@ -19,6 +19,12 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
 
     @Override
     public SetResourceAccessRightsStatement visitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx) {
+        // check that this statement has not been called before
+        if (visitorCtx.scope().areResourceAccessRightsSet()) {
+            visitorCtx.errorLog().addError(ctx, "set resource access rights has already been called");
+            return new SetResourceAccessRightsStatement(visitorCtx.scope().getResourceAccessRights());
+        }
+
         PALParser.AccessRightArrayContext accessRightArrayCtx = ctx.accessRightArray();
         List<PALParser.AccessRightContext> identifiers = accessRightArrayCtx.accessRight();
         AccessRightSet arset = new AccessRightSet();
@@ -26,7 +32,7 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
             String ar = id.getText();
             arset.add(ar);
 
-            this.visitorCtx.scope().addVariable(ar, Type.string(), true);
+            visitorCtx.scope().addVariable(ar, Type.string(), true);
         }
 
         return new SetResourceAccessRightsStatement(arset);

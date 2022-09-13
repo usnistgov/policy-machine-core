@@ -9,6 +9,8 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 public class SuperPolicy {
 
+    public static final String SUPER_PREFIX = "super";
+
     public static final String SUPER_USER = "super";
     public static final String SUPER_PC = "super_pc";
     public static final String SUPER_UA = "super_ua";

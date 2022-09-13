@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.policy.author.pal.statement;
 
+import gov.nist.csd.pm.policy.author.pal.model.expression.*;
+import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
@@ -90,17 +91,21 @@ public class CreateProhibitionStatement extends PALStatement {
     public String toString() {
         String subjectStr = "";
         switch (subjectType) {
-            case USER_ATTRIBUTE -> subjectStr = "user attribute ";
-            case USER -> subjectStr = "user ";
-            case PROCESS -> subjectStr = "process ";
+            case USER_ATTRIBUTE -> subjectStr = "user attribute";
+            case USER -> subjectStr = "user";
+            case PROCESS -> subjectStr = "process";
         }
 
-        StringBuilder containerStr = new StringBuilder("on " + (isIntersection ? "intersection" : "union") + " of ");
+        StringBuilder containerStr = new StringBuilder((isIntersection ? "intersection" : "union") + " of ");
+        int length = containerStr.length();
         for (Container c : containers) {
+            if (containerStr.length() != length) {
+                containerStr.append(", ");
+            }
             containerStr.append(c);
         }
 
-        return String.format("create prohibition %s deny %s access rights %s on %s;", label, subjectStr, accessRights, containerStr);
+        return String.format("create prohibition %s deny %s %s access rights %s on %s;", label, subjectStr, subject, accessRights, containerStr);
     }
 
     @Override
@@ -129,5 +134,26 @@ public class CreateProhibitionStatement extends PALStatement {
         public String toString() {
             return (isComplement ? "!" : "") + expression;
         }
+    }
+
+    public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {
+        List<Expression> exprs = new ArrayList<>();
+        for (String ar : prohibition.getAccessRightSet()) {
+            exprs.add(new Expression(new VariableReference(ar, Type.string())));
+        }
+
+        List<Container> containers = new ArrayList<>();
+        for (ContainerCondition cc : prohibition.getContainers()) {
+            containers.add(new Container(cc.complement(), new Expression(new Literal(cc.name()))));
+        }
+
+        return new CreateProhibitionStatement(
+                new Expression(new Literal(prohibition.getLabel())),
+                new Expression(new Literal(prohibition.getSubject().name())),
+                prohibition.getSubject().type(),
+                new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string()))),
+                prohibition.isIntersection(),
+                containers
+        );
     }
 }

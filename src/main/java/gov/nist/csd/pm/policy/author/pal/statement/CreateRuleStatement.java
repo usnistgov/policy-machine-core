@@ -90,7 +90,13 @@ public class CreateRuleStatement extends PALStatement {
         }
 
         Target target = Target.anyPolicyElement();
-        Value onValue = onClause.expr.execute(ctx, policyAuthor);
+        Value onValue;
+        if (onClause.expr != null) {
+           onValue = onClause.expr.execute(ctx, policyAuthor);
+        } else {
+            onValue = new Value();
+        }
+
         if (onValue.isString()) {
             // with POLICY_ELEMENT or CONTAINED_IN
             if (onClause.isPolicyElement()) {
@@ -242,7 +248,7 @@ public class CreateRuleStatement extends PALStatement {
 
         @Override
         public String toString() {
-            if (expr == null && onClauseType == null) {
+            if (onClauseType == null) {
                 return "";
             }
 

@@ -38,7 +38,7 @@ public class Expression extends PALStatement {
             expression = new Expression(literal);
 
         } else {
-            expression = new Expression(expressionCtx.getText());
+            expression = new Expression(new Literal(""));
             visitorCtx.errorLog().addError(
                     expressionCtx,
                     "expression is not a variable reference, function call, or literal"
@@ -81,17 +81,6 @@ public class Expression extends PALStatement {
     public Expression(Literal literal) {
         this.literal = literal;
         this.isLiteral = true;
-    }
-
-    // this variable and constructor are intended to be used ONLY by the ExpressionParser
-    // in the rare case an incompatible Expression is provided
-    private String text;
-    public Expression(String text) {
-        this.text = text;
-    }
-
-    public String getText() {
-        return text;
     }
 
     public VariableReference getVariableReference() {
@@ -203,8 +192,7 @@ public class Expression extends PALStatement {
                 && isLiteral == that.isLiteral
                 && Objects.equals(variableReference, that.variableReference)
                 && Objects.equals(functionCall, that.functionCall)
-                && Objects.equals(literal, that.literal)
-                && Objects.equals(text, that.text);
+                && Objects.equals(literal, that.literal);
     }
 
     @Override

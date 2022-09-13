@@ -3,6 +3,7 @@ package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.CreateRuleStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
@@ -66,7 +67,6 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
             expr = Expression.compile(visitorCtx, policyElementContext.expression(), Type.string());
             onClauseType = CreateRuleStatement.TargetType.POLICY_ELEMENT;
         } else if (onClauseCtx instanceof PALParser.AnyPolicyElementContext anyPolicyElementContext) {
-            // ignore as there is no PE defined
             onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
         } else if (onClauseCtx instanceof PALParser.AnyContainedInContext anyContainedInContext) {
             expr = Expression.compile(visitorCtx, anyContainedInContext.expression(), Type.string());
@@ -74,6 +74,8 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         } else if (onClauseCtx instanceof PALParser.AnyOfSetContext anyOfSetContext) {
             expr = Expression.compile(visitorCtx, anyOfSetContext.expression(), Type.array(Type.any()));
             onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
+        } else {
+            onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
         }
 
         return new CreateRuleStatement.OnClause(expr, onClauseType);
@@ -109,7 +111,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
 
         } else {
             type = null;
-            expr = new Expression(ctx.getText());
+            expr = new Expression(new Literal(""));
             visitorCtx.errorLog().addError(
                     ctx,
                     "invalid subject clause"
