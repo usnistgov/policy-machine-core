@@ -42,6 +42,11 @@ public class SetNodePropertiesStatement extends PALStatement {
     }
 
     @Override
+    public String toString() {
+        return String.format("set properties of %s to %s;", nameExpr, propertiesExpr);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

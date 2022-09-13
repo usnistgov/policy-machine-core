@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.pal;
+package gov.nist.csd.pm.policy.author.pal;
 
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;

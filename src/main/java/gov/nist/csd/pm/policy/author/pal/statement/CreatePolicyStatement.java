@@ -40,4 +40,9 @@ public class CreatePolicyStatement extends PALStatement {
 
         return new Value();
     }
+
+    @Override
+    public String toString() {
+        return String.format("create policy class %s;", name);
+    }
 }

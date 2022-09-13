@@ -28,6 +28,10 @@ public class ForeachStmtVisitor extends PALBaseVisitor<ForeachStatement> {
         Type iterType = iter.getType(visitorCtx.scope());
 
         String varName = ctx.key.getText();
+        if (visitorCtx.scope().hasVariable(varName)) {
+            visitorCtx.errorLog().addError(ctx, "variable \"" + varName + "\" already exists in scope");
+        }
+
         String mapValueVarName = null;
         if (ctx.mapValue != null) {
             if (!iterType.equals(Type.map(Type.any(), Type.any()))) {

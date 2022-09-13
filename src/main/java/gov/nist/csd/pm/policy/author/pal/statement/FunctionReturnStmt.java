@@ -1,9 +1,7 @@
-package gov.nist.csd.pm.policy.author.pal.model.function;
+package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
@@ -40,6 +38,11 @@ public class FunctionReturnStmt extends PALStatement {
         }
 
         return Value.returnValue(value);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("return%s;", (isVoid ? "" : String.format(" %s", expr)));
     }
 
     @Override

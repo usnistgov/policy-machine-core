@@ -106,5 +106,10 @@ public class PDP implements PolicyEventEmitter {
         public void compileAndExecutePAL(UserContext author, String input) throws PMException {
             new PALExecutor(this).compileAndExecutePAL(author, input);
         }
+
+        @Override
+        public String toPAL() throws PMException {
+            return new PALExecutor(this).toPAL();
+        }
     }
 }

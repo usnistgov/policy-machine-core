@@ -47,6 +47,11 @@ public class AssignStatement extends PALStatement {
     }
 
     @Override
+    public String toString() {
+        return String.format("assign %s to %s;", child, assignTo);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
+
 public class FunctionDefinitionStatement extends PALStatement {
 
     public static String name(String name) {
@@ -77,6 +79,31 @@ public class FunctionDefinitionStatement extends PALStatement {
         ctx.addFunction(this);
 
         return new Value();
+    }
+
+    @Override
+    public String toString() {
+        String argsStr = serializeFormalArgs();
+
+        return String.format(
+                "function %s(%s) %s {%s}",
+                functionName,
+                argsStr,
+                returnType.toString(),
+                statementsToString(body)
+        );
+    }
+
+    private String serializeFormalArgs() {
+        String pal = "";
+        for (FormalArgument formalArgument : args) {
+            if (!pal.isEmpty()) {
+                pal += ", ";
+            }
+
+            pal += formalArgument.type().toString() + " " + formalArgument.name();
+        }
+        return pal;
     }
 
     @Override

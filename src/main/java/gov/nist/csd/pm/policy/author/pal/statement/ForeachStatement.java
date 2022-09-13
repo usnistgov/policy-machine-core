@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.author.pal.PALExecutor.executeStatementBlock;
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 
 public class ForeachStatement extends PALStatement {
 
@@ -81,6 +82,15 @@ public class ForeachStatement extends PALStatement {
         }
 
         return new Value();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("foreach %s in %s {%s}",
+                (valueVarName != null ? String.format("%s, %s", varName, valueVarName) : varName),
+                iter,
+                statementsToString(block)
+        );
     }
 
     @Override

@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.author.pal.model.function.FunctionReturnStmt;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionReturnStmt;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,10 +58,16 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
             }
         } else {
             if (lastStmt instanceof FunctionReturnStmt returnStmt) {
-                 if (returnStmt.isVoid()) {
+                Type retExprType = returnStmt.getExpr().getType(visitorCtx.scope());
+                if (returnStmt.isVoid()) {
                      visitorCtx.errorLog().addError(
                              ctx,
                              "return statement missing expression"
+                     );
+                 } else if (!retExprType.equals(returnType)) {
+                     visitorCtx.errorLog().addError(
+                             ctx,
+                             "function expected to return type " + returnType + " not " + retExprType
                      );
                  }
             } else {

@@ -12,12 +12,12 @@ public class AssociateStatement extends PALStatement {
 
     private final Expression ua;
     private final Expression target;
-    private final Expression permissions;
+    private final Expression accessRights;
 
-    public AssociateStatement(Expression ua, Expression target, Expression permissions) {
+    public AssociateStatement(Expression ua, Expression target, Expression accessRights) {
         this.ua = ua;
         this.target = target;
-        this.permissions = permissions;
+        this.accessRights = accessRights;
     }
 
     public Expression getUa() {
@@ -28,15 +28,15 @@ public class AssociateStatement extends PALStatement {
         return target;
     }
 
-    public Expression getPermissions() {
-        return permissions;
+    public Expression getAccessRights() {
+        return accessRights;
     }
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         Value uaValue = ua.execute(ctx, policyAuthor);
         Value targetValue = target.execute(ctx, policyAuthor);
-        Value permissionsValue = permissions.execute(ctx, policyAuthor);
+        Value permissionsValue = accessRights.execute(ctx, policyAuthor);
 
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Value v : permissionsValue.getArrayValue()) {
@@ -53,15 +53,21 @@ public class AssociateStatement extends PALStatement {
     }
 
     @Override
+    public String toString() {
+        return String.format("associate %s and %s with access rights %s;",
+                ua, target, accessRights);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AssociateStatement that = (AssociateStatement) o;
-        return Objects.equals(ua, that.ua) && Objects.equals(target, that.target) && Objects.equals(permissions, that.permissions);
+        return Objects.equals(ua, that.ua) && Objects.equals(target, that.target) && Objects.equals(accessRights, that.accessRights);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ua, target, permissions);
+        return Objects.hash(ua, target, accessRights);
     }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.author.pal.PALExecutor.executeStatementBlock;
+import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 
 public class IfStatement extends PALStatement {
 
@@ -50,6 +51,36 @@ public class IfStatement extends PALStatement {
         }
 
         return executeBlock(ctx, policyAuthor, elseBlock);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "%s%s%s",
+                ifBlockToString(),
+                elseIfBlockToString(),
+                elseBlockToString()
+        );
+    }
+
+    private String elseBlockToString() {
+        if (elseBlock.isEmpty()) {
+            return "";
+        }
+        return String.format("else {%s}", statementsToString(elseBlock));
+    }
+
+    private String elseIfBlockToString() {
+        StringBuilder s = new StringBuilder();
+        for (ConditionalBlock b : ifElseBlocks) {
+            s.append(String.format(" else if %s {%s} ", b.condition, statementsToString(b.block)));
+        }
+
+        return s.toString();
+    }
+
+    private String ifBlockToString() {
+        return String.format("if %s {%s}", ifBlock.condition, statementsToString(ifBlock.block));
     }
 
     private Value executeBlock(ExecutionContext ctx, PolicyAuthor policyAuthor, List<PALStatement> block) throws PMException {

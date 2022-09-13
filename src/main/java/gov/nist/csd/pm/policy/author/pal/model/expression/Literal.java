@@ -144,16 +144,14 @@ public class Literal extends PALStatement {
 
     @Override
     public String toString() {
-        return "Literal{" +
-                "isStringLiteral=" + isStringLiteral +
-                ", stringLiteral='" + stringLiteral + '\'' +
-                ", isBooleanLiteral=" + isBooleanLiteral +
-                ", booleanLiteral=" + booleanLiteral +
-                ", isArrayLiteral=" + isArrayLiteral +
-                ", arrayLiteral=" + arrayLiteral +
-                ", isMapLiteral=" + isMapLiteral +
-                ", mapLiteral=" + mapLiteral +
-                ", type=" + type +
-                '}';
+        if (isStringLiteral) {
+            return String.format("'%s'", getStringLiteral());
+        } else if (isBooleanLiteral) {
+            return String.valueOf(getBooleanLiteral());
+        } else if (isArrayLiteral) {
+            return getArrayLiteral().toString();
+        } else {
+            return getMapLiteral().toString();
+        }
     }
 }

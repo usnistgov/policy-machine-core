@@ -13,4 +13,6 @@ public abstract class PALStatement implements Serializable {
 
     public abstract Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException;
 
+    @Override
+    public abstract String toString();
 }

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.author.pal.model.context;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 
 import java.io.Serializable;
@@ -14,14 +15,15 @@ public class ExecutionContext implements Serializable {
     private final UserContext author;
     private final Map<String, FunctionDefinitionStatement> functions;
     private final Map<String, Value> variables;
-
     private final Map<String, Value> constants;
+    private AccessRightSet resourceAccessRights;
 
     public ExecutionContext(UserContext author) {
         this.author = author;
         this.functions = new HashMap<>();
         this.variables = new HashMap<>();
         this.constants = new HashMap<>();
+        this.resourceAccessRights = new AccessRightSet();
     }
 
     public ExecutionContext copy() {
@@ -38,6 +40,8 @@ public class ExecutionContext implements Serializable {
         for (String varName : this.getConstants().keySet()) {
             copy.addVariable(varName, this.getVariable(varName), true);
         }
+
+        copy.setResourceAccessRights(resourceAccessRights);
 
         return copy;
     }
@@ -78,6 +82,14 @@ public class ExecutionContext implements Serializable {
         } else {
             this.variables.put(varName, value);
         }
+    }
+
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) {
+        this.resourceAccessRights = resourceAccessRights;
+    }
+
+    public AccessRightSet getResourceAccessRights() {
+        return resourceAccessRights;
     }
 
     public FunctionDefinitionStatement getFunction(String name) {

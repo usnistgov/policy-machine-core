@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
+
 public class CreateAttrStatement extends PALStatement {
 
     public Expression name;
@@ -57,7 +59,7 @@ public class CreateAttrStatement extends PALStatement {
 
         String[] parentsArr = parents.toArray(new String[]{});
 
-        if (type == NodeType.OA) {
+        if (type == OA) {
             policyAuthor.graph().createObjectAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
@@ -74,6 +76,15 @@ public class CreateAttrStatement extends PALStatement {
         }
 
         return new Value();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("create %s %s assign to %s;",
+                (type == OA ? "object attribute" : "user attribute"),
+                name,
+                assignTo
+        );
     }
 
     @Override

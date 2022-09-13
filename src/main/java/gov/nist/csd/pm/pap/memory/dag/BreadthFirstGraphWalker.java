@@ -57,14 +57,11 @@ public class BreadthFirstGraphWalker implements GraphWalker {
 
             List<String> nextLevel = getNextLevel(node, direction);
             for (String n : nextLevel) {
-                // if this node has already been seen, we don't need to se it again
-                if (seen.contains(n)) {
-                    continue;
+                // if this node has already been seen, we don't need to see it again
+                if (!seen.contains(n)) {
+                    queue.add(n);
+                    seen.add(n);
                 }
-
-                // add the node to the queue and the seen set
-                queue.add(n);
-                seen.add(n);
 
                 // propagate from the nextLevel to the current node
                 propagator.propagate(node, n);

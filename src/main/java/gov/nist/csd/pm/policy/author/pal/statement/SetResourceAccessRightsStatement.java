@@ -17,11 +17,20 @@ public class SetResourceAccessRightsStatement extends PALStatement{
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         policyAuthor.graph().setResourceAccessRights(accessRightSet);
-
-        for (String ar : accessRightSet) {
-            ctx.addVariable(ar, new Value(ar), true);
-        }
-
+        ctx.setResourceAccessRights(accessRightSet);
         return new Value();
+    }
+
+    @Override
+    public String toString() {
+        String ars = "";
+        for (String ar : accessRightSet) {
+            if (!ars.isEmpty()) {
+                ars += ", ";
+            }
+
+            ars += String.format("%s", ar);
+        }
+        return String.format("set resource access rights [%s];", ars);
     }
 }

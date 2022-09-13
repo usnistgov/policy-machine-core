@@ -107,12 +107,10 @@ public class VariableReference extends PALStatement {
 
     @Override
     public String toString() {
-        return "VariableReference{" +
-                "isID=" + isID +
-                ", id='" + id + '\'' +
-                ", isMapEntryReference=" + isMapEntryReference +
-                ", mapEntryReference=" + mapEntryReference +
-                ", type=" + type +
-                '}';
+        if (isID) {
+            return id;
+        } else {
+            return mapEntryReference.toString();
+        }
     }
 }

@@ -63,7 +63,7 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
 
             if (elementType == null) {
                 elementType = type;
-            } else if (!type.equals(elementType)) {
+            } else if (type == null || !type.equals(elementType)) {
                 elementType = Type.any();
             }
 

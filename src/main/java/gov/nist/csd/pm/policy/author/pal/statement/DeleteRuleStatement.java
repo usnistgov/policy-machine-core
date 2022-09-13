@@ -44,6 +44,11 @@ public class DeleteRuleStatement extends PALStatement {
     }
 
     @Override
+    public String toString() {
+        return String.format("delete rule %s from obligation %s;", ruleExpr, oblExpr);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

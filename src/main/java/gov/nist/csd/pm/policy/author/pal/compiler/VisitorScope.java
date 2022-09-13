@@ -3,25 +3,24 @@ package gov.nist.csd.pm.policy.author.pal.compiler;
 import gov.nist.csd.pm.policy.author.pal.compiler.error.ErrorLog;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import static gov.nist.csd.pm.policy.author.pal.compiler.error.CompileError.fromParserRuleContext;
+import java.util.*;
 
 public class VisitorScope {
 
     // local functions and variables
     private final Map<String, FunctionDefinitionStatement> functions;
     private final Map<String, Variable> variables;
-    private ErrorLog errorLog;
+    private AccessRightSet resourceAccessRights;
+    private final ErrorLog errorLog;
 
 
     public VisitorScope(ErrorLog errorLog) {
         this.functions = new HashMap<>();
         this.variables = new HashMap<>();
+        this.resourceAccessRights = new AccessRightSet();
         this.errorLog = errorLog;
     }
 
@@ -56,7 +55,34 @@ public class VisitorScope {
     }
 
     public void addVariable(String varName, Type type, boolean isConst) {
-        this.variables.put(varName, new Variable(varName, type, isConst));
+        this.variables.put(varName, new Variable(varName, type, isConst, false));
+    }
+
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) {
+        this.resourceAccessRights = resourceAccessRights;
+    }
+
+    public boolean areResourceAccessRightsSet() {
+        for (String varName : variables.keySet()) {
+            Variable variable = variables.get(varName);
+            if (variable.isAccessRight()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public AccessRightSet getResourceAccessRights() {
+        AccessRightSet accessRightSet = new AccessRightSet();
+        for (String varName : variables.keySet()) {
+            Variable variable = variables.get(varName);
+            if (variable.isAccessRight()) {
+                accessRightSet.add(variable.name());
+            }
+        }
+
+        return accessRightSet;
     }
 
     public FunctionDefinitionStatement getFunction(String name) {

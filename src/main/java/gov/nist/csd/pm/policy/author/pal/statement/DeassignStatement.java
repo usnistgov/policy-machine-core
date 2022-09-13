@@ -47,6 +47,14 @@ public class DeassignStatement extends PALStatement {
     }
 
     @Override
+    public String toString() {
+        return String.format("deassign %s from %s;",
+                child,
+                deassignFrom
+        );
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

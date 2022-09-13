@@ -318,25 +318,41 @@ public class Value implements Serializable {
 
     @Override
     public String toString() {
-        return "Value{" +
-                "sValue='" + sValue + '\'' +
-                ", isString=" + isString +
-                ", bValue=" + bValue +
-                ", isBoolean=" + isBoolean +
-                ", aValue=" + Arrays.toString(aValue) +
-                ", isArray=" + isArray +
-                ", mValue=" + mValue +
-                ", isMap=" + isMap +
-                ", isVoid=" + isVoid +
-                ", isReturn=" + isReturn +
-                ", isBreak=" + isBreak +
-                ", isContinue=" + isContinue +
-                ", value=" + value +
-                ", isValue=" + isValue +
-                ", isNull=" + isNull +
-                ", type=" + type +
-                ", rule=" + rule +
-                ", isRule=" + isRule +
-                '}';
+        if (isString()) {
+            return String.format("'%s'", getStringValue());
+        } else if (isBoolean()) {
+            return String.valueOf(getBooleanValue());
+        } else if (isMap()) {
+            return mapToString(getMapValue());
+        } else if (isArray()) {
+            return Arrays.toString(getArrayValue());
+        } else if (isVoid()) {
+            return "void";
+        } else if (isReturn()) {
+            return "return";
+        } else if (isBreak()) {
+            return "break";
+        } else if (isContinue()) {
+            return "continue";
+        } else if (isValue()) {
+            return value.toString();
+        } else if (isNull()) {
+            return "null";
+        } else {
+            return getRule().toString();
+        }
+    }
+
+    private String mapToString(Map<Value, Value> mapValue) {
+        StringBuilder entries = new StringBuilder();
+        for (Value k : mapValue.keySet()) {
+            if (entries.length() > 0) {
+                entries.append(", ");
+            }
+
+            entries.append(k.toString()).append(": ").append(mapValue.get(k).toString());
+        }
+
+        return String.format("{%s}", entries);
     }
 }
