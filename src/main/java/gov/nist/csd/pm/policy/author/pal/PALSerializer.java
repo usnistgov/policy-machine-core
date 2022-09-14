@@ -23,69 +23,6 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 
 class PALSerializer {
 
-    public static void main(String[] args) throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-
-        String pal = """
-                set resource access rights [read, write];
-                
-                const test = 'test';
-                
-                function testFunc() void {
-                    if equals('1', '2') {
-                        create policy class test;
-                    } else if equals('3', '4') {
-                        create policy class test;
-                    } else {
-                        create policy class test;
-                    }
-                
-                    let x = 'hello world';
-                    create policy class x;
-                    
-                    foreach y in ['a', 'b'] {
-                        create policy class y;
-                    }
-                    
-                    create obligation 'o1' {
-                        create rule 'rule1'
-                        when any user
-                        performs 'event'
-                        do(evtCtx) {
-                            foreach y in ['c', 'd'] {
-                                create policy class y;
-                            }
-                        }
-                    }
-                }
-                
-                create policy class 'pc1';
-                create object attribute 'oa1' assign to ['pc1'];
-                create object attribute 'oa2' assign to ['pc1'];
-                create user attribute 'ua1' assign to ['pc1'];
-                create user attribute 'ua2' assign to ['pc1'];
-                create user 'u1' assign to ['ua1', 'ua2'];
-                create object 'o1' assign to ['oa1', 'oa2'];
-                
-                create prohibition 'label' deny user 'u1' access rights [read] on union of !'oa1', 'oa2';
-                
-                create obligation 'o1' {
-                    create rule 'rule1'
-                    when any user
-                    performs 'event'
-                    do(evtCtx) {
-                        foreach y in ['c', 'd'] {
-                            create policy class y;
-                        }
-                    }
-                }
-                """;
-
-        pap.compileAndExecutePAL(new UserContext(SUPER_USER), pal);
-
-        pal = pap.toPAL();
-    }
-
     private static final String TAB_SPACES = "    ";
     private static final String SEMI_COLON = ";";
 
@@ -236,13 +173,13 @@ class PALSerializer {
     }
 
     private String serializeConstants() throws PMException {
-        String pal = "";
+        StringBuilder pal = new StringBuilder();
         Map<String, Value> constants = policy.pal().getConstants();
         for (String c : constants.keySet()) {
             Value v = constants.get(c);
-            pal += serializeConstant(c, v) + SEMI_COLON;
+            pal.append(serializeConstant(c, v)).append(SEMI_COLON);
         }
-        return pal;
+        return pal.toString();
     }
 
     private String serializeConstant(String name, Value value) {
