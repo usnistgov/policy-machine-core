@@ -168,7 +168,6 @@ public class PALExecutor implements PALExecutable{
     @Override
     public String toPAL() throws PMException {
         String pal = new PALSerializer(policy).toPAL();
-        System.out.println(pal);
         return PALFormatter.format(pal);
     }
 }
