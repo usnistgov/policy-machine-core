@@ -11,7 +11,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 public class CreatePolicyStatement extends PALStatement {
 
-    private final Expression name;
+    private final NameExpression name;
 
     @Override
     public boolean equals(Object o) {
@@ -26,11 +26,11 @@ public class CreatePolicyStatement extends PALStatement {
         return Objects.hash(name);
     }
 
-    public CreatePolicyStatement(Expression name) {
+    public CreatePolicyStatement(NameExpression name) {
         this.name = name;
     }
 
-    public Expression getName() {
+    public NameExpression getName() {
         return name;
     }
 

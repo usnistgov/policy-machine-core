@@ -1,11 +1,13 @@
 package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.author.pal.model.exception.PALExecutionException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.author.pal.model.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
+import gov.nist.csd.pm.policy.author.pal.model.scope.FunctionAlreadyDefinedInScopeException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,15 +32,15 @@ public class FunctionDefinitionStatement extends PALStatement {
     private final String functionName;
     private final Type returnType;
     private final List<FormalArgument> args;
-    private List<PALStatement> body;
+    private List<PALStatement> statements;
     private FunctionExecutor functionExecutor;
     private boolean isFuncExec;
 
-    public FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PALStatement> body) {
+    public FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PALStatement> stmts) {
         this.functionName = functionName;
         this.returnType = returnType;
         this.args = args;
-        this.body = body;
+        this.statements = stmts;
     }
 
     public FunctionDefinitionStatement(String functionName, Type returnType,
@@ -71,12 +73,16 @@ public class FunctionDefinitionStatement extends PALStatement {
     }
 
     public List<PALStatement> getBody() {
-        return body;
+        return statements;
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) {
-        ctx.addFunction(this);
+    public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PALExecutionException {
+        try {
+            ctx.scope().addFunction(this);
+        } catch (FunctionAlreadyDefinedInScopeException e) {
+            throw new PALExecutionException(e.getMessage());
+        }
 
         return new Value();
     }
@@ -90,7 +96,7 @@ public class FunctionDefinitionStatement extends PALStatement {
                 functionName,
                 argsStr,
                 returnType.toString(),
-                statementsToString(body)
+                statementsToString(statements)
         );
     }
 
@@ -111,11 +117,11 @@ public class FunctionDefinitionStatement extends PALStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FunctionDefinitionStatement that = (FunctionDefinitionStatement) o;
-        return isFuncExec == that.isFuncExec && Objects.equals(functionName, that.functionName) && Objects.equals(returnType, that.returnType) && Objects.equals(args, that.args) && Objects.equals(body, that.body) && Objects.equals(functionExecutor, that.functionExecutor);
+        return isFuncExec == that.isFuncExec && Objects.equals(functionName, that.functionName) && Objects.equals(returnType, that.returnType) && Objects.equals(args, that.args) && Objects.equals(statements, that.statements) && Objects.equals(functionExecutor, that.functionExecutor);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(functionName, returnType, args, body, functionExecutor, isFuncExec);
+        return Objects.hash(functionName, returnType, args, statements, functionExecutor, isFuncExec);
     }
 }

@@ -4,7 +4,6 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.SetResourceAccessRightsStatement;
 
 import java.util.List;
@@ -20,9 +19,9 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
     @Override
     public SetResourceAccessRightsStatement visitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx) {
         // check that this statement has not been called before
-        if (visitorCtx.scope().areResourceAccessRightsSet()) {
+        if (!visitorCtx.scope().resourceAccessRights().isEmpty()) {
             visitorCtx.errorLog().addError(ctx, "set resource access rights has already been called");
-            return new SetResourceAccessRightsStatement(visitorCtx.scope().getResourceAccessRights());
+            return new SetResourceAccessRightsStatement(visitorCtx.scope().resourceAccessRights());
         }
 
         PALParser.AccessRightArrayContext accessRightArrayCtx = ctx.accessRightArray();
@@ -31,9 +30,9 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
         for (PALParser.AccessRightContext id : identifiers) {
             String ar = id.getText();
             arset.add(ar);
-
-            visitorCtx.scope().addVariable(ar, Type.string(), true);
         }
+
+        visitorCtx.scope().setResourceAccessRights(arset);
 
         return new SetResourceAccessRightsStatement(arset);
     }

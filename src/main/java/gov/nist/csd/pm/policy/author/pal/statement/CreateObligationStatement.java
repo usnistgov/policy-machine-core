@@ -1,10 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.ArrayLiteral;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -22,43 +19,35 @@ import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 
 public class CreateObligationStatement extends PALStatement {
 
-    private final Expression labelExpr;
-    private final List<CreateRuleStatement> ruleStmts;
+    private final NameExpression name;
+    private final List<PALStatement> ruleStmts;
 
-    public CreateObligationStatement(Expression labelExpr, List<CreateRuleStatement> ruleStmts) {
-        this.labelExpr = labelExpr;
+    public CreateObligationStatement(NameExpression name, List<PALStatement> ruleStmts) {
+        this.name = name;
         this.ruleStmts = ruleStmts;
-    }
-
-    public Expression getLabelExpr() {
-        return labelExpr;
-    }
-
-    public List<CreateRuleStatement> getRuleStmts() {
-        return ruleStmts;
     }
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        UserContext author = ctx.getAuthor();
-        String label = labelExpr.execute(ctx, policyAuthor).getStringValue();
+        UserContext author = ctx.author();
+        String nameStr = name.execute(ctx, policyAuthor).getStringValue();
 
         // execute the create rule statements and add to obligation
         List<Rule> rules = new ArrayList<>();
-        for (CreateRuleStatement createRuleStmt : ruleStmts) {
+        for (PALStatement createRuleStmt : ruleStmts) {
             Value createRuleValue = createRuleStmt.execute(ctx, policyAuthor);
             Rule rule = createRuleValue.getRule();
             rules.add(rule);
         }
 
-        policyAuthor.obligations().create(author, label, rules.toArray(rules.toArray(Rule[]::new)));
+        policyAuthor.obligations().create(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
 
         return new Value();
     }
 
     @Override
     public String toString() {
-        return String.format("create obligation %s {%s}", labelExpr, statementsToString(ruleStmts));
+        return String.format("create obligation %s {%s}", name, statementsToString(ruleStmts));
     }
 
     @Override
@@ -66,39 +55,39 @@ public class CreateObligationStatement extends PALStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateObligationStatement that = (CreateObligationStatement) o;
-        return Objects.equals(labelExpr, that.labelExpr) && Objects.equals(ruleStmts, that.ruleStmts);
+        return Objects.equals(name, that.name) && Objects.equals(ruleStmts, that.ruleStmts);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(labelExpr, ruleStmts);
+        return Objects.hash(name, ruleStmts);
     }
 
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         return new CreateObligationStatement(
-                new Expression(new Literal(obligation.getLabel())),
+                new NameExpression(new VariableReference(obligation.getLabel(), Type.string())),
                 createRuleStatementsFromObligation(obligation.getRules())
         );
     }
 
-    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) {
-        List<CreateRuleStatement> createRuleStatements = new ArrayList<>();
+    private static List<PALStatement> createRuleStatementsFromObligation(List<Rule> rules) {
+        List<PALStatement> createRuleStatements = new ArrayList<>();
 
         for (Rule rule : rules) {
             EventPattern event = rule.getEvent();
 
-            createRuleStatements.add(
-                    new CreateRuleStatement(
-                            new Expression(new Literal(rule.getLabel())),
-                            getSubjectClause(event),
-                            getPerformsClause(event),
-                            getOnClause(event),
-                            new CreateRuleStatement.ResponseBlock(
-                                    rule.getResponse().getEventCtxVariable(),
-                                    rule.getResponse().getStatements()
-                            )
+            CreateRuleStatement createRuleStatement = new CreateRuleStatement(
+                    new NameExpression(new VariableReference(rule.getLabel(), Type.string())),
+                    getSubjectClause(event.getSubject()),
+                    getPerformsClause(event.getOperations()),
+                    getOnClause(event),
+                    new CreateRuleStatement.ResponseBlock(
+                            rule.getResponse().getEventCtxVariable(),
+                            rule.getResponse().getStatements()
                     )
             );
+
+            createRuleStatements.add(createRuleStatement);
         }
 
         return createRuleStatements;
@@ -107,25 +96,25 @@ public class CreateObligationStatement extends PALStatement {
     private static CreateRuleStatement.OnClause getOnClause(EventPattern event) {
         Target target = event.getTarget();
         Target.Type type = target.getType();
-        Expression expression = null;
+        NameExpression expression = null;
         CreateRuleStatement.TargetType onClauseType = null;
         switch (type) {
             case ANY_CONTAINED_IN -> {
-                expression = new Expression(new Literal(target.anyContainedIn()));
+                expression = new NameExpression(new VariableReference(target.anyContainedIn(), Type.string()));
                 onClauseType = CreateRuleStatement.TargetType.ANY_CONTAINED_IN;
             }
             case POLICY_ELEMENT -> {
-                expression = new Expression(new Literal(target.policyElement()));
+                expression = new NameExpression(new VariableReference(target.policyElement(), Type.string()));
                 onClauseType = CreateRuleStatement.TargetType.POLICY_ELEMENT;
             }
             case ANY_OF_SET -> {
                 List<String> set = target.anyOfSet();
-                List<Expression> exprs = new ArrayList<>();
+                List<NameExpression> exprs = new ArrayList<>();
                 for (String s : set) {
-                    exprs.add(new Expression(new Literal(s)));
+                    exprs.add(new NameExpression(new VariableReference(s, Type.string())));
                 }
 
-                expression = new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())));
+                expression = new NameExpression(exprs);
                 onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
             }
             case ANY_POLICY_ELEMENT -> {
@@ -136,48 +125,44 @@ public class CreateObligationStatement extends PALStatement {
         return new CreateRuleStatement.OnClause(expression, onClauseType);
     }
 
-    private static CreateRuleStatement.PerformsClause getPerformsClause(EventPattern event) {
-        List<String> operations = event.getOperations();
+    private static CreateRuleStatement.PerformsClause getPerformsClause(List<String> operations) {
         List<Expression> exprs = new ArrayList<>();
         for (String op : operations) {
             exprs.add(new Expression(new Literal(op)));
         }
         return new CreateRuleStatement.PerformsClause(
-                new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string()))));
+                new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())))
+        );
     }
 
-    private static CreateRuleStatement.SubjectClause getSubjectClause(EventPattern event) {
-        EventSubject subject = event.getSubject();
+    private static CreateRuleStatement.SubjectClause getSubjectClause(EventSubject subject) {
         EventSubject.Type eventSubjectType = subject.getType();
         CreateRuleStatement.SubjectType type = null;
-        Expression subjectExpr = null;
+        NameExpression subjectExpr = null;
         CreateRuleStatement.SubjectClause subjectClause = null;
         switch (eventSubjectType) {
             case USERS -> {
                 if (subject.users().size() > 1) {
                     type = CreateRuleStatement.SubjectType.USERS;
 
-                    List<Expression> userExprs = new ArrayList<>();
+                    List<NameExpression> userExprs = new ArrayList<>();
                     for (String user : subject.users()) {
-                        userExprs.add(new Expression(new Literal(user)));
+                        userExprs.add(new NameExpression(new VariableReference(user, Type.string())));
                     }
 
-                    subjectExpr = new Expression(new Literal(new ArrayLiteral(
-                            userExprs.toArray(new Expression[]{}),
-                            Type.string()
-                    )));
+                    subjectExpr = new NameExpression(userExprs.toArray(NameExpression[]::new));
                 } else {
                     type = CreateRuleStatement.SubjectType.USER;
-                    subjectExpr = new Expression(new Literal(subject.users().get(0)));
+                    subjectExpr = new NameExpression(new VariableReference(subject.users().get(0), Type.string()));
                 }
             }
             case PROCESS -> {
                 type = CreateRuleStatement.SubjectType.PROCESS;
-                subjectExpr = new Expression(new Literal(subject.process()));
+                subjectExpr = new NameExpression(new VariableReference(subject.process(), Type.string()));
             }
             case ANY_USER_WITH_ATTRIBUTE -> {
                 type = CreateRuleStatement.SubjectType.USER_ATTR;
-                subjectExpr = new Expression(new Literal(subject.anyUserWithAttribute()));
+                subjectExpr = new NameExpression(new VariableReference(subject.anyUserWithAttribute(), Type.string()));
             }
             case ANY_USER -> {
                 type = CreateRuleStatement.SubjectType.ANY_USER;

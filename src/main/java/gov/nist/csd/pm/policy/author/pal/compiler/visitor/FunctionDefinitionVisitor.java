@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
@@ -25,13 +26,6 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
     @Override
     public FunctionDefinitionStatement visitFuncDefStmt(PALParser.FuncDefStmtContext ctx) {
         String funcName = ctx.IDENTIFIER().getText();
-        if (visitorCtx.scope().getFunction(funcName) != null) {
-            visitorCtx.errorLog().addError(
-                    ctx,
-                    "function " + funcName + " already defined in scope"
-            );
-        }
-
         List<FormalArgument> args = parseFormalArgs(ctx.formalArgList());
         Type returnType = parseReturnType(ctx.funcReturnType());
         List<PALStatement> body = parseBody(ctx, args);
@@ -39,7 +33,11 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
         FunctionDefinitionStatement functionDefinition = new FunctionDefinitionStatement(funcName, returnType, args, body);
 
         // add function to scope
-        visitorCtx.scope().addFunction(ctx, functionDefinition);
+        try {
+            visitorCtx.scope().addFunction(functionDefinition);
+        } catch (FunctionAlreadyDefinedInScopeException e) {
+            visitorCtx.errorLog().addError(ctx, e.getMessage());
+        }
 
         // check that the body has a return statement IF the return type is NOT VOID
         PALStatement lastStmt = null;
@@ -58,18 +56,23 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
             }
         } else {
             if (lastStmt instanceof FunctionReturnStmt returnStmt) {
-                Type retExprType = returnStmt.getExpr().getType(visitorCtx.scope());
+                Type retExprType = Type.any();
+                try {
+                    retExprType = returnStmt.getExpr().getType(visitorCtx.scope());
+                } catch (PALScopeException e) {
+                    visitorCtx.errorLog().addError(ctx, e.getMessage());
+                }
                 if (returnStmt.isVoid()) {
-                     visitorCtx.errorLog().addError(
-                             ctx,
-                             "return statement missing expression"
-                     );
-                 } else if (!retExprType.equals(returnType)) {
-                     visitorCtx.errorLog().addError(
-                             ctx,
-                             "function expected to return type " + returnType + " not " + retExprType
-                     );
-                 }
+                    visitorCtx.errorLog().addError(
+                            ctx,
+                            "return statement missing expression"
+                    );
+                } else if (!retExprType.equals(returnType)) {
+                    visitorCtx.errorLog().addError(
+                            ctx,
+                            "function expected to return type " + returnType + " not " + retExprType
+                    );
+                }
             } else {
                 visitorCtx.errorLog().addError(
                         ctx,
@@ -89,7 +92,11 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
         // add the args to the local scope
         for (FormalArgument formalArgument : args) {
             // string literal as a placeholder since the actual value is not determined yet
-            localVisitorCtx.scope().addVariable(formalArgument.name(), formalArgument.type(), false);
+            try {
+                localVisitorCtx.scope().addVariable(formalArgument.name(), formalArgument.type(), false);
+            } catch (PALScopeException e) {
+                visitorCtx.errorLog().addError(ctx, e.getMessage());
+            }
         }
 
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
@@ -109,10 +116,10 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
             PALParser.VarTypeContext varTypeContext = formalArgCtx.formalArgType().varType();
 
             // check that a formalArg does not clash with an already defined variable
-            if (visitorCtx.scope().getVariable(name) != null || argNames.contains(name)) {
+            if (visitorCtx.scope().variableExists(name) || argNames.contains(name)) {
                 visitorCtx.errorLog().addError(
                         formalArgCtx,
-                        "formal arg " + name + " already defined in scope"
+                        String.format("formal arg '%s' already defined in scope", name)
                 );
             }
 

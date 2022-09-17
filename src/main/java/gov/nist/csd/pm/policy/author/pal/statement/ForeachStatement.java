@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
@@ -16,40 +17,34 @@ public class ForeachStatement extends PALStatement {
     private final String varName;
     private final String valueVarName;
     private final Expression iter;
-    private final List<PALStatement> block;
+    private final List<PALStatement> statements;
 
-    public ForeachStatement(String varName, String valueVarName, Expression iter, List<PALStatement> block) {
+    public ForeachStatement(String varName, String valueVarName, Expression iter, List<PALStatement> statements) {
         this.varName = varName;
         this.valueVarName = valueVarName;
         this.iter = iter;
-        this.block = block;
-    }
-
-    public String getVarName() {
-        return varName;
-    }
-
-    public Expression getIter() {
-        return iter;
-    }
-
-    public List<PALStatement> getBlock() {
-        return block;
+        this.statements = statements;
     }
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        if (block.isEmpty()) {
+        if (statements.isEmpty()) {
             return new Value();
         }
 
         Value iterValue = iter.execute(ctx, policyAuthor);
         if (iterValue.isArray()) {
             for (Value v : iterValue.getArrayValue()) {
-                ExecutionContext localExecutionCtx = ctx.copy();
-                localExecutionCtx.addVariable(varName, v, false);
+                ExecutionContext localExecutionCtx;
+                try {
+                    localExecutionCtx = ctx.copy();
+                } catch (PALScopeException e) {
+                    throw new RuntimeException(e);
+                }
 
-                Value value = executeStatementBlock(localExecutionCtx, policyAuthor, block);
+                localExecutionCtx.scope().addValue(varName, v);
+
+                Value value = executeStatementBlock(localExecutionCtx, policyAuthor, statements);
 
                 if (value.isBreak()) {
                     break;
@@ -57,19 +52,25 @@ public class ForeachStatement extends PALStatement {
                     return value;
                 }
 
-                ctx.updateVariables(localExecutionCtx);
+                ctx.scope().overwriteValues(localExecutionCtx.scope());
             }
         } else if (iterValue.isMap()) {
             for (Value key : iterValue.getMapValue().keySet()) {
-                ExecutionContext localExecutionCtx = ctx.copy();
-                Value mapValue = iterValue.getMapValue().get(key);
-
-                localExecutionCtx.addVariable(varName, key, false);
-                if (valueVarName != null) {
-                    localExecutionCtx.addVariable(valueVarName, mapValue, false);
+                ExecutionContext localExecutionCtx;
+                try {
+                    localExecutionCtx = ctx.copy();
+                } catch (PALScopeException e) {
+                    throw new RuntimeException(e);
                 }
 
-                Value value = executeStatementBlock(localExecutionCtx, policyAuthor, block);
+                Value mapValue = iterValue.getMapValue().get(key);
+
+                localExecutionCtx.scope().addValue(varName, key);
+                if (valueVarName != null) {
+                    localExecutionCtx.scope().addValue(valueVarName, mapValue);
+                }
+
+                Value value = executeStatementBlock(localExecutionCtx, policyAuthor, statements);
 
                 if (value.isBreak()) {
                     break;
@@ -77,7 +78,7 @@ public class ForeachStatement extends PALStatement {
                     return value;
                 }
 
-                ctx.updateVariables(localExecutionCtx);
+                ctx.scope().overwriteValues(localExecutionCtx.scope());
             }
         }
 
@@ -89,7 +90,7 @@ public class ForeachStatement extends PALStatement {
         return String.format("foreach %s in %s {%s}",
                 (valueVarName != null ? String.format("%s, %s", varName, valueVarName) : varName),
                 iter,
-                statementsToString(block)
+                statementsToString(statements)
         );
     }
 
@@ -98,11 +99,12 @@ public class ForeachStatement extends PALStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ForeachStatement that = (ForeachStatement) o;
-        return Objects.equals(varName, that.varName) && Objects.equals(valueVarName, that.valueVarName) && Objects.equals(iter, that.iter) && Objects.equals(block, that.block);
+        return Objects.equals(varName, that.varName) && Objects.equals(valueVarName, that.valueVarName) && Objects.equals(iter, that.iter) && Objects.equals(statements, that.statements);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(varName, valueVarName, iter, block);
+        return Objects.hash(varName, valueVarName, iter, statements);
     }
+
 }

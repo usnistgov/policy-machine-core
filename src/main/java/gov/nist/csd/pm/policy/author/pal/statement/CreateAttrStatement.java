@@ -15,17 +15,17 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 
 public class CreateAttrStatement extends PALStatement {
 
-    public Expression name;
+    public NameExpression name;
     public NodeType type;
-    public Expression assignTo;
+    public NameExpression assignTo;
 
-    public CreateAttrStatement(Expression name, NodeType type, Expression assignTo) {
+    public CreateAttrStatement(NameExpression name, NodeType type, NameExpression assignTo) {
         this.name = name;
         this.type = type;
         this.assignTo = assignTo;
     }
 
-    public Expression getName() {
+    public NameExpression getName() {
         return name;
     }
 
@@ -33,7 +33,7 @@ public class CreateAttrStatement extends PALStatement {
         return type;
     }
 
-    public Expression getAssignTo() {
+    public NameExpression getAssignTo() {
         return assignTo;
     }
 

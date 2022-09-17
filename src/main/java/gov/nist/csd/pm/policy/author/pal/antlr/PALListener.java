@@ -656,41 +656,35 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code VariableReference}
-	 * labeled alternative in {@link PALParser#expression}.
+	 * Enter a parse tree produced by {@link PALParser#expression}.
 	 * @param ctx the parse tree
 	 */
-	void enterVariableReference(PALParser.VariableReferenceContext ctx);
+	void enterExpression(PALParser.ExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code VariableReference}
-	 * labeled alternative in {@link PALParser#expression}.
+	 * Exit a parse tree produced by {@link PALParser#expression}.
 	 * @param ctx the parse tree
 	 */
-	void exitVariableReference(PALParser.VariableReferenceContext ctx);
+	void exitExpression(PALParser.ExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code FunctionCall}
-	 * labeled alternative in {@link PALParser#expression}.
+	 * Enter a parse tree produced by {@link PALParser#nameExpressionArray}.
 	 * @param ctx the parse tree
 	 */
-	void enterFunctionCall(PALParser.FunctionCallContext ctx);
+	void enterNameExpressionArray(PALParser.NameExpressionArrayContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code FunctionCall}
-	 * labeled alternative in {@link PALParser#expression}.
+	 * Exit a parse tree produced by {@link PALParser#nameExpressionArray}.
 	 * @param ctx the parse tree
 	 */
-	void exitFunctionCall(PALParser.FunctionCallContext ctx);
+	void exitNameExpressionArray(PALParser.NameExpressionArrayContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code LiteralExpr}
-	 * labeled alternative in {@link PALParser#expression}.
+	 * Enter a parse tree produced by {@link PALParser#nameExpression}.
 	 * @param ctx the parse tree
 	 */
-	void enterLiteralExpr(PALParser.LiteralExprContext ctx);
+	void enterNameExpression(PALParser.NameExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code LiteralExpr}
-	 * labeled alternative in {@link PALParser#expression}.
+	 * Exit a parse tree produced by {@link PALParser#nameExpression}.
 	 * @param ctx the parse tree
 	 */
-	void exitLiteralExpr(PALParser.LiteralExprContext ctx);
+	void exitNameExpression(PALParser.NameExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PALParser#array}.
 	 * @param ctx the parse tree

@@ -9,19 +9,19 @@ import java.util.Objects;
 
 public class AssignStatement extends PALStatement {
 
-    private final Expression child;
-    private final Expression assignTo;
+    private final NameExpression child;
+    private final NameExpression assignTo;
 
-    public AssignStatement(Expression child, Expression assignTo) {
+    public AssignStatement(NameExpression child, NameExpression assignTo) {
         this.child = child;
         this.assignTo = assignTo;
     }
 
-    public Expression getChild() {
+    public NameExpression getChild() {
         return child;
     }
 
-    public Expression getAssignTo() {
+    public NameExpression getAssignTo() {
         return assignTo;
     }
 

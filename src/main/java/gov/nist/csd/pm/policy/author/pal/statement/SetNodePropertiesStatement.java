@@ -11,15 +11,15 @@ import java.util.Objects;
 
 public class SetNodePropertiesStatement extends PALStatement {
 
-    private final Expression nameExpr;
+    private final NameExpression nameExpr;
     private final Expression propertiesExpr;
 
-    public SetNodePropertiesStatement(Expression nameExpr, Expression propertiesExpr) {
+    public SetNodePropertiesStatement(NameExpression nameExpr, Expression propertiesExpr) {
         this.nameExpr = nameExpr;
         this.propertiesExpr = propertiesExpr;
     }
 
-    public Expression getNameExpr() {
+    public NameExpression getNameExpr() {
         return nameExpr;
     }
 

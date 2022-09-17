@@ -7,7 +7,9 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.model.expression.MapLiteral;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.ArrayLiteral;
+import gov.nist.csd.pm.policy.author.pal.model.scope.PALScopeException;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,23 +24,36 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
         this.visitorCtx = visitorCtx;
     }
 
-    @Override
-    public Literal visitLiteralExpr(PALParser.LiteralExprContext ctx) {
-        return visitLiteral(ctx.literal());
-    }
-
-    private Literal visitLiteral(PALParser.LiteralContext literalCtx) {
+    public Literal visitLiteral(PALParser.LiteralContext literalCtx) {
         if (literalCtx instanceof PALParser.StringLiteralContext stringLiteralCtx) {
             return parseStringLiteral(stringLiteralCtx);
         } else if (literalCtx instanceof PALParser.BooleanLiteralContext booleanLiteralCtx) {
             return parseBooleanLiteral(booleanLiteralCtx);
         } else if (literalCtx instanceof PALParser.ArrayLiteralContext arrayLiteralCtx) {
             return parseArrayLiteral(arrayLiteralCtx);
-        } else if (literalCtx instanceof PALParser.MapLiteralContext mapLiteralCtx) {
-            return parseMapLiteral(mapLiteralCtx);
+        } else  {
+            return parseMapLiteral((PALParser.MapLiteralContext) literalCtx);
         }
+    }
 
-        return null;
+    @Override
+    public Literal visitStringLiteral(PALParser.StringLiteralContext ctx) {
+        return visitLiteral(ctx);
+    }
+
+    @Override
+    public Literal visitBooleanLiteral(PALParser.BooleanLiteralContext ctx) {
+        return visitLiteral(ctx);
+    }
+
+    @Override
+    public Literal visitArrayLiteral(PALParser.ArrayLiteralContext ctx) {
+        return visitLiteral(ctx);
+    }
+
+    @Override
+    public Literal visitMapLiteral(PALParser.MapLiteralContext ctx) {
+        return visitLiteral(ctx);
     }
 
     private Literal parseStringLiteral(PALParser.StringLiteralContext ctx) {
@@ -59,11 +74,16 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
         List<Expression> exprs = new ArrayList<>();
         for (PALParser.ExpressionContext expressionCtx : arrayCtx.expression()) {
             Expression expr = Expression.compile(visitorCtx, expressionCtx);
-            Type type = expr.getType(visitorCtx.scope());
+            Type type = Type.any();
+            try {
+                type = expr.getType(visitorCtx.scope());
+            } catch (PALScopeException e) {
+                visitorCtx.errorLog().addError(expressionCtx, e.getMessage());
+            }
 
             if (elementType == null) {
                 elementType = type;
-            } else if (type == null || !type.equals(elementType)) {
+            } else if (!type.equals(elementType)) {
                 elementType = Type.any();
             }
 
@@ -82,10 +102,15 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
         for(PALParser.MapEntryContext mapEntryCtx : ctx.map().mapEntry()) {
             Expression keyExpr = Expression.compile(visitorCtx, mapEntryCtx.key);
             Expression valueExpr = Expression.compile(visitorCtx, mapEntryCtx.value);
-
-
-            Type keyExprType = keyExpr.getType(visitorCtx.scope());
-            Type valueExprType = valueExpr.getType(visitorCtx.scope());
+            
+            Type keyExprType = Type.any();
+            Type valueExprType = Type.any();
+            try {
+                keyExprType = keyExpr.getType(visitorCtx.scope());
+                valueExprType = valueExpr.getType(visitorCtx.scope());
+            } catch (PALScopeException e) {
+                visitorCtx.errorLog().addError(mapEntryCtx, e.getMessage());
+            }
 
             // check that all map keys are the same type
             if (keyType == null) {

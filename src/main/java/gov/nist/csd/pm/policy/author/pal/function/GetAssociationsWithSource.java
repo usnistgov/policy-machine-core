@@ -18,7 +18,7 @@ public class GetAssociationsWithSource extends FunctionDefinitionStatement {
                         new FormalArgument("source", Type.string())
                 ),
                 (ctx, author) -> {
-                    Value source = ctx.getVariable("source");
+                    Value source = ctx.scope().getValue("source");
                     List<Association> associations = author.graph().getAssociationsWithSource(source.getStringValue());
                     Value[] associationValues = new Value[associations.size()];
                     for (int i = 0; i < associations.size(); i++)  {

@@ -82,7 +82,7 @@ class PALSerializer {
                 continue;
             }
 
-            pal.append(new CreatePolicyStatement(new Expression(new Literal(policyClass)))).append("\n");
+            pal.append(new CreatePolicyStatement(new NameExpression(new VariableReference(policyClass, Type.string())))).append("\n");
 
             new BreadthFirstGraphWalker(policy.graph())
                     .withPropagator((parent, child) -> {
@@ -99,8 +99,8 @@ class PALSerializer {
                                 pal.append(stmt).append("\n");
                             } else {
                                 pal.append(new AssignStatement(
-                                        new Expression(new Literal(child)),
-                                        new Expression(new Literal(parent))
+                                        new NameExpression(new VariableReference(child, Type.string())),
+                                        new NameExpression(new VariableReference(parent, Type.string()))
                                 )).append("\n");
                             }
 
@@ -112,9 +112,9 @@ class PALSerializer {
                                         exprs.add(new Expression(new VariableReference(ar, Type.string())));
                                     }
 
-                                   pal.append(new AssociateStatement(
-                                            new Expression(new Literal(child)),
-                                            new Expression(new Literal(association.getTarget())),
+                                    pal.append(new AssociateStatement(
+                                            new NameExpression(new VariableReference(child, Type.string())),
+                                            new NameExpression(new VariableReference(association.getTarget(), Type.string())),
                                             new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())))
                                     )).append("\n");
                                 }
@@ -126,8 +126,8 @@ class PALSerializer {
                                 pal.append(stmt).append("\n");
                             } else {
                                 pal.append(new AssignStatement(
-                                        new Expression(new Literal(child)),
-                                        new Expression(new Literal(parent))
+                                        new NameExpression(new VariableReference(child, Type.string())),
+                                        new NameExpression(new VariableReference(parent, Type.string()))
                                 )).append("\n");
                             }
                         }
@@ -142,19 +142,19 @@ class PALSerializer {
     private PALStatement buildCreateNodeStatement(String name, NodeType type, String parent) {
         if (type == UA || type == OA) {
             return new CreateAttrStatement(
-                    new Expression(new Literal(name)),
+                    new NameExpression(new VariableReference(name, Type.string())),
                     type,
-                    new Expression(new Literal(
-                            new ArrayLiteral(new Expression[]{new Expression(new Literal(parent))}, Type.string())
-                    ))
+                    new NameExpression(
+                            new NameExpression(new VariableReference(parent, Type.string()))
+                    )
             );
         } else {
             return new CreateUserOrObjectStatement(
-                    new Expression(new Literal(name)),
+                    new NameExpression(new VariableReference(name, Type.string())),
                     type,
-                    new Expression(new Literal(
-                            new ArrayLiteral(new Expression[]{new Expression(new Literal(parent))}, Type.string())
-                    ))
+                    new NameExpression(
+                            new NameExpression(new VariableReference(parent, Type.string()))
+                    )
             );
         }
     }

@@ -17,7 +17,7 @@ public class GetChildren extends FunctionDefinitionStatement {
                         new FormalArgument("nodeName", Type.string())
                 ),
                 (ctx, author) -> {
-                    List<String> children = author.graph().getChildren(ctx.getVariable("nodeName").getStringValue());
+                    List<String> children = author.graph().getChildren(ctx.scope().getValue("nodeName").getStringValue());
                     Value[] childValues = new Value[children.size()];
                     for (int i = 0; i < children.size(); i++) {
                         childValues[i] = new Value(children.get(i));

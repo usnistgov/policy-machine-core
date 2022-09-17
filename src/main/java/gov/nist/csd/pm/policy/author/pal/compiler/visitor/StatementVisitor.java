@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
+import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 
@@ -15,70 +16,72 @@ public class StatementVisitor extends PALBaseVisitor<PALStatement> {
 
     @Override
     public PALStatement visitStmt(PALParser.StmtContext ctx) {
+        PALStatement statement = null;
         if (ctx.varStmt() != null) {
-            return new VarStmtVisitor(visitorCtx)
+            statement = new VarStmtVisitor(visitorCtx)
                     .visitVarStmt(ctx.varStmt());
         } else if (ctx.funcDefStmt() != null) {
-            return new FunctionDefinitionVisitor(visitorCtx)
+            statement = new FunctionDefinitionVisitor(visitorCtx)
                     .visitFuncDefStmt(ctx.funcDefStmt());
         } else if (ctx.foreachStmt() != null) {
-            return new ForeachStmtVisitor(visitorCtx)
+            statement = new ForeachStmtVisitor(visitorCtx)
                     .visitForeachStmt(ctx.foreachStmt());
         } else if (ctx.funcCallStmt() != null) {
-            return new FunctionCallVisitor(visitorCtx)
+            statement = new FunctionCallVisitor(visitorCtx)
                     .visitFuncCallStmt(ctx.funcCallStmt());
         } else if (ctx.ifStmt() != null) {
-            return new IfStmtVisitor(visitorCtx)
+            statement = new IfStmtVisitor(visitorCtx)
                     .visitIfStmt(ctx.ifStmt());
         } else if (ctx.createAttrStmt() != null) {
-            return new CreateAttrStmtVisitor(visitorCtx)
+            statement = new CreateAttrStmtVisitor(visitorCtx)
                     .visitCreateAttrStmt(ctx.createAttrStmt());
         } else if (ctx.createPolicyStmt() != null) {
-            return new CreatePolicyStmtVisitor(visitorCtx)
+            statement = new CreatePolicyStmtVisitor(visitorCtx)
                     .visitCreatePolicyStmt(ctx.createPolicyStmt());
         } else if (ctx.createUserOrObjectStmt() != null) {
-            return new CreateUserOrObjectStmtVisitor(visitorCtx)
+            statement = new CreateUserOrObjectStmtVisitor(visitorCtx)
                     .visitCreateUserOrObjectStmt(ctx.createUserOrObjectStmt());
         } else if (ctx.createProhibitionStmt() != null) {
-            return new CreateProhibitionStmtVisitor(visitorCtx)
+            statement = new CreateProhibitionStmtVisitor(visitorCtx)
                     .visitCreateProhibitionStmt(ctx.createProhibitionStmt());
         } else if (ctx.createObligationStmt() != null) {
-            return new CreateObligationStmtVisitor(visitorCtx)
+            statement = new CreateObligationStmtVisitor(visitorCtx)
                     .visitCreateObligationStmt(ctx.createObligationStmt());
         } else if (ctx.setNodePropsStmt() != null) {
-            return new SetNodePropertiesStmtVisitor(visitorCtx)
+            statement = new SetNodePropertiesStmtVisitor(visitorCtx)
                     .visitSetNodePropsStmt(ctx.setNodePropsStmt());
         } else if (ctx.assignStmt() != null) {
-            return new AssignStmtVisitor(visitorCtx)
+            statement = new AssignStmtVisitor(visitorCtx)
                     .visitAssignStmt(ctx.assignStmt());
         } else if (ctx.deassignStmt() != null) {
-            return new DeassignStmtVisitor(visitorCtx)
+            statement = new DeassignStmtVisitor(visitorCtx)
                     .visitDeassignStmt(ctx.deassignStmt());
         } else if (ctx.deleteStmt() != null) {
-            return new DeleteStmtVisitor(visitorCtx)
+            statement = new DeleteStmtVisitor(visitorCtx)
                     .visitDeleteStmt(ctx.deleteStmt());
         } else if (ctx.associateStmt() != null) {
-            return new AssociateStmtVisitor(visitorCtx)
+            statement = new AssociateStmtVisitor(visitorCtx)
                     .visitAssociateStmt(ctx.associateStmt());
         } else if (ctx.dissociateStmt() != null) {
-            return new DissociateStmtVisitor(visitorCtx)
+            statement = new DissociateStmtVisitor(visitorCtx)
                     .visitDissociateStmt(ctx.dissociateStmt());
         } else if (ctx.funcReturnStmt() != null) {
-            return new FunctionReturnStmtVisitor(visitorCtx)
+            statement = new FunctionReturnStmtVisitor(visitorCtx)
                     .visitFuncReturnStmt(ctx.funcReturnStmt());
         } else if (ctx.breakStmt() != null) {
-            return new BreakStmtVisitor(visitorCtx)
+            statement = new BreakStmtVisitor(visitorCtx)
                     .visitBreakStmt(ctx.breakStmt());
         } else if (ctx.continueStmt() != null) {
-            return new ContinueStmtVisitor(visitorCtx)
+            statement = new ContinueStmtVisitor(visitorCtx)
                     .visitContinueStmt(ctx.continueStmt());
         } else if (ctx.setResourceAccessRightsStmt() != null) {
-            return new SetResourceAccessRightsStmtVisitor(visitorCtx)
+            statement = new SetResourceAccessRightsStmtVisitor(visitorCtx)
                     .visitSetResourceAccessRightsStmt(ctx.setResourceAccessRightsStmt());
         } else if (ctx.deleteRuleStmt() != null) {
-            return new DeleteRuleStmtVisitor(visitorCtx)
+            statement = new DeleteRuleStmtVisitor(visitorCtx)
                     .visitDeleteRuleStmt(ctx.deleteRuleStmt());
         }
-        return null;
+
+        return statement;
     }
 }

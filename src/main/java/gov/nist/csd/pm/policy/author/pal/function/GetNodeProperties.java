@@ -19,7 +19,7 @@ public class GetNodeProperties extends FunctionDefinitionStatement {
                         new FormalArgument("nodeName", Type.string())
                 ),
                 (ctx, author) -> {
-                    Node node = author.graph().getNode(ctx.getVariable("nodeName").getStringValue());
+                    Node node = author.graph().getNode(ctx.scope().getValue("nodeName").getStringValue());
                     Map<String, String> properties = node.getProperties();
                     Map<Value, Value> propertiesValues = new HashMap<>();
                     for (String k : properties.keySet()) {

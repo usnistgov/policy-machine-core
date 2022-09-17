@@ -4,7 +4,9 @@ import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class ErrorLog {
@@ -16,13 +18,27 @@ public class ErrorLog {
     }
 
     public ErrorLog addError(ParserRuleContext ctx, String message) {
-        this.errors.add(CompileError.fromParserRuleContext(ctx, message));
+        CompileError compileError = CompileError.fromParserRuleContext(ctx, message);
+
+        addError(compileError);
+
         return this;
     }
 
     public ErrorLog addError(int line, int charPos, int end, String msg) {
-        this.errors.add(new CompileError(new Position(line, charPos, end), msg));
+        CompileError compileError = new CompileError(new Position(line, charPos, end), msg);
+
+        addError(compileError);
+
         return this;
+    }
+
+    private void addError(CompileError error) {
+        if (this.errors.contains(error)) {
+            return;
+        }
+
+        this.errors.add(error);
     }
 
     public List<CompileError> getErrors() {
