@@ -137,7 +137,6 @@ public class PALExecutor implements PALExecutable{
         ctx.addVariable("SUPER_USER", new Value(SUPER_USER), true);
         ctx.addVariable("SUPER_PC", new Value(SUPER_PC), true);
         ctx.addVariable("SUPER_UA", new Value(SUPER_UA), true);
-        ctx.addVariable("SUPER_OA", new Value(SUPER_OA), true);
         ctx.addVariable("SUPER_OBJECT", new Value(SUPER_OBJECT), true);
 
         PALContext palContext = policy.pal().getContext();

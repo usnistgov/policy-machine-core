@@ -15,7 +15,6 @@ public class SuperPolicy {
     public static final String SUPER_USER = "super";
     public static final String SUPER_PC = "super_pc";
     public static final String SUPER_UA = "super_ua";
-    public static final String SUPER_OA = "super_oa";
     public static final String SUPER_OBJECT = "super_object";
 
     public static void configureSuperPolicy(GraphAuthor graph) throws PMException {
@@ -45,17 +44,17 @@ public class SuperPolicy {
             graph.createUser(SUPER_USER, noprops(), SUPER_UA, baseUA);
         }
 
-        // create super oa and object
-        if (!graph.nodeExists(SUPER_OA)) {
-            graph.createObjectAttribute(SUPER_OA, noprops(), baseOA);
-        }
-
         if (!graph.nodeExists(SUPER_OBJECT)) {
-            graph.createObject(SUPER_OBJECT, noprops(), SUPER_OA);
+            graph.createObject(SUPER_OBJECT, noprops(), baseOA);
         }
 
+        setSuperAccessRightsOnPolicyClass(graph, SUPER_PC);
+    }
+
+    public static void setSuperAccessRightsOnPolicyClass(GraphAuthor graph, String policyClass) throws PMException {
         // associate the super ua with the super_base_ua and super_oa
-        graph.associate(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET);
-        graph.associate(SUPER_UA, SUPER_OA, ALL_ACCESS_RIGHTS_SET);
+        graph.associate(SUPER_UA, Naming.baseUserAttribute(policyClass), ALL_ACCESS_RIGHTS_SET);
+        graph.associate(SUPER_UA, Naming.baseObjectAttribute(policyClass), ALL_ACCESS_RIGHTS_SET);
+        graph.associate(SUPER_UA, Naming.pcRepObjectAttribute(policyClass), ALL_ACCESS_RIGHTS_SET);
     }
 }
