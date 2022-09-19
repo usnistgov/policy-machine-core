@@ -3,9 +3,10 @@ package gov.nist.csd.pm.pap.policies;
 import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ACCESS_RIGHTS_SET;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.*;
 
 public class SuperPolicy {
 
@@ -20,16 +21,20 @@ public class SuperPolicy {
     public static void configureSuperPolicy(GraphAuthor graph) throws PMException {
         String baseUA = Naming.baseUserAttribute(SUPER_PC);
         String baseOA = Naming.baseObjectAttribute(SUPER_PC);
+        String repOA = Naming.pcRepObjectAttribute(SUPER_PC);
 
         // create super policy class node and base attributes
         if (!graph.nodeExists(SUPER_PC)) {
-            graph.createPolicyClass(SUPER_PC, noprops());
+            graph.createPolicyClass(SUPER_PC, toProperties(REP_PROPERTY, repOA));
         }
         if (!graph.nodeExists(baseUA)) {
             graph.createUserAttribute(baseUA, noprops(), SUPER_PC);
         }
         if (!graph.nodeExists(baseOA)) {
             graph.createObjectAttribute(baseOA, noprops(), SUPER_PC);
+        }
+        if (!graph.nodeExists(repOA)) {
+            graph.createObjectAttribute(repOA, noprops(), SUPER_PC);
         }
 
         // create super ua and user
@@ -53,5 +58,4 @@ public class SuperPolicy {
         graph.associate(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET);
         graph.associate(SUPER_UA, SUPER_OA, ALL_ACCESS_RIGHTS_SET);
     }
-
 }

@@ -87,40 +87,53 @@ class PAPTest {
 
             String baseOA = Naming.baseObjectAttribute(SUPER_PC);
             String baseUA = Naming.baseUserAttribute(SUPER_PC);
+            String repOA = Naming.pcRepObjectAttribute(SUPER_PC);
+
             assertTrue(pap.graph().nodeExists(baseOA));
             assertTrue(pap.graph().nodeExists(baseUA));
+            assertTrue(pap.graph().nodeExists(repOA));
 
             assertTrue(pap.graph().nodeExists(SUPER_UA));
             assertTrue(pap.graph().nodeExists(SUPER_USER));
             assertTrue(pap.graph().nodeExists(SUPER_OA));
             assertTrue(pap.graph().nodeExists(SUPER_OBJECT));
 
-            assertTrue(pap.graph().getChildren(SUPER_PC).containsAll(Arrays.asList(SUPER_UA, baseUA, baseOA)));
+            List<String> expected = Arrays.asList(SUPER_UA, baseUA, baseOA, repOA);
+            List<String> actual = pap.graph().getChildren(SUPER_PC);
 
-            assertTrue(pap.graph().getChildren(baseUA).contains(SUPER_USER));
-            assertTrue(pap.graph().getParents(baseUA).contains(SUPER_PC));
+            assertTrue(expected.containsAll(actual));
+            assertTrue(actual.containsAll(expected));
+            assertEquals(List.of(SUPER_PC), pap.graph().getParents(repOA));
 
-            assertTrue(pap.graph().getChildren(baseOA).contains(SUPER_OA));
-            assertTrue(pap.graph().getParents(baseOA).contains(SUPER_PC));
+            assertEquals(List.of(SUPER_USER), pap.graph().getChildren(baseUA));
+            assertEquals(List.of(SUPER_PC), pap.graph().getParents(baseUA));
 
-            assertTrue(pap.graph().getChildren(SUPER_UA).contains(SUPER_USER));
-            assertTrue(pap.graph().getParents(SUPER_UA).contains(SUPER_PC));
+            assertEquals(List.of(SUPER_OA), pap.graph().getChildren(baseOA));
+            assertEquals(List.of(SUPER_PC), pap.graph().getParents(baseOA));
 
-            assertTrue(pap.graph().getChildren(SUPER_OA).contains(SUPER_OBJECT));
-            assertTrue(pap.graph().getParents(SUPER_OA).contains(baseOA));
+            assertEquals(List.of(SUPER_USER), pap.graph().getChildren(SUPER_UA));
+            assertEquals(List.of(SUPER_PC), pap.graph().getParents(SUPER_UA));
 
-            assertTrue(pap.graph().getAssociationsWithSource(SUPER_UA).containsAll(List.of(
-                    new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET),
-                    new Association(SUPER_UA, SUPER_OA, ALL_ACCESS_RIGHTS_SET)
-            )));
+            assertEquals(List.of(SUPER_OBJECT), pap.graph().getChildren(SUPER_OA));
+            assertEquals(List.of(baseOA), pap.graph().getParents(SUPER_OA));
 
-            assertTrue(pap.graph().getAssociationsWithTarget(baseUA).contains(
-                    new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET)
-            ));
+            assertEquals(
+                    Arrays.asList(
+                            new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET),
+                            new Association(SUPER_UA, SUPER_OA, ALL_ACCESS_RIGHTS_SET)
+                    ),
+                    pap.graph().getAssociationsWithSource(SUPER_UA)
+            );
 
-            assertTrue(pap.graph().getAssociationsWithTarget(SUPER_OA).contains(
-                    new Association(SUPER_UA, SUPER_OA, ALL_ACCESS_RIGHTS_SET)
-            ));
+            assertEquals(
+                    List.of(new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET)),
+                    pap.graph().getAssociationsWithTarget(baseUA)
+            );
+
+            assertEquals(
+                    List.of(new Association(SUPER_UA, SUPER_OA, ALL_ACCESS_RIGHTS_SET)),
+                    pap.graph().getAssociationsWithTarget(SUPER_OA)
+            );
         });
     }
 
@@ -474,7 +487,7 @@ class PAPTest {
             pap.graph().createObjectAttribute("oa3", toProperties("key1", "value1", "key2", "value2"), "pc1");
 
             List<String> nodes = pap.graph().search(OA, noprops());
-            assertEquals(7, nodes.size());
+            assertEquals(8, nodes.size());
 
             nodes = pap.graph().search(null, toProperties("key1", "value1"));
             assertEquals(2, nodes.size());
@@ -495,7 +508,7 @@ class PAPTest {
             nodes = pap.graph().search(OA, toProperties("key1", "value1", "key2", "no_value"));
             assertEquals(0, nodes.size());
             nodes = pap.graph().search(null, noprops());
-            assertEquals(14, nodes.size());
+            assertEquals(15, nodes.size());
         });
     }
 
@@ -1716,6 +1729,5 @@ class PAPTest {
                 assertEquals(const2, actual);
             });
         }
-
     }
 }
