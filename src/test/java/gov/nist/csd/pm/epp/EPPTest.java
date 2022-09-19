@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_OA;
+import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_PC;
 import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
@@ -115,7 +115,7 @@ class EPPTest {
             policy.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
             policy.graph().createUser("u1", noprops(), "ua1");
             policy.graph().createObject("o1", noprops(), "oa1");
-            policy.graph().associate("ua1", SUPER_OA, new AccessRightSet(CREATE_OBLIGATION));
+            policy.graph().associate("ua1", Naming.baseObjectAttribute(SUPER_PC), new AccessRightSet(CREATE_OBLIGATION));
             policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
         });
 
