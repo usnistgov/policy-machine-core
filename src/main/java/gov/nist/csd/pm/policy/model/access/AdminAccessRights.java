@@ -22,7 +22,7 @@ public class AdminAccessRights {
     public static final String CREATE_USER_ATTRIBUTE = "create_user_attribute";
     public static final String CREATE_USER = "create_user";
     public static final String DELETE_OBJECT = "delete_object";
-    public static final String DELETE_OBJECT_ATTRIBUTE = "delete_object attribute";
+    public static final String DELETE_OBJECT_ATTRIBUTE = "delete_object_attribute";
     public static final String DELETE_USER_ATTRIBUTE = "delete_user_attribute";
     public static final String DELETE_USER = "delete_user";
     public static final String DELETE_POLICY_CLASS = "delete_policy_class";

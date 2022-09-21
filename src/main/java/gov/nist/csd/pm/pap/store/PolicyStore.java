@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 public abstract class PolicyStore extends PolicyAuthor implements PolicySync, Transactional {
 
-    @Override
+    /*@Override
     public abstract GraphStore graph();
 
     @Override
@@ -16,6 +16,6 @@ public abstract class PolicyStore extends PolicyAuthor implements PolicySync, Tr
     public abstract ObligationsStore obligations();
 
     @Override
-    public abstract PALStore pal();
+    public abstract PALStore pal();*/
 
 }

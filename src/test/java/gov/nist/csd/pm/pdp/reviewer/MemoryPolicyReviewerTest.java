@@ -1,23 +1,57 @@
-package gov.nist.csd.pm.pap.memory;
+package gov.nist.csd.pm.pdp.reviewer;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.reviewer.MemoryPolicyReviewer;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryPolicyReviewerTest {
+
+    @Test
+    void testConstructor() throws PMException {
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        MemoryPAP memoryPAP = new MemoryPAP(memoryPolicyStore);
+        MemoryPolicyReviewer reviewerWithListener = new MemoryPolicyReviewer();
+        MemoryPolicyReviewer reviewerNoListener = new MemoryPolicyReviewer(memoryPAP);
+        memoryPAP.graph().createPolicyClass("pc1", noprops());
+        assertFalse(reviewerWithListener.policy.graph().nodeExists("pc1"));
+        assertTrue(reviewerNoListener.policy.graph().nodeExists("pc1"));
+
+        memoryPAP.addEventListener(reviewerWithListener, true);
+        assertTrue(reviewerWithListener.policy.graph().nodeExists("pc1"));
+
+        memoryPAP.graph().createObjectAttribute("oa1", noprops(), "pc1");
+        assertTrue(reviewerWithListener.policy.graph().nodeExists("oa1"));
+        assertTrue(reviewerNoListener.policy.graph().nodeExists("oa1"));
+
+        memoryPAP.beginTx();
+        memoryPAP.graph().createPolicyClass("pc2", noprops());
+        assertTrue(reviewerWithListener.policy.graph().nodeExists("pc2"));
+        assertTrue(reviewerNoListener.policy.graph().nodeExists("pc2"));
+
+        MemoryPAP pap2 = new MemoryPAP(memoryPolicyStore);
+        assertFalse(pap2.graph().nodeExists("pc2"));
+
+        memoryPAP.commit();
+
+        assertTrue(pap2.graph().nodeExists("pc2"));
+    }
 
     @Nested
     class GetAccessRights {
@@ -25,8 +59,8 @@ class MemoryPolicyReviewerTest {
 
         @Test
         void testGetChildren() throws PMException {
-            PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            MemoryPAP pap = new MemoryPAP();
+            PDP pdp = new PDP(pap, new MemoryPolicyReviewer(pap));
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -50,8 +84,8 @@ class MemoryPolicyReviewerTest {
 
         @Test
         void testGetAccessibleNodes() throws PMException {
-            PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            MemoryPAP pap = new MemoryPAP();
+            PDP pdp = new PDP(pap, new MemoryPolicyReviewer(pap));
 
             pap.graph().setResourceAccessRights(RWE);
 

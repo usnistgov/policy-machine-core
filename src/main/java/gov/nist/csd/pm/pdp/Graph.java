@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;

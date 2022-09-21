@@ -388,8 +388,8 @@ class Graph implements GraphAuthor, PolicyEventEmitter {
         emitEvent(new AssociateEvent(ua, target, accessRights));
     }
 
-    static void checkAccessRightsValid(GraphStore graphStore, AccessRightSet accessRightSet) throws PMException {
-        AccessRightSet resourceAccessRights = graphStore.getResourceAccessRights();
+    static void checkAccessRightsValid(GraphAuthor graph, AccessRightSet accessRightSet) throws PMException {
+        AccessRightSet resourceAccessRights = graph.getResourceAccessRights();
 
         for (String ar : accessRightSet) {
             if (!resourceAccessRights.contains(ar)

@@ -35,7 +35,7 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
         this.policyStore = policyStoreConnection;
         this.listeners = new ArrayList<>();
 
-        this.graph = new Graph(
+        /*this.graph = new Graph(
                 this.policyStore,
                 listeners
         );
@@ -57,27 +57,39 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
         this.pal = new PAL(
                 this.policyStore,
                 listeners
-        );
+        );*/
     }
 
     @Override
     public GraphAuthor graph() {
-        return graph;
+        return new Graph(
+                this.policyStore,
+                listeners
+        );
     }
 
     @Override
     public ProhibitionsAuthor prohibitions() {
-        return prohibitions;
+        return new Prohibitions(
+                this.policyStore,
+                listeners
+        );
     }
 
     @Override
     public ObligationsAuthor obligations() {
-        return obligations;
+        return new Obligations(
+                this.policyStore,
+                listeners
+        );
     }
 
     @Override
     public PALAuthor pal() {
-        return pal;
+        return new PAL(
+                this.policyStore,
+                listeners
+        );
     }
 
     @Override
