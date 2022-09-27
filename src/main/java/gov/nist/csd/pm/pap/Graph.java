@@ -164,7 +164,7 @@ class Graph implements GraphAuthor, PolicyEventEmitter {
         NodeType type = getNode(name).getType();
         if (type == PC) {
             // a pc will have the base attributes but should have no other nodes assigned to it
-            if (children.size() > 3) {
+            if (children.size() > 4) {
                 throw new NodeHasChildrenException(name);
             }
 

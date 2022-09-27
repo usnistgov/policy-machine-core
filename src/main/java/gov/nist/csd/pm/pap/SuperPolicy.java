@@ -19,22 +19,20 @@ public class SuperPolicy {
     public static void applySuperPolicy(Graph graph, String pc, String uaName, String oaName, String rep) throws PMException {
         PolicyStore store = graph.store();
         runTx(store, () -> {
-            if (store.graph().nodeExists(SUPER_USER)) {
-                graph.createUser(SUPER_USER, noprops(), uaName);
-            } else {
-                graph.assign(SUPER_USER, uaName);
-            }
-
-            if (store.graph().nodeExists(SUPER_UA)) {
+            if (!store.graph().nodeExists(SUPER_UA)) {
                 graph.createUserAttribute(SUPER_UA, noprops(), pc);
             } else {
                 graph.assign(SUPER_UA, pc);
             }
 
-            if (store.graph().nodeExists(SUPER_OBJECT)) {
-                graph.createUserAttribute(SUPER_OBJECT, noprops(), oaName);
+            if (!store.graph().nodeExists(SUPER_USER)) {
+                graph.createUser(SUPER_USER, noprops(), uaName, SUPER_UA);
             } else {
-                graph.assign(SUPER_OBJECT, oaName);
+                graph.assign(SUPER_USER, uaName);
+            }
+
+            if (!store.graph().nodeExists(SUPER_OBJECT)) {
+                graph.createObject(SUPER_OBJECT, noprops(), oaName);
             }
 
             //associate super ua with base ua and oa and rep oa
