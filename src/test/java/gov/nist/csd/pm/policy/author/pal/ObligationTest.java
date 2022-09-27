@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.policy.author.pal;
 
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -12,7 +11,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

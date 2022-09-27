@@ -20,7 +20,7 @@ import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.*;
+import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.author.pal.PALBuiltinFunctions.getBuiltinFunctions;
 
 public class PALExecutor implements PALExecutable{

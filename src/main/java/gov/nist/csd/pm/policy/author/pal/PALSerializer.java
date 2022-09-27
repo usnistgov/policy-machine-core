@@ -1,13 +1,10 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -17,7 +14,7 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.*;
+import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 

@@ -4,8 +4,6 @@ import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.pap.store.GraphStore;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
-import gov.nist.csd.pm.policy.author.ObligationsAuthor;
-import gov.nist.csd.pm.policy.author.ProhibitionsAuthor;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -24,7 +22,7 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.*;
+import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
@@ -40,6 +38,10 @@ class Graph implements GraphAuthor, PolicyEventEmitter {
     Graph(PolicyStore store, List<PolicyEventListener> listeners) {
         this.store = store;
         this.listeners = listeners;
+    }
+
+    protected PolicyStore store() {
+        return store;
     }
 
     @Override
@@ -79,13 +81,8 @@ class Graph implements GraphAuthor, PolicyEventEmitter {
             // create the rep object attribute for this policy class
             createObjectAttribute(rep, noprops(), name);
 
-            // assign super user to base ua
-            assign(SUPER_USER, uaName);
-
-            //associate super ua with base ua and oa and rep oa
-            associate(SUPER_UA, uaName, ALL_ACCESS_RIGHTS_SET);
-            associate(SUPER_UA, oaName, ALL_ACCESS_RIGHTS_SET);
-            associate(SUPER_UA, rep, ALL_ACCESS_RIGHTS_SET);
+            // apply super policy to new policy class
+            applySuperPolicy(this, name, uaName, oaName, rep);
         });
 
         return name;

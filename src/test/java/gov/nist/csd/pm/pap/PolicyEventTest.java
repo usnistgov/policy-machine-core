@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

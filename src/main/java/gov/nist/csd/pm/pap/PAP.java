@@ -13,7 +13,8 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.configureSuperPolicy;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Transactional, PALExecutable {
 
@@ -32,13 +33,13 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
 
     protected void init(PolicyStoreConnection policyStoreConnection) throws PMException {
         this.policyStore = policyStoreConnection;
-        configureSuperPolicy(this.policyStore.graph());
         this.listeners = new ArrayList<>();
 
         this.graph = new Graph(
                 this.policyStore,
                 listeners
         );
+        this.graph.createPolicyClass(SUPER_PC, noprops());
 
         this.prohibitions = new Prohibitions(
                 this.policyStore,

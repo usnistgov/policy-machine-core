@@ -11,7 +11,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_OBJECT;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
 class PAL implements PALAuthor {

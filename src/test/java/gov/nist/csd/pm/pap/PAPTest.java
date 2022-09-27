@@ -42,7 +42,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.*;
+import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PAPTest {

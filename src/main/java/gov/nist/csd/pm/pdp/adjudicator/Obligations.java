@@ -10,10 +10,9 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 
-import java.security.Policy;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_OBJECT;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.GET_OBLIGATION;
 
