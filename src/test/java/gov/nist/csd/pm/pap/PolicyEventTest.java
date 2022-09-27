@@ -81,7 +81,7 @@ public class PolicyEventTest {
                 ));
         pap.obligations().delete("label");
 
-        assertEquals(27, events.size());
+        assertEquals(28, events.size());
     }
 
 }

@@ -39,7 +39,10 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
                 this.policyStore,
                 listeners
         );
-        this.graph.createPolicyClass(SUPER_PC, noprops());
+
+        if (!this.graph.nodeExists(SUPER_PC)) {
+            this.graph.createPolicyClass(SUPER_PC, noprops());
+        }
 
         this.prohibitions = new Prohibitions(
                 this.policyStore,
