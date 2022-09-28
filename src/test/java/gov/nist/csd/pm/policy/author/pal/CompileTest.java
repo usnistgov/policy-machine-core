@@ -2,7 +2,6 @@ package gov.nist.csd.pm.policy.author.pal;
 
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
@@ -22,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_PC;
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.model.obligation.event.Performs.events;

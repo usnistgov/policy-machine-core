@@ -16,7 +16,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_OBJECT;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.GET_ASSOCIATIONS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;

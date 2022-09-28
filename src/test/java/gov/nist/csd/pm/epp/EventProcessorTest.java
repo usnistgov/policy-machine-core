@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.model.obligation.Response.Do;
 import static gov.nist.csd.pm.model.obligation.event.EventPattern.*;
 import static org.junit.jupiter.api.Assertions.*;
