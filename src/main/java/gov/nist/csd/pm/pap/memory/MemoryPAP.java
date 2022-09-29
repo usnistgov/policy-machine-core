@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.pdp.reviewer.MemoryPolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 

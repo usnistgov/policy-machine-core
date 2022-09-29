@@ -14,17 +14,18 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 
+import java.util.ArrayList;
 import java.util.List;
 
-class Obligations implements ObligationsAuthor, PolicyEventEmitter {
+class Obligations extends ObligationsAuthor implements PolicyEventEmitter {
 
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
 
-    public Obligations(PolicyStore store, List<PolicyEventListener> listeners) {
+    public Obligations(PolicyStore store) {
         this.store = store;
-        this.listeners = listeners;
+        this.listeners = new ArrayList<>();
     }
 
     @Override
@@ -147,12 +148,12 @@ class Obligations implements ObligationsAuthor, PolicyEventEmitter {
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) {
-        // listeners are added by the policy class
+        listeners.add(listener);
     }
 
     @Override
     public void removeEventListener(PolicyEventListener listener) {
-        // listeners are removed by the policy class
+        listeners.remove(listener);
     }
 
     @Override

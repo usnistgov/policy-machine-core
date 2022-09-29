@@ -35,29 +35,14 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
         this.policyStore = policyStoreConnection;
         this.listeners = new ArrayList<>();
 
-        this.graph = new Graph(
-                this.policyStore,
-                listeners
-        );
-
+        this.graph = new Graph(this.policyStore);
         if (!this.graph.nodeExists(SUPER_PC)) {
             this.graph.createPolicyClass(SUPER_PC, noprops());
         }
 
-        this.prohibitions = new Prohibitions(
-                this.policyStore,
-                listeners
-        );
-
-        this.obligations = new Obligations(
-                this.policyStore,
-                listeners
-        );
-
-        this.pal = new PAL(
-                this.policyStore,
-                listeners
-        );
+        this.prohibitions = new Prohibitions(this.policyStore);
+        this.obligations = new Obligations(this.policyStore);
+        this.pal = new PAL(this.policyStore);
     }
 
     @Override
@@ -82,7 +67,10 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-        this.listeners.add(listener);
+        this.graph.addEventListener(listener, sync);
+        this.prohibitions.addEventListener(listener, sync);
+        this.obligations.addEventListener(listener, sync);
+        this.pal.addEventListener(listener, sync);
 
         if (sync) {
             listener.handlePolicyEvent(policyStore.policySync());
@@ -91,7 +79,10 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
 
     @Override
     public void removeEventListener(PolicyEventListener listener) {
-        this.listeners.remove(listener);
+        this.graph.removeEventListener(listener);
+        this.prohibitions.removeEventListener(listener);
+        this.obligations.removeEventListener(listener);
+        this.pal.removeEventListener(listener);
     }
 
     @Override

@@ -13,13 +13,13 @@ class TxPolicyStore extends PolicyStore {
     /**
      * The policy store to operate on during the transaction
      */
-    private final MemoryPolicyStore txStore;
+    protected final MemoryPolicyStore txStore;
 
     /**
      * An event listener to track the events that occur during the transaction.
      * These events will be committed to the target policy store on commit.
      */
-    private final TxPolicyEventListener txPolicyEventListener;
+    protected final TxPolicyEventListener txPolicyEventListener;
 
     public TxPolicyStore(MemoryPolicyStore txStore) {
         this.txStore = copy(txStore);
@@ -29,6 +29,10 @@ class TxPolicyStore extends PolicyStore {
     private MemoryPolicyStore copy(MemoryPolicyStore memoryPolicyStore) {
         PolicySynchronizationEvent policySync = memoryPolicyStore.policySync();
         return new MemoryPolicyStore(policySync);
+    }
+
+    public MemoryPolicyStore txStore() {
+        return txStore;
     }
 
     public List<PolicyEvent> getEvents() {

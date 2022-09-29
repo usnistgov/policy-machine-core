@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.naming.Naming;
-import gov.nist.csd.pm.pap.store.GraphStore;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.events.*;
@@ -19,6 +18,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +30,14 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.REP_PROPERTY;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
-class Graph implements GraphAuthor, PolicyEventEmitter {
+class Graph extends GraphAuthor implements PolicyEventEmitter {
     
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
-    Graph(PolicyStore store, List<PolicyEventListener> listeners) {
+    Graph(PolicyStore store) {
         this.store = store;
-        this.listeners = listeners;
+        this.listeners = new ArrayList<>();
     }
 
     protected PolicyStore store() {
@@ -388,8 +388,8 @@ class Graph implements GraphAuthor, PolicyEventEmitter {
         emitEvent(new AssociateEvent(ua, target, accessRights));
     }
 
-    static void checkAccessRightsValid(GraphStore graphStore, AccessRightSet accessRightSet) throws PMException {
-        AccessRightSet resourceAccessRights = graphStore.getResourceAccessRights();
+    static void checkAccessRightsValid(GraphAuthor graph, AccessRightSet accessRightSet) throws PMException {
+        AccessRightSet resourceAccessRights = graph.getResourceAccessRights();
 
         for (String ar : accessRightSet) {
             if (!resourceAccessRights.contains(ar)
@@ -435,12 +435,12 @@ class Graph implements GraphAuthor, PolicyEventEmitter {
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) {
-        // listeners are added by the PAP class
+        listeners.add(listener);
     }
 
     @Override
     public void removeEventListener(PolicyEventListener listener) {
-        // listeners are removed by the PAP class
+        listeners.remove(listener);
     }
 
     @Override

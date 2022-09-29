@@ -17,7 +17,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.GET_OBLIGATION;
 
 
-class Obligations implements ObligationsAuthor {
+class Obligations extends ObligationsAuthor {
 
     private final UserContext userCtx;
     private final PAP pap;

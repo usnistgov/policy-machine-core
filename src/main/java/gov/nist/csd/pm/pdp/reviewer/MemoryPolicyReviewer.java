@@ -1,11 +1,19 @@
 package gov.nist.csd.pm.pdp.reviewer;
 
+import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreListener;
-import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
+import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.policy.author.GraphAuthor;
+import gov.nist.csd.pm.policy.author.ObligationsAuthor;
+import gov.nist.csd.pm.policy.author.ProhibitionsAuthor;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
+import gov.nist.csd.pm.policy.events.EventContext;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.audit.EdgePath;
 import gov.nist.csd.pm.policy.model.audit.Explain;
@@ -15,17 +23,14 @@ import gov.nist.csd.pm.policy.model.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.policy.model.graph.dag.UserDagResult;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.policy.model.graph.dag.visitor.Visitor;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
-import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
-import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.graph.relationships.Relationship;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
@@ -39,10 +44,24 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
 public class MemoryPolicyReviewer extends PolicyReviewer {
 
-    private MemoryPolicyStoreListener policy;
+    final MemoryPolicyStoreListener policy;
 
-    public MemoryPolicyReviewer() {
+    /**
+     * Creates a new MemoryPolicyReviewer instance that can listen to a PolicyEventEmitter. The MemoryPolicyStoreListener
+     * is initially provided an empty MemoryPolicyStore and will listen for updated on any emitter it is attached to.
+     */
+    public MemoryPolicyReviewer() throws PMException {
         this.policy = new MemoryPolicyStoreListener(new MemoryPolicyStore());
+    }
+
+    /**
+     * This is a special use case constructor intended only to be used when the reviewer and PAP are both in memory on
+     * the same machine. In this case the reviewer will operate on the same policy that the MemoryPAP is operating on
+     * instead of listening for events from the MemoryPAP and storing a copy. This is to save memory space.
+     * @param memoryPAP the MemoryPAP that the reviewer will operate on.
+     */
+    public MemoryPolicyReviewer(MemoryPAP memoryPAP) {
+        this.policy = new EmbeddedPolicyListener(memoryPAP);
     }
 
     @Override
@@ -105,7 +124,6 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         }
 
         Map<String, AccessRightSet> borderTargets = userCtx.borderTargets();
-
         Map<String, Map<String, AccessRightSet>> visitedNodes = new HashMap<>();
         Set<String> reachedTargets = new HashSet<>();
 
@@ -902,21 +920,50 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     @Override
     public void beginTx() throws PMException {
-        this.policy.beginTx();
+
     }
 
     @Override
     public void commit() throws PMException {
-        this.policy.commit();
+
     }
 
     @Override
     public void rollback() throws PMException {
-        this.policy.rollback();
+
     }
 
     @Override
     public void handlePolicyEvent(PolicyEvent event) throws PMException {
         this.policy.handlePolicyEvent(event);
+    }
+
+    private static class EmbeddedPolicyListener extends MemoryPolicyStoreListener {
+
+        private final MemoryPAP pap;
+
+        public EmbeddedPolicyListener(MemoryPAP pap) {
+            this.pap = pap;
+        }
+
+        @Override
+        public GraphAuthor graph() {
+            return pap.graph();
+        }
+
+        @Override
+        public ProhibitionsAuthor prohibitions() {
+            return pap.prohibitions();
+        }
+
+        @Override
+        public ObligationsAuthor obligations() {
+            return pap.obligations();
+        }
+
+        @Override
+        public void handlePolicyEvent(PolicyEvent event) throws PMException {
+            // ignore events as the pap will be updated in real time
+        }
     }
 }

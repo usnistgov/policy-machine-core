@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
 import gov.nist.csd.pm.policy.author.GraphAuthor;
+import gov.nist.csd.pm.policy.author.GraphReader;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.NoopPropagator;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
@@ -13,12 +14,12 @@ import java.util.List;
 
 public class DepthFirstGraphWalker implements GraphWalker {
 
-    private final GraphAuthor graph;
+    private final GraphReader graph;
     private Direction direction;
     private Visitor visitor;
     private Propagator propagator;
 
-    public DepthFirstGraphWalker(GraphAuthor graph) {
+    public DepthFirstGraphWalker(GraphReader graph) {
         this.graph = graph;
         this.visitor = new NoopVisitor();
         this.propagator = new NoopPropagator();

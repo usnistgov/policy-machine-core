@@ -17,7 +17,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
-public class Prohibitions implements ProhibitionsAuthor {
+public class Prohibitions extends ProhibitionsAuthor {
 
     private final UserContext userCtx;
     private final PAP pap;

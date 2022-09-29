@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
@@ -19,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Graph implements GraphAuthor, PolicyEventEmitter {
+class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     private final UserContext userCtx;
     private final PAP pap;

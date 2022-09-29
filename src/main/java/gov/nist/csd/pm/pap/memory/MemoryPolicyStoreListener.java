@@ -1,12 +1,14 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 
-public class MemoryPolicyStoreListener extends PolicyStore implements PolicyEventListener {
+public class MemoryPolicyStoreListener implements PolicyEventListener {
 
     public MemoryPolicyStore store;
 
@@ -14,45 +16,59 @@ public class MemoryPolicyStoreListener extends PolicyStore implements PolicyEven
         this.store = store;
     }
 
+    public MemoryPolicyStoreListener() {}
+
+    public GraphReader graph() {
+        return store.graph();
+    }
+
+    public ProhibitionsReader prohibitions() {
+        return store.prohibitions();
+    }
+
+    public ObligationsReader obligations() {
+        return store.obligations();
+    }
+
     @Override
     public void handlePolicyEvent(PolicyEvent event) throws PMException {
-            if (event instanceof PolicySynchronizationEvent policySynchronizationEvent) {
-                this.store = new MemoryPolicyStore(policySynchronizationEvent);
-            } else if (event instanceof CreateNodeEvent createNodeEvent) {
-                handleCreateNodeEvent(createNodeEvent);
-            } else if (event instanceof AssignEvent assignEvent) {
-                handleAssignEvent(assignEvent);
-            } else if (event instanceof AssociateEvent associateEvent) {
-                handleAssociateEvent(associateEvent);
-            } else if (event instanceof CreateObligationEvent createObligationEvent) {
-                handleCreateObligationEvent(createObligationEvent);
-            } else if (event instanceof CreateProhibitionEvent createProhibitionEvent) {
-                handleCreateProhibitionEvent(createProhibitionEvent);
-            } else if (event instanceof DeassignEvent deassignEvent) {
-                handleDeassignEvent(deassignEvent);
-            } else if (event instanceof DeleteNodeEvent deleteNodeEvent) {
-                handleDeleteNodeEvent(deleteNodeEvent);
-            } else if (event instanceof DeleteObligationEvent deleteObligationEvent) {
-                handleDeleteObligationEvent(deleteObligationEvent);
-            } else if (event instanceof DeleteProhibitionEvent deleteProhibitionEvent) {
-                handleDeleteProhibitionEvent(deleteProhibitionEvent);
-            } else if (event instanceof DissociateEvent dissociateEvent) {
-                handleDissociateEvent(dissociateEvent);
-            } else if (event instanceof SetNodePropertiesEvent setNodePropertiesEvent) {
-                handleSetNodePropertiesEvent(setNodePropertiesEvent);
-            } else if (event instanceof SetResourceAccessRightsEvent setResourceAccessRightsEvent) {
-                handleSetResourceAccessRights(setResourceAccessRightsEvent);
-            } else if (event instanceof UpdateObligationEvent updateObligationEvent) {
-                handleUpdateObligationEvent(updateObligationEvent);
-            } else if (event instanceof UpdateProhibitionEvent updateProhibitionEvent) {
-                handleUpdateProhibitionEvent(updateProhibitionEvent);
-            } else if (event instanceof BeginTxEvent) {
-                store.beginTx();
-            } else if (event instanceof CommitTxEvent) {
-                store.commit();
-            } else if (event instanceof RollbackTxEvent) {
-                store.rollback();
-            }
+        if (event instanceof PolicySynchronizationEvent policySynchronizationEvent) {
+            this.store = new MemoryPolicyStore(policySynchronizationEvent);
+        } else if (event instanceof CreateNodeEvent createNodeEvent) {
+            handleCreateNodeEvent(createNodeEvent);
+        } else if (event instanceof AssignEvent assignEvent) {
+            handleAssignEvent(assignEvent);
+        } else if (event instanceof AssociateEvent associateEvent) {
+            handleAssociateEvent(associateEvent);
+        } else if (event instanceof CreateObligationEvent createObligationEvent) {
+            handleCreateObligationEvent(createObligationEvent);
+        } else if (event instanceof CreateProhibitionEvent createProhibitionEvent) {
+            handleCreateProhibitionEvent(createProhibitionEvent);
+        } else if (event instanceof DeassignEvent deassignEvent) {
+            handleDeassignEvent(deassignEvent);
+        } else if (event instanceof DeleteNodeEvent deleteNodeEvent) {
+            handleDeleteNodeEvent(deleteNodeEvent);
+        } else if (event instanceof DeleteObligationEvent deleteObligationEvent) {
+            handleDeleteObligationEvent(deleteObligationEvent);
+        } else if (event instanceof DeleteProhibitionEvent deleteProhibitionEvent) {
+            handleDeleteProhibitionEvent(deleteProhibitionEvent);
+        } else if (event instanceof DissociateEvent dissociateEvent) {
+            handleDissociateEvent(dissociateEvent);
+        } else if (event instanceof SetNodePropertiesEvent setNodePropertiesEvent) {
+            handleSetNodePropertiesEvent(setNodePropertiesEvent);
+        } else if (event instanceof SetResourceAccessRightsEvent setResourceAccessRightsEvent) {
+            handleSetResourceAccessRights(setResourceAccessRightsEvent);
+        } else if (event instanceof UpdateObligationEvent updateObligationEvent) {
+            handleUpdateObligationEvent(updateObligationEvent);
+        } else if (event instanceof UpdateProhibitionEvent updateProhibitionEvent) {
+            handleUpdateProhibitionEvent(updateProhibitionEvent);
+        } else if (event instanceof BeginTxEvent) {
+            store.beginTx();
+        } else if (event instanceof CommitTxEvent) {
+            store.commit();
+        } else if (event instanceof RollbackTxEvent) {
+            store.rollback();
+        }
     }
 
     private void handleUpdateProhibitionEvent(UpdateProhibitionEvent updateProhibitionEvent) throws PMException {
@@ -158,43 +174,5 @@ public class MemoryPolicyStoreListener extends PolicyStore implements PolicyEven
         }
     }
 
-    @Override
-    public GraphStore graph() {
-        return store.graph();
-    }
 
-    @Override
-    public ProhibitionsStore prohibitions() {
-        return store.prohibitions();
-    }
-
-    @Override
-    public ObligationsStore obligations() {
-        return store.obligations();
-    }
-
-    @Override
-    public PALStore pal() {
-        return store.pal();
-    }
-
-    @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return store.policySync();
-    }
-
-    @Override
-    public void beginTx() throws PMException {
-        store.beginTx();
-    }
-
-    @Override
-    public void commit() throws PMException {
-        store.commit();
-    }
-
-    @Override
-    public void rollback() throws PMException {
-        store.rollback();
-    }
 }

@@ -9,19 +9,20 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.Graph.checkAccessRightsValid;
 
-class Prohibitions implements ProhibitionsAuthor, PolicyEventEmitter {
+class Prohibitions extends ProhibitionsAuthor implements PolicyEventEmitter {
 
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
-    Prohibitions(PolicyStore store, List<PolicyEventListener> listeners) {
+    Prohibitions(PolicyStore store) {
         this.store = store;
-        this.listeners = listeners;
+        this.listeners = new ArrayList<>();
     }
 
     @Override
@@ -125,12 +126,12 @@ class Prohibitions implements ProhibitionsAuthor, PolicyEventEmitter {
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) {
-        // listeners are added by the policy class
+        listeners.add(listener);
     }
 
     @Override
     public void removeEventListener(PolicyEventListener listener) {
-        // listeners are removed by the policy class
+        listeners.remove(listener);
     }
 
     @Override
