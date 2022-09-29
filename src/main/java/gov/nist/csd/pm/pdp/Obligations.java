@@ -21,7 +21,7 @@ import static gov.nist.csd.pm.policy.model.obligation.event.EventSubject.Type.PR
 import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.*;
 import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.ANY_OF_SET;
 
-class Obligations implements ObligationsAuthor, PolicyEventEmitter {
+class Obligations extends ObligationsAuthor implements PolicyEventEmitter {
 
     private UserContext userCtx;
     private PAP pap;

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Graph implements GraphAuthor, PolicyEventEmitter {
+class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     private final UserContext userCtx;
     private final PAP pap;

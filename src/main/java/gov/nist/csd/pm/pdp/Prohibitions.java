@@ -17,7 +17,7 @@ import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import java.util.List;
 import java.util.Map;
 
-class Prohibitions implements ProhibitionsAuthor, PolicyEventEmitter {
+class Prohibitions extends ProhibitionsAuthor implements PolicyEventEmitter {
 
     private final UserContext userCtx;
     private final PAP pap;

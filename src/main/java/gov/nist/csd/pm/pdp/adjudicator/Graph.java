@@ -21,7 +21,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.GET_ASSOCIATIONS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 
-class Graph implements GraphAuthor {
+class Graph extends GraphAuthor {
     
     private final UserContext userCtx;
     private final PAP pap;

@@ -36,6 +36,7 @@ class MemoryConnectionTest {
 
         assertTrue(policyStore.graph().nodeExists("pc2"));
         assertTrue(c1.graph().nodeExists("pc2"));
+        System.out.println(c2.graph().getPolicyClasses());
         assertTrue(c2.graph().nodeExists("pc1"));
     }
 
