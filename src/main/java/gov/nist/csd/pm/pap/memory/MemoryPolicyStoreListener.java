@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.store.*;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.author.ObligationsAuthor;
@@ -10,7 +11,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 
-public class MemoryPolicyStoreListener extends PolicyStore implements PolicyEventListener {
+public class MemoryPolicyStoreListener implements PolicyEventListener {
 
     public MemoryPolicyStore store;
 
@@ -19,6 +20,18 @@ public class MemoryPolicyStoreListener extends PolicyStore implements PolicyEven
     }
 
     public MemoryPolicyStoreListener() {}
+
+    public GraphAuthor graph() {
+        return store.graph();
+    }
+
+    public ProhibitionsAuthor prohibitions() {
+        return store.prohibitions();
+    }
+
+    public ObligationsAuthor obligations() {
+        return store.obligations();
+    }
 
     @Override
     public void handlePolicyEvent(PolicyEvent event) throws PMException {
@@ -164,43 +177,5 @@ public class MemoryPolicyStoreListener extends PolicyStore implements PolicyEven
         }
     }
 
-    @Override
-    public GraphAuthor graph() {
-        return store.graph();
-    }
 
-    @Override
-    public ProhibitionsAuthor prohibitions() {
-        return store.prohibitions();
-    }
-
-    @Override
-    public ObligationsAuthor obligations() {
-        return store.obligations();
-    }
-
-    @Override
-    public PALAuthor pal() {
-        return store.pal();
-    }
-
-    @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return store.policySync();
-    }
-
-    @Override
-    public void beginTx() throws PMException {
-        store.beginTx();
-    }
-
-    @Override
-    public void commit() throws PMException {
-        store.commit();
-    }
-
-    @Override
-    public void rollback() throws PMException {
-        store.rollback();
-    }
 }

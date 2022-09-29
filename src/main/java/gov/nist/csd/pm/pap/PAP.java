@@ -19,10 +19,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Transactional, PALExecutable {
 
     protected PolicyStoreConnection policyStore;
-    protected Graph graph;
-    protected Prohibitions prohibitions;
-    protected Obligations obligations;
-    protected PAL pal;
+
     protected List<PolicyEventListener> listeners;
 
     protected PAP() {}
@@ -35,29 +32,9 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
         this.policyStore = policyStoreConnection;
         this.listeners = new ArrayList<>();
 
-        /*this.graph = new Graph(
-                this.policyStore,
-                listeners
-        );
-
-        if (!this.graph.nodeExists(SUPER_PC)) {
-            this.graph.createPolicyClass(SUPER_PC, noprops());
+        if (!this.policyStore.graph().nodeExists(SUPER_PC)) {
+            this.graph().createPolicyClass(SUPER_PC, noprops());
         }
-
-        this.prohibitions = new Prohibitions(
-                this.policyStore,
-                listeners
-        );
-
-        this.obligations = new Obligations(
-                this.policyStore,
-                listeners
-        );
-
-        this.pal = new PAL(
-                this.policyStore,
-                listeners
-        );*/
     }
 
     @Override

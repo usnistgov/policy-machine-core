@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
@@ -32,7 +33,7 @@ public class SuperPolicy {
             }
 
             if (!store.graph().nodeExists(SUPER_OBJECT)) {
-                graph.createObject(SUPER_OBJECT, noprops(), oaName);
+                graph.createObject(SUPER_OBJECT, noprops(), Naming.baseObjectAttribute(SUPER_PC));
             }
 
             //associate super ua with base ua and oa and rep oa

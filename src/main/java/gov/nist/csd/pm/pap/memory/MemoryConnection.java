@@ -40,22 +40,11 @@ class MemoryConnection extends PolicyStoreConnection {
         }
 
         synchronized (main) {
-            MemoryPolicyStore rollback = new MemoryPolicyStore(txHandler.getState().policySync());
-
-            // apply events
-            try {
-                MemoryPolicyStoreListener listener = new MemoryPolicyStoreListener(main);
-
-                List<PolicyEvent> events = txHandler.getState().getEvents();
-                for (PolicyEvent event : events) {
-                    listener.handlePolicyEvent(event);
-                }
-            } catch (PMException e) {
-                main.setGraph(rollback.getGraph());
-                main.setProhibitions(rollback.getProhibitions());
-                main.setObligations(rollback.getObligations());
-                main.setPAL(rollback.getPAL());
-            }
+            MemoryPolicyStore txStore = txHandler.getState().txStore;
+            main.setGraph(txStore.getGraph());
+            main.setProhibitions(txStore.getProhibitions());
+            main.setObligations(txStore.getObligations());
+            main.setPAL(txStore.getPAL());
         }
 
         txHandler.commit();
