@@ -2,10 +2,7 @@ package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.store.*;
-import gov.nist.csd.pm.policy.author.GraphAuthor;
-import gov.nist.csd.pm.policy.author.ObligationsAuthor;
-import gov.nist.csd.pm.policy.author.PALAuthor;
-import gov.nist.csd.pm.policy.author.ProhibitionsAuthor;
+import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
@@ -21,15 +18,15 @@ public class MemoryPolicyStoreListener implements PolicyEventListener {
 
     public MemoryPolicyStoreListener() {}
 
-    public GraphAuthor graph() {
+    public GraphReader graph() {
         return store.graph();
     }
 
-    public ProhibitionsAuthor prohibitions() {
+    public ProhibitionsReader prohibitions() {
         return store.prohibitions();
     }
 
-    public ObligationsAuthor obligations() {
+    public ObligationsReader obligations() {
         return store.obligations();
     }
 

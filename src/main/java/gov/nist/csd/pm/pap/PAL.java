@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.store.PALStore;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.policy.author.PALAuthor;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.ConstantAlreadyDefinedException;
 import gov.nist.csd.pm.policy.exceptions.FunctionAlreadyDefinedException;
@@ -11,8 +9,8 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +19,9 @@ class PAL implements PALAuthor, PolicyEventEmitter {
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
-    public PAL(PolicyStore store, List<PolicyEventListener> listeners) {
+    public PAL(PolicyStore store) {
         this.store = store;
-
-        this.listeners = listeners;
+        this.listeners = new ArrayList<>();
     }
 
     @Override
@@ -81,12 +78,12 @@ class PAL implements PALAuthor, PolicyEventEmitter {
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) {
-        // listeners are added by the PAP
+        listeners.add(listener);
     }
 
     @Override
     public void removeEventListener(PolicyEventListener listener) {
-        // listeners are removed by the PAP
+        listeners.remove(listener);
     }
 
     @Override

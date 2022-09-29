@@ -19,7 +19,10 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Transactional, PALExecutable {
 
     protected PolicyStoreConnection policyStore;
-
+    protected Graph graph;
+    protected Prohibitions prohibitions;
+    protected Obligations obligations;
+    protected PAL pal;
     protected List<PolicyEventListener> listeners;
 
     protected PAP() {}
@@ -32,46 +35,42 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
         this.policyStore = policyStoreConnection;
         this.listeners = new ArrayList<>();
 
-        if (!this.policyStore.graph().nodeExists(SUPER_PC)) {
-            this.graph().createPolicyClass(SUPER_PC, noprops());
+        this.graph = new Graph(this.policyStore);
+        if (!this.graph.nodeExists(SUPER_PC)) {
+            this.graph.createPolicyClass(SUPER_PC, noprops());
         }
+
+        this.prohibitions = new Prohibitions(this.policyStore);
+        this.obligations = new Obligations(this.policyStore);
+        this.pal = new PAL(this.policyStore);
     }
 
     @Override
     public GraphAuthor graph() {
-        return new Graph(
-                this.policyStore,
-                listeners
-        );
+        return graph;
     }
 
     @Override
     public ProhibitionsAuthor prohibitions() {
-        return new Prohibitions(
-                this.policyStore,
-                listeners
-        );
+        return prohibitions;
     }
 
     @Override
     public ObligationsAuthor obligations() {
-        return new Obligations(
-                this.policyStore,
-                listeners
-        );
+        return obligations;
     }
 
     @Override
     public PALAuthor pal() {
-        return new PAL(
-                this.policyStore,
-                listeners
-        );
+        return pal;
     }
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-        this.listeners.add(listener);
+        this.graph.addEventListener(listener, sync);
+        this.prohibitions.addEventListener(listener, sync);
+        this.obligations.addEventListener(listener, sync);
+        this.pal.addEventListener(listener, sync);
 
         if (sync) {
             listener.handlePolicyEvent(policyStore.policySync());
@@ -80,7 +79,10 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
 
     @Override
     public void removeEventListener(PolicyEventListener listener) {
-        this.listeners.remove(listener);
+        this.graph.removeEventListener(listener);
+        this.prohibitions.removeEventListener(listener);
+        this.obligations.removeEventListener(listener);
+        this.pal.removeEventListener(listener);
     }
 
     @Override
