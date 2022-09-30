@@ -116,12 +116,12 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
 
     @Override
     public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
-        return new PALExecutor(this).compilePAL(input);
+        return new PALExecutor(this).compilePAL(input, customBuiltinFunctions);
     }
 
     @Override
     public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement... customBuiltinFunctions) throws PMException {
-        new PALExecutor(this).compileAndExecutePAL(author, input);
+        new PALExecutor(this).compileAndExecutePAL(author, input, customBuiltinFunctions);
     }
 
     @Override

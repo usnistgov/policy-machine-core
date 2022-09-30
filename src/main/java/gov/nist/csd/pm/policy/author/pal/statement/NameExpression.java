@@ -80,49 +80,6 @@ public class NameExpression extends PALStatement {
     }
 
     /**
-     * Initialize the NameExpression as a constant in the compiler scope. This method assumes the passed NameContext
-     * is a VariableReference using an ID (not a map reference).
-     *
-     * This is intended to be used by only the PAL statements that CREATE an entity
-     *   - nodes
-     *   - prohibitions
-     *   - obligations
-     *   - rules
-     *
-     * @param visitorCtx the compiler scope
-     * @param nameCtx the antlr context for the name expression
-     * @return a compiled NameExpression
-     */
-    /*public static NameExpression compileAndCreate(VisitorContext visitorCtx,
-                                                  PALParser.NameExpressionContext nameCtx) {
-        boolean create = false;
-        if (nameCtx.varRef() != null) {
-            try {
-                String var = nameCtx.varRef().getText();
-
-                if (!visitorCtx.scope().variableExists(var)) {
-                    if (nameCtx.varRef() instanceof PALParser.ReferenceByIDContext) {
-                        create = true;
-                        visitorCtx.scope().addVariable(var, Type.string(), true);
-                    }
-                } else {
-                    // check if variable is of type string
-                    Type type = visitorCtx.scope().getVariable(var).type();
-                    if (!type.isString()) {
-                        visitorCtx.errorLog().addError(nameCtx, String.format("expected string got %s", type));
-                    }
-                }
-            } catch (PMException e) {
-                visitorCtx.errorLog().addError(nameCtx, e.getMessage());
-            }
-        }
-
-        NameExpression nameExpression = compile(visitorCtx, nameCtx);
-        nameExpression.setCreate(create);
-        return nameExpression;
-    }*/
-
-    /**
      * Compile an antlr NameContext into a NameExpression.
      *
      * @param visitorCtx the compiler scope
@@ -141,7 +98,7 @@ public class NameExpression extends PALStatement {
         if (!(nameAndType.type.isString() || nameAndType.type.isAny())) {
             visitorCtx.errorLog().addError(
                     nameCtx,
-                    "name type " + nameAndType.type + " not allowed, only [string]"
+                    "name type " + nameAndType.type + " not allowed, only string"
             );
         }
 
@@ -169,7 +126,7 @@ public class NameExpression extends PALStatement {
 
         }
 
-        // if there are more than one names they all need to be strings
+        // if there is more than one name they all need to be strings
         NameExpression compiled = new NameExpression();
         if (nameAndTypes.size() > 1) {
             for (NameAndType nameAndType : nameAndTypes) {
