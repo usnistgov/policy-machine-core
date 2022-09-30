@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.model.access.AdminAccessRights;
 import java.util.HashMap;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.*;
+import static gov.nist.csd.pm.pap.SuperPolicy.*;
 
 public class PALBuiltinConstants {
 

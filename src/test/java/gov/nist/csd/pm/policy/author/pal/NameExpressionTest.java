@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static gov.nist.csd.pm.pap.policies.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NameExpressionTest {
