@@ -190,7 +190,7 @@ public class CompileTest {
                 """;
         ex = assertThrows(PALCompilationException.class, () -> test(pal1, new MemoryPAP()));
         assertEquals(1, ex.getErrors().size());
-        assertTrue(ex.getErrors().get(0).errorMessage().contains("name type map[string]string not allowed, only [string]"));
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("name type map[string]string not allowed, only string"));
     }
 
     @Test
