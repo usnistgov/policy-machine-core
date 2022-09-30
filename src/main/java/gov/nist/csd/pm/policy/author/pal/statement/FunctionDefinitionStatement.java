@@ -9,6 +9,7 @@ import gov.nist.csd.pm.policy.author.pal.model.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.scope.FunctionAlreadyDefinedInScopeException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -123,5 +124,45 @@ public class FunctionDefinitionStatement extends PALStatement {
     @Override
     public int hashCode() {
         return Objects.hash(functionName, returnType, args, statements, functionExecutor, isFuncExec);
+    }
+
+    public static class Builder {
+        private final String name;
+        private Type returnType;
+        private List<FormalArgument> args;
+        private FunctionExecutor functionExecutor;
+        private List<PALStatement> body;
+
+        public Builder(String name) {
+            this.name = name;
+        }
+
+        public Builder returns(Type type) {
+            this.returnType = type;
+            return this;
+        }
+
+        public Builder args(FormalArgument ... args) {
+            this.args = new ArrayList<>(List.of(args));
+            return this;
+        }
+
+        public Builder executor(FunctionExecutor executor) {
+            this.functionExecutor = executor;
+            return this;
+        }
+
+        public Builder body(PALStatement ... body) {
+            this.body = new ArrayList<>(List.of(body));
+            return this;
+        }
+
+        public FunctionDefinitionStatement build() {
+            if (functionExecutor != null) {
+                return new FunctionDefinitionStatement(name, returnType, args, functionExecutor);
+            }
+
+            return new FunctionDefinitionStatement(name, returnType, args, body);
+        }
     }
 }

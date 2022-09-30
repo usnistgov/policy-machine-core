@@ -30,10 +30,19 @@ public class PALExecutor implements PALExecutable{
     }
 
     @Override
-    public List<PALStatement> compilePAL(String input) throws PMException {
+    public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
         ErrorLog errorLog = new ErrorLog();
         Scope scope = new Scope(Scope.Mode.COMPILE);
         scope.loadFromPALContext(policy.pal().getContext());
+
+        // add custom builtin functions to scope
+        for (FunctionDefinitionStatement func : customBuiltinFunctions) {
+            try {
+                scope.addFunction(func);
+            } catch (FunctionAlreadyDefinedInScopeException e) {
+                errorLog.addError(0, 0, 0, e.getMessage());
+            }
+        }
 
         PALLexer lexer = new PALLexer(CharStreams.fromString(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -44,7 +53,6 @@ public class PALExecutor implements PALExecutable{
                 errorLog.addError(line, charPositionInLine, offendingSymbol.toString().length(), msg);
             }
         });
-
 
         PolicyVisitor policyVisitor = new PolicyVisitor(new VisitorContext(scope, errorLog));
         List<PALStatement> stmts = new ArrayList<>();
@@ -63,16 +71,23 @@ public class PALExecutor implements PALExecutable{
     }
 
     @Override
-    public void compileAndExecutePAL(UserContext author, String input) throws PMException {
+    public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
         // compile the PAL into statements
         List<PALStatement> compiledStatements = compilePAL(input);
 
         // initialize the execution context
         ExecutionContext ctx = new ExecutionContext(author);
         ctx.scope().loadFromPALContext(policy.pal().getContext());
-        ExecutionContext copy;
+
+        ExecutionContext predefined;
         try {
-            copy = ctx.copy();
+            // add custom builtin functions to scope
+            for (FunctionDefinitionStatement func : customBuiltinFunctions) {
+                ctx.scope().addFunction(func);
+            }
+
+            // store the predefined ctx to avoid adding again at the end of execution
+            predefined = ctx.copy();
         } catch (PALScopeException e) {
             throw new PALExecutionException(e.getMessage());
         }
@@ -83,7 +98,7 @@ public class PALExecutor implements PALExecutable{
         }
 
         // save any top level functions and constants to be used later
-        saveTopLevelFunctionsAndConstants(copy, ctx);
+        saveTopLevelFunctionsAndConstants(predefined, ctx);
     }
 
     private void saveTopLevelFunctionsAndConstants(ExecutionContext predefinedCtx, ExecutionContext ctx) throws PMException {

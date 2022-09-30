@@ -65,7 +65,7 @@ public class FunctionCallVisitor extends PALBaseVisitor<FunctionStatement> {
         if (formalArgs.size() != actualArgs.size()) {
             visitorCtx.errorLog().addError(
                     funcCallCtx,
-                    "wrong number of args for function call " + funcName + "." +
+                    "wrong number of args for function call " + funcName + ": " +
                             "expected " + formalArgs.size() + ", got " + actualArgs.size()
             );
         } else {
