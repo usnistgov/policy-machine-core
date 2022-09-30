@@ -18,7 +18,7 @@ public class GetProhibitionsFor extends FunctionDefinitionStatement {
                         new FormalArgument("subject", Type.string())
                 ),
                 (ctx, author) -> {
-                    String subject = ctx.getVariable("subject").getStringValue();
+                    String subject = ctx.scope().getValue("subject").getStringValue();
                     List<Prohibition> prohibitions = author.prohibitions().getWithSubject(subject);
                     Value[] prohibitionValues = new Value[prohibitions.size()];
                     for (int i = 0; i < prohibitions.size(); i++) {

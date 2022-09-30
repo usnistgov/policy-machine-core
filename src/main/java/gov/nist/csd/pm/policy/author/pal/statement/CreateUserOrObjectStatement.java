@@ -12,21 +12,20 @@ import java.util.List;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.O;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 
 public class CreateUserOrObjectStatement extends PALStatement {
 
-    public Expression name;
+    public NameExpression name;
     public NodeType type;
-    public Expression assignTo;
+    public NameExpression assignTo;
 
-    public CreateUserOrObjectStatement(Expression name, NodeType type, Expression assignTo) {
+    public CreateUserOrObjectStatement(NameExpression name, NodeType type, NameExpression assignTo) {
         this.name = name;
         this.type = type;
         this.assignTo = assignTo;
     }
 
-    public Expression getName() {
+    public NameExpression getName() {
         return name;
     }
 
@@ -34,7 +33,7 @@ public class CreateUserOrObjectStatement extends PALStatement {
         return type;
     }
 
-    public Expression getAssignTo() {
+    public NameExpression getAssignTo() {
         return assignTo;
     }
 

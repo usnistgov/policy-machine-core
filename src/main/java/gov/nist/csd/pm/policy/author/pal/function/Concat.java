@@ -17,7 +17,7 @@ public class Concat extends FunctionDefinitionStatement {
                         new FormalArgument(ARR_ARG, Type.array(Type.string()))
                 ),
                 (ctx, author) -> {
-                    Value[] arr = ctx.getVariable(ARR_ARG).getArrayValue();
+                    Value[] arr = ctx.scope().getValue(ARR_ARG).getArrayValue();
                     StringBuilder s = new StringBuilder();
                     for (Value v : arr) {
                         s.append(v.getStringValue());

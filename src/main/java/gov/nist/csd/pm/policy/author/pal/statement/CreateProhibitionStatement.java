@@ -15,14 +15,14 @@ import java.util.Objects;
 
 public class CreateProhibitionStatement extends PALStatement {
 
-    private final Expression label;
-    private final Expression subject;
+    private final NameExpression label;
+    private final NameExpression subject;
     private final ProhibitionSubject.Type subjectType;
     private final Expression accessRights;
     private final boolean isIntersection;
     private final List<Container> containers;
 
-    public CreateProhibitionStatement(Expression label, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
+    public CreateProhibitionStatement(NameExpression label, NameExpression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
                                       boolean isIntersection, List<Container> containers) {
         this.label = label;
         this.subject = subject;
@@ -32,11 +32,11 @@ public class CreateProhibitionStatement extends PALStatement {
         this.containers = containers;
     }
 
-    public Expression getLabel() {
+    public NameExpression getLabel() {
         return label;
     }
 
-    public Expression getSubject() {
+    public NameExpression getSubject() {
         return subject;
     }
 
@@ -71,7 +71,7 @@ public class CreateProhibitionStatement extends PALStatement {
         List<ContainerCondition> containerConditions = new ArrayList<>();
         for (Container container : containers) {
             boolean isComplement = container.isComplement;
-            Value containerValue = container.expression.execute(ctx, policyAuthor);
+            Value containerValue = container.name.execute(ctx, policyAuthor);
             containerConditions.add(new ContainerCondition(containerValue.getStringValue(), isComplement));
         }
 
@@ -123,16 +123,16 @@ public class CreateProhibitionStatement extends PALStatement {
 
     public static class Container {
         private final boolean isComplement;
-        private final Expression expression;
+        private final NameExpression name;
 
-        public Container(boolean isComplement, Expression expression) {
+        public Container(boolean isComplement, NameExpression name) {
             this.isComplement = isComplement;
-            this.expression = expression;
+            this.name = name;
         }
 
         @Override
         public String toString() {
-            return (isComplement ? "!" : "") + expression;
+            return (isComplement ? "!" : "") + name;
         }
     }
 
@@ -144,12 +144,12 @@ public class CreateProhibitionStatement extends PALStatement {
 
         List<Container> containers = new ArrayList<>();
         for (ContainerCondition cc : prohibition.getContainers()) {
-            containers.add(new Container(cc.complement(), new Expression(new Literal(cc.name()))));
+            containers.add(new Container(cc.complement(), new NameExpression(new VariableReference(cc.name(), Type.string()))));
         }
 
         return new CreateProhibitionStatement(
-                new Expression(new Literal(prohibition.getLabel())),
-                new Expression(new Literal(prohibition.getSubject().name())),
+                new NameExpression(new VariableReference(prohibition.getLabel(), Type.string())),
+                new NameExpression(new VariableReference(prohibition.getSubject().name(), Type.string())),
                 prohibition.getSubject().type(),
                 new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string()))),
                 prohibition.isIntersection(),

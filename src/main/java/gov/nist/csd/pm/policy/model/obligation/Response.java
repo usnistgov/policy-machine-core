@@ -35,6 +35,12 @@ public class Response implements Serializable {
         this.stmts = List.of(stmts);
     }
 
+    public Response(UserContext author, String eventCtxVariable, PALStatement... stmts) {
+        this.eventCtxVariable = eventCtxVariable;
+        this.executionCtx = new ExecutionContext(author);
+        this.stmts = List.of(stmts);
+    }
+
     public Response(Response response) {
         this.executionCtx = response.executionCtx;
         this.stmts = response.stmts;
@@ -54,7 +60,7 @@ public class Response implements Serializable {
     }
 
     public Value execute(PolicyAuthor policyAuthor, EventContext eventCtx) throws PMException {
-        executionCtx.addVariable(eventCtxVariable, Value.objectToValue(eventCtx), false);
+        executionCtx.scope().addValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
         for (PALStatement stmt : stmts) {
             stmt.execute(executionCtx, policyAuthor);

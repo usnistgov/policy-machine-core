@@ -23,31 +23,31 @@ public class ExecutionTest {
 
         String input =
                 """
-                set resource access rights [read, write];
+                set resource access rights read, write;
                 
-                create policy class 'pc1';
+                create policy class pc1;
                 
-                set properties of 'pc1' to {'k': 'v'};
+                set properties of pc1 to {'k': 'v'};
                 
-                create object attribute 'oa1' assign to 'pc1';
-                create object attribute 'oa2' assign to 'pc1';
-                create object attribute 'oa3' assign to 'pc1';
+                create object attribute oa1 assign to pc1;
+                create object attribute oa2 assign to pc1;
+                create object attribute oa3 assign to pc1;
                 
                 let parents = ['oa1', 'oa2', 'oa3'];
-                create object 'o1' assign to parents;
+                create object o1 assign to parents;
                 
-                create user attribute 'ua1' assign to 'pc1';
-                create user attribute 'ua2' assign to 'pc1';
-                create user attribute 'ua3' assign to 'pc1';
+                create user attribute ua1 assign to pc1;
+                create user attribute ua2 assign to pc1;
+                create user attribute ua3 assign to pc1;
                 
                 let username = 'u1';
-                create user username assign to 'ua1';
-                assign username to 'ua2';
-                assign username to ['ua3'];
+                create user username assign to ua1;
+                assign username to ua2;
+                assign username to ua3;
                 
-                associate 'ua1' and 'oa1' with access rights [read, write];
-                associate 'ua2' and 'oa2' with access rights [read, write];
-                associate 'ua3' and 'oa3' with access rights [read, write];
+                associate ua1 and oa1 with access rights read, write;
+                associate ua2 and oa2 with access rights read, write;
+                associate ua3 and oa3 with access rights read, write;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
 
@@ -86,7 +86,8 @@ public class ExecutionTest {
 
         input =
                 """
-                deassign 'u1' from ['ua1', 'ua2'];
+                deassign u1 from ua1;
+                deassign u1 from ua2;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
@@ -95,14 +96,14 @@ public class ExecutionTest {
 
         input =
                 """
-                delete user 'u1';
+                delete user u1;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("u1"));
 
         input =
                 """
-                deassign 'o1' from 'oa1';
+                deassign o1 from oa1;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().getParents("oa1").contains("oa1"));
@@ -110,16 +111,16 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object 'o1';
+                delete object o1;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("o1"));
 
         input =
                 """
-                delete user attribute 'ua1';
-                delete user attribute 'ua2';
-                delete user attribute 'ua3';
+                delete user attribute ua1;
+                delete user attribute ua2;
+                delete user attribute ua3;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("ua1"));
@@ -129,9 +130,9 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object attribute 'oa1';
-                delete object attribute 'oa2';
-                delete object attribute 'oa3';
+                delete object attribute oa1;
+                delete object attribute oa2;
+                delete object attribute oa3;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("oa1"));
@@ -140,7 +141,7 @@ public class ExecutionTest {
 
         input =
                 """
-                delete policy class 'pc1';
+                delete policy class pc1;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         assertFalse(pap.graph().nodeExists("pc1"));
@@ -154,7 +155,7 @@ public class ExecutionTest {
                 let x = 'test';
                 let y = 'test';
                 if equals(x, y) {
-                    create policy class 'pc1';
+                    create policy class pc1;
                 }
                 """;
         pap = new MemoryPAP();
@@ -167,9 +168,9 @@ public class ExecutionTest {
                 let y = 'test';
                 let z = 'test1';
                 if equals(x, z) {
-                    create policy class 'pc1';
+                    create policy class pc1;
                 } else if equals(x, y) {
-                    create policy class 'pc2';
+                    create policy class pc2;
                 }
                 """;
         pap = new MemoryPAP();
@@ -183,11 +184,11 @@ public class ExecutionTest {
                 let y = 'test1';
                 let z = 'test2';
                 if equals(x, z) {
-                    create policy class 'pc1';
+                    create policy class pc1;
                 } else if equals(x, y) {
-                    create policy class 'pc2';
+                    create policy class pc2;
                 } else {
-                    create policy class 'pc3';
+                    create policy class pc3;
                 }
                 """;
         pap = new MemoryPAP();
@@ -202,9 +203,9 @@ public class ExecutionTest {
                 let y = 'test1';
                 let z = 'test2';
                 if equals(x, y) {
-                    create policy class 'pc1';
+                    create policy class pc1;
                 } else {
-                    create policy class 'pc2';
+                    create policy class pc2;
                 }
                 """;
         pap = new MemoryPAP();

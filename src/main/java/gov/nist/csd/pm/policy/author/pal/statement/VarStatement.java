@@ -34,7 +34,7 @@ public class VarStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        ctx.addVariable(varName, expression.execute(ctx, policyAuthor), isConst);
+        ctx.scope().addValue(varName, expression.execute(ctx, policyAuthor));
 
         return new Value();
     }

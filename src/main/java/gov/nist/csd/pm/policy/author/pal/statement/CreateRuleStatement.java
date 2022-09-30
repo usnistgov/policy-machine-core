@@ -1,7 +1,9 @@
 package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.author.pal.model.exception.PALExecutionException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
@@ -19,23 +21,23 @@ import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 
 public class CreateRuleStatement extends PALStatement {
 
-    private final Expression label;
+    private final NameExpression name;
     private final SubjectClause subjectClause;
     private final PerformsClause performsClause;
     private final OnClause onClause;
     private final ResponseBlock responseBlock;
 
-    public CreateRuleStatement(Expression label, SubjectClause subjectClause,
+    public CreateRuleStatement(NameExpression name, SubjectClause subjectClause,
                                PerformsClause performsClause, OnClause onClause, ResponseBlock responseBlock) {
-        this.label = label;
+        this.name = name;
         this.subjectClause = subjectClause;
         this.performsClause = performsClause;
         this.onClause = onClause;
         this.responseBlock = responseBlock;
     }
 
-    public Expression getLabel() {
-        return label;
+    public NameExpression getName() {
+        return name;
     }
 
     public SubjectClause getSubjectClause() {
@@ -56,7 +58,7 @@ public class CreateRuleStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        Value nameValue = label.execute(ctx, policyAuthor);
+        Value nameValue = name.execute(ctx, policyAuthor);
 
         EventSubject subject;
         if (subjectClause.type == SubjectType.USER || subjectClause.type == SubjectType.USERS) {
@@ -91,8 +93,8 @@ public class CreateRuleStatement extends PALStatement {
 
         Target target = Target.anyPolicyElement();
         Value onValue;
-        if (onClause.expr != null) {
-           onValue = onClause.expr.execute(ctx, policyAuthor);
+        if (onClause.nameExpr != null) {
+           onValue = onClause.nameExpr.execute(ctx, policyAuthor);
         } else {
             onValue = new Value();
         }
@@ -115,6 +117,13 @@ public class CreateRuleStatement extends PALStatement {
             target = Target.anyOfSet(policyElements.toArray(String[]::new));
         }
 
+        ExecutionContext ruleCtx = null;
+        try {
+            ruleCtx = ctx.copy();
+        } catch (PALScopeException e) {
+            throw new PALExecutionException(e.getMessage());
+        }
+
         Rule rule = new Rule(
                 nameValue.getStringValue(),
                 new EventPattern(
@@ -122,7 +131,7 @@ public class CreateRuleStatement extends PALStatement {
                         performs,
                         target
                 ),
-                new Response(responseBlock.evtCtxVar, ctx.copy(), responseBlock.getStatements())
+                new Response(responseBlock.evtCtxVar, ruleCtx, responseBlock.getStatements())
         );
 
         return new Value(rule);
@@ -132,7 +141,7 @@ public class CreateRuleStatement extends PALStatement {
     public String toString() {
         return String.format(
                 "create rule %s %s %s %s do(%s) {%s}",
-                label, subjectClause, performsClause, onClause, responseBlock.evtCtxVar,
+                name, subjectClause, performsClause, onClause, responseBlock.evtCtxVar,
                 statementsToString(responseBlock.statements)
         );
     }
@@ -142,12 +151,12 @@ public class CreateRuleStatement extends PALStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateRuleStatement that = (CreateRuleStatement) o;
-        return Objects.equals(label, that.label) && Objects.equals(subjectClause, that.subjectClause) && Objects.equals(performsClause, that.performsClause) && Objects.equals(onClause, that.onClause) && Objects.equals(responseBlock, that.responseBlock);
+        return Objects.equals(name, that.name) && Objects.equals(subjectClause, that.subjectClause) && Objects.equals(performsClause, that.performsClause) && Objects.equals(onClause, that.onClause) && Objects.equals(responseBlock, that.responseBlock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(label, subjectClause, performsClause, onClause, responseBlock);
+        return Objects.hash(name, subjectClause, performsClause, onClause, responseBlock);
     }
 
     public enum SubjectType {
@@ -160,12 +169,12 @@ public class CreateRuleStatement extends PALStatement {
 
     public static class SubjectClause {
         private SubjectType type;
-        private Expression expr;
+        private NameExpression expr;
 
         public SubjectClause() {
         }
 
-        public SubjectClause(SubjectType type, Expression expr) {
+        public SubjectClause(SubjectType type, NameExpression expr) {
             this.type = type;
             this.expr = expr;
         }
@@ -217,16 +226,16 @@ public class CreateRuleStatement extends PALStatement {
 
     public static class OnClause {
 
-        private final Expression expr;
+        private final NameExpression nameExpr;
         private final TargetType onClauseType;
 
         public OnClause() {
-            expr = null;
+            nameExpr = null;
             onClauseType = null;
         }
 
-        public OnClause(Expression expr, TargetType onClauseType) {
-            this.expr = expr;
+        public OnClause(NameExpression nameExpr, TargetType onClauseType) {
+            this.nameExpr = nameExpr;
             this.onClauseType = onClauseType;
         }
 
@@ -254,10 +263,10 @@ public class CreateRuleStatement extends PALStatement {
 
             String s = "on ";
             switch (onClauseType) {
-                case POLICY_ELEMENT -> s += expr;
+                case POLICY_ELEMENT -> s += nameExpr;
                 case ANY_POLICY_ELEMENT -> s += "any policy element";
-                case ANY_CONTAINED_IN -> s += "any policy element in " + expr;
-                case ANY_OF_SET -> s += "any policy element of " + expr;
+                case ANY_CONTAINED_IN -> s += "any policy element in " + nameExpr;
+                case ANY_OF_SET -> s += "any policy element of " + nameExpr;
             }
 
             return s;
@@ -267,6 +276,11 @@ public class CreateRuleStatement extends PALStatement {
     public static class ResponseBlock {
         private final String evtCtxVar;
         private final List<PALStatement> statements;
+
+        public ResponseBlock() {
+            this.evtCtxVar = "";
+            this.statements = new ArrayList<>();
+        }
 
         public ResponseBlock(String evtCtxVar, List<PALStatement> statements) {
             this.evtCtxVar = evtCtxVar;

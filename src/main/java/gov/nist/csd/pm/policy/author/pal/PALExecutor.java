@@ -4,24 +4,22 @@ import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALLexer;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.compiler.error.ErrorLog;
-import gov.nist.csd.pm.policy.author.pal.compiler.VisitorScope;
 import gov.nist.csd.pm.policy.author.pal.compiler.visitor.PolicyVisitor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.model.exception.PALExecutionException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.AdminAccessRights;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.*;
-import static gov.nist.csd.pm.policy.author.pal.PALBuiltinFunctions.getBuiltinFunctions;
+import static gov.nist.csd.pm.policy.author.pal.PALBuiltinFunctions.BUILTIN_FUNCTIONS;
 
 public class PALExecutor implements PALExecutable{
 
@@ -32,14 +30,23 @@ public class PALExecutor implements PALExecutable{
     }
 
     @Override
-    public List<PALStatement> compilePAL(String input) throws PMException {
+    public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
+        ErrorLog errorLog = new ErrorLog();
+        Scope scope = new Scope(Scope.Mode.COMPILE);
+        scope.loadFromPALContext(policy.pal().getContext());
+
+        // add custom builtin functions to scope
+        for (FunctionDefinitionStatement func : customBuiltinFunctions) {
+            try {
+                scope.addFunction(func);
+            } catch (FunctionAlreadyDefinedInScopeException e) {
+                errorLog.addError(0, 0, 0, e.getMessage());
+            }
+        }
+
         PALLexer lexer = new PALLexer(CharStreams.fromString(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PALParser parser = new PALParser(tokens);
-
-        ErrorLog errorLog = new ErrorLog();
-        VisitorScope visitorScope = new VisitorScope(errorLog);
-
         parser.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
@@ -47,59 +54,58 @@ public class PALExecutor implements PALExecutable{
             }
         });
 
-        for (FunctionDefinitionStatement functionDefinitionStmt : getBuiltinFunctions()) {
-            visitorScope.addFunction(functionDefinitionStmt);
+        PolicyVisitor policyVisitor = new PolicyVisitor(new VisitorContext(scope, errorLog));
+        List<PALStatement> stmts = new ArrayList<>();
+        try {
+            stmts = policyVisitor.visitPal(parser.pal());
+        } catch (Exception e) {
+            errorLog.addError(parser.pal(), e.getMessage());
         }
-
-        for (String adminAccessRight : AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET) {
-            visitorScope.addVariable(adminAccessRight, Type.string(), true);
-        }
-
-        PALContext palContext = policy.pal().getContext();
-        Map<String, FunctionDefinitionStatement> functions = palContext.getFunctions();
-        for (FunctionDefinitionStatement customFunction : functions.values()) {
-            visitorScope.addFunction(customFunction);
-        }
-
-        Map<String, Value> constants = palContext.getConstants();
-        for (String constName : constants.keySet()) {
-            visitorScope.addVariable(constName, constants.get(constName).getType(), true);
-        }
-
-        PolicyVisitor policyVisitor = new PolicyVisitor(new VisitorContext(visitorScope, errorLog));
-        List<PALStatement> stmts = policyVisitor.visitPal(parser.pal());
 
         // throw an exception if there are any errors from parsing
         if (!errorLog.getErrors().isEmpty()) {
-            throw new PALCompilationException(errorLog.getErrors());
+            throw new PALCompilationException(errorLog);
         }
 
         return stmts;
     }
 
     @Override
-    public void compileAndExecutePAL(UserContext author, String input) throws PMException {
+    public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
         // compile the PAL into statements
-        List<PALStatement> statements = compilePAL(input);
+        List<PALStatement> compiledStatements = compilePAL(input);
 
         // initialize the execution context
-        ExecutionContext predefinedCtx = prepareExecutionCtx(author);
-        ExecutionContext ctx = predefinedCtx.copy();
+        ExecutionContext ctx = new ExecutionContext(author);
+        ctx.scope().loadFromPALContext(policy.pal().getContext());
+
+        ExecutionContext predefined;
+        try {
+            // add custom builtin functions to scope
+            for (FunctionDefinitionStatement func : customBuiltinFunctions) {
+                ctx.scope().addFunction(func);
+            }
+
+            // store the predefined ctx to avoid adding again at the end of execution
+            predefined = ctx.copy();
+        } catch (PALScopeException e) {
+            throw new PALExecutionException(e.getMessage());
+        }
 
         // execute each statement
-        for (PALStatement stmt : statements) {
+        for (PALStatement stmt : compiledStatements) {
             stmt.execute(ctx, policy);
         }
 
         // save any top level functions and constants to be used later
-        saveTopLevelFunctionsAndConstants(predefinedCtx, ctx);
+        saveTopLevelFunctionsAndConstants(predefined, ctx);
     }
 
     private void saveTopLevelFunctionsAndConstants(ExecutionContext predefinedCtx, ExecutionContext ctx) throws PMException {
-        Map<String, FunctionDefinitionStatement> predefinedFunctions = predefinedCtx.getFunctions();
-        Map<String, Value> predefinedConstants = predefinedCtx.getConstants();
+        Map<String, FunctionDefinitionStatement> predefinedFunctions = predefinedCtx.scope().functions();
+        Map<String, Value> predefinedConstants = predefinedCtx.scope().values();
 
-        Map<String, FunctionDefinitionStatement> topLevelFunctions = ctx.getFunctions();
+        Map<String, FunctionDefinitionStatement> topLevelFunctions = ctx.scope().functions();
         for (String funcName : topLevelFunctions.keySet()) {
             if (predefinedFunctions.containsKey(funcName)) {
                 continue;
@@ -109,7 +115,7 @@ public class PALExecutor implements PALExecutable{
             policy.pal().addFunction(funcDef);
         }
 
-        Map<String, Value> topLevelConstants = ctx.getConstants();
+        Map<String, Value> topLevelConstants = ctx.scope().values();
         for (String name : topLevelConstants.keySet()) {
             if (predefinedConstants.containsKey(name)) {
                 continue;
@@ -118,39 +124,6 @@ public class PALExecutor implements PALExecutable{
             Value value = topLevelConstants.get(name);
             policy.pal().addConstant(name, value);
         }
-    }
-
-    private ExecutionContext prepareExecutionCtx(UserContext author) throws PMException {
-        ExecutionContext ctx = new ExecutionContext(author);
-
-        // add builtin functions
-        for (FunctionDefinitionStatement functionDefinitionStmt : getBuiltinFunctions()) {
-            ctx.addFunction(functionDefinitionStmt);
-        }
-
-        // add admin access rights which are constants
-        for (String adminAccessRight : AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET) {
-            ctx.addVariable(adminAccessRight, new Value(adminAccessRight), true);
-        }
-
-        // add super constants to ctx
-        ctx.addVariable("SUPER_USER", new Value(SUPER_USER), true);
-        ctx.addVariable("SUPER_PC", new Value(SUPER_PC), true);
-        ctx.addVariable("SUPER_UA", new Value(SUPER_UA), true);
-        ctx.addVariable("SUPER_OBJECT", new Value(SUPER_OBJECT), true);
-
-        PALContext palContext = policy.pal().getContext();
-        Map<String, FunctionDefinitionStatement> customFunctions = palContext.getFunctions();
-        for (FunctionDefinitionStatement customFunction : customFunctions.values()) {
-            ctx.addFunction(customFunction);
-        }
-
-        Map<String, Value> customConstants = palContext.getConstants();
-        for (String constName : customConstants.keySet()) {
-            ctx.addVariable(constName, customConstants.get(constName), true);
-        }
-
-        return ctx;
     }
 
     public static Value executeStatementBlock(ExecutionContext executionCtx, PolicyAuthor policyAuthor, List<PALStatement> statements) throws PMException {

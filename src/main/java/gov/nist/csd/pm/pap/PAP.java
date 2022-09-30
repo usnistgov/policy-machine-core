@@ -4,6 +4,7 @@ import gov.nist.csd.pm.pap.store.PolicyStoreConnection;
 import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.author.pal.PALExecutable;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -114,13 +115,13 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
     }
 
     @Override
-    public List<PALStatement> compilePAL(String input) throws PMException {
-        return new PALExecutor(this).compilePAL(input);
+    public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
+        return new PALExecutor(this).compilePAL(input, customBuiltinFunctions);
     }
 
     @Override
-    public void compileAndExecutePAL(UserContext author, String input) throws PMException {
-        new PALExecutor(this).compileAndExecutePAL(author, input);
+    public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement... customBuiltinFunctions) throws PMException {
+        new PALExecutor(this).compileAndExecutePAL(author, input, customBuiltinFunctions);
     }
 
     @Override

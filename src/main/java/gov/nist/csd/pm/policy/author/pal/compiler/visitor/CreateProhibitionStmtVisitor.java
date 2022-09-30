@@ -3,7 +3,7 @@ package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.author.pal.statement.CreateProhibitionStatement;
@@ -21,8 +21,8 @@ public class CreateProhibitionStmtVisitor extends PALBaseVisitor<CreateProhibiti
 
     @Override
     public CreateProhibitionStatement visitCreateProhibitionStmt(PALParser.CreateProhibitionStmtContext ctx) {
-        Expression label = Expression.compile(visitorCtx, ctx.subject, Type.string());
-        Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
+        NameExpression label = NameExpression.compile(visitorCtx, ctx.name);
+        NameExpression subject = NameExpression.compile(visitorCtx, ctx.subject);
         ProhibitionSubject.Type type;
         if (ctx.USER() != null) {
             type = ProhibitionSubject.Type.USER;
@@ -40,8 +40,8 @@ public class CreateProhibitionStmtVisitor extends PALBaseVisitor<CreateProhibiti
         for (PALParser.ProhibitionContainerExpressionContext contExprCtx : ctx.containers.prohibitionContainerExpression()) {
             boolean isComplement =
                     contExprCtx.IS_COMPLEMENT() != null && contExprCtx.IS_COMPLEMENT().getText().equals("!");
-            Expression expr = Expression.compile(visitorCtx, contExprCtx.container, Type.string());
-            containers.add(new CreateProhibitionStatement.Container(isComplement, expr));
+            NameExpression name = NameExpression.compile(visitorCtx, contExprCtx.container);
+            containers.add(new CreateProhibitionStatement.Container(isComplement, name));
         }
 
         return new CreateProhibitionStatement(label, subject, type, accessRights, isIntersection, containers);

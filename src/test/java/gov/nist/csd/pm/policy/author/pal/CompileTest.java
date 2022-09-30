@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
+import gov.nist.csd.pm.policy.author.pal.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -126,17 +127,16 @@ public class CompileTest {
                 let c = {'a': 'b'};
                 let d = c[true];
                 let e = {'': '', ['']: {'': ''}, true: ''};
-                let a = b;     
-                a = b;           
+                let a = b;
+                a = b;
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
-        assertEquals(6, ex.getErrors().size(), ex.getErrors().toString());
+        assertEquals(5, ex.getErrors().size(), ex.getErrors().toString());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("expected []string, got string"));
         assertTrue(ex.getErrors().get(1).errorMessage().contains("expected map type"));
         assertTrue(ex.getErrors().get(2).errorMessage().contains("expression type boolean not allowed, only: [string]"));
         assertTrue(ex.getErrors().get(3).errorMessage().contains("expected map keys to be of the same type but found"));
         assertTrue(ex.getErrors().get(4).errorMessage().contains("expected map keys to be of the same type but found"));
-        assertTrue(ex.getErrors().get(5).errorMessage().contains("already exists"));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class CompileTest {
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
         assertEquals(2, ex.getErrors().size(), ex.getErrors().toString());
-        assertTrue(ex.getErrors().get(0).errorMessage().contains("already exists"));
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("already defined"));
         assertTrue(ex.getErrors().get(1).errorMessage().contains("cannot reassign"));
     }
 
@@ -190,30 +190,30 @@ public class CompileTest {
                 """;
         ex = assertThrows(PALCompilationException.class, () -> test(pal1, new MemoryPAP()));
         assertEquals(1, ex.getErrors().size());
-        assertTrue(ex.getErrors().get(0).errorMessage().contains("expression type map[string]string not allowed, only: [string]"));
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("name type map[string]string not allowed, only string"));
     }
 
     @Test
-    void testMapsSuccess() throws PMException {
+    void testMapsSuccess() throws PMException, UnknownVariableInScopeException {
         String pal = """
                 let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}};
                 let x = m['k1']['k1-1']['k1-1-1'];
                 create policy class x;
                 """;
-        ExecutionContext ctx = new ExecutionContext(new UserContext(SUPER_USER));
         MemoryPAP pap = new MemoryPAP();
         List<PALStatement> test = test(pal, new MemoryPAP());
 
+        ExecutionContext ctx = new ExecutionContext(new UserContext(SUPER_USER));
         PALStatement stmt = test.get(0);
         stmt.execute(ctx, pap);
-        Value m = ctx.getVariable("m");
+        Value m = ctx.scope().getValue("m");
         assertTrue(m.isMap());
         assertEquals(Type.string(), m.getType().getMapKeyType());
         assertEquals(Type.map(Type.string(), Type.map(Type.string(), Type.map(Type.string(), Type.string()))), m.getType());
 
         stmt = test.get(1);
         stmt.execute(ctx, pap);
-        Value x = ctx.getVariable("x");
+        Value x = ctx.scope().getValue("x");
         assertEquals(Type.string(), x.getType());
         assertEquals("v1", x.getStringValue());
 
@@ -224,11 +224,11 @@ public class CompileTest {
     @Test
     void testCompileObligation() throws PMException {
         String pal = """
-                create obligation 'test' {
-                    create rule 'rule1'
+                create obligation test {
+                    create rule rule1
                     when any user
                     performs 'create_object_attribute'
-                    on 'oa1'
+                    on oa1
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
                         let target = evtCtx['target'];
@@ -241,16 +241,18 @@ public class CompileTest {
                     }
                 }
                 """;
+
         UserContext userCtx = new UserContext(SUPER_USER);
-        ExecutionContext ctx = new ExecutionContext(userCtx);
         MemoryPAP pap = new MemoryPAP();
+        ExecutionContext ctx = new ExecutionContext(userCtx);
         pap.graph().createPolicyClass("pc1", noprops());
         pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-        List<PALStatement> test = test(pal, new MemoryPAP());
+        List<PALStatement> test = test(pal, pap);
         assertEquals(1, test.size());
 
         PALStatement stmt = test.get(0);
         stmt.execute(ctx, pap);
+
         assertEquals(1, pap.obligations().getAll().size());
         Obligation actual = pap.obligations().get("test");
         assertEquals(1, actual.getRules().size());
@@ -272,9 +274,10 @@ public class CompileTest {
         assertEquals(6, statements.size());
 
         stmt = statements.get(0);
+
         Type evtCtxType = Type.map(Type.string(), Type.any());
         PALStatement expected = new CreatePolicyStatement(
-                new Expression(
+                new NameExpression(
                         new VariableReference(
                                 new MapEntryReference(
                                         new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("eventName"))
@@ -315,7 +318,7 @@ public class CompileTest {
 
         stmt = statements.get(3);
         expected = new CreatePolicyStatement(
-                new Expression(
+                new NameExpression(
                         new FunctionStatement(
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
@@ -333,14 +336,14 @@ public class CompileTest {
         HashMap<Expression, Expression> exprMap = new HashMap<>();
         exprMap.put(new Expression(new Literal("key")), new Expression(new VariableReference("target", Type.any())));
         expected = new SetNodePropertiesStatement(
-                new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                new NameExpression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
                 new Expression(new Literal(new MapLiteral(exprMap, Type.string(), Type.any())))
         );
         assertEquals(expected, stmt);
 
         stmt = statements.get(5);
         expected = new CreatePolicyStatement(
-                new Expression(
+                new NameExpression(
                         new FunctionStatement(
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
@@ -378,5 +381,4 @@ public class CompileTest {
                 """;
         assertThrows(PALCompilationException.class, () -> new MemoryPAP().compilePAL(pal));
     }
-
 }

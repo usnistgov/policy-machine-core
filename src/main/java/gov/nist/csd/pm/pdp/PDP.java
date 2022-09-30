@@ -4,6 +4,7 @@ import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.author.pal.PALExecutable;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
@@ -65,46 +66,46 @@ public class PDP implements PolicyEventEmitter {
 
     public static class PDPTx extends PolicyAuthor implements PALExecutable {
 
-        private final UserContext userCtx;
-        private final List<PolicyEventListener> epps;
-        private final PAP pap;
-        private final PolicyReviewer policyReviewer;
+        private final Graph graph;
+        private final Prohibitions prohibitions;
+        private final Obligations obligations;
+        private final PAL pal;
 
         public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<PolicyEventListener> epps) {
-            this.userCtx = userCtx;
-            this.pap = pap;
-            this.epps = epps;
-            this.policyReviewer = policyReviewer;
+            this.graph = new Graph(userCtx, pap, policyReviewer, epps);
+            this.prohibitions = new Prohibitions(userCtx, pap, policyReviewer, epps);
+            this.obligations = new Obligations(userCtx, pap, policyReviewer, epps);
+            this.pal = new PAL(userCtx, pap, policyReviewer, epps);
         }
 
         @Override
         public GraphAuthor graph() {
-            return new Graph(userCtx, pap, policyReviewer, epps);
+            return graph;
         }
 
         @Override
         public ProhibitionsAuthor prohibitions() {
-            return new Prohibitions(userCtx, pap, policyReviewer, epps);
+            return prohibitions;
         }
 
         @Override
         public ObligationsAuthor obligations() {
-            return new Obligations(userCtx, pap, policyReviewer, epps);
+            return obligations;
         }
 
         @Override
         public PALAuthor pal() {
-            return new PAL(userCtx, pap, policyReviewer, epps);
+            return pal;
         }
 
         @Override
-        public List<PALStatement> compilePAL(String input) throws PMException {
-            return new PALExecutor(this).compilePAL(input);
+        public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
+            return new PALExecutor(this).compilePAL(input, customBuiltinFunctions);
         }
 
         @Override
-        public void compileAndExecutePAL(UserContext author, String input) throws PMException {
-            new PALExecutor(this).compileAndExecutePAL(author, input);
+        public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
+            new PALExecutor(this).compileAndExecutePAL(author, input, customBuiltinFunctions);
         }
 
         @Override

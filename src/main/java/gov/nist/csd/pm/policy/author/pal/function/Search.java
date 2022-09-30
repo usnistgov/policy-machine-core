@@ -20,9 +20,9 @@ public class Search extends FunctionDefinitionStatement {
                         new FormalArgument("properties", Type.map(Type.string(), Type.string()))
                 ),
                 (ctx, author) -> {
-                    NodeType nodeType = NodeType.toNodeType(ctx.getVariable("type").getStringValue());
+                    NodeType nodeType = NodeType.toNodeType(ctx.scope().getValue("type").getStringValue());
 
-                    Map<Value, Value> propertiesValue = ctx.getVariable("properties").getMapValue();
+                    Map<Value, Value> propertiesValue = ctx.scope().getValue("properties").getMapValue();
 
                     Map<String, String> properties = new HashMap<>();
                     for (Value key : propertiesValue.keySet()) {

@@ -18,8 +18,8 @@ public class Contains extends FunctionDefinitionStatement {
                         new FormalArgument("element", Type.any())
                 ),
                 (ctx, author) -> {
-                    Value[] valueArr = ctx.getVariable("arr").getArrayValue();
-                    Value element = ctx.getVariable("element");
+                    Value[] valueArr = ctx.scope().getValue("arr").getArrayValue();
+                    Value element = ctx.scope().getValue("element");
                     boolean contains = Arrays.asList(valueArr).contains(element);
                     return new Value(contains);
                 }

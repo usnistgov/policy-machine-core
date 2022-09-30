@@ -1,25 +1,15 @@
 package gov.nist.csd.pm.policy.author.pal.model.context;
 
 import gov.nist.csd.pm.policy.author.pal.compiler.error.ErrorLog;
-import gov.nist.csd.pm.policy.author.pal.compiler.Variable;
-import gov.nist.csd.pm.policy.author.pal.compiler.VisitorScope;
+import gov.nist.csd.pm.policy.author.pal.model.scope.Scope;
 
 import java.util.Objects;
 
-public record VisitorContext(VisitorScope scope, ErrorLog errorLog) {
+public record VisitorContext(Scope scope, ErrorLog errorLog) {
 
     public VisitorContext copy() {
-        VisitorScope copyScope = new VisitorScope(errorLog);
-        for (String varName : this.scope.getVariables().keySet()) {
-            Variable var = this.scope.getVariable(varName);
-            copyScope.addVariable(varName, var.type(), var.isConst());
-        }
-        for (String function : this.scope.getFunctions().keySet()) {
-            copyScope.addFunction(this.scope.getFunction(function));
-        }
-
         // want to persist the error tracker
-        return new VisitorContext(copyScope, this.errorLog);
+        return new VisitorContext(scope.copy(), this.errorLog);
     }
 
     @Override

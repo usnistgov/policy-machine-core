@@ -17,7 +17,7 @@ public class SetResourceAccessRightsStatement extends PALStatement{
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         policyAuthor.graph().setResourceAccessRights(accessRightSet);
-        ctx.setResourceAccessRights(accessRightSet);
+        ctx.scope().setResourceAccessRights(accessRightSet);
         return new Value();
     }
 

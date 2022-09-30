@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
@@ -12,9 +15,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class PolicyEventTest {
                         ),
                         new Response(
                                 new UserContext(SUPER_USER),
-                                new CreatePolicyStatement(new Expression(new Literal("test_pc")))
+                                new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
                         )
                 )
         );
@@ -76,7 +77,7 @@ public class PolicyEventTest {
                         ),
                         new Response(
                                 new UserContext(SUPER_USER),
-                                new CreatePolicyStatement(new Expression(new Literal("test_pc2")))
+                                new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc2", Type.string())))
                         )
                 ));
         pap.obligations().delete("label");

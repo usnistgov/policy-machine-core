@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.author.pal.model.expression;
 
+import gov.nist.csd.pm.policy.author.pal.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -43,10 +44,6 @@ public class VariableReference extends PALStatement {
         return mapEntryReference;
     }
 
-    public String getIdentifier() {
-        return id;
-    }
-
     public Type getType() {
         return type;
     }
@@ -54,7 +51,11 @@ public class VariableReference extends PALStatement {
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         if (isID) {
-            return ctx.getVariable(id);
+            try {
+                return ctx.scope().getValue(id);
+            } catch (UnknownVariableInScopeException e) {
+                throw new PMException(e.getMessage());
+            }
         }
 
         List<MapEntryReference> refChain = new ArrayList<>();

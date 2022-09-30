@@ -9,19 +9,19 @@ import java.util.Objects;
 
 public class DeassignStatement extends PALStatement {
 
-    private final Expression child;
-    private final Expression deassignFrom;
+    private final NameExpression child;
+    private final NameExpression deassignFrom;
 
-    public DeassignStatement(Expression child, Expression deassignFrom) {
+    public DeassignStatement(NameExpression child, NameExpression deassignFrom) {
         this.child = child;
         this.deassignFrom = deassignFrom;
     }
 
-    public Expression getChild() {
+    public NameExpression getChild() {
         return child;
     }
 
-    public Expression getDeassignFrom() {
+    public NameExpression getDeassignFrom() {
         return deassignFrom;
     }
 

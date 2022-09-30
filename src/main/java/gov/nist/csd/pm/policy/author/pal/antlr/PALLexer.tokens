@@ -75,7 +75,6 @@ OPEN_PAREN=74
 CLOSE_PAREN=75
 IS_COMPLEMENT=76
 EQUALS=77
-DOT=78
 '*'=1
 '*r'=2
 '*a'=3
@@ -91,4 +90,3 @@ DOT=78
 ')'=75
 '!'=76
 '='=77
-'.'=78

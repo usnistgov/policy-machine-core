@@ -2,12 +2,14 @@ package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
+import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
+import gov.nist.csd.pm.policy.author.pal.model.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.CreateRuleStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +24,22 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
 
     @Override
     public CreateRuleStatement visitCreateRuleStmt(PALParser.CreateRuleStmtContext ctx) {
-        Expression name = Expression.compile(visitorCtx, ctx.label, Type.string());
+        NameExpression name = NameExpression.compile(visitorCtx, ctx.ruleName);
 
         CreateRuleStatement.SubjectClause subjectClause = getSubjectClause(ctx.subjectClause());
         CreateRuleStatement.PerformsClause performsClause = getPerformsClause(ctx.performsClause);
         CreateRuleStatement.OnClause onClause = getOnClause(ctx.onClause());
-        CreateRuleStatement.ResponseBlock responseBlock = getResponse(ctx.response());
+        CreateRuleStatement.ResponseBlock responseBlock = new CreateRuleStatement.ResponseBlock();
+        try {
+            responseBlock = getResponse(ctx.response());
+        } catch (VariableAlreadyDefinedInScopeException e) {
+            visitorCtx.errorLog().addError(ctx, e.getMessage());
+        }
 
         return new CreateRuleStatement(name, subjectClause, performsClause, onClause, responseBlock);
     }
 
-    private CreateRuleStatement.ResponseBlock getResponse(PALParser.ResponseContext ctx) {
+    private CreateRuleStatement.ResponseBlock getResponse(PALParser.ResponseContext ctx) throws VariableAlreadyDefinedInScopeException {
         String evtCtxVar = ctx.IDENTIFIER().getText();
 
         // create a new local parser scope for the response block
@@ -61,61 +68,53 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
     }
 
     private CreateRuleStatement.OnClause getOnClause(PALParser.OnClauseContext onClauseCtx) {
-        Expression expr = null;
+        NameExpression name = null;
         CreateRuleStatement.TargetType onClauseType = null;
         if (onClauseCtx instanceof PALParser.PolicyElementContext policyElementContext) {
-            expr = Expression.compile(visitorCtx, policyElementContext.expression(), Type.string());
+            name = NameExpression.compile(visitorCtx, policyElementContext.nameExpression());
             onClauseType = CreateRuleStatement.TargetType.POLICY_ELEMENT;
         } else if (onClauseCtx instanceof PALParser.AnyPolicyElementContext anyPolicyElementContext) {
             onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
         } else if (onClauseCtx instanceof PALParser.AnyContainedInContext anyContainedInContext) {
-            expr = Expression.compile(visitorCtx, anyContainedInContext.expression(), Type.string());
+            name = NameExpression.compile(visitorCtx, anyContainedInContext.nameExpression());
             onClauseType = CreateRuleStatement.TargetType.ANY_CONTAINED_IN;
         } else if (onClauseCtx instanceof PALParser.AnyOfSetContext anyOfSetContext) {
-            expr = Expression.compile(visitorCtx, anyOfSetContext.expression(), Type.array(Type.any()));
+            name = NameExpression.compileArray(visitorCtx, anyOfSetContext.nameExpressionArray());
             onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
         } else {
             onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
         }
 
-        return new CreateRuleStatement.OnClause(expr, onClauseType);
+        return new CreateRuleStatement.OnClause(name, onClauseType);
     }
 
     private CreateRuleStatement.PerformsClause getPerformsClause(PALParser.ExpressionContext ctx) {
-        Expression performsExpr = Expression.compile(visitorCtx, ctx, Type.string(), Type.array(Type.any()));
+        Expression performsExpr = Expression.compile(visitorCtx, ctx);
         return new CreateRuleStatement.PerformsClause(performsExpr);
     }
 
     private CreateRuleStatement.SubjectClause getSubjectClause(PALParser.SubjectClauseContext ctx) {
         CreateRuleStatement.SubjectType type;
-        Expression expr;
+        NameExpression expr;
 
         if (ctx instanceof PALParser.AnyUserSubjectContext) {
             type = CreateRuleStatement.SubjectType.ANY_USER;
             return new CreateRuleStatement.SubjectClause(type);
         } else if (ctx instanceof PALParser.UserSubjectContext userSubjectCtx) {
             type = CreateRuleStatement.SubjectType.USER;
-            expr = Expression.compile(visitorCtx, userSubjectCtx.user, Type.string());
+            expr = NameExpression.compile(visitorCtx, userSubjectCtx.user);
 
         } else if (ctx instanceof PALParser.UsersListSubjectContext usersListSubjectCtx) {
             type = CreateRuleStatement.SubjectType.USERS;
-            expr = Expression.compile(visitorCtx, usersListSubjectCtx.users, Type.array(Type.any()));
+            expr = NameExpression.compileArray(visitorCtx, usersListSubjectCtx.users);
 
         } else if (ctx instanceof PALParser.UserAttrSubjectContext userAttrSubjectCtx) {
             type = CreateRuleStatement.SubjectType.USER;
-            expr = Expression.compile(visitorCtx, userAttrSubjectCtx.attribute, Type.string());
-
-        } else if (ctx instanceof PALParser.ProcessSubjectContext processSubjectCtx) {
-            type = CreateRuleStatement.SubjectType.USER;
-            expr = Expression.compile(visitorCtx, processSubjectCtx.process, Type.string());
+            expr = NameExpression.compile(visitorCtx, userAttrSubjectCtx.attribute);
 
         } else {
-            type = null;
-            expr = new Expression(new Literal(""));
-            visitorCtx.errorLog().addError(
-                    ctx,
-                    "invalid subject clause"
-            );
+            type = CreateRuleStatement.SubjectType.USER;
+            expr = NameExpression.compile(visitorCtx, ((PALParser.ProcessSubjectContext)ctx).process);
         }
 
         return new CreateRuleStatement.SubjectClause(type, expr);

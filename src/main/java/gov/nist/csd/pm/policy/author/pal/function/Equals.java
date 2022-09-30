@@ -19,8 +19,8 @@ public class Equals extends FunctionDefinitionStatement {
                         new FormalArgument(VALUE2, Type.any())
                 ),
                 (ctx, author) -> {
-                    Value v1 = ctx.getVariable(VALUE1);
-                    Value v2 = ctx.getVariable(VALUE2);
+                    Value v1 = ctx.scope().getValue(VALUE1);
+                    Value v2 = ctx.scope().getValue(VALUE2);
 
                     return new Value(v1.equals(v2));
                 }

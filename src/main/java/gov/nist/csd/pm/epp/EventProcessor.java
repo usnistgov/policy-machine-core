@@ -39,7 +39,7 @@ class EventProcessor {
                 ExecutionContext executionCtx = response.getExecutionCtx();
                 String eventCtxVariable = response.getEventCtxVariable();
 
-                executionCtx.addVariable(eventCtxVariable, Value.objectToValue(eventCtx), false);
+                executionCtx.scope().addValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
                 // need to run pdp tx as author
                 pdp.runTx(author, (txPDP) -> {

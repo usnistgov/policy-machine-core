@@ -1,14 +1,19 @@
 package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
+import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import gov.nist.csd.pm.policy.author.pal.compiler.Variable;
-import gov.nist.csd.pm.policy.author.pal.compiler.VisitorScope;
+import gov.nist.csd.pm.policy.author.pal.compiler.error.CompileError;
 import gov.nist.csd.pm.policy.author.pal.compiler.visitor.FunctionCallVisitor;
 import gov.nist.csd.pm.policy.author.pal.compiler.visitor.LiteralExprVisitor;
 import gov.nist.csd.pm.policy.author.pal.compiler.visitor.VariableReferenceVisitor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
+import gov.nist.csd.pm.policy.author.pal.model.scope.Scope;
+import gov.nist.csd.pm.policy.author.pal.model.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.policy.author.pal.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
@@ -22,30 +27,27 @@ public class Expression extends PALStatement {
                                      PALParser.ExpressionContext expressionCtx,
                                      Type... allowedTypes) {
         Expression expression;
-        if (expressionCtx instanceof PALParser.VariableReferenceContext varRefCtx) {
-            VariableReference varRef = new VariableReferenceVisitor(visitorCtx)
-                    .visitVariableReference(varRefCtx);
-            expression = new Expression(varRef);
-
-        } else if (expressionCtx instanceof PALParser.FunctionCallContext funcCallCtx) {
-            FunctionStatement functionCall = new FunctionCallVisitor(visitorCtx)
-                    .visitFunctionCall(funcCallCtx);
-            expression = new Expression(functionCall);
-
-        } else if (expressionCtx instanceof PALParser.LiteralExprContext literalExprCtx) {
+        if (expressionCtx.literal() != null) {
             Literal literal = new LiteralExprVisitor(visitorCtx)
-                    .visitLiteralExpr(literalExprCtx);
+                    .visitLiteral(expressionCtx.literal());
             expression = new Expression(literal);
-
+        } else if (expressionCtx.funcCall() != null) {
+            FunctionStatement functionCall = new FunctionCallVisitor(visitorCtx)
+                    .visitFuncCall(expressionCtx.funcCall());
+            expression = new Expression(functionCall);
         } else {
-            expression = new Expression(new Literal(""));
-            visitorCtx.errorLog().addError(
-                    expressionCtx,
-                    "expression is not a variable reference, function call, or literal"
-            );
+            VariableReference varRef = new VariableReferenceVisitor(visitorCtx)
+                    .visitVarRef(expressionCtx.varRef());
+            expression = new Expression(varRef);
         }
 
-        Type type = expression.getType(visitorCtx.scope());
+        Type type;
+        try {
+            type = expression.getType(visitorCtx.scope());
+        } catch (UnknownFunctionInScopeException | UnknownVariableInScopeException e) {
+            visitorCtx.errorLog().addError(expressionCtx, e.getMessage());
+            type = Type.any();
+        }
 
         // check the expression type is part of the given allowed types
         // if no types are given then any type is allowed
@@ -118,26 +120,26 @@ public class Expression extends PALStatement {
         }
     }
 
-    public Type getType(VisitorScope visitorScope) {
+    public Type getType(Scope Scope) throws UnknownFunctionInScopeException, UnknownVariableInScopeException {
         if (isFunctionCall) {
-            return getFunctionCallType(visitorScope);
+            return getFunctionCallType(Scope);
         } else if (isLiteral) {
             return getLiteralType();
         } else {
-            return getVarRefType(visitorScope);
+            return getVarRefType(Scope);
         }
     }
 
-    private Type getVarRefType(VisitorScope visitorScope) {
+    private Type getVarRefType(Scope Scope) throws UnknownVariableInScopeException {
         if (variableReference.isID()) {
-            return getIDType(visitorScope, variableReference);
+            return getIDType(Scope, variableReference);
         } else {
             return variableReference.getType();
         }
     }
 
-    private Type getIDType(VisitorScope visitorScope, VariableReference variableReference) {
-        Variable variable = visitorScope.getVariable(variableReference.getID());
+    private Type getIDType(Scope Scope, VariableReference variableReference) throws UnknownVariableInScopeException {
+        Variable variable = Scope.getVariable(variableReference.getID());
         if (variable == null) {
             return null;
         }
@@ -145,9 +147,9 @@ public class Expression extends PALStatement {
         return variable.type();
     }
 
-    private Type getFunctionCallType(VisitorScope visitorScope) {
+    private Type getFunctionCallType(Scope Scope) throws UnknownFunctionInScopeException {
         String functionName = functionCall.getFunctionName();
-        FunctionDefinitionStatement function = visitorScope.getFunction(functionName);
+        FunctionDefinitionStatement function = Scope.getFunction(functionName);
         if (function == null) {
             return null;
         }

@@ -3,17 +3,13 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.mysql.MysqlPAP;
 import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.PolicyAuthor;
+import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.author.pal.statement.CreateAttrStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
-import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
@@ -1250,7 +1246,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new Expression(new Literal("test_pc")))
+                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 )
@@ -1268,7 +1264,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new Expression(new Literal("test_pc")))
+                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 ).addRule(
@@ -1280,7 +1276,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new Expression(new Literal("test_pc")))
+                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 );
@@ -1291,9 +1287,11 @@ class PAPTest {
 
             @Test
             void AuthorDoesNotExist() throws PMException {
-                runTest(pap -> assertThrows(NodeDoesNotExistException.class,
-                        () -> pap.obligations().create(new UserContext("u1"), obligation1.getLabel(),
-                                obligation1.getRules().toArray(Rule[]::new))));
+                runTest(pap -> {
+                    assertThrows(NodeDoesNotExistException.class,
+                            () -> pap.obligations().create(new UserContext("u1"), obligation1.getLabel(),
+                                    obligation1.getRules().toArray(Rule[]::new)));
+                });
             }
 
             @Test
@@ -1595,16 +1593,16 @@ class PAPTest {
                         new FormalArgument("arg2", Type.array(Type.string()))
                 ),
                 Arrays.asList(
-                        new CreatePolicyStatement(new Expression(new Literal("pc1"))),
+                        new CreatePolicyStatement(new NameExpression(new VariableReference("pc1", Type.string()))),
                         new CreateAttrStatement(
-                                new Expression(new Literal("ua1")),
+                                new NameExpression(new VariableReference("ua1", Type.string())),
                                 UA,
-                                new Expression(new Literal("pc1"))
+                                new NameExpression(new VariableReference("pc1", Type.string()))
                         ),
                         new CreateAttrStatement(
-                                new Expression(new Literal("oa1")),
+                                new NameExpression(new VariableReference("oa1", Type.string())),
                                 OA,
-                                new Expression(new Literal("pc1"))
+                                new NameExpression(new VariableReference("pc1", Type.string()))
                         )
                 )
         );
@@ -1658,7 +1656,6 @@ class PAPTest {
             FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement("testFunc2", Type.voidType(), List.of(), List.of());
 
             runTest(pap -> {
-
                 pap.pal().addFunction(testFunc1);
                 pap.pal().addFunction(testFunc2);
 

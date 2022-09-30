@@ -11,19 +11,19 @@ import java.util.Objects;
 
 public class DeleteRuleStatement extends PALStatement {
 
-    private final Expression ruleExpr;
-    private final Expression oblExpr;
+    private final NameExpression ruleExpr;
+    private final NameExpression oblExpr;
 
-    public DeleteRuleStatement(Expression ruleExpr, Expression oblExpr) {
+    public DeleteRuleStatement(NameExpression ruleExpr, NameExpression oblExpr) {
         this.ruleExpr = ruleExpr;
         this.oblExpr = oblExpr;
     }
 
-    public Expression getRuleExpr() {
+    public NameExpression getRuleExpr() {
         return ruleExpr;
     }
 
-    public Expression getOblExpr() {
+    public NameExpression getOblExpr() {
         return oblExpr;
     }
 

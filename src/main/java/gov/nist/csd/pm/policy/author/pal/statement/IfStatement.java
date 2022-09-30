@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.author.pal.statement;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
@@ -15,12 +16,12 @@ public class IfStatement extends PALStatement {
 
     private final ConditionalBlock ifBlock;
     private final List<ConditionalBlock> ifElseBlocks;
-    private final List<PALStatement> elseBlock;
+    private final List<PALStatement> elseBlockStatements;
 
     public IfStatement(ConditionalBlock ifBlock, List<ConditionalBlock> ifElseBlocks, List<PALStatement> elseBlock) {
         this.ifBlock = ifBlock;
         this.ifElseBlocks = ifElseBlocks;
-        this.elseBlock = elseBlock;
+        this.elseBlockStatements = elseBlock;
     }
 
     public ConditionalBlock getIfBlock() {
@@ -31,8 +32,8 @@ public class IfStatement extends PALStatement {
         return ifElseBlocks;
     }
 
-    public List<PALStatement> getElseBlock() {
-        return elseBlock;
+    public List<PALStatement> getElseBlockStatements() {
+        return elseBlockStatements;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class IfStatement extends PALStatement {
             }
         }
 
-        return executeBlock(ctx, policyAuthor, elseBlock);
+        return executeBlock(ctx, policyAuthor, elseBlockStatements);
     }
 
     @Override
@@ -64,10 +65,10 @@ public class IfStatement extends PALStatement {
     }
 
     private String elseBlockToString() {
-        if (elseBlock.isEmpty()) {
+        if (elseBlockStatements.isEmpty()) {
             return "";
         }
-        return String.format("else {%s}", statementsToString(elseBlock));
+        return String.format("else {%s}", statementsToString(elseBlockStatements));
     }
 
     private String elseIfBlockToString() {
@@ -84,10 +85,15 @@ public class IfStatement extends PALStatement {
     }
 
     private Value executeBlock(ExecutionContext ctx, PolicyAuthor policyAuthor, List<PALStatement> block) throws PMException {
-        ExecutionContext copy = ctx.copy();
+        ExecutionContext copy = null;
+        try {
+            copy = ctx.copy();
+        } catch (PALScopeException e) {
+            throw new PMException(e.getMessage());
+        }
         Value value = executeStatementBlock(copy, policyAuthor, block);
 
-        ctx.updateVariables(copy);
+        ctx.scope().overwriteValues(copy.scope());
 
         return value;
     }
@@ -97,12 +103,12 @@ public class IfStatement extends PALStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IfStatement ifStmt = (IfStatement) o;
-        return Objects.equals(ifBlock, ifStmt.ifBlock) && Objects.equals(ifElseBlocks, ifStmt.ifElseBlocks) && Objects.equals(elseBlock, ifStmt.elseBlock);
+        return Objects.equals(ifBlock, ifStmt.ifBlock) && Objects.equals(ifElseBlocks, ifStmt.ifElseBlocks) && Objects.equals(elseBlockStatements, ifStmt.elseBlockStatements);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ifBlock, ifElseBlocks, elseBlock);
+        return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
     public record ConditionalBlock(Expression condition, List<PALStatement> block) { }

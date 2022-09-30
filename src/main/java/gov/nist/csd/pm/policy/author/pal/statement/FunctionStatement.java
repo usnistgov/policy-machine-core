@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
+import gov.nist.csd.pm.policy.author.pal.model.scope.PALScopeException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
@@ -30,40 +31,44 @@ public class FunctionStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        FunctionDefinitionStatement functionDef = ctx.getFunction(functionName);
-        ExecutionContext localCtx = ctx.copy();
+        try {
+            FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionName);
+            ExecutionContext localCtx = ctx.copy();
 
-        List<FormalArgument> formalArgs = functionDef.getArgs();
+            List<FormalArgument> formalArgs = functionDef.getArgs();
 
-        for (int i = 0; i < actualArgs.size(); i++) {
-            Expression argExpr = actualArgs.get(i);
-            Value argValue = argExpr.execute(localCtx, policyAuthor);
-            FormalArgument formalArg = formalArgs.get(i);
+            for (int i = 0; i < actualArgs.size(); i++) {
+                Expression argExpr = actualArgs.get(i);
+                Value argValue = argExpr.execute(localCtx, policyAuthor);
+                FormalArgument formalArg = formalArgs.get(i);
 
-            if (!argValue.getType().equals(formalArg.type())) {
-                throw new PMException("actual arg value has type " + argValue.getType() + " expected " + formalArg.type());
+                if (!argValue.getType().equals(formalArg.type())) {
+                    throw new PMException("actual arg value has type " + argValue.getType() + " expected " + formalArg.type());
+                }
+
+                localCtx.scope().addValue(formalArg.name(), argValue);
             }
 
-            localCtx.addVariable(formalArg.name(), argValue, false);
-        }
-
-        Value value = new Value();
-        if (functionDef.isFunctionExecutor()) {
-            FunctionExecutor functionExecutor = functionDef.getFunctionExecutor();
-            value = functionExecutor.exec(localCtx, policyAuthor);
-        } else {
-            List<PALStatement> statements = functionDef.getBody();
-            for (PALStatement stmt : statements) {
-                value = stmt.execute(localCtx, policyAuthor);
-                if (value.isReturn()) {
-                    break;
+            Value value = new Value();
+            if (functionDef.isFunctionExecutor()) {
+                FunctionExecutor functionExecutor = functionDef.getFunctionExecutor();
+                value = functionExecutor.exec(localCtx, policyAuthor);
+            } else {
+                List<PALStatement> statements = functionDef.getBody();
+                for (PALStatement stmt : statements) {
+                    value = stmt.execute(localCtx, policyAuthor);
+                    if (value.isReturn()) {
+                        break;
+                    }
                 }
             }
+
+            ctx.scope().overwriteValues(localCtx.scope());
+
+            return value;
+        } catch (PALScopeException e) {
+            throw new PMException(e.getMessage());
         }
-
-        ctx.updateVariables(localCtx);
-
-        return value;
     }
 
     @Override

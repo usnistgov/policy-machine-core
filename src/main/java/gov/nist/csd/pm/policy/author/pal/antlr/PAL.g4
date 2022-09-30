@@ -90,39 +90,39 @@ deleteType:
 nodeType:
     (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
-createPolicyStmt: CREATE POLICY_CLASS name=expression SEMI_COLON ;
-createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression ASSIGN_TO assignTo=expression SEMI_COLON ;
-createUserOrObjectStmt: CREATE (USER | OBJECT) name=expression ASSIGN_TO assignTo=expression SEMI_COLON ;
+createPolicyStmt: CREATE POLICY_CLASS nameExpression SEMI_COLON ;
+createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) nameExpression ASSIGN_TO nameExpressionArray SEMI_COLON ;
+createUserOrObjectStmt: CREATE (USER | OBJECT) nameExpression ASSIGN_TO nameExpressionArray SEMI_COLON ;
 
-setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression SEMI_COLON ;
+setNodePropsStmt: SET_PROPERTIES OF nameExpression TO properties=expression SEMI_COLON ;
 
-assignStmt: ASSIGN child=expression TO assignTo=expression SEMI_COLON ;
-deassignStmt: DEASSIGN child=expression FROM deassignFrom=expression SEMI_COLON ;
+assignStmt: ASSIGN child=nameExpression TO parent=nameExpression SEMI_COLON ;
+deassignStmt: DEASSIGN child=nameExpression FROM parent=nameExpression SEMI_COLON ;
 
-associateStmt: ASSOCIATE ua=expression AND target=expression WITH_ACCESS_RIGHTS accessRights=accessRightArray SEMI_COLON ;
-dissociateStmt: DISSOCIATE ua=expression AND target=expression SEMI_COLON ;
+associateStmt: ASSOCIATE ua=nameExpression AND target=nameExpression WITH_ACCESS_RIGHTS accessRights=accessRightArray SEMI_COLON ;
+dissociateStmt: DISSOCIATE ua=nameExpression AND target=nameExpression SEMI_COLON ;
 
-deleteStmt: DELETE deleteType name=expression SEMI_COLON ;
+deleteStmt: DELETE deleteType nameExpression SEMI_COLON ;
 
 createObligationStmt:
-    CREATE OBLIGATION label=expression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
+    CREATE OBLIGATION nameExpression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
 createRuleStmt:
-    CREATE RULE label=expression
+    CREATE RULE ruleName=nameExpression
     WHEN subjectClause
     PERFORMS performsClause=expression
     (ON onClause)?
     response ;
 subjectClause:
     ANY_USER #AnyUserSubject
-    | USER user=expression #UserSubject
-    | USERS users=expression #UsersListSubject
-    | ANY_USER_WITH_ATTRIBUTE attribute=expression #UserAttrSubject
-    | PROCESS process=expression #ProcessSubject ;
+    | USER user=nameExpression #UserSubject
+    | USERS users=nameExpressionArray #UsersListSubject
+    | ANY_USER_WITH_ATTRIBUTE attribute=nameExpression #UserAttrSubject
+    | PROCESS process=nameExpression #ProcessSubject ;
 onClause:
-    expression #PolicyElement
+    nameExpression #PolicyElement
     | anyPe #AnyPolicyElement
-    | anyPe IN expression #AnyContainedIn
-    | anyPe OF expression #AnyOfSet ;
+    | anyPe IN nameExpression #AnyContainedIn
+    | anyPe OF nameExpressionArray #AnyOfSet ;
 anyPe: ANY POLICY_ELEMENT;
 
 response:
@@ -135,30 +135,33 @@ responseStmt:
     stmt
     | createRuleStmt ;
 deleteRuleStmt:
-    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression SEMI_COLON ;
+    DELETE RULE ruleName=nameExpression FROM OBLIGATION obligationName=nameExpression SEMI_COLON ;
 
 createProhibitionStmt:
-    CREATE PROHIBITION label=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
+    CREATE PROHIBITION name=nameExpression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=nameExpression
     ACCESS_RIGHTS accessRights=accessRightArray
     ON (INTERSECTION|UNION) OF containers=prohibitionContainerList
     SEMI_COLON ;
 prohibitionContainerList:
     (prohibitionContainerExpression (COMMA prohibitionContainerExpression)*)?;
 prohibitionContainerExpression:
-    IS_COMPLEMENT? container=expression ;
+    IS_COMPLEMENT? container=nameExpression ;
 
 setResourceAccessRightsStmt:
     SET_RESOURCE_ACCESS_RIGHTS accessRightArray SEMI_COLON;
 
 expression:
-    varRef #VariableReference
-    | funcCall #FunctionCall
-    | literal #LiteralExpr;
+    varRef
+    | funcCall
+    | literal;
+
+nameExpressionArray: nameExpression (COMMA nameExpression)* ;
+nameExpression: (varRef | funcCall) ;
 
 array:
     OPEN_BRACKET (expression (COMMA expression)*)? CLOSE_BRACKET ;
 accessRightArray:
-    OPEN_BRACKET (accessRight (COMMA accessRight)*)? CLOSE_BRACKET ;
+    (accessRight (COMMA accessRight)*)? ;
 accessRight:
     ('*' | '*r' | '*a' | IDENTIFIER) ;
 map:
@@ -222,11 +225,11 @@ PROHIBITION: [Pp][Rr][Oo][Hh][Ii][Bb][Ii][Tt][Ii][Oo][Nn];
 OBLIGATION: [Oo][Bb][Ll][Ii][Gg][Aa][Tt][Ii][Oo][Nn];
 ACCESS_RIGHTS: [Aa][Cc][Cc][Ee][Ss][Ss][ ][Rr][Ii][Gg][Hh][Tt][Ss] ;
 
-POLICY_CLASS: [Pp][Oo][Ll][Ii][Cc][Yy][ ][Cc][Ll][Aa][Ss][Ss] ;
-OBJECT_ATTRIBUTE: OBJECT [ ] ATTR ;
-USER_ATTRIBUTE: USER [ ] ATTR ;
-OBJECT: [Oo][Bb][Jj][Ee][Cc][Tt] ;
-USER: [Uu][Ss][Ee][Rr] ;
+POLICY_CLASS: ([Pp][Oo][Ll][Ii][Cc][Yy][ ][Cc][Ll][Aa][Ss][Ss] | [Pp][Cc]) ;
+OBJECT_ATTRIBUTE: (OBJECT [ ] ATTR | [Oo][Aa]) ;
+USER_ATTRIBUTE: (USER [ ] ATTR | [Uu][Aa]);
+OBJECT: ([Oo][Bb][Jj][Ee][Cc][Tt] | [Oo]);
+USER: ([Uu][Ss][Ee][Rr] | [Uu]) ;
 ATTR:  [Aa][Tt][Tt][Rr][Ii][Bb][Uu][Tt][Ee] ;
 
 ANY: [Aa][Nn][Yy] ;
@@ -247,7 +250,7 @@ IN: [Ii][Nn] ;
 IF: [Ii][Ff] ;
 ELSE: [Ee][Ll][Ss][Ee];
 
-IDENTIFIER: [a-zA-Z_]+ [a-zA-Z0-9_]* ;
+IDENTIFIER: [a-zA-Z0-9_+\-\\.@]+ [a-zA-Z0-9_+\-\\.@]* ;
 STRING: '\'' (~['\\])*  '\'' ;
 LINE_COMMENT : '#' ~'\n'* '\n' -> channel(HIDDEN) ;
 WS : [ \t\n\r]+ -> skip ;
@@ -264,4 +267,3 @@ OPEN_PAREN: '(' ;
 CLOSE_PAREN: ')' ;
 IS_COMPLEMENT: '!' ;
 EQUALS: '=' ;
-DOT: '.' ;

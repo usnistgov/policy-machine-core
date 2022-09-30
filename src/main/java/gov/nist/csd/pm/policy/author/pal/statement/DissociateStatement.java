@@ -9,19 +9,19 @@ import java.util.Objects;
 
 public class DissociateStatement extends PALStatement {
 
-    private final Expression uaExpr;
-    private final Expression targetExpr;
+    private final NameExpression uaExpr;
+    private final NameExpression targetExpr;
 
-    public DissociateStatement(Expression uaExpr, Expression targetExpr) {
+    public DissociateStatement(NameExpression uaExpr, NameExpression targetExpr) {
         this.uaExpr = uaExpr;
         this.targetExpr = targetExpr;
     }
 
-    public Expression getUaExpr() {
+    public NameExpression getUaExpr() {
         return uaExpr;
     }
 
-    public Expression getTargetExpr() {
+    public NameExpression getTargetExpr() {
         return targetExpr;
     }
 

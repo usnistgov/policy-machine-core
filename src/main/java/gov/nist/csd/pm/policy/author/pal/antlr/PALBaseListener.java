@@ -748,37 +748,37 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVariableReference(PALParser.VariableReferenceContext ctx) { }
+	@Override public void enterExpression(PALParser.ExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitVariableReference(PALParser.VariableReferenceContext ctx) { }
+	@Override public void exitExpression(PALParser.ExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunctionCall(PALParser.FunctionCallContext ctx) { }
+	@Override public void enterNameExpressionArray(PALParser.NameExpressionArrayContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunctionCall(PALParser.FunctionCallContext ctx) { }
+	@Override public void exitNameExpressionArray(PALParser.NameExpressionArrayContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLiteralExpr(PALParser.LiteralExprContext ctx) { }
+	@Override public void enterNameExpression(PALParser.NameExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLiteralExpr(PALParser.LiteralExprContext ctx) { }
+	@Override public void exitNameExpression(PALParser.NameExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

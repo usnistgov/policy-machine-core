@@ -16,7 +16,7 @@ public class GetNodeType extends FunctionDefinitionStatement {
                         new FormalArgument("nodeName", Type.string())
                 ),
                 (ctx, author) -> {
-                    Node node = author.graph().getNode(ctx.getVariable("nodeName").getStringValue());
+                    Node node = author.graph().getNode(ctx.scope().getValue("nodeName").getStringValue());
                     return new Value(node.getType().toString());
                 }
         );

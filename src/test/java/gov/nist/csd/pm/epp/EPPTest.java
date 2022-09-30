@@ -2,10 +2,11 @@ package gov.nist.csd.pm.epp;
 
 import gov.nist.csd.pm.pdp.reviewer.MemoryPolicyReviewer;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
+import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.CreateUserOrObjectStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.policy.events.EventContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -45,13 +46,13 @@ class EPPTest {
         pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
 
         String pal = """
-                create obligation 'test' {
-                    create rule 'rule1'
+                create obligation test {
+                    create rule rule1
                     when any user
                     performs 'create_object_attribute'
-                    on 'oa1'
+                    on oa1
                     do(evtCtx) {
-                        create policy class 'pc2';
+                        create policy class pc2;
                     }
                 }
                 """;
@@ -76,11 +77,11 @@ class EPPTest {
         pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
 
         String pal = """
-                create obligation 'test' {
-                    create rule 'rule1'
+                create obligation test {
+                    create rule rule1
                     when any user
                     performs 'create_object_attribute'
-                    on 'oa1'
+                    on oa1
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
                         let target = evtCtx['target'];
@@ -124,8 +125,12 @@ class EPPTest {
                     new Rule("rule1",
                             new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
                             new Response(new UserContext("u1"),
-                                    new CreateUserOrObjectStatement(new Expression(new Literal("o2")), NodeType.O, new Expression(new Literal("oa1"))),
-                                    new CreatePolicyStatement(new Expression(new Literal("pc2"))))
+                                    new CreateUserOrObjectStatement(
+                                            new NameExpression(new VariableReference("o2", Type.string())),
+                                            NodeType.O,
+                                            new NameExpression(new VariableReference("oa1", Type.string()))
+                                    ),
+                                    new CreatePolicyStatement(new NameExpression(new VariableReference("pc2", Type.string()))))
                     )
             );
         });

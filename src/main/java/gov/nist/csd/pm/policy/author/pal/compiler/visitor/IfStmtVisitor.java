@@ -5,8 +5,8 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.IfStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class IfStmtVisitor extends PALBaseVisitor<IfStatement> {
         }
 
         // update outer scoped variables
-        visitorCtx.scope().updateVariables(localVisitorCtx.scope());
+        visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
 
         IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(condition, block);
 
@@ -51,7 +51,7 @@ public class IfStmtVisitor extends PALBaseVisitor<IfStatement> {
             elseIfs.add(new IfStatement.ConditionalBlock(condition, block));
 
             // update outer scoped variables
-            visitorCtx.scope().updateVariables(localVisitorCtx.scope());
+            visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
         }
 
         // else
@@ -65,7 +65,7 @@ public class IfStmtVisitor extends PALBaseVisitor<IfStatement> {
             }
 
             // update outer scoped variables
-            visitorCtx.scope().updateVariables(localVisitorCtx.scope());
+            visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
         }
 
         return new IfStatement(ifBlock, elseIfs, block);
