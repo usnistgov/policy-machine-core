@@ -833,6 +833,24 @@ public class MemoryPolicyReviewer extends PolicyReviewer implements PolicyEventL
 
         return pros;
     }
+
+    @Override
+    public List<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
+        List<Prohibition> pros = new ArrayList<>();
+
+        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
+        for (String subject : prohibitions.keySet()) {
+            List<Prohibition> subjectProhibitions = prohibitions.get(subject);
+            for (Prohibition prohibition : subjectProhibitions) {
+                if (prohibition.getContainers().contains(new ContainerCondition(container, false))) {
+                    pros.add(prohibition);
+                }
+            }
+        }
+
+        return pros;
+    }
+
     @Override
     public synchronized List<Obligation> getObligationsWithAuthor(UserContext userCtx) throws PMException {
         List<Obligation> obls = new ArrayList<>();
