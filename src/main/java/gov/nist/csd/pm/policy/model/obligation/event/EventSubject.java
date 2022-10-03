@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.policy.model.obligation.event;
 
+import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.review.PolicyReview;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class EventSubject implements Serializable {
         return subjects;
     }
 
-    public boolean matches(UserContext userCtx, PolicyReview policyReviewer) throws PMException {
+    public boolean matches(UserContext userCtx, PolicyReviewer policyReviewer) throws PMException {
         switch (type) {
             case ANY_USER -> {
                 return true;

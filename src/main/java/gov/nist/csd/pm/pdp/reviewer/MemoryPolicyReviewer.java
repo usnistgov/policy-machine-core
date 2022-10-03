@@ -34,7 +34,6 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.review.PolicyReview;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
