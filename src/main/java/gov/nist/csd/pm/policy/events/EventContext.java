@@ -46,7 +46,7 @@ public class EventContext extends PolicyEvent {
         return event;
     }
 
-    public boolean matchesPattern(EventPattern pattern, PolicyReview policyReview) throws PMException {
+    public boolean matchesPattern(EventPattern pattern, PolicyReview policyReviewer) throws PMException {
         if (pattern.getOperations().isEmpty() || pattern.getOperations().get(0).isEmpty()) {
             return true; // an empty event pattern will match all events
         } else if (pattern.getOperations() != null &&
@@ -57,8 +57,8 @@ public class EventContext extends PolicyEvent {
         EventSubject patternSubject = pattern.getSubject();
         Target patternTarget = pattern.getTarget();
 
-        return patternSubject.matches(userCtx, policyReview) &&
-                patternTarget.matches(target, policyReview);
+        return patternSubject.matches(userCtx, policyReviewer) &&
+                patternTarget.matches(target, policyReviewer);
     }
 
     private String getEventName(PolicyEvent event) {

@@ -12,6 +12,7 @@ import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.policy.review.PolicyReview;
 import gov.nist.csd.pm.policy.tx.TxRunner;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class PDP implements PolicyEventEmitter {
         this.pap.addEventListener(this.policyReviewer, true);
     }
 
-    public PolicyReviewer policyReviewer() {
+    public PolicyReview policyReviewer() {
         return this.policyReviewer;
     }
 

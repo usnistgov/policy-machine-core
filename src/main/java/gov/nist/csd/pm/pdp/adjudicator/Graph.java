@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.naming.Naming;
-import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -12,6 +11,7 @@ import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.review.PolicyReview;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ class Graph extends GraphAuthor {
     private final PAP pap;
     private final AccessRightChecker accessRightChecker;
 
-    Graph(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer) {
+    Graph(UserContext userCtx, PAP pap, PolicyReview policyReviewer) {
         this.userCtx = userCtx;
         this.pap = pap;
         this.accessRightChecker = new AccessRightChecker(pap, policyReviewer);

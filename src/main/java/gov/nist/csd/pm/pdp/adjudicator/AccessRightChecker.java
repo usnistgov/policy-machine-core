@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.RepObjectNotSetException;
 import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
+import gov.nist.csd.pm.policy.review.PolicyReview;
 
 import java.util.Arrays;
 
@@ -17,9 +17,9 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.REP_PROPERTY;
 public class AccessRightChecker {
 
     private PAP pap;
-    private PolicyReviewer policyReviewer;
+    private PolicyReview policyReviewer;
 
-    public AccessRightChecker(PAP pap, PolicyReviewer policyReviewer) {
+    public AccessRightChecker(PAP pap, PolicyReview policyReviewer) {
         this.pap = pap;
         this.policyReviewer = policyReviewer;
     }

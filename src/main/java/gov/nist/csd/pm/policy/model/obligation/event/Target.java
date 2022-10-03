@@ -60,10 +60,10 @@ public class Target implements Serializable {
        return policyElements.get(0);
     }
 
-    public boolean matches(String target, PolicyReview policyReview) throws PMException {
+    public boolean matches(String target, PolicyReview policyReviewer) throws PMException {
         switch (type) {
             case ANY_CONTAINED_IN -> {
-                return policyReview.isContained(target, anyContainedIn());
+                return policyReviewer.isContained(target, anyContainedIn());
             }
             case POLICY_ELEMENT -> {
                 return policyElement().equals(target);

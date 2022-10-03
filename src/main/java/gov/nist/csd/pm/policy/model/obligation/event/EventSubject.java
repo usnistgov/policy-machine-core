@@ -64,14 +64,14 @@ public class EventSubject implements Serializable {
         return subjects;
     }
 
-    public boolean matches(UserContext userCtx, PolicyReview policyReview) throws PMException {
+    public boolean matches(UserContext userCtx, PolicyReview policyReviewer) throws PMException {
         switch (type) {
             case ANY_USER -> {
                 return true;
             }
             case ANY_USER_WITH_ATTRIBUTE -> {
                 String user = userCtx.getUser();
-                return policyReview.isContained(user, anyUserWithAttribute());
+                return policyReviewer.isContained(user, anyUserWithAttribute());
             }
             case PROCESS -> {
                 return userCtx.getProcess().equals(process());
