@@ -352,7 +352,7 @@ class MysqlGraphStore extends GraphStore {
     public List<String> search(NodeType type, Map<String, String> properties) throws PMException {
         String sql = "select name from node";
         StringBuilder where = new StringBuilder();
-        if (type != null) {
+        if (type != ANY) {
             where = new StringBuilder("node_type_id = " + MysqlPolicyStore.getNodeTypeId(type));
         }
 
