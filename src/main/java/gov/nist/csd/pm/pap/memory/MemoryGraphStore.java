@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.store.GraphStore;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.TransactionNotStartedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.exceptions.NodeNameExistsException;
@@ -15,6 +16,7 @@ import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 class MemoryGraphStore extends GraphStore {
 
@@ -82,8 +84,18 @@ class MemoryGraphStore extends GraphStore {
     }
 
     @Override
+    public String createPolicyClass(String name) throws PMException {
+        return createPolicyClass(name, noprops());
+    }
+
+    @Override
     public synchronized String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) {
         return createNode(name, UA, properties, parent, parents);
+    }
+
+    @Override
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+        return createUserAttribute(name, noprops(), parent, parents);
     }
 
     @Override
@@ -92,13 +104,28 @@ class MemoryGraphStore extends GraphStore {
     }
 
     @Override
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+        return createObjectAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
     public synchronized String createObject(String name, Map<String, String> properties, String parent, String... parents) {
         return createNode(name, O, properties, parent, parents);
     }
 
     @Override
+    public String createObject(String name, String parent, String... parents) throws PMException {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
     public synchronized String createUser(String name, Map<String, String> properties, String parent, String... parents) {
         return createNode(name, U, properties, parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) throws PMException {
+        return createUser(name, noprops(), parent, parents);
     }
 
     private synchronized String createNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... parents) {
@@ -139,7 +166,7 @@ class MemoryGraphStore extends GraphStore {
         for (String name : graph.getNodes().keySet()) {
             Node node = graph.getNode(name);
             // if the type parameter is not null and the current node type does not equal the type parameter, do not add
-            if (type != null && !node.getType().equals(type)) {
+            if (type != ANY && !node.getType().equals(type)) {
                 continue;
             }
 

@@ -15,12 +15,12 @@ class MemoryPAPTest {
     void testTx() throws PMException {
         MemoryPAP pap = new MemoryPAP();
         pap.beginTx();
-        pap.graph().createPolicyClass("pc1", noprops());
+        pap.graph().createPolicyClass("pc1");
         pap.rollback();
         assertFalse(pap.graph().nodeExists("pc1"));
 
         pap.beginTx();
-        pap.graph().createPolicyClass("pc1", noprops());
+        pap.graph().createPolicyClass("pc1");
         pap.commit();
         assertTrue(pap.graph().nodeExists("pc1"));
     }

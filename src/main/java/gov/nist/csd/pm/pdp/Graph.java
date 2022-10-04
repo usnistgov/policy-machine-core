@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+
 class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     private final UserContext userCtx;
@@ -54,6 +56,11 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     }
 
     @Override
+    public String createPolicyClass(String name) throws PMException {
+        return createPolicyClass(name, noprops());
+    }
+
+    @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         adjudicator.graph().createUserAttribute(name, properties, parent, parents);
 
@@ -65,6 +72,11 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
         emitCreateNodeEvent(event, name, parent, parents);
 
         return name;
+    }
+
+    @Override
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+        return createUserAttribute(name, noprops(), parent, parents);
     }
 
     @Override
@@ -83,6 +95,11 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     }
 
     @Override
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+        return createObjectAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         adjudicator.graph().createObject(name, properties, parent, parents);
 
@@ -97,6 +114,11 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     }
 
     @Override
+    public String createObject(String name, String parent, String... parents) throws PMException {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         adjudicator.graph().createUser(name, properties, parent, parents);
 
@@ -107,6 +129,11 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
         emitCreateNodeEvent(event, name, parent, parents);
 
         return name;
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) throws PMException {
+        return createUser(name, noprops(), parent, parents);
     }
 
     private void emitCreateNodeEvent(PolicyEvent event, String name, String parent, String ... parents) throws PMException {

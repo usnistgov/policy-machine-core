@@ -13,6 +13,8 @@ import gov.nist.csd.pm.policy.tx.TxPolicyEventListener;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+
 class TxGraph extends GraphStore implements PolicyEventEmitter {
 
     private final MemoryGraphStore store;
@@ -41,9 +43,19 @@ class TxGraph extends GraphStore implements PolicyEventEmitter {
     }
 
     @Override
+    public String createPolicyClass(String name) throws PMException {
+        return createPolicyClass(name, noprops());
+    }
+
+    @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         emitEvent(new CreateUserAttributeEvent(name, properties, parent, parents));
         return store.createUserAttribute(name, properties, parent, parents);
+    }
+
+    @Override
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+        return createUserAttribute(name, noprops(), parent, parents);
     }
 
     @Override
@@ -53,15 +65,30 @@ class TxGraph extends GraphStore implements PolicyEventEmitter {
     }
 
     @Override
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+        return createObjectAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         emitEvent(new CreateObjectEvent(name, properties, parent, parents));
         return store.createObject(name, properties, parent, parents);
     }
 
     @Override
+    public String createObject(String name, String parent, String... parents) throws PMException {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         emitEvent(new CreateUserEvent(name, properties, parent, parents));
         return store.createUser(name, properties, parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) throws PMException {
+        return createUser(name, noprops(), parent, parents);
     }
 
     @Override

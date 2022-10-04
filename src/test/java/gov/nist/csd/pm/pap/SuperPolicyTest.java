@@ -37,7 +37,7 @@ class SuperPolicyTest {
         accessRights = reviewer.getAccessRights(userContext, SUPER_OBJECT);
         assertTrue(accessRights.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
 
-        memoryPAP.graph.createPolicyClass("pc1", noprops());
+        memoryPAP.graph.createPolicyClass("pc1");
         accessRights = reviewer.getAccessRights(userContext, Naming.baseUserAttribute("pc1"));
         assertTrue(accessRights.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         accessRights = reviewer.getAccessRights(userContext, Naming.baseObjectAttribute("pc1"));

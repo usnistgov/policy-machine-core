@@ -21,6 +21,7 @@ public interface GraphWriter {
      * @throws PMException if there is an error creating the policy class node in the graph.
      */
     String createPolicyClass(String name, Map<String, String> properties) throws PMException;
+    String createPolicyClass(String name) throws PMException;
 
     /**
      * Create a new user attribute. User attributes do not have to be connected to the graph, therefore
@@ -33,6 +34,7 @@ public interface GraphWriter {
      * @throws PMException
      */
     String createUserAttribute(String name, Map<String, String> properties, String parent, String ... parents) throws PMException;
+    String createUserAttribute(String name, String parent, String ... parents) throws PMException;
 
     /**
      * Create a new object attribute with the given name, and assign it to the given parents.
@@ -46,6 +48,7 @@ public interface GraphWriter {
      * @throws PMException if there is an error creating the node in the graph.
      */
     String createObjectAttribute(String name, Map<String, String> properties, String parent, String ... parents) throws PMException;
+    String createObjectAttribute(String name, String parent, String ... parents) throws PMException;
 
     /**
      * Create a new object with the given name, and assign it to the given parents.
@@ -59,6 +62,7 @@ public interface GraphWriter {
      * @throws PMException if there is an error creating the node in the graph.
      */
     String createObject(String name, Map<String, String> properties, String parent, String ... parents) throws PMException;
+    String createObject(String name, String parent, String ... parents) throws PMException;
 
     /**
      * Create a new user with the given name, and assign it to the given parents.
@@ -72,6 +76,7 @@ public interface GraphWriter {
      * @throws PMException if there is an error creating the node in the graph.
      */
     String createUser(String name, Map<String, String> properties, String parent, String ... parents) throws PMException;
+    String createUser(String name, String parent, String ... parents) throws PMException;
 
     /**
      * Update the properties of the node with the given name. The given properties overwrite any existing properties.

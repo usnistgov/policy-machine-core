@@ -42,7 +42,7 @@ class MysqlGraphStoreTest {
         MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);
 
         MysqlGraphStore graph = mysqlPolicyStore.graph();
-        graph.createPolicyClass("pc1", noprops());
+        graph.createPolicyClass("pc1");
 
         // put a row in the assignment table for oa1 -> pc1
         // this should cause an error and a rollback
@@ -52,7 +52,7 @@ class MysqlGraphStoreTest {
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
         }
 
-        assertThrows(MysqlPolicyException.class, () -> graph.createObjectAttribute("oa1", noprops(), "pc1"));
+        assertThrows(MysqlPolicyException.class, () -> graph.createObjectAttribute("oa1", "pc1"));
         assertFalse(graph.nodeExists("oa1"));
     }
 

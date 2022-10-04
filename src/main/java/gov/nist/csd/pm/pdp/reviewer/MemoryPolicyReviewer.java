@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import static gov.nist.csd.pm.policy.model.access.UserContext.NO_PROCESS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 public class MemoryPolicyReviewer extends PolicyReviewer implements PolicyEventListener, Transactional {
 
@@ -307,7 +308,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer implements PolicyEventL
     @Override
     public synchronized Map<String, AccessRightSet> buildACL(String target) throws PMException {
         Map<String, AccessRightSet> acl = new HashMap<>();
-        List<String> search = policy.graph().search(U, null);
+        List<String> search = policy.graph().search(U, noprops());
         for (String user : search) {
             AccessRightSet list = this.getAccessRights(new UserContext(user), target);
             acl.put(user, list);

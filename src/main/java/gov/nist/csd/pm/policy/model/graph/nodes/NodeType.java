@@ -19,7 +19,8 @@ public enum NodeType implements Serializable {
     UA("UA"),
     U("U"),
     O("O"),
-    PC("PC");
+    PC("PC"),
+    ANY("ANY");
 
     private final String label;
 

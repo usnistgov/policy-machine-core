@@ -46,9 +46,9 @@ class MysqlProhibitionsStoreTest {
         MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);
 
         MysqlGraphStore graph = mysqlPolicyStore.graph();
-        graph.createPolicyClass("pc1", noprops());
-        graph.createUserAttribute("ua1", noprops(), "pc1");
-        graph.createObjectAttribute("oa1", noprops(), "pc1");
+        graph.createPolicyClass("pc1");
+        graph.createUserAttribute("ua1", "pc1");
+        graph.createObjectAttribute("oa1", "pc1");
 
         try(Statement stmt = connection.getConnection().createStatement()) {
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
