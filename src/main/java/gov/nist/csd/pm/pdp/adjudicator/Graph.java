@@ -4,11 +4,11 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
@@ -18,7 +18,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.GET_ASSOCIATIONS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 
 class Graph extends GraphAuthor {

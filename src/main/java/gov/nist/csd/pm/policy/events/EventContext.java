@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.policy.events;
 
+import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
-import gov.nist.csd.pm.policy.review.PolicyReview;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
@@ -46,7 +46,7 @@ public class EventContext extends PolicyEvent {
         return event;
     }
 
-    public boolean matchesPattern(EventPattern pattern, PolicyReview policyReview) throws PMException {
+    public boolean matchesPattern(EventPattern pattern, PolicyReviewer policyReviewer) throws PMException {
         if (pattern.getOperations().isEmpty() || pattern.getOperations().get(0).isEmpty()) {
             return true; // an empty event pattern will match all events
         } else if (pattern.getOperations() != null &&
@@ -57,8 +57,8 @@ public class EventContext extends PolicyEvent {
         EventSubject patternSubject = pattern.getSubject();
         Target patternTarget = pattern.getTarget();
 
-        return patternSubject.matches(userCtx, policyReview) &&
-                patternTarget.matches(target, policyReview);
+        return patternSubject.matches(userCtx, policyReviewer) &&
+                patternTarget.matches(target, policyReviewer);
     }
 
     private String getEventName(PolicyEvent event) {

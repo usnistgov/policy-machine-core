@@ -4,11 +4,9 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.author.ObligationsAuthor;
-import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
-import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.events.*;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
@@ -17,9 +15,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import java.util.List;
 
 import static gov.nist.csd.pm.policy.model.obligation.event.EventSubject.Type.*;
-import static gov.nist.csd.pm.policy.model.obligation.event.EventSubject.Type.PROCESS;
 import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.*;
-import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.ANY_OF_SET;
 
 class Obligations extends ObligationsAuthor implements PolicyEventEmitter {
 

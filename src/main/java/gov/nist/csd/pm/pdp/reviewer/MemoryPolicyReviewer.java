@@ -11,6 +11,7 @@ import gov.nist.csd.pm.policy.author.ProhibitionsAuthor;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.EventContext;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -33,6 +34,7 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,7 +44,7 @@ import java.util.regex.Pattern;
 import static gov.nist.csd.pm.policy.model.access.UserContext.NO_PROCESS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
-public class MemoryPolicyReviewer extends PolicyReviewer {
+public class MemoryPolicyReviewer extends PolicyReviewer implements PolicyEventListener, Transactional {
 
     final MemoryPolicyStoreListener policy;
 
@@ -830,6 +832,24 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
         return pros;
     }
+
+    @Override
+    public List<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
+        List<Prohibition> pros = new ArrayList<>();
+
+        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
+        for (String subject : prohibitions.keySet()) {
+            List<Prohibition> subjectProhibitions = prohibitions.get(subject);
+            for (Prohibition prohibition : subjectProhibitions) {
+                if (prohibition.getContainers().contains(new ContainerCondition(container, false))) {
+                    pros.add(prohibition);
+                }
+            }
+        }
+
+        return pros;
+    }
+
     @Override
     public synchronized List<Obligation> getObligationsWithAuthor(UserContext userCtx) throws PMException {
         List<Obligation> obls = new ArrayList<>();

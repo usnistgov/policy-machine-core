@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.model.obligation.event;
 
+import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.review.PolicyReview;
 
 import java.io.Serializable;
 import java.util.*;
@@ -60,10 +60,10 @@ public class Target implements Serializable {
        return policyElements.get(0);
     }
 
-    public boolean matches(String target, PolicyReview policyReview) throws PMException {
+    public boolean matches(String target, PolicyReviewer policyReviewer) throws PMException {
         switch (type) {
             case ANY_CONTAINED_IN -> {
-                return policyReview.isContained(target, anyContainedIn());
+                return policyReviewer.isContained(target, anyContainedIn());
             }
             case POLICY_ELEMENT -> {
                 return policyElement().equals(target);

@@ -1,11 +1,6 @@
 package gov.nist.csd.pm.policy.tx;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.review.PolicyReview;
-
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 public class TxRunner {
 

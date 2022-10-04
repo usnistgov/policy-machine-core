@@ -14,7 +14,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
-public abstract class PolicyReviewer implements PolicyReview, PolicyEventListener, Transactional {
+public abstract class PolicyReviewer extends PolicyReview implements PolicyEventListener, Transactional {
 
     public AccessRightSet resolvePermissions(UserDagResult userContext, TargetDagResult targetCtx, String target, AccessRightSet resourceOps) {
         AccessRightSet allowed = resolveAllowedPermissions(targetCtx.pcSet(), resourceOps);
