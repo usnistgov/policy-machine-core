@@ -23,12 +23,12 @@ class PDPTest {
 
         UserContext superUser = new UserContext(SUPER_USER);
         pdp.runTx(superUser, (policy) -> {
-            policy.graph().createPolicyClass("pc1", noprops());
-            policy.graph().createUserAttribute("ua1", noprops(), baseUserAttribute("pc1"));
-            policy.graph().createObjectAttribute("oa1", noprops(), baseObjectAttribute("pc1"));
-            policy.graph().createObjectAttribute("oa2", noprops(), baseObjectAttribute("pc1"));
-            policy.graph().createUser("u1", noprops(), "ua1");
-            policy.graph().createObject("o1", noprops(), "oa1");
+            policy.graph().createPolicyClass("pc1");
+            policy.graph().createUserAttribute("ua1", baseUserAttribute("pc1"));
+            policy.graph().createObjectAttribute("oa1", baseObjectAttribute("pc1"));
+            policy.graph().createObjectAttribute("oa2", baseObjectAttribute("pc1"));
+            policy.graph().createUser("u1", "ua1");
+            policy.graph().createObject("o1", "oa1");
         });
 
         assertThrows(PMException.class, () -> pdp.runTx(new UserContext("u1"), ((policy) ->

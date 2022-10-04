@@ -36,13 +36,13 @@ public class PolicyEventTest {
         pap.addEventListener(events::add, false);
 
         pap.graph().setResourceAccessRights(new AccessRightSet("read"));
-        pap.graph().createPolicyClass("pc1", noprops());
-        pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-        pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-        pap.graph().createUserAttribute("ua2", noprops(), "pc1");
-        pap.graph().createObject("o1", noprops(), "oa1");
-        pap.graph().createUser("u1", noprops(), "ua1");
-        pap.graph().createUser("u2", noprops(), "ua1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
+        pap.graph().createUserAttribute("ua2", "pc1");
+        pap.graph().createObject("o1", "oa1");
+        pap.graph().createUser("u1", "ua1");
+        pap.graph().createUser("u2", "ua1");
         pap.graph().setNodeProperties("u1", Map.of("k", "v"));
         pap.graph().deleteNode("u1");
         pap.graph().assign("u2", "ua2");

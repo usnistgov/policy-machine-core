@@ -28,8 +28,8 @@ public class ObligationTest {
     @Test
     void testObligation() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.graph().createPolicyClass("pc1", noprops());
-        pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
         String input = """
                 create obligation obligation1 {
@@ -83,8 +83,8 @@ public class ObligationTest {
                 """;
         UserContext userCtx = new UserContext(SUPER_USER);
         MemoryPAP pap = new MemoryPAP();
-        pap.graph().createPolicyClass("pc1", noprops());
-        pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
         new PALExecutor(pap).compileAndExecutePAL(userCtx, pal);
 

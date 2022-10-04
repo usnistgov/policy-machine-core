@@ -41,8 +41,8 @@ class MysqlPAPTest {
 
             MysqlPAP pap = new MysqlPAP(connection);
             pap.beginTx();
-            pap.graph().createPolicyClass("pc1", noprops());
-            pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createObjectAttribute("oa1", "pc1");
             pap.commit();
 
 

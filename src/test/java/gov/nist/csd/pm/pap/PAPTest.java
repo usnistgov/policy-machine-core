@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.mysql.MysqlPAP;
 import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
@@ -150,13 +149,13 @@ class PAPTest {
     class CreatePolicyClassTest {
         @Test
         public void NameAlreadyExists() throws PMException {
-            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createPolicyClass(SUPER_PC, noprops())));
+            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createPolicyClass(SUPER_PC)));
         }
 
         @Test
         public void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
+                pap.graph().createPolicyClass("pc1");
 
                 String baseUA = Naming.baseUserAttribute("pc1");
                 String baseOA = Naming.baseObjectAttribute("pc1");
@@ -194,16 +193,16 @@ class PAPTest {
         @Test
         void NameAlreadyExists() throws PMException {
             runTest(pap -> assertThrows(NodeNameExistsException.class,
-                    () -> pap.graph().createObjectAttribute(Naming.baseObjectAttribute(SUPER_PC), noprops(), "pc1")));
+                    () -> pap.graph().createObjectAttribute(Naming.baseObjectAttribute(SUPER_PC), "pc1")));
         }
 
         @Test
         void ParentDoesNotExist() throws PMException {
             runTest(pap -> {
                 assertThrows(NodeDoesNotExistException.class,
-                        () -> pap.graph().createObjectAttribute("oa1", noprops(), "pc1"));
+                        () -> pap.graph().createObjectAttribute("oa1", "pc1"));
                 assertThrows(NodeDoesNotExistException.class,
-                        () -> pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute(SUPER_PC), "pc1"));
+                        () -> pap.graph().createObjectAttribute("oa1", Naming.baseObjectAttribute(SUPER_PC), "pc1"));
             });
         }
 
@@ -211,7 +210,7 @@ class PAPTest {
         void Success() throws PMException {
             runTest(pap -> {
                 String superOA = Naming.baseObjectAttribute(SUPER_PC);
-                pap.graph().createObjectAttribute("oa1", noprops(), superOA);
+                pap.graph().createObjectAttribute("oa1", superOA);
                 pap.graph().createObjectAttribute("oa2", toProperties("k", "v"), superOA, "oa1");
 
                 assertTrue(pap.graph().nodeExists("oa1"));
@@ -231,21 +230,21 @@ class PAPTest {
 
         @Test
         void NameAlreadyExists() throws PMException {
-            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createUserAttribute(SUPER_UA, noprops(), "pc1")));
+            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createUserAttribute(SUPER_UA, "pc1")));
         }
 
         @Test
         void ParentDoesNotExist() throws PMException {
             runTest(pap -> {
-                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUserAttribute("ua1", noprops(), "pc1"));
-                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUserAttribute("ua1", noprops(), SUPER_UA, "pc1"));
+                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUserAttribute("ua1", "pc1"));
+                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUserAttribute("ua1", SUPER_UA, "pc1"));
             });
         }
 
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createUserAttribute("ua1", noprops(), SUPER_UA);
+                pap.graph().createUserAttribute("ua1", SUPER_UA);
                 pap.graph().createUserAttribute("ua2", toProperties("k", "v"), SUPER_UA, "ua1");
 
                 assertTrue(pap.graph().nodeExists("ua1"));
@@ -266,16 +265,16 @@ class PAPTest {
         @Test
         void NameAlreadyExists() throws PMException {
             runTest(pap -> assertThrows(NodeNameExistsException.class,
-                    () -> pap.graph().createObject(Naming.baseObjectAttribute(SUPER_PC), noprops(), "oa1")));
+                    () -> pap.graph().createObject(Naming.baseObjectAttribute(SUPER_PC), "oa1")));
         }
 
         @Test
         void ParentDoesNotExist() throws PMException {
             runTest(pap -> {
                 assertThrows(NodeDoesNotExistException.class,
-                        () -> pap.graph().createObject("o1", noprops(), "oa1"));
+                        () -> pap.graph().createObject("o1", "oa1"));
                 assertThrows(NodeDoesNotExistException.class,
-                        () -> pap.graph().createObject("o1", noprops(), Naming.baseObjectAttribute(SUPER_PC), "oa1"));
+                        () -> pap.graph().createObject("o1", Naming.baseObjectAttribute(SUPER_PC), "oa1"));
             });
         }
 
@@ -301,14 +300,14 @@ class PAPTest {
 
         @Test
         void NameAlreadyExists() throws PMException {
-            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createUser(SUPER_USER, noprops(), "ua1")));
+            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createUser(SUPER_USER, "ua1")));
         }
 
         @Test
         void ParentDoesNotExist() throws PMException {
             runTest(pap -> {
-                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUser("u1", noprops(), "ua1"));
-                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUser("u1", noprops(), SUPER_UA, "ua1"));
+                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUser("u1", "ua1"));
+                assertThrows(NodeDoesNotExistException.class, () -> pap.graph().createUser("u1", SUPER_UA, "ua1"));
             });
         }
 
@@ -338,9 +337,9 @@ class PAPTest {
         }
 
         @Test
-        void NullProperties() throws PMException {
+        void EmptyProperties() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
+                pap.graph().createPolicyClass("pc1");
                 pap.graph().setNodeProperties("pc1", noprops());
 
                 assertTrue(pap.graph().getNode("pc1").getProperties().isEmpty());
@@ -350,7 +349,7 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
+                pap.graph().createPolicyClass("pc1");
                 pap.graph().setNodeProperties("pc1", toProperties("k", "v"));
 
                 assertEquals("v", pap.graph().getNode("pc1").getProperties().get("k"));
@@ -372,8 +371,8 @@ class PAPTest {
         @Test
         void DeletePolicyClassHasChildren() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
 
                 assertThrows(NodeHasChildrenException.class,
                         () -> pap.graph().deleteNode("pc1"));
@@ -383,7 +382,7 @@ class PAPTest {
         @Test
         void DeletePolicyClass() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
+                pap.graph().createPolicyClass("pc1");
                 pap.graph().deleteNode("pc1");
                 assertFalse(pap.graph().nodeExists("pc1"));
                 assertFalse(pap.graph().nodeExists(Naming.baseUserAttribute("pc1")));
@@ -395,9 +394,9 @@ class PAPTest {
         @Test
         void DeleteNodeHasChildren() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "oa1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "oa1");
 
                 assertThrows(NodeHasChildrenException.class,
                         () -> pap.graph().deleteNode("oa1"));
@@ -407,9 +406,9 @@ class PAPTest {
         @Test
         void DeleteNodeWithProhibitionsAndObligations() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createUserAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("oa1", "pc1");
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", true));
                 pap.obligations().create(new UserContext(SUPER_USER), "oblLabel",
                         new Rule(
@@ -440,8 +439,8 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
 
                 pap.graph().deleteNode("oa1");
 
@@ -474,7 +473,7 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
+                pap.graph().createPolicyClass("pc1");
                 pap.graph().createObjectAttribute("oa1", Properties.toProperties("k", "v"), "pc1");
 
                 Node oa1 = pap.graph().getNode("oa1");
@@ -489,7 +488,7 @@ class PAPTest {
     @Test
     void testSearch() throws PMException {
         runTest(pap -> {
-            pap.graph().createPolicyClass("pc1", noprops());
+            pap.graph().createPolicyClass("pc1");
             pap.graph().createObjectAttribute("oa1", toProperties("namespace", "test"), "pc1");
             pap.graph().createObjectAttribute("oa2", toProperties("key1", "value1"), "pc1");
             pap.graph().createObjectAttribute("oa3", toProperties("key1", "value1", "key2", "value2"), "pc1");
@@ -497,10 +496,10 @@ class PAPTest {
             List<String> nodes = pap.graph().search(OA, noprops());
             assertEquals(7, nodes.size());
 
-            nodes = pap.graph().search(null, toProperties("key1", "value1"));
+            nodes = pap.graph().search(ANY, toProperties("key1", "value1"));
             assertEquals(2, nodes.size());
 
-            nodes = pap.graph().search(null, toProperties("namespace", "test"));
+            nodes = pap.graph().search(ANY, toProperties("namespace", "test"));
             assertEquals(1, nodes.size());
 
             nodes = pap.graph().search(OA, toProperties("namespace", "test"));
@@ -515,7 +514,7 @@ class PAPTest {
             assertEquals(1, nodes.size());
             nodes = pap.graph().search(OA, toProperties("key1", "value1", "key2", "no_value"));
             assertEquals(0, nodes.size());
-            nodes = pap.graph().search(null, noprops());
+            nodes = pap.graph().search(ANY, noprops());
             assertEquals(14, nodes.size());
         });
     }
@@ -523,9 +522,9 @@ class PAPTest {
     @Test
     void testGetPolicyClasses() throws PMException {
         runTest(pap -> {
-            pap.graph().createPolicyClass("pc1", noprops());
-            pap.graph().createPolicyClass("pc2", noprops());
-            pap.graph().createPolicyClass("pc3", noprops());
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createPolicyClass("pc2");
+            pap.graph().createPolicyClass("pc3");
 
             assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(SUPER_PC, "pc1", "pc2", "pc3")));
         });
@@ -556,8 +555,8 @@ class PAPTest {
         @Test
         void ParentNodeDoesNotExist() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 assertThrows(NodeDoesNotExistException.class,
                         () -> pap.graph().assign("oa1", "oa2"));
             });
@@ -566,8 +565,8 @@ class PAPTest {
         @Test
         void AssignmentExistsDoesNothing() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().assign("oa1", "pc1");
             });
         }
@@ -575,9 +574,9 @@ class PAPTest {
         @Test
         void InvalidAssignment() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
 
                 assertThrows(InvalidAssignmentException.class,
                         () -> pap.graph().assign("ua1", "oa1"));
@@ -587,9 +586,9 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
                 pap.graph().assign("oa2", "oa1");
                 assertTrue(pap.graph().getParents("oa2").contains("oa1"));
                 assertTrue(pap.graph().getChildren("oa1").contains("oa2"));
@@ -609,10 +608,10 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa3", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
+                pap.graph().createObjectAttribute("oa3", "pc1");
 
 
                 assertTrue(pap.graph().getChildren("pc1").containsAll(List.of("oa1", "oa2", "oa3")));
@@ -632,11 +631,11 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa3", noprops(), "pc1");
-                pap.graph().createObject("o1", noprops(), "oa1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
+                pap.graph().createObjectAttribute("oa3", "pc1");
+                pap.graph().createObject("o1", "oa1");
                 pap.graph().assign("o1", "oa2");
                 pap.graph().assign("o1", "oa3");
 
@@ -656,8 +655,8 @@ class PAPTest {
         @Test
         void ParentNodeDoesNotExistDoesNothing() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().deassign("oa1", "oa2");
             });
         }
@@ -665,9 +664,9 @@ class PAPTest {
         @Test
         void AssignmentDoesNotExistDoesNothing() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
                 pap.graph().deassign("oa1", "oa2");
             });
         }
@@ -675,8 +674,8 @@ class PAPTest {
         @Test
         void DisconnectedNode() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
 
                 assertThrows(DisconnectedNodeException.class,
                         () -> pap.graph().deassign("oa1", "pc1"));
@@ -686,9 +685,9 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createPolicyClass("pc2", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1", "pc2");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createPolicyClass("pc2");
+                pap.graph().createObjectAttribute("oa1", "pc1", "pc2");
                 pap.graph().deassign("oa1", "pc1");
                 assertEquals(List.of("pc2"), pap.graph().getParents("oa1"));
                 assertFalse(pap.graph().getParents("oa1").contains("pc1"));
@@ -707,8 +706,8 @@ class PAPTest {
                 assertThrows(NodeDoesNotExistException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet()));
 
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
 
                 assertThrows(NodeDoesNotExistException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet()));
@@ -718,9 +717,9 @@ class PAPTest {
         @Test
         void NodesAlreadyAssigned() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua2", noprops(), "ua1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("ua2", "ua1");
                 assertThrows(NodesAlreadyAssignedException.class,
                         () -> pap.graph().associate("ua2", "ua1", new AccessRightSet()));
             });
@@ -729,9 +728,9 @@ class PAPTest {
         @Test
         void UnknownResourceAccessRight() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 assertThrows(UnknownResourceAccessRightException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet("read")));
                 pap.graph().setResourceAccessRights(new AccessRightSet("read"));
@@ -747,11 +746,11 @@ class PAPTest {
         @Test
         void InvalidAssociation() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua2", noprops(), "ua1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("ua2", "ua1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
 
                 assertThrows(InvalidAssociationException.class,
                         () -> pap.graph().associate("ua2", "pc1", new AccessRightSet()));
@@ -763,9 +762,9 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
 
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
                 pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
@@ -784,9 +783,9 @@ class PAPTest {
         @Test
         void OverwriteSuccess() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
 
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
                 pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
@@ -816,9 +815,9 @@ class PAPTest {
             runTest(pap -> {
                 assertDoesNotThrow(() -> pap.graph().dissociate("ua1", "oa1"));
 
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
 
                 assertDoesNotThrow(() -> pap.graph().dissociate("ua1", "oa2"));
             });
@@ -827,9 +826,9 @@ class PAPTest {
         @Test
         void AssociationDoesNotExistDoesNothing() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
 
                 assertDoesNotThrow(() -> pap.graph().dissociate("ua1", "oa1"));
             });
@@ -838,9 +837,9 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
                 pap.graph().associate("ua1", "oa1", new AccessRightSet());
 
                 pap.graph().dissociate("ua1", "oa1");
@@ -866,10 +865,10 @@ class PAPTest {
         void Success() throws PMException {
             runTest(pap -> {
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
                 pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
                 pap.graph().associate("ua1", "oa2", new AccessRightSet("read", "write"));
 
@@ -905,10 +904,10 @@ class PAPTest {
         void Success() throws PMException {
             runTest(pap -> {
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua1", noprops(), "pc1");
-                pap.graph().createUserAttribute("ua2", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("ua2", "pc1");
                 pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
                 pap.graph().associate("ua2", "oa1", new AccessRightSet("read", "write"));
 
@@ -937,8 +936,8 @@ class PAPTest {
         @Test
         void ProhibitionExists() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
 
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false);
 
@@ -950,8 +949,8 @@ class PAPTest {
         @Test
         void InvalidAccessRights() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
 
                 assertThrows(UnknownResourceAccessRightException.class,
                         () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false));
@@ -961,8 +960,8 @@ class PAPTest {
         @Test
         void ContainerDoesNotExist() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read"));
                 assertThrows(ProhibitionContainerDoesNotExistException.class,
                         () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false, new ContainerCondition("oa1", true)));
@@ -972,10 +971,10 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1008,9 +1007,9 @@ class PAPTest {
         @Test
         void InvalidAccessRights() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1024,9 +1023,9 @@ class PAPTest {
         @Test
         void SubjectDoesNotExist() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1041,9 +1040,9 @@ class PAPTest {
         @Test
         void ContainerDoesNotExist() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1057,11 +1056,11 @@ class PAPTest {
         @Test
         void Success() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createUserAttribute("subject2", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createUserAttribute("subject2", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1096,10 +1095,10 @@ class PAPTest {
             @Test
             void Success() throws PMException {
                 runTest(pap -> {
-                    pap.graph().createPolicyClass("pc1", noprops());
-                    pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                    pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                    pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
+                    pap.graph().createPolicyClass("pc1");
+                    pap.graph().createUserAttribute("subject", "pc1");
+                    pap.graph().createObjectAttribute("oa1", "pc1");
+                    pap.graph().createObjectAttribute("oa2", "pc1");
                     pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                     pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1121,12 +1120,12 @@ class PAPTest {
         @Test
         void GetProhibitions() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa3", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa4", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
+                pap.graph().createObjectAttribute("oa3", "pc1");
+                pap.graph().createObjectAttribute("oa4", "pc1");
 
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
@@ -1175,12 +1174,12 @@ class PAPTest {
         @Test
         void GetProhibitionsFor() throws PMException {
             runTest(pap -> {
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa3", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa4", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
+                pap.graph().createObjectAttribute("oa3", "pc1");
+                pap.graph().createObjectAttribute("oa4", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1202,12 +1201,12 @@ class PAPTest {
                 assertThrows(ProhibitionDoesNotExistException.class,
                         () -> pap.prohibitions().get("label"));
 
-                pap.graph().createPolicyClass("pc1", noprops());
-                pap.graph().createUserAttribute("subject", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa2", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa3", noprops(), "pc1");
-                pap.graph().createObjectAttribute("oa4", noprops(), "pc1");
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createUserAttribute("subject", "pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createObjectAttribute("oa2", "pc1");
+                pap.graph().createObjectAttribute("oa3", "pc1");
+                pap.graph().createObjectAttribute("oa4", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
                 pap.prohibitions().create("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
@@ -1564,9 +1563,9 @@ class PAPTest {
     void testTx() throws PMException {
         runTest(pap -> {
             pap.beginTx();
-            pap.graph().createPolicyClass("pc1", noprops());
-            pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
-            pap.graph().createUserAttribute("ua1", noprops(), "pc1");
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createObjectAttribute("oa1", "pc1");
+            pap.graph().createUserAttribute("ua1", "pc1");
             pap.graph().associate("ua1", "oa1", new AccessRightSet());
             pap.commit();
 

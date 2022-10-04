@@ -46,8 +46,8 @@ class MemoryConnectionTest {
         Thread t1 = new Thread(() -> {
             try {
                 MemoryConnection c1 = new MemoryConnection(memoryPolicyStore);
-                c1.graph().createPolicyClass("pc1", noprops());
-                c1.graph().createObjectAttribute("oa1", noprops(), "pc1");
+                c1.graph().createPolicyClass("pc1");
+                c1.graph().createObjectAttribute("oa1", "pc1");
             } catch (PMException e) {
                 throw new RuntimeException(e);
             }
@@ -56,7 +56,7 @@ class MemoryConnectionTest {
         Thread t2 = new Thread(() -> {
             try {
                 MemoryConnection c1 = new MemoryConnection(memoryPolicyStore);
-                c1.graph().createUserAttribute("ua1", noprops(), "pc1");
+                c1.graph().createUserAttribute("ua1", "pc1");
             } catch (PMException e) {
                 throw new RuntimeException(e);
             }

@@ -19,6 +19,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 class Graph extends GraphAuthor {
     
@@ -52,11 +53,21 @@ class Graph extends GraphAuthor {
     }
 
     @Override
+    public String createPolicyClass(String name) throws PMException {
+        return createPolicyClass(name, noprops());
+    }
+
+    @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         checkParents(CREATE_USER_ATTRIBUTE, parent);
         checkParents(CREATE_USER_ATTRIBUTE, parents);
 
         return null;
+    }
+
+    @Override
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+        return createUserAttribute(name, noprops(), parent, parents);
     }
 
     @Override
@@ -68,6 +79,11 @@ class Graph extends GraphAuthor {
     }
 
     @Override
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+        return createObjectAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         checkParents(CREATE_OBJECT, parent);
         checkParents(CREATE_OBJECT, parents);
@@ -76,11 +92,21 @@ class Graph extends GraphAuthor {
     }
 
     @Override
+    public String createObject(String name, String parent, String... parents) throws PMException {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         checkParents(CREATE_USER, parent);
         checkParents(CREATE_USER, parents);
 
         return null;
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) throws PMException {
+        return createUser(name, noprops(), parent, parents);
     }
 
     private void checkParents(String accessRight, String ... parents) throws PMException {

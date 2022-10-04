@@ -89,8 +89,18 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     }
 
     @Override
+    public String createPolicyClass(String name) throws PMException {
+        return createPolicyClass(name, noprops());
+    }
+
+    @Override
     public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, OA, properties, parent, parents);
+    }
+
+    @Override
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+        return createObjectAttribute(name, noprops(), parent, parents);
     }
 
     @Override
@@ -99,13 +109,28 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     }
 
     @Override
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+        return createUserAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, O, properties, parent, parents);
     }
 
     @Override
+    public String createObject(String name, String parent, String... parents) throws PMException {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, U, properties, parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) throws PMException {
+        return createUser(name, noprops(), parent, parents);
     }
 
     private String createNode(String name, NodeType type, Map<String, String> properties, String parent, String ... parents) throws PMException {

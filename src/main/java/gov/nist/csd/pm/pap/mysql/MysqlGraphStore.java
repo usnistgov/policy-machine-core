@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 class MysqlGraphStore extends GraphStore {
 
@@ -175,13 +176,28 @@ class MysqlGraphStore extends GraphStore {
     }
 
     @Override
+    public String createPolicyClass(String name) throws PMException {
+        return createPolicyClass(name, noprops());
+    }
+
+    @Override
     public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, OA, properties, parent, parents);
     }
 
     @Override
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+        return createObjectAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, UA, properties, parent, parents);
+    }
+
+    @Override
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+        return createUserAttribute(name, noprops(), parent, parents);
     }
 
 
@@ -191,8 +207,18 @@ class MysqlGraphStore extends GraphStore {
     }
 
     @Override
+    public String createObject(String name, String parent, String... parents) throws PMException {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, U, properties, parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) throws PMException {
+        return createUser(name, noprops(), parent, parents);
     }
 
     private String createNode(String name, Map<String, String> properties) throws MysqlPolicyException {
@@ -326,7 +352,7 @@ class MysqlGraphStore extends GraphStore {
     public List<String> search(NodeType type, Map<String, String> properties) throws PMException {
         String sql = "select name from node";
         StringBuilder where = new StringBuilder();
-        if (type != null) {
+        if (type != ANY) {
             where = new StringBuilder("node_type_id = " + MysqlPolicyStore.getNodeTypeId(type));
         }
 

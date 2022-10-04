@@ -42,8 +42,8 @@ class EPPTest {
         PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
         EPP epp = new EPP(pdp, pap);
 
-        pap.graph().createPolicyClass("pc1", noprops());
-        pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", Naming.baseObjectAttribute("pc1"));
 
         String pal = """
                 create obligation test {
@@ -61,7 +61,7 @@ class EPPTest {
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
 
-        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", noprops(), "oa1"));
+        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
 
         assertTrue(pap.graph().nodeExists("pc2"));
 
@@ -73,8 +73,8 @@ class EPPTest {
         PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
         EPP epp = new EPP(pdp, pap);
 
-        pap.graph().createPolicyClass("pc1", noprops());
-        pap.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", Naming.baseObjectAttribute("pc1"));
 
         String pal = """
                 create obligation test {
@@ -97,7 +97,7 @@ class EPPTest {
                 """;
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), pal);
 
-        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", noprops(), "oa1"));
+        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
 
         assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(
                 "super_pc", "pc1", "create_object_attribute", "oa2_test", "super_test"
@@ -111,11 +111,11 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
 
         pdp.runTx(new UserContext(SUPER_USER), (policy) -> {
-            policy.graph().createPolicyClass("pc1", noprops());
-            policy.graph().createUserAttribute("ua1", noprops(), Naming.baseUserAttribute("pc1"));
-            policy.graph().createObjectAttribute("oa1", noprops(), Naming.baseObjectAttribute("pc1"));
-            policy.graph().createUser("u1", noprops(), "ua1");
-            policy.graph().createObject("o1", noprops(), "oa1");
+            policy.graph().createPolicyClass("pc1");
+            policy.graph().createUserAttribute("ua1", Naming.baseUserAttribute("pc1"));
+            policy.graph().createObjectAttribute("oa1", Naming.baseObjectAttribute("pc1"));
+            policy.graph().createUser("u1", "ua1");
+            policy.graph().createObject("o1", "oa1");
             policy.graph().associate("ua1", Naming.baseObjectAttribute(SUPER_PC), new AccessRightSet(CREATE_OBLIGATION));
             policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
         });

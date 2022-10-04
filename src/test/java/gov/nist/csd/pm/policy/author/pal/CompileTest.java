@@ -245,8 +245,8 @@ public class CompileTest {
         UserContext userCtx = new UserContext(SUPER_USER);
         MemoryPAP pap = new MemoryPAP();
         ExecutionContext ctx = new ExecutionContext(userCtx);
-        pap.graph().createPolicyClass("pc1", noprops());
-        pap.graph().createObjectAttribute("oa1", noprops(), "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
         List<PALStatement> test = test(pal, pap);
         assertEquals(1, test.size());
 
