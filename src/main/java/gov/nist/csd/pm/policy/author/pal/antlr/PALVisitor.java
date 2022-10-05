@@ -91,6 +91,12 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitForeachStmt(PALParser.ForeachStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PALParser#forRangeStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForRangeStmt(PALParser.ForRangeStmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PALParser#breakStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

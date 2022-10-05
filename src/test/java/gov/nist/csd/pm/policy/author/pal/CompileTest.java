@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.author.pal;
 
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
@@ -168,6 +169,18 @@ public class CompileTest {
                 }
                 """;
         assertDoesNotThrow(() -> test(pal1, new MemoryPAP()));
+    }
+
+    @Test
+    void testForRangeCompileErrors() throws PMException {
+        String pal = """
+                for i in range [1, 5] {
+                    create policy class i;
+                }
+                """;
+        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
+        assertEquals(1, ex.getErrors().size());
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("number not allowed, only string"));
     }
 
     private List<PALStatement> test(String pal, PolicyAuthor policyAuthor) throws PMException {

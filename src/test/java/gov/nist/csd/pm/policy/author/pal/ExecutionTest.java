@@ -307,6 +307,20 @@ public class ExecutionTest {
     }
 
     @Test
+    void testForRange() throws PMException {
+        String input = """
+                for i in range [1, 5] {
+                    create policy class numToStr(i);
+                }
+                """;
+        PAP pap = new MemoryPAP();
+        new PALExecutor(pap)
+                .compileAndExecutePAL(new UserContext(SUPER_USER), input);
+        assertEquals(6, pap.graph().getPolicyClasses().size());
+        assertTrue(pap.graph().getPolicyClasses().containsAll(List.of("1", "2", "3", "4", "5")));
+    }
+
+    @Test
     void testFunction() throws PMException {
         String input = """
                 function testFunc(any x) {
