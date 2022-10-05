@@ -142,6 +142,16 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitForeachStmt(PALParser.ForeachStmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PALParser#forRangeStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterForRangeStmt(PALParser.ForRangeStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#forRangeStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitForRangeStmt(PALParser.ForRangeStmtContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PALParser#breakStmt}.
 	 * @param ctx the parse tree
 	 */

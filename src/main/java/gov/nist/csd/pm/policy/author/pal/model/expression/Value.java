@@ -12,6 +12,9 @@ public class Value implements Serializable {
     private String sValue;
     private boolean isString;
 
+    private boolean isNumber;
+    private int nValue;
+
     private boolean bValue;
     private boolean isBoolean;
 
@@ -71,6 +74,12 @@ public class Value implements Serializable {
         this.isString = true;
         this.sValue = value;
         this.type = Type.string();
+    }
+
+    public Value(int value) {
+        this.isNumber = true;
+        this.nValue = value;
+        this.type = Type.number();
     }
 
     public Value(boolean value) {
@@ -137,6 +146,10 @@ public class Value implements Serializable {
         return isString;
     }
 
+    public boolean isNumber() {
+        return isNumber;
+    }
+
     public boolean isBoolean() {
         return isBoolean;
     }
@@ -171,6 +184,14 @@ public class Value implements Serializable {
         }
 
         return sValue;
+    }
+
+    public int getNumberValue() {
+        if (!isNumber) {
+            throw new IllegalStateException("expected value to be number but was " + type);
+        }
+
+        return nValue;
     }
 
     public boolean getBooleanValue() {
@@ -320,6 +341,8 @@ public class Value implements Serializable {
     public String toString() {
         if (isString()) {
             return String.format("'%s'", getStringValue());
+        } else if (isNumber()) {
+            return String.valueOf(getNumberValue());
         } else if (isBoolean()) {
             return String.valueOf(getBooleanValue());
         } else if (isMap()) {

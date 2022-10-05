@@ -9,6 +9,7 @@ public class Type implements Serializable {
     private boolean isVoid;
     private boolean isAny;
     private boolean isString;
+    private boolean isNumber;
     private boolean isBoolean;
     private boolean isArray;
     private Type arrayType;
@@ -25,6 +26,12 @@ public class Type implements Serializable {
     public static Type string() {
         Type type = new Type();
         type.isString = true;
+        return type;
+    }
+
+    public static Type number() {
+        Type type = new Type();
+        type.isNumber = true;
         return type;
     }
 
@@ -83,6 +90,10 @@ public class Type implements Serializable {
         return isString || isAny;
     }
 
+    public boolean isNumber() {
+        return isNumber || isAny;
+    }
+
     public boolean isBoolean() {
         return isBoolean || isAny;
     }
@@ -120,6 +131,8 @@ public class Type implements Serializable {
                 return true;
             } else if (isString && type.isString) {
                 return true;
+            } else if (isNumber && type.isNumber) {
+                return true;
             } else if (isBoolean && type.isBoolean) {
                 return true;
             } else if (isArray && type.isArray) {
@@ -139,6 +152,8 @@ public class Type implements Serializable {
             return "void";
         } else if (isString) {
             return "string";
+        } else if (isNumber) {
+            return "number";
         } else if (isBoolean) {
             return "boolean";
         } else if (isArray) {

@@ -13,6 +13,7 @@ public class PALBuiltinFunctions {
     private static final FunctionDefinitionStatement equals = new Equals();
     private static final FunctionDefinitionStatement contains = new Contains();
     private static final FunctionDefinitionStatement containsKey = new ContainsKey();
+    private static final FunctionDefinitionStatement numToStr = new NumToStr();
 
     // policy functions
     private static final FunctionDefinitionStatement getAssociationsWithSource = new GetAssociationsWithSource();
@@ -35,6 +36,7 @@ public class PALBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(equals.getFunctionName(), equals);
         BUILTIN_FUNCTIONS.put(contains.getFunctionName(), contains);
         BUILTIN_FUNCTIONS.put(containsKey.getFunctionName(), containsKey);
+        BUILTIN_FUNCTIONS.put(numToStr.getFunctionName(), numToStr);
 
         BUILTIN_FUNCTIONS.put(getAssociationsWithSource.getFunctionName(), getAssociationsWithSource);
         BUILTIN_FUNCTIONS.put(getAssociationsWithTarget.getFunctionName(), getAssociationsWithTarget);

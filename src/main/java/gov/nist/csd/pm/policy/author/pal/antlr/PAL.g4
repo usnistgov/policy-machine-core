@@ -7,6 +7,7 @@ stmt: (
     | funcDefStmt
     | funcReturnStmt
     | foreachStmt
+    | forRangeStmt
     | breakStmt
     | continueStmt
     | funcCallStmt
@@ -48,6 +49,9 @@ funcBody:
 
 foreachStmt:
     FOREACH key=IDENTIFIER (COMMA mapValue=IDENTIFIER)? IN expression stmtBlock ;
+
+forRangeStmt:
+    FOR IDENTIFIER IN_RANGE OPEN_BRACKET lower=NUMBER COMMA upper=NUMBER CLOSE_BRACKET stmtBlock ;
 
 // break
 breakStmt:
@@ -246,10 +250,13 @@ VOID_TYPE: [Vv][Oo][Ii][Dd] ;
 ARRAY_TYPE: [Aa][Rr][Rr][Aa][Yy] ;
 MAP_TYPE: [Mm][Aa][Pp] ;
 FOREACH: [Ff][Oo][Rr][Ee][Aa][Cc][Hh] ;
+FOR: [Ff][Oo][Rr] ;
 IN: [Ii][Nn] ;
 IF: [Ii][Ff] ;
-ELSE: [Ee][Ll][Ss][Ee];
+ELSE: [Ee][Ll][Ss][Ee] ;
+IN_RANGE: [Ii][Nn][ ][Rr][Aa][Nn][Gg][Ee] ;
 
+NUMBER: [0-9]+ ;
 IDENTIFIER: [a-zA-Z0-9_+\-\\.@]+ [a-zA-Z0-9_+\-\\.@]* ;
 STRING: '\'' (~['\\])*  '\'' ;
 LINE_COMMENT : '#' ~'\n'* '\n' -> channel(HIDDEN) ;

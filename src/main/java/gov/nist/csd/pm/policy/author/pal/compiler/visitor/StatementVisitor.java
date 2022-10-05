@@ -26,6 +26,9 @@ public class StatementVisitor extends PALBaseVisitor<PALStatement> {
         } else if (ctx.foreachStmt() != null) {
             statement = new ForeachStmtVisitor(visitorCtx)
                     .visitForeachStmt(ctx.foreachStmt());
+        } else if (ctx.forRangeStmt() != null) {
+            statement = new ForRangeStmtVisitor(visitorCtx)
+                    .visitForRangeStmt(ctx.forRangeStmt());
         } else if (ctx.funcCallStmt() != null) {
             statement = new FunctionCallVisitor(visitorCtx)
                     .visitFuncCallStmt(ctx.funcCallStmt());
