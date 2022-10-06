@@ -5,20 +5,22 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.expression.ArrayLiteral;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccessRightsVisitor extends PALBaseVisitor<Expression> {
+public class AccessRightsVisitor extends PALBaseVisitor<NameExpression> {
 
     @Override
-    public Expression visitAccessRightArray(PALParser.AccessRightArrayContext ctx) {
-        List<Expression> exprs = new ArrayList<>();
+    public NameExpression visitAccessRightArray(PALParser.AccessRightArrayContext ctx) {
+        List<NameExpression> exprs = new ArrayList<>();
         for (PALParser.AccessRightContext accessRightCtx : ctx.accessRight()) {
-            exprs.add(new Expression(new Literal(accessRightCtx.getText())));
+            exprs.add(new NameExpression(new VariableReference(accessRightCtx.getText(), Type.string())));
         }
-        return new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())));
+        return new NameExpression(exprs);
     }
 
 }

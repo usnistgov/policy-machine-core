@@ -12,9 +12,9 @@ public class AssociateStatement extends PALStatement {
 
     private final NameExpression ua;
     private final NameExpression target;
-    private final Expression accessRights;
+    private final NameExpression accessRights;
 
-    public AssociateStatement(NameExpression ua, NameExpression target, Expression accessRights) {
+    public AssociateStatement(NameExpression ua, NameExpression target, NameExpression accessRights) {
         this.ua = ua;
         this.target = target;
         this.accessRights = accessRights;
@@ -28,7 +28,7 @@ public class AssociateStatement extends PALStatement {
         return target;
     }
 
-    public Expression getAccessRights() {
+    public NameExpression getAccessRights() {
         return accessRights;
     }
 

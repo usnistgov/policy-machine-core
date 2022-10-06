@@ -37,6 +37,14 @@ public class FunctionDefinitionStatement extends PALStatement {
     private FunctionExecutor functionExecutor;
     private boolean isFuncExec;
 
+    public FunctionDefinitionStatement(FunctionDefinitionStatement functionDefinitionStatement) {
+        this.functionName = functionDefinitionStatement.functionName;
+        this.returnType = functionDefinitionStatement.returnType;
+        this.args = functionDefinitionStatement.args;
+        this.statements = functionDefinitionStatement.statements;
+        this.functionExecutor = functionDefinitionStatement.functionExecutor;
+        this.isFuncExec = functionDefinitionStatement.isFuncExec;
+    }
     public FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PALStatement> stmts) {
         this.functionName = functionName;
         this.returnType = returnType;

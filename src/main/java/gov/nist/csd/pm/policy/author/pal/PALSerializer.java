@@ -70,7 +70,7 @@ class PALSerializer {
         StringBuilder pal = new StringBuilder();
 
         // resource access rights
-        pal.append(new SetResourceAccessRightsStatement(policy.graph().getResourceAccessRights()));
+        pal.append(new SetResourceAccessRightsStatement(policy.graph().getResourceAccessRights())).append("\n");
 
         List<String> policyClasses = policy.graph().getPolicyClasses();
 
@@ -107,15 +107,15 @@ class PALSerializer {
                             if (childNode.getType() == UA) {
                                 List<Association> sourceAssociations = policy.graph().getAssociationsWithSource(child);
                                 for (Association association : sourceAssociations) {
-                                    List<Expression> exprs = new ArrayList<>();
+                                    List<NameExpression> exprs = new ArrayList<>();
                                     for (String ar : association.getAccessRightSet()) {
-                                        exprs.add(new Expression(new VariableReference(ar, Type.string())));
+                                        exprs.add(new NameExpression(new VariableReference(ar, Type.string())));
                                     }
 
                                     pal.append(new AssociateStatement(
                                             new NameExpression(new VariableReference(child, Type.string())),
                                             new NameExpression(new VariableReference(association.getTarget(), Type.string())),
-                                            new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())))
+                                            new NameExpression(exprs)
                                     )).append("\n");
                                 }
                             }
