@@ -168,6 +168,7 @@ accessRightArray:
     (accessRight (COMMA accessRight)*)? ;
 accessRight:
     ('*' | '*r' | '*a' | IDENTIFIER) ;
+
 map:
     OPEN_CURLY (mapEntry (COMMA mapEntry)*)? CLOSE_CURLY ;
 mapEntry:
@@ -190,6 +191,9 @@ funcCallArgs:
     OPEN_PAREN (expression (COMMA expression)*)? CLOSE_PAREN ;
 
 // LEXER RULES
+ALL_ACCESS_RIGHTS : '*' ;
+ALL_RESOURCE_ACCESS_RIGHTS : '*r' ;
+ALL_ADMIN_ACCESS_RIGHTS : '*a' ;
 CREATE: [Cc][Rr][Ee][Aa][Tt][Ee] ;
 UPDATE: [Uu][Pp][Dd][Aa][Tt][Ee] ;
 DELETE: [Dd][Ee][Ll][Ee][Tt][Ee] ;

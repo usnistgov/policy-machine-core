@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_RESOURCE_ACCESS_RIGHTS;
 
 public class PALBuiltinConstants {
 
@@ -22,6 +24,9 @@ public class PALBuiltinConstants {
         for (String adminAccessRight : AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET) {
             BUILTIN_VALUES.put(adminAccessRight, new Value(adminAccessRight));
         }
+
+        BUILTIN_VALUES.put(ALL_ADMIN_ACCESS_RIGHTS, new Value(ALL_ADMIN_ACCESS_RIGHTS));
+        BUILTIN_VALUES.put(ALL_RESOURCE_ACCESS_RIGHTS, new Value(ALL_RESOURCE_ACCESS_RIGHTS));
     }
 
     public static final Map<String, Variable> BUILTIN_VARIABLES = new HashMap<>();
@@ -34,6 +39,9 @@ public class PALBuiltinConstants {
         for (String adminAccessRight : AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET) {
             BUILTIN_VARIABLES.put(adminAccessRight, new Variable(adminAccessRight, Type.string(), true));
         }
+
+        BUILTIN_VARIABLES.put(ALL_ADMIN_ACCESS_RIGHTS, new Variable(ALL_ADMIN_ACCESS_RIGHTS, Type.string(), true));
+        BUILTIN_VARIABLES.put(ALL_RESOURCE_ACCESS_RIGHTS, new Variable(ALL_RESOURCE_ACCESS_RIGHTS, Type.string(), true));
     }
 
 }

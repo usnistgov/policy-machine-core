@@ -18,11 +18,11 @@ public class CreateProhibitionStatement extends PALStatement {
     private final NameExpression label;
     private final NameExpression subject;
     private final ProhibitionSubject.Type subjectType;
-    private final Expression accessRights;
+    private final NameExpression accessRights;
     private final boolean isIntersection;
     private final List<Container> containers;
 
-    public CreateProhibitionStatement(NameExpression label, NameExpression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
+    public CreateProhibitionStatement(NameExpression label, NameExpression subject, ProhibitionSubject.Type subjectType, NameExpression accessRights,
                                       boolean isIntersection, List<Container> containers) {
         this.label = label;
         this.subject = subject;
@@ -44,7 +44,7 @@ public class CreateProhibitionStatement extends PALStatement {
         return subjectType;
     }
 
-    public Expression getAccessRights() {
+    public NameExpression getAccessRights() {
         return accessRights;
     }
 
@@ -137,9 +137,9 @@ public class CreateProhibitionStatement extends PALStatement {
     }
 
     public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {
-        List<Expression> exprs = new ArrayList<>();
+        List<NameExpression> exprs = new ArrayList<>();
         for (String ar : prohibition.getAccessRightSet()) {
-            exprs.add(new Expression(new VariableReference(ar, Type.string())));
+            exprs.add(new NameExpression(new VariableReference(ar, Type.string())));
         }
 
         List<Container> containers = new ArrayList<>();
@@ -151,7 +151,7 @@ public class CreateProhibitionStatement extends PALStatement {
                 new NameExpression(new VariableReference(prohibition.getLabel(), Type.string())),
                 new NameExpression(new VariableReference(prohibition.getSubject().name(), Type.string())),
                 prohibition.getSubject().type(),
-                new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string()))),
+                new NameExpression(exprs),
                 prohibition.isIntersection(),
                 containers
         );
