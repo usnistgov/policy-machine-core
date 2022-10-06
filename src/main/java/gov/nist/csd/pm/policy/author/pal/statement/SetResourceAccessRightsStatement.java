@@ -23,14 +23,14 @@ public class SetResourceAccessRightsStatement extends PALStatement{
 
     @Override
     public String toString() {
-        String ars = "";
+        StringBuilder ars = new StringBuilder();
         for (String ar : accessRightSet) {
-            if (!ars.isEmpty()) {
-                ars += ", ";
+            if (ars.length() > 0) {
+                ars.append(", ");
             }
 
-            ars += String.format("%s", ar);
+            ars.append(String.format("%s", ar));
         }
-        return String.format("set resource access rights [%s];", ars);
+        return String.format("set resource access rights %s;", ars);
     }
 }
