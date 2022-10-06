@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.policy.author.pal;
 
+import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -19,6 +21,14 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 
 class PALSerializer {
+
+    public static void main(String[] args) throws PMException {
+        MemoryPAP memoryPAP = new MemoryPAP();
+        memoryPAP.graph().setResourceAccessRights(new AccessRightSet("read"));
+        memoryPAP.graph().createPolicyClass("pc1");
+        String s = new PALExecutor(memoryPAP).toPAL();
+        System.out.println(s);
+    }
 
     private static final String TAB_SPACES = "    ";
     private static final String SEMI_COLON = ";";
