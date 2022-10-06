@@ -80,7 +80,7 @@ public class CreateAttrStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("create %s %s assign to %s;",
+        return String.format("create %s %s in %s;",
                 (type == OA ? "object attribute" : "user attribute"),
                 name,
                 assignTo

@@ -28,15 +28,15 @@ stmt: (
 );
 
 // let
-varStmt: (LET | CONST)? IDENTIFIER EQUALS expression SEMI_COLON ;
+varStmt: (LET | CONST)? id EQUALS expression SEMI_COLON ;
 
 // function definition
 funcDefStmt:
-    FUNCTION IDENTIFIER OPEN_PAREN formalArgList CLOSE_PAREN funcReturnType? funcBody ;
+    FUNCTION id OPEN_PAREN formalArgList CLOSE_PAREN funcReturnType? funcBody ;
 formalArgList:
     (formalArg (COMMA formalArg)*)? ;
 formalArg:
-    formalArgType IDENTIFIER ;
+    formalArgType id ;
 formalArgType:
     varType ;
 funcReturnStmt:
@@ -48,10 +48,10 @@ funcBody:
     OPEN_CURLY stmt* CLOSE_CURLY;
 
 foreachStmt:
-    FOREACH key=IDENTIFIER (COMMA mapValue=IDENTIFIER)? IN expression stmtBlock ;
+    FOREACH key=id (COMMA mapValue=id)? IN expression stmtBlock ;
 
 forRangeStmt:
-    FOR IDENTIFIER IN_RANGE OPEN_BRACKET lower=NUMBER COMMA upper=NUMBER CLOSE_BRACKET stmtBlock ;
+    FOR id IN_RANGE OPEN_BRACKET lower=NUMBER COMMA upper=NUMBER CLOSE_BRACKET stmtBlock ;
 
 // break
 breakStmt:
@@ -95,15 +95,15 @@ nodeType:
     (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
 createPolicyStmt: CREATE POLICY_CLASS nameExpression SEMI_COLON ;
-createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) nameExpression ASSIGN_TO nameExpressionArray SEMI_COLON ;
-createUserOrObjectStmt: CREATE (USER | OBJECT) nameExpression ASSIGN_TO nameExpressionArray SEMI_COLON ;
+createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) nameExpression IN nameExpressionArray SEMI_COLON ;
+createUserOrObjectStmt: CREATE (USER | OBJECT) nameExpression IN nameExpressionArray SEMI_COLON ;
 
 setNodePropsStmt: SET_PROPERTIES OF nameExpression TO properties=expression SEMI_COLON ;
 
 assignStmt: ASSIGN child=nameExpression TO parent=nameExpression SEMI_COLON ;
 deassignStmt: DEASSIGN child=nameExpression FROM parent=nameExpression SEMI_COLON ;
 
-associateStmt: ASSOCIATE ua=nameExpression AND target=nameExpression WITH_ACCESS_RIGHTS accessRights=accessRightArray SEMI_COLON ;
+associateStmt: ASSOCIATE ua=nameExpression AND target=nameExpression WITH accessRights=accessRightArray SEMI_COLON ;
 dissociateStmt: DISSOCIATE ua=nameExpression AND target=nameExpression SEMI_COLON ;
 
 deleteStmt: DELETE deleteType nameExpression SEMI_COLON ;
@@ -130,7 +130,7 @@ onClause:
 anyPe: ANY POLICY_ELEMENT;
 
 response:
-    DO OPEN_PAREN IDENTIFIER CLOSE_PAREN responseBlock;
+    DO OPEN_PAREN id CLOSE_PAREN responseBlock;
 responseBlock:
     OPEN_CURLY responseStmts CLOSE_CURLY ;
 responseStmts:
@@ -167,14 +167,14 @@ array:
 accessRightArray:
     (accessRight (COMMA accessRight)*)? ;
 accessRight:
-    ('*' | '*r' | '*a' | IDENTIFIER) ;
+    (ALL_ACCESS_RIGHTS | ALL_RESOURCE_ACCESS_RIGHTS | ALL_ADMIN_ACCESS_RIGHTS | id) ;
 
 map:
     OPEN_CURLY (mapEntry (COMMA mapEntry)*)? CLOSE_CURLY ;
 mapEntry:
     key=expression COLON value=expression ;
 mapEntryRef:
-    IDENTIFIER (OPEN_BRACKET key=expression CLOSE_BRACKET)+;
+    id (OPEN_BRACKET key=expression CLOSE_BRACKET)+;
 
 literal:
     STRING #StringLiteral
@@ -182,22 +182,36 @@ literal:
     | array #ArrayLiteral
     | map #MapLiteral;
 varRef:
-    IDENTIFIER #ReferenceByID
+    id #ReferenceByID
     | mapEntryRef #MapEntryReference ;
 
 funcCall:
-    IDENTIFIER funcCallArgs ;
+    id funcCallArgs ;
 funcCallArgs:
     OPEN_PAREN (expression (COMMA expression)*)? CLOSE_PAREN ;
+
+id: (IDENTIFIER | keywordAsID) ;
+
+keywordAsID:
+    ALL_ACCESS_RIGHTS
+    | ALL_RESOURCE_ACCESS_RIGHTS
+    | ALL_ADMIN_ACCESS_RIGHTS
+    | CREATE
+    | DELETE
+    | ASSIGN
+    | DEASSIGN
+    | ASSOCIATE
+    | DISSOCIATE
+    | DENY
+    ;
 
 // LEXER RULES
 ALL_ACCESS_RIGHTS : '*' ;
 ALL_RESOURCE_ACCESS_RIGHTS : '*r' ;
 ALL_ADMIN_ACCESS_RIGHTS : '*a' ;
-CREATE: [Cc][Rr][Ee][Aa][Tt][Ee] ;
-UPDATE: [Uu][Pp][Dd][Aa][Tt][Ee] ;
-DELETE: [Dd][Ee][Ll][Ee][Tt][Ee] ;
 
+CREATE: [Cc][Rr][Ee][Aa][Tt][Ee] ;
+DELETE: [Dd][Ee][Ll][Ee][Tt][Ee] ;
 BREAK: [Bb][Rr][Ee][Aa][Kk] ;
 CONTINUE: [Cc][Oo][Nn][Tt][Ii][Nn][Uu][Ee] ;
 
@@ -224,10 +238,8 @@ OF: [Oo][Ff] ;
 TO: [Tt][Oo] ;
 ASSOCIATE: [Aa][Ss][Ss][Oo][Cc][Ii][Aa][Tt][Ee] ;
 AND: [Aa][Nn][Dd] ;
-WITH_ACCESS_RIGHTS: [Ww][Ii][Tt][Hh][ ] ACCESS_RIGHTS ;
+WITH: [Ww][Ii][Tt][Hh] ;
 DISSOCIATE: [Dd][Ii][Ss][Ss][Oo][Cc][Ii][Aa][Tt][Ee] ;
-ASSIGN_TO: [Aa][Ss][Ss][Ii][Gg][Nn][ ][Tt][Oo]  ;
-DEASSIGN_FROM: [Dd][Ee][Aa][Ss][Ss][Ii][Gg][Nn][ ][Ff][Rr][Oo][Mm] ;
 DENY: [Dd][Ee][Nn][Yy];
 PROHIBITION: [Pp][Rr][Oo][Hh][Ii][Bb][Ii][Tt][Ii][Oo][Nn];
 OBLIGATION: [Oo][Bb][Ll][Ii][Gg][Aa][Tt][Ii][Oo][Nn];
@@ -261,7 +273,7 @@ ELSE: [Ee][Ll][Ss][Ee] ;
 IN_RANGE: [Ii][Nn][ ][Rr][Aa][Nn][Gg][Ee] ;
 
 NUMBER: [0-9]+ ;
-IDENTIFIER: [a-zA-Z0-9_+\-\\.@]+ [a-zA-Z0-9_+\-\\.@]* ;
+IDENTIFIER: [a-zA-Z0-9_+\-\\.@]+ ;
 STRING: '\'' (~['\\])*  '\'' ;
 LINE_COMMENT : '#' ~'\n'* '\n' -> channel(HIDDEN) ;
 WS : [ \t\n\r]+ -> skip ;

@@ -29,25 +29,25 @@ public class ExecutionTest {
                 
                 set properties of pc1 to {'k': 'v'};
                 
-                create object attribute oa1 assign to pc1;
-                create object attribute oa2 assign to pc1;
-                create object attribute oa3 assign to pc1;
+                create object attribute oa1 in pc1;
+                create object attribute oa2 in pc1;
+                create object attribute oa3 in pc1;
                 
                 let parents = ['oa1', 'oa2', 'oa3'];
-                create object o1 assign to parents;
+                create object o1 in parents;
                 
-                create user attribute ua1 assign to pc1;
-                create user attribute ua2 assign to pc1;
-                create user attribute ua3 assign to pc1;
+                create user attribute ua1 in pc1;
+                create user attribute ua2 in pc1;
+                create user attribute ua3 in pc1;
                 
                 let username = 'u1';
-                create user username assign to ua1;
+                create user username in ua1;
                 assign username to ua2;
                 assign username to ua3;
                 
-                associate ua1 and oa1 with access rights read, write;
-                associate ua2 and oa2 with access rights read, write;
-                associate ua3 and oa3 with access rights read, write;
+                associate ua1 and oa1 with read, write;
+                associate ua2 and oa2 with read, write;
+                associate ua3 and oa3 with read, write;
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
 

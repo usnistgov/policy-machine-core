@@ -509,4 +509,16 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFuncCallArgs(PALParser.FuncCallArgsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PALParser#id}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitId(PALParser.IdContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PALParser#keywordAsID}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitKeywordAsID(PALParser.KeywordAsIDContext ctx);
 }

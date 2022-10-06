@@ -32,7 +32,7 @@ public class VariableReferenceVisitor extends PALBaseVisitor<VariableReference> 
 
     @Override
     public VariableReference visitReferenceByID(PALParser.ReferenceByIDContext ctx) {
-        String id = ctx.IDENTIFIER().getText();
+        String id = ctx.id().getText();
 
         // check variable id is in scope
         Type type = Type.any();
@@ -48,7 +48,7 @@ public class VariableReferenceVisitor extends PALBaseVisitor<VariableReference> 
 
     @Override
     public VariableReference visitMapEntryReference(PALParser.MapEntryReferenceContext ctx) {
-        String mapName = ctx.mapEntryRef().IDENTIFIER().getText();
+        String mapName = ctx.mapEntryRef().id().getText();
         Type mapType = Type.map(Type.any(), Type.any());
         try {
             Variable mapVar = visitorCtx.scope().getVariable(mapName);

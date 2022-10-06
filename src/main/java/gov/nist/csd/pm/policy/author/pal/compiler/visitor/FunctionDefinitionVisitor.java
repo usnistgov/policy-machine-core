@@ -25,7 +25,7 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
 
     @Override
     public FunctionDefinitionStatement visitFuncDefStmt(PALParser.FuncDefStmtContext ctx) {
-        String funcName = ctx.IDENTIFIER().getText();
+        String funcName = ctx.id().getText();
         List<FormalArgument> args = parseFormalArgs(ctx.formalArgList());
         Type returnType = parseReturnType(ctx.funcReturnType());
         List<PALStatement> body = parseBody(ctx, args);
@@ -112,7 +112,7 @@ public class FunctionDefinitionVisitor extends PALBaseVisitor<FunctionDefinition
         List<FormalArgument> formalArguments = new ArrayList<>();
         Set<String> argNames = new HashSet<>();
         for (PALParser.FormalArgContext formalArgCtx : formalArgListCtx.formalArg()) {
-            String name = formalArgCtx.IDENTIFIER().getText();
+            String name = formalArgCtx.id().getText();
             PALParser.VarTypeContext varTypeContext = formalArgCtx.formalArgType().varType();
 
             // check that a formalArg does not clash with an already defined variable

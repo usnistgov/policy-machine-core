@@ -23,7 +23,7 @@ public class NameExpressionTest {
         assertTrue(pap.graph().nodeExists("pc1"));
 
         pal = """
-                create oa oa1 assign to pc1;
+                create oa oa1 in pc1;
                 """;
         pap.compileAndExecutePAL(new UserContext(SUPER_USER), pal);
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -31,7 +31,7 @@ public class NameExpressionTest {
 
         pal = """
                 let parent = 'oa1';
-                create oa oa2 assign to parent;
+                create oa oa2 in parent;
                 """;
         pap.compileAndExecutePAL(new UserContext(SUPER_USER), pal);
         assertTrue(pap.graph().nodeExists("oa1"));
