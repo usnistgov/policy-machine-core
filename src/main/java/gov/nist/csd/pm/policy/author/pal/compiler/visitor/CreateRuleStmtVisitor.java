@@ -40,7 +40,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
     }
 
     private CreateRuleStatement.ResponseBlock getResponse(PALParser.ResponseContext ctx) throws VariableAlreadyDefinedInScopeException {
-        String evtCtxVar = ctx.IDENTIFIER().getText();
+        String evtCtxVar = ctx.id().getText();
 
         // create a new local parser scope for the response block
         // add the event name and event context map to the local parser scope

@@ -81,7 +81,7 @@ public class CreateUserOrObjectStatement extends PALStatement {
     @Override
     public String toString() {
         return String.format(
-                "create %s %s assign to %s;",
+                "create %s %s in %s;",
                 (type == O ? "object" : "user"),
                 name,
                 assignTo

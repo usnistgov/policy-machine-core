@@ -847,4 +847,24 @@ public interface PALListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFuncCallArgs(PALParser.FuncCallArgsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PALParser#id}.
+	 * @param ctx the parse tree
+	 */
+	void enterId(PALParser.IdContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#id}.
+	 * @param ctx the parse tree
+	 */
+	void exitId(PALParser.IdContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PALParser#keywordAsID}.
+	 * @param ctx the parse tree
+	 */
+	void enterKeywordAsID(PALParser.KeywordAsIDContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#keywordAsID}.
+	 * @param ctx the parse tree
+	 */
+	void exitKeywordAsID(PALParser.KeywordAsIDContext ctx);
 }

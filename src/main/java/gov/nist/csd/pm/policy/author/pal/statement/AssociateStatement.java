@@ -54,7 +54,7 @@ public class AssociateStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("associate %s and %s with access rights %s;",
+        return String.format("associate %s and %s with %s;",
                 ua, target, accessRights);
     }
 

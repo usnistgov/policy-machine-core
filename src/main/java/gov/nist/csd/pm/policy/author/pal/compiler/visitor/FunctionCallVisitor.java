@@ -35,7 +35,7 @@ public class FunctionCallVisitor extends PALBaseVisitor<FunctionStatement> {
     }
 
     private FunctionStatement parse(PALParser.FuncCallContext funcCallCtx) {
-        String funcName = funcCallCtx.IDENTIFIER().getText();
+        String funcName = funcCallCtx.id().getText();
 
         // get actual arg expressions
         PALParser.FuncCallArgsContext funcCallArgsCtx = funcCallCtx.funcCallArgs();

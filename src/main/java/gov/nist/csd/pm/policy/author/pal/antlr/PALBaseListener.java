@@ -959,6 +959,30 @@ public class PALBaseListener implements PALListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFuncCallArgs(PALParser.FuncCallArgsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterId(PALParser.IdContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitId(PALParser.IdContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterKeywordAsID(PALParser.KeywordAsIDContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitKeywordAsID(PALParser.KeywordAsIDContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
