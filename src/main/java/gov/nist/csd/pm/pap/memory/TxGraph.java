@@ -17,10 +17,10 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 class TxGraph extends GraphStore implements PolicyEventEmitter {
 
-    private final MemoryGraphStore store;
+    private final GraphStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxGraph(MemoryGraphStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxGraph(GraphStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }

@@ -40,7 +40,7 @@ class MemoryConnectionTest {
     }
 
     @Test
-    void testTwoConcurrentConnections() throws InterruptedException {
+    void testTwoConcurrentConnections() throws InterruptedException, PMException {
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
 
         Thread t1 = new Thread(() -> {

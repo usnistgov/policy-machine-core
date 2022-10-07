@@ -44,7 +44,7 @@ class MemoryConnection extends PolicyStoreConnection {
 
             // apply events
             try {
-                MemoryPolicyStoreListener listener = new MemoryPolicyStoreListener(main);
+                MemoryPolicyStoreEventHandler listener = new MemoryPolicyStoreEventHandler(main);
 
                 List<PolicyEvent> events = txHandler.getState().getEvents();
                 for (PolicyEvent event : events) {

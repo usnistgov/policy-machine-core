@@ -12,10 +12,10 @@ import java.util.Map;
 
 class TxPAL extends PALStore implements PolicyEventEmitter {
 
-    private final MemoryPALStore store;
+    private final PALStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxPAL(MemoryPALStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxPAL(PALStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
+import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.RepObjectNotSetException;
 import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;

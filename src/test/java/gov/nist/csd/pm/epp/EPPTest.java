@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.pdp.reviewer.MemoryPolicyReviewer;
+import gov.nist.csd.pm.pdp.memory.MemoryPDP;
+import gov.nist.csd.pm.pdp.memory.MemoryPolicyReviewer;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
@@ -30,7 +31,6 @@ import java.util.HashMap;
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC;
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.model.obligation.event.Performs.events;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,7 +39,7 @@ class EPPTest {
     @Test
     void test() throws PMException {
         PAP pap = new MemoryPAP();
-        PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+        PDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         pap.graph().createPolicyClass("pc1");
@@ -70,7 +70,7 @@ class EPPTest {
     @Test
     void testAccessingEventContextInResponse() throws PMException {
         PAP pap = new MemoryPAP();
-        PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+        PDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         pap.graph().createPolicyClass("pc1");
@@ -107,7 +107,7 @@ class EPPTest {
     @Test
     void testErrorInEPPResponse() throws PMException {
         PAP pap = new MemoryPAP();
-        PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+        PDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         pdp.runTx(new UserContext(SUPER_USER), (policy) -> {

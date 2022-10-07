@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
+import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreEventHandler;
 import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.author.pal.PALExecutable;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
-import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
-import gov.nist.csd.pm.policy.events.PolicyEventListener;
+import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.tx.TxRunner;
@@ -17,35 +17,27 @@ import gov.nist.csd.pm.policy.tx.TxRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PDP implements PolicyEventEmitter {
+public abstract class PDP implements PolicyEventEmitter {
 
-    private final PAP pap;
-    private final List<PolicyEventListener> eventListeners;
+    protected final PAP pap;
+    protected final List<PolicyEventListener> eventListeners;
 
-    private final PolicyReviewer policyReviewer;
-
-    public PDP(PAP pap, PolicyReviewer policyReviewer) throws PMException {
+    public PDP(PAP pap) throws PMException {
         this.pap = pap;
         this.eventListeners = new ArrayList<>();
-        this.policyReviewer = policyReviewer;
-
-        this.pap.addEventListener(this.policyReviewer, true);
     }
 
-    public PolicyReviewer policyReviewer() {
-        return this.policyReviewer;
-    }
+    public abstract PolicyReviewer policyReviewer() throws PMException;
 
-    public synchronized void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
-        TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, pap, policyReviewer, eventListeners);
-            txRunner.run(pdpTx);
-        });
-    }
+    public abstract void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException;
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
         eventListeners.add(listener);
+
+        if (sync) {
+            listener.handlePolicyEvent(pap.policySync());
+        }
     }
 
     @Override

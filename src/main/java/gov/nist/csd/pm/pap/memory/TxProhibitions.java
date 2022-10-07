@@ -14,10 +14,10 @@ import java.util.Map;
 
 class TxProhibitions extends ProhibitionsStore implements PolicyEventEmitter {
 
-    private final MemoryProhibitionsStore store;
+    private final ProhibitionsStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxProhibitions(MemoryProhibitionsStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxProhibitions(ProhibitionsStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }

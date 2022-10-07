@@ -5,6 +5,8 @@ import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

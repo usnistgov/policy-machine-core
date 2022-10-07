@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.model.obligation.event;
 
-import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
+import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 

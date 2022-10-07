@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.author;
+package gov.nist.csd.pm.policy;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;

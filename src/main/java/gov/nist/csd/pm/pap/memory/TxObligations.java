@@ -12,10 +12,10 @@ import java.util.List;
 
 class TxObligations extends ObligationsStore implements PolicyEventEmitter {
 
-    private final MemoryObligationsStore store;
+    private final ObligationsStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxObligations(MemoryObligationsStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxObligations(ObligationsStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }

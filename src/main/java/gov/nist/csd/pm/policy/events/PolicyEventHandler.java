@@ -1,40 +1,30 @@
-package gov.nist.csd.pm.pap.memory;
+package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.pdp.PolicyReviewer;
+import gov.nist.csd.pm.policy.GraphReader;
+import gov.nist.csd.pm.policy.ObligationsReader;
+import gov.nist.csd.pm.policy.PolicyReader;
+import gov.nist.csd.pm.policy.ProhibitionsReader;
 import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
+import gov.nist.csd.pm.policy.review.ObligationsReview;
 
-public class MemoryPolicyStoreListener implements PolicyEventListener {
+/**
+ * Implements the PolicyEventListener interface to apply policy events to the passed PolicyAuthor.
+ */
+public class PolicyEventHandler implements PolicyEventListener, PolicyReader {
+    
+    protected PolicyAuthor policy;
 
-    public MemoryPolicyStore store;
-
-    public MemoryPolicyStoreListener(MemoryPolicyStore store) {
-        this.store = store;
-    }
-
-    public MemoryPolicyStoreListener() {}
-
-    public GraphReader graph() {
-        return store.graph();
-    }
-
-    public ProhibitionsReader prohibitions() {
-        return store.prohibitions();
-    }
-
-    public ObligationsReader obligations() {
-        return store.obligations();
+    public PolicyEventHandler(PolicyAuthor policy) {
+        this.policy = policy;
     }
 
     @Override
     public void handlePolicyEvent(PolicyEvent event) throws PMException {
-        if (event instanceof PolicySynchronizationEvent policySynchronizationEvent) {
-            this.store = new MemoryPolicyStore(policySynchronizationEvent);
-        } else if (event instanceof CreateNodeEvent createNodeEvent) {
+        if (event instanceof CreateNodeEvent createNodeEvent) {
             handleCreateNodeEvent(createNodeEvent);
         } else if (event instanceof AssignEvent assignEvent) {
             handleAssignEvent(assignEvent);
@@ -62,17 +52,11 @@ public class MemoryPolicyStoreListener implements PolicyEventListener {
             handleUpdateObligationEvent(updateObligationEvent);
         } else if (event instanceof UpdateProhibitionEvent updateProhibitionEvent) {
             handleUpdateProhibitionEvent(updateProhibitionEvent);
-        } else if (event instanceof BeginTxEvent) {
-            store.beginTx();
-        } else if (event instanceof CommitTxEvent) {
-            store.commit();
-        } else if (event instanceof RollbackTxEvent) {
-            store.rollback();
         }
     }
 
-    private void handleUpdateProhibitionEvent(UpdateProhibitionEvent updateProhibitionEvent) throws PMException {
-        store.prohibitions().update(
+    protected void handleUpdateProhibitionEvent(UpdateProhibitionEvent updateProhibitionEvent) throws PMException {
+        policy.prohibitions().update(
                 updateProhibitionEvent.getName(),
                 updateProhibitionEvent.getSubject(),
                 updateProhibitionEvent.getAccessRightSet(),
@@ -81,44 +65,44 @@ public class MemoryPolicyStoreListener implements PolicyEventListener {
         );
     }
 
-    private void handleUpdateObligationEvent(UpdateObligationEvent updateObligationEvent) throws PMException {
-        store.obligations().update(
+    protected void handleUpdateObligationEvent(UpdateObligationEvent updateObligationEvent) throws PMException {
+        policy.obligations().update(
                 updateObligationEvent.getAuthor(),
                 updateObligationEvent.getLabel(),
                 updateObligationEvent.getRules().toArray(Rule[]::new)
         );
     }
 
-    private void handleSetResourceAccessRights(SetResourceAccessRightsEvent setResourceAccessRightsEvent) throws PMException {
-        store.graph().setResourceAccessRights(setResourceAccessRightsEvent.getAccessRightSet());
+    protected void handleSetResourceAccessRights(SetResourceAccessRightsEvent setResourceAccessRightsEvent) throws PMException {
+        policy.graph().setResourceAccessRights(setResourceAccessRightsEvent.getAccessRightSet());
     }
 
-    private void handleSetNodePropertiesEvent(SetNodePropertiesEvent setNodePropertiesEvent) throws PMException {
-        store.graph().setNodeProperties(setNodePropertiesEvent.getName(), setNodePropertiesEvent.getProperties());
+    protected void handleSetNodePropertiesEvent(SetNodePropertiesEvent setNodePropertiesEvent) throws PMException {
+        policy.graph().setNodeProperties(setNodePropertiesEvent.getName(), setNodePropertiesEvent.getProperties());
     }
 
-    private void handleDissociateEvent(DissociateEvent dissociateEvent) throws PMException {
-        store.graph().dissociate(dissociateEvent.getUa(), dissociateEvent.getTarget());
+    protected void handleDissociateEvent(DissociateEvent dissociateEvent) throws PMException {
+        policy.graph().dissociate(dissociateEvent.getUa(), dissociateEvent.getTarget());
     }
 
-    private void handleDeleteProhibitionEvent(DeleteProhibitionEvent deleteProhibitionEvent) throws PMException {
-        store.prohibitions().delete(deleteProhibitionEvent.getLabel());
+    protected void handleDeleteProhibitionEvent(DeleteProhibitionEvent deleteProhibitionEvent) throws PMException {
+        policy.prohibitions().delete(deleteProhibitionEvent.getLabel());
     }
 
-    private void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {
-        store.obligations().delete(deleteObligationEvent.getLabel());
+    protected void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {
+        policy.obligations().delete(deleteObligationEvent.getLabel());
     }
 
-    private void handleDeleteNodeEvent(DeleteNodeEvent deleteNodeEvent) throws PMException {
-        store.graph().deleteNode(deleteNodeEvent.getName());
+    protected void handleDeleteNodeEvent(DeleteNodeEvent deleteNodeEvent) throws PMException {
+        policy.graph().deleteNode(deleteNodeEvent.getName());
     }
 
-    private void handleDeassignEvent(DeassignEvent deassignEvent) throws PMException {
-        store.graph().deassign(deassignEvent.getChild(), deassignEvent.getParent());
+    protected void handleDeassignEvent(DeassignEvent deassignEvent) throws PMException {
+        policy.graph().deassign(deassignEvent.getChild(), deassignEvent.getParent());
     }
 
-    private void handleCreateProhibitionEvent(CreateProhibitionEvent createProhibitionEvent) throws PMException {
-        store.prohibitions().create(
+    protected void handleCreateProhibitionEvent(CreateProhibitionEvent createProhibitionEvent) throws PMException {
+        policy.prohibitions().create(
                 createProhibitionEvent.getLabel(),
                 createProhibitionEvent.getSubject(),
                 createProhibitionEvent.getAccessRightSet(),
@@ -127,45 +111,45 @@ public class MemoryPolicyStoreListener implements PolicyEventListener {
         );
     }
 
-    private void handleCreateObligationEvent(CreateObligationEvent createObligationEvent) throws PMException {
-        store.obligations().create(createObligationEvent.getAuthor(),
+    protected void handleCreateObligationEvent(CreateObligationEvent createObligationEvent) throws PMException {
+        policy.obligations().create(createObligationEvent.getAuthor(),
                 createObligationEvent.getLabel(),
                 createObligationEvent.getRules().toArray(Rule[]::new));
     }
 
-    private void handleAssociateEvent(AssociateEvent associateEvent) throws PMException {
-        store.graph().associate(associateEvent.getUa(), associateEvent.getTarget(), associateEvent.getAccessRightSet());
+    protected void handleAssociateEvent(AssociateEvent associateEvent) throws PMException {
+        policy.graph().associate(associateEvent.getUa(), associateEvent.getTarget(), associateEvent.getAccessRightSet());
     }
 
-    private void handleAssignEvent(AssignEvent assignEvent) throws PMException {
-        store.graph().assign(assignEvent.getChild(), assignEvent.getParent());
+    protected void handleAssignEvent(AssignEvent assignEvent) throws PMException {
+        policy.graph().assign(assignEvent.getChild(), assignEvent.getParent());
     }
 
-    private void handleCreateNodeEvent(CreateNodeEvent createNodeEvent) throws PMException {
+    protected void handleCreateNodeEvent(CreateNodeEvent createNodeEvent) throws PMException {
         switch (createNodeEvent.getType()) {
-            case PC -> this.store.graph().createPolicyClass(
+            case PC -> this.policy.graph().createPolicyClass(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties()
             );
-            case OA -> this.store.graph().createObjectAttribute(
+            case OA -> this.policy.graph().createObjectAttribute(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
-            case UA -> this.store.graph().createUserAttribute(
+            case UA -> this.policy.graph().createUserAttribute(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
-            case O -> this.store.graph().createObject(
+            case O -> this.policy.graph().createObject(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
-            case U -> this.store.graph().createUser(
+            case U -> this.policy.graph().createUser(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
@@ -174,5 +158,18 @@ public class MemoryPolicyStoreListener implements PolicyEventListener {
         }
     }
 
+    @Override
+    public GraphReader graph() {
+        return policy.graph();
+    }
 
+    @Override
+    public ProhibitionsReader prohibitions() {
+        return policy.prohibitions();
+    }
+
+    @Override
+    public ObligationsReader obligations() {
+        return policy.obligations();
+    }
 }

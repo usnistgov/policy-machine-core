@@ -100,22 +100,22 @@ public class MemoryPolicyStore extends PolicyStore {
     }
 
     @Override
-    public MemoryGraphStore graph() {
+    public GraphStore graph() {
         return graph;
     }
 
     @Override
-    public MemoryProhibitionsStore prohibitions() {
+    public ProhibitionsStore prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public MemoryObligationsStore obligations() {
+    public ObligationsStore obligations() {
         return obligations;
     }
 
     @Override
-    public MemoryPALStore pal() {
+    public PALStore pal() {
         return pal;
     }
 }

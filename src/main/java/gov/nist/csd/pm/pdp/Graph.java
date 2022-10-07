@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
-import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
