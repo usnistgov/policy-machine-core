@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
-import gov.nist.csd.pm.policy.author.GraphAuthor;
-import gov.nist.csd.pm.policy.author.GraphReader;
+import gov.nist.csd.pm.policy.GraphReader;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.NoopPropagator;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;

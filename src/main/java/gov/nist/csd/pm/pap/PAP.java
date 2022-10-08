@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.store.PolicyStoreConnection;
+import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.author.pal.PALExecutable;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
@@ -17,7 +18,7 @@ import java.util.List;
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
-public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Transactional, PALExecutable {
+public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEventEmitter, Transactional, PALExecutable, PolicyReader {
 
     protected PolicyStoreConnection policyStore;
     protected Graph graph;
@@ -68,10 +69,10 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
 
     @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-        this.graph.addEventListener(listener, sync);
-        this.prohibitions.addEventListener(listener, sync);
-        this.obligations.addEventListener(listener, sync);
-        this.pal.addEventListener(listener, sync);
+        this.graph.addEventListener(listener, false);
+        this.prohibitions.addEventListener(listener, false);
+        this.obligations.addEventListener(listener, false);
+        this.pal.addEventListener(listener, false);
 
         if (sync) {
             listener.handlePolicyEvent(policyStore.policySync());
@@ -94,6 +95,11 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
     }
 
     @Override
+    public PolicySynchronizationEvent policySync() throws PMException {
+        return this.policyStore.policySync();
+    }
+
+    @Override
     public void beginTx() throws PMException {
         policyStore.beginTx();
 
@@ -111,7 +117,7 @@ public abstract class PAP extends PolicyAuthor implements PolicyEventEmitter, Tr
     public void rollback() throws PMException {
         policyStore.rollback();
 
-        emitEvent(new RollbackTxEvent());
+        emitEvent(new RollbackTxEvent(this));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.author;
+package gov.nist.csd.pm.policy;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface GraphReader {
-
 
     AccessRightSet getResourceAccessRights() throws PMException;
     boolean nodeExists(String name) throws PMException;

@@ -1,8 +1,7 @@
-package gov.nist.csd.pm.pdp.reviewer;
+package gov.nist.csd.pm.pdp.memory;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -18,40 +17,9 @@ import java.util.Set;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryPolicyReviewerTest {
-
-    @Test
-    void testConstructor() throws PMException {
-        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        MemoryPAP memoryPAP = new MemoryPAP(memoryPolicyStore);
-        MemoryPolicyReviewer reviewerWithListener = new MemoryPolicyReviewer();
-        MemoryPolicyReviewer reviewerNoListener = new MemoryPolicyReviewer(memoryPAP);
-        memoryPAP.graph().createPolicyClass("pc1");
-        assertFalse(reviewerWithListener.policy.graph().nodeExists("pc1"));
-        assertTrue(reviewerNoListener.policy.graph().nodeExists("pc1"));
-
-        memoryPAP.addEventListener(reviewerWithListener, true);
-        assertTrue(reviewerWithListener.policy.graph().nodeExists("pc1"));
-
-        memoryPAP.graph().createObjectAttribute("oa1", "pc1");
-        assertTrue(reviewerWithListener.policy.graph().nodeExists("oa1"));
-        assertTrue(reviewerNoListener.policy.graph().nodeExists("oa1"));
-
-        memoryPAP.beginTx();
-        memoryPAP.graph().createPolicyClass("pc2");
-        assertTrue(reviewerWithListener.policy.graph().nodeExists("pc2"));
-        assertTrue(reviewerNoListener.policy.graph().nodeExists("pc2"));
-
-        MemoryPAP pap2 = new MemoryPAP(memoryPolicyStore);
-        assertFalse(pap2.graph().nodeExists("pc2"));
-
-        memoryPAP.commit();
-
-        assertTrue(pap2.graph().nodeExists("pc2"));
-    }
 
     @Nested
     class GetAccessRights {
@@ -60,7 +28,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGetChildren() throws PMException {
             MemoryPAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer(pap));
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -85,7 +53,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGetAccessibleNodes() throws PMException {
             MemoryPAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer(pap));
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -116,7 +84,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph1() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -133,7 +101,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph2() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -154,7 +122,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph3() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -170,7 +138,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph4() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -188,7 +156,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph5() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -210,7 +178,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph6() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -231,7 +199,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph7() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -251,7 +219,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph8() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -270,7 +238,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph9() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -291,7 +259,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph10() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -312,7 +280,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph11() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -331,7 +299,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph12() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -350,7 +318,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph13() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -372,7 +340,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph14() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -394,7 +362,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph15() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -416,7 +384,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph16() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -438,7 +406,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph18() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -456,7 +424,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph19() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -474,7 +442,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph20() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -495,7 +463,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph21() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -516,7 +484,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph22() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             String pc1 = pap.graph().createPolicyClass("pc1");
@@ -535,7 +503,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph23WithProhibitions() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -566,7 +534,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph24WithProhibitions() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -603,7 +571,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph25WithProhibitions() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -631,7 +599,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testGraph25WithProhibitions2() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -656,7 +624,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testDeciderWithUA() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -678,7 +646,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testProhibitionsAllCombinations() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             pap.graph().createPolicyClass("pc1");
@@ -766,7 +734,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testPermissions() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
 
@@ -797,7 +765,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testPermissionsInOnlyOnePC() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(RWE);
             pap.graph().createPolicyClass("pc1");
@@ -819,7 +787,7 @@ class MemoryPolicyReviewerTest {
         @Test
         void testProhibitionsWithContainerAsTarget() throws PMException {
             PAP pap = new MemoryPAP();
-            PDP pdp = new PDP(pap, new MemoryPolicyReviewer());
+            PDP pdp = new MemoryPDP(pap);
 
             pap.graph().setResourceAccessRights(new AccessRightSet("read"));
             pap.graph().createPolicyClass("pc1");
