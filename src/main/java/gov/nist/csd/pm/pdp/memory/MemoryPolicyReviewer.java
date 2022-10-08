@@ -789,6 +789,12 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     @Override
     public synchronized boolean isContained(String subject, String container) throws PMException {
+        if (!policyReader.graph().nodeExists(subject)) {
+            throw new NodeDoesNotExistException(subject);
+        } else if (!policyReader.graph().nodeExists(container)){
+            throw new NodeDoesNotExistException(container);
+        }
+
         AtomicBoolean found = new AtomicBoolean(false);
 
         new DepthFirstGraphWalker(policyReader.graph())
