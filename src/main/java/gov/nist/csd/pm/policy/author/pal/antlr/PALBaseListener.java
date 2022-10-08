@@ -544,18 +544,6 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPerformsEvent(PALParser.PerformsEventContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPerformsEvent(PALParser.PerformsEventContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterAnyUserSubject(PALParser.AnyUserSubjectContext ctx) { }
 	/**
 	 * {@inheritDoc}

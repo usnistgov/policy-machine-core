@@ -78,23 +78,12 @@ public class CreateRuleStatement extends PALStatement {
             );
         }
 
-        Performs performs;
-        Value performsValue = performsClause.events.execute(ctx, policyAuthor);
-        if (performsValue.isString()) {
-            performs = Performs.events(performsValue.getStringValue());
-        } else {
-            List<String> events = new ArrayList<>();
-            Value[] arrayValue = performsValue.getArrayValue();
-            for (Value value : arrayValue) {
-                events.add(value.getStringValue());
-            }
-            performs = Performs.events(events.toArray(new String[]{}));
-        }
+        Performs performs = Performs.events(performsClause.events.toArray(new String[]{}));
 
         Target target = Target.anyPolicyElement();
         Value onValue;
         if (onClause.nameExpr != null) {
-           onValue = onClause.nameExpr.execute(ctx, policyAuthor);
+            onValue = onClause.nameExpr.execute(ctx, policyAuthor);
         } else {
             onValue = new Value();
         }
@@ -131,7 +120,7 @@ public class CreateRuleStatement extends PALStatement {
                         performs,
                         target
                 ),
-                new Response(responseBlock.evtCtxVar, ruleCtx, responseBlock.getStatements())
+                new Response(ruleCtx, responseBlock.getStatements())
         );
 
         return new Value(rule);
@@ -140,8 +129,8 @@ public class CreateRuleStatement extends PALStatement {
     @Override
     public String toString() {
         return String.format(
-                "create rule %s %s %s %s do(%s) {%s}",
-                name, subjectClause, performsClause, onClause, responseBlock.evtCtxVar,
+                "create rule %s %s %s %s do {%s}",
+                name, subjectClause, performsClause, onClause,
                 statementsToString(responseBlock.statements)
         );
     }
@@ -203,19 +192,34 @@ public class CreateRuleStatement extends PALStatement {
     }
 
     public static class PerformsClause {
-        private final Expression events;
+        private final List<String> events;
 
-        public PerformsClause(Expression events) {
+        public PerformsClause(List<String> events) {
             this.events = events;
         }
 
-        public Expression getEvents() {
+        public List<String> getEvents() {
             return events;
         }
 
         @Override
         public String toString() {
-            return "performs " + events.toString();
+            StringBuilder s =  new StringBuilder("performs ");
+            StringBuilder eventsStr = new StringBuilder();
+            for (String event : events) {
+                if (!eventsStr.isEmpty()) {
+                    eventsStr.append(", ");
+                }
+                eventsStr.append(event);
+            }
+            return s.append(eventsStr).toString();
+        }
+
+        public record Event(String eventName, String alias) {
+            @Override
+            public String toString() {
+                return String.format("%s%s", eventName, alias == null || alias.isEmpty() ? "" : "as " + alias);
+            }
         }
     }
 
@@ -274,21 +278,14 @@ public class CreateRuleStatement extends PALStatement {
     }
 
     public static class ResponseBlock {
-        private final String evtCtxVar;
         private final List<PALStatement> statements;
 
         public ResponseBlock() {
-            this.evtCtxVar = "";
             this.statements = new ArrayList<>();
         }
 
-        public ResponseBlock(String evtCtxVar, List<PALStatement> statements) {
-            this.evtCtxVar = evtCtxVar;
+        public ResponseBlock(List<PALStatement> statements) {
             this.statements = statements;
-        }
-
-        public String getEvtCtxVar() {
-            return evtCtxVar;
         }
 
         public List<PALStatement> getStatements() {

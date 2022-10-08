@@ -468,16 +468,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitPerformsClause(PALParser.PerformsClauseContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#performsEvent}.
-	 * @param ctx the parse tree
-	 */
-	void enterPerformsEvent(PALParser.PerformsEventContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#performsEvent}.
-	 * @param ctx the parse tree
-	 */
-	void exitPerformsEvent(PALParser.PerformsEventContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code AnyUserSubject}
 	 * labeled alternative in {@link PALParser#subjectClause}.
 	 * @param ctx the parse tree

@@ -36,14 +36,11 @@ class EventProcessor {
                 }
 
                 Response response = rule.getResponse();
-                ExecutionContext executionCtx = response.getExecutionCtx();
-                String eventCtxVariable = response.getEventCtxVariable();
-
-                executionCtx.scope().addValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
                 // need to run pdp tx as author
                 pdp.runTx(author, (txPDP) -> {
-                    PALExecutor.executeStatementBlock(executionCtx, txPDP, response.getStatements());
+                    /*PALExecutor.executeStatementBlock(executionCtx, txPDP, response.getStatements());*/
+                    response.execute(txPDP, eventCtx);
                 });
             }
         }

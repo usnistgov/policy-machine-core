@@ -79,10 +79,9 @@ public class CreateObligationStatement extends PALStatement {
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
                     new NameExpression(new VariableReference(rule.getLabel(), Type.string())),
                     getSubjectClause(event.getSubject()),
-                    getPerformsClause(event.getOperations()),
+                    new CreateRuleStatement.PerformsClause(event.getOperations()),
                     getOnClause(event),
                     new CreateRuleStatement.ResponseBlock(
-                            rule.getResponse().getEventCtxVariable(),
                             rule.getResponse().getStatements()
                     )
             );
@@ -123,16 +122,6 @@ public class CreateObligationStatement extends PALStatement {
         }
 
         return new CreateRuleStatement.OnClause(expression, onClauseType);
-    }
-
-    private static CreateRuleStatement.PerformsClause getPerformsClause(List<String> operations) {
-        List<Expression> exprs = new ArrayList<>();
-        for (String op : operations) {
-            exprs.add(new Expression(new Literal(op)));
-        }
-        return new CreateRuleStatement.PerformsClause(
-                new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())))
-        );
     }
 
     private static CreateRuleStatement.SubjectClause getSubjectClause(EventSubject subject) {

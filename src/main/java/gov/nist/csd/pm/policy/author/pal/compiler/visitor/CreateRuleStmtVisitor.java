@@ -2,7 +2,6 @@ package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
-import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.model.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
@@ -27,7 +26,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         NameExpression name = NameExpression.compile(visitorCtx, ctx.ruleName);
 
         CreateRuleStatement.SubjectClause subjectClause = getSubjectClause(ctx.subjectClause());
-        CreateRuleStatement.PerformsClause performsClause = getPerformsClause(ctx.performsClause);
+        CreateRuleStatement.PerformsClause performsClause = getPerformsClause(ctx.performsClause());
         CreateRuleStatement.OnClause onClause = getOnClause(ctx.onClause());
         CreateRuleStatement.ResponseBlock responseBlock = new CreateRuleStatement.ResponseBlock();
         try {
@@ -40,31 +39,39 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
     }
 
     private CreateRuleStatement.ResponseBlock getResponse(PALParser.ResponseContext ctx) throws VariableAlreadyDefinedInScopeException {
-        String evtCtxVar = ctx.id().getText();
-
         // create a new local parser scope for the response block
         // add the event name and event context map to the local parser scope
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        localVisitorCtx.scope().addVariable(evtCtxVar, Type.map(Type.string(), Type.any()), false);
 
         PALParser.ResponseBlockContext responseBlockCtx = ctx.responseBlock();
-        PALParser.ResponseStmtsContext responseStmtsCtx = responseBlockCtx.responseStmts();
+        List<PALParser.ResponseStmtContext> responseStmtsCtx = responseBlockCtx.responseStmt();
 
         List<PALStatement> stmts = new ArrayList<>();
-        for (PALParser.ResponseStmtContext responseStmtCtx : responseStmtsCtx.responseStmt()) {
+        for (PALParser.ResponseStmtContext responseStmtCtx : responseStmtsCtx) {
             PALStatement stmt = null;
+
             if (responseStmtCtx.stmt() != null) {
                 stmt = new StatementVisitor(localVisitorCtx)
                         .visitStmt(responseStmtCtx.stmt());
             } else if (responseStmtCtx.createRuleStmt() != null) {
                 stmt = new CreateRuleStmtVisitor(localVisitorCtx)
                         .visitCreateRuleStmt(responseStmtCtx.createRuleStmt());
+            } else if (responseStmtCtx.deleteRuleStmt() != null) {
+                stmt = new DeleteRuleStmtVisitor(localVisitorCtx)
+                        .visitDeleteRuleStmt(responseStmtCtx.deleteRuleStmt());
+            } else if (responseStmtCtx.eventSpecificResponse() != null) {
+                stmt = new EventSpecificResponseStmtVisitor(localVisitorCtx)
+                        .visitEventSpecificResponse(responseStmtCtx.eventSpecificResponse());
             }
 
             stmts.add(stmt);
         }
 
-        return new CreateRuleStatement.ResponseBlock(evtCtxVar, stmts);
+        return new CreateRuleStatement.ResponseBlock(stmts);
+    }
+
+    public CreateRuleStatement visitEventSpecificResponse(PALParser.EventSpecificResponseContext ctx) {
+        return super.visitEventSpecificResponse(ctx);
     }
 
     private CreateRuleStatement.OnClause getOnClause(PALParser.OnClauseContext onClauseCtx) {
@@ -88,9 +95,13 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         return new CreateRuleStatement.OnClause(name, onClauseType);
     }
 
-    private CreateRuleStatement.PerformsClause getPerformsClause(PALParser.ExpressionContext ctx) {
-        Expression performsExpr = Expression.compile(visitorCtx, ctx);
-        return new CreateRuleStatement.PerformsClause(performsExpr);
+    private CreateRuleStatement.PerformsClause getPerformsClause(PALParser.PerformsClauseContext ctx) {
+        List<String> events = new ArrayList<>();
+        for (PALParser.IdContext idContext : ctx.id()) {
+            events.add(idContext.getText());
+        }
+
+        return new CreateRuleStatement.PerformsClause(events);
     }
 
     private CreateRuleStatement.SubjectClause getSubjectClause(PALParser.SubjectClauseContext ctx) {

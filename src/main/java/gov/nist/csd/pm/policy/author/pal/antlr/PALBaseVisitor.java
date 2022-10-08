@@ -325,13 +325,6 @@ public class PALBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements PA
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPerformsEvent(PALParser.PerformsEventContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitAnyUserSubject(PALParser.AnyUserSubjectContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

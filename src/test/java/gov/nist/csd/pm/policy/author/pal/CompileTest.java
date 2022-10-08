@@ -281,7 +281,6 @@ public class CompileTest {
         assertEquals(Target.policyElement("oa1"), event.getTarget());
 
         Response response = rule.getResponse();
-        assertEquals("evtCtx", response.getEventCtxVariable());
 
         List<PALStatement> statements = response.getStatements();
         assertEquals(6, statements.size());

@@ -117,9 +117,7 @@ createRuleStmt:
     (ON onClause)?
     response ;
 performsClause:
-    performsEvent (COMMA performsEvent)+ ;
-performsEvent:
-    id (AS alias=id) ;
+    id (COMMA id)+ ;
 subjectClause:
     ANY_USER #AnyUserSubject
     | USER user=nameExpression #UserSubject
@@ -134,7 +132,7 @@ onClause:
 anyPe: ANY POLICY_ELEMENT;
 
 response:
-    DO OPEN_PAREN id CLOSE_PAREN responseBlock;
+    DO responseBlock;
 responseBlock:
     OPEN_CURLY responseStmt* CLOSE_CURLY ;
 responseStmt:
@@ -145,7 +143,7 @@ responseStmt:
 deleteRuleStmt:
     DELETE RULE ruleName=nameExpression FROM OBLIGATION obligationName=nameExpression SEMI_COLON ;
 eventSpecificResponse:
-    EVENT id OPEN_CURLY responseStmt* CLOSE_CURLY ;
+    EVENT event=id (AS alias=id) OPEN_CURLY responseStmt* CLOSE_CURLY ;
 
 createProhibitionStmt:
     CREATE PROHIBITION name=nameExpression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=nameExpression

@@ -11,6 +11,7 @@ import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException
 import gov.nist.csd.pm.policy.author.pal.model.exception.PALExecutionException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.scope.*;
+import gov.nist.csd.pm.policy.author.pal.statement.ForeachStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;

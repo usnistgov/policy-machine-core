@@ -285,12 +285,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPerformsClause(PALParser.PerformsClauseContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#performsEvent}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPerformsEvent(PALParser.PerformsEventContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code AnyUserSubject}
 	 * labeled alternative in {@link PALParser#subjectClause}.
 	 * @param ctx the parse tree
