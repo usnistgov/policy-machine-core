@@ -532,6 +532,30 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPerformsClause(PALParser.PerformsClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPerformsClause(PALParser.PerformsClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPerformsEvent(PALParser.PerformsEventContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPerformsEvent(PALParser.PerformsEventContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAnyUserSubject(PALParser.AnyUserSubjectContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -676,18 +700,6 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterResponseStmts(PALParser.ResponseStmtsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitResponseStmts(PALParser.ResponseStmtsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterResponseStmt(PALParser.ResponseStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -707,6 +719,18 @@ public class PALBaseListener implements PALListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDeleteRuleStmt(PALParser.DeleteRuleStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEventSpecificResponse(PALParser.EventSpecificResponseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEventSpecificResponse(PALParser.EventSpecificResponseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -279,6 +279,18 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreateRuleStmt(PALParser.CreateRuleStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PALParser#performsClause}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPerformsClause(PALParser.PerformsClauseContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PALParser#performsEvent}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPerformsEvent(PALParser.PerformsEventContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code AnyUserSubject}
 	 * labeled alternative in {@link PALParser#subjectClause}.
 	 * @param ctx the parse tree
@@ -360,12 +372,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitResponseBlock(PALParser.ResponseBlockContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#responseStmts}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitResponseStmts(PALParser.ResponseStmtsContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link PALParser#responseStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -377,6 +383,12 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitDeleteRuleStmt(PALParser.DeleteRuleStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PALParser#eventSpecificResponse}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEventSpecificResponse(PALParser.EventSpecificResponseContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PALParser#createProhibitionStmt}.
 	 * @param ctx the parse tree

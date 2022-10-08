@@ -458,6 +458,26 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitCreateRuleStmt(PALParser.CreateRuleStmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PALParser#performsClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterPerformsClause(PALParser.PerformsClauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#performsClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitPerformsClause(PALParser.PerformsClauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PALParser#performsEvent}.
+	 * @param ctx the parse tree
+	 */
+	void enterPerformsEvent(PALParser.PerformsEventContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#performsEvent}.
+	 * @param ctx the parse tree
+	 */
+	void exitPerformsEvent(PALParser.PerformsEventContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code AnyUserSubject}
 	 * labeled alternative in {@link PALParser#subjectClause}.
 	 * @param ctx the parse tree
@@ -596,16 +616,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitResponseBlock(PALParser.ResponseBlockContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#responseStmts}.
-	 * @param ctx the parse tree
-	 */
-	void enterResponseStmts(PALParser.ResponseStmtsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#responseStmts}.
-	 * @param ctx the parse tree
-	 */
-	void exitResponseStmts(PALParser.ResponseStmtsContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link PALParser#responseStmt}.
 	 * @param ctx the parse tree
 	 */
@@ -625,6 +635,16 @@ public interface PALListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDeleteRuleStmt(PALParser.DeleteRuleStmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PALParser#eventSpecificResponse}.
+	 * @param ctx the parse tree
+	 */
+	void enterEventSpecificResponse(PALParser.EventSpecificResponseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#eventSpecificResponse}.
+	 * @param ctx the parse tree
+	 */
+	void exitEventSpecificResponse(PALParser.EventSpecificResponseContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PALParser#createProhibitionStmt}.
 	 * @param ctx the parse tree
