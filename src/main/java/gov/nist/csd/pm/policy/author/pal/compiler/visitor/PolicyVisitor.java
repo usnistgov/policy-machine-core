@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PolicyVisitor extends PALBaseVisitor<List<PALStatement>> {
@@ -17,8 +18,13 @@ public class PolicyVisitor extends PALBaseVisitor<List<PALStatement>> {
 
     @Override
     public List<PALStatement> visitPal(PALParser.PalContext ctx) {
-        StatementsVisitor visitor = new StatementsVisitor(visitorCtx);
-        return visitor.visitStmts(ctx.stmts());
+        List<PALStatement> statements = new ArrayList<>();
+        for (PALParser.StmtContext stmtCtx : ctx.stmt()) {
+            StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
+            PALStatement statement = statementVisitor.visitStmt(stmtCtx);
+            statements.add(statement);
+        }
+        return statements;
     }
 
 }

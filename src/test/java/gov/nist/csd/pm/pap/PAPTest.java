@@ -1245,7 +1245,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 )
@@ -1263,7 +1263,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 ).addRule(
@@ -1275,7 +1275,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 );
@@ -1592,16 +1592,16 @@ class PAPTest {
                         new FormalArgument("arg2", Type.array(Type.string()))
                 ),
                 Arrays.asList(
-                        new CreatePolicyStatement(new NameExpression(new VariableReference("pc1", Type.string()))),
+                        new CreatePolicyStatement(new Expression(new VariableReference("pc1", Type.string()))),
                         new CreateAttrStatement(
-                                new NameExpression(new VariableReference("ua1", Type.string())),
+                                new Expression(new VariableReference("ua1", Type.string())),
                                 UA,
-                                new NameExpression(new VariableReference("pc1", Type.string()))
+                                new Expression(new VariableReference("pc1", Type.string()))
                         ),
                         new CreateAttrStatement(
-                                new NameExpression(new VariableReference("oa1", Type.string())),
+                                new Expression(new VariableReference("oa1", Type.string())),
                                 OA,
-                                new NameExpression(new VariableReference("pc1", Type.string()))
+                                new Expression(new VariableReference("pc1", Type.string()))
                         )
                 )
         );

@@ -180,7 +180,7 @@ public class CompileTest {
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
         assertEquals(1, ex.getErrors().size());
-        assertTrue(ex.getErrors().get(0).errorMessage().contains("number not allowed, only string"));
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("number not allowed, only: [string]"));
     }
 
     private List<PALStatement> test(String pal, PolicyAuthor policyAuthor) throws PMException {
@@ -203,7 +203,7 @@ public class CompileTest {
                 """;
         ex = assertThrows(PALCompilationException.class, () -> test(pal1, new MemoryPAP()));
         assertEquals(1, ex.getErrors().size());
-        assertTrue(ex.getErrors().get(0).errorMessage().contains("name type map[string]string not allowed, only string"));
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("expression type map[string]string not allowed, only: [string]"));
     }
 
     @Test
@@ -237,20 +237,19 @@ public class CompileTest {
     @Test
     void testCompileObligation() throws PMException {
         String pal = """
-                create obligation test {
-                    create rule rule1
+                create obligation 'test' {
+                    create rule 'rule1'
                     when any user
                     performs 'create_object_attribute'
-                    on oa1
-                    do(evtCtx) {
-                        create policy class evtCtx['eventName'];
-                        let target = evtCtx['target'];
+                    on 'oa1'
+                    do(event) {
+                        create policy class event['eventName'];
+                        let target = event['target'];
                         
-                        let event = evtCtx['event'];
                         create policy class concat([event['name'], '_test']);
-                        set properties of event['name'] to {'key': target};
+                        set properties of event['event']['name'] to {'key': target};
                         
-                        create policy class concat([evtCtx['userCtx']['user'], '_test']);
+                        create policy class concat([event['userCtx']['user'], '_test']);
                     }
                 }
                 """;
@@ -283,16 +282,16 @@ public class CompileTest {
         Response response = rule.getResponse();
 
         List<PALStatement> statements = response.getStatements();
-        assertEquals(6, statements.size());
+        assertEquals(5, statements.size());
 
         stmt = statements.get(0);
 
         Type evtCtxType = Type.map(Type.string(), Type.any());
         PALStatement expected = new CreatePolicyStatement(
-                new NameExpression(
+                new Expression(
                         new VariableReference(
                                 new MapEntryReference(
-                                        new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("eventName"))
+                                        new VariableReference("event", evtCtxType), new Expression(new Literal("eventName"))
                                 ),
                                 Type.any()
                         )
@@ -306,7 +305,7 @@ public class CompileTest {
                 new Expression(
                         new VariableReference(
                                 new MapEntryReference(
-                                        new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("target"))
+                                        new VariableReference("event", evtCtxType), new Expression(new Literal("target"))
                                 ),
                                 Type.any()
                         )
@@ -315,22 +314,8 @@ public class CompileTest {
         assertEquals(expected, stmt);
 
         stmt = statements.get(2);
-        expected = new VarStatement(
-                "event",
-                new Expression(
-                        new VariableReference(
-                                new MapEntryReference(
-                                        new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("event"))
-                                ),
-                                Type.any()
-                        )
-                ),
-                false);
-        assertEquals(expected, stmt);
-
-        stmt = statements.get(3);
         expected = new CreatePolicyStatement(
-                new NameExpression(
+                new Expression(
                         new FunctionStatement(
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
@@ -344,18 +329,32 @@ public class CompileTest {
         );
         assertEquals(expected, stmt);
 
-        stmt = statements.get(4);
+        stmt = statements.get(3);
         HashMap<Expression, Expression> exprMap = new HashMap<>();
         exprMap.put(new Expression(new Literal("key")), new Expression(new VariableReference("target", Type.any())));
         expected = new SetNodePropertiesStatement(
-                new NameExpression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                new Expression(
+                        new VariableReference(
+                                new MapEntryReference(
+                                        new VariableReference(
+                                                new MapEntryReference(
+                                                        new VariableReference("event", Type.any()),
+                                                        new Expression(new Literal("event"))
+                                                ),
+                                                Type.any()
+                                        ),
+                                        new Expression(new Literal("name"))
+                                ),
+                                Type.any()
+                        )
+                ),
                 new Expression(new Literal(new MapLiteral(exprMap, Type.string(), Type.any())))
         );
         assertEquals(expected, stmt);
 
-        stmt = statements.get(5);
+        stmt = statements.get(4);
         expected = new CreatePolicyStatement(
-                new NameExpression(
+                new Expression(
                         new FunctionStatement(
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
@@ -365,7 +364,7 @@ public class CompileTest {
                                                                 new MapEntryReference(
                                                                         new VariableReference(
                                                                                 new MapEntryReference(
-                                                                                        new VariableReference("evtCtx", Type.map(Type.string(), Type.any())),
+                                                                                        new VariableReference("event", Type.any()),
                                                                                         new Expression(new Literal("userCtx"))
                                                                                 ),
                                                                                 Type.any()
@@ -375,7 +374,7 @@ public class CompileTest {
                                                                 Type.any()
                                                         )
                                                 ),
-                                                new Expression(new Literal("_test"))
+                                                new Expression(new Literal("_test")),
                                         },
                                         Type.any()
                                 )))))

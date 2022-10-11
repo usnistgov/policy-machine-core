@@ -18,16 +18,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitPal(PALParser.PalContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#stmts}.
-	 * @param ctx the parse tree
-	 */
-	void enterStmts(PALParser.StmtsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#stmts}.
-	 * @param ctx the parse tree
-	 */
-	void exitStmts(PALParser.StmtsContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link PALParser#stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -458,16 +448,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitCreateRuleStmt(PALParser.CreateRuleStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#performsClause}.
-	 * @param ctx the parse tree
-	 */
-	void enterPerformsClause(PALParser.PerformsClauseContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#performsClause}.
-	 * @param ctx the parse tree
-	 */
-	void exitPerformsClause(PALParser.PerformsClauseContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code AnyUserSubject}
 	 * labeled alternative in {@link PALParser#subjectClause}.
 	 * @param ctx the parse tree
@@ -626,16 +606,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitDeleteRuleStmt(PALParser.DeleteRuleStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#eventSpecificResponse}.
-	 * @param ctx the parse tree
-	 */
-	void enterEventSpecificResponse(PALParser.EventSpecificResponseContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#eventSpecificResponse}.
-	 * @param ctx the parse tree
-	 */
-	void exitEventSpecificResponse(PALParser.EventSpecificResponseContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link PALParser#createProhibitionStmt}.
 	 * @param ctx the parse tree
 	 */
@@ -676,6 +646,16 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PALParser#expressionArray}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpressionArray(PALParser.ExpressionArrayContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PALParser#expressionArray}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpressionArray(PALParser.ExpressionArrayContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PALParser#expression}.
 	 * @param ctx the parse tree
 	 */
@@ -685,26 +665,6 @@ public interface PALListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpression(PALParser.ExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link PALParser#nameExpressionArray}.
-	 * @param ctx the parse tree
-	 */
-	void enterNameExpressionArray(PALParser.NameExpressionArrayContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#nameExpressionArray}.
-	 * @param ctx the parse tree
-	 */
-	void exitNameExpressionArray(PALParser.NameExpressionArrayContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link PALParser#nameExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterNameExpression(PALParser.NameExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#nameExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitNameExpression(PALParser.NameExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PALParser#array}.
 	 * @param ctx the parse tree
@@ -857,24 +817,4 @@ public interface PALListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFuncCallArgs(PALParser.FuncCallArgsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link PALParser#id}.
-	 * @param ctx the parse tree
-	 */
-	void enterId(PALParser.IdContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#id}.
-	 * @param ctx the parse tree
-	 */
-	void exitId(PALParser.IdContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link PALParser#keywordAsID}.
-	 * @param ctx the parse tree
-	 */
-	void enterKeywordAsID(PALParser.KeywordAsIDContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#keywordAsID}.
-	 * @param ctx the parse tree
-	 */
-	void exitKeywordAsID(PALParser.KeywordAsIDContext ctx);
 }

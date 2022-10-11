@@ -2,7 +2,6 @@ package gov.nist.csd.pm.epp;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.events.PolicyEventListener;
-import gov.nist.csd.pm.policy.events.EventContext;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 

@@ -2,13 +2,11 @@ package gov.nist.csd.pm.policy.model.obligation;
 
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.model.scope.PALScopeException;
-import gov.nist.csd.pm.policy.author.pal.statement.EventSpecificResponseStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.events.EventContext;
+import gov.nist.csd.pm.epp.EventContext;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,24 +16,39 @@ public class Response implements Serializable {
 
     private final ExecutionContext executionCtx;
     private final List<PALStatement> stmts;
-    public Response(ExecutionContext executionCtx, List<PALStatement> stmts) {
+    private final String eventCtxVariable;
+    public Response(String eventCtxVariable, ExecutionContext executionCtx, List<PALStatement> stmts) {
+        this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = executionCtx;
         this.stmts = stmts;
     }
 
-    public Response(ExecutionContext executionCtx, PALStatement... stmts) {
+    public Response(String eventNameVariable, String eventCtxVariable, ExecutionContext executionCtx, PALStatement... stmts) {
+        this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = executionCtx;
         this.stmts = List.of(stmts);
     }
 
     public Response(UserContext author, PALStatement... stmts) {
+        this.eventCtxVariable = "";
+        this.executionCtx = new ExecutionContext(author);
+        this.stmts = List.of(stmts);
+    }
+
+    public Response(UserContext author, String eventNameVariable, String eventCtxVariable, PALStatement... stmts) {
+        this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = new ExecutionContext(author);
         this.stmts = List.of(stmts);
     }
 
     public Response(Response response) {
+        this.eventCtxVariable = response.eventCtxVariable;
         this.executionCtx = response.executionCtx;
         this.stmts = response.stmts;
+    }
+
+    public String getEventCtxVariable() {
+        return eventCtxVariable;
     }
 
     public List<PALStatement> getStatements() {
@@ -47,32 +60,10 @@ public class Response implements Serializable {
     }
 
     public Value execute(PolicyAuthor policyAuthor, EventContext eventCtx) throws PMException {
-        ExecutionContext copyCtx = null;
-        try {
-            copyCtx = executionCtx.copy();
-        } catch (PALScopeException e) {
-            throw new PMException(e.getMessage());
-        }
+        executionCtx.scope().addValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
         for (PALStatement stmt : stmts) {
-            String eventName = eventCtx.getEventName();
-
-            if (stmt instanceof EventSpecificResponseStatement eventSpecificResponseStmt) {
-                if (!eventSpecificResponseStmt.getEvent().equals(eventName)) {
-                    continue;
-                }
-
-                Value eventCtxValue = Value.objectToValue(eventCtx);
-                copyCtx.scope().addValue(eventSpecificResponseStmt.getEvent(), eventCtxValue);
-
-                if (eventSpecificResponseStmt.hasAlias()) {
-                    copyCtx.scope().addValue(eventSpecificResponseStmt.getAlias(), eventCtxValue);
-                }
-
-                eventSpecificResponseStmt.execute(copyCtx, policyAuthor);
-            } else {
-                stmt.execute(copyCtx, policyAuthor);
-            }
+            stmt.execute(executionCtx, policyAuthor);
         }
 
         return new Value();

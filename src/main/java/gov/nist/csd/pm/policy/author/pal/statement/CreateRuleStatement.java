@@ -21,13 +21,13 @@ import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 
 public class CreateRuleStatement extends PALStatement {
 
-    private final NameExpression name;
+    private final Expression name;
     private final SubjectClause subjectClause;
     private final PerformsClause performsClause;
     private final OnClause onClause;
     private final ResponseBlock responseBlock;
 
-    public CreateRuleStatement(NameExpression name, SubjectClause subjectClause,
+    public CreateRuleStatement(Expression name, SubjectClause subjectClause,
                                PerformsClause performsClause, OnClause onClause, ResponseBlock responseBlock) {
         this.name = name;
         this.subjectClause = subjectClause;
@@ -36,7 +36,7 @@ public class CreateRuleStatement extends PALStatement {
         this.responseBlock = responseBlock;
     }
 
-    public NameExpression getName() {
+    public Expression getName() {
         return name;
     }
 
@@ -78,7 +78,18 @@ public class CreateRuleStatement extends PALStatement {
             );
         }
 
-        Performs performs = Performs.events(performsClause.events.toArray(new String[]{}));
+        Performs performs;
+        Value performsValue = performsClause.events.execute(ctx, policyAuthor);
+        if (performsValue.isString()) {
+            performs = Performs.events(performsValue.getStringValue());
+        } else {
+            List<String> events = new ArrayList<>();
+            Value[] arrayValue = performsValue.getArrayValue();
+            for (Value value : arrayValue) {
+                events.add(value.getStringValue());
+            }
+            performs = Performs.events(events.toArray(new String[]{}));
+        }
 
         Target target = Target.anyPolicyElement();
         Value onValue;
@@ -106,7 +117,7 @@ public class CreateRuleStatement extends PALStatement {
             target = Target.anyOfSet(policyElements.toArray(String[]::new));
         }
 
-        ExecutionContext ruleCtx = null;
+        ExecutionContext ruleCtx;
         try {
             ruleCtx = ctx.copy();
         } catch (PALScopeException e) {
@@ -120,7 +131,7 @@ public class CreateRuleStatement extends PALStatement {
                         performs,
                         target
                 ),
-                new Response(ruleCtx, responseBlock.getStatements())
+                new Response(responseBlock.evtVar, ruleCtx, responseBlock.getStatements())
         );
 
         return new Value(rule);
@@ -129,9 +140,9 @@ public class CreateRuleStatement extends PALStatement {
     @Override
     public String toString() {
         return String.format(
-                "create rule %s %s %s %s do {%s}",
+                "create rule %s %s %s %s do (%s) {%s}",
                 name, subjectClause, performsClause, onClause,
-                statementsToString(responseBlock.statements)
+                responseBlock.evtVar, statementsToString(responseBlock.statements)
         );
     }
 
@@ -158,12 +169,12 @@ public class CreateRuleStatement extends PALStatement {
 
     public static class SubjectClause {
         private SubjectType type;
-        private NameExpression expr;
+        private Expression expr;
 
         public SubjectClause() {
         }
 
-        public SubjectClause(SubjectType type, NameExpression expr) {
+        public SubjectClause(SubjectType type, Expression expr) {
             this.type = type;
             this.expr = expr;
         }
@@ -192,13 +203,13 @@ public class CreateRuleStatement extends PALStatement {
     }
 
     public static class PerformsClause {
-        private final List<String> events;
+        private final Expression events;
 
-        public PerformsClause(List<String> events) {
+        public PerformsClause(Expression events) {
             this.events = events;
         }
 
-        public List<String> getEvents() {
+        public Expression getEvents() {
             return events;
         }
 
@@ -206,7 +217,7 @@ public class CreateRuleStatement extends PALStatement {
         public String toString() {
             StringBuilder s =  new StringBuilder("performs ");
             StringBuilder eventsStr = new StringBuilder();
-            for (String event : events) {
+            for (Expression event : events.getExprList()) {
                 if (!eventsStr.isEmpty()) {
                     eventsStr.append(", ");
                 }
@@ -230,7 +241,7 @@ public class CreateRuleStatement extends PALStatement {
 
     public static class OnClause {
 
-        private final NameExpression nameExpr;
+        private final Expression nameExpr;
         private final TargetType onClauseType;
 
         public OnClause() {
@@ -238,7 +249,7 @@ public class CreateRuleStatement extends PALStatement {
             onClauseType = null;
         }
 
-        public OnClause(NameExpression nameExpr, TargetType onClauseType) {
+        public OnClause(Expression nameExpr, TargetType onClauseType) {
             this.nameExpr = nameExpr;
             this.onClauseType = onClauseType;
         }
@@ -278,14 +289,21 @@ public class CreateRuleStatement extends PALStatement {
     }
 
     public static class ResponseBlock {
+        private final String evtVar;
         private final List<PALStatement> statements;
 
         public ResponseBlock() {
+            this.evtVar = "";
             this.statements = new ArrayList<>();
         }
 
-        public ResponseBlock(List<PALStatement> statements) {
+        public ResponseBlock(String evtVar, List<PALStatement> statements) {
+            this.evtVar = evtVar;
             this.statements = statements;
+        }
+
+        public String getEvtVar() {
+            return evtVar;
         }
 
         public List<PALStatement> getStatements() {

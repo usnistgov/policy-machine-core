@@ -32,15 +32,15 @@ public class ObligationTest {
         pap.graph().createObjectAttribute("oa1", "pc1");
 
         String input = """
-                create obligation obligation1 {
-                    create rule rule1
+                create obligation 'obligation1' {
+                    create rule 'rule1'
                     when any user
                     performs 'test_event'
-                    on oa1
+                    on 'oa1'
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
                         
-                        delete rule rule1 from obligation obligation1;
+                        delete rule 'rule1' from obligation 'obligation1';
                     }
                 }
                 """;
@@ -64,11 +64,11 @@ public class ObligationTest {
     @Test
     void testObligationComplex() throws PMException {
         String pal = """
-                create obligation test {
-                    create rule rule1
+                create obligation 'test' {
+                    create rule 'rule1'
                     when any user
                     performs 'create_object_attribute'
-                    on oa1
+                    on 'oa1'
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
                         let target = evtCtx['target'];
@@ -103,6 +103,7 @@ public class ObligationTest {
         assertEquals(Target.policyElement("oa1"), event.getTarget());
 
         Response response = rule.getResponse();
+        assertEquals("evtCtx", response.getEventCtxVariable());
 
         List<PALStatement> statements = response.getStatements();
         assertEquals(6, statements.size());
@@ -110,7 +111,7 @@ public class ObligationTest {
         PALStatement stmt = statements.get(0);
         Type evtCtxType = Type.map(Type.string(), Type.any());
         PALStatement expected = new CreatePolicyStatement(
-                new NameExpression(
+                new Expression(
                         new VariableReference(
                                 new MapEntryReference(
                                         new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("eventName"))
@@ -151,7 +152,7 @@ public class ObligationTest {
 
         stmt = statements.get(3);
         expected = new CreatePolicyStatement(
-                new NameExpression(
+                new Expression(
                         new FunctionStatement(
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
@@ -169,14 +170,14 @@ public class ObligationTest {
         HashMap<Expression, Expression> exprMap = new HashMap<>();
         exprMap.put(new Expression(new Literal("key")), new Expression(new VariableReference("target", Type.any())));
         expected = new SetNodePropertiesStatement(
-                new NameExpression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
                 new Expression(new Literal(new MapLiteral(exprMap, Type.string(), Type.any())))
         );
         assertEquals(expected, stmt);
 
         stmt = statements.get(5);
         expected = new CreatePolicyStatement(
-                new NameExpression(
+                new Expression(
                         new FunctionStatement(
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(

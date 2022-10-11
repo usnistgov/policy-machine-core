@@ -4,7 +4,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
-import gov.nist.csd.pm.policy.events.EventContext;
+import gov.nist.csd.pm.epp.EventContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

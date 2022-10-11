@@ -1,15 +1,13 @@
 package gov.nist.csd.pm.epp;
 
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;
-import gov.nist.csd.pm.pdp.memory.MemoryPolicyReviewer;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.statement.NameExpression;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.CreateUserOrObjectStatement;
+import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
-import gov.nist.csd.pm.policy.events.EventContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -46,13 +44,13 @@ class EPPTest {
         pap.graph().createObjectAttribute("oa1", Naming.baseObjectAttribute("pc1"));
 
         String pal = """
-                create obligation test {
-                    create rule rule1
+                create obligation 'test' {
+                    create rule 'rule1'
                     when any user
                     performs 'create_object_attribute'
-                    on oa1
+                    on 'oa1'
                     do(evtCtx) {
-                        create policy class pc2;
+                        create policy class 'pc2';
                     }
                 }
                 """;
@@ -77,18 +75,17 @@ class EPPTest {
         pap.graph().createObjectAttribute("oa1", Naming.baseObjectAttribute("pc1"));
 
         String pal = """
-                create obligation test {
-                    create rule rule1
+                create obligation 'test' {
+                    create rule 'rule1'
                     when any user
                     performs 'create_object_attribute'
-                    on oa1
+                    on 'oa1'
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
                         let target = evtCtx['target'];
                         
-                        let event = evtCtx['event'];
-                        create policy class concat([event['name'], '_test']);
-                        set properties of event['name'] to {'key': target};
+                        create policy class concat([evtCtx['event']['name'], '_test']);
+                        set properties of evtCtx['event']['name'] to {'key': target};
                         
                         let userCtx = evtCtx['userCtx'];
                         create policy class concat([userCtx['user'], '_test']);
@@ -98,7 +95,6 @@ class EPPTest {
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), pal);
 
         pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
-
         assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(
                 "super_pc", "pc1", "create_object_attribute", "oa2_test", "super_test"
         )));
@@ -126,11 +122,11 @@ class EPPTest {
                             new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
                             new Response(new UserContext("u1"),
                                     new CreateUserOrObjectStatement(
-                                            new NameExpression(new VariableReference("o2", Type.string())),
+                                            new Expression(new VariableReference("o2", Type.string())),
                                             NodeType.O,
-                                            new NameExpression(new VariableReference("oa1", Type.string()))
+                                            new Expression(new VariableReference("oa1", Type.string()))
                                     ),
-                                    new CreatePolicyStatement(new NameExpression(new VariableReference("pc2", Type.string()))))
+                                    new CreatePolicyStatement(new Expression(new VariableReference("pc2", Type.string()))))
                     )
             );
         });

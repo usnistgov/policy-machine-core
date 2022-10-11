@@ -10,9 +10,9 @@ import java.util.Objects;
 public class DeleteStatement extends PALStatement {
 
     private final Type type;
-    private final NameExpression expression;
+    private final Expression expression;
 
-    public DeleteStatement(Type type, NameExpression expression) {
+    public DeleteStatement(Type type, Expression expression) {
         this.type = type;
         this.expression = expression;
     }
@@ -21,7 +21,7 @@ public class DeleteStatement extends PALStatement {
         return type;
     }
 
-    public NameExpression getExpression() {
+    public Expression getExpression() {
         return expression;
     }
 

@@ -92,7 +92,7 @@ class PALSerializer {
                 continue;
             }
 
-            pal.append(new CreatePolicyStatement(new NameExpression(new VariableReference(policyClass, Type.string())))).append("\n");
+            pal.append(new CreatePolicyStatement(new Expression(new VariableReference(policyClass, Type.string())))).append("\n");
 
             new BreadthFirstGraphWalker(policy.graph())
                     .withPropagator((parent, child) -> {
@@ -109,23 +109,23 @@ class PALSerializer {
                                 pal.append(stmt).append("\n");
                             } else {
                                 pal.append(new AssignStatement(
-                                        new NameExpression(new VariableReference(child, Type.string())),
-                                        new NameExpression(new VariableReference(parent, Type.string()))
+                                        new Expression(new VariableReference(child, Type.string())),
+                                        new Expression(new VariableReference(parent, Type.string()))
                                 )).append("\n");
                             }
 
                             if (childNode.getType() == UA) {
                                 List<Association> sourceAssociations = policy.graph().getAssociationsWithSource(child);
                                 for (Association association : sourceAssociations) {
-                                    List<NameExpression> exprs = new ArrayList<>();
+                                    List<Expression> exprs = new ArrayList<>();
                                     for (String ar : association.getAccessRightSet()) {
-                                        exprs.add(new NameExpression(new VariableReference(ar, Type.string())));
+                                        exprs.add(new Expression(new VariableReference(ar, Type.string())));
                                     }
 
                                     pal.append(new AssociateStatement(
-                                            new NameExpression(new VariableReference(child, Type.string())),
-                                            new NameExpression(new VariableReference(association.getTarget(), Type.string())),
-                                            new NameExpression(exprs)
+                                            new Expression(new VariableReference(child, Type.string())),
+                                            new Expression(new VariableReference(association.getTarget(), Type.string())),
+                                            new Expression(exprs)
                                     )).append("\n");
                                 }
                             }
@@ -136,8 +136,8 @@ class PALSerializer {
                                 pal.append(stmt).append("\n");
                             } else {
                                 pal.append(new AssignStatement(
-                                        new NameExpression(new VariableReference(child, Type.string())),
-                                        new NameExpression(new VariableReference(parent, Type.string()))
+                                        new Expression(new VariableReference(child, Type.string())),
+                                        new Expression(new VariableReference(parent, Type.string()))
                                 )).append("\n");
                             }
                         }
@@ -152,18 +152,18 @@ class PALSerializer {
     private PALStatement buildCreateNodeStatement(String name, NodeType type, String parent) {
         if (type == UA || type == OA) {
             return new CreateAttrStatement(
-                    new NameExpression(new VariableReference(name, Type.string())),
+                    new Expression(new VariableReference(name, Type.string())),
                     type,
-                    new NameExpression(
-                            new NameExpression(new VariableReference(parent, Type.string()))
+                    new Expression(
+                            new Expression(new VariableReference(parent, Type.string()))
                     )
             );
         } else {
             return new CreateUserOrObjectStatement(
-                    new NameExpression(new VariableReference(name, Type.string())),
+                    new Expression(new VariableReference(name, Type.string())),
                     type,
-                    new NameExpression(
-                            new NameExpression(new VariableReference(parent, Type.string()))
+                    new Expression(
+                            new Expression(new VariableReference(parent, Type.string()))
                     )
             );
         }

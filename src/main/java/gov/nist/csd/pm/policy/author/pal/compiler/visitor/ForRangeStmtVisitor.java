@@ -20,7 +20,7 @@ public class ForRangeStmtVisitor extends PALBaseVisitor<ForRangeStatement> {
 
     @Override
     public ForRangeStatement visitForRangeStmt(PALParser.ForRangeStmtContext ctx) {
-        String varName = ctx.id().getText();
+        String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
 
         int lower = Integer.parseInt(ctx.lower.getText());
         int upper = Integer.parseInt(ctx.upper.getText());
