@@ -33,9 +33,7 @@ class EventProcessor {
                 Response response = rule.getResponse();
 
                 // need to run pdp tx as author
-                pdp.runTx(author, (txPDP) -> {
-                    response.execute(txPDP, eventCtx);
-                });
+                pdp.runTx(author, txPDP -> response.execute(txPDP, eventCtx));
             }
         }
     }

@@ -9,6 +9,7 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -121,7 +122,7 @@ public class CreateProhibitionStatement extends PALStatement {
         return Objects.hash(label, subject, accessRights, isIntersection, containers);
     }
 
-    public static class Container {
+    public static class Container implements Serializable {
         private final boolean isComplement;
         private final Expression name;
 

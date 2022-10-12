@@ -2,7 +2,7 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
-public class AssociateEvent extends PolicyEvent {
+public class AssociateEvent implements PolicyEvent {
 
     private final String ua;
     private final String target;
@@ -24,5 +24,10 @@ public class AssociateEvent extends PolicyEvent {
 
     public AccessRightSet getAccessRightSet() {
         return accessRightSet;
+    }
+
+    @Override
+    public String getEventName() {
+        return "associate";
     }
 }

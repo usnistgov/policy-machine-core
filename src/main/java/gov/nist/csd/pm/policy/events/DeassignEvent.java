@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-public class DeassignEvent extends PolicyEvent {
+public class DeassignEvent implements PolicyEvent {
 
     private final String child;
     private final String parent;
@@ -16,5 +16,10 @@ public class DeassignEvent extends PolicyEvent {
 
     public String getParent() {
         return parent;
+    }
+
+    @Override
+    public String getEventName() {
+        return "deassign";
     }
 }

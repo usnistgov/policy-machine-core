@@ -117,9 +117,7 @@ public class CreateObligationStatement extends PALStatement {
                 expression = new Expression(exprs);
                 onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
             }
-            case ANY_POLICY_ELEMENT -> {
-                onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
-            }
+            case ANY_POLICY_ELEMENT -> onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
         }
 
         return new CreateRuleStatement.OnClause(expression, onClauseType);
@@ -164,9 +162,7 @@ public class CreateObligationStatement extends PALStatement {
                 type = CreateRuleStatement.SubjectType.USER_ATTR;
                 subjectExpr = new Expression(new VariableReference(subject.anyUserWithAttribute(), Type.string()));
             }
-            case ANY_USER -> {
-                type = CreateRuleStatement.SubjectType.ANY_USER;
-            }
+            case ANY_USER -> type = CreateRuleStatement.SubjectType.ANY_USER;
         }
 
         if (subjectExpr == null) {

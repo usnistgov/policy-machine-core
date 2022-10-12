@@ -2,7 +2,7 @@ package gov.nist.csd.pm.policy.events;
 
 import java.util.Map;
 
-public class SetNodePropertiesEvent extends PolicyEvent {
+public class SetNodePropertiesEvent implements PolicyEvent {
 
     private final String name;
     private final Map<String, String> properties;
@@ -18,5 +18,10 @@ public class SetNodePropertiesEvent extends PolicyEvent {
 
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    @Override
+    public String getEventName() {
+        return "set_node_properties";
     }
 }

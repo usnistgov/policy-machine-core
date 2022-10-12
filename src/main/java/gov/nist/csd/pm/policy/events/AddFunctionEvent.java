@@ -2,7 +2,7 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 
-public class AddFunctionEvent extends PolicyEvent {
+public class AddFunctionEvent implements PolicyEvent {
 
     private final FunctionDefinitionStatement functionDefinitionStatement;
 
@@ -12,5 +12,10 @@ public class AddFunctionEvent extends PolicyEvent {
 
     public FunctionDefinitionStatement getFunctionDefinitionStatement() {
         return functionDefinitionStatement;
+    }
+
+    @Override
+    public String getEventName() {
+        return "add_function";
     }
 }

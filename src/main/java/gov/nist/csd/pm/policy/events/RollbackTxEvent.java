@@ -2,7 +2,7 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public class RollbackTxEvent extends PolicyEvent implements PolicySync {
+public class RollbackTxEvent implements PolicySync, PolicyEvent {
 
     private final PolicySync policySync;
 
@@ -13,5 +13,10 @@ public class RollbackTxEvent extends PolicyEvent implements PolicySync {
     @Override
     public PolicySynchronizationEvent policySync() throws PMException {
         return policySync.policySync();
+    }
+
+    @Override
+    public String getEventName() {
+        return "rollback_tx";
     }
 }

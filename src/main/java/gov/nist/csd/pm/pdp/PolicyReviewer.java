@@ -28,13 +28,13 @@ public abstract class PolicyReviewer extends PolicyReview {
 
     public AccessRightSet resolveAllowedPermissions(Map<String, AccessRightSet> pcMap, AccessRightSet resourceOps) {
         Map<String, AccessRightSet> resolvedPcMap = new HashMap<>();
-        for (String pc : pcMap.keySet()) {
-            AccessRightSet pcOps = pcMap.get(pc);
+        for (Map.Entry<String, AccessRightSet> pc : pcMap.entrySet()) {
+            AccessRightSet pcOps = pc.getValue();
 
             // replace instances of *, *a or *r with the literal operations
             resolveSpecialPermissions(pcOps, resourceOps);
 
-            resolvedPcMap.put(pc, pcOps);
+            resolvedPcMap.put(pc.getKey(), pcOps);
         }
 
         return resolvePolicyClassOperationSets(resolvedPcMap);
@@ -44,8 +44,7 @@ public abstract class PolicyReviewer extends PolicyReview {
         // retain only the ops that the decider knows about
         AccessRightSet allowed = new AccessRightSet();
         boolean first = true;
-        for (String pc : pcMap.keySet()) {
-            Set<String> ops = pcMap.get(pc);
+        for (AccessRightSet ops : pcMap.values()) {
             if(first) {
                 allowed.addAll(ops);
                 first = false;
@@ -67,13 +66,13 @@ public abstract class PolicyReviewer extends PolicyReview {
         // if the permission set includes *, remove the * and add all resource operations
         if (permissions.contains(ALL_ACCESS_RIGHTS)) {
             permissions.remove(ALL_ACCESS_RIGHTS);
-            permissions.addAll(ALL_ADMIN_ACCESS_RIGHTS_SET);
+            permissions.addAll(allAdminAccessRights());
             permissions.addAll(resourceOps);
         } else {
             // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
             if (permissions.contains(ALL_ADMIN_ACCESS_RIGHTS)) {
                 permissions.remove(ALL_ADMIN_ACCESS_RIGHTS);
-                permissions.addAll(ALL_ADMIN_ACCESS_RIGHTS_SET);
+                permissions.addAll(allAccessRights());
             }
             if (permissions.contains(ALL_RESOURCE_ACCESS_RIGHTS)) {
                 permissions.remove(ALL_RESOURCE_ACCESS_RIGHTS);
@@ -88,49 +87,53 @@ public abstract class PolicyReviewer extends PolicyReview {
         Set<String> reachedTargets = targetCtx.reachedTargets();
 
         for(Prohibition p : prohibitions) {
-            boolean inter = p.isIntersection();
-            List<ContainerCondition> containers = p.getContainers();
-            boolean addOps = false;
-
-            for (ContainerCondition containerCondition : containers) {
-                String contName = containerCondition.name();
-                boolean isComplement = containerCondition.complement();
-
-                if (target.equals(contName)) {
-                    // if the prohibition is UNION and the target is the container then the prohibition is satisfied
-                    // if the prohibition is INTERSECTION and the target is the container then the prohibition is not satisfied
-                    if (!inter) {
-                        addOps = true;
-                    }
-
-                    break;
-                }
-
-                if (!isComplement && reachedTargets.contains(contName) || isComplement && !reachedTargets.contains(contName)) {
-                    addOps = true;
-
-                    // if the prohibition is not intersection, one satisfied container condition means
-                    // the prohibition is satisfied
-                    if (!inter) {
-                        break;
-                    }
-                } else {
-                    // since the intersection requires the target to satisfy each node condition in the prohibition
-                    // if one is not satisfied then the whole is not satisfied
-                    addOps = false;
-
-                    // if the prohibition is the intersection, one unsatisfied container condition means the whole
-                    // prohibition is not satisfied
-                    if (inter) {
-                        break;
-                    }
-                }
-            }
-
-            if (addOps) {
+            if (isProhibitionSatisfied(p, reachedTargets, target)) {
                 denied.addAll(p.getAccessRightSet());
             }
         }
         return denied;
+    }
+
+    private boolean isProhibitionSatisfied(Prohibition prohibition, Set<String> reachedTargets, String target) {
+        boolean inter = prohibition.isIntersection();
+        List<ContainerCondition> containers = prohibition.getContainers();
+        boolean addOps = false;
+
+        for (ContainerCondition containerCondition : containers) {
+            String contName = containerCondition.name();
+            boolean isComplement = containerCondition.complement();
+
+            if (target.equals(contName)) {
+                // if the prohibition is UNION and the target is the container then the prohibition is satisfied
+                // if the prohibition is INTERSECTION and the target is the container then the prohibition is not satisfied
+                if (!inter) {
+                    addOps = true;
+                }
+
+                break;
+            }
+
+            if (!isComplement && reachedTargets.contains(contName) || isComplement && !reachedTargets.contains(contName)) {
+                addOps = true;
+
+                // if the prohibition is not intersection, one satisfied container condition means
+                // the prohibition is satisfied
+                if (!inter) {
+                    break;
+                }
+            } else {
+                // since the intersection requires the target to satisfy each node condition in the prohibition
+                // if one is not satisfied then the whole is not satisfied
+                addOps = false;
+
+                // if the prohibition is the intersection, one unsatisfied container condition means the whole
+                // prohibition is not satisfied
+                if (inter) {
+                    break;
+                }
+            }
+        }
+
+        return addOps;
     }
 }

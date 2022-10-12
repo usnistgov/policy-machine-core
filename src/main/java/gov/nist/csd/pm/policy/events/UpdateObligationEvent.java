@@ -5,7 +5,7 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 
 import java.util.List;
 
-public class UpdateObligationEvent extends PolicyEvent {
+public class UpdateObligationEvent implements PolicyEvent {
 
     private UserContext author;
     private String label;
@@ -27,5 +27,10 @@ public class UpdateObligationEvent extends PolicyEvent {
 
     public List<Rule> getRules() {
         return rules;
+    }
+
+    @Override
+    public String getEventName() {
+        return "update_obligation";
     }
 }

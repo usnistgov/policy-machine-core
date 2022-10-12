@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.policy.events;
 
-public class PolicyEvent {
+public interface PolicyEvent {
+
+    String getEventName();
 
 }

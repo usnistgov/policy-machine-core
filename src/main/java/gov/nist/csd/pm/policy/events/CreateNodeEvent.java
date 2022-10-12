@@ -4,7 +4,7 @@ import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 
 import java.util.Map;
 
-public abstract class CreateNodeEvent extends PolicyEvent {
+public abstract class CreateNodeEvent implements PolicyEvent {
 
     private final String name;
     private final NodeType type;
@@ -12,7 +12,7 @@ public abstract class CreateNodeEvent extends PolicyEvent {
     private String initialParent;
     private String[] additionalParents;
 
-    public CreateNodeEvent(String name, NodeType type, Map<String, String> properties, String initialParent, String ... parents) {
+    protected CreateNodeEvent(String name, NodeType type, Map<String, String> properties, String initialParent, String ... parents) {
         this.name = name;
         this.type = type;
         this.properties = properties;
@@ -20,7 +20,7 @@ public abstract class CreateNodeEvent extends PolicyEvent {
         this.additionalParents = parents;
     }
 
-    public CreateNodeEvent(String name, NodeType type, Map<String, String> properties) {
+    protected CreateNodeEvent(String name, NodeType type, Map<String, String> properties) {
         this.name = name;
         this.type = type;
         this.properties = properties;

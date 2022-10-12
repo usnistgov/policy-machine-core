@@ -15,9 +15,9 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.O;
 
 public class CreateUserOrObjectStatement extends PALStatement {
 
-    public Expression name;
-    public NodeType type;
-    public Expression assignTo;
+    private final Expression name;
+    private final NodeType type;
+    private final Expression assignTo;
 
     public CreateUserOrObjectStatement(Expression name, NodeType type, Expression assignTo) {
         this.name = name;

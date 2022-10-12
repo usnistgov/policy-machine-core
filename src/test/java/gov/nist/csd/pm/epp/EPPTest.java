@@ -131,7 +131,10 @@ class EPPTest {
             );
         });
 
-        assertThrows(PMRuntimeException.class, () -> epp.handlePolicyEvent(new EventContext(new UserContext(SUPER_USER), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"))));
+        EventContext eventCtx = new EventContext(new UserContext(SUPER_USER), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"));
+        assertThrows(PMRuntimeException.class, () -> {
+            epp.handlePolicyEvent(eventCtx);
+        });
 
         assertFalse(pap.graph().nodeExists("o2"));
         assertFalse(pap.graph().nodeExists("pc2"));

@@ -3,7 +3,6 @@ package gov.nist.csd.pm.policy.author.pal.compiler.error;
 import gov.nist.csd.pm.policy.author.pal.PALFormatter;
 import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
 
 import java.util.Objects;
 

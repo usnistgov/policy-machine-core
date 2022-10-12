@@ -13,6 +13,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,30 @@ public class CreateRuleStatement extends PALStatement {
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         Value nameValue = name.execute(ctx, policyAuthor);
 
+        EventSubject subject = executeEventSubject(ctx, policyAuthor);
+        Performs performs = executePerforms(ctx, policyAuthor);
+        Target target = executeTarget(ctx, policyAuthor);
+        ExecutionContext ruleCtx;
+        try {
+            ruleCtx = ctx.copy();
+        } catch (PALScopeException e) {
+            throw new PALExecutionException(e.getMessage());
+        }
+
+        Rule rule = new Rule(
+                nameValue.getStringValue(),
+                new EventPattern(
+                        subject,
+                        performs,
+                        target
+                ),
+                new Response(responseBlock.evtVar, ruleCtx, responseBlock.getStatements())
+        );
+
+        return new Value(rule);
+    }
+
+    private EventSubject executeEventSubject(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         EventSubject subject;
         if (subjectClause.type == SubjectType.USER || subjectClause.type == SubjectType.USERS) {
             List<String> subjectValues = new ArrayList<>();
@@ -78,6 +103,10 @@ public class CreateRuleStatement extends PALStatement {
             );
         }
 
+        return subject;
+    }
+
+    private Performs executePerforms(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         Performs performs;
         Value performsValue = performsClause.events.execute(ctx, policyAuthor);
         if (performsValue.isString()) {
@@ -91,6 +120,10 @@ public class CreateRuleStatement extends PALStatement {
             performs = Performs.events(events.toArray(new String[]{}));
         }
 
+        return performs;
+    }
+
+    private Target executeTarget(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         Target target = Target.anyPolicyElement();
         Value onValue;
         if (onClause.nameExpr != null) {
@@ -117,25 +150,9 @@ public class CreateRuleStatement extends PALStatement {
             target = Target.anyOfSet(policyElements.toArray(String[]::new));
         }
 
-        ExecutionContext ruleCtx;
-        try {
-            ruleCtx = ctx.copy();
-        } catch (PALScopeException e) {
-            throw new PALExecutionException(e.getMessage());
-        }
-
-        Rule rule = new Rule(
-                nameValue.getStringValue(),
-                new EventPattern(
-                        subject,
-                        performs,
-                        target
-                ),
-                new Response(responseBlock.evtVar, ruleCtx, responseBlock.getStatements())
-        );
-
-        return new Value(rule);
+        return target;
     }
+
 
     @Override
     public String toString() {
@@ -159,7 +176,7 @@ public class CreateRuleStatement extends PALStatement {
         return Objects.hash(name, subjectClause, performsClause, onClause, responseBlock);
     }
 
-    public enum SubjectType {
+    public enum SubjectType implements Serializable {
         ANY_USER,
         USER,
         USERS,
@@ -167,7 +184,7 @@ public class CreateRuleStatement extends PALStatement {
         PROCESS
     }
 
-    public static class SubjectClause {
+    public static class SubjectClause implements Serializable {
         private SubjectType type;
         private Expression expr;
 
@@ -202,7 +219,7 @@ public class CreateRuleStatement extends PALStatement {
         }
     }
 
-    public static class PerformsClause {
+    public static class PerformsClause implements Serializable {
         private final Expression events;
 
         public PerformsClause(Expression events) {
@@ -239,7 +256,7 @@ public class CreateRuleStatement extends PALStatement {
 
     }
 
-    public static class OnClause {
+    public static class OnClause implements Serializable {
 
         private final Expression nameExpr;
         private final TargetType onClauseType;
@@ -288,7 +305,7 @@ public class CreateRuleStatement extends PALStatement {
         }
     }
 
-    public static class ResponseBlock {
+    public static class ResponseBlock implements Serializable {
         private final String evtVar;
         private final List<PALStatement> statements;
 

@@ -291,7 +291,8 @@ public class Value implements Serializable {
         Value value;
         if (o instanceof String s) {
             value = new Value(s);
-
+        } else if (o instanceof Integer i) {
+            value = new Value(i);
         } else if (o.getClass().isArray()) {
             Object[] arr = (Object[])o;
             Value[] valueArr = new Value[arr.length];

@@ -30,16 +30,16 @@ public class DeassignStatement extends PALStatement {
         Value childValue = child.execute(ctx, policyAuthor);
         Value deassignFromValue = deassignFrom.execute(ctx, policyAuthor);
 
-        String child = childValue.getStringValue();
+        String childStringValue = childValue.getStringValue();
 
         if (deassignFromValue.isString()) {
             String parent = deassignFromValue.getStringValue();
-            policyAuthor.graph().deassign(child, parent);
+            policyAuthor.graph().deassign(childStringValue, parent);
         } else {
             Value[] valueArr = deassignFromValue.getArrayValue();
             for (Value value : valueArr) {
                 String parent = value.getStringValue();
-                policyAuthor.graph().deassign(childValue.getStringValue(), parent);
+                policyAuthor.graph().deassign(childStringValue, parent);
             }
         }
 

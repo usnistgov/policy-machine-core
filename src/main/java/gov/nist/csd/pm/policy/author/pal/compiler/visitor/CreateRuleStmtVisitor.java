@@ -75,7 +75,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         if (onClauseCtx instanceof PALParser.PolicyElementContext policyElementContext) {
             name = Expression.compile(visitorCtx, policyElementContext.expression(), Type.string());
             onClauseType = CreateRuleStatement.TargetType.POLICY_ELEMENT;
-        } else if (onClauseCtx instanceof PALParser.AnyPolicyElementContext anyPolicyElementContext) {
+        } else if (onClauseCtx instanceof PALParser.AnyPolicyElementContext) {
             onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
         } else if (onClauseCtx instanceof PALParser.AnyContainedInContext anyContainedInContext) {
             name = Expression.compile(visitorCtx, anyContainedInContext.expression(), Type.string());

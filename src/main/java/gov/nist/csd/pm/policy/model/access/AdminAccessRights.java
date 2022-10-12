@@ -69,7 +69,7 @@ public class AdminAccessRights {
     public static final String ALL_ADMIN_ACCESS_RIGHTS = "*a";
     public static final String ALL_RESOURCE_ACCESS_RIGHTS = "*r";
 
-    public static final AccessRightSet ALL_ADMIN_ACCESS_RIGHTS_SET = new AccessRightSet(
+    private static final AccessRightSet ALL_ADMIN_ACCESS_RIGHTS_SET = new AccessRightSet(
             CREATE_POLICY_CLASS,
             ASSIGN_OBJECT_ATTRIBUTE,
             ASSIGN_OBJECT_ATTRIBUTE_TO,
@@ -115,5 +115,16 @@ public class AdminAccessRights {
             GET_PROCESS_PROHIBITIONS
     );
 
-    public static final AccessRightSet ALL_ACCESS_RIGHTS_SET = new AccessRightSet(ALL_ACCESS_RIGHTS);
+    private static final AccessRightSet ALL_ACCESS_RIGHTS_SET = new AccessRightSet(ALL_ACCESS_RIGHTS);
+
+    private AdminAccessRights() {}
+
+    public static AccessRightSet allAdminAccessRights() {
+        return new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS_SET);
+    }
+
+    public static AccessRightSet allAccessRights() {
+        return new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
+    }
+
 }

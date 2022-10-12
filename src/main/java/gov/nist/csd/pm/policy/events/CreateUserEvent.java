@@ -8,4 +8,9 @@ public class CreateUserEvent extends CreateNodeEvent{
     public CreateUserEvent(String name, Map<String, String> properties, String initialParent, String... parents) {
         super(name, NodeType.U, properties, initialParent, parents);
     }
+
+    @Override
+    public String getEventName() {
+        return "create_user";
+    }
 }

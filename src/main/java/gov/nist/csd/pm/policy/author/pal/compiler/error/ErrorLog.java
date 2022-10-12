@@ -4,10 +4,7 @@ import gov.nist.csd.pm.policy.author.pal.compiler.Position;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 
 public class ErrorLog {
 
