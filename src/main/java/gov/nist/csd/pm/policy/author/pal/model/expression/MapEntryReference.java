@@ -2,9 +2,10 @@ package gov.nist.csd.pm.policy.author.pal.model.expression;
 
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class MapEntryReference {
+public class MapEntryReference implements Serializable {
 
     private final VariableReference map;
     private final Expression key;

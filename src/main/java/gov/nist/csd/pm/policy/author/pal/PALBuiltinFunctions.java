@@ -29,7 +29,7 @@ public class PALBuiltinFunctions {
     private static final FunctionDefinitionStatement getNode = new GetNode();
     private static final FunctionDefinitionStatement search = new Search();
 
-    public static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
+    private static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
 
     static {
         BUILTIN_FUNCTIONS.put(concat.getFunctionName(), concat);
@@ -52,8 +52,13 @@ public class PALBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(search.getFunctionName(), search);
     }
 
+    public static Map<String, FunctionDefinitionStatement> builtinFunctions() {
+        return new HashMap<>(BUILTIN_FUNCTIONS);
+    }
+
     public static boolean isBuiltinFunction(String functionName) {
         return BUILTIN_FUNCTIONS.containsKey(functionName);
     }
 
+    private PALBuiltinFunctions() {}
 }

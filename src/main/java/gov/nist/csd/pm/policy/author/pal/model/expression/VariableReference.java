@@ -69,10 +69,10 @@ public class VariableReference extends PALStatement {
         }
 
         Value value = null;
-        for (MapEntryReference mapEntryReference : refChain) {
+        for (MapEntryReference mer : refChain) {
             if (value == null) {
-                Value mapValue = mapEntryReference.getMap().execute(ctx, policyAuthor);
-                Value keyValue = mapEntryReference.getKey().execute(ctx, policyAuthor);
+                Value mapValue = mer.getMap().execute(ctx, policyAuthor);
+                Value keyValue = mer.getKey().execute(ctx, policyAuthor);
                 value = mapValue.getMapValue().get(keyValue);
                 continue;
             }
@@ -82,7 +82,7 @@ public class VariableReference extends PALStatement {
             }
 
             Map<Value, Value> mapValue = value.getMapValue();
-            Value keyValue = mapEntryReference.getKey().execute(ctx, policyAuthor);
+            Value keyValue = mer.getKey().execute(ctx, policyAuthor);
             value = mapValue.get(keyValue);
         }
 

@@ -123,7 +123,7 @@ public class Scope implements Serializable {
         if (functions.containsKey(name)) {
             return functions.get(name);
         } else if (isBuiltinFunction(name)) {
-            return PALBuiltinFunctions.BUILTIN_FUNCTIONS.get(name);
+            return PALBuiltinFunctions.builtinFunctions().get(name);
         }
 
         throw new UnknownFunctionInScopeException(name);
@@ -189,7 +189,7 @@ public class Scope implements Serializable {
     }
 
     private boolean isBuiltinFunction(String name) {
-        return PALBuiltinFunctions.BUILTIN_FUNCTIONS.containsKey(name);
+        return PALBuiltinFunctions.builtinFunctions().containsKey(name);
     }
 
     public enum Mode {
