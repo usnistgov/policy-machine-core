@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.author.pal.function;
+package gov.nist.csd.pm.policy.author.pal.functions;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
@@ -7,23 +7,23 @@ import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 
 import java.util.List;
 
-public class GetChildren extends FunctionDefinitionStatement {
+public class GetParents extends FunctionDefinitionStatement {
 
-    public GetChildren() {
+    public GetParents() {
         super(
-                name("getChildren"),
+                name("getParents"),
                 returns(Type.array(Type.string())),
                 args(
                         new FormalArgument("nodeName", Type.string())
                 ),
                 (ctx, author) -> {
-                    List<String> children = author.graph().getChildren(ctx.scope().getValue("nodeName").getStringValue());
-                    Value[] childValues = new Value[children.size()];
-                    for (int i = 0; i < children.size(); i++) {
-                        childValues[i] = new Value(children.get(i));
+                    List<String> parents = author.graph().getParents(ctx.scope().getValue("nodeName").getStringValue());
+                    Value[] parentValues = new Value[parents.size()];
+                    for (int i = 0; i < parents.size(); i++) {
+                        parentValues[i] = new Value(parents.get(i));
                     }
 
-                    return new Value(childValues);
+                    return new Value(parentValues);
                 }
         );
     }

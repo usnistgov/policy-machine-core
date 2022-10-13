@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.author.pal.function;
+package gov.nist.csd.pm.policy.author.pal.functions;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;

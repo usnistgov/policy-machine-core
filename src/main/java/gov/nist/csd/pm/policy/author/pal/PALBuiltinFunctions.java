@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.policy.author.pal.function.*;
+import gov.nist.csd.pm.policy.author.pal.functions.*;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 
 import java.util.HashMap;
