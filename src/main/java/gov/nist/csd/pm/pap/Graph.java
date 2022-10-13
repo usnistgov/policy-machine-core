@@ -24,7 +24,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.REP_PROPERTY;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
@@ -47,7 +46,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
         for (String ar : accessRightSet) {
-            if (isAdminAccessRight(ar)) {
+            if (isAdminAccessRight(ar) || isWildcardAccessRight(ar)) {
                 throw new AdminAccessRightExistsException(ar);
             }
         }
@@ -410,15 +409,9 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
         AccessRightSet resourceAccessRights = graph.getResourceAccessRights();
 
         for (String ar : accessRightSet) {
-            // throw errors if
-            // - ar is not resource ar
-            // - ar is not in admin rights set
-            // - ar is not a special ar
             if (!resourceAccessRights.contains(ar)
                     && !allAdminAccessRights().contains(ar)
-                    && !ar.equals(ALL_ACCESS_RIGHTS)
-                    && ! ar.equals(ALL_ADMIN_ACCESS_RIGHTS)
-                    && !ar.equals(ALL_RESOURCE_ACCESS_RIGHTS)) {
+                    && !wildcardAccessRights().contains(ar)) {
                 throw new UnknownAccessRightException(ar);
             }
         }

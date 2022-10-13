@@ -134,6 +134,12 @@ public class AdminAccessRights {
             GET_CONTEXT
     );
 
+    private static final AccessRightSet WILDCARD_ACCESS_RIGHTS_SET = new AccessRightSet(
+            ALL_ACCESS_RIGHTS,
+            ALL_ADMIN_ACCESS_RIGHTS,
+            ALL_RESOURCE_ACCESS_RIGHTS
+    );
+
     private static final AccessRightSet ALL_ACCESS_RIGHTS_SET = new AccessRightSet(ALL_ACCESS_RIGHTS);
 
     private AdminAccessRights() {}
@@ -146,8 +152,16 @@ public class AdminAccessRights {
         return new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
     }
 
+    public static AccessRightSet wildcardAccessRights() {
+        return new AccessRightSet(WILDCARD_ACCESS_RIGHTS_SET);
+    }
+
     public static boolean isAdminAccessRight(String ar) {
         return ALL_ADMIN_ACCESS_RIGHTS_SET.contains(ar);
+    }
+
+    public static boolean isWildcardAccessRight(String ar) {
+        return WILDCARD_ACCESS_RIGHTS_SET.contains(ar);
     }
 
 }
