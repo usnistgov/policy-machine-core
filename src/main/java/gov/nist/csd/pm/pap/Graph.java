@@ -410,11 +410,15 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
         AccessRightSet resourceAccessRights = graph.getResourceAccessRights();
 
         for (String ar : accessRightSet) {
+            // throw errors if
+            // - ar is not resource ar
+            // - ar is not in admin rights set
+            // - ar is not a special ar
             if (!resourceAccessRights.contains(ar)
-                    && !(accessRightSet.contains(ALL_ACCESS_RIGHTS)
-                    || accessRightSet.contains(ALL_RESOURCE_ACCESS_RIGHTS)
-                    || accessRightSet.contains(ALL_ADMIN_ACCESS_RIGHTS)
-                    || allAdminAccessRights().contains(ar))) {
+                    && !allAdminAccessRights().contains(ar)
+                    && !ar.equals(ALL_ACCESS_RIGHTS)
+                    && ! ar.equals(ALL_ADMIN_ACCESS_RIGHTS)
+                    && !ar.equals(ALL_RESOURCE_ACCESS_RIGHTS)) {
                 throw new UnknownAccessRightException(ar);
             }
         }
@@ -423,7 +427,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     @Override
     public void dissociate(String ua, String target) throws PMException {
         if ((!nodeExists(ua) || !nodeExists(target))
-        || (!getAssociationsWithSource(ua).contains(new Association(ua, target)))) {
+                || (!getAssociationsWithSource(ua).contains(new Association(ua, target)))) {
             return;
         }
 
