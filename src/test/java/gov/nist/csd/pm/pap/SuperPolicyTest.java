@@ -42,5 +42,4 @@ class SuperPolicyTest {
         accessRights = reviewer.getAccessRights(userContext, Naming.pcRepObjectAttribute("pc1"));
         assertTrue(accessRights.containsAll(allAdminAccessRights()));
     }
-
 }
