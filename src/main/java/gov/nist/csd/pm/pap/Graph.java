@@ -46,6 +46,12 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
+        for (String ar : accessRightSet) {
+            if (isAdminAccessRight(ar)) {
+                throw new AdminAccessRightExistsException(ar);
+            }
+        }
+
         store.graph().setResourceAccessRights(accessRightSet);
 
         // notify listeners of policy modification

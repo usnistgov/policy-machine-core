@@ -146,4 +146,8 @@ public class AdminAccessRights {
         return new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
     }
 
+    public static boolean isAdminAccessRight(String ar) {
+        return ALL_ADMIN_ACCESS_RIGHTS_SET.contains(ar);
+    }
+
 }

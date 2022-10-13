@@ -76,7 +76,7 @@ class PAPTest {
     }
 
     @Test
-    public void testSuperPolicy() throws PMException {
+    void testSuperPolicy() throws PMException {
         runTest(pap -> {
             String baseOA = Naming.baseObjectAttribute(SUPER_PC);
             String baseUA = Naming.baseUserAttribute(SUPER_PC);
@@ -140,6 +140,8 @@ class PAPTest {
             AccessRightSet arset = new AccessRightSet("read", "write");
             pap.graph().setResourceAccessRights(arset);
             assertEquals(arset, pap.graph().getResourceAccessRights());
+
+            assertThrows(AdminAccessRightExistsException.class, () -> pap.graph().setResourceAccessRights(new AccessRightSet(CREATE_POLICY_CLASS)));
         });
     }
 
