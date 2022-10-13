@@ -409,7 +409,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
                     || accessRightSet.contains(ALL_RESOURCE_ACCESS_RIGHTS)
                     || accessRightSet.contains(ALL_ADMIN_ACCESS_RIGHTS)
                     || allAdminAccessRights().contains(ar))) {
-                throw new UnknownResourceAccessRightException(ar);
+                throw new UnknownAccessRightException(ar);
             }
         }
     }

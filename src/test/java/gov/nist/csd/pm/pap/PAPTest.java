@@ -729,10 +729,10 @@ class PAPTest {
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("ua1", "pc1");
                 pap.graph().createObjectAttribute("oa1", "pc1");
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet("read")));
                 pap.graph().setResourceAccessRights(new AccessRightSet("read"));
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet("write")));
                 assertDoesNotThrow(() -> pap.graph().associate("ua1", "oa1", new AccessRightSet("read")));
                 assertDoesNotThrow(() -> pap.graph().associate("ua1", "oa1", new AccessRightSet(ALL_ACCESS_RIGHTS)));
@@ -950,7 +950,7 @@ class PAPTest {
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("subject", "pc1");
 
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false));
             });
         }
@@ -1013,7 +1013,7 @@ class PAPTest {
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true));
 
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("test"), false));
             });
         }
