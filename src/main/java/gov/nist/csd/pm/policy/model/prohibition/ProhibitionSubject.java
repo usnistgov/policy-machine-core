@@ -2,6 +2,8 @@ package gov.nist.csd.pm.policy.model.prohibition;
 
 import gov.nist.csd.pm.policy.exceptions.InvalidProhibitionSubjectException;
 
+import java.util.Objects;
+
 public class ProhibitionSubject {
 
     public static ProhibitionSubject userAttribute(String ua) {
@@ -56,5 +58,18 @@ public class ProhibitionSubject {
             }
             default -> throw new InvalidProhibitionSubjectException(s);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProhibitionSubject that = (ProhibitionSubject) o;
+        return Objects.equals(name, that.name) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
     }
 }
