@@ -1,12 +1,10 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -22,15 +20,6 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 
 class PALSerializer {
 
-    public static void main(String[] args) throws PMException {
-        MemoryPAP memoryPAP = new MemoryPAP();
-        memoryPAP.graph().setResourceAccessRights(new AccessRightSet("read"));
-        memoryPAP.graph().createPolicyClass("pc1");
-        String s = new PALExecutor(memoryPAP).toPAL();
-        System.out.println(s);
-    }
-
-    private static final String TAB_SPACES = "    ";
     private static final String SEMI_COLON = ";";
 
     private final PolicyAuthor policy;
@@ -40,15 +29,33 @@ class PALSerializer {
     }
 
     String toPAL() throws PMException {
-        String pal = "%s\n%s\n%s\n%s\n%s";
-
+        String pal = "";
         String constants = serializeConstants();
-        String functions = serializeFunctions();
-        String graph = serializeGraph();
-        String prohibitions = serializeProhibitions();
-        String obligations = serializeObligations();
+        if (!constants.isEmpty()) {
+            pal += constants + "\n";
+        }
 
-        return String.format(pal, constants, functions, graph, prohibitions, obligations);
+        String functions = serializeFunctions();
+        if (!functions.isEmpty()) {
+            pal += functions + "\n";
+        }
+
+        String graph = serializeGraph();
+        if (!graph.isEmpty()) {
+            pal += graph + "\n";
+        }
+
+        String prohibitions = serializeProhibitions();
+        if (!prohibitions.isEmpty()) {
+            pal += prohibitions + "\n";
+        }
+
+        String obligations = serializeObligations();
+        if (!obligations.isEmpty()) {
+            pal += obligations;
+        }
+
+        return pal.trim();
     }
 
     private String serializeObligations() throws PMException {
@@ -56,7 +63,10 @@ class PALSerializer {
 
         List<Obligation> obligations = policy.obligations().getAll();
         for (Obligation o : obligations) {
-            pal.append(CreateObligationStatement.fromObligation(o)).append("\n");
+            if (!pal.isEmpty()) {
+                pal.append("\n");
+            }
+            pal.append(CreateObligationStatement.fromObligation(o));
         }
 
         return pal.toString();
@@ -66,10 +76,13 @@ class PALSerializer {
         StringBuilder pal = new StringBuilder();
 
         Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
-        for (String s : prohibitions.keySet()) {
-            List<Prohibition> subjectPros = prohibitions.get(s);
+        for (List<Prohibition> subjectPros : prohibitions.values()) {
             for (Prohibition p : subjectPros) {
-                pal.append(CreateProhibitionStatement.fromProhibition(p)).append("\n");
+                if (!pal.isEmpty()) {
+                    pal.append("\n");
+                }
+
+                pal.append(CreateProhibitionStatement.fromProhibition(p));
             }
         }
 
@@ -92,7 +105,7 @@ class PALSerializer {
                 continue;
             }
 
-            pal.append(new CreatePolicyStatement(new Expression(new VariableReference(policyClass, Type.string())))).append("\n");
+            pal.append(new CreatePolicyStatement(new Expression(new Literal(policyClass)))).append("\n");
 
             new BreadthFirstGraphWalker(policy.graph())
                     .withPropagator((parent, child) -> {
@@ -109,8 +122,8 @@ class PALSerializer {
                                 pal.append(stmt).append("\n");
                             } else {
                                 pal.append(new AssignStatement(
-                                        new Expression(new VariableReference(child, Type.string())),
-                                        new Expression(new VariableReference(parent, Type.string()))
+                                        new Expression(new Literal(child)),
+                                        new Expression(new Literal(parent))
                                 )).append("\n");
                             }
 
@@ -123,8 +136,8 @@ class PALSerializer {
                                     }
 
                                     pal.append(new AssociateStatement(
-                                            new Expression(new VariableReference(child, Type.string())),
-                                            new Expression(new VariableReference(association.getTarget(), Type.string())),
+                                            new Expression(new Literal(child)),
+                                            new Expression(new Literal(association.getTarget())),
                                             new Expression(exprs)
                                     )).append("\n");
                                 }
@@ -136,8 +149,8 @@ class PALSerializer {
                                 pal.append(stmt).append("\n");
                             } else {
                                 pal.append(new AssignStatement(
-                                        new Expression(new VariableReference(child, Type.string())),
-                                        new Expression(new VariableReference(parent, Type.string()))
+                                        new Expression(new Literal(child)),
+                                        new Expression(new Literal(parent))
                                 )).append("\n");
                             }
                         }
@@ -146,24 +159,24 @@ class PALSerializer {
                     .walk(policyClass);
         }
 
-        return pal.toString();
+        return pal.toString().trim();
     }
 
     private PALStatement buildCreateNodeStatement(String name, NodeType type, String parent) {
         if (type == UA || type == OA) {
             return new CreateAttrStatement(
-                    new Expression(new VariableReference(name, Type.string())),
+                    new Expression(new Literal(name)),
                     type,
                     new Expression(
-                            new Expression(new VariableReference(parent, Type.string()))
+                            new Expression(new Literal(parent))
                     )
             );
         } else {
             return new CreateUserOrObjectStatement(
-                    new Expression(new VariableReference(name, Type.string())),
+                    new Expression(new Literal(name)),
                     type,
                     new Expression(
-                            new Expression(new VariableReference(parent, Type.string()))
+                            new Expression(new Literal(parent))
                     )
             );
         }
@@ -172,8 +185,12 @@ class PALSerializer {
     private String serializeFunctions() throws PMException {
         StringBuilder pal = new StringBuilder();
         Map<String, FunctionDefinitionStatement> functions = policy.pal().getFunctions();
-        for (String funcName : functions.keySet()) {
-            pal.append("\n").append(functions.get(funcName).toString()).append("\n");
+        for (FunctionDefinitionStatement func : functions.values()) {
+            if (!pal.isEmpty()) {
+                pal.append("\n");
+            }
+
+            pal.append(func.toString());
         }
 
         return pal.toString();
@@ -182,9 +199,12 @@ class PALSerializer {
     private String serializeConstants() throws PMException {
         StringBuilder pal = new StringBuilder();
         Map<String, Value> constants = policy.pal().getConstants();
-        for (String c : constants.keySet()) {
-            Value v = constants.get(c);
-            pal.append(serializeConstant(c, v)).append(SEMI_COLON);
+        for (Map.Entry<String, Value> c : constants.entrySet()) {
+            if (!pal.isEmpty()) {
+                pal.append("\n");
+            }
+
+            pal.append(serializeConstant(c.getKey(), c.getValue())).append(SEMI_COLON);
         }
         return pal.toString();
     }
@@ -192,9 +212,4 @@ class PALSerializer {
     private String serializeConstant(String name, Value value) {
         return String.format("const %s = %s", name, value.toString());
     }
-
-    private String indentLine(String line, int indentNum) {
-        return TAB_SPACES.repeat(Math.max(0, indentNum)) + line;
-    }
-
 }
