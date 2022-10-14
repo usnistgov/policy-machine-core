@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.policy.author.pal.compiler.visitor;
 
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
+import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.statement.SetResourceAccessRightsStatement;
-
-import java.util.List;
 
 public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResourceAccessRightsStatement> {
 
@@ -19,21 +18,15 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
     @Override
     public SetResourceAccessRightsStatement visitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx) {
         // check that this statement has not been called before
-        if (!visitorCtx.scope().resourceAccessRights().isEmpty()) {
+        if (!visitorCtx.scope().isResourceAccessRightsExpressionSet()) {
             visitorCtx.errorLog().addError(ctx, "set resource access rights has already been called");
-            return new SetResourceAccessRightsStatement(visitorCtx.scope().resourceAccessRights());
+            return new SetResourceAccessRightsStatement(visitorCtx.scope().getResourceAccessRightsExpression());
         }
 
-        PALParser.AccessRightArrayContext accessRightArrayCtx = ctx.accessRightArray();
-        List<PALParser.AccessRightContext> identifiers = accessRightArrayCtx.accessRight();
-        AccessRightSet arset = new AccessRightSet();
-        for (PALParser.AccessRightContext id : identifiers) {
-            String ar = id.getText();
-            arset.add(ar);
-        }
+        Expression expression = Expression.compileArray(visitorCtx, ctx.expressionArray(), Type.string());
 
-        visitorCtx.scope().setResourceAccessRights(arset);
+        visitorCtx.scope().setResourceAccessRightsExpression(expression.getExprList());
 
-        return new SetResourceAccessRightsStatement(arset);
+        return new SetResourceAccessRightsStatement(expression.getExprList());
     }
 }

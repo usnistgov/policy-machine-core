@@ -93,7 +93,11 @@ class PALSerializer {
         StringBuilder pal = new StringBuilder();
 
         // resource access rights
-        pal.append(new SetResourceAccessRightsStatement(policy.graph().getResourceAccessRights())).append("\n");
+        List<Expression> arExprs = new ArrayList<>();
+        for (String ar : policy.graph().getResourceAccessRights()) {
+            arExprs.add(new Expression(new Literal(ar)));
+        }
+        pal.append(new SetResourceAccessRightsStatement(arExprs)).append("\n");
 
         List<String> policyClasses = policy.graph().getPolicyClasses();
 

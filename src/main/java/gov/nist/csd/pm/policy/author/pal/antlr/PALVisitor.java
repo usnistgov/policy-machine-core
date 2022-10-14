@@ -408,18 +408,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArray(PALParser.ArrayContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#accessRightArray}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAccessRightArray(PALParser.AccessRightArrayContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PALParser#accessRight}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAccessRight(PALParser.AccessRightContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link PALParser#map}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

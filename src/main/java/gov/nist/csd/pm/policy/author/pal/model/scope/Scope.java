@@ -1,22 +1,17 @@
 package gov.nist.csd.pm.policy.author.pal.model.scope;
 
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.PALBuiltinConstants;
 import gov.nist.csd.pm.policy.author.pal.PALBuiltinFunctions;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 import gov.nist.csd.pm.policy.author.pal.compiler.Variable;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.exceptions.ObligationDoesNotExistException;
-import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.exceptions.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Scope implements Serializable {
 
@@ -41,7 +36,12 @@ public class Scope implements Serializable {
     private final Map<String, Value> values;
 
     /**
-     * The resources access rights for the policy.
+     * The resources access rights expression for the policy. This is used during compilation.
+     */
+    private List<Expression> resourceAccessRightsExpression;
+
+    /**
+     * The resources access rights for the policy. This is used during execution.
      */
     private AccessRightSet resourceAccessRights;
 
@@ -52,6 +52,7 @@ public class Scope implements Serializable {
         this.functions = new HashMap<>();
         this.variables = new HashMap<>();
         this.values = new HashMap<>();
+        this.resourceAccessRightsExpression = new ArrayList<>();
         this.resourceAccessRights = new AccessRightSet();
     }
 
@@ -67,8 +68,12 @@ public class Scope implements Serializable {
         return values;
     }
 
-    public AccessRightSet resourceAccessRights() {
-        return resourceAccessRights;
+    public List<Expression> getResourceAccessRightsExpression() {
+        return resourceAccessRightsExpression;
+    }
+
+    public boolean isResourceAccessRightsExpressionSet() {
+        return !resourceAccessRightsExpression.isEmpty();
     }
 
     public Scope copy() {
@@ -76,7 +81,12 @@ public class Scope implements Serializable {
 
         copy.functions = new HashMap<>(this.functions);
         copy.variables = new HashMap<>(this.variables);
-        copy.resourceAccessRights = new AccessRightSet(resourceAccessRights);
+
+        if (isResourceAccessRightsExpressionSet()) {
+            copy.resourceAccessRightsExpression = this.resourceAccessRightsExpression;
+        }
+
+        copy.resourceAccessRights = this.resourceAccessRights;
 
         return copy;
     }
@@ -106,8 +116,12 @@ public class Scope implements Serializable {
         values.putAll(palCtx.getConstants());
     }
 
-    public void setResourceAccessRights(AccessRightSet arset) {
-        this.resourceAccessRights = arset;
+    public void setResourceAccessRightsExpression(List<Expression> expression) {
+        this.resourceAccessRightsExpression = expression;
+    }
+
+    public void setResourceAccessRights(AccessRightSet accessRightSet) {
+        this.resourceAccessRights = accessRightSet;
     }
 
     public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws FunctionAlreadyDefinedInScopeException {
@@ -131,7 +145,6 @@ public class Scope implements Serializable {
 
     public void addVariable(String name, Type type, boolean isConst) throws VariableAlreadyDefinedInScopeException {
         if (constantExists(name)
-                || resourceAccessRights.contains(name)
                 || isBuiltinVariable(name)) {
             throw new VariableAlreadyDefinedInScopeException(name);
         }
@@ -148,8 +161,6 @@ public class Scope implements Serializable {
             return variables.get(name);
         } else if (isBuiltinVariable(name)) {
             return PALBuiltinConstants.builtinVariables().get(name);
-        } else if (resourceAccessRights.contains(name)) {
-            return new Variable(name, Type.string(), true);
         }
 
         throw new UnknownVariableInScopeException(name);

@@ -458,20 +458,6 @@ public class PALBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements PA
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAccessRightArray(PALParser.AccessRightArrayContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitAccessRight(PALParser.AccessRightContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitMap(PALParser.MapContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
