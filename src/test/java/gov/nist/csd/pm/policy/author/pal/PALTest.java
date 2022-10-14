@@ -55,7 +55,7 @@ class PALTest {
     @Test
     void testCreatePolicy() throws PMException, PALCompilationException {
         String input = """
-                create policy class pc1;
+                create policy class 'pc1';
                 """;
         MemoryPAP pap = new MemoryPAP();
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
@@ -65,9 +65,9 @@ class PALTest {
     @Test
     void testCreateAttr() throws PMException, PALCompilationException {
         String input = """
-                create policy class pc1;
-                create user attribute ua1 in pc1;
-                create object attribute oa1 in pc1;
+                create policy class 'pc1';
+                create user attribute 'ua1' in 'pc1';
+                create object attribute 'oa1' in 'pc1';
                 """;
         MemoryPAP pap = new MemoryPAP();
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
@@ -82,11 +82,11 @@ class PALTest {
     @Test
     void testCreateUserObject() throws PMException, PALCompilationException {
         String input = """
-                create policy class pc1;
-                create user attribute ua1 in pc1;
-                create object attribute oa1 in pc1;
-                create user u1 in ua1;
-                create object o1 in oa1;
+                create policy class 'pc1';
+                create user attribute 'ua1' in 'pc1';
+                create object attribute 'oa1' in 'pc1';
+                create user 'u1' in 'ua1';
+                create object 'o1' in 'oa1';
                 """;
         MemoryPAP pap = new MemoryPAP();
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
@@ -101,9 +101,9 @@ class PALTest {
     @Test
     void testSetNodeProperties() throws PMException, PALCompilationException {
         String input = """
-                create policy class pc1;
-                create user attribute ua1 in pc1;
-                set properties of ua1 to {'key': 'value'};
+                create policy class 'pc1';
+                create user attribute 'ua1' in 'pc1';
+                set properties of 'ua1' to {'key': 'value'};
                 """;
         MemoryPAP pap = new MemoryPAP();
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);
@@ -113,12 +113,12 @@ class PALTest {
     @Test
     void testAssign() throws PMException, PALCompilationException {
         String input = """
-                create policy class pc1;
-                create user attribute ua1 in pc1;
-                create user attribute ua2 in pc1;
-                create user attribute ua3 in pc1;
-                assign ua1 to ua2;
-                assign ua1 to ua3;
+                create policy class 'pc1';
+                create user attribute 'ua1' in 'pc1';
+                create user attribute 'ua2' in 'pc1';
+                create user attribute 'ua3' in 'pc1';
+                assign 'ua1' to 'ua2';
+                assign 'ua1' to 'ua3';
                 """;
         MemoryPAP pap = new MemoryPAP();
         new PALExecutor(pap).compileAndExecutePAL(new UserContext(SUPER_USER), input);

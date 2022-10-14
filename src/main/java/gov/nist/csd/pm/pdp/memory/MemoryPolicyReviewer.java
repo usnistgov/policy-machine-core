@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.pdp.memory;
 
+import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
-import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-public class AssignEvent extends PolicyEvent {
+public class AssignEvent implements PolicyEvent {
 
     private final String child;
     private final String parent;
@@ -18,4 +18,8 @@ public class AssignEvent extends PolicyEvent {
         return parent;
     }
 
+    @Override
+    public String getEventName() {
+        return "assign";
+    }
 }

@@ -1,10 +1,15 @@
 package gov.nist.csd.pm.policy.author.pal.expression;
 
+import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.naming.Naming;
+import gov.nist.csd.pm.pdp.memory.MemoryPDP;
+import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
-import gov.nist.csd.pm.policy.events.EventContext;
+import gov.nist.csd.pm.epp.EventContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -50,8 +55,10 @@ class ValueTest {
 
     @Test
     void testObjectToValue() throws PMException {
-        Value objectToValue = Value.objectToValue(new EventContext(new UserContext("testUser"), "target123",
-                new CreateObjectAttributeEvent("testOA", noprops(), "pc1")));
+        EventContext testEventCtx = new EventContext(new UserContext("testUser"), "target123",
+                new CreateObjectAttributeEvent("testOA", noprops(), "pc1"));
+
+        Value objectToValue = Value.objectToValue(testEventCtx);
         assertTrue(objectToValue.isMap());
 
         Value key = new Value("userCtx");
@@ -86,7 +93,9 @@ class ValueTest {
                         new Value("type"), new Value("OA"),
                         new Value("properties"), new Value(new HashMap<>()),
                         new Value("initialParent"), new Value("pc1"),
-                        new Value("additionalParents"), new Value(new Value[]{})),
+                        new Value("additionalParents"), new Value(new Value[]{}),
+                        new Value("eventName"), new Value("create_object_attribute")
+                ),
                 value.getMapValue()
         );
     }

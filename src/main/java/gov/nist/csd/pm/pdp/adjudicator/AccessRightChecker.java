@@ -16,8 +16,8 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.REP_PROPERTY;
 
 public class AccessRightChecker {
 
-    private PAP pap;
-    private PolicyReviewer policyReviewer;
+    private final PAP pap;
+    private final PolicyReviewer policyReviewer;
 
     public AccessRightChecker(PAP pap, PolicyReviewer policyReviewer) {
         this.pap = pap;

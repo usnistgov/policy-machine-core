@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryPolicyReviewerTest {
@@ -232,7 +231,7 @@ class MemoryPolicyReviewerTest {
 
 
             Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
         @Test
@@ -253,7 +252,7 @@ class MemoryPolicyReviewerTest {
 
 
             Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
         @Test
@@ -334,7 +333,7 @@ class MemoryPolicyReviewerTest {
 
 
             Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.contains("read"));
         }
         @Test
@@ -356,7 +355,7 @@ class MemoryPolicyReviewerTest {
 
 
             Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
         @Test
@@ -378,7 +377,7 @@ class MemoryPolicyReviewerTest {
 
 
             Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
         @Test
@@ -744,21 +743,21 @@ class MemoryPolicyReviewerTest {
             String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
             String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.graph().associate(ua1, oa1, new AccessRightSet(ALL_ACCESS_RIGHTS));
+            pap.graph().associate(ua1, oa1, allAccessRights());
 
 
             Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
 
-            pap.graph().associate(ua1, oa1, new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS));
+            pap.graph().associate(ua1, oa1, allAdminAccessRights());
             list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
-            assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertTrue(list.containsAll(allAdminAccessRights()));
             assertFalse(list.containsAll(RWE));
 
             pap.graph().associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
             list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
-            assertFalse(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+            assertFalse(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
 

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-public class RemoveFunctionEvent extends PolicyEvent {
+public class RemoveFunctionEvent implements PolicyEvent {
 
     private String functionName;
 
@@ -10,5 +10,10 @@ public class RemoveFunctionEvent extends PolicyEvent {
 
     public String getFunctionName() {
         return functionName;
+    }
+
+    @Override
+    public String getEventName() {
+        return "remove_function";
     }
 }

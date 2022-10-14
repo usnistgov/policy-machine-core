@@ -2,10 +2,10 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 
-public class AddConstantEvent extends PolicyEvent {
+public class AddConstantEvent implements PolicyEvent {
 
-    private String name;
-    private Value value;
+    private final String name;
+    private final Value value;
 
     public AddConstantEvent(String name, Value value) {
         this.name = name;
@@ -18,5 +18,10 @@ public class AddConstantEvent extends PolicyEvent {
 
     public Value getValue() {
         return value;
+    }
+
+    @Override
+    public String getEventName() {
+        return "add_constant";
     }
 }

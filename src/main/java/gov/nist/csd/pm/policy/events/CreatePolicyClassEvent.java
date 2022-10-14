@@ -8,4 +8,9 @@ public class CreatePolicyClassEvent extends CreateNodeEvent{
     public CreatePolicyClassEvent(String name, Map<String, String> properties) {
         super(name, NodeType.PC, properties);
     }
+
+    @Override
+    public String getEventName() {
+        return "create_policy_class";
+    }
 }

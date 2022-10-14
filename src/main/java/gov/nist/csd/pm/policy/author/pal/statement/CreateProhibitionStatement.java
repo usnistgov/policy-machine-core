@@ -9,20 +9,21 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CreateProhibitionStatement extends PALStatement {
 
-    private final NameExpression label;
-    private final NameExpression subject;
+    private final Expression label;
+    private final Expression subject;
     private final ProhibitionSubject.Type subjectType;
-    private final NameExpression accessRights;
+    private final Expression accessRights;
     private final boolean isIntersection;
     private final List<Container> containers;
 
-    public CreateProhibitionStatement(NameExpression label, NameExpression subject, ProhibitionSubject.Type subjectType, NameExpression accessRights,
+    public CreateProhibitionStatement(Expression label, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
                                       boolean isIntersection, List<Container> containers) {
         this.label = label;
         this.subject = subject;
@@ -32,11 +33,11 @@ public class CreateProhibitionStatement extends PALStatement {
         this.containers = containers;
     }
 
-    public NameExpression getLabel() {
+    public Expression getLabel() {
         return label;
     }
 
-    public NameExpression getSubject() {
+    public Expression getSubject() {
         return subject;
     }
 
@@ -44,7 +45,7 @@ public class CreateProhibitionStatement extends PALStatement {
         return subjectType;
     }
 
-    public NameExpression getAccessRights() {
+    public Expression getAccessRights() {
         return accessRights;
     }
 
@@ -121,11 +122,11 @@ public class CreateProhibitionStatement extends PALStatement {
         return Objects.hash(label, subject, accessRights, isIntersection, containers);
     }
 
-    public static class Container {
+    public static class Container implements Serializable {
         private final boolean isComplement;
-        private final NameExpression name;
+        private final Expression name;
 
-        public Container(boolean isComplement, NameExpression name) {
+        public Container(boolean isComplement, Expression name) {
             this.isComplement = isComplement;
             this.name = name;
         }
@@ -137,21 +138,21 @@ public class CreateProhibitionStatement extends PALStatement {
     }
 
     public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {
-        List<NameExpression> exprs = new ArrayList<>();
+        List<Expression> exprs = new ArrayList<>();
         for (String ar : prohibition.getAccessRightSet()) {
-            exprs.add(new NameExpression(new VariableReference(ar, Type.string())));
+            exprs.add(new Expression(new VariableReference(ar, Type.string())));
         }
 
         List<Container> containers = new ArrayList<>();
         for (ContainerCondition cc : prohibition.getContainers()) {
-            containers.add(new Container(cc.complement(), new NameExpression(new VariableReference(cc.name(), Type.string()))));
+            containers.add(new Container(cc.complement(), new Expression(new VariableReference(cc.name(), Type.string()))));
         }
 
         return new CreateProhibitionStatement(
-                new NameExpression(new VariableReference(prohibition.getLabel(), Type.string())),
-                new NameExpression(new VariableReference(prohibition.getSubject().name(), Type.string())),
+                new Expression(new VariableReference(prohibition.getLabel(), Type.string())),
+                new Expression(new VariableReference(prohibition.getSubject().name(), Type.string())),
                 prohibition.getSubject().type(),
-                new NameExpression(exprs),
+                new Expression(exprs),
                 prohibition.isIntersection(),
                 containers
         );

@@ -17,12 +17,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPal(PALParser.PalContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#stmts}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStmts(PALParser.StmtsContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link PALParser#stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -360,12 +354,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitResponseBlock(PALParser.ResponseBlockContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#responseStmts}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitResponseStmts(PALParser.ResponseStmtsContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link PALParser#responseStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -402,23 +390,17 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PALParser#expressionArray}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpressionArray(PALParser.ExpressionArrayContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PALParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpression(PALParser.ExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PALParser#nameExpressionArray}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNameExpressionArray(PALParser.NameExpressionArrayContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PALParser#nameExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNameExpression(PALParser.NameExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PALParser#array}.
 	 * @param ctx the parse tree
@@ -509,16 +491,4 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFuncCallArgs(PALParser.FuncCallArgsContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PALParser#id}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitId(PALParser.IdContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PALParser#keywordAsID}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitKeywordAsID(PALParser.KeywordAsIDContext ctx);
 }

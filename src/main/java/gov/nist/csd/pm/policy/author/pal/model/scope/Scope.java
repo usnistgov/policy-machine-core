@@ -123,7 +123,7 @@ public class Scope implements Serializable {
         if (functions.containsKey(name)) {
             return functions.get(name);
         } else if (isBuiltinFunction(name)) {
-            return PALBuiltinFunctions.BUILTIN_FUNCTIONS.get(name);
+            return PALBuiltinFunctions.builtinFunctions().get(name);
         }
 
         throw new UnknownFunctionInScopeException(name);
@@ -147,7 +147,7 @@ public class Scope implements Serializable {
         if (variables.containsKey(name)) {
             return variables.get(name);
         } else if (isBuiltinVariable(name)) {
-            return PALBuiltinConstants.BUILTIN_VARIABLES.get(name);
+            return PALBuiltinConstants.builtinVariables().get(name);
         } else if (resourceAccessRights.contains(name)) {
             return new Variable(name, Type.string(), true);
         }
@@ -172,8 +172,8 @@ public class Scope implements Serializable {
     public Value getValue(String name) throws UnknownVariableInScopeException {
         if (values.containsKey(name)) {
             return values.get(name);
-        } else if (isBuiltinVariable(name)) {
-            return PALBuiltinConstants.BUILTIN_VALUES.get(name);
+        } else if (isBuiltinValue(name)) {
+            return PALBuiltinConstants.builtinValues().get(name);
         } else if (resourceAccessRights.contains(name)) {
             return new Value(name);
         }
@@ -182,11 +182,14 @@ public class Scope implements Serializable {
     }
 
     private boolean isBuiltinVariable(String name) {
-        return PALBuiltinConstants.BUILTIN_VARIABLES.containsKey(name);
+        return PALBuiltinConstants.builtinVariables().containsKey(name);
+    }
+    private boolean isBuiltinValue(String name) {
+        return PALBuiltinConstants.builtinValues().containsKey(name);
     }
 
     private boolean isBuiltinFunction(String name) {
-        return PALBuiltinFunctions.BUILTIN_FUNCTIONS.containsKey(name);
+        return PALBuiltinFunctions.builtinFunctions().containsKey(name);
     }
 
     public enum Mode {

@@ -1,9 +1,5 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -11,7 +7,6 @@ import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.policy.events.EventContext;
 
 import java.util.List;
 
@@ -36,15 +31,9 @@ class EventProcessor {
                 }
 
                 Response response = rule.getResponse();
-                ExecutionContext executionCtx = response.getExecutionCtx();
-                String eventCtxVariable = response.getEventCtxVariable();
-
-                executionCtx.scope().addValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
                 // need to run pdp tx as author
-                pdp.runTx(author, (txPDP) -> {
-                    PALExecutor.executeStatementBlock(executionCtx, txPDP, response.getStatements());
-                });
+                pdp.runTx(author, txPDP -> response.execute(txPDP, eventCtx));
             }
         }
     }

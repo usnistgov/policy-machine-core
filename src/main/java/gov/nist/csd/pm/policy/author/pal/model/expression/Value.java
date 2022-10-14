@@ -288,53 +288,64 @@ public class Value implements Serializable {
             return Value.nullValue();
         }
 
-        Value value;
         if (o instanceof String s) {
-            value = new Value(s);
-
+            return new Value(s);
+        } else if (o instanceof Integer i) {
+            return new Value(i);
         } else if (o.getClass().isArray()) {
-            Object[] arr = (Object[])o;
-            Value[] valueArr = new Value[arr.length];
-            for (int i = 0; i < arr.length; i++) {
-                Object arrObj = arr[i];
-                valueArr[i] = objectToValue(arrObj);
-            }
-
-            value = new Value(valueArr);
-
+            return toArrayValue(o);
         } else if (o instanceof List list) {
-            List<Value> valueList = new ArrayList<>();
-            for (Object arrObj : list) {
-                valueList.add(objectToValue(arrObj));
-            }
-
-            value = new Value(valueList.toArray(new Value[]{}));
-
+            return toListValue(list);
         } else if (o instanceof Boolean b) {
-            value = new Value(b);
-
+            return new Value(b);
         } else if (o instanceof Map m) {
-            Map<Value, Value> map = new HashMap<>();
-            for (Object key : m.keySet()) {
-                map.put(objectToValue(key), objectToValue(m.get(key)));
-            }
-
-            value = new Value(map);
+            return toMapValue(m);
         } else {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map map = objectMapper.convertValue(o, Map.class);
+            return objToValue(o);
+        }
+    }
 
-            Map<Value, Value> valueMap = new HashMap<>();
-            for (Object key : map.keySet()) {
-                String field = key.toString();
-                Object obj = map.get(field);
-                valueMap.put(new Value(field), objectToValue(obj));
-            }
-
-            value = new Value(valueMap);
+    private static Value toArrayValue(Object o) {
+        Object[] arr = (Object[])o;
+        Value[] valueArr = new Value[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            Object arrObj = arr[i];
+            valueArr[i] = objectToValue(arrObj);
         }
 
-        return value;
+        return new Value(valueArr);
+    }
+
+    private static Value toListValue(List list) {
+        List<Value> valueList = new ArrayList<>();
+        for (Object arrObj : list) {
+            valueList.add(objectToValue(arrObj));
+        }
+
+        return new Value(valueList.toArray(new Value[]{}));
+    }
+
+    private static Value toMapValue(Map m) {
+        Map<Value, Value> map = new HashMap<>();
+        for (Object key : m.keySet()) {
+            map.put(objectToValue(key), objectToValue(m.get(key)));
+        }
+
+        return new Value(map);
+    }
+
+    private static Value objToValue(Object o) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map map = objectMapper.convertValue(o, Map.class);
+
+        Map<Value, Value> valueMap = new HashMap<>();
+        for (Object key : map.keySet()) {
+            String field = key.toString();
+            Object obj = map.get(field);
+            valueMap.put(new Value(field), objectToValue(obj));
+        }
+
+        return new Value(valueMap);
     }
 
     @Override
@@ -368,12 +379,12 @@ public class Value implements Serializable {
 
     private String mapToString(Map<Value, Value> mapValue) {
         StringBuilder entries = new StringBuilder();
-        for (Value k : mapValue.keySet()) {
+        for (Map.Entry<Value, Value> entry : mapValue.entrySet()) {
             if (entries.length() > 0) {
                 entries.append(", ");
             }
 
-            entries.append(k.toString()).append(": ").append(mapValue.get(k).toString());
+            entries.append(entry.getKey()).append(": ").append(entry.getValue());
         }
 
         return String.format("{%s}", entries);

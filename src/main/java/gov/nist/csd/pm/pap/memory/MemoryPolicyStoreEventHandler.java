@@ -6,20 +6,23 @@ import gov.nist.csd.pm.policy.ProhibitionsReader;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public class MemoryPolicyStoreEventHandler extends PolicyEventHandler {
+public class MemoryPolicyStoreEventHandler extends BasePolicyEventHandler {
 
     public MemoryPolicyStoreEventHandler(MemoryPolicyStore store) {
         super(store);
     }
 
+    @Override
     public GraphReader graph() {
         return policy.graph();
     }
 
+    @Override
     public ProhibitionsReader prohibitions() {
         return policy.prohibitions();
     }
 
+    @Override
     public ObligationsReader obligations() {
         return policy.obligations();
     }

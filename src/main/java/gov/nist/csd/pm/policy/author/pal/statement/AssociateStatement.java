@@ -10,25 +10,25 @@ import java.util.Objects;
 
 public class AssociateStatement extends PALStatement {
 
-    private final NameExpression ua;
-    private final NameExpression target;
-    private final NameExpression accessRights;
+    private final Expression ua;
+    private final Expression target;
+    private final Expression accessRights;
 
-    public AssociateStatement(NameExpression ua, NameExpression target, NameExpression accessRights) {
+    public AssociateStatement(Expression ua, Expression target, Expression accessRights) {
         this.ua = ua;
         this.target = target;
         this.accessRights = accessRights;
     }
 
-    public NameExpression getUa() {
+    public Expression getUa() {
         return ua;
     }
 
-    public NameExpression getTarget() {
+    public Expression getTarget() {
         return target;
     }
 
-    public NameExpression getAccessRights() {
+    public Expression getAccessRights() {
         return accessRights;
     }
 

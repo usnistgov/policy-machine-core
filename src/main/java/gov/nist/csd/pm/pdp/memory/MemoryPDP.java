@@ -17,7 +17,7 @@ import gov.nist.csd.pm.policy.tx.TxRunner;
 
 public class MemoryPDP extends PDP {
 
-    private final PolicyEventHandler policyEventHandler;
+    private final BasePolicyEventHandler policyEventHandler;
 
     public MemoryPDP(MemoryPAP pap) throws PMException {
         super(pap);
@@ -68,7 +68,7 @@ public class MemoryPDP extends PDP {
         }
     }
 
-    private static class EmbeddedPolicyListener extends PolicyEventHandler implements PolicyReader {
+    private static class EmbeddedPolicyListener extends BasePolicyEventHandler implements PolicyReader {
 
         public EmbeddedPolicyListener(MemoryPAP pap) {
             super(pap);

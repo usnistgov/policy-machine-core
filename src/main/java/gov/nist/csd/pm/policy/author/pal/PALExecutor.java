@@ -19,8 +19,6 @@ import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.policy.author.pal.PALBuiltinFunctions.BUILTIN_FUNCTIONS;
-
 public class PALExecutor implements PALExecutable{
 
     private final PolicyAuthor policy;

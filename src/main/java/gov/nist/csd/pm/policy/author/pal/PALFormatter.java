@@ -34,7 +34,6 @@ public class PALFormatter extends PALBaseVisitor<String> {
 
         String formatted = new PALFormatter().visitPal(parser.pal());
 
-        // last step is to remove any blank lines
         return removeEmptyLines(formatted);
     }
 
@@ -72,11 +71,6 @@ public class PALFormatter extends PALBaseVisitor<String> {
 
     @Override
     public String visitPal(PALParser.PalContext ctx) {
-        return visitStmts(ctx.stmts());
-    }
-
-    @Override
-    public String visitStmts(PALParser.StmtsContext ctx) {
         StringBuilder s = new StringBuilder();
         for (PALParser.StmtContext stmtCtx : ctx.stmt()) {
             s.append(visitStmt(stmtCtx));
@@ -150,11 +144,11 @@ public class PALFormatter extends PALBaseVisitor<String> {
         PALParser.FuncBodyContext funcBodyCtx = ctx.funcBody();
         int openCurlyIndex = funcBodyCtx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         int closeCurlyIndex = funcBodyCtx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
-        String signature = indent() + (text.substring(0, openCurlyIndex + 1)) + NEW_LINE;
+        String signature = indent() + (text.substring(0, openCurlyIndex + 1).trim()) + NEW_LINE;
 
         String body = visitStmts(funcBodyCtx.stmt());
 
-        String close = "\n" + indent() + text.substring(closeCurlyIndex) + NEW_LINE;
+        String close = "\n" + indent() + text.substring(closeCurlyIndex).trim() + NEW_LINE;
 
         return signature + body + close;
     }
@@ -182,11 +176,11 @@ public class PALFormatter extends PALBaseVisitor<String> {
         PALParser.StmtBlockContext forStmtsCtx = ctx.stmtBlock();
         int openCurlyIndex = forStmtsCtx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         int closeCurlyIndex = forStmtsCtx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
-        String forloop = indent() + (text.substring(0, openCurlyIndex + 1)) + NEW_LINE;
+        String forloop = indent() + (text.substring(0, openCurlyIndex + 1).trim()) + NEW_LINE;
 
         String body = visitStmts(ctx.stmtBlock().stmt());
 
-        String close = "\n" + indent() + text.substring(closeCurlyIndex) + NEW_LINE;
+        String close = "\n" + indent() + text.substring(closeCurlyIndex).trim() + NEW_LINE;
 
         return forloop + body + close;
     }
@@ -211,7 +205,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
         int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
-        String ifStr = indent() + text.substring(0, openCurlyIndex);
+        String ifStr = indent() + text.substring(0, openCurlyIndex).trim() + " ";
 
         String ifStmtBlock = visitStmtBlock(ctx.stmtBlock());
 
@@ -234,7 +228,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
         int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
-        String ifStr = " " + text.substring(0, openCurlyIndex);
+        String ifStr = " " + text.substring(0, openCurlyIndex).trim() + " ";
 
         String stmtBlock = visitStmtBlock(ctx.stmtBlock());
 
@@ -250,7 +244,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
         int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
-        String elseStr = " " + text.substring(0, openCurlyIndex);
+        String elseStr = " " + text.substring(0, openCurlyIndex).trim();
 
         String stmtBlock = visitStmtBlock(ctx.stmtBlock());
 
@@ -321,7 +315,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         int stmtStartIndex = ctx.start.getStartIndex();
         int openCurlyIndex = ctx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         int closeCurlyIndex = ctx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
-        String create = indent() + (text.substring(0, openCurlyIndex + 1)) + NEW_LINE;
+        String create = indent() + (text.substring(0, openCurlyIndex + 1).trim()) + NEW_LINE;
 
         StringBuilder body = new StringBuilder();
         List<PALParser.CreateRuleStmtContext> createRuleStmts = ctx.createRuleStmt();
@@ -331,7 +325,7 @@ public class PALFormatter extends PALBaseVisitor<String> {
         }
         indentLevel--;
 
-        String close = "\n" + indent() + text.substring(closeCurlyIndex) + NEW_LINE;
+        String close = "\n" + indent() + text.substring(closeCurlyIndex).trim() + NEW_LINE;
 
         return create + body + close;
     }
@@ -341,10 +335,10 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
         int stmtStartIndex = ctx.start.getStartIndex();
         int whenIndex = ctx.WHEN().getSymbol().getStartIndex() - stmtStartIndex;
-        String create = indent() + (text.substring(0, whenIndex)) + NEW_LINE;
+        String create = indent() + (text.substring(0, whenIndex).trim()) + NEW_LINE;
 
         int performsIndex = ctx.PERFORMS().getSymbol().getStartIndex() - stmtStartIndex;
-        String when = indent() + (text.substring(whenIndex, performsIndex)) + NEW_LINE;
+        String when = indent() + (text.substring(whenIndex, performsIndex).trim()) + NEW_LINE;
 
         int doIndex = ctx.response().DO().getSymbol().getStartIndex() - stmtStartIndex;
         String performs = "";
@@ -353,12 +347,12 @@ public class PALFormatter extends PALBaseVisitor<String> {
         if (ctx.ON() != null) {
             int onIndex = ctx.ON().getSymbol().getStartIndex() - stmtStartIndex;
             performsEndIndex = onIndex;
-            on = indent() + (text.substring(onIndex, doIndex)) + NEW_LINE;
+            on = indent() + (text.substring(onIndex, doIndex).trim()) + NEW_LINE;
         } else {
             performsEndIndex = doIndex;
         }
 
-        performs = indent() + (text.substring(performsIndex, performsEndIndex)) + NEW_LINE;
+        performs = indent() + (text.substring(performsIndex, performsEndIndex).trim()) + NEW_LINE;
 
         String response = visitResponse(ctx.response());
 
@@ -370,8 +364,8 @@ public class PALFormatter extends PALBaseVisitor<String> {
         String text = getText(ctx);
 
         int start = ctx.start.getStartIndex();
-        int closeParenIndex = (ctx.CLOSE_PAREN().getSymbol().getStartIndex() + 1) - start;
-        String doStr = indent() + text.substring(0, closeParenIndex) + " ";
+        int closeParenIndex = (ctx.CLOSE_PAREN().getSymbol().getStopIndex() + 1) - start;
+        String doStr = indent() + text.substring(0, closeParenIndex).trim() + " ";
 
         String response = visitResponseBlock(ctx.responseBlock());
 
@@ -381,16 +375,15 @@ public class PALFormatter extends PALBaseVisitor<String> {
     @Override
     public String visitResponseBlock(PALParser.ResponseBlockContext ctx) {
         indentLevel++;
-        String responseBlock = visitResponseStmts(ctx.responseStmts());
+        String responseBlock = visitResponseStmts(ctx.responseStmt());
         indentLevel--;
 
         return "{" + NEW_LINE + responseBlock + indent() + "}" + NEW_LINE;
     }
 
-    @Override
-    public String visitResponseStmts(PALParser.ResponseStmtsContext ctx) {
+    public String visitResponseStmts(List<PALParser.ResponseStmtContext> ctx) {
         StringBuilder stmts = new StringBuilder();
-        for (PALParser.ResponseStmtContext stmtCtx : ctx.responseStmt()) {
+        for (PALParser.ResponseStmtContext stmtCtx : ctx) {
             stmts.append(visitResponseStmt(stmtCtx)).append(NEW_LINE);
         }
         return stmts.toString();
@@ -400,8 +393,10 @@ public class PALFormatter extends PALBaseVisitor<String> {
     public String visitResponseStmt(PALParser.ResponseStmtContext ctx) {
         if (ctx.stmt() != null) {
             return visitStmt(ctx.stmt());
-        } else {
+        } else if (ctx.createRuleStmt() != null){
             return visitCreateRuleStmt(ctx.createRuleStmt());
+        } else {
+            return visitDeleteRuleStmt(ctx.deleteRuleStmt());
         }
     }
 

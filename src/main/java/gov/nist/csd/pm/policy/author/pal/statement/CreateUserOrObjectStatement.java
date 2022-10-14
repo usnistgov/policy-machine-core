@@ -15,17 +15,17 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.O;
 
 public class CreateUserOrObjectStatement extends PALStatement {
 
-    public NameExpression name;
-    public NodeType type;
-    public NameExpression assignTo;
+    private final Expression name;
+    private final NodeType type;
+    private final Expression assignTo;
 
-    public CreateUserOrObjectStatement(NameExpression name, NodeType type, NameExpression assignTo) {
+    public CreateUserOrObjectStatement(Expression name, NodeType type, Expression assignTo) {
         this.name = name;
         this.type = type;
         this.assignTo = assignTo;
     }
 
-    public NameExpression getName() {
+    public Expression getName() {
         return name;
     }
 
@@ -33,7 +33,7 @@ public class CreateUserOrObjectStatement extends PALStatement {
         return type;
     }
 
-    public NameExpression getAssignTo() {
+    public Expression getAssignTo() {
         return assignTo;
     }
 

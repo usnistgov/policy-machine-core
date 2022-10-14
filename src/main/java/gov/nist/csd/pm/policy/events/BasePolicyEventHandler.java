@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.GraphReader;
 import gov.nist.csd.pm.policy.ObligationsReader;
 import gov.nist.csd.pm.policy.PolicyReader;
@@ -9,16 +8,15 @@ import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
-import gov.nist.csd.pm.policy.review.ObligationsReview;
 
 /**
  * Implements the PolicyEventListener interface to apply policy events to the passed PolicyAuthor.
  */
-public class PolicyEventHandler implements PolicyEventListener, PolicyReader {
+public abstract class BasePolicyEventHandler implements PolicyEventListener, PolicyReader {
     
     protected PolicyAuthor policy;
 
-    public PolicyEventHandler(PolicyAuthor policy) {
+    protected BasePolicyEventHandler(PolicyAuthor policy) {
         this.policy = policy;
     }
 
@@ -155,6 +153,7 @@ public class PolicyEventHandler implements PolicyEventListener, PolicyReader {
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
+            default -> { /* ANY will never be passed as a node type */ }
         }
     }
 

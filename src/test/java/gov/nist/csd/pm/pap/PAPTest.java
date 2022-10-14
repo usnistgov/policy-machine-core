@@ -76,10 +76,8 @@ class PAPTest {
     }
 
     @Test
-    public void testSuperPolicy() throws PMException {
+    void testSuperPolicy() throws PMException {
         runTest(pap -> {
-            assertTrue(pap.graph().nodeExists(SUPER_PC));
-
             String baseOA = Naming.baseObjectAttribute(SUPER_PC);
             String baseUA = Naming.baseUserAttribute(SUPER_PC);
             String repOA = Naming.pcRepObjectAttribute(SUPER_PC);
@@ -111,25 +109,25 @@ class PAPTest {
             assertEquals(List.of(SUPER_OBJECT), pap.graph().getChildren(baseOA));
 
             List<Association> expectedAssociations = Arrays.asList(
-                    new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET),
-                    new Association(SUPER_UA, baseOA, ALL_ACCESS_RIGHTS_SET),
-                    new Association(SUPER_UA, repOA, ALL_ACCESS_RIGHTS_SET)
+                    new Association(SUPER_UA, baseUA, allAccessRights()),
+                    new Association(SUPER_UA, baseOA, allAccessRights()),
+                    new Association(SUPER_UA, repOA, allAccessRights())
             );
             List<Association> actualAssociations = pap.graph().getAssociationsWithSource(SUPER_UA);
             assertTrue(expectedAssociations.containsAll(actualAssociations));
             assertTrue(actualAssociations.containsAll(expectedAssociations));
 
-            expectedAssociations = List.of(new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET));
+            expectedAssociations = List.of(new Association(SUPER_UA, baseUA, allAccessRights()));
             actualAssociations = pap.graph().getAssociationsWithTarget(baseUA);
             assertTrue(expectedAssociations.containsAll(actualAssociations));
             assertTrue(actualAssociations.containsAll(expectedAssociations));
 
-            expectedAssociations = List.of(new Association(SUPER_UA, baseOA, ALL_ACCESS_RIGHTS_SET));
+            expectedAssociations = List.of(new Association(SUPER_UA, baseOA, allAccessRights()));
             actualAssociations = pap.graph().getAssociationsWithTarget(baseOA);
             assertTrue(expectedAssociations.containsAll(actualAssociations));
             assertTrue(actualAssociations.containsAll(expectedAssociations));
 
-            expectedAssociations = List.of(new Association(SUPER_UA, repOA, ALL_ACCESS_RIGHTS_SET));
+            expectedAssociations = List.of(new Association(SUPER_UA, repOA, allAccessRights()));
             actualAssociations = pap.graph().getAssociationsWithTarget(repOA);
             assertTrue(expectedAssociations.containsAll(actualAssociations));
             assertTrue(actualAssociations.containsAll(expectedAssociations));
@@ -137,23 +135,25 @@ class PAPTest {
     }
 
     @Test
-    public void testSetResourceAccessRights() throws PMException {
+    void testSetResourceAccessRights() throws PMException {
         runTest(pap -> {
             AccessRightSet arset = new AccessRightSet("read", "write");
             pap.graph().setResourceAccessRights(arset);
             assertEquals(arset, pap.graph().getResourceAccessRights());
+
+            assertThrows(AdminAccessRightExistsException.class, () -> pap.graph().setResourceAccessRights(new AccessRightSet(CREATE_POLICY_CLASS)));
         });
     }
 
     @Nested
     class CreatePolicyClassTest {
         @Test
-        public void NameAlreadyExists() throws PMException {
+        void NameAlreadyExists() throws PMException {
             runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createPolicyClass(SUPER_PC)));
         }
 
         @Test
-        public void Success() throws PMException {
+        void Success() throws PMException {
             runTest(pap -> {
                 pap.graph().createPolicyClass("pc1");
 
@@ -172,16 +172,16 @@ class PAPTest {
                 assertTrue(pap.graph().getChildren("pc1").contains(rep));
 
                 assertTrue(pap.graph().getAssociationsWithSource(SUPER_UA).containsAll(List.of(
-                        new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET),
-                        new Association(SUPER_UA, baseOA, ALL_ACCESS_RIGHTS_SET)
+                        new Association(SUPER_UA, baseUA, allAccessRights()),
+                        new Association(SUPER_UA, baseOA, allAccessRights())
                 )));
 
                 assertTrue(pap.graph().getAssociationsWithTarget(baseUA).contains(
-                        new Association(SUPER_UA, baseUA, ALL_ACCESS_RIGHTS_SET)
+                        new Association(SUPER_UA, baseUA, allAccessRights())
                 ));
 
                 assertTrue(pap.graph().getAssociationsWithTarget(baseOA).contains(
-                        new Association(SUPER_UA, baseOA, ALL_ACCESS_RIGHTS_SET)
+                        new Association(SUPER_UA, baseOA, allAccessRights())
                 ));
             });
         }
@@ -731,10 +731,10 @@ class PAPTest {
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("ua1", "pc1");
                 pap.graph().createObjectAttribute("oa1", "pc1");
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet("read")));
                 pap.graph().setResourceAccessRights(new AccessRightSet("read"));
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.graph().associate("ua1", "oa1", new AccessRightSet("write")));
                 assertDoesNotThrow(() -> pap.graph().associate("ua1", "oa1", new AccessRightSet("read")));
                 assertDoesNotThrow(() -> pap.graph().associate("ua1", "oa1", new AccessRightSet(ALL_ACCESS_RIGHTS)));
@@ -952,7 +952,7 @@ class PAPTest {
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("subject", "pc1");
 
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false));
             });
         }
@@ -1015,7 +1015,7 @@ class PAPTest {
                 pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true));
 
-                assertThrows(UnknownResourceAccessRightException.class,
+                assertThrows(UnknownAccessRightException.class,
                         () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("test"), false));
             });
         }
@@ -1245,7 +1245,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 )
@@ -1263,7 +1263,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 ).addRule(
@@ -1275,7 +1275,7 @@ class PAPTest {
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new NameExpression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
                 );
@@ -1592,16 +1592,16 @@ class PAPTest {
                         new FormalArgument("arg2", Type.array(Type.string()))
                 ),
                 Arrays.asList(
-                        new CreatePolicyStatement(new NameExpression(new VariableReference("pc1", Type.string()))),
+                        new CreatePolicyStatement(new Expression(new VariableReference("pc1", Type.string()))),
                         new CreateAttrStatement(
-                                new NameExpression(new VariableReference("ua1", Type.string())),
+                                new Expression(new VariableReference("ua1", Type.string())),
                                 UA,
-                                new NameExpression(new VariableReference("pc1", Type.string()))
+                                new Expression(new VariableReference("pc1", Type.string()))
                         ),
                         new CreateAttrStatement(
-                                new NameExpression(new VariableReference("oa1", Type.string())),
+                                new Expression(new VariableReference("oa1", Type.string())),
                                 OA,
-                                new NameExpression(new VariableReference("pc1", Type.string()))
+                                new Expression(new VariableReference("pc1", Type.string()))
                         )
                 )
         );

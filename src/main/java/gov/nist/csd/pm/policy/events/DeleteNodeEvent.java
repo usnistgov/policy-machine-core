@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-public class DeleteNodeEvent extends PolicyEvent {
+public class DeleteNodeEvent implements PolicyEvent {
 
     private final String name;
 
@@ -10,5 +10,10 @@ public class DeleteNodeEvent extends PolicyEvent {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getEventName() {
+        return "delete_node";
     }
 }

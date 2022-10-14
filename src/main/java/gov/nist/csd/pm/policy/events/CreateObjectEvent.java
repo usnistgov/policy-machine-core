@@ -8,4 +8,9 @@ public class CreateObjectEvent extends CreateNodeEvent{
     public CreateObjectEvent(String name, Map<String, String> properties, String initialParent, String... parents) {
         super(name, NodeType.O, properties, initialParent, parents);
     }
+
+    @Override
+    public String getEventName() {
+        return "create_object";
+    }
 }

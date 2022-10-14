@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-public class DeleteProhibitionEvent extends PolicyEvent {
+public class DeleteProhibitionEvent implements PolicyEvent {
 
     private final String label;
 
@@ -10,5 +10,10 @@ public class DeleteProhibitionEvent extends PolicyEvent {
 
     public String getLabel() {
         return label;
+    }
+
+    @Override
+    public String getEventName() {
+        return "delete_prohibition";
     }
 }

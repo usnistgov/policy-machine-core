@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.policy.events;
 
-public class RemoveConstantEvent extends PolicyEvent {
+public class RemoveConstantEvent implements PolicyEvent {
 
-    private String name;
+    private final String name;
 
     public RemoveConstantEvent(String name) {
         this.name = name;
@@ -10,5 +10,10 @@ public class RemoveConstantEvent extends PolicyEvent {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getEventName() {
+        return "remove_constant";
     }
 }

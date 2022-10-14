@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-public class DissociateEvent extends PolicyEvent {
+public class DissociateEvent implements PolicyEvent {
 
     private final String ua;
     private final String target;
@@ -16,5 +16,10 @@ public class DissociateEvent extends PolicyEvent {
 
     public String getTarget() {
         return target;
+    }
+
+    @Override
+    public String getEventName() {
+        return "dissociate";
     }
 }

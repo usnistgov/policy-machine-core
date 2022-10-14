@@ -22,7 +22,7 @@ public abstract class PDP implements PolicyEventEmitter {
     protected final PAP pap;
     protected final List<PolicyEventListener> eventListeners;
 
-    public PDP(PAP pap) throws PMException {
+    protected PDP(PAP pap) {
         this.pap = pap;
         this.eventListeners = new ArrayList<>();
     }

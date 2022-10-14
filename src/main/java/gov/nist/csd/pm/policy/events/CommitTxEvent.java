@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.policy.events;
 
-import java.util.List;
+public class CommitTxEvent implements PolicyEvent {
 
-public class CommitTxEvent extends PolicyEvent {
+    public CommitTxEvent() { /* This object is used to notify a listener that a commit event happened */ }
 
-    public CommitTxEvent() { }
-
+    @Override
+    public String getEventName() {
+        return "commit_tx";
+    }
 }

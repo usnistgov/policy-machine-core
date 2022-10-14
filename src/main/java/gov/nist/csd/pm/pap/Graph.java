@@ -24,14 +24,13 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.REP_PROPERTY;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
 class Graph extends GraphAuthor implements PolicyEventEmitter {
-    
+
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
@@ -46,6 +45,12 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
+        for (String ar : accessRightSet) {
+            if (isAdminAccessRight(ar) || isWildcardAccessRight(ar)) {
+                throw new AdminAccessRightExistsException(ar);
+            }
+        }
+
         store.graph().setResourceAccessRights(accessRightSet);
 
         // notify listeners of policy modification
@@ -163,6 +168,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
                 store.graph().createUser(name, properties, parent, parents);
                 emitEvent(new CreateUserEvent(name, properties, parent, parents));
             }
+            default -> { /* PC and ANY should not ever be passed to this private method */ }
         }
 
         return name;
@@ -210,8 +216,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     private void checkIfNodeInProhibition(String name) throws PMException {
         Map<String, List<Prohibition>> prohibitions = store.prohibitions().getAll();
-        for (String subj : prohibitions.keySet()) {
-            List<Prohibition> subjPros = prohibitions.get(subj);
+        for (List<Prohibition> subjPros : prohibitions.values()) {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(name, p)) {
                     throw new NodeReferencedInProhibitionException(name, p.getLabel());
@@ -258,28 +263,16 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     private boolean nodeInEvent(String name, EventPattern event) {
         // check subject
         EventSubject subject = event.getSubject();
-        if (subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE
-                && subject.anyUserWithAttribute().equals(name)) {
-            return true;
-        } else if (subject.getType() == EventSubject.Type.USERS
-                && subject.users().contains(name)) {
+        if ((subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE && subject.anyUserWithAttribute().equals(name))
+                || (subject.getType() == EventSubject.Type.USERS && subject.users().contains(name))) {
             return true;
         }
 
         // check the target
         Target target = event.getTarget();
-        if (target.getType() == Target.Type.ANY_CONTAINED_IN
-                && target.anyContainedIn().equals(name)) {
-            return true;
-        } else if (target.getType() == Target.Type.ANY_OF_SET
-                && target.anyOfSet().contains(name)) {
-            return true;
-        } else if (target.getType() == Target.Type.POLICY_ELEMENT
-                && target.policyElement().equals(name)) {
-            return true;
-        }
-
-        return false;
+        return (target.getType() == Target.Type.ANY_CONTAINED_IN && target.anyContainedIn().equals(name))
+                || (target.getType() == Target.Type.ANY_OF_SET && target.anyOfSet().contains(name))
+                || (target.getType() == Target.Type.POLICY_ELEMENT && target.policyElement().equals(name));
     }
 
     private void deletePolicyClass(String name) throws PMException {
@@ -358,9 +351,8 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     @Override
     public void deassign(String child, String parent) throws PMException {
-        if (!nodeExists(child) || !nodeExists(parent)) {
-            return;
-        } else if (!getParents(child).contains(parent)) {
+        if ((!nodeExists(child) || !nodeExists(parent))
+                || (!getParents(child).contains(parent))) {
             return;
         }
 
@@ -418,20 +410,17 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
 
         for (String ar : accessRightSet) {
             if (!resourceAccessRights.contains(ar)
-                    && !(accessRightSet.contains(ALL_ACCESS_RIGHTS)
-                    || accessRightSet.contains(ALL_RESOURCE_ACCESS_RIGHTS)
-                    || accessRightSet.contains(ALL_ADMIN_ACCESS_RIGHTS)
-                    || ALL_ADMIN_ACCESS_RIGHTS_SET.contains(ar))) {
-                throw new UnknownResourceAccessRightException(ar);
+                    && !allAdminAccessRights().contains(ar)
+                    && !wildcardAccessRights().contains(ar)) {
+                throw new UnknownAccessRightException(ar);
             }
         }
     }
 
     @Override
     public void dissociate(String ua, String target) throws PMException {
-        if (!nodeExists(ua) || !nodeExists(target)) {
-            return;
-        } else if (!getAssociationsWithSource(ua).contains(new Association(ua, target))) {
+        if ((!nodeExists(ua) || !nodeExists(target))
+                || (!getAssociationsWithSource(ua).contains(new Association(ua, target)))) {
             return;
         }
 

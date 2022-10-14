@@ -21,7 +21,7 @@ public class VarStmtVisitor extends PALBaseVisitor<VarStatement> {
 
     @Override
     public VarStatement visitVarStmt(PALParser.VarStmtContext ctx) {
-        String varName = ctx.id().getText();
+        String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
         PALParser.ExpressionContext expressionCtx = ctx.expression();
         Expression expr = Expression.compile(visitorCtx, expressionCtx);
         boolean isConst = ctx.CONST() != null;

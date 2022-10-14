@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.author.pal.function;
+package gov.nist.csd.pm.policy.author.pal.functions;
 
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
@@ -22,8 +22,8 @@ public class GetNodeProperties extends FunctionDefinitionStatement {
                     Node node = author.graph().getNode(ctx.scope().getValue("nodeName").getStringValue());
                     Map<String, String> properties = node.getProperties();
                     Map<Value, Value> propertiesValues = new HashMap<>();
-                    for (String k : properties.keySet()) {
-                        propertiesValues.put(new Value(k), new Value(properties.get(k)));
+                    for (Map.Entry<String, String> prop : properties.entrySet()) {
+                        propertiesValues.put(new Value(prop.getKey()), new Value(properties.get(prop.getValue())));
                     }
 
                     return new Value(propertiesValues);

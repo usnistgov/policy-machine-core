@@ -12,13 +12,15 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentException;
+import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 
 import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
+import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 class Graph extends GraphAuthor {
@@ -139,7 +141,7 @@ class Graph extends GraphAuthor {
         };
 
         // check the user can delete the node
-        accessRightChecker.check(userCtx, name, DELETE_NODE);
+        accessRightChecker.check(userCtx, name, op);
 
         // check that the user can delete the node from the node's parents
         List<String> parents = pap.graph().getParents(name);
@@ -211,20 +213,56 @@ class Graph extends GraphAuthor {
 
     @Override
     public void assign(String child, String parent) throws PMException {
+        Node childNode = pap.graph().getNode(child);
+        Node parentNode = pap.graph().getNode(parent);
+
+        String childAR = switch (childNode.getType()) {
+            case OA -> ASSIGN_OBJECT_ATTRIBUTE;
+            case UA -> ASSIGN_USER_ATTRIBUTE;
+            case O -> ASSIGN_OBJECT;
+            case U -> ASSIGN_USER;
+            default -> throw new IllegalArgumentException("cannot assign node of type " + childNode.getType());
+        };
+
+        String parentAR = switch (parentNode.getType()) {
+            case OA -> ASSIGN_TO_OBJECT_ATTRIBUTE;
+            case UA -> ASSIGN_TO_USER_ATTRIBUTE;
+            case PC -> ASSIGN_TO_POLICY_CLASS;
+            default -> throw new IllegalArgumentException("cannot assign to a node of type " + childNode.getType());
+        };
+
         //check the user can assign the child
-        accessRightChecker.check(userCtx, child, ASSIGN);
+        accessRightChecker.check(userCtx, child, childAR);
 
         // check that the user can assign to the parent node
-        accessRightChecker.check(userCtx, parent, ASSIGN_TO);
+        accessRightChecker.check(userCtx, parent, parentAR);
     }
 
     @Override
     public void deassign(String child, String parent) throws PMException {
+        Node childNode = pap.graph().getNode(child);
+        Node parentNode = pap.graph().getNode(parent);
+
+        String childAR = switch (childNode.getType()) {
+            case OA -> DEASSIGN_OBJECT_ATTRIBUTE;
+            case UA -> DEASSIGN_USER_ATTRIBUTE;
+            case O -> DEASSIGN_OBJECT;
+            case U -> DEASSIGN_USER;
+            default -> throw new InvalidAssignmentException("cannot deassign node of type " + childNode.getType());
+        };
+
+        String parentAR = switch (parentNode.getType()) {
+            case OA -> DEASSIGN_FROM_OBJECT_ATTRIBUTE;
+            case UA -> DEASSIGN_FROM_USER_ATTRIBUTE;
+            case PC -> DEASSIGN_FROM_POLICY_CLASS;
+            default -> throw new InvalidAssignmentException("cannot deassign from a node of type " + childNode.getType());
+        };
+
         //check the user can deassign the child
-        accessRightChecker.check(userCtx, child, DEASSIGN);
+        accessRightChecker.check(userCtx, child, childAR);
 
         // check that the user can deassign from the parent node
-        accessRightChecker.check(userCtx, parent, DEASSIGN_FROM);
+        accessRightChecker.check(userCtx, parent, parentAR);
     }
 
     @Override
@@ -259,41 +297,45 @@ class Graph extends GraphAuthor {
 
     @Override
     public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
+        Node targetNode = pap.graph().getNode(target);
+
+        String targetAR = switch (targetNode.getType()) {
+            case OA -> DISSOCIATE_OBJECT_ATTRIBUTE;
+            case UA -> DISSOCIATE_USER_ATTRIBUTE;
+            default -> throw new InvalidAssociationException("cannot associate a target node of type " + targetNode.getType());
+        };
+
         //check the user can associate the source and target nodes
-        accessRightChecker.check(userCtx, ua, ASSOCIATE);
-        accessRightChecker.check(userCtx, target, ASSOCIATE);
+        accessRightChecker.check(userCtx, ua, ASSOCIATE_USER_ATTRIBUTE);
+        accessRightChecker.check(userCtx, target, targetAR);
     }
 
     @Override
     public void dissociate(String ua, String target) throws PMException {
+        Node targetNode = pap.graph().getNode(target);
+
+        String targetAR = switch (targetNode.getType()) {
+            case OA -> DISSOCIATE_OBJECT_ATTRIBUTE;
+            case UA -> DISSOCIATE_USER_ATTRIBUTE;
+            default -> throw new InvalidAssociationException("cannot dissociate a target node of type " + targetNode.getType());
+        };
+
         //check the user can dissociate the source and target nodes
-        accessRightChecker.check(userCtx, ua, ASSOCIATE);
-        accessRightChecker.check(userCtx, target, ASSOCIATE);
+        accessRightChecker.check(userCtx, ua, DISSOCIATE_USER_ATTRIBUTE);
+        accessRightChecker.check(userCtx, target, targetAR);
     }
 
     @Override
     public List<Association> getAssociationsWithSource(String ua) throws PMException {
-        List<Association> associations = pap.graph().getAssociationsWithSource(ua);
-
-        // check that the user can see the associations of both the ua and the target
-        associations.removeIf(association -> {
-            try {
-                accessRightChecker.check(userCtx, association.getSource(), GET_ASSOCIATIONS);
-                accessRightChecker.check(userCtx, association.getTarget(), GET_ASSOCIATIONS);
-                return false;
-            } catch (PMException e) {
-                return true;
-            }
-        });
-
-        return associations;
+        return getAssociations(pap.graph().getAssociationsWithSource(ua));
     }
 
     @Override
     public List<Association> getAssociationsWithTarget(String target) throws PMException {
-        List<Association> associations = pap.graph().getAssociationsWithTarget(target);
+        return getAssociations(pap.graph().getAssociationsWithTarget(target));
+    }
 
-        // check that the user can see the associations of both the ua and the target
+    private List<Association> getAssociations(List<Association> associations) {
         associations.removeIf(association -> {
             try {
                 accessRightChecker.check(userCtx, association.getSource(), GET_ASSOCIATIONS);

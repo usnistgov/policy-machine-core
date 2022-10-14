@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.events.EventContext;
+import gov.nist.csd.pm.epp.EventContext;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,7 +23,7 @@ public class Response implements Serializable {
         this.stmts = stmts;
     }
 
-    public Response(String eventCtxVariable, ExecutionContext executionCtx, PALStatement... stmts) {
+    public Response(String eventNameVariable, String eventCtxVariable, ExecutionContext executionCtx, PALStatement... stmts) {
         this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = executionCtx;
         this.stmts = List.of(stmts);
@@ -35,16 +35,20 @@ public class Response implements Serializable {
         this.stmts = List.of(stmts);
     }
 
-    public Response(UserContext author, String eventCtxVariable, PALStatement... stmts) {
+    public Response(UserContext author, String eventNameVariable, String eventCtxVariable, PALStatement... stmts) {
         this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = new ExecutionContext(author);
         this.stmts = List.of(stmts);
     }
 
     public Response(Response response) {
+        this.eventCtxVariable = response.eventCtxVariable;
         this.executionCtx = response.executionCtx;
         this.stmts = response.stmts;
-        this.eventCtxVariable = response.eventCtxVariable;
+    }
+
+    public String getEventCtxVariable() {
+        return eventCtxVariable;
     }
 
     public List<PALStatement> getStatements() {
@@ -53,10 +57,6 @@ public class Response implements Serializable {
 
     public ExecutionContext getExecutionCtx() {
         return executionCtx;
-    }
-
-    public String getEventCtxVariable() {
-        return eventCtxVariable;
     }
 
     public Value execute(PolicyAuthor policyAuthor, EventContext eventCtx) throws PMException {
@@ -74,11 +74,11 @@ public class Response implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Response response = (Response) o;
-        return Objects.equals(executionCtx, response.executionCtx) && Objects.equals(stmts, response.stmts) && Objects.equals(eventCtxVariable, response.eventCtxVariable);
+        return Objects.equals(executionCtx, response.executionCtx) && Objects.equals(stmts, response.stmts);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(executionCtx, stmts, eventCtxVariable);
+        return Objects.hash(executionCtx, stmts);
     }
 }

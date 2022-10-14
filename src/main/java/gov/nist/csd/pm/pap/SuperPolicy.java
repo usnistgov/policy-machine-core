@@ -4,11 +4,13 @@ import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.allAccessRights;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
 public class SuperPolicy {
+
+    private SuperPolicy() { }
 
     public static final String SUPER_PREFIX = "super";
 
@@ -37,9 +39,9 @@ public class SuperPolicy {
             }
 
             //associate super ua with base ua and oa and rep oa
-            graph.associate(SUPER_UA, uaName, ALL_ACCESS_RIGHTS_SET);
-            graph.associate(SUPER_UA, oaName, ALL_ACCESS_RIGHTS_SET);
-            graph.associate(SUPER_UA, rep, ALL_ACCESS_RIGHTS_SET);
+            graph.associate(SUPER_UA, uaName, allAccessRights());
+            graph.associate(SUPER_UA, oaName, allAccessRights());
+            graph.associate(SUPER_UA, rep, allAccessRights());
         });
     }
 }

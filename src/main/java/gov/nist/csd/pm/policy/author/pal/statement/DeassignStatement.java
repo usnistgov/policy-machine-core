@@ -9,19 +9,19 @@ import java.util.Objects;
 
 public class DeassignStatement extends PALStatement {
 
-    private final NameExpression child;
-    private final NameExpression deassignFrom;
+    private final Expression child;
+    private final Expression deassignFrom;
 
-    public DeassignStatement(NameExpression child, NameExpression deassignFrom) {
+    public DeassignStatement(Expression child, Expression deassignFrom) {
         this.child = child;
         this.deassignFrom = deassignFrom;
     }
 
-    public NameExpression getChild() {
+    public Expression getChild() {
         return child;
     }
 
-    public NameExpression getDeassignFrom() {
+    public Expression getDeassignFrom() {
         return deassignFrom;
     }
 
@@ -30,16 +30,16 @@ public class DeassignStatement extends PALStatement {
         Value childValue = child.execute(ctx, policyAuthor);
         Value deassignFromValue = deassignFrom.execute(ctx, policyAuthor);
 
-        String child = childValue.getStringValue();
+        String childStringValue = childValue.getStringValue();
 
         if (deassignFromValue.isString()) {
             String parent = deassignFromValue.getStringValue();
-            policyAuthor.graph().deassign(child, parent);
+            policyAuthor.graph().deassign(childStringValue, parent);
         } else {
             Value[] valueArr = deassignFromValue.getArrayValue();
             for (Value value : valueArr) {
                 String parent = value.getStringValue();
-                policyAuthor.graph().deassign(childValue.getStringValue(), parent);
+                policyAuthor.graph().deassign(childStringValue, parent);
             }
         }
 

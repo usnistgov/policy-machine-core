@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.author.pal.function;
+package gov.nist.csd.pm.policy.author.pal.functions;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
@@ -25,8 +25,8 @@ public class Search extends FunctionDefinitionStatement {
                     Map<Value, Value> propertiesValue = ctx.scope().getValue("properties").getMapValue();
 
                     Map<String, String> properties = new HashMap<>();
-                    for (Value key : propertiesValue.keySet()) {
-                        properties.put(key.getStringValue(), propertiesValue.get(key).getStringValue());
+                    for (Map.Entry<Value, Value> prop : propertiesValue.entrySet()) {
+                        properties.put(prop.getKey().getStringValue(), prop.getValue().getStringValue());
                     }
 
                     List<String> search = author.graph().search(nodeType, properties);

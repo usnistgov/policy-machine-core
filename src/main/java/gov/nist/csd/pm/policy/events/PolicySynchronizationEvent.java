@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PolicySynchronizationEvent extends PolicyEvent {
+public class PolicySynchronizationEvent implements PolicyEvent {
 
     private final Graph graph;
     private final Map<String, List<Prohibition>> prohibitions;
@@ -39,5 +39,10 @@ public class PolicySynchronizationEvent extends PolicyEvent {
 
     public PALContext getPALContext() {
         return palCtx;
+    }
+
+    @Override
+    public String getEventName() {
+        return "policy_sync";
     }
 }

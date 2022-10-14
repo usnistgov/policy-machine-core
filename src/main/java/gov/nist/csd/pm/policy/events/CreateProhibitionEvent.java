@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
 import java.util.List;
 
-public class CreateProhibitionEvent extends PolicyEvent {
+public class CreateProhibitionEvent implements PolicyEvent {
 
     private final String label;
     private final ProhibitionSubject      subject;
@@ -40,5 +40,10 @@ public class CreateProhibitionEvent extends PolicyEvent {
 
     public boolean isIntersection() {
         return intersection;
+    }
+
+    @Override
+    public String getEventName() {
+        return "create_prohibition";
     }
 }
