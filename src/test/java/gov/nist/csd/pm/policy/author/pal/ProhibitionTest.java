@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_POLICY_CLASS;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProhibitionTest {
@@ -21,17 +22,17 @@ class ProhibitionTest {
     @Test
     void testCreateProhibition() throws PMException {
         String input = """
-                set resource access rights read, write;
+                set resource access rights 'read', 'write';
                 create pc 'pc1';
                 create oa 'oa1' in baseOA('pc1');
                 create ua 'ua1' in baseUA('pc1');
                 create u 'u1' in 'ua1';
                 create u 'u2' in 'ua1';
-                associate 'ua1' and 'oa1' with read, write;
+                associate 'ua1' and 'oa1' with 'read', 'write';
                 
                 create prohibition 'pro1'
                 deny user 'u1'
-                access rights write
+                access rights create_policy_class, 'write'
                 on union of 'oa1';
                 """;
         MemoryPAP pap = new MemoryPAP();
@@ -41,7 +42,7 @@ class ProhibitionTest {
         Prohibition prohibition = prohibitions.get("pro1");
         assertEquals("pro1", prohibition.getLabel());
         assertEquals(new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), prohibition.getSubject());
-        assertEquals(new AccessRightSet("write"), prohibition.getAccessRightSet());
+        assertEquals(new AccessRightSet(CREATE_POLICY_CLASS, "write"), prohibition.getAccessRightSet());
         assertFalse(prohibition.isIntersection());
         assertEquals(List.of(new ContainerCondition("oa1", false)), prohibition.getContainers());
 

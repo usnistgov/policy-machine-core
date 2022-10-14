@@ -15,6 +15,7 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import java.util.*;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 
@@ -136,7 +137,11 @@ class PALSerializer {
                                 for (Association association : sourceAssociations) {
                                     List<Expression> exprs = new ArrayList<>();
                                     for (String ar : association.getAccessRightSet()) {
-                                        exprs.add(new Expression(new VariableReference(ar, Type.string())));
+                                        if (isAdminAccessRight(ar)) {
+                                            exprs.add(new Expression(new VariableReference(ar, Type.string())));
+                                        } else {
+                                            exprs.add(new Expression(new Literal(ar)));
+                                        }
                                     }
 
                                     pal.append(new AssociateStatement(

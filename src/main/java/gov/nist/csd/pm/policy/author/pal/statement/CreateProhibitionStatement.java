@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
+
 public class CreateProhibitionStatement extends PALStatement {
 
     private final Expression label;
@@ -140,7 +142,11 @@ public class CreateProhibitionStatement extends PALStatement {
     public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {
         List<Expression> exprs = new ArrayList<>();
         for (String ar : prohibition.getAccessRightSet()) {
-            exprs.add(new Expression(new VariableReference(ar, Type.string())));
+            if (isAdminAccessRight(ar)) {
+                exprs.add(new Expression(new VariableReference(ar, Type.string())));
+            } else {
+                exprs.add(new Expression(new Literal(ar)));
+            }
         }
 
         List<Container> containers = new ArrayList<>();
