@@ -65,7 +65,7 @@ public class CreateObligationStatement extends PALStatement {
 
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         return new CreateObligationStatement(
-                new Expression(new VariableReference(obligation.getLabel(), Type.string())),
+                new Expression(new Literal(obligation.getLabel())),
                 createRuleStatementsFromObligation(obligation.getRules())
         );
     }
@@ -77,7 +77,7 @@ public class CreateObligationStatement extends PALStatement {
             EventPattern event = rule.getEvent();
 
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                    new Expression(new VariableReference(rule.getLabel(), Type.string())),
+                    new Expression(new Literal(rule.getLabel())),
                     getSubjectClause(event.getSubject()),
                     getPerformsClause(event.getOperations()),
                     getOnClause(event),
@@ -129,7 +129,7 @@ public class CreateObligationStatement extends PALStatement {
             exprs.add(new Expression(new Literal(op)));
         }
         return new CreateRuleStatement.PerformsClause(
-                new Expression(new Literal(new ArrayLiteral(exprs.toArray(Expression[]::new), Type.string())))
+                new Expression(exprs)
         );
     }
 
@@ -145,22 +145,22 @@ public class CreateObligationStatement extends PALStatement {
 
                     List<Expression> userExprs = new ArrayList<>();
                     for (String user : subject.users()) {
-                        userExprs.add(new Expression(new VariableReference(user, Type.string())));
+                        userExprs.add(new Expression(new Literal(user)));
                     }
 
                     subjectExpr = new Expression(userExprs.toArray(Expression[]::new));
                 } else {
                     type = CreateRuleStatement.SubjectType.USER;
-                    subjectExpr = new Expression(new VariableReference(subject.users().get(0), Type.string()));
+                    subjectExpr = new Expression(new Literal(subject.users().get(0)));
                 }
             }
             case PROCESS -> {
                 type = CreateRuleStatement.SubjectType.PROCESS;
-                subjectExpr = new Expression(new VariableReference(subject.process(), Type.string()));
+                subjectExpr = new Expression(new Literal(subject.process()));
             }
             case ANY_USER_WITH_ATTRIBUTE -> {
                 type = CreateRuleStatement.SubjectType.USER_ATTR;
-                subjectExpr = new Expression(new VariableReference(subject.anyUserWithAttribute(), Type.string()));
+                subjectExpr = new Expression(new Literal(subject.anyUserWithAttribute()));
             }
             case ANY_USER -> type = CreateRuleStatement.SubjectType.ANY_USER;
         }

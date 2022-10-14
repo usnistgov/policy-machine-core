@@ -145,12 +145,12 @@ public class CreateProhibitionStatement extends PALStatement {
 
         List<Container> containers = new ArrayList<>();
         for (ContainerCondition cc : prohibition.getContainers()) {
-            containers.add(new Container(cc.complement(), new Expression(new VariableReference(cc.name(), Type.string()))));
+            containers.add(new Container(cc.complement(), new Expression(new Literal(cc.name()))));
         }
 
         return new CreateProhibitionStatement(
-                new Expression(new VariableReference(prohibition.getLabel(), Type.string())),
-                new Expression(new VariableReference(prohibition.getSubject().name(), Type.string())),
+                new Expression(new Literal(prohibition.getLabel())),
+                new Expression(new Literal(prohibition.getSubject().name())),
                 prohibition.getSubject().type(),
                 new Expression(exprs),
                 prohibition.isIntersection(),
