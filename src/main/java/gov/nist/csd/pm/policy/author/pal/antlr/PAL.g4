@@ -154,7 +154,7 @@ setResourceAccessRightsStmt:
     SET_RESOURCE_ACCESS_RIGHTS expressionArray SEMI_COLON;
 
 expressionArray:
-    expression (COMMA expression)? ;
+    expression (COMMA expression)* ;
 
 expression:
     varRef

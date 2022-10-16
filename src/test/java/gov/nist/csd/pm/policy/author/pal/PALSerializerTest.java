@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PALSerializerTest {
 
     private static final String input = """
-            set resource access rights 'read', 'write';
+            set resource access rights 'read', 'write', 'execute';
             create policy class 'pc1';
             set properties of 'pc1' to {'k':'v'};
             create oa 'oa1' in 'pc1';
@@ -34,7 +34,7 @@ class PALSerializerTest {
             }
             """;
     private static final String expected = """
-            set resource access rights 'read', 'write';
+            set resource access rights 'read', 'write', 'execute';
             create policy class 'pc1';
             set properties of 'pc1' to {'k': 'v'};
             create user attribute 'pc1_base_UA' in 'pc1';
