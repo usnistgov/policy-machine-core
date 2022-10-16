@@ -149,6 +149,8 @@ public class Expression extends PALStatement {
         this.isList = true;
     }
 
+    public Expression() {}
+
     public VariableReference getVariableReference() {
         return variableReference;
     }

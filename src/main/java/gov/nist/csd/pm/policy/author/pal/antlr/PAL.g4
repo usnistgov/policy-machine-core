@@ -102,7 +102,7 @@ setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression SEM
 assignStmt: ASSIGN child=expression TO parent=expression SEMI_COLON ;
 deassignStmt: DEASSIGN child=expression FROM parent=expression SEMI_COLON ;
 
-associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=accessRightArray SEMI_COLON ;
+associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expressionArray SEMI_COLON ;
 dissociateStmt: DISSOCIATE ua=expression AND target=expression SEMI_COLON ;
 
 deleteStmt: DELETE deleteType expression SEMI_COLON ;
@@ -142,7 +142,7 @@ deleteRuleStmt:
 
 createProhibitionStmt:
     CREATE PROHIBITION name=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
-    ACCESS_RIGHTS accessRights=accessRightArray
+    ACCESS_RIGHTS accessRights=expressionArray
     ON (INTERSECTION|UNION) OF containers=prohibitionContainerList
     SEMI_COLON ;
 prohibitionContainerList:
@@ -151,7 +151,7 @@ prohibitionContainerExpression:
     IS_COMPLEMENT? container=expression ;
 
 setResourceAccessRightsStmt:
-    SET_RESOURCE_ACCESS_RIGHTS accessRightArray SEMI_COLON;
+    SET_RESOURCE_ACCESS_RIGHTS expressionArray SEMI_COLON;
 
 expressionArray:
     expression (COMMA expression)? ;
@@ -163,10 +163,6 @@ expression:
 
 array:
     OPEN_BRACKET (expression (COMMA expression)*)? CLOSE_BRACKET ;
-accessRightArray:
-    (accessRight (COMMA accessRight)*)? ;
-accessRight:
-    (ALL_ACCESS_RIGHTS | ALL_RESOURCE_ACCESS_RIGHTS | ALL_ADMIN_ACCESS_RIGHTS | VARIABLE_OR_FUNCTION_NAME) ;
 
 map:
     OPEN_CURLY (mapEntry (COMMA mapEntry)*)? CLOSE_CURLY ;
@@ -189,11 +185,7 @@ funcCall:
 funcCallArgs:
     OPEN_PAREN (expression (COMMA expression)*)? CLOSE_PAREN ;
 
-// LEXER RULES
-ALL_ACCESS_RIGHTS : '*' ;
-ALL_RESOURCE_ACCESS_RIGHTS : '*r' ;
-ALL_ADMIN_ACCESS_RIGHTS : '*a' ;
-
+// LEXER RULEs
 CREATE: [c][r][e][a][t][e] ;
 DELETE: [d][e][l][e][t][e] ;
 BREAK: [b][r][e][a][k] ;

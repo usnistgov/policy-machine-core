@@ -23,7 +23,7 @@ public class ExecutionTest {
 
         String input =
                 """
-                set resource access rights read, write;
+                set resource access rights 'read', 'write';
                 
                 create policy class 'pc1';
                 
@@ -45,9 +45,9 @@ public class ExecutionTest {
                 assign username to 'ua2';
                 assign username to 'ua3';
                 
-                associate 'ua1' and 'oa1' with read, write;
-                associate 'ua2' and 'oa2' with read, write;
-                associate 'ua3' and 'oa3' with read, write;
+                associate 'ua1' and 'oa1' with 'read', 'write';
+                associate 'ua2' and 'oa2' with 'read', 'write';
+                associate 'ua3' and 'oa3' with 'read', 'write';
                 """;
         pal.compileAndExecutePAL(new UserContext(SUPER_USER), input);
 

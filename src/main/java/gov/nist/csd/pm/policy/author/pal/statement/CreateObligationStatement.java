@@ -100,18 +100,18 @@ public class CreateObligationStatement extends PALStatement {
         CreateRuleStatement.TargetType onClauseType = null;
         switch (type) {
             case ANY_CONTAINED_IN -> {
-                expression = new Expression(new VariableReference(target.anyContainedIn(), Type.string()));
+                expression = new Expression(new Literal(target.anyContainedIn()));
                 onClauseType = CreateRuleStatement.TargetType.ANY_CONTAINED_IN;
             }
             case POLICY_ELEMENT -> {
-                expression = new Expression(new VariableReference(target.policyElement(), Type.string()));
+                expression = new Expression(new Literal(target.policyElement()));
                 onClauseType = CreateRuleStatement.TargetType.POLICY_ELEMENT;
             }
             case ANY_OF_SET -> {
                 List<String> set = target.anyOfSet();
                 List<Expression> exprs = new ArrayList<>();
                 for (String s : set) {
-                    exprs.add(new Expression(new VariableReference(s, Type.string())));
+                    exprs.add(new Expression(new Literal(s)));
                 }
 
                 expression = new Expression(exprs);
