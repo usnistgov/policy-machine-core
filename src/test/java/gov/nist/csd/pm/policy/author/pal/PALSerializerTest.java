@@ -13,7 +13,9 @@ class PALSerializerTest {
     private static final String input = """
             set resource access rights read, write;
             create policy class 'pc1';
+            set properties of 'pc1' to {'k':'v'};
             create oa 'oa1' in 'pc1';
+            set properties of 'oa1' to {'k1':'v1'};
             create ua 'ua1' in 'pc1';
             associate 'ua1' and 'oa1' with read, write;
             create prohibition 'p1' deny user attribute 'ua1' access rights read on union of !'oa1';
@@ -34,10 +36,12 @@ class PALSerializerTest {
     private static final String expected = """
             set resource access rights read, write;
             create policy class 'pc1';
+            set properties of 'pc1' to {'k': 'v'};
             create user attribute 'pc1_base_UA' in 'pc1';
             create object attribute 'pc1_base_OA' in 'pc1';
             create object attribute 'pc1_pc_rep' in 'pc1';
             create object attribute 'oa1' in 'pc1';
+            set properties of 'oa1' to {'k1': 'v1'};
             create user attribute 'ua1' in 'pc1';
             associate 'ua1' and 'oa1' with read, write;       
             create prohibition 'p1' deny user attribute 'ua1' access rights read on union of !'oa1';           
