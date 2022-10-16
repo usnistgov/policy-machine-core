@@ -107,6 +107,12 @@ class PALSerializer {
 
             pal.append(new CreatePolicyStatement(new Expression(new Literal(policyClass)))).append("\n");
 
+            Node pcNode = policy.graph().getNode(policyClass);
+            if (!pcNode.getProperties().isEmpty()) {
+                PALStatement stmt = buildSetNodePropertiesStatement(pcNode.getName(), pcNode.getProperties());
+                pal.append(stmt).append("\n");
+            }
+
             new BreadthFirstGraphWalker(policy.graph())
                     .withPropagator((parent, child) -> {
                         if (child.startsWith(SUPER_PREFIX)) {
@@ -120,6 +126,10 @@ class PALSerializer {
                                 attributes.add(child);
                                 PALStatement stmt = buildCreateNodeStatement(child, childNode.getType(), parent);
                                 pal.append(stmt).append("\n");
+                                if (!childNode.getProperties().isEmpty()) {
+                                    stmt = buildSetNodePropertiesStatement(child, childNode.getProperties());
+                                    pal.append(stmt).append("\n");
+                                }
                             } else {
                                 pal.append(new AssignStatement(
                                         new Expression(new Literal(child)),
@@ -160,6 +170,21 @@ class PALSerializer {
         }
 
         return pal.toString().trim();
+    }
+
+    private PALStatement buildSetNodePropertiesStatement(String name, Map<String, String> properties) {
+        Map<Expression, Expression> propertiesExpressions = new HashMap<>();
+        for (Map.Entry<String, String> property : properties.entrySet()) {
+            propertiesExpressions.put(
+                    new Expression(new Literal(property.getKey())),
+                    new Expression(new Literal(property.getValue()))
+            );
+        }
+
+        return new SetNodePropertiesStatement(
+                new Expression(new Literal(name)),
+                new Expression(new Literal(new MapLiteral(propertiesExpressions, Type.string(), Type.string())))
+        );
     }
 
     private PALStatement buildCreateNodeStatement(String name, NodeType type, String parent) {
