@@ -104,7 +104,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
      * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
      * each policy class.
      */
-    private TargetDagResult processTargetDAG(String target, UserDagResult userCtx) throws PMException {
+    protected TargetDagResult processTargetDAG(String target, UserDagResult userCtx) throws PMException {
         if (!policyReader.graph().nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }
@@ -167,7 +167,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
      *
      * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
      */
-    private UserDagResult processUserDAG(String subject, String process) throws PMException {
+    protected UserDagResult processUserDAG(String subject, String process) throws PMException {
         if (!policyReader.graph().nodeExists(subject)) {
             throw new NodeDoesNotExistException(subject);
         }
