@@ -137,7 +137,7 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
     }
 
     private String removeQuotes(String s) {
-        if (s.startsWith("'") && s.endsWith("'")) {
+        if ((s.startsWith("'") && s.endsWith("'")) || (s.startsWith("\"") && s.endsWith("\""))) {
             return s.substring(1, s.length() - 1);
         } else {
             return s;
