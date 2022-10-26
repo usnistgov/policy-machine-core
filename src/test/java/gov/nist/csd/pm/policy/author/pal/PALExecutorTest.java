@@ -10,11 +10,13 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.VarStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PALExecutorTest {
@@ -49,11 +51,18 @@ class PALExecutorTest {
                 
                 """;
 
-        List<PALStatement> statements = memoryPAP.compilePAL(pal, test1, test2);
+        List<PALStatement> statements = new PALExecutor(memoryPAP).compilePAL(pal, test1, test2);
         assertEquals(2, statements.size());
 
         Map<String, FunctionDefinitionStatement> functions = memoryPAP.pal().getFunctions();
         assertTrue(functions.isEmpty());
+
+        new PALExecutor(memoryPAP).compileAndExecutePAL(new UserContext(SUPER_USER), pal, test1, test2);
+        assertEquals(2, statements.size());
+
+        functions = memoryPAP.pal().getFunctions();
+        assertTrue(functions.isEmpty());
+
     }
 
 }
