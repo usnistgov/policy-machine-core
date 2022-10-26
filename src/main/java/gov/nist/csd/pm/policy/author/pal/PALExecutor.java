@@ -71,7 +71,7 @@ public class PALExecutor implements PALExecutable{
     @Override
     public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
         // compile the PAL into statements
-        List<PALStatement> compiledStatements = compilePAL(input);
+        List<PALStatement> compiledStatements = compilePAL(input, customBuiltinFunctions);
 
         // initialize the execution context
         ExecutionContext ctx = new ExecutionContext(author);
