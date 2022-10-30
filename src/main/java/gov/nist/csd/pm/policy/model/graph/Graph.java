@@ -4,31 +4,35 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-import gov.nist.csd.pm.policy.model.graph.relationships.Relationship;
-import org.jgrapht.graph.DirectedAcyclicGraph;
 
 import java.util.*;
 
 public class Graph {
 
-    private final DirectedAcyclicGraph<String, Relationship> graph;
-    private final HashMap<String, Node> nodes;
+    private final Map<String, Vertex> graph;
     private final List<String> pcs;
-    private AccessRightSet resourceAccessRights;
+    private final AccessRightSet resourceAccessRights;
 
     public Graph() {
-        this.graph = new DirectedAcyclicGraph<>(Relationship.class);
-        this.nodes = new HashMap<>();
+        this.graph = new HashMap<>();
         this.pcs = new ArrayList<>();
         this.resourceAccessRights = new AccessRightSet();
     }
 
-    public Graph(DirectedAcyclicGraph<String, Relationship> graph, HashMap<String, Node> nodes,
-                 List<String> pcs, AccessRightSet resourceAccessRights) {
-        this.graph = graph;
-        this.nodes = nodes;
+    public Graph(Map<String, Vertex> nodes, List<String> pcs, AccessRightSet resourceAccessRights) {
+        this.graph = nodes;
         this.pcs = pcs;
         this.resourceAccessRights = resourceAccessRights;
+    }
+
+    public Graph(Graph graph) {
+        this.graph = new HashMap<>();
+        for (String n : graph.graph.keySet()) {
+            this.graph.put(n, graph.graph.get(n).copy());
+        }
+
+        this.pcs = new ArrayList<>(graph.pcs);
+        this.resourceAccessRights = new AccessRightSet(graph.getResourceAccessRights());
     }
 
     public AccessRightSet getResourceAccessRights() {
@@ -36,15 +40,12 @@ public class Graph {
     }
 
     public void setResourceAccessRights(AccessRightSet resourceAccessRights) {
-        this.resourceAccessRights = resourceAccessRights;
+        this.resourceAccessRights.clear();
+        this.resourceAccessRights.addAll(resourceAccessRights);
     }
 
-    public DirectedAcyclicGraph<String, Relationship> getGraph() {
+    public Map<String, Vertex> getGraph() {
         return graph;
-    }
-
-    public HashMap<String, Node> getNodes() {
-        return nodes;
     }
 
     public List<String> getPcs() {
@@ -52,8 +53,7 @@ public class Graph {
     }
 
     public String addNode(String name, NodeType type, Map<String, String> properties) {
-        this.graph.addVertex(name);
-        this.nodes.put(name, new Node(name, type, properties));
+        this.graph.put(name, getVertex(name, type, properties));
         if (type == NodeType.PC) {
             this.pcs.add(name);
         }
@@ -61,106 +61,121 @@ public class Graph {
         return name;
     }
 
-    public void setNodeProperties(String name, Map<String, String> properties) {
-        Node node = this.nodes.get(name);
-        if (node == null) {
-            return;
+    private Vertex getVertex(String name, NodeType type, Map<String, String> properties) {
+        switch (type){
+            case PC -> {
+                return new PolicyClass(name, properties);
+            }
+            case OA -> {
+                return new ObjectAttribute(name, properties);
+            }
+            case UA -> {
+                return new UserAttribute(name, properties);
+            }
+            case O -> {
+                return new Object(name, properties);
+            }
+            default -> {
+                return new User(name, properties);
+            }
         }
+    }
 
-        node.setProperties(properties);
-        this.nodes.put(name, node);
+    public void setNodeProperties(String name, Map<String, String> properties) {
+        this.graph.get(name).setProperties(properties);
     }
 
     public Node getNode(String name) {
-        return this.nodes.get(name);
+        return this.graph.get(name).getNode();
     }
 
     public void deleteNode(String name) {
-        if (this.graph.containsVertex(name)) {
-            this.graph.removeVertex(name);
+        if (!graph.containsKey(name)) {
+            return;
         }
 
-        nodes.remove(name);
+        Vertex vertex = graph.get(name);
+
+        List<String> children = vertex.getChildren();
+        List<String> parents = vertex.getParents();
+        List<Association> incomingAssociations = vertex.getIncomingAssociations();
+        List<Association> outgoingAssociations = vertex.getOutgoingAssociations();
+
+        for (String child : children) {
+            graph.get(child).removeAssignment(child, name);
+        }
+
+        for (String parent : parents) {
+            graph.get(parent).removeAssignment(name, parent);
+        }
+
+        for (Association association : incomingAssociations) {
+            graph.get(association.getSource()).removeAssociation(association.getSource(), association.getTarget());
+        }
+
+        for (Association association : outgoingAssociations) {
+            graph.get(association.getTarget()).removeAssociation(association.getSource(), association.getTarget());
+        }
+
+        graph.remove(name);
         pcs.remove(name);
     }
 
     public boolean containsNode(String node) {
-        return graph.containsVertex(node);
+        return graph.containsKey(node);
     }
 
     public void addAssignmentEdge(String source, String target) {
-        graph.addEdge(source, target, new Relationship(source, target));
+        if (graph.get(source).getParents().contains(target)) {
+            return;
+        }
+
+        graph.get(source).addAssignment(source, target);
+        graph.get(target).addAssignment(source, target);
     }
 
     public void addAssociationEdge(String source, String target, AccessRightSet set) {
-        graph.addEdge(source, target, new Relationship(source, target, set));
+        graph.get(source).addAssociation(source, target, set);
+        graph.get(target).addAssociation(source, target, set);
     }
 
-    public void removeEdge(String source, String target) {
-        graph.removeEdge(source, target);
+    public void deassign(String child, String parent) {
+        graph.get(child).removeAssignment(child, parent);
+        graph.get(parent).removeAssignment(child, parent);
     }
 
-    public List<String> getIncomingAssignmentEdges(String node) {
-        Set<Relationship> rels = graph.incomingEdgesOf(node);
-        List<String> edges = new ArrayList<>();
-        for (Relationship rel : rels) {
-            if (rel.isAssociation()) {
-                continue;
-            }
-
-            edges.add(rel.getSource());
-        }
-        return edges;
+    public void dissociate(String ua, String target) {
+        graph.get(ua).removeAssociation(ua, target);
+        graph.get(target).removeAssociation(ua, target);
     }
 
-    public List<String> getOutgoingAssignmentEdges(String node) {
-        Set<Relationship> rels = graph.outgoingEdgesOf(node);
-        List<String> edges = new ArrayList<>();
-        for (Relationship rel : rels) {
-            if (rel.isAssociation()) {
-                continue;
-            }
-
-            edges.add(rel.getTarget());
-        }
-        return edges;
+    public List<String> getChildren(String node) {
+        return new ArrayList<>(graph.get(node).getChildren());
     }
 
-    public List<Association> getIncomingAssociationEdges(String node) {
-        Set<Relationship> rels = graph.incomingEdgesOf(node);
-        List<Association> edges = new ArrayList<>();
-        for (Relationship rel : rels) {
-            if (!rel.isAssociation()) {
-                continue;
-            }
-
-            edges.add(new Association(rel.getSource(), rel.getTarget(), rel.getAccessRightSet()));
-        }
-        return edges;
+    public List<String> getParents(String node) {
+        return new ArrayList<>(graph.get(node).getParents());
     }
 
-    public List<Association> getOutgoingAssociationEdges(String node) {
-        Set<Relationship> rels = graph.outgoingEdgesOf(node);
-        List<Association> edges = new ArrayList<>();
-        for (Relationship rel : rels) {
-            if (!rel.isAssociation()) {
-                continue;
-            }
+    public List<Association> getIncomingAssociations(String node) {
+        return new ArrayList<>(graph.get(node).getIncomingAssociations());
+    }
 
-            edges.add(new Association(rel.getSource(), rel.getTarget(), rel.getAccessRightSet()));
-        }
-        return edges;
+    public List<Association> getOutgoingAssociations(String node) {
+        return new ArrayList<>(graph.get(node).getOutgoingAssociations());
     }
 
     public boolean containsEdge(String source, String target) {
-        return graph.containsEdge(source, target);
+        return graph.get(source).getParents().contains(target)
+                || graph.get(source).getOutgoingAssociations().contains(new Association(source, target));
     }
 
-    public boolean isEdgeAssociation(String source, String target) {
-        if(!graph.containsEdge(source, target)) {
-            return false;
+    public List<Node> getNodes() {
+        Collection<Vertex> values = graph.values();
+        List<Node> nodes = new ArrayList<>();
+        for (Vertex v : values) {
+            nodes.add(v.getNode());
         }
-
-        return graph.getEdge(source, target).isAssociation();
+        return nodes;
     }
 }

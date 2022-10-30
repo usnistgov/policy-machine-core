@@ -10,7 +10,7 @@ import java.util.Objects;
  * This class will serve as a parent class for Assignments and Associations.  Both types of relations have a source node
  * and a target node.
  */
-public class Relationship extends DefaultEdge implements Serializable {
+public class Relationship implements Serializable {
     private String source;
     private String target;
     private AccessRightSet accessRightSet;
@@ -69,16 +69,15 @@ public class Relationship extends DefaultEdge implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Relationship)) {
+        if (!(o instanceof Relationship ge)) {
             return false;
         }
 
-        Relationship ge = (Relationship) o;
         return this.source.equals(ge.source) && this.target.equals(ge.target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.source, this.target);
+        return Objects.hash(source, target);
     }
 }
