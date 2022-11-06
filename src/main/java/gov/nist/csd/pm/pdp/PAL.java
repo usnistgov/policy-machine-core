@@ -14,7 +14,7 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import java.util.List;
 import java.util.Map;
 
-class PAL implements PALAuthor, PolicyEventEmitter {
+class PAL extends PALAuthor implements PolicyEventEmitter {
 
     private final UserContext userCtx;
     private final PAP pap;

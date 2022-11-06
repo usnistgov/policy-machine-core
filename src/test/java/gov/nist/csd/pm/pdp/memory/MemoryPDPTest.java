@@ -43,7 +43,7 @@ public class MemoryPDPTest {
 
     @Test
     void testTx() throws PMException {
-        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        /*MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         MemoryPDP pdp = new MemoryPDP(new MemoryPAP(memoryPolicyStore));
 
         PAP genericPAP  = new MemoryPAP(memoryPolicyStore);
@@ -82,17 +82,17 @@ public class MemoryPDPTest {
             assertTrue(mysqlPAP.graph().nodeExists("ua1"));
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     @Test
     void testRollback() throws PMException {
-        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        memoryPolicyStore.graph().createPolicyClass("pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
+        MemoryPAP pap = new MemoryPAP();
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
 
-        MemoryPDP pdp = new MemoryPDP(new MemoryPAP(memoryPolicyStore));
+        MemoryPDP pdp = new MemoryPDP(pap);
         assertThrows(NodeNameExistsException.class, () -> {
             pdp.runTx(new UserContext(SUPER_USER), policy -> {
                 policy.graph().createPolicyClass("pc2");
@@ -101,10 +101,9 @@ public class MemoryPDPTest {
             });
         });
 
-        assertEquals(10, memoryPolicyStore.graph().search(NodeType.ANY, noprops()).size());
-        assertTrue(memoryPolicyStore.graph().nodeExists("pc1"));
-        assertTrue(memoryPolicyStore.graph().nodeExists("ua1"));
-        assertTrue(memoryPolicyStore.graph().nodeExists("oa1"));
-        assertFalse(memoryPolicyStore.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("ua1"));
+        assertTrue(pap.graph().nodeExists("oa1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
     }
 }

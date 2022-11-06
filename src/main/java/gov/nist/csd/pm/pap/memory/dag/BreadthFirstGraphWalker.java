@@ -2,6 +2,10 @@ package gov.nist.csd.pm.pap.memory.dag;
 
 import gov.nist.csd.pm.policy.GraphReader;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.graph.dag.AllPathsShortCircuit;
+import gov.nist.csd.pm.policy.model.graph.dag.NoopShortCircuit;
+import gov.nist.csd.pm.policy.model.graph.dag.ShortCircuit;
+import gov.nist.csd.pm.policy.model.graph.dag.SinglePathShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.NoopPropagator;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.policy.model.graph.dag.visitor.NoopVisitor;
@@ -17,12 +21,16 @@ public class BreadthFirstGraphWalker implements GraphWalker {
     private Direction direction;
     private Visitor visitor;
     private Propagator propagator;
+    private ShortCircuit allPathsShortCircuit;
+    private ShortCircuit singlePathShortCircuit;
 
     public BreadthFirstGraphWalker(GraphReader graph) {
         this.graph = graph;
         this.visitor = new NoopVisitor();
         this.propagator = new NoopPropagator();
         this.direction = Direction.PARENTS;
+        this.allPathsShortCircuit = new NoopShortCircuit();
+        this.singlePathShortCircuit = new NoopShortCircuit();
     }
 
     public BreadthFirstGraphWalker withVisitor(Visitor visitor) {
@@ -40,36 +48,54 @@ public class BreadthFirstGraphWalker implements GraphWalker {
         return this;
     }
 
-    @Override
-    public void walk(String start) throws PMException {
-        // set up a queue to ensure FIFO
-        Queue<String> queue = new LinkedList<>();
-        // set up a set to ensure nodes are only visited once
-        Set<String> seen = new HashSet<>();
-        queue.add(start);
-        seen.add(start);
-
-        while (!queue.isEmpty()) {
-            String node = queue.poll();
-
-            // visit the current node
-            visitor.visit(node);
-
-            List<String> nextLevel = getNextLevel(node, direction);
-            for (String n : nextLevel) {
-                // if this node has already been seen, we don't need to see it again
-                if (!seen.contains(n)) {
-                    queue.add(n);
-                    seen.add(n);
-                }
-
-                // propagate from the nextLevel to the current node
-                propagator.propagate(node, n);
-            }
-        }
+    public BreadthFirstGraphWalker withAllPathShortCircuit(ShortCircuit shortCircuit) {
+        this.allPathsShortCircuit = shortCircuit;
+        return this;
     }
 
-    private List<String> getNextLevel(String node, Direction direction) throws PMException {
+    public BreadthFirstGraphWalker withSinglePathShortCircuit(ShortCircuit shortCircuit) {
+        this.singlePathShortCircuit = shortCircuit;
+        return this;
+    }
+
+    @Override
+    public void walk(String start) throws PMException {
+        visitor.visit(start);
+        if (allPathsShortCircuit.evaluate(start)
+                || singlePathShortCircuit.evaluate(start)){
+            return;
+        }
+
+        walkInternal(start);
+    }
+
+    private boolean walkInternal(String start) throws PMException {
+        List<String> nextLevel = getNextLevel(start);
+        for (String n : nextLevel) {
+            visitor.visit(n);
+            if (allPathsShortCircuit.evaluate(n)){
+                return true;
+            } else if (singlePathShortCircuit.evaluate(n)){
+                return false;
+            }
+
+            propagator.propagate(n, start);
+        }
+
+        for (String n : nextLevel) {
+            if (walkInternal(n)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static final int WALK = 0;
+    private static final int CONTINUE = 1;
+    private static final int RETURN = 2;
+
+    private List<String> getNextLevel(String node) throws PMException {
         if (direction == Direction.PARENTS) {
             return graph.getParents(node);
         } else {

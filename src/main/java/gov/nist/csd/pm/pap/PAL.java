@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class PAL implements PALAuthor, PolicyEventEmitter {
+class PAL extends PALAuthor implements PolicyEventEmitter {
 
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;

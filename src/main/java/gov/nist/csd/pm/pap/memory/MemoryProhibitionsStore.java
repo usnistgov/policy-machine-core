@@ -16,16 +16,13 @@ import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 class MemoryProhibitionsStore extends ProhibitionsStore {
 
     private Map<String, List<Prohibition>> prohibitions;
-    private TxHandler<Map<String, List<Prohibition>>> txHandler;
 
     MemoryProhibitionsStore() {
         this.prohibitions = new HashMap<>();
-        this.txHandler = new TxHandler<>();
     }
 
     MemoryProhibitionsStore(Map<String, List<Prohibition>> prohibitions) {
         this.prohibitions = copyProhibitions(prohibitions);
-        this.txHandler = new TxHandler<>();
     }
 
     Map<String, List<Prohibition>> copyProhibitions(Map<String, List<Prohibition>> toCopy) {
@@ -108,29 +105,16 @@ class MemoryProhibitionsStore extends ProhibitionsStore {
 
     @Override
     public synchronized void beginTx() {
-        if (!txHandler.isInTx()) {
-            txHandler.setState(copyProhibitions(prohibitions));
-        }
 
-        txHandler.beginTx();
     }
 
     @Override
     public synchronized void commit() throws TransactionNotStartedException {
-        if (!txHandler.isInTx()) {
-            throw new TransactionNotStartedException();
-        }
 
-        txHandler.commit();
     }
 
     @Override
     public synchronized void rollback() throws TransactionNotStartedException {
-        if (!txHandler.isInTx()) {
-            return;
-        }
 
-        prohibitions = txHandler.getState();
-        txHandler.rollback();
     }
 }

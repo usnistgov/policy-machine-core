@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.policy.model.graph;
 
+import gov.nist.csd.pm.policy.GraphReader;
+import gov.nist.csd.pm.policy.GraphWriter;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -7,7 +10,10 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 
 import java.util.*;
 
-public class Graph {
+import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
+
+public class Graph implements GraphReader, GraphWriter {
 
     private final Map<String, Vertex> graph;
     private final List<String> pcs;
@@ -35,27 +41,89 @@ public class Graph {
         this.resourceAccessRights = new AccessRightSet(graph.getResourceAccessRights());
     }
 
+    public String addNode(String name, NodeType type, Map<String, String> properties) {
+        this.graph.put(name, getVertex(name, type, properties));
+        if (type == NodeType.PC) {
+            this.pcs.add(name);
+        }
+
+        return name;
+    }
+
+    @Override
     public AccessRightSet getResourceAccessRights() {
         return resourceAccessRights;
     }
 
+    @Override
+    public boolean nodeExists(String name) {
+        return graph.containsKey(name);
+    }
+
+    @Override
     public void setResourceAccessRights(AccessRightSet resourceAccessRights) {
         this.resourceAccessRights.clear();
         this.resourceAccessRights.addAll(resourceAccessRights);
     }
 
-    public Map<String, Vertex> getGraph() {
-        return graph;
+    @Override
+    public String createPolicyClass(String name, Map<String, String> properties) {
+        this.graph.put(name, getVertex(name, PC, properties));
+        this.pcs.add(name);
+
+        return name;
     }
 
-    public List<String> getPcs() {
-        return pcs;
+    @Override
+    public String createPolicyClass(String name) {
+        return createPolicyClass(name, new HashMap<>());
     }
 
-    public String addNode(String name, NodeType type, Map<String, String> properties) {
+    @Override
+    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) {
+        return addNode(name, UA, properties, parent, parents);
+    }
+
+    @Override
+    public String createUserAttribute(String name, String parent, String... parents) {
+        return createUserAttribute(name, new HashMap<>(), parent, parents);
+    }
+
+    @Override
+    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) {
+        return addNode(name, OA, properties, parent, parents);
+    }
+
+    @Override
+    public String createObjectAttribute(String name, String parent, String... parents) {
+        return createObjectAttribute(name, new HashMap<>(), parent, parents);
+    }
+
+    @Override
+    public String createObject(String name, Map<String, String> properties, String parent, String... parents) {
+        return addNode(name, O, properties, parent, parents);
+    }
+
+    @Override
+    public String createObject(String name, String parent, String... parents) {
+        return createObject(name, new HashMap<>(), parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, Map<String, String> properties, String parent, String... parents) {
+        return addNode(name, U, properties, parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) {
+        return createUser(name, new HashMap<>(), parent, parents);
+    }
+
+    private String addNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... parents) {
         this.graph.put(name, getVertex(name, type, properties));
-        if (type == NodeType.PC) {
-            this.pcs.add(name);
+        assign(name, initialParent);
+        for (String parent : parents) {
+            assign(name, parent);
         }
 
         return name;
@@ -81,12 +149,63 @@ public class Graph {
         }
     }
 
+    @Override
     public void setNodeProperties(String name, Map<String, String> properties) {
         this.graph.get(name).setProperties(properties);
     }
 
+    @Override
     public Node getNode(String name) {
         return this.graph.get(name).getNode();
+    }
+
+    @Override
+    public List<String> search(NodeType type, Map<String, String> checkProperties) {
+        List<String> results = new ArrayList<>();
+        // iterate over the nodes to find ones that match the search parameters
+        for (String name : graph.keySet()) {
+            Node node = getNode(name);
+            Map<String, String> nodeProperties = node.getProperties();
+
+            // if the type parameter is not null and the current node type does not equal the type parameter, do not add
+            if (type != ANY && !node.getType().equals(type)
+                    || !hasAllKeys(nodeProperties, checkProperties)
+                    || !valuesMatch(nodeProperties, checkProperties)) {
+                continue;
+            }
+
+            results.add(node.getName());
+        }
+
+        return results;
+    }
+
+    private boolean valuesMatch(Map<String, String> nodeProperties, Map<String, String> checkProperties) {
+        for (Map.Entry<String, String> entry : checkProperties.entrySet()) {
+            String checkKey = entry.getKey();
+            String checkValue = entry.getValue();
+            if (!checkValue.equals(nodeProperties.get(checkKey))
+                    && !checkValue.equals(WILDCARD)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean hasAllKeys(Map<String, String> nodeProperties, Map<String, String> checkProperties) {
+        for (String key : checkProperties.keySet()) {
+            if (!nodeProperties.containsKey(key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public List<String> getPolicyClasses() {
+        return pcs;
     }
 
     public void deleteNode(String name) {
@@ -121,48 +240,52 @@ public class Graph {
         pcs.remove(name);
     }
 
-    public boolean containsNode(String node) {
-        return graph.containsKey(node);
-    }
-
-    public void addAssignmentEdge(String source, String target) {
-        if (graph.get(source).getParents().contains(target)) {
+    @Override
+    public void assign(String child, String parent) {
+        if (graph.get(child).getParents().contains(parent)) {
             return;
         }
 
-        graph.get(source).addAssignment(source, target);
-        graph.get(target).addAssignment(source, target);
+        graph.get(child).addAssignment(child, parent);
+        graph.get(parent).addAssignment(child, parent);
     }
 
-    public void addAssociationEdge(String source, String target, AccessRightSet set) {
-        graph.get(source).addAssociation(source, target, set);
-        graph.get(target).addAssociation(source, target, set);
-    }
-
+    @Override
     public void deassign(String child, String parent) {
         graph.get(child).removeAssignment(child, parent);
         graph.get(parent).removeAssignment(child, parent);
     }
 
+    @Override
+    public void associate(String ua, String target, AccessRightSet accessRights) {
+        graph.get(ua).addAssociation(ua, target, accessRights);
+        graph.get(target).addAssociation(ua, target, accessRights);
+    }
+
+    @Override
     public void dissociate(String ua, String target) {
         graph.get(ua).removeAssociation(ua, target);
         graph.get(target).removeAssociation(ua, target);
     }
 
+    @Override
     public List<String> getChildren(String node) {
         return new ArrayList<>(graph.get(node).getChildren());
     }
 
+    @Override
     public List<String> getParents(String node) {
         return new ArrayList<>(graph.get(node).getParents());
     }
 
-    public List<Association> getIncomingAssociations(String node) {
-        return new ArrayList<>(graph.get(node).getIncomingAssociations());
+    @Override
+    public List<Association> getAssociationsWithSource(String ua) {
+        return new ArrayList<>(graph.get(ua).getOutgoingAssociations());
     }
 
-    public List<Association> getOutgoingAssociations(String node) {
-        return new ArrayList<>(graph.get(node).getOutgoingAssociations());
+    @Override
+    public List<Association> getAssociationsWithTarget(String target) {
+        return new ArrayList<>(graph.get(target).getIncomingAssociations());
     }
 
     public boolean containsEdge(String source, String target) {

@@ -7,8 +7,8 @@ public interface Propagator {
     /**
      * Propagate information from the node to the target node. This can be from a parent to a child if direction is
      *
-     * @param node the node that holds the information already.
-     * @param target the node to propagate the information to.
+     * @param src the node that holds the information already.
+     * @param dst the node to propagate the information to.
      */
-    void propagate(String node, String target) throws PMException;
+    void propagate(String src, String dst) throws PMException;
 }

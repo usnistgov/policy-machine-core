@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryPolicyStoreTest {
@@ -188,6 +189,41 @@ class MemoryPolicyStoreTest {
     }
 
     @Test
-    void getObligation() {
+    void getObligation() throws PMException {
+        Rule rule1 = new Rule(
+                "rule1",
+                new EventPattern(
+                        EventSubject.anyUser(),
+                        Performs.events("test_event")
+                ),
+                new Response(
+                        new UserContext("test")
+                )
+        );
+
+        memoryPolicyStore.obligations().create(
+                new UserContext("test"),
+                "label",
+                rule1
+        );
+
+        Obligation obligation = memoryPolicyStore.obligations().get("label");
+        assertEquals("label", obligation.getLabel());
+        assertEquals(new UserContext("test"), obligation.getAuthor());
+        assertEquals(1, obligation.getRules().size());
+        assertEquals(rule1, obligation.getRules().get(0));
+    }
+
+    @Test
+    void testTx() throws PMException {
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        store.graph().createPolicyClass("pc1");
+        try {
+            runTx(store, () -> {
+                store.graph().createObjectAttribute("oa1", "pc1");
+                throw new PMException("test");
+            });
+        } catch (PMException e) { }
+        assertFalse(store.graph().nodeExists("oa1"));
     }
 }

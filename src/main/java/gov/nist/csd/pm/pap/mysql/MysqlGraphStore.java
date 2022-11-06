@@ -41,12 +41,12 @@ class MysqlGraphStore extends GraphStore {
 
         List<Assignment> assignments = getAssignments();
         for (Relationship assignment : assignments) {
-            graph.addAssignmentEdge(assignment.getSource(), assignment.getTarget());
+            graph.assign(assignment.getSource(), assignment.getTarget());
         }
 
         List<Association> associations = getAssociations();
         for (Relationship association : associations) {
-            graph.addAssociationEdge(association.getSource(), association.getTarget(), association.getAccessRightSet());
+            graph.associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
         }
 
         return graph;

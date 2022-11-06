@@ -119,7 +119,7 @@ class PALSerializer {
             }
 
             new BreadthFirstGraphWalker(policy.graph())
-                    .withPropagator((parent, child) -> {
+                    .withPropagator((child, parent) -> {
                         if (child.startsWith(SUPER_PREFIX)) {
                             return;
                         }

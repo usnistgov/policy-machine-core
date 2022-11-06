@@ -7,17 +7,16 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.tx.TxPolicyEventListener;
 
 import java.util.List;
 import java.util.Map;
 
 class TxProhibitions extends ProhibitionsStore implements PolicyEventEmitter {
 
-    private final ProhibitionsStore store;
+    private final MemoryProhibitionsStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxProhibitions(ProhibitionsStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxProhibitions(MemoryProhibitionsStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }
@@ -30,13 +29,16 @@ class TxProhibitions extends ProhibitionsStore implements PolicyEventEmitter {
 
     @Override
     public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        emitEvent(new UpdateProhibitionEvent(label, subject, accessRightSet, intersection, List.of(containerConditions)));
+        emitEvent(new TxEvents.MemoryUpdateProhibitionEvent(
+                new Prohibition(label, subject, accessRightSet, intersection, List.of(containerConditions)),
+                store.get(label)
+        ));
         store.update(label, subject, accessRightSet, intersection, containerConditions);
     }
 
     @Override
     public void delete(String label) throws PMException {
-        emitEvent(new DeleteProhibitionEvent(label));
+        emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(label, store.get(label)));
         store.delete(label);
     }
 

@@ -7,7 +7,7 @@
     <groupId>com.github.PM-Master</groupId>
     <artifactId>policy-machine-core</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.18</version>
+    <version>3.0.24</version>
 
     <build>
         <plugins>

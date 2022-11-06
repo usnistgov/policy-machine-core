@@ -7,8 +7,4 @@ public class MemoryPAP extends PAP {
     public MemoryPAP() throws PMException {
         super(new MemoryConnection(new MemoryPolicyStore()));
     }
-
-    public MemoryPAP(MemoryPolicyStore policyStore) throws PMException {
-        super(new MemoryConnection(policyStore));
-    }
 }

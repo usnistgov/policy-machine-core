@@ -54,6 +54,12 @@ class PALSerializerTest {
         palExecutor.compileAndExecutePAL(new UserContext(SUPER_USER), input);
         String actual = new PALSerializer(pap).toPAL();
         assertEquals(expected, actual);
+
+        pap = new MemoryPAP();
+        palExecutor = new PALExecutor(pap);
+        palExecutor.compileAndExecutePAL(new UserContext(SUPER_USER), actual);
+        actual = new PALSerializer(pap).toPAL();
+        assertEquals(expected, actual);
     }
 
 }

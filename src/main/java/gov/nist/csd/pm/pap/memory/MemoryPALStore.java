@@ -14,30 +14,13 @@ import java.util.Map;
 class MemoryPALStore extends PALStore {
 
     private PALContext palCtx;
-    private TxHandler<PALContext> txHandler;
 
     MemoryPALStore() {
         this.palCtx = new PALContext();
-        this.txHandler = new TxHandler<>();
     }
 
     MemoryPALStore(PALContext palCtx) {
-        this.palCtx = copyPALContext(palCtx);
-        this.txHandler = new TxHandler<>();
-    }
-
-    private PALContext copyPALContext(PALContext palContext) {
-        PALContext copy = new PALContext();
-        for (String functionName : palContext.getFunctions().keySet()) {
-            FunctionDefinitionStatement functionDefinitionStatement = palContext.getFunctions().get(functionName);
-            copy.addFunction(functionDefinitionStatement);
-        }
-
-        for (String constName : palContext.getConstants().keySet()) {
-            copy.addConstant(constName, palContext.getConstants().get(constName));
-        }
-
-        return copy;
+        this.palCtx = palCtx;
     }
 
     @Override
@@ -91,30 +74,17 @@ class MemoryPALStore extends PALStore {
 
     @Override
     public synchronized void beginTx() throws PMException {
-        if (!txHandler.isInTx()) {
-            txHandler.setState(copyPALContext(palCtx));
-        }
 
-        txHandler.beginTx();
     }
 
     @Override
     public synchronized void commit() throws PMException {
-        if (!txHandler.isInTx()) {
-            throw new TransactionNotStartedException();
-        }
 
-        txHandler.commit();
     }
 
     @Override
     public synchronized void rollback() throws TransactionNotStartedException {
-        if (!txHandler.isInTx()) {
-            return;
-        }
 
-        palCtx = txHandler.getState();
-        txHandler.rollback();
     }
 
 

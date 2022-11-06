@@ -3,74 +3,23 @@ package gov.nist.csd.pm.pap.memory;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryConnectionTest {
 
     @Test
-    void testTwoConnections() throws PMException {
-        MemoryPolicyStore policyStore = new MemoryPolicyStore();
-
-        MemoryConnection c1 = new MemoryConnection(policyStore);
-        MemoryConnection c2 = new MemoryConnection(policyStore);
-
-        c1.beginTx();
-        c2.beginTx();
-
-        c1.graph().createPolicyClass("pc1", null);
-        assertTrue(c1.graph().nodeExists("pc1"));
-        assertFalse(policyStore.graph().nodeExists("pc1"));
-
-        c2.graph().createPolicyClass("pc2", null);
-        assertTrue(c2.graph().nodeExists("pc2"));
-        assertFalse(policyStore.graph().nodeExists("pc2"));
-
-        c1.commit();
-
-        assertTrue(policyStore.graph().nodeExists("pc1"));
-        assertTrue(c1.graph().nodeExists("pc1"));
-        assertFalse(c2.graph().nodeExists("pc1"));
-
-        c2.commit();
-
-        assertTrue(policyStore.graph().nodeExists("pc2"));
-        assertTrue(c1.graph().nodeExists("pc2"));
-        assertTrue(c2.graph().nodeExists("pc1"));
+    void testTx() throws PMException {
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        MemoryConnection conn = new MemoryConnection(store);
+        conn.graph().createPolicyClass("pc1");
+        conn.beginTx();
+        conn.graph().createObjectAttribute("oa1", "pc1");
+        assertTrue(store.graph().nodeExists("oa1"));
+        conn.rollback();
+        assertFalse(store.graph().nodeExists("oa1"));
+        conn.commit();
+        assertFalse(store.graph().nodeExists("oa1"));
     }
-
-    @Test
-    void testTwoConcurrentConnections() throws InterruptedException, PMException {
-        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-
-        Thread t1 = new Thread(() -> {
-            try {
-                MemoryConnection c1 = new MemoryConnection(memoryPolicyStore);
-                c1.graph().createPolicyClass("pc1");
-                c1.graph().createObjectAttribute("oa1", "pc1");
-            } catch (PMException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        Thread t2 = new Thread(() -> {
-            try {
-                MemoryConnection c1 = new MemoryConnection(memoryPolicyStore);
-                c1.graph().createUserAttribute("ua1", "pc1");
-            } catch (PMException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-
-        assertTrue(memoryPolicyStore.graph().nodeExists("pc1"));
-        assertTrue(memoryPolicyStore.graph().nodeExists("ua1"));
-        assertTrue(memoryPolicyStore.graph().nodeExists("oa1"));
-
-    }
-
 }
