@@ -7,7 +7,7 @@
     <groupId>com.github.PM-Master</groupId>
     <artifactId>policy-machine-core</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.24</version>
+    <version>3.0.0</version>
 
     <build>
         <plugins>
@@ -130,7 +130,6 @@
             <version>1.17.4</version>
             <scope>test</scope>
         </dependency>
-
 
         <!-- jackson -->
         <dependency>
