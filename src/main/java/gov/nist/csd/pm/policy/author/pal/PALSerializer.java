@@ -14,44 +14,48 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 
-class PALSerializer {
+public class PALSerializer {
 
     private static final String SEMI_COLON = ";";
 
-    private final PolicyAuthor policy;
+    public static String toPAL(PolicyAuthor policyAuthor, boolean format) throws PMException {
+        String pal = PALSerializer.toPAL(policyAuthor);
+        if (format) {
+            pal = PALFormatter.format(pal);
+        }
 
-    PALSerializer(PolicyAuthor policy) {
-        this.policy = policy;
+        return pal;
     }
 
-    String toPAL() throws PMException {
+    private PALSerializer() {}
+
+    static String toPAL(PolicyAuthor policy) throws PMException {
         String pal = "";
-        String constants = serializeConstants();
+        String constants = serializeConstants(policy);
         if (!constants.isEmpty()) {
             pal += constants + "\n";
         }
 
-        String functions = serializeFunctions();
+        String functions = serializeFunctions(policy);
         if (!functions.isEmpty()) {
             pal += functions + "\n";
         }
 
-        String graph = serializeGraph();
+        String graph = serializeGraph(policy);
         if (!graph.isEmpty()) {
             pal += graph + "\n";
         }
 
-        String prohibitions = serializeProhibitions();
+        String prohibitions = serializeProhibitions(policy);
         if (!prohibitions.isEmpty()) {
             pal += prohibitions + "\n";
         }
 
-        String obligations = serializeObligations();
+        String obligations = serializeObligations(policy);
         if (!obligations.isEmpty()) {
             pal += obligations;
         }
@@ -59,7 +63,7 @@ class PALSerializer {
         return pal.trim();
     }
 
-    private String serializeObligations() throws PMException {
+    private static String serializeObligations(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
 
         List<Obligation> obligations = policy.obligations().getAll();
@@ -73,7 +77,7 @@ class PALSerializer {
         return pal.toString();
     }
 
-    private String serializeProhibitions() throws PMException {
+    private static String serializeProhibitions(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
 
         Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
@@ -90,7 +94,7 @@ class PALSerializer {
         return pal.toString();
     }
 
-    private String serializeGraph() throws PMException {
+    private static String serializeGraph(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
 
         // resource access rights
@@ -106,10 +110,6 @@ class PALSerializer {
         Set<String> usersAndObjects = new HashSet<>();
 
         for (String policyClass : policyClasses) {
-            if (policyClass.equals(SUPER_PC)) {
-                continue;
-            }
-
             pal.append(new CreatePolicyStatement(new Expression(new Literal(policyClass)))).append("\n");
 
             Node pcNode = policy.graph().getNode(policyClass);
@@ -120,10 +120,6 @@ class PALSerializer {
 
             new BreadthFirstGraphWalker(policy.graph())
                     .withPropagator((child, parent) -> {
-                        if (child.startsWith(SUPER_PREFIX)) {
-                            return;
-                        }
-
                         Node childNode = policy.graph().getNode(child);
 
                         if (childNode.getType() == OA || childNode.getType() == UA) {
@@ -181,7 +177,7 @@ class PALSerializer {
         return pal.toString().trim();
     }
 
-    private PALStatement buildSetNodePropertiesStatement(String name, Map<String, String> properties) {
+    private static PALStatement buildSetNodePropertiesStatement(String name, Map<String, String> properties) {
         Map<Expression, Expression> propertiesExpressions = new HashMap<>();
         for (Map.Entry<String, String> property : properties.entrySet()) {
             propertiesExpressions.put(
@@ -196,7 +192,7 @@ class PALSerializer {
         );
     }
 
-    private PALStatement buildCreateNodeStatement(String name, NodeType type, String parent) {
+    private static PALStatement buildCreateNodeStatement(String name, NodeType type, String parent) {
         if (type == UA || type == OA) {
             return new CreateAttrStatement(
                     new Expression(new Literal(name)),
@@ -216,7 +212,7 @@ class PALSerializer {
         }
     }
 
-    private String serializeFunctions() throws PMException {
+    private static String serializeFunctions(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
         Map<String, FunctionDefinitionStatement> functions = policy.pal().getFunctions();
         for (FunctionDefinitionStatement func : functions.values()) {
@@ -230,7 +226,7 @@ class PALSerializer {
         return pal.toString();
     }
 
-    private String serializeConstants() throws PMException {
+    private static String serializeConstants(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
         Map<String, Value> constants = policy.pal().getConstants();
         for (Map.Entry<String, Value> c : constants.entrySet()) {
@@ -243,7 +239,7 @@ class PALSerializer {
         return pal.toString();
     }
 
-    private String serializeConstant(String name, Value value) {
+    private static String serializeConstant(String name, Value value) {
         return String.format("const %s = %s", name, value.toString());
     }
 }

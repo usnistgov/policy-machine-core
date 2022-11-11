@@ -3,8 +3,10 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.store.PolicyStoreConnection;
 import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.author.pal.PALExecutable;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.PALFormatter;
+import gov.nist.csd.pm.policy.author.pal.PALSerializable;
+import gov.nist.csd.pm.policy.author.pal.PALSerializer;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.*;
@@ -15,10 +17,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
-
-public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEventEmitter, Transactional, PALExecutable, PolicyReader {
+public abstract class PAP implements PolicySync, PolicyEventEmitter, Transactional, PolicyReader, PolicyAuthor, PALSerializable {
 
     protected PolicyStoreConnection policyStore;
     protected Graph graph;
@@ -29,17 +28,17 @@ public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEven
 
     protected PAP() {}
 
-    protected PAP(PolicyStoreConnection policyStoreConnection) throws PMException {
-        init(policyStoreConnection);
+    protected PAP(PolicyStoreConnection policyStoreConnection, boolean verifySuperPolicy) throws PMException {
+        init(policyStoreConnection, verifySuperPolicy);
     }
 
-    protected void init(PolicyStoreConnection policyStoreConnection) throws PMException {
+    protected void init(PolicyStoreConnection policyStoreConnection, boolean verifySuperPolicy) throws PMException {
         this.policyStore = policyStoreConnection;
         this.listeners = new ArrayList<>();
 
         this.graph = new Graph(this.policyStore);
-        if (!this.graph.nodeExists(SUPER_PC)) {
-            this.graph.createPolicyClass(SUPER_PC, noprops());
+        if (verifySuperPolicy) {
+            SuperPolicy.verifySuperPolicy(this.graph);
         }
 
         this.prohibitions = new Prohibitions(this.policyStore);
@@ -65,6 +64,11 @@ public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEven
     @Override
     public PALAuthor pal() {
         return pal;
+    }
+
+    @Override
+    public String toPAL(boolean format) throws PMException {
+        return PALSerializer.toPAL(this, format);
     }
 
     @Override
@@ -118,20 +122,5 @@ public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEven
         policyStore.rollback();
 
         emitEvent(new RollbackTxEvent(this));
-    }
-
-    @Override
-    public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
-        return new PALExecutor(this).compilePAL(input, customBuiltinFunctions);
-    }
-
-    @Override
-    public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement... customBuiltinFunctions) throws PMException {
-        new PALExecutor(this).compileAndExecutePAL(author, input, customBuiltinFunctions);
-    }
-
-    @Override
-    public String toPAL() throws PMException {
-        return new PALExecutor(this).toPAL();
     }
 }

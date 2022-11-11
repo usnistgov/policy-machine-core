@@ -1,12 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal.expression;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
-import gov.nist.csd.pm.pap.naming.Naming;
-import gov.nist.csd.pm.pdp.memory.MemoryPDP;
-import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.epp.EventContext;

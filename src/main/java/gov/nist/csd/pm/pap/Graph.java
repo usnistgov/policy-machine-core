@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.naming.Naming;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.events.*;
@@ -19,22 +18,21 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.REP_PROPERTY;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
-import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
 class Graph extends GraphAuthor implements PolicyEventEmitter {
 
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
-    Graph(PolicyStore store) {
+    Graph(PolicyStore store) throws PMException {
         this.store = store;
         this.listeners = new ArrayList<>();
     }
@@ -68,27 +66,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
             throw new NodeNameExistsException(name);
         }
 
-        runTx(store, () -> {
-            String rep = Naming.pcRepObjectAttribute(name);
-            properties.put(REP_PROPERTY, rep);
-
-            store.graph().createPolicyClass(name, properties);
-            emitEvent(new CreatePolicyClassEvent(name, properties));
-
-            // create the PC UA node
-            String uaName = Naming.baseUserAttribute(name);
-            createUserAttribute(uaName, noprops(), name);
-
-            // create the PC OA node
-            String oaName = Naming.baseObjectAttribute(name);
-            createObjectAttribute(oaName, noprops(), name);
-
-            // create the rep object attribute for this policy class
-            createObjectAttribute(rep, noprops(), name);
-
-            // apply super policy to new policy class
-            applySuperPolicy(this, name, uaName, oaName, rep);
-        });
+        SuperPolicy.createPolicyClass(this, name, properties);
 
         return name;
     }
@@ -143,12 +121,20 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
             throw new NodeNameExistsException(name);
         } else if (!nodeExists(parent)) {
             throw new NodeDoesNotExistException(parent);
-        } else {
-            for (String p : parents) {
-                if (!nodeExists(p)) {
-                    throw new NodeDoesNotExistException(p);
-                }
+        }
+
+        // collect any parents that are of type PC
+        // this will also check if the nodes exist by calling getNode
+        List<String> pcParents = new ArrayList<>();
+        List<String> parentsList = new ArrayList<>(Arrays.asList(parents));
+        parentsList.add(parent);
+        for (String p : parentsList) {
+            Node parentNode = getNode(p);
+            if (parentNode.getType() != PC) {
+                continue;
             }
+
+            pcParents.add(p);
         }
 
         switch (type) {
@@ -169,6 +155,11 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
                 emitEvent(new CreateUserEvent(name, properties, parent, parents));
             }
             default -> { /* PC and ANY should not ever be passed to this private method */ }
+        }
+
+        // for any pc parents, create any necessary super policy configurations
+        for (String pc : pcParents) {
+            SuperPolicy.assignedToPolicyClass(this, name, pc);
         }
 
         return name;
@@ -192,26 +183,28 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
         }
 
         List<String> children = getChildren(name);
-        NodeType type = getNode(name).getType();
-        if (type == PC) {
-            // a pc will have the base attributes but should have no other nodes assigned to it
-            if (children.size() > 4) {
-                throw new NodeHasChildrenException(name);
-            }
-
-            deletePolicyClass(name);
-        } else {
-            if (!children.isEmpty()) {
-                throw new NodeHasChildrenException(name);
-            }
+        if (!children.isEmpty()) {
+            throw new NodeHasChildrenException(name);
         }
 
         checkIfNodeInProhibition(name);
         checkIfNodeInObligation(name);
 
-        store.graph().deleteNode(name);
+        NodeType type = getNode(name).getType();
 
+        // delete the rep node if node is a PC
+        store.beginTx();
+
+        if (type == PC) {
+            String rep = pcRepObjectAttribute(name);
+            store.graph().deleteNode(rep);
+            emitEvent(new DeleteNodeEvent(rep));
+        }
+
+        store.graph().deleteNode(name);
         emitEvent(new DeleteNodeEvent(name));
+
+        store.commit();
     }
 
     private void checkIfNodeInProhibition(String name) throws PMException {
@@ -275,39 +268,6 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
                 || (target.getType() == Target.Type.POLICY_ELEMENT && target.policyElement().equals(name));
     }
 
-    private void deletePolicyClass(String name) throws PMException {
-        // deassign super user from base ua
-        String ua = Naming.baseUserAttribute(name);
-        store.graph().deassign(SUPER_USER, ua);
-        emitEvent(new DeassignEvent(SUPER_USER, ua));
-
-        // delete base ua
-        if (!store.graph().getChildren(ua).isEmpty()) {
-            throw new NodeHasChildrenException(ua);
-        }
-
-        store.graph().deleteNode(ua);
-        emitEvent(new DeleteNodeEvent(ua));
-
-        // delete base oa
-        String oa = Naming.baseObjectAttribute(name);
-        if (!store.graph().getChildren(oa).isEmpty()) {
-            throw new NodeHasChildrenException(oa);
-        }
-
-        store.graph().deleteNode(oa);
-        emitEvent(new DeleteNodeEvent(oa));
-
-        // delete rep
-        String rep = Naming.pcRepObjectAttribute(name);
-        if (!store.graph().getChildren(rep).isEmpty()) {
-            throw new NodeHasChildrenException(rep);
-        }
-
-        store.graph().deleteNode(rep);
-        emitEvent(new DeleteNodeEvent(oa));
-    }
-
     @Override
     public Node getNode(String name) throws PMException {
         if (!nodeExists(name)) {
@@ -342,11 +302,16 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
             return;
         }
 
+        // check node types make a valid assignment relation
         Assignment.checkAssignment(childNode.getType(), parentNode.getType());
 
-        store.graph().assign(child, parent);
-
+        store().graph().assign(child, parent);
         emitEvent(new AssignEvent(child, parent));
+
+        // if the parent is a policy class, need to associate the super ua with the child
+        if (parentNode.getType() == PC) {
+            SuperPolicy.assignedToPolicyClass(this, child, parent);
+        }
     }
 
     @Override
@@ -389,19 +354,14 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
         Node uaNode = getNode(ua);
         Node targetNode = getNode(target);
 
-        // check that nodes are not already assigned
-        // and there are no unknown access rights
-        if (getChildren(target).contains(ua)) {
-            throw new NodesAlreadyAssignedException(ua, target);
-        }
-
         // check the access rights are valid
         checkAccessRightsValid(store.graph(), accessRights);
 
+        // check the types of each node make a valid association
         Association.checkAssociation(uaNode.getType(), targetNode.getType());
 
+        // associate and emit event
         store.graph().associate(ua, target, accessRights);
-
         emitEvent(new AssociateEvent(ua, target, accessRights));
     }
 

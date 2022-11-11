@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC_REP;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
 public class Prohibitions extends ProhibitionsAuthor {
@@ -33,7 +33,7 @@ public class Prohibitions extends ProhibitionsAuthor {
     public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         // check that the user can create a prohibition for the subject
         if (subject.type() == ProhibitionSubject.Type.PROCESS) {
-            accessRightChecker.check(userCtx, SUPER_OBJECT, CREATE_PROCESS_PROHIBITION);
+            accessRightChecker.check(userCtx, SUPER_PC_REP, CREATE_PROCESS_PROHIBITION);
         } else {
             accessRightChecker.check(userCtx, subject.name(), CREATE_PROHIBITION);
         }
@@ -45,7 +45,7 @@ public class Prohibitions extends ProhibitionsAuthor {
 
             // there is another access right needed if the condition is a complement
             if (contCond.complement()) {
-                accessRightChecker.check(userCtx, SUPER_OBJECT, ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION);
+                accessRightChecker.check(userCtx, SUPER_PC_REP, ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION);
             }
         }
     }
@@ -62,7 +62,7 @@ public class Prohibitions extends ProhibitionsAuthor {
 
         // check that the user can create a prohibition for the subject
         if (prohibition.getSubject().type() == ProhibitionSubject.Type.PROCESS) {
-            accessRightChecker.check(userCtx, SUPER_OBJECT, DELETE_PROCESS_PROHIBITION);
+            accessRightChecker.check(userCtx, SUPER_PC_REP, DELETE_PROCESS_PROHIBITION);
         } else {
             accessRightChecker.check(userCtx, prohibition.getSubject().name(), DELETE_PROHIBITION);
         }
@@ -73,7 +73,7 @@ public class Prohibitions extends ProhibitionsAuthor {
 
             // there is another access right needed if the condition is a complement
             if (contCond.complement()) {
-                accessRightChecker.check(userCtx, SUPER_OBJECT, REMOVE_CONTAINER_COMPLEMENT_FROM_PROHIBITION);
+                accessRightChecker.check(userCtx, SUPER_PC_REP, REMOVE_CONTAINER_COMPLEMENT_FROM_PROHIBITION);
             }
         }
     }
@@ -100,7 +100,7 @@ public class Prohibitions extends ProhibitionsAuthor {
             try {
                 // check user has access to subject prohibitions
                 if (prohibition.getSubject().type() == ProhibitionSubject.Type.PROCESS) {
-                    accessRightChecker.check(userCtx, SUPER_OBJECT, GET_PROCESS_PROHIBITIONS);
+                    accessRightChecker.check(userCtx, SUPER_PC_REP, GET_PROCESS_PROHIBITIONS);
                 } else {
                     accessRightChecker.check(userCtx, prohibition.getSubject().name(), GET_PROHIBITIONS);
                 }
@@ -125,7 +125,7 @@ public class Prohibitions extends ProhibitionsAuthor {
 
         // check user has access to subject prohibitions
         if (prohibition.getSubject().type() == ProhibitionSubject.Type.PROCESS) {
-            accessRightChecker.check(userCtx, SUPER_OBJECT, GET_PROCESS_PROHIBITIONS);
+            accessRightChecker.check(userCtx, SUPER_PC_REP, GET_PROCESS_PROHIBITIONS);
         } else {
             accessRightChecker.check(userCtx, prohibition.getSubject().name(), GET_PROHIBITIONS);
         }

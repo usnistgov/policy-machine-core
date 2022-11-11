@@ -11,7 +11,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC_REP;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
 class PAL extends PALAuthor {
@@ -26,41 +26,41 @@ class PAL extends PALAuthor {
 
     @Override
     public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, ADD_FUNCTION);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, ADD_FUNCTION);
     }
 
     @Override
     public void removeFunction(String functionName) throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, REMOVE_FUNCTION);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, REMOVE_FUNCTION);
     }
 
     @Override
     public Map<String, FunctionDefinitionStatement> getFunctions() throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, GET_FUNCTIONS);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, GET_FUNCTIONS);
 
         return null;
     }
 
     @Override
     public void addConstant(String constantName, Value constantValue) throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, ADD_CONSTANT);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, ADD_CONSTANT);
     }
 
     @Override
     public void removeConstant(String constName) throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, REMOVE_CONSTANT);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, REMOVE_CONSTANT);
     }
 
     @Override
     public Map<String, Value> getConstants() throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, GET_CONSTANTS);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, GET_CONSTANTS);
 
         return null;
     }
 
     @Override
     public PALContext getContext() throws PMException {
-        accessRightChecker.check(userCtx, SUPER_OBJECT, GET_CONTEXT);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, GET_CONTEXT);
 
         return null;
     }

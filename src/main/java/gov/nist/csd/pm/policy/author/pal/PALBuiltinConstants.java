@@ -21,7 +21,7 @@ public class PALBuiltinConstants {
         BUILTIN_VALUES.put(SUPER_USER, new Value(SUPER_USER));
         BUILTIN_VALUES.put(SUPER_PC, new Value(SUPER_PC));
         BUILTIN_VALUES.put(SUPER_UA, new Value(SUPER_UA));
-        BUILTIN_VALUES.put(SUPER_OBJECT, new Value(SUPER_OBJECT));
+        BUILTIN_VALUES.put(SUPER_PC_REP, new Value(SUPER_PC_REP));
 
         for (String adminAccessRight : AdminAccessRights.allAdminAccessRights()) {
             BUILTIN_VALUES.put(adminAccessRight, new Value(adminAccessRight));
@@ -36,7 +36,7 @@ public class PALBuiltinConstants {
         BUILTIN_VARIABLES.put(SUPER_USER, new Variable(SUPER_USER, Type.string(), true));
         BUILTIN_VARIABLES.put(SUPER_PC, new Variable(SUPER_PC, Type.string(), true));
         BUILTIN_VARIABLES.put(SUPER_UA, new Variable(SUPER_UA, Type.string(), true));
-        BUILTIN_VARIABLES.put(SUPER_OBJECT, new Variable(SUPER_OBJECT, Type.string(), true));
+        BUILTIN_VARIABLES.put(SUPER_PC_REP, new Variable(SUPER_PC_REP, Type.string(), true));
 
         for (String adminAccessRight : AdminAccessRights.allAdminAccessRights()) {
             BUILTIN_VARIABLES.put(adminAccessRight, new Variable(adminAccessRight, Type.string(), true));

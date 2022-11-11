@@ -40,11 +40,7 @@ class DepthFirstGraphWalkerTest {
         DepthFirstGraphWalker bfs = new DepthFirstGraphWalker(graph)
                 .withDirection(Direction.CHILDREN)
                 .withVisitor((node) -> {
-                    System.out.println(node);
                     visited.add(node);
-                })
-                .withPropagator((s, d) -> {
-                    System.out.println(s + " => " + d);
                 });
         bfs.walk("pc1");
         List<String> expected = List.of(

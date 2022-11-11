@@ -8,8 +8,6 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.naming.Naming.baseObjectAttribute;
-import static gov.nist.csd.pm.pap.naming.Naming.baseUserAttribute;
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,9 +22,9 @@ class PDPTest {
         UserContext superUser = new UserContext(SUPER_USER);
         pdp.runTx(superUser, (policy) -> {
             policy.graph().createPolicyClass("pc1");
-            policy.graph().createUserAttribute("ua1", baseUserAttribute("pc1"));
-            policy.graph().createObjectAttribute("oa1", baseObjectAttribute("pc1"));
-            policy.graph().createObjectAttribute("oa2", baseObjectAttribute("pc1"));
+            policy.graph().createUserAttribute("ua1", "pc1");
+            policy.graph().createObjectAttribute("oa1", "pc1");
+            policy.graph().createObjectAttribute("oa2", "pc1");
             policy.graph().createUser("u1", "ua1");
             policy.graph().createObject("o1", "oa1");
         });

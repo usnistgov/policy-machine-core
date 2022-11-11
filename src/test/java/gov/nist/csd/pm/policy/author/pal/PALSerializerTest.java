@@ -37,28 +37,33 @@ class PALSerializerTest {
             set resource access rights 'read', 'write', 'execute';
             create policy class 'pc1';
             set properties of 'pc1' to {'k': 'v'};
-            create user attribute 'pc1_base_UA' in 'pc1';
-            create object attribute 'pc1_base_OA' in 'pc1';
-            create object attribute 'pc1_pc_rep' in 'pc1';
             create object attribute 'oa1' in 'pc1';
             set properties of 'oa1' to {'k1': 'v1'};
             create user attribute 'ua1' in 'pc1';
-            associate 'ua1' and 'oa1' with 'read', 'write';       
-            create prohibition 'p1' deny user attribute 'ua1' access rights 'read' on union of !'oa1';           
+            associate 'ua1' and 'oa1' with 'read', 'write';
+            create policy class 'super_policy';
+            create object attribute 'super_oa' in 'super_policy';
+            create user attribute 'super_ua' in 'super_policy';
+            associate 'super_ua' and 'super_oa' with '*';
+            associate 'super_ua' and 'oa1' with '*';
+            associate 'super_ua' and 'ua1' with '*';
+            create user attribute 'super_ua1' in 'super_policy';
+            associate 'super_ua1' and 'super_ua' with '*';
+            create object attribute 'super_policy_pc_rep' in 'super_oa';
+            create user 'super' in 'super_ua';
+            assign 'super' to 'super_ua1';
+            create prohibition 'p1' deny user attribute 'ua1' access rights 'read' on union of !'oa1';
             create obligation 'obl1' {create rule 'rule1' when any user performs 'event1', 'event2' on any policy element do (evtCtx) {let event = evtCtx['event'];if equals(event, 'event1') {create policy class 'e1';} else if equals(event, 'event2') {create policy class 'e2';} }}""";
-
     @Test
     void testSerialize() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        PALExecutor palExecutor = new PALExecutor(pap);
-        palExecutor.compileAndExecutePAL(new UserContext(SUPER_USER), input);
-        String actual = new PALSerializer(pap).toPAL();
+        pap.fromPAL(new UserContext(SUPER_USER), input);
+        String actual = pap.toPAL(false);
         assertEquals(expected, actual);
 
         pap = new MemoryPAP();
-        palExecutor = new PALExecutor(pap);
-        palExecutor.compileAndExecutePAL(new UserContext(SUPER_USER), actual);
-        actual = new PALSerializer(pap).toPAL();
+        pap.fromPAL(new UserContext(SUPER_USER), actual);
+        actual = pap.toPAL(false);
         assertEquals(expected, actual);
     }
 

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.SuperPolicy;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.RepObjectNotSetException;
@@ -29,11 +30,7 @@ public class AccessRightChecker {
         Node targetNode = pap.graph().getNode(target);
 
         if (targetNode.getType().equals(PC)) {
-            if (!targetNode.getProperties().containsKey(REP_PROPERTY)) {
-                throw new RepObjectNotSetException(targetNode.getName());
-            }
-
-            target = targetNode.getProperties().get(REP_PROPERTY);
+            target = SuperPolicy.pcRepObjectAttribute(target);
         }
 
         AccessRightSet accessRights = policyReviewer.getAccessRights(userCtx, target);

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.naming.Naming;
+import gov.nist.csd.pm.pap.SuperPolicy;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
@@ -18,7 +18,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationExcept
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_OBJECT;
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC_REP;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
@@ -38,7 +38,7 @@ class Graph extends GraphAuthor {
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
         // check user has SET_RESOURCE_ACCESS_RIGHTS on the super object
-        accessRightChecker.check(userCtx, SUPER_OBJECT, SET_RESOURCE_ACCESS_RIGHTS);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, SET_RESOURCE_ACCESS_RIGHTS);
     }
 
     @Override
@@ -49,7 +49,7 @@ class Graph extends GraphAuthor {
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
         // check that the user has the CREATE_POLICY_CLASS right on the super policy object
-        accessRightChecker.check(userCtx, SUPER_OBJECT, CREATE_POLICY_CLASS);
+        accessRightChecker.check(userCtx, SUPER_PC_REP, CREATE_POLICY_CLASS);
 
         return null;
     }
@@ -128,7 +128,7 @@ class Graph extends GraphAuthor {
         NodeType nodeType = pap.graph().getNode(name).getType();
 
         if (nodeType == PC) {
-            accessRightChecker.check(userCtx, Naming.pcRepObjectAttribute(name), DELETE_POLICY_CLASS);
+            accessRightChecker.check(userCtx, SuperPolicy.pcRepObjectAttribute(name), DELETE_POLICY_CLASS);
             return;
         }
 
@@ -202,7 +202,7 @@ class Graph extends GraphAuthor {
         List<String> policyClasses = pap.graph().getPolicyClasses();
         policyClasses.removeIf(pc -> {
             try {
-                accessRightChecker.check(userCtx, Naming.pcRepObjectAttribute(pc));
+                accessRightChecker.check(userCtx, SuperPolicy.pcRepObjectAttribute(pc));
                 return false;
             } catch (PMException e) {
                 return true;

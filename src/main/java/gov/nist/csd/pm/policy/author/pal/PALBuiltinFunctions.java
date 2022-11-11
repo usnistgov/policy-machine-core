@@ -28,8 +28,6 @@ public class PALBuiltinFunctions {
     private static final FunctionDefinitionStatement nodeExists = new NodeExists();
     private static final FunctionDefinitionStatement getNode = new GetNode();
     private static final FunctionDefinitionStatement search = new Search();
-    private static final FunctionDefinitionStatement baseUA = new BaseUA();
-    private static final FunctionDefinitionStatement baseOA = new BaseOA();
 
 
     private static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
@@ -41,8 +39,6 @@ public class PALBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(containsKey.getFunctionName(), containsKey);
         BUILTIN_FUNCTIONS.put(numToStr.getFunctionName(), numToStr);
 
-        BUILTIN_FUNCTIONS.put(baseUA.getFunctionName(), baseUA);
-        BUILTIN_FUNCTIONS.put(baseOA.getFunctionName(), baseOA);
         BUILTIN_FUNCTIONS.put(getAssociationsWithSource.getFunctionName(), getAssociationsWithSource);
         BUILTIN_FUNCTIONS.put(getAssociationsWithTarget.getFunctionName(), getAssociationsWithTarget);
         BUILTIN_FUNCTIONS.put(getChildren.getFunctionName(), getChildren);
