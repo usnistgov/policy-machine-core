@@ -15,25 +15,12 @@ import java.util.List;
 class MemoryObligationsStore extends ObligationsStore {
 
     private List<Obligation> obligations;
-    private TxHandler<List<Obligation>> txHandler;
-
     MemoryObligationsStore() {
         this.obligations = new ArrayList<>();
-        this.txHandler = new TxHandler<>();
     }
 
     MemoryObligationsStore(List<Obligation> obligations) {
         this.obligations = obligations;
-        this.txHandler = new TxHandler<>();
-    }
-
-    List<Obligation> copyObligations(List<Obligation> toCopy) {
-        List<Obligation> obligations = new ArrayList<>();
-        for (Obligation obligation : toCopy) {
-            obligations.add(new Obligation(obligation));
-        }
-
-        return obligations;
     }
 
     @Override
@@ -75,29 +62,16 @@ class MemoryObligationsStore extends ObligationsStore {
 
     @Override
     public synchronized void beginTx() throws PMException {
-        if (!txHandler.isInTx()) {
-            txHandler.setState(copyObligations(obligations));
-        }
 
-        txHandler.beginTx();
     }
 
     @Override
     public synchronized void commit() throws PMException {
-        if (!txHandler.isInTx()) {
-            throw new TransactionNotStartedException();
-        }
 
-        txHandler.commit();
     }
 
     @Override
     public synchronized void rollback() throws TransactionNotStartedException {
-        if (!txHandler.isInTx()) {
-            return;
-        }
 
-        obligations = txHandler.getState();
-        txHandler.rollback();
     }
 }

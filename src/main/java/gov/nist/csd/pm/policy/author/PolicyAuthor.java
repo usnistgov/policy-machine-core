@@ -1,10 +1,14 @@
 package gov.nist.csd.pm.policy.author;
 
-public abstract class PolicyAuthor {
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 
-    public abstract GraphAuthor graph();
-    public abstract ProhibitionsAuthor prohibitions();
-    public abstract ObligationsAuthor obligations();
-    public abstract PALAuthor pal();
+public interface PolicyAuthor {
+
+    GraphAuthor graph();
+    ProhibitionsAuthor prohibitions();
+    ObligationsAuthor obligations();
+    PALAuthor pal();
 
 }

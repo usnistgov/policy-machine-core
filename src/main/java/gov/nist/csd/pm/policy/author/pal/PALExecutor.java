@@ -19,59 +19,16 @@ import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-public class PALExecutor implements PALExecutable{
+public class PALExecutor {
 
-    private final PolicyAuthor policy;
-
-    public PALExecutor(PolicyAuthor policy) {
-        this.policy = policy;
+    public static void execute(PolicyAuthor policyAuthor, UserContext userContext, String input,
+                               FunctionDefinitionStatement ... functionDefinitionStatements) throws PMException {
+        compileAndExecutePAL(policyAuthor, userContext, input, functionDefinitionStatements);
     }
 
-    @Override
-    public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
-        ErrorLog errorLog = new ErrorLog();
-        Scope scope = new Scope(Scope.Mode.COMPILE);
-        scope.loadFromPALContext(policy.pal().getContext());
-
-        // add custom builtin functions to scope
-        for (FunctionDefinitionStatement func : customBuiltinFunctions) {
-            try {
-                scope.addFunction(func);
-            } catch (FunctionAlreadyDefinedInScopeException e) {
-                errorLog.addError(0, 0, 0, e.getMessage());
-            }
-        }
-
-        PALLexer lexer = new PALLexer(CharStreams.fromString(input));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PALParser parser = new PALParser(tokens);
-        parser.addErrorListener(new BaseErrorListener() {
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                errorLog.addError(line, charPositionInLine, offendingSymbol.toString().length(), msg);
-            }
-        });
-
-        PolicyVisitor policyVisitor = new PolicyVisitor(new VisitorContext(scope, errorLog));
-        List<PALStatement> stmts = new ArrayList<>();
-        try {
-            stmts = policyVisitor.visitPal(parser.pal());
-        } catch (Exception e) {
-            errorLog.addError(parser.pal(), e.getMessage());
-        }
-
-        // throw an exception if there are any errors from parsing
-        if (!errorLog.getErrors().isEmpty()) {
-            throw new PALCompilationException(errorLog);
-        }
-
-        return stmts;
-    }
-
-    @Override
-    public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
+    public static void compileAndExecutePAL(PolicyAuthor policy, UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
         // compile the PAL into statements
-        List<PALStatement> compiledStatements = compilePAL(input, customBuiltinFunctions);
+        List<PALStatement> compiledStatements = PALCompiler.compilePAL(policy, input, customBuiltinFunctions);
 
         // initialize the execution context
         ExecutionContext ctx = new ExecutionContext(author);
@@ -96,10 +53,10 @@ public class PALExecutor implements PALExecutable{
         }
 
         // save any top level functions and constants to be used later
-        saveTopLevelFunctionsAndConstants(predefined, ctx);
+        saveTopLevelFunctionsAndConstants(policy, predefined, ctx);
     }
 
-    private void saveTopLevelFunctionsAndConstants(ExecutionContext predefinedCtx, ExecutionContext ctx) throws PMException {
+    private static void saveTopLevelFunctionsAndConstants(PolicyAuthor policy, ExecutionContext predefinedCtx, ExecutionContext ctx) throws PMException {
         Map<String, FunctionDefinitionStatement> predefinedFunctions = predefinedCtx.scope().functions();
         Map<String, Value> predefinedConstants = predefinedCtx.scope().values();
 
@@ -133,11 +90,5 @@ public class PALExecutor implements PALExecutable{
         }
 
         return new Value();
-    }
-
-    @Override
-    public String toPAL() throws PMException {
-        String pal = new PALSerializer(policy).toPAL();
-        return PALFormatter.format(pal);
     }
 }

@@ -10,7 +10,4 @@ public class UnauthorizedException extends PMException {
         super("[" + user + "] does not have access right " + Arrays.toString(missingAccessRights) + " on [" + target + "]");
     }
 
-    public UnauthorizedException(UserContext user, String ... missingAccessRights) {
-        super("[" + user + "] does not have access right " + Arrays.toString(missingAccessRights));
-    }
 }

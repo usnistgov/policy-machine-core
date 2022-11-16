@@ -24,8 +24,8 @@ class ProhibitionTest {
         String input = """
                 set resource access rights 'read', 'write';
                 create pc 'pc1';
-                create oa 'oa1' in baseOA('pc1');
-                create ua 'ua1' in baseUA('pc1');
+                create oa 'oa1' in 'pc1';
+                create ua 'ua1' in 'pc1';
                 create u 'u1' in 'ua1';
                 create u 'u2' in 'ua1';
                 associate 'ua1' and 'oa1' with 'read', 'write';
@@ -36,7 +36,7 @@ class ProhibitionTest {
                 on union of 'oa1';
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.compileAndExecutePAL(new UserContext(SUPER_USER), input);
+        pap.fromPAL(new UserContext(SUPER_USER), input);
 
         ProhibitionsAuthor prohibitions = pap.prohibitions();
         Prohibition prohibition = prohibitions.get("pro1");

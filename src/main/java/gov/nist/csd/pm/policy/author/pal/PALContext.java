@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PALContext implements PALAuthor {
+public class PALContext extends PALAuthor {
 
     private final Map<String, FunctionDefinitionStatement> functions;
 

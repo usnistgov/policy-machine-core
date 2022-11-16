@@ -6,16 +6,15 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.tx.TxPolicyEventListener;
 
 import java.util.Map;
 
 class TxPAL extends PALStore implements PolicyEventEmitter {
 
-    private final PALStore store;
+    private final MemoryPALStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxPAL(PALStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxPAL(MemoryPALStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }
@@ -28,7 +27,7 @@ class TxPAL extends PALStore implements PolicyEventEmitter {
 
     @Override
     public void removeFunction(String functionName) throws PMException {
-        emitEvent(new RemoveFunctionEvent(functionName));
+        emitEvent(new TxEvents.MemoryRemoveFunctionEvent(store.getFunctions().get(functionName)));
         store.removeFunction(functionName);
     }
 
@@ -45,7 +44,7 @@ class TxPAL extends PALStore implements PolicyEventEmitter {
 
     @Override
     public void removeConstant(String constName) throws PMException {
-        emitEvent(new RemoveConstantEvent(constName));
+        emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, store.getConstants().get(constName)));
         store.removeConstant(constName);
     }
 

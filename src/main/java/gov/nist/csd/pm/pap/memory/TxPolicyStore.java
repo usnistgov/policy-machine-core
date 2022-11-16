@@ -4,7 +4,6 @@ import gov.nist.csd.pm.pap.store.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.tx.TxPolicyEventListener;
 
 import java.util.List;
 
@@ -19,44 +18,47 @@ class TxPolicyStore extends PolicyStore {
      * An event listener to track the events that occur during the transaction.
      * These events will be committed to the target policy store on commit.
      */
-    protected final TxPolicyEventListener txPolicyEventListener;
+    protected TxPolicyEventListener txPolicyEventListener;
+    private final TxGraph graph;
+    private final TxProhibitions prohibitions;
+    private final TxObligations obligations;
+    private final TxPAL pal;
 
     public TxPolicyStore(MemoryPolicyStore txStore) {
-        this.txStore = copy(txStore);
+        this.txStore = txStore;
         this.txPolicyEventListener = new TxPolicyEventListener();
+        this.graph = new TxGraph(txStore.getGraph(), txPolicyEventListener);
+        this.prohibitions = new TxProhibitions(txStore.getProhibitions(), txPolicyEventListener);
+        this.obligations = new TxObligations(txStore.getObligations(), txPolicyEventListener);
+        this.pal = new TxPAL(txStore.getPAL(), txPolicyEventListener);
     }
 
-    private MemoryPolicyStore copy(MemoryPolicyStore memoryPolicyStore) {
-        PolicySynchronizationEvent policySync = memoryPolicyStore.policySync();
-        return new MemoryPolicyStore(policySync);
+    public TxPolicyEventListener getTxPolicyEventListener() {
+        return txPolicyEventListener;
     }
 
-    public MemoryPolicyStore txStore() {
-        return txStore;
-    }
-
-    public List<PolicyEvent> getEvents() {
-        return txPolicyEventListener.getEvents();
+    public void clearEvents() {
+        txPolicyEventListener = new TxPolicyEventListener();
     }
 
     @Override
     public GraphStore graph() {
-        return new TxGraph(txStore.graph(), txPolicyEventListener);
+        return graph;
     }
 
     @Override
     public ProhibitionsStore prohibitions() {
-        return new TxProhibitions(txStore.prohibitions(), txPolicyEventListener);
+        return prohibitions;
     }
 
     @Override
     public ObligationsStore obligations() {
-        return new TxObligations(txStore.obligations(), txPolicyEventListener);
+        return obligations;
     }
 
     @Override
     public PALStore pal() {
-        return new TxPAL(txStore.pal(), txPolicyEventListener);
+        return pal;
     }
 
     @Override

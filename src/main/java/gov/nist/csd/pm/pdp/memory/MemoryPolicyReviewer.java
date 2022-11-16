@@ -109,6 +109,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
             throw new NodeDoesNotExistException(target);
         }
 
+        List<String> policyClasses = policyReader.graph().getPolicyClasses();
         Map<String, AccessRightSet> borderTargets = userCtx.borderTargets();
         Map<String, Map<String, AccessRightSet>> visitedNodes = new HashMap<>();
         Set<String> reachedTargets = new HashSet<>();
@@ -124,7 +125,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
                 visitedNodes.put(node, nodeCtx);
             }
 
-            if (policyReader.graph().getPolicyClasses().contains(node)) {
+            if (policyClasses.contains(node)) {
                 nodeCtx.put(node, new AccessRightSet());
             } else {
                 if (borderTargets.containsKey(node)) {
@@ -192,7 +193,10 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
                 }
             }
 
-            //get the parents of the subject to start bfs on user side
+            List<Association> nodeAssociations = policyReader.graph().getAssociationsWithSource(node);
+            collectAssociations(nodeAssociations, borderTargets);
+
+            /*//get the parents of the subject to start bfs on user side
             List<String> parents = policyReader.graph().getParents(node);
             while (!parents.isEmpty()) {
                 String parent = parents.iterator().next();
@@ -210,7 +214,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
                 //remove the current parent from the queue
                 parents.remove(parent);
-            }
+            }*/
         };
 
         // start the bfs

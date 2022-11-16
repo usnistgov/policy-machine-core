@@ -1,18 +1,15 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreEventHandler;
+import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.author.pal.PALExecutable;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
+import gov.nist.csd.pm.policy.author.pal.PALSerializable;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.tx.TxRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,18 +53,22 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx extends PolicyAuthor implements PALExecutable {
+    public static class PDPTx implements PolicyAuthor, PALSerializable {
 
         private final Graph graph;
         private final Prohibitions prohibitions;
         private final Obligations obligations;
         private final PAL pal;
+        private final Adjudicator adjudicator;
+        private final PAP pap;
 
         public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<PolicyEventListener> epps) {
             this.graph = new Graph(userCtx, pap, policyReviewer, epps);
             this.prohibitions = new Prohibitions(userCtx, pap, policyReviewer, epps);
             this.obligations = new Obligations(userCtx, pap, policyReviewer, epps);
             this.pal = new PAL(userCtx, pap, policyReviewer, epps);
+            this.adjudicator = new Adjudicator(userCtx, pap, policyReviewer);
+            this.pap = pap;
         }
 
         @Override
@@ -90,19 +91,19 @@ public abstract class PDP implements PolicyEventEmitter {
             return pal;
         }
 
+
         @Override
-        public List<PALStatement> compilePAL(String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
-            return new PALExecutor(this).compilePAL(input, customBuiltinFunctions);
+        public String toPAL(boolean format) throws PMException {
+            this.adjudicator.toPAL(format);
+
+            return this.pap.toPAL(format);
         }
 
         @Override
-        public void compileAndExecutePAL(UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
-            new PALExecutor(this).compileAndExecutePAL(author, input, customBuiltinFunctions);
-        }
+        public void fromPAL(UserContext author, String input, FunctionDefinitionStatement... customFunctions) throws PMException {
+            this.adjudicator.fromPAL(author, input, customFunctions);
 
-        @Override
-        public String toPAL() throws PMException {
-            return new PALExecutor(this).toPAL();
+            this.pap.fromPAL(author, input, customFunctions);
         }
     }
 }

@@ -6,16 +6,15 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.tx.TxPolicyEventListener;
 
 import java.util.List;
 
 class TxObligations extends ObligationsStore implements PolicyEventEmitter {
 
-    private final ObligationsStore store;
+    private final MemoryObligationsStore store;
     private final TxPolicyEventListener txPolicyEventListener;
 
-    public TxObligations(ObligationsStore store, TxPolicyEventListener txPolicyEventListener) {
+    public TxObligations(MemoryObligationsStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
     }
@@ -28,13 +27,13 @@ class TxObligations extends ObligationsStore implements PolicyEventEmitter {
 
     @Override
     public void update(UserContext author, String label, Rule... rules) throws PMException {
-        emitEvent(new UpdateObligationEvent(author, label, List.of(rules)));
+        emitEvent(new TxEvents.MemoryUpdateObligationEvent(new Obligation(author, label, List.of(rules)), store.get(label)));
         store.update(author, label, rules);
     }
 
     @Override
     public void delete(String label) throws PMException {
-        emitEvent(new DeleteObligationEvent(label));
+        emitEvent(new TxEvents.MemoryDeleteObligationEvent(label, store.get(label)));
         store.delete(label);
     }
 

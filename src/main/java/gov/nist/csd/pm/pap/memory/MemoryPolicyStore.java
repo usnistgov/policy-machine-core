@@ -4,20 +4,16 @@ import gov.nist.csd.pm.pap.store.*;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.TransactionNotStartedException;
-import gov.nist.csd.pm.policy.model.graph.Graph;
-import gov.nist.csd.pm.policy.model.obligation.Obligation;
-import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.author.pal.PALContext;
-
-import java.util.List;
-import java.util.Map;
 
 public class MemoryPolicyStore extends PolicyStore {
 
-    private MemoryGraphStore graph;
-    private MemoryProhibitionsStore prohibitions;
-    private MemoryObligationsStore obligations;
-    private MemoryPALStore pal;
+    private final MemoryGraphStore graph;
+    private final MemoryProhibitionsStore prohibitions;
+    private final MemoryObligationsStore obligations;
+    private final MemoryPALStore pal;
+    private boolean inTx;
+    private int txCounter;
+    private TxPolicyStore txPolicyStore;
 
     public MemoryPolicyStore() {
         graph = new MemoryGraphStore();
@@ -27,26 +23,10 @@ public class MemoryPolicyStore extends PolicyStore {
     }
 
     public MemoryPolicyStore(PolicySynchronizationEvent event) {
-        this.graph = new MemoryGraphStore(event.getGraph());
-        this.prohibitions = new MemoryProhibitionsStore(event.getProhibitions());
-        this.obligations = new MemoryObligationsStore(event.getObligations());
-        this.pal = new MemoryPALStore(event.getPALContext());
-    }
-
-    void setGraph(MemoryGraphStore graph) {
-        this.graph = graph;
-    }
-
-    void setProhibitions(MemoryProhibitionsStore prohibitions) {
-        this.prohibitions = prohibitions;
-    }
-
-    void setObligations(MemoryObligationsStore obligations) {
-        this.obligations = obligations;
-    }
-
-    void setPAL(MemoryPALStore pal) {
-        this.pal = pal;
+        graph = new MemoryGraphStore(event.getGraph());
+        prohibitions = new MemoryProhibitionsStore(event.getProhibitions());
+        obligations = new MemoryObligationsStore(event.getObligations());
+        pal = new MemoryPALStore(event.getPALContext());
     }
 
     MemoryGraphStore getGraph() {
@@ -77,45 +57,65 @@ public class MemoryPolicyStore extends PolicyStore {
 
     @Override
     public synchronized void beginTx() throws PMException {
-        graph.beginTx();
-        prohibitions.beginTx();
-        obligations.beginTx();
-        pal.beginTx();
+        if (!inTx) {
+            txPolicyStore = new TxPolicyStore(this);
+        }
+
+        inTx = true;
+        txCounter++;
     }
 
     @Override
     public synchronized void commit() throws PMException {
-        graph.commit();
-        prohibitions.commit();
-        obligations.commit();
-        pal.commit();
+        txCounter--;
+        if(txCounter == 0) {
+            inTx = false;
+            txPolicyStore.clearEvents();
+        }
     }
 
     @Override
-    public synchronized void rollback() throws TransactionNotStartedException {
-        graph.rollback();
-        prohibitions.rollback();
-        obligations.rollback();
-        pal.rollback();
+    public synchronized void rollback() throws PMException {
+        inTx = false;
+        txCounter = 0;
+
+        TxPolicyEventListener txPolicyEventListener = txPolicyStore.getTxPolicyEventListener();
+        txPolicyEventListener.revert(this);
     }
 
     @Override
     public GraphStore graph() {
+        if (inTx) {
+            return txPolicyStore.graph();
+        }
+
         return graph;
     }
 
     @Override
     public ProhibitionsStore prohibitions() {
+        if (inTx) {
+            return txPolicyStore.prohibitions();
+        }
+
         return prohibitions;
     }
 
     @Override
     public ObligationsStore obligations() {
+        if (inTx) {
+            return txPolicyStore.obligations();
+        }
+
         return obligations;
     }
 
     @Override
     public PALStore pal() {
+        if (inTx) {
+            return txPolicyStore.pal();
+        }
+
         return pal;
     }
 }

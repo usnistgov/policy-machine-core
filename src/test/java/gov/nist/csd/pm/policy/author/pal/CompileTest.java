@@ -182,7 +182,7 @@ class CompileTest {
     }
 
     private List<PALStatement> test(String pal, PolicyAuthor policyAuthor) throws PMException {
-        return new PALExecutor(policyAuthor).compilePAL(pal);
+        return PALCompiler.compilePAL(policyAuthor, pal);
     }
 
     @Test
@@ -388,6 +388,6 @@ class CompileTest {
                 create policy class concat([x, ' ', y]);
                 let y = 'world';
                 """;
-        assertThrows(PALCompilationException.class, () -> new MemoryPAP().compilePAL(pal));
+        assertThrows(PALCompilationException.class, () -> PALCompiler.compilePAL(new MemoryPAP(), pal));
     }
 }

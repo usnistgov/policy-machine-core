@@ -44,8 +44,8 @@ public class ObligationTest {
                     }
                 }
                 """;
-        new PALExecutor(pap)
-                .compileAndExecutePAL(new UserContext(SUPER_USER), input);
+        pap.fromPAL(new UserContext(SUPER_USER), input);
+
         Obligation obligation1 = pap.obligations().get("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
         assertEquals(1, obligation1.getRules().size());
@@ -86,7 +86,7 @@ public class ObligationTest {
         pap.graph().createPolicyClass("pc1");
         pap.graph().createObjectAttribute("oa1", "pc1");
 
-        new PALExecutor(pap).compileAndExecutePAL(userCtx, pal);
+        pap.fromPAL(userCtx, pal);
 
         assertEquals(1, pap.obligations().getAll().size());
         Obligation actual = pap.obligations().get("test");
