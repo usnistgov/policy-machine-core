@@ -7,6 +7,7 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.statement.SetResourceAccessRightsStatement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResourceAccessRightsStatement> {
@@ -25,7 +26,13 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
         }
 
         Expression expression = Expression.compileArray(visitorCtx, ctx.expressionArray(), Type.string());
-        List<Expression> exprList = expression.getExprList();
+        List<Expression> exprList = null;
+        if (expression.isLiteral()) {
+            exprList = new ArrayList<>();
+            exprList.add(expression);
+        } else {
+            exprList = expression.getExprList();
+        }
 
         visitorCtx.scope().setResourceAccessRightsExpression(exprList);
 

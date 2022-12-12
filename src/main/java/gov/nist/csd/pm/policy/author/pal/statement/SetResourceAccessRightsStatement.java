@@ -6,7 +6,9 @@ import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SetResourceAccessRightsStatement extends PALStatement{
 
@@ -20,7 +22,22 @@ public class SetResourceAccessRightsStatement extends PALStatement{
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Expression e : arExprList) {
-            accessRightSet.add(e.execute(ctx, policyAuthor).getStringValue());
+            Value v = e.execute(ctx, policyAuthor);
+            switch (v.getType().toString()) {
+                case "string":
+                    accessRightSet.add(e.execute(ctx, policyAuthor).getStringValue());
+                    break;
+                case "[]string":
+                    List<String> l = Arrays.stream(v.getArrayValue())
+                        .map(Value::getStringValue)
+                        .collect(Collectors.toList());
+
+                    accessRightSet.addAll(l);
+                    break;
+                default:
+                    throw new PMException("Illegal value type for access right: " + v.getType().toString());
+            }
+
         }
 
         policyAuthor.graph().setResourceAccessRights(accessRightSet);
