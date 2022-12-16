@@ -72,7 +72,7 @@ public class Expression extends PALStatement {
         List<PALParser.ExpressionContext> expressionCtxs = expressionArrayCtx.expression();
         List<Expression> expressions = new ArrayList<>();
         for (PALParser.ExpressionContext expressionCtx : expressionCtxs) {
-            Expression compiledExpr = compile(visitorCtx, expressionCtx);
+            Expression compiledExpr = compile(visitorCtx, expressionCtx, allowedType, Type.array(allowedType));
             expressions.add(compiledExpr);
         }
 
@@ -105,8 +105,12 @@ public class Expression extends PALStatement {
             // if the type is an array of the allowed type (variable or function) then return the expression itself
             if (exprType.equals(allowedType)) {
                 return new Expression(expression);
-            } else if (exprType.equals(Type.array(allowedType))) {
+            } else if (!expression.isLiteral && exprType.equals(Type.array(allowedType))) {
                 return expression;
+            } else if (expression.isLiteral && expression.getLiteral().isArrayLiteral() && expression.getLiteral().getType().equals(Type.array(allowedType))) {
+                Literal literal = expression.getLiteral();
+                ArrayLiteral arrayLiteral = literal.getArrayLiteral();
+                return new Expression(Arrays.stream(arrayLiteral.getArray()).toList());
             } else {
                 visitorCtx.errorLog().addError(expressionArrayCtx, String.format("expected expression array of type %s but got %s", allowedType, exprType));
             }

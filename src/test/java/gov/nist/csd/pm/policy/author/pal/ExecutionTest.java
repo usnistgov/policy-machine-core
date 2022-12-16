@@ -390,13 +390,17 @@ public class ExecutionTest {
     }
 
     @Test
-    void test() throws PMException {
+    void testArrayWithLiteral() throws PMException {
         String input = """
-                set resource access rights "read", "write";
+                set resource access rights ["read", "write"];
                 """;
         PAP pap = new MemoryPAP();
         PALExecutor.execute(pap, superUser, input);
-        System.out.println(pap.graph().getResourceAccessRights());
         assertTrue(pap.graph().getResourceAccessRights().contains("read"));
+
+        String input1 = """
+                set resource access rights [["read", "write"], ["exec"]];
+                """;
+        assertThrows(PMException.class, () -> PALExecutor.execute(pap, superUser, input1));
     }
 }
