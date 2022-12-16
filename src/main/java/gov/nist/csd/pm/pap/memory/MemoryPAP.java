@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 
 public class MemoryPAP extends PAP {
     public MemoryPAP() throws PMException {
@@ -17,9 +15,13 @@ public class MemoryPAP extends PAP {
     }
 
     @Override
-    public void fromPAL(UserContext author, String input, FunctionDefinitionStatement... customFunctions) throws PMException {
-        MemoryConnection memoryConnection = new MemoryConnection(new MemoryPolicyStore());
-        PALExecutor.execute(memoryConnection, author, input, customFunctions);
-        this.init(memoryConnection, true);
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return this.policyStore.toString(policySerializer);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        this.policyStore.fromString(s, policyDeserializer);
+        init(policyStore, true);
     }
 }

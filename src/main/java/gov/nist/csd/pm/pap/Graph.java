@@ -32,7 +32,7 @@ class Graph extends GraphAuthor implements PolicyEventEmitter {
     private final PolicyStore store;
     private final List<PolicyEventListener> listeners;
 
-    Graph(PolicyStore store) throws PMException {
+    Graph(PolicyStore store) {
         this.store = store;
         this.listeners = new ArrayList<>();
     }

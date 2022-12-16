@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
-import gov.nist.csd.pm.policy.tx.TxCommitException;
 
 import java.util.*;
 
@@ -99,5 +100,17 @@ public class MysqlPolicyStore extends PolicyStore {
 
     public static String arsetToJson(AccessRightSet set) throws JsonProcessingException {
         return objectMapper.writeValueAsString(set);
+    }
+
+    @Override
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return policySerializer.serialize(this);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        beginTx();
+        policyDeserializer.deserialize(this, s);
+        commit();
     }
 }

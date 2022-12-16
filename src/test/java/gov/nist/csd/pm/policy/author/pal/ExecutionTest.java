@@ -388,4 +388,15 @@ public class ExecutionTest {
         PALExecutor.execute(pap, superUser, input);
         assertTrue(pap.graph().getPolicyClasses().contains("v1"));
     }
+
+    @Test
+    void test() throws PMException {
+        String input = """
+                set resource access rights "read", "write";
+                """;
+        PAP pap = new MemoryPAP();
+        PALExecutor.execute(pap, superUser, input);
+        System.out.println(pap.graph().getResourceAccessRights());
+        assertTrue(pap.graph().getResourceAccessRights().contains("read"));
+    }
 }

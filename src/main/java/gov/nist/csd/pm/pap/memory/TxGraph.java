@@ -2,8 +2,8 @@ package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.store.GraphStore;
 import gov.nist.csd.pm.policy.events.*;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.graph.Graph;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
@@ -21,6 +21,10 @@ class TxGraph extends GraphStore implements PolicyEventEmitter {
     public TxGraph(MemoryGraphStore store, TxPolicyEventListener txPolicyEventListener) {
         this.store = store;
         this.txPolicyEventListener = txPolicyEventListener;
+    }
+
+    void setGraph(Graph graph) {
+        this.store.setGraph(graph);
     }
 
     @Override

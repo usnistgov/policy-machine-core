@@ -22,6 +22,8 @@ class PAL extends PALAuthor implements PolicyEventEmitter {
     public PAL(PolicyStore store) {
         this.store = store;
         this.listeners = new ArrayList<>();
+
+        // add pre defined functions and constants
     }
 
     @Override

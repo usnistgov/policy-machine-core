@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-
-import java.util.List;
 
 class MemoryConnection extends PolicyStoreConnection {
 
@@ -52,5 +52,15 @@ class MemoryConnection extends PolicyStoreConnection {
     @Override
     public PolicySynchronizationEvent policySync() throws PMException {
         return main.policySync();
+    }
+
+    @Override
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return main.toString(policySerializer);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        main.fromString(s, policyDeserializer);
     }
 }

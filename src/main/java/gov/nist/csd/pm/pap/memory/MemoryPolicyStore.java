@@ -1,16 +1,17 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.exceptions.TransactionNotStartedException;
 
 public class MemoryPolicyStore extends PolicyStore {
 
-    private final MemoryGraphStore graph;
-    private final MemoryProhibitionsStore prohibitions;
-    private final MemoryObligationsStore obligations;
-    private final MemoryPALStore pal;
+    private MemoryGraphStore graph;
+    private MemoryProhibitionsStore prohibitions;
+    private MemoryObligationsStore obligations;
+    private MemoryPALStore pal;
     private boolean inTx;
     private int txCounter;
     private TxPolicyStore txPolicyStore;
@@ -117,5 +118,25 @@ public class MemoryPolicyStore extends PolicyStore {
         }
 
         return pal;
+    }
+
+    @Override
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return policySerializer.serialize(this);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        if (inTx) {
+            policyDeserializer.deserialize(txPolicyStore, s);
+        } else {
+            // clear policy
+            this.graph = new MemoryGraphStore();
+            this.prohibitions = new MemoryProhibitionsStore();
+            this.obligations = new MemoryObligationsStore();
+            this.pal = new MemoryPALStore();
+
+            policyDeserializer.deserialize(this, s);
+        }
     }
 }

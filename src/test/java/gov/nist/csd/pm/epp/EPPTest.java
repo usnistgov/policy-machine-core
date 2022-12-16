@@ -20,6 +20,8 @@ import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
+import gov.nist.csd.pm.policy.serializer.PALSerializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -51,7 +53,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.fromPAL(new UserContext(SUPER_USER), pal);
+        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
 
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -88,7 +90,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.fromPAL(new UserContext(SUPER_USER), pal);
+        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
 
         pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
         assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(

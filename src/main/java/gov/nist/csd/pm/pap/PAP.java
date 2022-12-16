@@ -3,21 +3,14 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.store.PolicyStoreConnection;
 import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.PALFormatter;
-import gov.nist.csd.pm.policy.author.pal.PALSerializable;
-import gov.nist.csd.pm.policy.author.pal.PALSerializer;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PAP implements PolicySync, PolicyEventEmitter, Transactional, PolicyReader, PolicyAuthor, PALSerializable {
+public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEventEmitter, Transactional, PolicyReader {
 
     protected PolicyStoreConnection policyStore;
     protected Graph graph;
@@ -64,11 +57,6 @@ public abstract class PAP implements PolicySync, PolicyEventEmitter, Transaction
     @Override
     public PALAuthor pal() {
         return pal;
-    }
-
-    @Override
-    public String toPAL(boolean format) throws PMException {
-        return PALSerializer.toPAL(this, format);
     }
 
     @Override

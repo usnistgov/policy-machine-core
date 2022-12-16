@@ -21,6 +21,10 @@ class TxProhibitions extends ProhibitionsStore implements PolicyEventEmitter {
         this.txPolicyEventListener = txPolicyEventListener;
     }
 
+    void setProhibitions(List<Prohibition> prohibitions) {
+        store.setProhibitions(prohibitions);
+    }
+
     @Override
     public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         emitEvent(new CreateProhibitionEvent(label, subject, accessRightSet, intersection, List.of(containerConditions)));

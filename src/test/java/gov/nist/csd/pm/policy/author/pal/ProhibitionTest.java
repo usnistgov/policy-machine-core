@@ -9,6 +9,7 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -36,7 +37,7 @@ class ProhibitionTest {
                 on union of 'oa1';
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.fromPAL(new UserContext(SUPER_USER), input);
+        pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
 
         ProhibitionsAuthor prohibitions = pap.prohibitions();
         Prohibition prohibition = prohibitions.get("pro1");

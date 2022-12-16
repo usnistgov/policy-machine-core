@@ -11,6 +11,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.VarStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -57,7 +58,7 @@ class PALExecutorTest {
         Map<String, FunctionDefinitionStatement> functions = memoryPAP.pal().getFunctions();
         assertTrue(functions.isEmpty());
 
-        memoryPAP.fromPAL(new UserContext(SUPER_USER), pal, test1, test2);
+        memoryPAP.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER), test1, test2));
         assertEquals(2, statements.size());
 
         functions = memoryPAP.pal().getFunctions();

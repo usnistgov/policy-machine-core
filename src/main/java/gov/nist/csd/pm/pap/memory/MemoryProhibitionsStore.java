@@ -25,6 +25,14 @@ class MemoryProhibitionsStore extends ProhibitionsStore {
         this.prohibitions = copyProhibitions(prohibitions);
     }
 
+    synchronized void setProhibitions(List<Prohibition> prohibitions) {
+        for (Prohibition p : prohibitions) {
+            List<Prohibition> pros = this.prohibitions.getOrDefault(p.getSubject().name(), new ArrayList<>());
+            pros.add(p);
+            this.prohibitions.put(p.getSubject().name(), pros);
+        }
+    }
+
     Map<String, List<Prohibition>> copyProhibitions(Map<String, List<Prohibition>> toCopy) {
         HashMap<String, List<Prohibition>> prohibitions = new HashMap<>();
         for (String subject : toCopy.keySet()) {

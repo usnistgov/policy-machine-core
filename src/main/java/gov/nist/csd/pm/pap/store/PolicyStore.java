@@ -4,6 +4,6 @@ import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.events.PolicySync;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
-public abstract class PolicyStore implements PolicySync, Transactional, PolicyAuthor {
+public abstract class PolicyStore extends PolicyAuthor implements PolicySync, Transactional {
 
 }

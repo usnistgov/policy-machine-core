@@ -2,11 +2,10 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.PALSerializable;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -53,7 +52,7 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements PolicyAuthor, PALSerializable {
+    public static class PDPTx extends PolicyAuthor {
 
         private final Graph graph;
         private final Prohibitions prohibitions;
@@ -91,19 +90,18 @@ public abstract class PDP implements PolicyEventEmitter {
             return pal;
         }
 
-
         @Override
-        public String toPAL(boolean format) throws PMException {
-            this.adjudicator.toPAL(format);
+        public String toString(PolicySerializer policySerializer) throws PMException {
+            adjudicator.toString(policySerializer);
 
-            return this.pap.toPAL(format);
+            return pap.toString(policySerializer);
         }
 
         @Override
-        public void fromPAL(UserContext author, String input, FunctionDefinitionStatement... customFunctions) throws PMException {
-            this.adjudicator.fromPAL(author, input, customFunctions);
+        public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+            adjudicator.fromString(s, policyDeserializer);
 
-            this.pap.fromPAL(author, input, customFunctions);
+            pap.fromString(s, policyDeserializer);
         }
     }
 }

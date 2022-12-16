@@ -19,7 +19,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
 class MemoryGraphStore extends GraphStore {
 
-    private final Graph graph;
+    private Graph graph;
 
     MemoryGraphStore() {
         this.graph = new Graph();
@@ -35,6 +35,10 @@ class MemoryGraphStore extends GraphStore {
 
     Graph getGraph() {
         return graph;
+    }
+
+    synchronized void setGraph(Graph graph) {
+        this.graph = graph;
     }
 
     @Override

@@ -3,6 +3,8 @@ package gov.nist.csd.pm.policy.author.pal;
 import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
+import gov.nist.csd.pm.policy.serializer.PALSerializer;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
@@ -57,13 +59,13 @@ class PALSerializerTest {
     @Test
     void testSerialize() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.fromPAL(new UserContext(SUPER_USER), input);
-        String actual = pap.toPAL(false);
+        pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
+        String actual = pap.toString(new PALSerializer(false));
         assertEquals(expected, actual);
 
         pap = new MemoryPAP();
-        pap.fromPAL(new UserContext(SUPER_USER), actual);
-        actual = pap.toPAL(false);
+        pap.fromString(actual, new PALDeserializer(new UserContext(SUPER_USER)));
+        actual = pap.toString(new PALSerializer(false));
         assertEquals(expected, actual);
     }
 
