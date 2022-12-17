@@ -2,243 +2,99 @@ package gov.nist.csd.pm.policy.events;
 
 public class PolicyEventHandler {
 
-    private final PolicyEvent event;
+    public PolicyEventHandler() {}
 
-    public PolicyEventHandler(PolicyEvent event) {
-        this.event = event;
-    }
-
-    public PolicyEventHandler onAddConstantEvent(AddConstantExecutor executor) {
+    public void handle(PolicyEvent event) {
         if (event instanceof AddConstantEvent e) {
-            executor.exec(e);
+            handleAddConstantEvent(e);
+        } else if (event instanceof AddFunctionEvent e) {
+            handleAddFunctionEvent(e);
+        } else if (event instanceof AssignEvent e) {
+            handleAssignEvent(e);
+        } else if (event instanceof AssignToEvent e) {
+            handleAssignToEvent(e);
+        } else if (event instanceof AssociateEvent e) {
+            handleAssociateEvent(e);
+        } else if (event instanceof BeginTxEvent e) {
+            handleBeginTxEvent(e);
+        } else if (event instanceof CommitTxEvent e) {
+            handleCommitTxEvent(e);
+        }else if (event instanceof CreateObjectAttributeEvent e) {
+            handleCreateObjectAttributeEvent(e);
+        } else if (event instanceof CreateObjectEvent e) {
+            handleCreateObjectEvent(e);
+        } else if (event instanceof CreateObligationEvent e) {
+            handleCreateObligationEvent(e);
+        } else if (event instanceof CreatePolicyClassEvent e) {
+            handleCreatePolicyClassEvent(e);
+        } else if (event instanceof CreateProhibitionEvent e) {
+            handleCreateProhibitionEvent(e);
+        } else if (event instanceof CreateUserAttributeEvent e) {
+            handleCreateUserAttributeEvent(e);
+        } else if (event instanceof CreateUserEvent e) {
+            handleCreateUserEvent(e);
+        } else if (event instanceof CreateNodeEvent e) {
+            handleCreateNodeEvent(e);
+        } else if (event instanceof DeassignEvent e) {
+            handleDeassignEvent(e);
+        } else if (event instanceof DeassignFromEvent e) {
+            handleDeassignFromEvent(e);
+        } else if (event instanceof DeleteNodeEvent e) {
+            handleDeleteNodeEvent(e);
+        } else if (event instanceof DeleteObligationEvent e) {
+            handleDeleteObligationEvent(e);
+        } else if (event instanceof DeleteProhibitionEvent e) {
+            handleDeleteProhibitionEvent(e);
+        } else if (event instanceof DissociateEvent e) {
+            handleDissociateEvent(e);
+        } else if (event instanceof PolicySynchronizationEvent e) {
+            handlePolicySyncEvent(e);
+        } else if (event instanceof RemoveConstantEvent e) {
+            handleRemoveConstantEvent(e);
+        } else if (event instanceof RemoveFunctionEvent e) {
+            handleRemoveFunctionEvent(e);
+        } else if (event instanceof RollbackTxEvent e) {
+            handleRollbackTxEvent(e);
+        } else if (event instanceof SetNodePropertiesEvent e) {
+            handleSetNodePropertiesEvent(e);
+        } else if (event instanceof SetResourceAccessRightsEvent e) {
+            handleSetResourceAccessRightsEvent(e);
+        } else if (event instanceof UpdateObligationEvent e) {
+            handleUpdateObligationEvent(e);
+        } else if (event instanceof UpdateProhibitionEvent e) {
+            handleUpdateProhibitionEvent(e);
         }
-
-        return this;
     }
 
-    public PolicyEventHandler onAddFunctionEvent(AddFunctionExecutor executor) {
-        if (event instanceof AddFunctionEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onAssignEvent(AssignExecutor executor) {
-        if (event instanceof AssignEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onAssignToEvent(AssignToExecutor executor) {
-        if (event instanceof AssignToEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onAssociateEvent(AssociateExecutor executor) {
-        if (event instanceof AssociateEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onBeginTxEvent(BeginTxExecutor executor) {
-        if (event instanceof BeginTxEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCommitTxEvent(CommitTxExecutor executor) {
-        if (event instanceof CommitTxEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateNodeEvent(CreateNodeExecutor executor) {
-        if (event instanceof CreateNodeEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateObjectAttributeEvent(CreateObjectAttributeExecutor executor) {
-        if (event instanceof CreateObjectAttributeEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateObjectEvent(CreateObjectExecutor executor) {
-        if (event instanceof CreateObjectEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateObligationEvent(CreateObligationExecutor executor) {
-        if (event instanceof CreateObligationEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreatePolicyClassEvent(CreatePolicyClassExecutor executor) {
-        if (event instanceof CreatePolicyClassEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateProhibitionEvent(CreateProhibitionExecutor executor) {
-        if (event instanceof CreateProhibitionEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateUserAttributeEvent(CreateUserAttributeExecutor executor) {
-        if (event instanceof CreateUserAttributeEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onCreateUserEvent(CreateUserExecutor executor) {
-        if (event instanceof CreateUserEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onDeassignEvent(DeassignExecutor executor) {
-        if (event instanceof DeassignEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onDeassignFromEvent(DeassignFromExecutor executor) {
-        if (event instanceof DeassignFromEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onDeleteNodeEvent(DeleteNodeExecutor executor) {
-        if (event instanceof DeleteNodeEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onDeleteObligationEvent(DeleteObligationExecutor executor) {
-        if (event instanceof DeleteObligationEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onDeleteProhibitionEvent(DeleteProhibitionExecutor executor) {
-        if (event instanceof DeleteProhibitionEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onDissociateEvent(DissociateExecutor executor) {
-        if (event instanceof DissociateEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onPolicySyncEvent(PolicySyncExecutor executor) {
-        if (event instanceof PolicySynchronizationEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onRemoveConstantEvent(RemoveConstantExecutor executor) {
-        if (event instanceof RemoveConstantEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onRemoveFunctionEvent(RemoveFunctionExecutor executor) {
-        if (event instanceof RemoveFunctionEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onRollbackTxEvent(RollbackTxExecutor executor) {
-        if (event instanceof RollbackTxEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onSetNodePropertiesEvent(SetNodePropertiesExecutor executor) {
-        if (event instanceof SetNodePropertiesEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onSetResourceAccessRightsEvent(SetResourceAccessRightsExecutor executor) {
-        if (event instanceof SetResourceAccessRightsEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onUpdateObligationEvent(UpdateObligationExecutor executor) {
-        if (event instanceof UpdateObligationEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
-
-    public PolicyEventHandler onUpdateProhibitionEvent(UpdateProhibitionExecutor executor) {
-        if (event instanceof UpdateProhibitionEvent e) {
-            executor.exec(e);
-        }
-
-        return this;
-    }
+    public void handleAddConstantEvent(AddConstantEvent e) {}
+    public void handleAddFunctionEvent(AddFunctionEvent e) {}
+    public void handleAssignEvent(AssignEvent e) {}
+    public void handleAssignToEvent(AssignToEvent e) {}
+    public void handleAssociateEvent(AssociateEvent e) {}
+    public void handleBeginTxEvent(BeginTxEvent e) {}
+    public void handleCommitTxEvent(CommitTxEvent e) {}
+    public void handleCreateNodeEvent(CreateNodeEvent e) {}
+    public void handleCreateObjectAttributeEvent(CreateObjectAttributeEvent e) {}
+    public void handleCreateObjectEvent(CreateObjectEvent e) {}
+    public void handleCreateObligationEvent(CreateObligationEvent e) {}
+    public void handleCreatePolicyClassEvent(CreatePolicyClassEvent e) {}
+    public void handleCreateProhibitionEvent(CreateProhibitionEvent e) {}
+    public void handleCreateUserAttributeEvent(CreateUserAttributeEvent e) {}
+    public void handleCreateUserEvent(CreateUserEvent e) {}
+    public void handleDeassignEvent(DeassignEvent e) {}
+    public void handleDeassignFromEvent(DeassignFromEvent e) {}
+    public void handleDeleteNodeEvent(DeleteNodeEvent e) {}
+    public void handleDeleteObligationEvent(DeleteObligationEvent e) {}
+    public void handleDeleteProhibitionEvent(DeleteProhibitionEvent e) {}
+    public void handleDissociateEvent(DissociateEvent e) {}
+    public void handlePolicySyncEvent(PolicySynchronizationEvent e) {}
+    public void handleRemoveConstantEvent(RemoveConstantEvent e) {}
+    public void handleRemoveFunctionEvent(RemoveFunctionEvent e) {}
+    public void handleRollbackTxEvent(RollbackTxEvent e) {}
+    public void handleSetNodePropertiesEvent(SetNodePropertiesEvent e) {}
+    public void handleSetResourceAccessRightsEvent(SetResourceAccessRightsEvent e) {}
+    public void handleUpdateObligationEvent(UpdateObligationEvent e) {}
+    public void handleUpdateProhibitionEvent(UpdateProhibitionEvent e) {}
 
     interface AddConstantExecutor {
         void exec(AddConstantEvent event);
