@@ -23,6 +23,10 @@ class MemoryObligationsStore extends ObligationsStore {
         this.obligations = obligations;
     }
 
+    synchronized void setObligations(List<Obligation> obligations) {
+        this.obligations = new ArrayList<>(obligations);
+    }
+
     @Override
     public synchronized void create(UserContext author, String label, Rule... rules) {
         obligations.add(new Obligation(author, label, Arrays.asList(rules)));

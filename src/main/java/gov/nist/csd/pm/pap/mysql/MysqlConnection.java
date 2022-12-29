@@ -1,9 +1,10 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -91,5 +92,15 @@ class MysqlConnection extends PolicyStoreConnection {
                 obligations().getAll(),
                 pal().getContext()
         );
+    }
+
+    @Override
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return policySerializer.serialize(this);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        policyDeserializer.deserialize(this, s);
     }
 }

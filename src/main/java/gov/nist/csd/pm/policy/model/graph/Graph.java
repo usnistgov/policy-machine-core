@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.model.graph;
 
 import gov.nist.csd.pm.policy.GraphReader;
 import gov.nist.csd.pm.policy.GraphWriter;
+import gov.nist.csd.pm.policy.author.GraphAuthor;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
@@ -13,7 +14,7 @@ import java.util.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 
-public class Graph implements GraphReader, GraphWriter {
+public class Graph extends GraphAuthor {
 
     private final Map<String, Vertex> graph;
     private final List<String> pcs;

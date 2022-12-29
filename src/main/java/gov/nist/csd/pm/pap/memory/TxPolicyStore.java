@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.store.*;
-import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-
-import java.util.List;
 
 class TxPolicyStore extends PolicyStore {
 
@@ -42,22 +41,22 @@ class TxPolicyStore extends PolicyStore {
     }
 
     @Override
-    public GraphStore graph() {
+    public TxGraph graph() {
         return graph;
     }
 
     @Override
-    public ProhibitionsStore prohibitions() {
+    public TxProhibitions prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public ObligationsStore obligations() {
+    public TxObligations obligations() {
         return obligations;
     }
 
     @Override
-    public PALStore pal() {
+    public TxPAL pal() {
         return pal;
     }
 
@@ -79,5 +78,20 @@ class TxPolicyStore extends PolicyStore {
     @Override
     public void rollback() throws PMException {
 
+    }
+
+    @Override
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return txStore.toString(policySerializer);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        // clear tx events
+        clearEvents();
+
+        policyDeserializer.deserialize(this, s);
+
+        txPolicyEventListener.handlePolicyEvent(txStore.policySync());
     }
 }

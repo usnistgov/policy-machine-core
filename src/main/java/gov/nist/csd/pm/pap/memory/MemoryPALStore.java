@@ -23,6 +23,10 @@ class MemoryPALStore extends PALStore {
         this.palCtx = palCtx;
     }
 
+    synchronized void setPalContext(PALContext palCtx) {
+        this.palCtx = palCtx;
+    }
+
     @Override
     public synchronized void addFunction(FunctionDefinitionStatement functionDefinitionStatement) {
         if (functionDefinitionStatement.isFunctionExecutor()) {
@@ -86,6 +90,4 @@ class MemoryPALStore extends PALStore {
     public synchronized void rollback() throws TransactionNotStartedException {
 
     }
-
-
 }

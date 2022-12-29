@@ -12,6 +12,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class ObligationTest {
                     }
                 }
                 """;
-        pap.fromPAL(new UserContext(SUPER_USER), input);
+        pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
 
         Obligation obligation1 = pap.obligations().get("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
@@ -86,7 +87,7 @@ public class ObligationTest {
         pap.graph().createPolicyClass("pc1");
         pap.graph().createObjectAttribute("oa1", "pc1");
 
-        pap.fromPAL(userCtx, pal);
+        pap.fromString(pal, new PALDeserializer(userCtx));
 
         assertEquals(1, pap.obligations().getAll().size());
         Obligation actual = pap.obligations().get("test");

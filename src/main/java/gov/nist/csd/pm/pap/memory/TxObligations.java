@@ -19,6 +19,10 @@ class TxObligations extends ObligationsStore implements PolicyEventEmitter {
         this.txPolicyEventListener = txPolicyEventListener;
     }
 
+    void setObligations(List<Obligation> obligations) {
+        store.setObligations(obligations);
+    }
+
     @Override
     public void create(UserContext author, String label, Rule... rules) throws PMException {
         emitEvent(new CreateObligationEvent(author, label, List.of(rules)));

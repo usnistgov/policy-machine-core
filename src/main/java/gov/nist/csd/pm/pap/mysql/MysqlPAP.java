@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
+import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
+import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -26,7 +27,6 @@ public class MysqlPAP extends PAP {
         this.connection = connection;
     }
 
-    @Override
     public void fromPAL(UserContext author, String input, FunctionDefinitionStatement... customFunctions) throws PMException {
         resetPolicy();
         PALExecutor.execute(this, author, input, customFunctions);
@@ -42,5 +42,16 @@ public class MysqlPAP extends PAP {
         } catch (SQLException e) {
             throw new PMException(e.getMessage());
         }
+    }
+
+    @Override
+    public String toString(PolicySerializer policySerializer) throws PMException {
+        return policyStore.toString(policySerializer);
+    }
+
+    @Override
+    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        policyStore.fromString(s, policyDeserializer);
+        init(policyStore, true);
     }
 }

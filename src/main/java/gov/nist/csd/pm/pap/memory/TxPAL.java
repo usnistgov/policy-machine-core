@@ -19,6 +19,10 @@ class TxPAL extends PALStore implements PolicyEventEmitter {
         this.txPolicyEventListener = txPolicyEventListener;
     }
 
+    void setPALCtx(PALContext palContext) {
+        store.setPalContext(palContext);
+    }
+
     @Override
     public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
         emitEvent(new AddFunctionEvent(functionDefinitionStatement));
