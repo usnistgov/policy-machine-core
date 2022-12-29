@@ -82,7 +82,7 @@ pap.fromString(input, new PALDeserializer(superUser);
 
 #### 3. Wrap in a PDP object to add permission checks
 ```java
-PDP pdp = new MemoryPDP(memoryPAP);
+PDP pdp = new MemoryPDP(pap);
 ```
 
 #### 4. Run a PDP Transaction as the super user
