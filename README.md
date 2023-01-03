@@ -99,7 +99,8 @@ pdp.runTx(superUser, (policy) -> {
 #### 5. Run a PDP transaction as u1 that will fail
 u1 does not have permission to create an object attribute in 'oa1'. This transaction will fail and 'newOA' will not be created.
 ```java
-pdp.runTx(superUser, (policy) -> {
+UserContext u1 = new UserContext("u1");
+pdp.runTx(u1, (policy) -> {
     policy.graph().createObjectAttribute("newOA", "oa1");
 });
 ```
