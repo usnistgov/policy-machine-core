@@ -51,15 +51,8 @@ public class TxEvents {
 
     public static class MemoryDeleteProhibitionEvent extends DeleteProhibitionEvent {
 
-        private Prohibition prohibition;
-
-        public MemoryDeleteProhibitionEvent(String label, Prohibition prohibition) {
-            super(label);
-            this.prohibition = prohibition;
-        }
-
-        public Prohibition getProhibition() {
-            return prohibition;
+        public MemoryDeleteProhibitionEvent(Prohibition prohibition) {
+            super(prohibition);
         }
     }
 

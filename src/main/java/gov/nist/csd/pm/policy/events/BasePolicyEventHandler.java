@@ -84,7 +84,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleDeleteProhibitionEvent(DeleteProhibitionEvent deleteProhibitionEvent) throws PMException {
-        policy.prohibitions().delete(deleteProhibitionEvent.getLabel());
+        policy.prohibitions().delete(deleteProhibitionEvent.getProhibition().getLabel());
     }
 
     protected void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {

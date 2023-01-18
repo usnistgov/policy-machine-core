@@ -1,15 +1,17 @@
 package gov.nist.csd.pm.policy.events;
 
+import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+
 public class DeleteProhibitionEvent implements PolicyEvent {
 
-    private final String label;
+    private final Prohibition prohibition;
 
-    public DeleteProhibitionEvent(String label) {
-        this.label = label;
+    public DeleteProhibitionEvent(Prohibition prohibition) {
+        this.prohibition = prohibition;
     }
 
-    public String getLabel() {
-        return label;
+    public Prohibition getProhibition() {
+        return prohibition;
     }
 
     @Override

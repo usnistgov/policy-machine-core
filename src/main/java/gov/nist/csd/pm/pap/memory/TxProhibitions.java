@@ -42,7 +42,7 @@ class TxProhibitions extends ProhibitionsStore implements PolicyEventEmitter {
 
     @Override
     public void delete(String label) throws PMException {
-        emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(label, store.get(label)));
+        emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(store.get(label)));
         store.delete(label);
     }
 

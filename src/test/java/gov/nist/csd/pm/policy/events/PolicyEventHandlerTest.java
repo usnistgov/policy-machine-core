@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PolicyEventHandlerTest {
 
     @Test
-    void testPolicyEventHandler() {
+    void testPolicyEventHandler() throws PMException {
         TestPolicyEventHandler handler = new TestPolicyEventHandler();
 
         handler.handle(new AddConstantEvent("", new Value()));
@@ -33,7 +34,7 @@ class PolicyEventHandlerTest {
         handler.handle(new DeassignFromEvent("", ""));
         handler.handle(new DeleteNodeEvent(""));
         handler.handle(new DeleteObligationEvent(""));
-        handler.handle(new DeleteProhibitionEvent(""));
+        handler.handle(new DeleteProhibitionEvent(null));
         handler.handle(new DissociateEvent("", ""));
         handler.handle(new PolicySynchronizationEvent(null, null, null, null));
         handler.handle(new RemoveConstantEvent(null));

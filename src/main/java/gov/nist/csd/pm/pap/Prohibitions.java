@@ -83,9 +83,11 @@ class Prohibitions extends ProhibitionsAuthor implements PolicyEventEmitter {
             return;
         }
 
+        Prohibition prohibition = store.prohibitions().get(label);
+
         store.prohibitions().delete(label);
 
-        emitEvent(new DeleteProhibitionEvent(label));
+        emitEvent(new DeleteProhibitionEvent(prohibition));
     }
 
     private boolean prohibitionExists(String label) throws PMException {

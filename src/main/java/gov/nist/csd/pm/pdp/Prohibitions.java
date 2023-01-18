@@ -96,13 +96,13 @@ class Prohibitions extends ProhibitionsAuthor implements PolicyEventEmitter {
         try {
             prohibition = pap.prohibitions().get(label);
         } catch (PMException e) {
-            throw new PMException("error getting prohibition " + label + " from PolicyReviewer: " + e.getMessage());
+            throw new PMException("error getting prohibition " + label + ": " + e.getMessage());
         }
 
         ProhibitionSubject subject = prohibition.getSubject();
         List<ContainerCondition> containerConditions = prohibition.getContainers();
 
-        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(label);
+        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition);
 
         // emit event for subject
         emitEvent(new EventContext(userCtx, subject.name(), deleteProhibitionEvent));

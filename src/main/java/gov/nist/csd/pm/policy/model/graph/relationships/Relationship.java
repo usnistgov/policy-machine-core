@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.policy.model.graph.relationships;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
-import org.jgrapht.graph.DefaultEdge;
 
 import java.io.Serializable;
 import java.util.Objects;

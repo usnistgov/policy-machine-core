@@ -336,17 +336,15 @@ interface TxCmd<T> {
     }
 
     class DeleteProhibitionTxCmd extends ProhibitionsTxCmd {
-        private final String label;
         private final Prohibition prohibitionToDelete;
 
-        public DeleteProhibitionTxCmd(String label, Prohibition prohibitionToDelete) {
-            this.label = label;
+        public DeleteProhibitionTxCmd(Prohibition prohibitionToDelete) {
             this.prohibitionToDelete = prohibitionToDelete;
         }
 
         @Override
         public void apply(MemoryProhibitionsStore store) {
-            store.delete(label);
+            store.delete(prohibitionToDelete.getLabel());
         }
 
         @Override
