@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.PolicyReader;
+import gov.nist.csd.pm.policy.PolicySerializable;
 import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
@@ -31,32 +32,25 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.pcRepObjectAttribute;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.allAdminAccessRights;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.wildcardAccessRights;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
-public class PAP implements PolicySync, PolicyEventEmitter, Transactional, PolicyAuthor {
+public class PAP implements PolicySync, PolicyEventEmitter, Transactional, PolicyAuthor, PolicySerializable {
 
     protected PolicyStore policyStore;
 
     protected List<PolicyEventListener> listeners;
 
     public PAP(PolicyStore policyStore) throws PMException {
-        init(policyStore, true);
-    }
-
-    protected void init(PolicyStore policyStore, boolean verifySuperPolicy) throws PMException {
         this.policyStore = policyStore;
         this.listeners = new ArrayList<>();
 
-        if (verifySuperPolicy) {
-            SuperPolicy.verifySuperPolicy(this.policyStore);
-        }
+        SuperPolicy.verifySuperPolicy(this.policyStore);
     }
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+    public synchronized void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
         listeners.add(listener);
 
         if (sync) {
@@ -65,55 +59,55 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void removeEventListener(PolicyEventListener listener) {
+    public synchronized void removeEventListener(PolicyEventListener listener) {
         listeners.remove(listener);
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
+    public synchronized void emitEvent(PolicyEvent event) throws PMException {
         for (PolicyEventListener listener : listeners) {
             listener.handlePolicyEvent(event);
         }
     }
 
     @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
+    public synchronized PolicySynchronizationEvent policySync() throws PMException {
         return this.policyStore.policySync();
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public synchronized void beginTx() throws PMException {
         policyStore.beginTx();
 
         emitEvent(new BeginTxEvent());
     }
 
     @Override
-    public void commit() throws PMException {
+    public synchronized void commit() throws PMException {
         policyStore.commit();
 
         emitEvent(new CommitTxEvent());
     }
 
     @Override
-    public void rollback() throws PMException {
+    public synchronized void rollback() throws PMException {
         policyStore.rollback();
 
         emitEvent(new RollbackTxEvent(this));
     }
 
     @Override
-    public AccessRightSet getResourceAccessRights() throws PMException {
+    public synchronized AccessRightSet getResourceAccessRights() throws PMException {
         return policyStore.getResourceAccessRights();
     }
 
     @Override
-    public boolean nodeExists(String name) throws PMException {
+    public synchronized boolean nodeExists(String name) throws PMException {
         return policyStore.nodeExists(name);
     }
 
     @Override
-    public Node getNode(String name) throws PMException {
+    public synchronized Node getNode(String name) throws PMException {
         if (!nodeExists(name)) {
             throw new NodeDoesNotExistException(name);
         }
@@ -122,17 +116,17 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public List<String> search(NodeType type, Map<String, String> properties) throws PMException {
+    public synchronized List<String> search(NodeType type, Map<String, String> properties) throws PMException {
         return policyStore.search(type, properties);
     }
 
     @Override
-    public List<String> getPolicyClasses() throws PMException {
+    public synchronized List<String> getPolicyClasses() throws PMException {
         return policyStore.getPolicyClasses();
     }
 
     @Override
-    public List<String> getChildren(String node) throws PMException {
+    public synchronized List<String> getChildren(String node) throws PMException {
         if (!nodeExists(node)) {
             throw new NodeDoesNotExistException(node);
         }
@@ -141,7 +135,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public List<String> getParents(String node) throws PMException {
+    public synchronized List<String> getParents(String node) throws PMException {
         if (!nodeExists(node)) {
             throw new NodeDoesNotExistException(node);
         }
@@ -150,7 +144,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public List<Association> getAssociationsWithSource(String ua) throws PMException {
+    public synchronized List<Association> getAssociationsWithSource(String ua) throws PMException {
         if (!nodeExists(ua)) {
             throw new NodeDoesNotExistException(ua);
         }
@@ -159,7 +153,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public List<Association> getAssociationsWithTarget(String target) throws PMException {
+    public synchronized List<Association> getAssociationsWithTarget(String target) throws PMException {
         if (!nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }
@@ -168,17 +162,17 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public Map<String, List<Prohibition>> getProhibitions() throws PMException {
+    public synchronized Map<String, List<Prohibition>> getProhibitions() throws PMException {
         return policyStore.getProhibitions();
     }
 
     @Override
-    public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
+    public synchronized List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
         return policyStore.getProhibitionsWithSubject(subject);
     }
 
     @Override
-    public Prohibition getProhibition(String label) throws PMException {
+    public synchronized Prohibition getProhibition(String label) throws PMException {
         Prohibition prohibition = getProhibitionOrNull(label);
         if (prohibition == null) {
             throw new ProhibitionDoesNotExistException(label);
@@ -200,12 +194,12 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public List<Obligation> getObligations() throws PMException {
+    public synchronized List<Obligation> getObligations() throws PMException {
         return policyStore.getObligations();
     }
 
     @Override
-    public Obligation getObligation(String label) throws PMException {
+    public synchronized Obligation getObligation(String label) throws PMException {
         if (!obligationExists(label)) {
             throw new ObligationDoesNotExistException(label);
         }
@@ -214,27 +208,36 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public Map<String, FunctionDefinitionStatement> getPALFunctions() throws PMException {
+    public synchronized Map<String, FunctionDefinitionStatement> getPALFunctions() throws PMException {
         return policyStore.getPALFunctions();
     }
 
     @Override
-    public Map<String, Value> getPALConstants() throws PMException {
+    public synchronized Map<String, Value> getPALConstants() throws PMException {
         return policyStore.getPALConstants();
     }
 
     @Override
-    public PALContext getPALContext() throws PMException {
+    public synchronized PALContext getPALContext() throws PMException {
         return policyStore.getPALContext();
     }
 
     @Override
-    public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
+    public synchronized void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
+        for (String ar : accessRightSet) {
+            if (isAdminAccessRight(ar) || isWildcardAccessRight(ar)) {
+                throw new AdminAccessRightExistsException(ar);
+            }
+        }
+
         policyStore.setResourceAccessRights(accessRightSet);
+
+        // notify listeners of policy modification
+        emitEvent(new SetResourceAccessRightsEvent(accessRightSet));
     }
 
     @Override
-    public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
+    public synchronized String createPolicyClass(String name, Map<String, String> properties) throws PMException {
         if (nodeExists(name)) {
             throw new NodeNameExistsException(name);
         }
@@ -248,47 +251,47 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public String createPolicyClass(String name) throws PMException {
+    public synchronized String createPolicyClass(String name) throws PMException {
         return createPolicyClass(name, noprops());
     }
 
     @Override
-    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public synchronized String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, UA, properties, parent, parents);
     }
 
     @Override
-    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+    public synchronized String createUserAttribute(String name, String parent, String... parents) throws PMException {
         return createUserAttribute(name, noprops(), parent, parents);
     }
 
     @Override
-    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public synchronized String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, OA, properties, parent, parents);
     }
 
     @Override
-    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+    public synchronized String createObjectAttribute(String name, String parent, String... parents) throws PMException {
         return createObjectAttribute(name, noprops(), parent, parents);
     }
 
     @Override
-    public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public synchronized String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, O, properties, parent, parents);
     }
 
     @Override
-    public String createObject(String name, String parent, String... parents) throws PMException {
+    public synchronized String createObject(String name, String parent, String... parents) throws PMException {
         return createObject(name, noprops(), parent, parents);
     }
 
     @Override
-    public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public synchronized String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, U, properties, parent, parents);
     }
 
     @Override
-    public String createUser(String name, String parent, String... parents) throws PMException {
+    public synchronized String createUser(String name, String parent, String... parents) throws PMException {
         return createUser(name, noprops(), parent, parents);
     }
 
@@ -335,14 +338,17 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
 
         // for any pc parents, create any necessary super policy configurations
         for (String pc : pcParents) {
-            SuperPolicy.assignedToPolicyClass(policyStore, name, pc);
+            List<PolicyEvent> events = SuperPolicy.assignedToPolicyClass(policyStore, name, pc);
+            for (PolicyEvent e : events) {
+                emitEvent(e);
+            }
         }
 
         return name;
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
+    public synchronized void setNodeProperties(String name, Map<String, String> properties) throws PMException {
         if (!nodeExists(name)) {
             throw new NodeDoesNotExistException(name);
         }
@@ -353,7 +359,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void deleteNode(String name) throws PMException {
+    public synchronized void deleteNode(String name) throws PMException {
         if (!nodeExists(name)) {
             return;
         }
@@ -445,7 +451,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void assign(String child, String parent) throws PMException {
+    public synchronized void assign(String child, String parent) throws PMException {
         Node childNode = getNode(child);
         Node parentNode = getNode(parent);
 
@@ -462,12 +468,15 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
 
         // if the parent is a policy class, need to associate the super ua with the child
         if (parentNode.getType() == PC) {
-            SuperPolicy.assignedToPolicyClass(policyStore, child, parent);
+            List<PolicyEvent> events = SuperPolicy.assignedToPolicyClass(policyStore, child, parent);
+            for (PolicyEvent e : events) {
+                emitEvent(e);
+            }
         }
     }
 
     @Override
-    public void deassign(String child, String parent) throws PMException {
+    public synchronized void deassign(String child, String parent) throws PMException {
         if ((!nodeExists(child) || !nodeExists(parent))
             || (!getParents(child).contains(parent))) {
             return;
@@ -484,7 +493,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
+    public synchronized void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
         Node uaNode = getNode(ua);
         Node targetNode = getNode(target);
 
@@ -512,7 +521,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void dissociate(String ua, String target) throws PMException {
+    public synchronized void dissociate(String ua, String target) throws PMException {
         if ((!nodeExists(ua) || !nodeExists(target))
             || (!getAssociationsWithSource(ua).contains(new Association(ua, target)))) {
             return;
@@ -524,7 +533,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public synchronized void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (prohibitionExists(label)) {
             throw new ProhibitionExistsException(label);
         }
@@ -539,7 +548,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public synchronized void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (!prohibitionExists(label)) {
             throw new ProhibitionDoesNotExistException(label);
         }
@@ -576,7 +585,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void deleteProhibition(String label) throws PMException {
+    public synchronized void deleteProhibition(String label) throws PMException {
         if (!prohibitionExists(label)) {
             return;
         }
@@ -593,7 +602,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void createObligation(UserContext author, String label, Rule... rules) throws PMException {
+    public synchronized void createObligation(UserContext author, String label, Rule... rules) throws PMException {
         if (obligationExists(label)) {
             throw new ObligationExistsException(label);
         }
@@ -672,7 +681,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
+    public synchronized void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
         if (!obligationExists(label)) {
             throw new ObligationDoesNotExistException(label);
         }
@@ -686,7 +695,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void deleteObligation(String label) throws PMException {
+    public synchronized void deleteObligation(String label) throws PMException {
         if (!obligationExists(label)) {
             return;
         }
@@ -697,7 +706,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void addPALFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
+    public synchronized void addPALFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
         if (getPALFunctions().containsKey(functionDefinitionStatement.getFunctionName())) {
             throw new FunctionAlreadyDefinedException(functionDefinitionStatement.getFunctionName());
         }
@@ -708,14 +717,14 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void removePALFunction(String functionName) throws PMException {
+    public synchronized void removePALFunction(String functionName) throws PMException {
         policyStore.removePALFunction(functionName);
 
         emitEvent(new RemoveFunctionEvent(functionName));
     }
 
     @Override
-    public void addPALConstant(String constantName, Value constantValue) throws PMException {
+    public synchronized void addPALConstant(String constantName, Value constantValue) throws PMException {
         if (getPALConstants().containsKey(constantName)) {
             throw new ConstantAlreadyDefinedException(constantName);
         }
@@ -726,20 +735,30 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
-    public void removePALConstant(String constName) throws PMException {
+    public synchronized void removePALConstant(String constName) throws PMException {
         policyStore.removePALConstant(constName);
 
         emitEvent(new RemoveConstantEvent(constName));
     }
 
     @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return policyStore.toString(policySerializer);
+    public synchronized String toString(PolicySerializer policySerializer) throws PMException {
+        return policySerializer.serialize(this);
     }
 
     @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        policyStore.fromString(s, policyDeserializer);
-        init(policyStore, true);
+    public synchronized void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
+        beginTx();
+
+        // reset policy store
+        policyStore.reset();
+
+        // verify super policy
+        SuperPolicy.verifySuperPolicy(this.policyStore);
+
+        // deserialize using deserializer
+        policyDeserializer.deserialize(this, s);
+
+        commit();
     }
 }

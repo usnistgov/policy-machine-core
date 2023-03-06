@@ -29,10 +29,10 @@ import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
 public class MemoryPolicyStore extends PolicyStore {
 
-    private final Graph graph;
-    private final Map<String, List<Prohibition>> prohibitions;
-    private final List<Obligation> obligations;
-    private final PALContext pal;
+    private Graph graph;
+    private Map<String, List<Prohibition>> prohibitions;
+    private List<Obligation> obligations;
+    private PALContext pal;
 
     private boolean inTx;
     private int txCounter;
@@ -129,16 +129,6 @@ public class MemoryPolicyStore extends PolicyStore {
     }
 
 
-
-    @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return policySerializer.serialize(this);
-    }
-
-    @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        policyDeserializer.deserialize(this, s);
-    }
 
     @Override
     public synchronized void setResourceAccessRights(AccessRightSet accessRightSet) {
@@ -513,5 +503,13 @@ public class MemoryPolicyStore extends PolicyStore {
     @Override
     public PALContext getPALContext() {
         return pal;
+    }
+
+    @Override
+    protected void reset() {
+        graph = new Graph();
+        prohibitions = new HashMap<>();
+        obligations = new ArrayList<>();
+        pal = new PALContext();
     }
 }

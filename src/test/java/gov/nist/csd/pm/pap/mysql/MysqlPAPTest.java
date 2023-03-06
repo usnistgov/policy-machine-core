@@ -12,10 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,11 +56,9 @@ class MysqlPAPTest {
     }
 
     @Test
-    void testRollbackProhibitionTx() throws PMException, SQLException {
+    void testRollbackGraphTx() throws PMException, SQLException {
         Connection connection
                 = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
-        MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);
-
         PAP pap = new PAP(new MysqlPolicyStore(connection));
 
         pap.createPolicyClass("pc1");
@@ -72,7 +67,7 @@ class MysqlPAPTest {
         // this should cause an error and a rollback
         try(Statement stmt = connection.createStatement()) {
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
-            stmt.executeUpdate("insert into assignment values (1, 2, 1)");
+            stmt.executeUpdate("insert into assignment values (8, 9, 7)");
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
         }
 
@@ -81,7 +76,7 @@ class MysqlPAPTest {
     }
 
     @Test
-    void testRollbackGraphTx() throws PMException, IOException, SQLException {
+    void testRollbackProhibitionTx() throws PMException, IOException, SQLException {
         Connection connection
                 = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
         MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);
@@ -93,12 +88,13 @@ class MysqlPAPTest {
 
         try(Statement stmt = connection.createStatement()) {
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
-            stmt.executeUpdate("insert into prohibition_container values (1, 3, 1)");
+            stmt.executeUpdate("insert into prohibition_container values (1, (select id from node where name = 'oa1'), 1)");
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
         }
 
-        assertThrows(MysqlPolicyException.class, () -> pap.createProhibition("label", ProhibitionSubject.userAttribute("ua1"),
-                new AccessRightSet(), false, new ContainerCondition("oa1", true)));
+        assertThrows(MysqlPolicyException.class, () ->
+                pap.createProhibition("label", ProhibitionSubject.userAttribute("ua1"),
+                        new AccessRightSet(), false, new ContainerCondition("oa1", true)));
         assertThrows(ProhibitionDoesNotExistException.class, () -> pap.getProhibition("label"));
     }
 

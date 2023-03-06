@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pdp.adjudicator;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperPolicy;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
+import gov.nist.csd.pm.policy.PolicySerializable;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
@@ -37,7 +38,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.GET_ASSOCIAT
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
-public class Adjudicator implements PolicyAuthor {
+public class Adjudicator implements PolicyAuthor, PolicySerializable {
 
     private final UserContext userCtx;
     private final PAP pap;

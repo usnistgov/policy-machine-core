@@ -101,18 +101,6 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return policySerializer.serialize(this);
-    }
-
-    @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        beginTx();
-        policyDeserializer.deserialize(this, s);
-        commit();
-    }
-
-    @Override
     public AccessRightSet getResourceAccessRights() throws MysqlPolicyException {
         AccessRightSet arset = new AccessRightSet();
         String sql = """
@@ -593,7 +581,7 @@ public class MysqlPolicyStore extends PolicyStore {
 
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws MysqlPolicyException {
-        return createNode(name, properties);
+        return createPolicyClassNode(name, properties);
     }
 
     @Override
@@ -603,7 +591,7 @@ public class MysqlPolicyStore extends PolicyStore {
 
     @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws MysqlPolicyException {
-        return createNode(name, OA, properties, parent, parents);
+        return createNode(name, UA, properties, parent, parents);
     }
 
     @Override
@@ -641,7 +629,7 @@ public class MysqlPolicyStore extends PolicyStore {
         return createUser(name, noprops(), parent, parents);
     }
 
-    private String createNode(String name, Map<String, String> properties) throws MysqlPolicyException {
+    private String createPolicyClassNode(String name, Map<String, String> properties) throws MysqlPolicyException {
         String sql = """
                     INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)
                     """;
@@ -836,6 +824,7 @@ public class MysqlPolicyStore extends PolicyStore {
 
             ps.executeBatch();
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             rollback();
             throw new MysqlPolicyException(e.getMessage());
         }
@@ -1111,6 +1100,18 @@ public class MysqlPolicyStore extends PolicyStore {
             AccessRightSet arset = MysqlPolicyStore.arsetReader.readValue(rs.getString(3));
             return new Association(ua, target, arset);
         } catch (SQLException | JsonProcessingException e) {
+            throw new MysqlPolicyException(e.getMessage());
+        }
+    }
+
+    @Override
+    protected void reset() throws MysqlPolicyException {
+        List<String> sequence = PolicyResetSequence.getSequence();
+        try (Statement stmt = connection.getConnection().createStatement()) {
+            for (String s : sequence) {
+                stmt.executeUpdate(s);
+            }
+        } catch (SQLException e) {
             throw new MysqlPolicyException(e.getMessage());
         }
     }

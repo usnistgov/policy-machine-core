@@ -35,22 +35,56 @@ public class PolicyEventTest {
         pap.addEventListener(events::add, false);
 
         pap.setResourceAccessRights(new AccessRightSet("read"));
+        assertEquals(1, events.size());
+
         pap.createPolicyClass("pc1");
+        assertEquals(3, events.size());
+
         pap.createObjectAttribute("oa1", "pc1");
+        assertEquals(5, events.size());
+
         pap.createUserAttribute("ua1", "pc1");
+        assertEquals(7, events.size());
+
         pap.createUserAttribute("ua2", "pc1");
+        assertEquals(9, events.size());
+
         pap.createObject("o1", "oa1");
+        assertEquals(10, events.size());
+
         pap.createUser("u1", "ua1");
+        assertEquals(11, events.size());
+
         pap.createUser("u2", "ua1");
+        assertEquals(12, events.size());
+
         pap.setNodeProperties("u1", Map.of("k", "v"));
+        assertEquals(13, events.size());
+
         pap.deleteNode("u1");
+        assertEquals(14, events.size());
+
         pap.assign("u2", "ua2");
+        assertEquals(15, events.size());
+
         pap.deassign("u2", "ua2");
+        assertEquals(16, events.size());
+
         pap.associate("ua1", "oa1", new AccessRightSet());
+        assertEquals(17, events.size());
+
         pap.dissociate("ua1", "oa1");
+        assertEquals(18, events.size());
+
         pap.createProhibition("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        assertEquals(19, events.size());
+
         pap.updateProhibition("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        assertEquals(20, events.size());
+
         pap.deleteProhibition("label");
+        assertEquals(21, events.size());
+
         pap.createObligation(
                 new UserContext(SUPER_USER),
                 "label",
@@ -66,6 +100,8 @@ public class PolicyEventTest {
                         )
                 )
         );
+        assertEquals(22, events.size());
+
         pap.updateObligation(new UserContext(SUPER_USER),
                 "label",
                 new Rule(
@@ -79,10 +115,9 @@ public class PolicyEventTest {
                                 new CreatePolicyStatement(new Expression(new VariableReference("test_pc2", Type.string())))
                         )
                 ));
+        assertEquals(23, events.size());
+
         pap.deleteObligation("label");
-
-        System.out.println(events);
-
         assertEquals(24, events.size());
     }
 

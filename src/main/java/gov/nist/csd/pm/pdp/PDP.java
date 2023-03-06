@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pdp;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
+import gov.nist.csd.pm.policy.PolicySerializable;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -74,7 +75,7 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements PolicyAuthor, PolicyEventEmitter {
+    public static class PDPTx implements PolicyAuthor, PolicyEventEmitter, PolicySerializable {
 
         private final UserContext userCtx;
         private final Adjudicator adjudicator;

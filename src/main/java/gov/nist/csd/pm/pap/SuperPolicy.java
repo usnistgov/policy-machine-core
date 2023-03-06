@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
-import gov.nist.csd.pm.policy.events.CreatePolicyClassEvent;
-import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.ArrayList;
@@ -95,7 +93,9 @@ public class SuperPolicy {
         });
     }
 
-    protected static void assignedToPolicyClass(PolicyStore store, String child, String pc) throws PMException {
+    protected static List<PolicyEvent> assignedToPolicyClass(PolicyStore store, String child, String pc) throws PMException {
+        List<PolicyEvent> events = new ArrayList<>();
+
         runTx(store, () -> {
             if (child.startsWith(SUPER_PREFIX)) {
                 return;
@@ -103,10 +103,14 @@ public class SuperPolicy {
 
             if (!store.nodeExists(SUPER_UA)) {
                 store.createUserAttribute(SUPER_UA, SUPER_PC);
+                events.add(new AssignEvent(SUPER_UA, SUPER_PC));
             }
 
             store.associate(SUPER_UA, child, allAccessRights());
+            events.add(new AssociateEvent(SUPER_UA, child, allAccessRights()));
         });
+
+        return events;
     }
 
     protected static List<PolicyEvent> createPolicyClass(PolicyStore store, String name, Map<String, String> properties) throws PMException {
