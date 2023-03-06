@@ -43,7 +43,7 @@ public class AssociateStatement extends PALStatement {
             accessRightSet.add(v.getStringValue());
         }
 
-        policyAuthor.graph().associate(
+        policyAuthor.associate(
                 uaValue.getStringValue(),
                 targetValue.getStringValue(),
                 accessRightSet

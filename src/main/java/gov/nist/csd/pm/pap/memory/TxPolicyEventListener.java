@@ -9,15 +9,15 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import java.util.ArrayList;
 import java.util.List;
 
-class TxPolicyEventListener implements PolicyEventListener, TxCmd<MemoryPolicyStore> {
+class TxPolicyEventListener implements PolicyEventListener, TxCmd {
 
-    private final List<TxCmd<?>> events;
+    private final List<TxCmd> events;
 
     public TxPolicyEventListener() {
         events = new ArrayList<>();
     }
 
-    public List<TxCmd<?>> getEvents() {
+    public List<TxCmd> getEvents() {
         return events;
     }
 
@@ -26,7 +26,7 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd<MemoryPolicySt
         this.events.add(0, eventToCmd(event));
     }
 
-    private TxCmd<?> eventToCmd(PolicyEvent event) {
+    private TxCmd eventToCmd(PolicyEvent event) {
         if (event instanceof AddConstantEvent e) {
             return new AddConstantTxCmd(e.getName(), e.getValue());
         } else if (event instanceof AddFunctionEvent e) {
@@ -81,31 +81,15 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd<MemoryPolicySt
 
     @Override
     public void apply(MemoryPolicyStore store) throws PMException {
-        for (TxCmd<?> cmd : events) {
-            if (cmd instanceof GraphTxCmd g) {
-                g.apply(store.getGraph());
-            } else if (cmd instanceof ProhibitionsTxCmd p) {
-                p.apply(store.getProhibitions());
-            } else if (cmd instanceof ObligationsTxCmd p) {
-                p.apply(store.getObligations());
-            } else if (cmd instanceof PALTxCmd p) {
-                p.apply(store.getPAL());
-            }
+        for (TxCmd cmd : events) {
+            cmd.apply(store);
         }
     }
 
     @Override
     public void revert(MemoryPolicyStore store) throws PMException {
-        for (TxCmd<?> cmd : events) {
-            if (cmd instanceof GraphTxCmd g) {
-                g.revert(store.getGraph());
-            } else if (cmd instanceof ProhibitionsTxCmd p) {
-                p.revert(store.getProhibitions());
-            } else if (cmd instanceof ObligationsTxCmd p) {
-                p.revert(store.getObligations());
-            } else if (cmd instanceof PALTxCmd p) {
-                p.revert(store.getPAL());
-            }
+        for (TxCmd cmd : events) {
+            cmd.revert(store);
         }
     }
 }

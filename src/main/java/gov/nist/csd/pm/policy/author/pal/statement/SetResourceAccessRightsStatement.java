@@ -23,7 +23,7 @@ public class SetResourceAccessRightsStatement extends PALStatement{
             accessRightSet.add(e.execute(ctx, policyAuthor).getStringValue());
         }
 
-        policyAuthor.graph().setResourceAccessRights(accessRightSet);
+        policyAuthor.setResourceAccessRights(accessRightSet);
         ctx.scope().setResourceAccessRights(accessRightSet);
         return new Value();
     }

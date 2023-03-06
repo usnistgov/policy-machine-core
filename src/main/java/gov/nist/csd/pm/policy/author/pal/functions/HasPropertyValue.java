@@ -21,7 +21,7 @@ public class HasPropertyValue extends FunctionDefinitionStatement {
                     String nodeName = ctx.scope().getValue("nodeName").getStringValue();
                     String key = ctx.scope().getValue("key").getStringValue();
                     String value = ctx.scope().getValue("value").getStringValue();
-                    Node node = author.graph().getNode(nodeName);
+                    Node node = author.getNode(nodeName);
                     boolean has = node.getProperties().containsKey(key);
                     if (!has) {
                         return new Value(false);

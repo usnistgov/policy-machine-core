@@ -36,7 +36,7 @@ public class SetNodePropertiesStatement extends PALStatement {
             properties.put(key.getStringValue(), map.get(key).getStringValue());
         }
 
-        policyAuthor.graph().setNodeProperties(name, properties);
+        policyAuthor.setNodeProperties(name, properties);
 
         return new Value();
     }

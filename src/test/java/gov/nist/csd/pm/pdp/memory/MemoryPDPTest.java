@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pdp.memory;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.policy.exceptions.NodeNameExistsException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -13,23 +15,23 @@ class MemoryPDPTest {
 
     @Test
     void testRollback() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
-        pap.graph().createUserAttribute("ua1", "pc1");
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.createPolicyClass("pc1");
+        pap.createObjectAttribute("oa1", "pc1");
+        pap.createUserAttribute("ua1", "pc1");
 
-        MemoryPDP pdp = new MemoryPDP(pap);
+        PDP pdp = new MemoryPDP(pap, false);
         assertThrows(NodeNameExistsException.class, () -> {
             pdp.runTx(new UserContext(SUPER_USER), policy -> {
-                policy.graph().createPolicyClass("pc2");
+                policy.createPolicyClass("pc2");
                 // expect error and rollback
-                policy.graph().createObjectAttribute("oa1", "pc2");
+                policy.createObjectAttribute("oa1", "pc2");
             });
         });
 
-        assertTrue(pap.graph().nodeExists("pc1"));
-        assertTrue(pap.graph().nodeExists("ua1"));
-        assertTrue(pap.graph().nodeExists("oa1"));
-        assertFalse(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.nodeExists("pc1"));
+        assertTrue(pap.nodeExists("ua1"));
+        assertTrue(pap.nodeExists("oa1"));
+        assertFalse(pap.nodeExists("pc2"));
     }
 }

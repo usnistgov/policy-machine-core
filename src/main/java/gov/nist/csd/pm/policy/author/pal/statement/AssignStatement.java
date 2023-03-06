@@ -34,12 +34,12 @@ public class AssignStatement extends PALStatement {
 
         if (assignToValue.isString()) {
             String parent = assignToValue.getStringValue();
-            policyAuthor.graph().assign(childStringValue, parent);
+            policyAuthor.assign(childStringValue, parent);
         } else if (assignToValue.isArray()) {
             Value[] valueArr = assignToValue.getArrayValue();
             for (Value value : valueArr) {
                 String parent = value.getStringValue();
-                policyAuthor.graph().assign(childStringValue, parent);
+                policyAuthor.assign(childStringValue, parent);
             }
         }
 

@@ -1,9 +1,5 @@
 package gov.nist.csd.pm.policy.model.graph;
 
-import gov.nist.csd.pm.policy.GraphReader;
-import gov.nist.csd.pm.policy.GraphWriter;
-import gov.nist.csd.pm.policy.author.GraphAuthor;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -14,7 +10,7 @@ import java.util.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 
-public class Graph extends GraphAuthor {
+public class Graph {
 
     private final Map<String, Vertex> graph;
     private final List<String> pcs;
@@ -51,23 +47,19 @@ public class Graph extends GraphAuthor {
         return name;
     }
 
-    @Override
     public AccessRightSet getResourceAccessRights() {
         return resourceAccessRights;
     }
 
-    @Override
     public boolean nodeExists(String name) {
         return graph.containsKey(name);
     }
 
-    @Override
     public void setResourceAccessRights(AccessRightSet resourceAccessRights) {
         this.resourceAccessRights.clear();
         this.resourceAccessRights.addAll(resourceAccessRights);
     }
 
-    @Override
     public String createPolicyClass(String name, Map<String, String> properties) {
         this.graph.put(name, getVertex(name, PC, properties));
         this.pcs.add(name);
@@ -75,47 +67,38 @@ public class Graph extends GraphAuthor {
         return name;
     }
 
-    @Override
     public String createPolicyClass(String name) {
         return createPolicyClass(name, new HashMap<>());
     }
 
-    @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) {
         return addNode(name, UA, properties, parent, parents);
     }
 
-    @Override
     public String createUserAttribute(String name, String parent, String... parents) {
         return createUserAttribute(name, new HashMap<>(), parent, parents);
     }
 
-    @Override
     public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) {
         return addNode(name, OA, properties, parent, parents);
     }
 
-    @Override
     public String createObjectAttribute(String name, String parent, String... parents) {
         return createObjectAttribute(name, new HashMap<>(), parent, parents);
     }
 
-    @Override
     public String createObject(String name, Map<String, String> properties, String parent, String... parents) {
         return addNode(name, O, properties, parent, parents);
     }
 
-    @Override
     public String createObject(String name, String parent, String... parents) {
         return createObject(name, new HashMap<>(), parent, parents);
     }
 
-    @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) {
         return addNode(name, U, properties, parent, parents);
     }
 
-    @Override
     public String createUser(String name, String parent, String... parents) {
         return createUser(name, new HashMap<>(), parent, parents);
     }
@@ -150,17 +133,14 @@ public class Graph extends GraphAuthor {
         }
     }
 
-    @Override
     public void setNodeProperties(String name, Map<String, String> properties) {
         this.graph.get(name).setProperties(properties);
     }
 
-    @Override
     public Node getNode(String name) {
         return this.graph.get(name).getNode();
     }
 
-    @Override
     public List<String> search(NodeType type, Map<String, String> checkProperties) {
         List<String> results = new ArrayList<>();
         // iterate over the nodes to find ones that match the search parameters
@@ -204,7 +184,6 @@ public class Graph extends GraphAuthor {
         return true;
     }
 
-    @Override
     public List<String> getPolicyClasses() {
         return pcs;
     }
@@ -241,7 +220,6 @@ public class Graph extends GraphAuthor {
         pcs.remove(name);
     }
 
-    @Override
     public void assign(String child, String parent) {
         if (graph.get(child).getParents().contains(parent)) {
             return;
@@ -251,40 +229,33 @@ public class Graph extends GraphAuthor {
         graph.get(parent).addAssignment(child, parent);
     }
 
-    @Override
     public void deassign(String child, String parent) {
         graph.get(child).removeAssignment(child, parent);
         graph.get(parent).removeAssignment(child, parent);
     }
 
-    @Override
     public void associate(String ua, String target, AccessRightSet accessRights) {
         graph.get(ua).addAssociation(ua, target, accessRights);
         graph.get(target).addAssociation(ua, target, accessRights);
     }
 
-    @Override
     public void dissociate(String ua, String target) {
         graph.get(ua).removeAssociation(ua, target);
         graph.get(target).removeAssociation(ua, target);
     }
 
-    @Override
     public List<String> getChildren(String node) {
         return new ArrayList<>(graph.get(node).getChildren());
     }
 
-    @Override
     public List<String> getParents(String node) {
         return new ArrayList<>(graph.get(node).getParents());
     }
 
-    @Override
     public List<Association> getAssociationsWithSource(String ua) {
         return new ArrayList<>(graph.get(ua).getOutgoingAssociations());
     }
 
-    @Override
     public List<Association> getAssociationsWithTarget(String target) {
         return new ArrayList<>(graph.get(target).getIncomingAssociations());
     }

@@ -12,21 +12,15 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
 import java.util.*;
-import java.util.function.Function;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 
-interface TxCmd<T> {
+interface TxCmd {
 
-    void apply(T t) throws PMException;
-    void revert(T t) throws PMException;
-
-    abstract class GraphTxCmd implements TxCmd<MemoryGraphStore> { }
-    abstract class ProhibitionsTxCmd implements TxCmd<MemoryProhibitionsStore> { }
-    abstract class ObligationsTxCmd implements TxCmd<MemoryObligationsStore> { }
-    abstract class PALTxCmd implements TxCmd<MemoryPALStore> { }
+    void apply(MemoryPolicyStore store) throws PMException;
+    void revert(MemoryPolicyStore store) throws PMException;
     
-    class CreatePolicyClassTxCmd extends GraphTxCmd {
+    class CreatePolicyClassTxCmd implements TxCmd {
             
         private String name;
         private Map<String, String> properties;
@@ -37,17 +31,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.createPolicyClass(name, properties);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
     }
 
-    class CreateObjectAttributeTxCmd extends GraphTxCmd {
+    class CreateObjectAttributeTxCmd implements TxCmd {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
@@ -61,17 +55,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.createObjectAttribute(name, properties, parent, parents);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
     }
 
-    class CreateUserAttributeTxCmd extends GraphTxCmd {
+    class CreateUserAttributeTxCmd implements TxCmd {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
@@ -85,17 +79,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.createUserAttribute(name, properties, parent, parents);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
     }
 
-    class CreateObjectTxCmd extends GraphTxCmd {
+    class CreateObjectTxCmd implements TxCmd {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
@@ -109,17 +103,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.createObject(name, properties, parent, parents);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
     }
 
-    class CreateUserTxCmd extends GraphTxCmd {
+    class CreateUserTxCmd implements TxCmd {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
@@ -133,17 +127,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.createUser(name, properties, parent, parents);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
     }
 
-    class SetNodePropertiesTxCmd extends GraphTxCmd {
+    class SetNodePropertiesTxCmd implements TxCmd {
         private final String name;
         private final Map<String, String> oldProperties;
         private final Map<String, String> newProperties;
@@ -155,17 +149,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.setNodeProperties(name, newProperties);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.setNodeProperties(name, oldProperties);
         }
     }
 
-    class DeleteNodeTxCmd extends GraphTxCmd {
+    class DeleteNodeTxCmd implements TxCmd {
         private final String name;
         private final Node nodeToDelete;
         private final List<String> parents;
@@ -177,12 +171,12 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             NodeType type = nodeToDelete.getType();
             Map<String, String> properties = nodeToDelete.getProperties();
             String initialParent = "";
@@ -203,7 +197,7 @@ interface TxCmd<T> {
         }
     }
 
-    final class AssignTxCmd extends GraphTxCmd {
+    final class AssignTxCmd implements TxCmd {
         private final String child;
         private final String parent;
 
@@ -213,17 +207,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.assign(child, parent);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.deassign(child, parent);
         }
     }
 
-    class DeassignTxCmd extends GraphTxCmd {
+    class DeassignTxCmd implements TxCmd {
         private final String child;
         private final String parent;
 
@@ -233,17 +227,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.deassign(child, parent);
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.assign(child, parent);
         }
     }
 
-    class AssociateTxCmd extends GraphTxCmd {
+    class AssociateTxCmd implements TxCmd {
         private final Association association;
 
         public AssociateTxCmd(Association association) {
@@ -251,17 +245,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.dissociate(association.getSource(), association.getTarget());
         }
     }
 
-    class DissociateTxCmd extends GraphTxCmd {
+    class DissociateTxCmd implements TxCmd {
         private final Association association;
 
         public DissociateTxCmd(Association association) {
@@ -269,17 +263,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             store.dissociate(association.getSource(), association.getTarget());
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
             store.associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
         }
     }
 
-    class CreateProhibitionTxCmd extends ProhibitionsTxCmd {
+    class CreateProhibitionTxCmd implements TxCmd {
         private final Prohibition prohibition;
 
         public CreateProhibitionTxCmd(Prohibition prohibition) {
@@ -287,8 +281,8 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryProhibitionsStore store) {
-            store.create(
+        public void apply(MemoryPolicyStore store) {
+            store.createProhibition(
                     prohibition.getLabel(),
                     prohibition.getSubject(),
                     prohibition.getAccessRightSet(),
@@ -298,12 +292,12 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void revert(MemoryProhibitionsStore store) {
-            store.delete(prohibition.getLabel());
+        public void revert(MemoryPolicyStore store) throws PMException {
+            store.deleteProhibition(prohibition.getLabel());
         }
     }
 
-    class UpdateProhibitionTxCmd extends ProhibitionsTxCmd {
+    class UpdateProhibitionTxCmd implements TxCmd {
         private final Prohibition newProhibition;
         private final Prohibition oldProhibition;
 
@@ -313,8 +307,8 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryProhibitionsStore store) throws PMException {
-            store.update(
+        public void apply(MemoryPolicyStore store) throws PMException {
+            store.updateProhibition(
                     newProhibition.getLabel(),
                     newProhibition.getSubject(),
                     newProhibition.getAccessRightSet(),
@@ -324,8 +318,8 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void revert(MemoryProhibitionsStore store) throws PMException {
-            store.update(
+        public void revert(MemoryPolicyStore store) throws PMException {
+            store.updateProhibition(
                     oldProhibition.getLabel(),
                     oldProhibition.getSubject(),
                     oldProhibition.getAccessRightSet(),
@@ -335,7 +329,7 @@ interface TxCmd<T> {
         }
     }
 
-    class DeleteProhibitionTxCmd extends ProhibitionsTxCmd {
+    class DeleteProhibitionTxCmd implements TxCmd {
         private final Prohibition prohibitionToDelete;
 
         public DeleteProhibitionTxCmd(Prohibition prohibitionToDelete) {
@@ -343,13 +337,13 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryProhibitionsStore store) {
-            store.delete(prohibitionToDelete.getLabel());
+        public void apply(MemoryPolicyStore store) throws PMException {
+            store.deleteProhibition(prohibitionToDelete.getLabel());
         }
 
         @Override
-        public void revert(MemoryProhibitionsStore store) {
-            store.create(
+        public void revert(MemoryPolicyStore store) {
+            store.createProhibition(
                     prohibitionToDelete.getLabel(),
                     prohibitionToDelete.getSubject(),
                     prohibitionToDelete.getAccessRightSet(),
@@ -359,7 +353,7 @@ interface TxCmd<T> {
         }
     }
 
-    class CreateObligationTxCmd extends ObligationsTxCmd {
+    class CreateObligationTxCmd implements TxCmd {
         private final Obligation obligation;
 
         public CreateObligationTxCmd(Obligation obligation) {
@@ -367,8 +361,8 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryObligationsStore store) {
-            store.create(
+        public void apply(MemoryPolicyStore store) {
+            store.createObligation(
                     obligation.getAuthor(),
                     obligation.getLabel(),
                     obligation.getRules().toArray(new Rule[]{})
@@ -376,12 +370,12 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void revert(MemoryObligationsStore store) {
-            store.delete(obligation.getLabel());
+        public void revert(MemoryPolicyStore store) throws PMException {
+            store.deleteObligation(obligation.getLabel());
         }
     }
 
-    class UpdateObligationTxCmd extends ObligationsTxCmd {
+    class UpdateObligationTxCmd implements TxCmd {
         private final Obligation newObligation;
         private final Obligation oldObligation;
 
@@ -391,8 +385,8 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryObligationsStore store) {
-            store.update(
+        public void apply(MemoryPolicyStore store) throws PMException {
+            store.updateObligation(
                     newObligation.getAuthor(),
                     newObligation.getLabel(),
                     newObligation.getRules().toArray(new Rule[]{})
@@ -400,8 +394,8 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void revert(MemoryObligationsStore store) {
-            store.update(
+        public void revert(MemoryPolicyStore store) throws PMException {
+            store.updateObligation(
                     oldObligation.getAuthor(),
                     oldObligation.getLabel(),
                     oldObligation.getRules().toArray(new Rule[]{})
@@ -409,7 +403,7 @@ interface TxCmd<T> {
         }
     }
 
-    class DeleteObligationTxCmd extends ObligationsTxCmd {
+    class DeleteObligationTxCmd implements TxCmd {
         private final String name;
         private final Obligation obligationToDelete;
 
@@ -419,13 +413,13 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryObligationsStore store) {
-            store.delete(name);
+        public void apply(MemoryPolicyStore store) throws PMException {
+            store.deleteObligation(name);
         }
 
         @Override
-        public void revert(MemoryObligationsStore store) {
-            store.create(
+        public void revert(MemoryPolicyStore store) {
+            store.createObligation(
                     obligationToDelete.getAuthor(),
                     obligationToDelete.getLabel(),
                     obligationToDelete.getRules().toArray(new Rule[]{})
@@ -433,7 +427,7 @@ interface TxCmd<T> {
         }
     }
 
-    class AddFunctionTxCmd extends PALTxCmd {
+    class AddFunctionTxCmd implements TxCmd {
         private final FunctionDefinitionStatement functionDefinitionStatement;
 
         public AddFunctionTxCmd(FunctionDefinitionStatement functionDefinitionStatement) {
@@ -441,17 +435,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryPALStore store) {
-            store.addFunction(functionDefinitionStatement);
+        public void apply(MemoryPolicyStore store) {
+            store.addPALFunction(functionDefinitionStatement);
         }
 
         @Override
-        public void revert(MemoryPALStore store) {
-            store.removeFunction(functionDefinitionStatement.getFunctionName());
+        public void revert(MemoryPolicyStore store) {
+            store.removePALFunction(functionDefinitionStatement.getFunctionName());
         }
     }
 
-    class RemoveFunctionTxCmd extends PALTxCmd {
+    class RemoveFunctionTxCmd implements TxCmd {
         private final FunctionDefinitionStatement functionDefinitionStatement;
 
         public RemoveFunctionTxCmd(FunctionDefinitionStatement functionDefinitionStatement) {
@@ -459,18 +453,18 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryPALStore store) {
-            store.removeFunction(functionDefinitionStatement.getFunctionName());
+        public void apply(MemoryPolicyStore store) {
+            store.removePALFunction(functionDefinitionStatement.getFunctionName());
         }
 
         @Override
-        public void revert(MemoryPALStore store) {
-            store.addFunction(functionDefinitionStatement);
+        public void revert(MemoryPolicyStore store) {
+            store.addPALFunction(functionDefinitionStatement);
         }
         
     }
 
-    class AddConstantTxCmd extends PALTxCmd {
+    class AddConstantTxCmd implements TxCmd {
         private final String constantName;
         private final Value value;
 
@@ -480,17 +474,17 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryPALStore store) {
-            store.addConstant(constantName, value);
+        public void apply(MemoryPolicyStore store) {
+            store.addPALConstant(constantName, value);
         }
 
         @Override
-        public void revert(MemoryPALStore store) {
-            store.removeConstant(constantName);
+        public void revert(MemoryPolicyStore store) {
+            store.removePALConstant(constantName);
         }
     }
 
-    class RemoveConstantTxCmd extends PALTxCmd {
+    class RemoveConstantTxCmd implements TxCmd {
         private final String constantName;
         private final Value oldValue;
 
@@ -500,27 +494,27 @@ interface TxCmd<T> {
         }
 
         @Override
-        public void apply(MemoryPALStore store) {
-            store.removeConstant(constantName);
+        public void apply(MemoryPolicyStore store) {
+            store.removePALConstant(constantName);
         }
 
         @Override
-        public void revert(MemoryPALStore store) {
-            store.addConstant(constantName, oldValue);
+        public void revert(MemoryPolicyStore store) {
+            store.addPALConstant(constantName, oldValue);
         }
     }
 
-    class NoopTxCmd extends GraphTxCmd {
+    class NoopTxCmd implements TxCmd {
         public NoopTxCmd() {
         }
         
         @Override
-        public void apply(MemoryGraphStore store) {
+        public void apply(MemoryPolicyStore store) {
             
         }
 
         @Override
-        public void revert(MemoryGraphStore store) {
+        public void revert(MemoryPolicyStore store) {
 
         }
     }

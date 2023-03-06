@@ -21,7 +21,7 @@ class EventProcessor {
     }
 
     public void processEvent(EventContext eventCtx) throws PMException {
-        List<Obligation> obligations = pap.obligations().getAll();
+        List<Obligation> obligations = pap.getObligations();
         for(Obligation obligation : obligations) {
             UserContext author = obligation.getAuthor();
             List<Rule> rules = obligation.getRules();

@@ -22,7 +22,7 @@ public class PALCompiler {
     public static List<PALStatement> compilePAL(PolicyAuthor policy, String input, FunctionDefinitionStatement... customBuiltinFunctions) throws PMException {
         ErrorLog errorLog = new ErrorLog();
         Scope scope = new Scope(Scope.Mode.COMPILE);
-        scope.loadFromPALContext(policy.pal().getContext());
+        scope.loadFromPALContext(policy.getPALContext());
 
         // add custom builtin functions to scope
         for (FunctionDefinitionStatement func : customBuiltinFunctions) {

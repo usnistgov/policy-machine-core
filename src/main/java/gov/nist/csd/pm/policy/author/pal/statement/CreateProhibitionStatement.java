@@ -79,7 +79,7 @@ public class CreateProhibitionStatement extends PALStatement {
         }
 
 
-        policyAuthor.prohibitions().create(
+        policyAuthor.createProhibition(
                 labelValue.getStringValue(),
                 new ProhibitionSubject(subjectValue.getStringValue(), subjectType),
                 ops,

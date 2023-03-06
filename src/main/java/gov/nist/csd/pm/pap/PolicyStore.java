@@ -1,9 +1,9 @@
-package gov.nist.csd.pm.pap.store;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.events.PolicySync;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
-public abstract class PolicyStore extends PolicyAuthor implements PolicySync, Transactional {
+public abstract class PolicyStore implements PolicySync, Transactional, PolicyAuthor {
 
 }

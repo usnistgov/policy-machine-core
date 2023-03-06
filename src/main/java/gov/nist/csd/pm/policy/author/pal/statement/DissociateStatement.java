@@ -30,7 +30,7 @@ public class DissociateStatement extends PALStatement {
         String ua = uaExpr.execute(ctx, policyAuthor).getStringValue();
         String target = targetExpr.execute(ctx, policyAuthor).getStringValue();
 
-        policyAuthor.graph().dissociate(ua, target);
+        policyAuthor.dissociate(ua, target);
 
         return new Value();
     }

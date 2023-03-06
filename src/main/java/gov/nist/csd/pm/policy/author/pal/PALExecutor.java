@@ -1,13 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal;
 
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.author.pal.antlr.PALLexer;
-import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
-import gov.nist.csd.pm.policy.author.pal.compiler.error.ErrorLog;
-import gov.nist.csd.pm.policy.author.pal.compiler.visitor.PolicyVisitor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException;
 import gov.nist.csd.pm.policy.author.pal.model.exception.PALExecutionException;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.scope.*;
@@ -15,7 +9,6 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
@@ -32,7 +25,7 @@ public class PALExecutor {
 
         // initialize the execution context
         ExecutionContext ctx = new ExecutionContext(author);
-        ctx.scope().loadFromPALContext(policy.pal().getContext());
+        ctx.scope().loadFromPALContext(policy.getPALContext());
 
         ExecutionContext predefined;
         try {
@@ -67,7 +60,7 @@ public class PALExecutor {
             }
 
             FunctionDefinitionStatement funcDef = topLevelFunctions.get(funcName);
-            policy.pal().addFunction(funcDef);
+            policy.addPALFunction(funcDef);
         }
 
         Map<String, Value> topLevelConstants = ctx.scope().values();
@@ -77,7 +70,7 @@ public class PALExecutor {
             }
 
             Value value = topLevelConstants.get(name);
-            policy.pal().addConstant(name, value);
+            policy.addPALConstant(name, value);
         }
     }
 

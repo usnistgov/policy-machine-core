@@ -60,14 +60,14 @@ public class CreateAttrStatement extends PALStatement {
         String[] parentsArr = parents.toArray(new String[]{});
 
         if (type == OA) {
-            policyAuthor.graph().createObjectAttribute(
+            policyAuthor.createObjectAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
             );
         } else {
-            policyAuthor.graph().createUserAttribute(
+            policyAuthor.createUserAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,

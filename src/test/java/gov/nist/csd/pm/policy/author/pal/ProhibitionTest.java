@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.memory.MemoryPolicyReviewer;
-import gov.nist.csd.pm.policy.author.ProhibitionsAuthor;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -36,11 +36,10 @@ class ProhibitionTest {
                 access rights create_policy_class, 'write'
                 on union of 'oa1';
                 """;
-        MemoryPAP pap = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
         pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
 
-        ProhibitionsAuthor prohibitions = pap.prohibitions();
-        Prohibition prohibition = prohibitions.get("pro1");
+        Prohibition prohibition = pap.getProhibition("pro1");
         assertEquals("pro1", prohibition.getLabel());
         assertEquals(new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), prohibition.getSubject());
         assertEquals(new AccessRightSet(CREATE_POLICY_CLASS, "write"), prohibition.getAccessRightSet());

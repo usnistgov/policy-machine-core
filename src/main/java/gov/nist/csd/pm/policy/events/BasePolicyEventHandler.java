@@ -1,13 +1,22 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.GraphReader;
-import gov.nist.csd.pm.policy.ObligationsReader;
 import gov.nist.csd.pm.policy.PolicyReader;
-import gov.nist.csd.pm.policy.ProhibitionsReader;
 import gov.nist.csd.pm.policy.author.*;
+import gov.nist.csd.pm.policy.author.pal.PALContext;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.graph.nodes.Node;
+import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
+import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
+import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the PolicyEventListener interface to apply policy events to the passed PolicyAuthor.
@@ -54,7 +63,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleUpdateProhibitionEvent(UpdateProhibitionEvent updateProhibitionEvent) throws PMException {
-        policy.prohibitions().update(
+        policy.updateProhibition(
                 updateProhibitionEvent.getName(),
                 updateProhibitionEvent.getSubject(),
                 updateProhibitionEvent.getAccessRightSet(),
@@ -64,7 +73,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleUpdateObligationEvent(UpdateObligationEvent updateObligationEvent) throws PMException {
-        policy.obligations().update(
+        policy.updateObligation(
                 updateObligationEvent.getAuthor(),
                 updateObligationEvent.getLabel(),
                 updateObligationEvent.getRules().toArray(Rule[]::new)
@@ -72,35 +81,35 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleSetResourceAccessRights(SetResourceAccessRightsEvent setResourceAccessRightsEvent) throws PMException {
-        policy.graph().setResourceAccessRights(setResourceAccessRightsEvent.getAccessRightSet());
+        policy.setResourceAccessRights(setResourceAccessRightsEvent.getAccessRightSet());
     }
 
     protected void handleSetNodePropertiesEvent(SetNodePropertiesEvent setNodePropertiesEvent) throws PMException {
-        policy.graph().setNodeProperties(setNodePropertiesEvent.getName(), setNodePropertiesEvent.getProperties());
+        policy.setNodeProperties(setNodePropertiesEvent.getName(), setNodePropertiesEvent.getProperties());
     }
 
     protected void handleDissociateEvent(DissociateEvent dissociateEvent) throws PMException {
-        policy.graph().dissociate(dissociateEvent.getUa(), dissociateEvent.getTarget());
+        policy.dissociate(dissociateEvent.getUa(), dissociateEvent.getTarget());
     }
 
     protected void handleDeleteProhibitionEvent(DeleteProhibitionEvent deleteProhibitionEvent) throws PMException {
-        policy.prohibitions().delete(deleteProhibitionEvent.getProhibition().getLabel());
+        policy.deleteProhibition(deleteProhibitionEvent.getProhibition().getLabel());
     }
 
     protected void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {
-        policy.obligations().delete(deleteObligationEvent.getLabel());
+        policy.deleteObligation(deleteObligationEvent.getLabel());
     }
 
     protected void handleDeleteNodeEvent(DeleteNodeEvent deleteNodeEvent) throws PMException {
-        policy.graph().deleteNode(deleteNodeEvent.getName());
+        policy.deleteNode(deleteNodeEvent.getName());
     }
 
     protected void handleDeassignEvent(DeassignEvent deassignEvent) throws PMException {
-        policy.graph().deassign(deassignEvent.getChild(), deassignEvent.getParent());
+        policy.deassign(deassignEvent.getChild(), deassignEvent.getParent());
     }
 
     protected void handleCreateProhibitionEvent(CreateProhibitionEvent createProhibitionEvent) throws PMException {
-        policy.prohibitions().create(
+        policy.createProhibition(
                 createProhibitionEvent.getLabel(),
                 createProhibitionEvent.getSubject(),
                 createProhibitionEvent.getAccessRightSet(),
@@ -110,44 +119,44 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleCreateObligationEvent(CreateObligationEvent createObligationEvent) throws PMException {
-        policy.obligations().create(createObligationEvent.getAuthor(),
+        policy.createObligation(createObligationEvent.getAuthor(),
                 createObligationEvent.getLabel(),
                 createObligationEvent.getRules().toArray(Rule[]::new));
     }
 
     protected void handleAssociateEvent(AssociateEvent associateEvent) throws PMException {
-        policy.graph().associate(associateEvent.getUa(), associateEvent.getTarget(), associateEvent.getAccessRightSet());
+        policy.associate(associateEvent.getUa(), associateEvent.getTarget(), associateEvent.getAccessRightSet());
     }
 
     protected void handleAssignEvent(AssignEvent assignEvent) throws PMException {
-        policy.graph().assign(assignEvent.getChild(), assignEvent.getParent());
+        policy.assign(assignEvent.getChild(), assignEvent.getParent());
     }
 
     protected void handleCreateNodeEvent(CreateNodeEvent createNodeEvent) throws PMException {
         switch (createNodeEvent.getType()) {
-            case PC -> this.policy.graph().createPolicyClass(
+            case PC -> this.policy.createPolicyClass(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties()
             );
-            case OA -> this.policy.graph().createObjectAttribute(
+            case OA -> this.policy.createObjectAttribute(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
-            case UA -> this.policy.graph().createUserAttribute(
+            case UA -> this.policy.createUserAttribute(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
-            case O -> this.policy.graph().createObject(
+            case O -> this.policy.createObject(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
                     createNodeEvent.getAdditionalParents()
             );
-            case U -> this.policy.graph().createUser(
+            case U -> this.policy.createUser(
                     createNodeEvent.getName(),
                     createNodeEvent.getProperties(),
                     createNodeEvent.getInitialParent(),
@@ -158,17 +167,87 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     @Override
-    public GraphReader graph() {
-        return policy.graph();
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return policy.getResourceAccessRights();
     }
 
     @Override
-    public ProhibitionsReader prohibitions() {
-        return policy.prohibitions();
+    public boolean nodeExists(String name) throws PMException {
+        return policy.nodeExists(name);
     }
 
     @Override
-    public ObligationsReader obligations() {
-        return policy.obligations();
+    public Node getNode(String name) throws PMException {
+        return policy.getNode(name);
+    }
+
+    @Override
+    public List<String> search(NodeType type, Map<String, String> properties) throws PMException {
+        return policy.search(type, properties);
+    }
+
+    @Override
+    public List<String> getPolicyClasses() throws PMException {
+        return policy.getPolicyClasses();
+    }
+
+    @Override
+    public List<String> getChildren(String node) throws PMException {
+        return policy.getChildren(node);
+    }
+
+    @Override
+    public List<String> getParents(String node) throws PMException {
+        return policy.getParents(node);
+    }
+
+    @Override
+    public List<Association> getAssociationsWithSource(String ua) throws PMException {
+        return policy.getAssociationsWithSource(ua);
+    }
+
+    @Override
+    public List<Association> getAssociationsWithTarget(String target) throws PMException {
+        return policy.getAssociationsWithTarget(target);
+    }
+
+    @Override
+    public Map<String, List<Prohibition>> getProhibitions() throws PMException {
+        return policy.getProhibitions();
+    }
+
+    @Override
+    public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
+        return policy.getProhibitionsWithSubject(subject);
+    }
+
+    @Override
+    public Prohibition getProhibition(String label) throws PMException {
+        return policy.getProhibition(label);
+    }
+
+    @Override
+    public List<Obligation> getObligations() throws PMException {
+        return policy.getObligations();
+    }
+
+    @Override
+    public Obligation getObligation(String label) throws PMException {
+        return policy.getObligation(label);
+    }
+
+    @Override
+    public Map<String, FunctionDefinitionStatement> getPALFunctions() throws PMException {
+        return policy.getPALFunctions();
+    }
+
+    @Override
+    public Map<String, Value> getPALConstants() throws PMException {
+        return policy.getPALConstants();
+    }
+
+    @Override
+    public PALContext getPALContext() throws PMException {
+        return policy.getPALContext();
     }
 }

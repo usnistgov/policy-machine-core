@@ -29,7 +29,7 @@ public class Search extends FunctionDefinitionStatement {
                         properties.put(prop.getKey().getStringValue(), prop.getValue().getStringValue());
                     }
 
-                    List<String> search = author.graph().search(nodeType, properties);
+                    List<String> search = author.search(nodeType, properties);
 
                     Value[] ret = new Value[search.size()];
                     for (int i = 0; i < search.size(); i++) {

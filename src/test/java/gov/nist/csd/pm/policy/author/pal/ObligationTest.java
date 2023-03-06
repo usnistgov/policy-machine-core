@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -20,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -28,9 +28,9 @@ public class ObligationTest {
 
     @Test
     void testObligation() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.createPolicyClass("pc1");
+        pap.createObjectAttribute("oa1", "pc1");
 
         String input = """
                 create obligation 'obligation1' {
@@ -47,7 +47,7 @@ public class ObligationTest {
                 """;
         pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
 
-        Obligation obligation1 = pap.obligations().get("obligation1");
+        Obligation obligation1 = pap.getObligation("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
         assertEquals(1, obligation1.getRules().size());
         assertEquals(new UserContext(SUPER_USER), obligation1.getAuthor());
@@ -83,14 +83,14 @@ public class ObligationTest {
                 }
                 """;
         UserContext userCtx = new UserContext(SUPER_USER);
-        MemoryPAP pap = new MemoryPAP();
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.createPolicyClass("pc1");
+        pap.createObjectAttribute("oa1", "pc1");
 
         pap.fromString(pal, new PALDeserializer(userCtx));
 
-        assertEquals(1, pap.obligations().getAll().size());
-        Obligation actual = pap.obligations().get("test");
+        assertEquals(1, pap.getObligations().size());
+        Obligation actual = pap.getObligation("test");
         assertEquals(1, actual.getRules().size());
         assertEquals("test", actual.getLabel());
         assertEquals(userCtx, actual.getAuthor());

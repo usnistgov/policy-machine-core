@@ -13,15 +13,15 @@ class MemoryPAPTest {
 
     @Test
     void testTx() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
         pap.beginTx();
-        pap.graph().createPolicyClass("pc1");
+        pap.createPolicyClass("pc1");
         pap.rollback();
-        assertFalse(pap.graph().nodeExists("pc1"));
+        assertFalse(pap.nodeExists("pc1"));
 
         pap.beginTx();
-        pap.graph().createPolicyClass("pc1");
+        pap.createPolicyClass("pc1");
         pap.commit();
-        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.nodeExists("pc1"));
     }
 }

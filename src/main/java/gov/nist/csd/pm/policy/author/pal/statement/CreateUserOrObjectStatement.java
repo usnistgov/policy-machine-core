@@ -60,14 +60,14 @@ public class CreateUserOrObjectStatement extends PALStatement {
         String[] parentsArr = parents.toArray(new String[]{});
 
         if (type == O) {
-            policyAuthor.graph().createObject(
+            policyAuthor.createObject(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
             );
         } else {
-            policyAuthor.graph().createUser(
+            policyAuthor.createUser(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,

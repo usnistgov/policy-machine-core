@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
@@ -43,7 +44,7 @@ class PALExecutorTest {
                 )
                 .build();
 
-        MemoryPAP memoryPAP = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
 
         String pal = """
                 
@@ -52,16 +53,16 @@ class PALExecutorTest {
                 
                 """;
 
-        List<PALStatement> statements = PALCompiler.compilePAL(memoryPAP, pal, test1, test2);
+        List<PALStatement> statements = PALCompiler.compilePAL(pap, pal, test1, test2);
         assertEquals(2, statements.size());
 
-        Map<String, FunctionDefinitionStatement> functions = memoryPAP.pal().getFunctions();
+        Map<String, FunctionDefinitionStatement> functions = pap.getPALFunctions();
         assertTrue(functions.isEmpty());
 
-        memoryPAP.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER), test1, test2));
+        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER), test1, test2));
         assertEquals(2, statements.size());
 
-        functions = memoryPAP.pal().getFunctions();
+        functions = pap.getPALFunctions();
         assertTrue(functions.isEmpty());
 
     }

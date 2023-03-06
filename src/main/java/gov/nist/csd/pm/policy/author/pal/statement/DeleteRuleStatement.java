@@ -32,13 +32,14 @@ public class DeleteRuleStatement extends PALStatement {
         String ruleLabel = ruleExpr.execute(ctx, policyAuthor).getStringValue();
         String oblLabel = oblExpr.execute(ctx, policyAuthor).getStringValue();
 
-        Obligation obligation = policyAuthor.obligations().get(oblLabel);
+        Obligation obligation = policyAuthor.getObligation(oblLabel);
         obligation.deleteRule(ruleLabel);
 
-        policyAuthor.obligations().update(
+        policyAuthor.updateObligation(
                 obligation.getAuthor(),
                 obligation.getLabel(),
-                obligation.getRules().toArray(new Rule[]{}));
+                obligation.getRules().toArray(new Rule[]{})
+        );
 
         return new Value();
     }

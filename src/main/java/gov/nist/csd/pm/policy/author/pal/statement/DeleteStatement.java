@@ -29,11 +29,11 @@ public class DeleteStatement extends PALStatement {
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
         String name = expression.execute(ctx, policyAuthor).getStringValue();
         if (type == Type.PROHIBITION) {
-            policyAuthor.prohibitions().delete(name);
+            policyAuthor.deleteProhibition(name);
         } else if (type == Type.OBLIGATION) {
-            policyAuthor.obligations().delete(name);
+            policyAuthor.deleteObligation(name);
         } else {
-            policyAuthor.graph().deleteNode(name);
+            policyAuthor.deleteNode(name);
         }
 
         return new Value();

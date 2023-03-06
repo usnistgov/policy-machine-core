@@ -1,12 +1,9 @@
 package gov.nist.csd.pm.policy.author;
 
+import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.PolicySerializable;
+import gov.nist.csd.pm.policy.PolicyWriter;
 
-public abstract class PolicyAuthor implements PolicySerializable {
-
-    public abstract GraphAuthor graph();
-    public abstract ProhibitionsAuthor prohibitions();
-    public abstract ObligationsAuthor obligations();
-    public abstract PALAuthor pal();
+public interface PolicyAuthor extends PolicyWriter, PolicyReader, PolicySerializable {
 
 }

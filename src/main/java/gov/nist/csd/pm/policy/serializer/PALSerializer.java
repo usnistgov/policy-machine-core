@@ -72,7 +72,7 @@ public class PALSerializer implements PolicySerializer {
     private String serializeObligations(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
 
-        List<Obligation> obligations = policy.obligations().getAll();
+        List<Obligation> obligations = policy.getObligations();
         for (Obligation o : obligations) {
             if (!pal.isEmpty()) {
                 pal.append("\n");
@@ -86,7 +86,7 @@ public class PALSerializer implements PolicySerializer {
     private String serializeProhibitions(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
 
-        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
+        Map<String, List<Prohibition>> prohibitions = policy.getProhibitions();
         for (List<Prohibition> subjectPros : prohibitions.values()) {
             for (Prohibition p : subjectPros) {
                 if (!pal.isEmpty()) {
@@ -105,12 +105,12 @@ public class PALSerializer implements PolicySerializer {
 
         // resource access rights
         List<Expression> arExprs = new ArrayList<>();
-        for (String ar : policy.graph().getResourceAccessRights()) {
+        for (String ar : policy.getResourceAccessRights()) {
             arExprs.add(new Expression(new Literal(ar)));
         }
         pal.append(new SetResourceAccessRightsStatement(arExprs)).append("\n");
 
-        List<String> policyClasses = policy.graph().getPolicyClasses();
+        List<String> policyClasses = policy.getPolicyClasses();
 
         Set<String> attributes = new HashSet<>();
         Set<String> usersAndObjects = new HashSet<>();
@@ -118,15 +118,15 @@ public class PALSerializer implements PolicySerializer {
         for (String policyClass : policyClasses) {
             pal.append(new CreatePolicyStatement(new Expression(new Literal(policyClass)))).append("\n");
 
-            Node pcNode = policy.graph().getNode(policyClass);
+            Node pcNode = policy.getNode(policyClass);
             if (!pcNode.getProperties().isEmpty()) {
                 PALStatement stmt = buildSetNodePropertiesStatement(pcNode.getName(), pcNode.getProperties());
                 pal.append(stmt).append("\n");
             }
 
-            new BreadthFirstGraphWalker(policy.graph())
+            new BreadthFirstGraphWalker(policy)
                     .withPropagator((child, parent) -> {
-                        Node childNode = policy.graph().getNode(child);
+                        Node childNode = policy.getNode(child);
 
                         if (childNode.getType() == OA || childNode.getType() == UA) {
                             if (!attributes.contains(child)) {
@@ -145,7 +145,7 @@ public class PALSerializer implements PolicySerializer {
                             }
 
                             if (childNode.getType() == UA) {
-                                List<Association> sourceAssociations = policy.graph().getAssociationsWithSource(child);
+                                List<Association> sourceAssociations = policy.getAssociationsWithSource(child);
                                 for (Association association : sourceAssociations) {
                                     List<Expression> exprs = new ArrayList<>();
                                     for (String ar : association.getAccessRightSet()) {
@@ -220,7 +220,7 @@ public class PALSerializer implements PolicySerializer {
 
     private String serializeFunctions(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
-        Map<String, FunctionDefinitionStatement> functions = policy.pal().getFunctions();
+        Map<String, FunctionDefinitionStatement> functions = policy.getPALFunctions();
         for (FunctionDefinitionStatement func : functions.values()) {
             if (!pal.isEmpty()) {
                 pal.append("\n");
@@ -234,7 +234,7 @@ public class PALSerializer implements PolicySerializer {
 
     private String serializeConstants(PolicyAuthor policy) throws PMException {
         StringBuilder pal = new StringBuilder();
-        Map<String, Value> constants = policy.pal().getConstants();
+        Map<String, Value> constants = policy.getPALConstants();
         for (Map.Entry<String, Value> c : constants.entrySet()) {
             if (!pal.isEmpty()) {
                 pal.append("\n");

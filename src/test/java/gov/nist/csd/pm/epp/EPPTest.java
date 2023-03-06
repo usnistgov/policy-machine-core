@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.epp;
 
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
@@ -12,8 +13,6 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.obligation.Response;
@@ -21,7 +20,6 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.serializer.PALDeserializer;
-import gov.nist.csd.pm.policy.serializer.PALSerializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -36,8 +34,8 @@ class EPPTest {
 
     @Test
     void test() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        PDP pdp = new MemoryPDP(pap);
+        PAP pap = new PAP(new MemoryPolicyStore());
+        PDP pdp = new MemoryPDP(pap, false);
         EPP epp = new EPP(pdp, pap);
 
         String pal = """
@@ -55,19 +53,19 @@ class EPPTest {
                 """;
         pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
 
-        assertTrue(pap.graph().nodeExists("pc1"));
-        assertTrue(pap.graph().nodeExists("oa1"));
+        assertTrue(pap.nodeExists("pc1"));
+        assertTrue(pap.nodeExists("oa1"));
 
-        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
+        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.createObjectAttribute("oa2", "oa1"));
 
-        assertTrue(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.nodeExists("pc2"));
 
     }
 
     @Test
     void testAccessingEventContextInResponse() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        PDP pdp = new MemoryPDP(pap);
+        PAP pap = new PAP(new MemoryPolicyStore());
+        PDP pdp = new MemoryPDP(pap, false);
         EPP epp = new EPP(pdp, pap);
 
         String pal = """
@@ -92,30 +90,30 @@ class EPPTest {
                 """;
         pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
 
-        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
-        assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(
+        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.createObjectAttribute("oa2", "oa1"));
+        assertTrue(pap.getPolicyClasses().containsAll(Arrays.asList(
                 SUPER_PC, "pc1", "create_object_attribute", "oa2_test", "super_test"
         )));
     }
 
     @Test
     void testErrorInEPPResponse() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        PDP pdp = new MemoryPDP(pap);
+        PAP pap = new PAP(new MemoryPolicyStore());
+        PDP pdp = new MemoryPDP(pap, false);
         EPP epp = new EPP(pdp, pap);
 
         pdp.runTx(new UserContext(SUPER_USER), (policy) -> {
-            policy.graph().createPolicyClass("pc1");
-            policy.graph().createUserAttribute("ua1", "pc1");
-            policy.graph().createObjectAttribute("oa1", "pc1");
-            policy.graph().createUser("u1", "ua1");
-            policy.graph().createObject("o1", "oa1");
-            policy.graph().associate("ua1", SUPER_OA, new AccessRightSet(CREATE_OBLIGATION));
-            policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
+            policy.createPolicyClass("pc1");
+            policy.createUserAttribute("ua1", "pc1");
+            policy.createObjectAttribute("oa1", "pc1");
+            policy.createUser("u1", "ua1");
+            policy.createObject("o1", "oa1");
+            policy.associate("ua1", SUPER_OA, new AccessRightSet(CREATE_OBLIGATION));
+            policy.associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
         });
 
         pdp.runTx(new UserContext("u1"), (policy) -> {
-            policy.obligations().create(new UserContext("u1"), "test",
+            policy.createObligation(new UserContext("u1"), "test",
                     new Rule("rule1",
                             new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
                             new Response(new UserContext("u1"),
@@ -134,7 +132,7 @@ class EPPTest {
             epp.handlePolicyEvent(eventCtx);
         });
 
-        assertFalse(pap.graph().nodeExists("o2"));
-        assertFalse(pap.graph().nodeExists("pc2"));
+        assertFalse(pap.nodeExists("o2"));
+        assertFalse(pap.nodeExists("pc2"));
     }
 }

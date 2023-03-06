@@ -27,7 +27,7 @@ public class AccessRightChecker {
 
     public void check(UserContext userCtx, String target, String... toCheck) throws PMException {
         // if checking the permissions on a PC, check the permissions on the rep node for the PC
-        Node targetNode = pap.graph().getNode(target);
+        Node targetNode = pap.getNode(target);
 
         if (targetNode.getType().equals(PC)) {
             target = SuperPolicy.pcRepObjectAttribute(target);

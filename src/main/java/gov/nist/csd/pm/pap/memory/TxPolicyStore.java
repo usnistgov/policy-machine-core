@@ -1,35 +1,37 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.pap.store.*;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
-import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
+import gov.nist.csd.pm.policy.PolicyWriter;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.model.obligation.Obligation;
+import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
+import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
-class TxPolicyStore extends PolicyStore {
+import java.util.List;
+import java.util.Map;
 
-    /**
-     * The policy store to operate on during the transaction
-     */
-    protected final MemoryPolicyStore txStore;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+
+class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
+
+    private final MemoryPolicyStore memoryPolicyStore;
 
     /**
      * An event listener to track the events that occur during the transaction.
      * These events will be committed to the target policy store on commit.
      */
     protected TxPolicyEventListener txPolicyEventListener;
-    private final TxGraph graph;
-    private final TxProhibitions prohibitions;
-    private final TxObligations obligations;
-    private final TxPAL pal;
 
     public TxPolicyStore(MemoryPolicyStore txStore) {
-        this.txStore = txStore;
+        this.memoryPolicyStore = txStore;
         this.txPolicyEventListener = new TxPolicyEventListener();
-        this.graph = new TxGraph(txStore.getGraph(), txPolicyEventListener);
-        this.prohibitions = new TxProhibitions(txStore.getProhibitions(), txPolicyEventListener);
-        this.obligations = new TxObligations(txStore.getObligations(), txPolicyEventListener);
-        this.pal = new TxPAL(txStore.getPAL(), txPolicyEventListener);
     }
 
     public TxPolicyEventListener getTxPolicyEventListener() {
@@ -41,57 +43,167 @@ class TxPolicyStore extends PolicyStore {
     }
 
     @Override
-    public TxGraph graph() {
-        return graph;
+    public void setResourceAccessRights(AccessRightSet accessRightSet) {
+        emitEvent(new SetResourceAccessRightsEvent(accessRightSet));
     }
 
     @Override
-    public TxProhibitions prohibitions() {
-        return prohibitions;
+    public String createPolicyClass(String name, Map<String, String> properties) {
+        emitEvent(new CreatePolicyClassEvent(name, properties));
+        return name;
     }
 
     @Override
-    public TxObligations obligations() {
-        return obligations;
+    public String createPolicyClass(String name) {
+        return createPolicyClass(name, noprops());
     }
 
     @Override
-    public TxPAL pal() {
-        return pal;
+    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) {
+        emitEvent(new CreateUserAttributeEvent(name, properties, parent, parents));
+        return name;
     }
 
     @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return txStore.policySync();
+    public String createUserAttribute(String name, String parent, String... parents) {
+        return createUserAttribute(name, noprops(), parent, parents);
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) {
+        emitEvent(new CreateObjectAttributeEvent(name, properties, parent, parents));
+        return name;
+    }
+
+    @Override
+    public String createObjectAttribute(String name, String parent, String... parents) {
+        return createObjectAttribute(name, noprops(), parent, parents);
+    }
+
+    @Override
+    public String createObject(String name, Map<String, String> properties, String parent, String... parents) {
+        emitEvent(new CreateObjectEvent(name, properties, parent, parents));
+        return name;
+    }
+
+    @Override
+    public String createObject(String name, String parent, String... parents) {
+        return createObject(name, noprops(), parent, parents);
+    }
+
+    @Override
+    public String createUser(String name, Map<String, String> properties, String parent, String... parents) {
+        emitEvent(new CreateUserEvent(name, properties, parent, parents));
+        return name;
+    }
+
+    @Override
+    public String createUser(String name, String parent, String... parents) {
+        return createUser(name, noprops(), parent, parents);
+    }
+
+    @Override
+    public void setNodeProperties(String name, Map<String, String> properties) {
+        emitEvent(new TxEvents.MemorySetNodePropertiesEvent(name, memoryPolicyStore.getNode(name).getProperties(), properties));
+    }
+
+    @Override
+    public void deleteNode(String name) {
+        emitEvent(new TxEvents.MemoryDeleteNodeEvent(name, memoryPolicyStore.getNode(name), memoryPolicyStore.getParents(name)));
+    }
+
+    @Override
+    public void assign(String child, String parent) {
+        emitEvent(new AssignEvent(child, parent));
+    }
+
+    @Override
+    public void deassign(String child, String parent) {
+        emitEvent(new DeassignEvent(child, parent));
+    }
+
+    @Override
+    public void associate(String ua, String target, AccessRightSet accessRights) {
+        emitEvent(new AssociateEvent(ua, target, accessRights));
+    }
+
+    @Override
+    public void dissociate(String ua, String target) {
+        AccessRightSet accessRightSet = new AccessRightSet();
+        for (Association association : memoryPolicyStore.getAssociationsWithSource(ua)) {
+            if (association.getTarget().equals(target)) {
+                accessRightSet = association.getAccessRightSet();
+            }
+        }
+
+        emitEvent(new TxEvents.MemoryDissociateEvent(ua, target, accessRightSet));
+    }
+
+    @Override
+    public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
+        emitEvent(new CreateProhibitionEvent(label, subject, accessRightSet, intersection, List.of(containerConditions)));
+    }
+
+    @Override
+    public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        emitEvent(new TxEvents.MemoryUpdateProhibitionEvent(
+                new Prohibition(label, subject, accessRightSet, intersection, List.of(containerConditions)),
+                memoryPolicyStore.getProhibition(label)
+        ));
+    }
+
+    @Override
+    public void deleteProhibition(String label) throws PMException {
+        emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryPolicyStore.getProhibition(label)));
+    }
+
+    @Override
+    public void createObligation(UserContext author, String label, Rule... rules) {
+        emitEvent(new CreateObligationEvent(author, label, List.of(rules)));
+    }
+
+    @Override
+    public void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
+        emitEvent(new TxEvents.MemoryUpdateObligationEvent(new Obligation(author, label, List.of(rules)), memoryPolicyStore.getObligation(label)));
+    }
+
+    @Override
+    public void deleteObligation(String label) throws PMException {
+        emitEvent(new TxEvents.MemoryDeleteObligationEvent(label, memoryPolicyStore.getObligation(label)));
+    }
+
+    @Override
+    public void addPALFunction(FunctionDefinitionStatement functionDefinitionStatement) {
+        emitEvent(new AddFunctionEvent(functionDefinitionStatement));
+    }
+
+    @Override
+    public void removePALFunction(String functionName) {
+        emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.getPALFunctions().get(functionName)));
+    }
+
+    @Override
+    public void addPALConstant(String constantName, Value constantValue) {
+        emitEvent(new AddConstantEvent(constantName, constantValue));
+    }
+
+    @Override
+    public void removePALConstant(String constName) {
+        emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.getPALConstants().get(constName)));
+    }
+
+    @Override
+    public void addEventListener(PolicyEventListener listener, boolean sync) {
 
     }
 
     @Override
-    public void commit() throws PMException {
+    public void removeEventListener(PolicyEventListener listener) {
 
     }
 
     @Override
-    public void rollback() throws PMException {
-
-    }
-
-    @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return txStore.toString(policySerializer);
-    }
-
-    @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        // clear tx events
-        clearEvents();
-
-        policyDeserializer.deserialize(this, s);
-
-        txPolicyEventListener.handlePolicyEvent(txStore.policySync());
+    public void emitEvent(PolicyEvent event) {
+        txPolicyEventListener.handlePolicyEvent(event);
     }
 }

@@ -40,7 +40,7 @@ public class CreateObligationStatement extends PALStatement {
             rules.add(rule);
         }
 
-        policyAuthor.obligations().create(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
+        policyAuthor.createObligation(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
 
         return new Value();
     }

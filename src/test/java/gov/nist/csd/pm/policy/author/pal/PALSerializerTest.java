@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.serializer.PALDeserializer;
@@ -58,12 +59,12 @@ class PALSerializerTest {
             create obligation 'obl1' {create rule 'rule1' when any user performs 'event1', 'event2' on any policy element do (evtCtx) {let event = evtCtx['event'];if equals(event, 'event1') {create policy class 'e1';} else if equals(event, 'event2') {create policy class 'e2';} }}""";
     @Test
     void testSerialize() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
         pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
         String actual = pap.toString(new PALSerializer(false));
         assertEquals(expected, actual);
 
-        pap = new MemoryPAP();
+        pap = new PAP(new MemoryPolicyStore());
         pap.fromString(actual, new PALDeserializer(new UserContext(SUPER_USER)));
         actual = pap.toString(new PALSerializer(false));
         assertEquals(expected, actual);

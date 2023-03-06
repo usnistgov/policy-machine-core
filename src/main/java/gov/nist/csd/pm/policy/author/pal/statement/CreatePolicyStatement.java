@@ -36,7 +36,7 @@ public class CreatePolicyStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
-        policyAuthor.graph().createPolicyClass(name.execute(ctx, policyAuthor).getStringValue(), noprops());
+        policyAuthor.createPolicyClass(name.execute(ctx, policyAuthor).getStringValue(), noprops());
 
         return new Value();
     }

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.exception.PALCompilationException;
@@ -41,7 +42,7 @@ class CompileTest {
                 let f = c['1'];
                 let g = concat([f, ' ', a]);
                 """;
-        List<PALStatement> stmts = test(pal, new MemoryPAP());
+        List<PALStatement> stmts = test(pal, new PAP(new MemoryPolicyStore()));
         VarStatement stmt = (VarStatement) stmts.get(0);
         assertEquals("a", stmt.getVarName());
         assertEquals("hello world", stmt.getExpression().getLiteral().getStringLiteral());
@@ -129,7 +130,7 @@ class CompileTest {
                 let a = b;
                 a = b;
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
+        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(5, ex.getErrors().size(), ex.getErrors().toString());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("expected []string, got string"));
         assertTrue(ex.getErrors().get(1).errorMessage().contains("expected map type"));
@@ -145,7 +146,7 @@ class CompileTest {
                 const a = 'test';
                 a = 'test';
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
+        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(2, ex.getErrors().size(), ex.getErrors().toString());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("already defined"));
         assertTrue(ex.getErrors().get(1).errorMessage().contains("cannot reassign"));
@@ -158,7 +159,7 @@ class CompileTest {
                 
                 }
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
+        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
 
         String pal1 = """
@@ -166,7 +167,7 @@ class CompileTest {
                 
                 }
                 """;
-        assertDoesNotThrow(() -> test(pal1, new MemoryPAP()));
+        assertDoesNotThrow(() -> test(pal1, new PAP(new MemoryPolicyStore())));
     }
 
     @Test
@@ -176,7 +177,7 @@ class CompileTest {
                     create policy class i;
                 }
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
+        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("number not allowed, only: [string]"));
     }
@@ -191,7 +192,7 @@ class CompileTest {
                 let m = {'k1': {'k2': 'v1'}};
                 let x = m['k1']['k2']['k3'];
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new MemoryPAP()));
+        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("expected map type"));
 
@@ -199,7 +200,7 @@ class CompileTest {
                 let m = {'k1': {'k2': 'v1'}};
                 create policy class m['k1'];
                 """;
-        ex = assertThrows(PALCompilationException.class, () -> test(pal1, new MemoryPAP()));
+        ex = assertThrows(PALCompilationException.class, () -> test(pal1, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("expression type map[string]string not allowed, only: [string]"));
     }
@@ -211,8 +212,8 @@ class CompileTest {
                 let x = m['k1']['k1-1']['k1-1-1'];
                 create policy class x;
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        List<PALStatement> test = test(pal, new MemoryPAP());
+        PAP pap = new PAP(new MemoryPolicyStore());
+        List<PALStatement> test = test(pal, new PAP(new MemoryPolicyStore()));
 
         ExecutionContext ctx = new ExecutionContext(new UserContext(SUPER_USER));
         PALStatement stmt = test.get(0);
@@ -253,18 +254,18 @@ class CompileTest {
                 """;
 
         UserContext userCtx = new UserContext(SUPER_USER);
-        MemoryPAP pap = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
         ExecutionContext ctx = new ExecutionContext(userCtx);
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
+        pap.createPolicyClass("pc1");
+        pap.createObjectAttribute("oa1", "pc1");
         List<PALStatement> test = test(pal, pap);
         assertEquals(1, test.size());
 
         PALStatement stmt = test.get(0);
         stmt.execute(ctx, pap);
 
-        assertEquals(1, pap.obligations().getAll().size());
-        Obligation actual = pap.obligations().get("test");
+        assertEquals(1, pap.getObligations().size());
+        Obligation actual = pap.getObligation("test");
         assertEquals(1, actual.getRules().size());
         assertEquals("test", actual.getLabel());
         assertEquals(userCtx, actual.getAuthor());
@@ -388,6 +389,6 @@ class CompileTest {
                 create policy class concat([x, ' ', y]);
                 let y = 'world';
                 """;
-        assertThrows(PALCompilationException.class, () -> PALCompiler.compilePAL(new MemoryPAP(), pal));
+        assertThrows(PALCompilationException.class, () -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
     }
 }

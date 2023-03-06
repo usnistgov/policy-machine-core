@@ -19,7 +19,7 @@ public class GetProhibitionsFor extends FunctionDefinitionStatement {
                 ),
                 (ctx, author) -> {
                     String subject = ctx.scope().getValue("subject").getStringValue();
-                    List<Prohibition> prohibitions = author.prohibitions().getWithSubject(subject);
+                    List<Prohibition> prohibitions = author.getProhibitionsWithSubject(subject);
                     Value[] prohibitionValues = new Value[prohibitions.size()];
                     for (int i = 0; i < prohibitions.size(); i++) {
                         prohibitionValues[i] = new Value(Value.objectToValue(prohibitions.get(i)));

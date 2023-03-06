@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
-import gov.nist.csd.pm.policy.GraphReader;
+import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.graph.dag.AllPathsShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.NoopShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.ShortCircuit;
-import gov.nist.csd.pm.policy.model.graph.dag.SinglePathShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.NoopPropagator;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.policy.model.graph.dag.visitor.NoopVisitor;
@@ -17,15 +15,15 @@ import java.util.*;
 
 public class BreadthFirstGraphWalker implements GraphWalker {
 
-    private final GraphReader graph;
+    private final PolicyReader policyReader;
     private Direction direction;
     private Visitor visitor;
     private Propagator propagator;
     private ShortCircuit allPathsShortCircuit;
     private ShortCircuit singlePathShortCircuit;
 
-    public BreadthFirstGraphWalker(GraphReader graph) {
-        this.graph = graph;
+    public BreadthFirstGraphWalker(PolicyReader policyReader) {
+        this.policyReader = policyReader;
         this.visitor = new NoopVisitor();
         this.propagator = new NoopPropagator();
         this.direction = Direction.PARENTS;
@@ -97,9 +95,9 @@ public class BreadthFirstGraphWalker implements GraphWalker {
 
     private List<String> getNextLevel(String node) throws PMException {
         if (direction == Direction.PARENTS) {
-            return graph.getParents(node);
+            return policyReader.getParents(node);
         } else {
-            return graph.getChildren(node);
+            return policyReader.getChildren(node);
         }
     }
 }

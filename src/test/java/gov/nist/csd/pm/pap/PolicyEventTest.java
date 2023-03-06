@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
@@ -29,29 +29,29 @@ public class PolicyEventTest {
 
     @Test
     void testEvents() throws PMException {
-        PAP pap = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
 
         List<PolicyEvent> events = new ArrayList<>();
         pap.addEventListener(events::add, false);
 
-        pap.graph().setResourceAccessRights(new AccessRightSet("read"));
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
-        pap.graph().createUserAttribute("ua1", "pc1");
-        pap.graph().createUserAttribute("ua2", "pc1");
-        pap.graph().createObject("o1", "oa1");
-        pap.graph().createUser("u1", "ua1");
-        pap.graph().createUser("u2", "ua1");
-        pap.graph().setNodeProperties("u1", Map.of("k", "v"));
-        pap.graph().deleteNode("u1");
-        pap.graph().assign("u2", "ua2");
-        pap.graph().deassign("u2", "ua2");
-        pap.graph().associate("ua1", "oa1", new AccessRightSet());
-        pap.graph().dissociate("ua1", "oa1");
-        pap.prohibitions().create("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
-        pap.prohibitions().update("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
-        pap.prohibitions().delete("label");
-        pap.obligations().create(
+        pap.setResourceAccessRights(new AccessRightSet("read"));
+        pap.createPolicyClass("pc1");
+        pap.createObjectAttribute("oa1", "pc1");
+        pap.createUserAttribute("ua1", "pc1");
+        pap.createUserAttribute("ua2", "pc1");
+        pap.createObject("o1", "oa1");
+        pap.createUser("u1", "ua1");
+        pap.createUser("u2", "ua1");
+        pap.setNodeProperties("u1", Map.of("k", "v"));
+        pap.deleteNode("u1");
+        pap.assign("u2", "ua2");
+        pap.deassign("u2", "ua2");
+        pap.associate("ua1", "oa1", new AccessRightSet());
+        pap.dissociate("ua1", "oa1");
+        pap.createProhibition("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        pap.updateProhibition("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        pap.deleteProhibition("label");
+        pap.createObligation(
                 new UserContext(SUPER_USER),
                 "label",
                 new Rule(
@@ -66,7 +66,7 @@ public class PolicyEventTest {
                         )
                 )
         );
-        pap.obligations().update(new UserContext(SUPER_USER),
+        pap.updateObligation(new UserContext(SUPER_USER),
                 "label",
                 new Rule(
                         "rule1",
@@ -79,7 +79,9 @@ public class PolicyEventTest {
                                 new CreatePolicyStatement(new Expression(new VariableReference("test_pc2", Type.string())))
                         )
                 ));
-        pap.obligations().delete("label");
+        pap.deleteObligation("label");
+
+        System.out.println(events);
 
         assertEquals(24, events.size());
     }
