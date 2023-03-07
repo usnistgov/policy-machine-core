@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -111,5 +112,5 @@ public class IfStatement extends PALStatement {
         return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(Expression condition, List<PALStatement> block) { }
+    public record ConditionalBlock(Expression condition, List<PALStatement> block) implements Serializable { }
 }

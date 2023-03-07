@@ -4,6 +4,8 @@ import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.PolicySerializable;
 import gov.nist.csd.pm.policy.author.*;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
+import gov.nist.csd.pm.policy.author.pal.PALExecutable;
+import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.events.*;
@@ -36,7 +38,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 
-public class PAP implements PolicySync, PolicyEventEmitter, Transactional, PolicyAuthor, PolicySerializable {
+public class PAP implements PolicySync, PolicyEventEmitter, Transactional, PolicyAuthor, PolicySerializable, PALExecutable {
 
     protected PolicyStore policyStore;
 
@@ -766,5 +768,10 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
         policyDeserializer.deserialize(this, s);
 
         commit();
+    }
+
+    @Override
+    public void executePAL(UserContext userContext, String input, FunctionDefinitionStatement... functionDefinitionStatements) throws PMException {
+        PALExecutor.compileAndExecutePAL(this, userContext, input, functionDefinitionStatements);
     }
 }

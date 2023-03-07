@@ -6,8 +6,8 @@ create user attribute "oa1" in "pc1";
 associate "ua1" and "oa1" with "read", "write";
 
 create policy class "pc2";
-assign "ua2" to "pc2";
-create user attribute "oa2" in "pc2";
+create user attribute "ua2" in "pc2";
+create object attribute "oa2" in "pc2";
 associate "ua2" and "oa2" with "read", "write";
 
 create user "u1" in "ua1", "ua2";

@@ -5,6 +5,8 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.policy.PolicySerializable;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
+import gov.nist.csd.pm.policy.author.pal.PALExecutable;
+import gov.nist.csd.pm.policy.author.pal.PALExecutor;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
@@ -75,7 +77,7 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements PolicyAuthor, PolicyEventEmitter, PolicySerializable {
+    public static class PDPTx implements PolicyAuthor, PolicyEventEmitter, PolicySerializable, PALExecutable {
 
         private final UserContext userCtx;
         private final Adjudicator adjudicator;
@@ -175,23 +177,17 @@ public abstract class PDP implements PolicyEventEmitter {
 
         @Override
         public Map<String, FunctionDefinitionStatement> getPALFunctions() throws PMException {
-            adjudicator.getPALFunctions();
-
             return pap.getPALFunctions();
         }
 
         @Override
         public Map<String, Value> getPALConstants() throws PMException {
-            adjudicator.getPALConstants();
-
             return pap.getPALConstants();
         }
 
         @Override
         public PALContext getPALContext() throws PMException {
-            adjudicator.getPALContext();
-
-            return adjudicator.getPALContext();
+            return pap.getPALContext();
         }
 
         @Override
@@ -581,6 +577,11 @@ public abstract class PDP implements PolicyEventEmitter {
             for (PolicyEventListener epp : epps) {
                 epp.handlePolicyEvent(event);
             }
+        }
+
+        @Override
+        public void executePAL(UserContext userContext, String input, FunctionDefinitionStatement... functionDefinitionStatements) throws PMException {
+            PALExecutor.compileAndExecutePAL(this, userContext, input, functionDefinitionStatements);
         }
     }
 }

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.SamplePolicy;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.mysql.MysqlPolicyStore;
 import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
@@ -48,12 +49,12 @@ class PAPTest {
     public void runTest(TestRunner testRunner) throws PMException {
         testRunner.run(new PAP(new MemoryPolicyStore()));
 
-        /*try (Connection connection = testEnv.getConnection()) {
+        try (Connection connection = testEnv.getConnection()) {
             PAP mysqlPAP = new PAP(new MysqlPolicyStore(connection));
             testRunner.run(mysqlPAP);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }*/
+        }
     }
 
     public interface TestRunner {
@@ -1737,6 +1738,31 @@ class PAPTest {
             pap.fromString(actual, new PALDeserializer(new UserContext(SUPER_USER)));
             actual = pap.toString(new PALSerializer(false));
             assertEquals(expected, actual);
+        });
+    }
+
+    @Test
+    void testExecutePAL() throws PMException {
+        runTest(pap -> {
+            try {
+                SamplePolicy.loadSamplePolicyFromPAL(pap);
+
+                FunctionDefinitionStatement functionDefinitionStatement = new FunctionDefinitionStatement(
+                        "testfunc",
+                        Type.voidType(),
+                        List.of(),
+                        (ctx, policy) -> {
+                            policy.createPolicyClass("pc3");
+                            return new Value();
+                        }
+                );
+
+                pap.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in 'pc2';\ntestfunc();", functionDefinitionStatement);
+                assertTrue(pap.nodeExists("ua3"));
+                assertTrue(pap.nodeExists("pc3"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 }
