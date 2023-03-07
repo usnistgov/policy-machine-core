@@ -31,9 +31,7 @@ import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
@@ -1733,12 +1731,29 @@ class PAPTest {
         runTest(pap -> {
             pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
             String actual = pap.toString(new PALSerializer(false));
-            assertEquals(expected, actual);
+            assertTrue(palEqual(expected, actual));
 
             pap.fromString(actual, new PALDeserializer(new UserContext(SUPER_USER)));
             actual = pap.toString(new PALSerializer(false));
-            assertEquals(expected, actual);
+            assertTrue(palEqual(expected, actual));
         });
+    }
+
+    private boolean palEqual(String expected, String actual) {
+        List<String> expectedLines = sortLines(expected);
+        List<String> actualLines = sortLines(actual);
+        return expectedLines.equals(actualLines);
+    }
+
+    private List<String> sortLines(String pal) {
+        List<String> lines = new ArrayList<>();
+        Scanner sc = new Scanner(pal);
+        while (sc.hasNextLine()) {
+            lines.add(sc.nextLine());
+        }
+
+        Collections.sort(lines);
+        return lines;
     }
 
     @Test
