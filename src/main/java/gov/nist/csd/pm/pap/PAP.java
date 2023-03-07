@@ -239,6 +239,10 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     @Override
     public synchronized String createPolicyClass(String name, Map<String, String> properties) throws PMException {
         if (nodeExists(name)) {
+            if (SuperPolicy.isSuperPolicyNode(name)) {
+                return name;
+            }
+
             throw new NodeNameExistsException(name);
         }
 
@@ -297,9 +301,11 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
 
     private String createNode(String name, NodeType type, Map<String, String> properties, String parent, String ... parents) throws PMException {
         if (nodeExists(name)) {
+            if (SuperPolicy.isSuperPolicyNode(name)) {
+                return name;
+            }
+
             throw new NodeNameExistsException(name);
-        } else if (!nodeExists(parent)) {
-            throw new NodeDoesNotExistException(parent);
         }
 
         // collect any parents that are of type PC

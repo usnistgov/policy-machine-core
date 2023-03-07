@@ -28,6 +28,15 @@ public class SuperPolicy {
         return policyClass + "_pc_rep";
     }
 
+    public static boolean isSuperPolicyNode(String node) {
+        return node.equals(SUPER_USER) ||
+               node.equals(SUPER_PC) ||
+               node.equals(SUPER_UA) ||
+               node.equals(SUPER_UA1) ||
+               node.equals(SUPER_OA) ||
+               node.equals(SUPER_PC_REP);
+    }
+
     protected static void verifySuperPolicy(PolicyStore store) throws PMException {
         // start a transaction on the policy store the graph uses
         // then use Graph methods to take advantage of the policy emitter
@@ -127,6 +136,10 @@ public class SuperPolicy {
             }
 
             String pcRep = pcRepObjectAttribute(name);
+            if (store.nodeExists(pcRep)) {
+                return;
+            }
+
             store.createObjectAttribute(pcRep, noprops(), SUPER_OA);
             events.add(new CreateObjectAttributeEvent(pcRep, noprops(), SUPER_OA));
         });

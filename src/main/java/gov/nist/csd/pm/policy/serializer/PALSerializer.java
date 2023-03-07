@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.PALFormatter;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -13,6 +14,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
+import java.sql.Statement;
 import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
@@ -111,9 +113,9 @@ public class PALSerializer implements PolicySerializer {
         pal.append(new SetResourceAccessRightsStatement(arExprs)).append("\n");
 
         List<String> policyClasses = policy.getPolicyClasses();
-
         Set<String> attributes = new HashSet<>();
         Set<String> usersAndObjects = new HashSet<>();
+        Map<String, List<AssociateStatement>> delayedAssociations = new HashMap<>();
 
         for (String policyClass : policyClasses) {
             pal.append(new CreatePolicyStatement(new Expression(new Literal(policyClass)))).append("\n");
@@ -144,6 +146,15 @@ public class PALSerializer implements PolicySerializer {
                                 )).append("\n");
                             }
 
+                            if (delayedAssociations.containsKey(child)) {
+                                List<AssociateStatement> associateStatements = delayedAssociations.get(child);
+                                for (AssociateStatement stmt : associateStatements) {
+                                    pal.append(stmt).append("\n");
+                                }
+
+                                delayedAssociations.remove(child);
+                            }
+
                             if (childNode.getType() == UA) {
                                 List<Association> sourceAssociations = policy.getAssociationsWithSource(child);
                                 for (Association association : sourceAssociations) {
@@ -156,11 +167,20 @@ public class PALSerializer implements PolicySerializer {
                                         }
                                     }
 
-                                    pal.append(new AssociateStatement(
+                                    String target = association.getTarget();
+                                    AssociateStatement stmt = new AssociateStatement(
                                             new Expression(new Literal(child)),
                                             new Expression(new Literal(association.getTarget())),
                                             new Expression(exprs)
-                                    )).append("\n");
+                                    );
+
+                                    if (!attributes.contains(target)) {
+                                        List<AssociateStatement> associateStmts = delayedAssociations.getOrDefault(target, new ArrayList<>());
+                                        associateStmts.add(stmt);
+                                        delayedAssociations.put(target, associateStmts);
+                                    } else {
+                                        pal.append(stmt).append("\n");
+                                    }
                                 }
                             }
                         } else {

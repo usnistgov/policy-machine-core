@@ -33,6 +33,8 @@ public class ObligationTest {
         pap.createObjectAttribute("oa1", "pc1");
 
         String input = """
+                create policy class 'pc1';
+                create oa 'oa1' in 'pc1';
                 create obligation 'obligation1' {
                     create rule 'rule1'
                     when any user
@@ -65,6 +67,9 @@ public class ObligationTest {
     @Test
     void testObligationComplex() throws PMException {
         String pal = """
+                create policy class 'pc1';
+                create oa 'oa1' in 'pc1';
+                
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
@@ -82,11 +87,9 @@ public class ObligationTest {
                     }
                 }
                 """;
+
         UserContext userCtx = new UserContext(SUPER_USER);
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.createPolicyClass("pc1");
-        pap.createObjectAttribute("oa1", "pc1");
-
         pap.fromString(pal, new PALDeserializer(userCtx));
 
         assertEquals(1, pap.getObligations().size());

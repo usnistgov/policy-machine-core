@@ -824,7 +824,6 @@ public class MysqlPolicyStore extends PolicyStore {
 
             ps.executeBatch();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             rollback();
             throw new MysqlPolicyException(e.getMessage());
         }
