@@ -133,6 +133,14 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
             map.put(keyExpr, valueExpr);
         }
 
+        if (keyType == null) {
+            keyType = Type.any();
+        }
+
+        if (valueType == null) {
+            valueType = Type.any();
+        }
+
         return new Literal(new MapLiteral(map, keyType, valueType));
     }
 

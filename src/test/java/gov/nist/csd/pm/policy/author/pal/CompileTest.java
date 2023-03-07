@@ -391,4 +391,16 @@ class CompileTest {
                 """;
         assertThrows(PALCompilationException.class, () -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
     }
+
+    @Test
+    void testEmptyMap() {
+        String pal = """
+                function testFunc(map[string]string m) {
+                
+                }
+                
+                testFunc({});
+                """;
+        assertDoesNotThrow(() -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
+    }
 }
