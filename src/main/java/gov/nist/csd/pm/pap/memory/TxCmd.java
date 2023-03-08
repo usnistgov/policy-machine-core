@@ -17,7 +17,6 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 
 interface TxCmd {
 
-    void apply(MemoryPolicyStore store) throws PMException;
     void revert(MemoryPolicyStore store) throws PMException;
     
     class CreatePolicyClassTxCmd implements TxCmd {
@@ -28,11 +27,6 @@ interface TxCmd {
         public CreatePolicyClassTxCmd(String name, Map<String, String> properties) {
             this.name = name;
             this.properties = properties;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createPolicyClass(name, properties);
         }
 
         @Override
@@ -55,11 +49,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createObjectAttribute(name, properties, parent, parents);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
@@ -76,11 +65,6 @@ interface TxCmd {
             this.properties = properties;
             this.parent = parent;
             this.parents = parents;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createUserAttribute(name, properties, parent, parents);
         }
 
         @Override
@@ -103,11 +87,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createObject(name, properties, parent, parents);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.deleteNode(name);
         }
@@ -124,11 +103,6 @@ interface TxCmd {
             this.properties = properties;
             this.parent = parent;
             this.parents = parents;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createUser(name, properties, parent, parents);
         }
 
         @Override
@@ -149,11 +123,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.setNodeProperties(name, newProperties);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.setNodeProperties(name, oldProperties);
         }
@@ -168,11 +137,6 @@ interface TxCmd {
             this.name = name;
             this.nodeToDelete = nodeToDelete;
             this.parents = parents;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.deleteNode(name);
         }
 
         @Override
@@ -207,11 +171,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.assign(child, parent);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.deassign(child, parent);
         }
@@ -224,11 +183,6 @@ interface TxCmd {
         public DeassignTxCmd(String child, String parent) {
             this.child = child;
             this.parent = parent;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.deassign(child, parent);
         }
 
         @Override
@@ -245,11 +199,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.dissociate(association.getSource(), association.getTarget());
         }
@@ -260,11 +209,6 @@ interface TxCmd {
 
         public DissociateTxCmd(Association association) {
             this.association = association;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.dissociate(association.getSource(), association.getTarget());
         }
 
         @Override
@@ -281,17 +225,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createProhibition(
-                    prohibition.getLabel(),
-                    prohibition.getSubject(),
-                    prohibition.getAccessRightSet(),
-                    prohibition.isIntersection(),
-                    prohibition.getContainers().toArray(new ContainerCondition[]{})
-            );
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) throws PMException {
             store.deleteProhibition(prohibition.getLabel());
         }
@@ -304,17 +237,6 @@ interface TxCmd {
         public UpdateProhibitionTxCmd(Prohibition newProhibition, Prohibition oldProhibition) {
             this.newProhibition = newProhibition;
             this.oldProhibition = oldProhibition;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) throws PMException {
-            store.updateProhibition(
-                    newProhibition.getLabel(),
-                    newProhibition.getSubject(),
-                    newProhibition.getAccessRightSet(),
-                    newProhibition.isIntersection(),
-                    newProhibition.getContainers().toArray(new ContainerCondition[]{})
-            );
         }
 
         @Override
@@ -337,11 +259,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) throws PMException {
-            store.deleteProhibition(prohibitionToDelete.getLabel());
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.createProhibition(
                     prohibitionToDelete.getLabel(),
@@ -361,15 +278,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.createObligation(
-                    obligation.getAuthor(),
-                    obligation.getLabel(),
-                    obligation.getRules().toArray(new Rule[]{})
-            );
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) throws PMException {
             store.deleteObligation(obligation.getLabel());
         }
@@ -382,15 +290,6 @@ interface TxCmd {
         public UpdateObligationTxCmd(Obligation newObligation, Obligation oldObligation) {
             this.newObligation = newObligation;
             this.oldObligation = oldObligation;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) throws PMException {
-            store.updateObligation(
-                    newObligation.getAuthor(),
-                    newObligation.getLabel(),
-                    newObligation.getRules().toArray(new Rule[]{})
-            );
         }
 
         @Override
@@ -413,11 +312,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) throws PMException {
-            store.deleteObligation(name);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.createObligation(
                     obligationToDelete.getAuthor(),
@@ -435,11 +329,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.addPALFunction(functionDefinitionStatement);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.removePALFunction(functionDefinitionStatement.getFunctionName());
         }
@@ -450,11 +339,6 @@ interface TxCmd {
 
         public RemoveFunctionTxCmd(FunctionDefinitionStatement functionDefinitionStatement) {
             this.functionDefinitionStatement = functionDefinitionStatement;
-        }
-
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            store.removePALFunction(functionDefinitionStatement.getFunctionName());
         }
 
         @Override
@@ -474,11 +358,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.addPALConstant(constantName, value);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.removePALConstant(constantName);
         }
@@ -494,11 +373,6 @@ interface TxCmd {
         }
 
         @Override
-        public void apply(MemoryPolicyStore store) {
-            store.removePALConstant(constantName);
-        }
-
-        @Override
         public void revert(MemoryPolicyStore store) {
             store.addPALConstant(constantName, oldValue);
         }
@@ -506,11 +380,6 @@ interface TxCmd {
 
     class NoopTxCmd implements TxCmd {
         public NoopTxCmd() {
-        }
-        
-        @Override
-        public void apply(MemoryPolicyStore store) {
-            
         }
 
         @Override

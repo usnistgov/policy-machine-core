@@ -315,6 +315,7 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
         List<String> pcParents = new ArrayList<>();
         List<String> parentsList = new ArrayList<>(Arrays.asList(parents));
         parentsList.add(parent);
+
         for (String p : parentsList) {
             Node parentNode = getNode(p);
             if (parentNode.getType() != PC) {

@@ -11,19 +11,27 @@ import java.util.List;
 
 class TxPolicyEventListener implements PolicyEventListener, TxCmd {
 
-    private final List<TxCmd> events;
+    private final List<PolicyEvent> events;
 
     public TxPolicyEventListener() {
         events = new ArrayList<>();
     }
 
-    public List<TxCmd> getEvents() {
+    public List<PolicyEvent> getEvents() {
         return events;
     }
 
     @Override
     public void handlePolicyEvent(PolicyEvent event) {
-        this.events.add(0, eventToCmd(event));
+        this.events.add(event);
+    }
+
+    @Override
+    public void revert(MemoryPolicyStore store) throws PMException {
+        for (int i = events.size()-1; i >= 0; i--) {
+            TxCmd cmd = eventToCmd(events.get(i));
+            cmd.revert(store);
+        }
     }
 
     private TxCmd eventToCmd(PolicyEvent event) {
@@ -77,19 +85,5 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd {
         }
 
         return new NoopTxCmd();
-    }
-
-    @Override
-    public void apply(MemoryPolicyStore store) throws PMException {
-        for (TxCmd cmd : events) {
-            cmd.apply(store);
-        }
-    }
-
-    @Override
-    public void revert(MemoryPolicyStore store) throws PMException {
-        for (TxCmd cmd : events) {
-            cmd.revert(store);
-        }
     }
 }
