@@ -128,8 +128,6 @@ public class MemoryPolicyStore extends PolicyStore {
         txPolicyEventListener.revert(this);
     }
 
-
-
     @Override
     public synchronized void setResourceAccessRights(AccessRightSet accessRightSet) {
         if (inTx) {

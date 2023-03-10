@@ -14,14 +14,10 @@ import java.util.*;
 
 public class PALExecutor {
 
-    public static void execute(PolicyAuthor policyAuthor, UserContext userContext, String input,
-                               FunctionDefinitionStatement ... functionDefinitionStatements) throws PMException {
-        compileAndExecutePAL(policyAuthor, userContext, input, functionDefinitionStatements);
-    }
-
-    public static void compileAndExecutePAL(PolicyAuthor policy, UserContext author, String input, FunctionDefinitionStatement ... customBuiltinFunctions) throws PMException {
+    public static void compileAndExecutePAL(PolicyAuthor policy, UserContext author, String input,
+                                            FunctionDefinitionStatement ... customFunctions) throws PMException {
         // compile the PAL into statements
-        List<PALStatement> compiledStatements = PALCompiler.compilePAL(policy, input, customBuiltinFunctions);
+        List<PALStatement> compiledStatements = PALCompiler.compilePAL(policy, input, customFunctions);
 
         // initialize the execution context
         ExecutionContext ctx = new ExecutionContext(author);
@@ -30,7 +26,7 @@ public class PALExecutor {
         ExecutionContext predefined;
         try {
             // add custom builtin functions to scope
-            for (FunctionDefinitionStatement func : customBuiltinFunctions) {
+            for (FunctionDefinitionStatement func : customFunctions) {
                 ctx.scope().addFunction(func);
             }
 
@@ -42,7 +38,11 @@ public class PALExecutor {
 
         // execute each statement
         for (PALStatement stmt : compiledStatements) {
-            stmt.execute(ctx, policy);
+            try {
+                stmt.execute(ctx, policy);
+            } catch (PMException e) {
+                throw new PALExecutionException(e.getMessage() + ": " + stmt);
+            }
         }
 
         // save any top level functions and constants to be used later

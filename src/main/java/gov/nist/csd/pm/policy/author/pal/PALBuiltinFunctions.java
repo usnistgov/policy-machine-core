@@ -28,7 +28,7 @@ public class PALBuiltinFunctions {
     private static final FunctionDefinitionStatement nodeExists = new NodeExists();
     private static final FunctionDefinitionStatement getNode = new GetNode();
     private static final FunctionDefinitionStatement search = new Search();
-
+    private static final FunctionDefinitionStatement executePAL = new ExecutePAL();
 
     private static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
 
@@ -51,6 +51,7 @@ public class PALBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(nodeExists.getFunctionName(), nodeExists);
         BUILTIN_FUNCTIONS.put(getNode.getFunctionName(), getNode);
         BUILTIN_FUNCTIONS.put(search.getFunctionName(), search);
+        BUILTIN_FUNCTIONS.put(executePAL.getFunctionName(), executePAL);
     }
 
     public static Map<String, FunctionDefinitionStatement> builtinFunctions() {

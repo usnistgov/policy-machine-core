@@ -50,7 +50,7 @@ public class ExecutionTest {
                 associate 'ua2' and 'oa2' with 'read', 'write';
                 associate 'ua3' and 'oa3' with 'read', 'write';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertTrue(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("oa1"));
@@ -90,7 +90,7 @@ public class ExecutionTest {
                 deassign 'u1' from 'ua1';
                 deassign 'u1' from 'ua2';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
         assertFalse(pap.getChildren("ua1").contains("u1"));
         assertFalse(pap.getChildren("ua2").contains("u1"));
@@ -99,14 +99,14 @@ public class ExecutionTest {
                 """
                 delete user 'u1';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("u1"));
 
         input =
                 """
                 deassign 'o1' from 'oa1';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.getParents("oa1").contains("oa1"));
         assertFalse(pap.getChildren("oa1").contains("o1"));
 
@@ -114,7 +114,7 @@ public class ExecutionTest {
                 """
                 delete object 'o1';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("o1"));
 
         input =
@@ -123,7 +123,7 @@ public class ExecutionTest {
                 delete user attribute 'ua2';
                 delete user attribute 'ua3';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("ua1"));
         assertFalse(pap.nodeExists("ua2"));
         assertFalse(pap.nodeExists("ua3"));
@@ -135,7 +135,7 @@ public class ExecutionTest {
                 delete object attribute 'oa2';
                 delete object attribute 'oa3';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("oa1"));
         assertFalse(pap.nodeExists("oa2"));
         assertFalse(pap.nodeExists("oa3"));
@@ -144,7 +144,7 @@ public class ExecutionTest {
                 """
                 delete policy class 'pc1';
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("pc1"));
     }
 
@@ -158,7 +158,7 @@ public class ExecutionTest {
                     create policy class 'pc1';
                 }
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertTrue(pap.nodeExists("pc1"));
 
         input = """
@@ -172,7 +172,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertFalse(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
@@ -190,7 +190,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertFalse(pap.nodeExists("pc1"));
         assertFalse(pap.nodeExists("pc2"));
@@ -207,7 +207,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertFalse(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
@@ -221,7 +221,7 @@ public class ExecutionTest {
                     create policy class x;
                 }
                 """;
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertTrue(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
@@ -234,7 +234,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertTrue(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
@@ -248,7 +248,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertTrue(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
@@ -263,7 +263,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertTrue(pap.nodeExists("pc1"));
         assertFalse(pap.nodeExists("pc2"));
@@ -278,7 +278,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertFalse(pap.nodeExists("pc1"));
         assertFalse(pap.nodeExists("pc2"));
@@ -297,7 +297,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertFalse(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
@@ -312,7 +312,7 @@ public class ExecutionTest {
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertEquals(6, pap.getPolicyClasses().size());
         assertTrue(pap.getPolicyClasses().containsAll(List.of("1", "2", "3", "4", "5")));
@@ -328,7 +328,7 @@ public class ExecutionTest {
                 testFunc('pc1');
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
         assertTrue(pap.nodeExists("pc1"));
 
@@ -340,7 +340,7 @@ public class ExecutionTest {
                 testFunc(['pc1']);
                 """;
         PAP pap1 = new PAP(new MemoryPolicyStore());
-        assertThrows(IllegalStateException.class, () -> PALExecutor.execute(pap1, superUser, input1));
+        assertThrows(IllegalStateException.class, () -> PALExecutor.compileAndExecutePAL(pap1, superUser, input1));
 
         input = """
                 let x = 'hello';
@@ -351,7 +351,7 @@ public class ExecutionTest {
                 
                 testFunc();
                 """;
-        PALExecutor.execute(pap1, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap1, superUser, input);
         assertTrue(pap1.nodeExists("hello world"));
     }
 
@@ -363,7 +363,7 @@ public class ExecutionTest {
                 create policy class b;
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertTrue(pap.nodeExists("hello world"));
 
         PAP pap1 = new PAP(new MemoryPolicyStore());
@@ -373,7 +373,7 @@ public class ExecutionTest {
                 a = 'test';
                 create policy class b;
                 """;
-        PALExecutor.execute(pap1, superUser, input1);
+        PALExecutor.compileAndExecutePAL(pap1, superUser, input1);
         assertFalse(pap.nodeExists("test"));
     }
 
@@ -385,7 +385,7 @@ public class ExecutionTest {
                 create policy class x;
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertTrue(pap.getPolicyClasses().contains("v1"));
     }
 
@@ -395,12 +395,12 @@ public class ExecutionTest {
                 set resource access rights ["read", "write"];
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.execute(pap, superUser, input);
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertTrue(pap.getResourceAccessRights().contains("read"));
 
         String input1 = """
                 set resource access rights [["read", "write"], ["exec"]];
                 """;
-        assertThrows(PMException.class, () -> PALExecutor.execute(pap, superUser, input1));
+        assertThrows(PMException.class, () -> PALExecutor.compileAndExecutePAL(pap, superUser, input1));
     }
 }
