@@ -64,7 +64,6 @@ class PALExecutorTest {
 
         functions = pap.getPALFunctions();
         assertTrue(functions.isEmpty());
-
     }
 
 }

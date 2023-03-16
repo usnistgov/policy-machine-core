@@ -106,7 +106,7 @@ public abstract class PolicyReviewer implements PolicyReview {
             if (target.equals(contName)) {
                 // if the prohibition is UNION and the target is the container then the prohibition is satisfied
                 // if the prohibition is INTERSECTION and the target is the container then the prohibition is not satisfied
-                if (!inter) {
+                if (!inter && !isComplement) {
                     addOps = true;
                 }
 

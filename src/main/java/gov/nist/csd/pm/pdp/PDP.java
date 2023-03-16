@@ -581,6 +581,7 @@ public abstract class PDP implements PolicyEventEmitter {
 
         @Override
         public void executePAL(UserContext userContext, String input, FunctionDefinitionStatement... functionDefinitionStatements) throws PMException {
+            // TODO does not use pap
             PALExecutor.compileAndExecutePAL(this, userContext, input, functionDefinitionStatements);
         }
     }

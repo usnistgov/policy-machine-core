@@ -61,14 +61,15 @@ class MemoryPDPTest {
 
             MemoryPDP memoryPDP = new MemoryPDP(pap, false);
             memoryPDP.runTx(new UserContext(SUPER_USER), policy -> {
-                policy.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in 'pc2';", functionDefinitionStatement);
+                policy.addPALFunction(functionDefinitionStatement);
+                policy.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in 'pc2';");
             });
 
             assertTrue(pap.nodeExists("ua3"));
 
             assertThrows(UnauthorizedException.class, () -> {
                 memoryPDP.runTx(new UserContext("u1"), policy -> {
-                    policy.executePAL(new UserContext("u1"), "testfunc();", functionDefinitionStatement);
+                    policy.executePAL(new UserContext("u1"), "testfunc();");
                 });
             });
 

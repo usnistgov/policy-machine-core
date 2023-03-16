@@ -41,7 +41,8 @@ public class PALExecutor {
             try {
                 stmt.execute(ctx, policy);
             } catch (PMException e) {
-                throw new PALExecutionException(e.getMessage() + ": " + stmt);
+                System.err.println(e.getMessage() + ": " + stmt);
+                throw e;
             }
         }
 

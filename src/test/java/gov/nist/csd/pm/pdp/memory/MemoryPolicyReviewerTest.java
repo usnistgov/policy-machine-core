@@ -801,6 +801,25 @@ class MemoryPolicyReviewerTest {
             AccessRightSet deniedAccessRights = pdp.policyReviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
             assertTrue(deniedAccessRights.contains("read"));
         }
+
+        @Test
+        void testProhibitionWithContainerAsTargetComplement() throws PMException {
+            PAP pap = new PAP(new MemoryPolicyStore());
+            PDP pdp = new MemoryPDP(pap, false);
+
+            pap.setResourceAccessRights(new AccessRightSet("read"));
+            pap.createPolicyClass("pc1");
+            pap.createUserAttribute("ua1", "pc1");
+            pap.createObjectAttribute("oa1", "pc1");
+            pap.createUser("u1", "ua1");
+            pap.associate("ua1", "oa1", new AccessRightSet("read"));
+
+            pap.createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+                    new ContainerCondition("oa1", true));
+
+            AccessRightSet deniedAccessRights = pdp.policyReviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
+            assertFalse(deniedAccessRights.contains("read"));
+        }
     }
 
 }
