@@ -66,11 +66,11 @@ funcCallStmt:
 
 // if
 ifStmt:
-    IF condition=expression stmtBlock
+    IF (IS_COMPLEMENT)? condition=expression stmtBlock
     elseIfStmt*
     elseStmt? ;
 elseIfStmt:
-    ELSE IF condition=expression stmtBlock ;
+    ELSE IF (IS_COMPLEMENT)? condition=expression stmtBlock ;
 elseStmt:
     ELSE stmtBlock ;
 

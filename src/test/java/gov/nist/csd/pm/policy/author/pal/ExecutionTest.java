@@ -211,6 +211,22 @@ public class ExecutionTest {
 
         assertFalse(pap.nodeExists("pc1"));
         assertTrue(pap.nodeExists("pc2"));
+
+        input = """
+                let x = 'test';
+                let y = 'test1';
+                let z = 'test2';
+                if !equals(x, y) {
+                    create policy class 'pc1';
+                } else {
+                    create policy class 'pc2';
+                }
+                """;
+        pap = new PAP(new MemoryPolicyStore());
+        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+
+        assertTrue(pap.nodeExists("pc1"));
+        assertFalse(pap.nodeExists("pc2"));
     }
 
     @Test

@@ -39,8 +39,9 @@ public class IfStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
+        boolean not = ifBlock.not;
         boolean condition = ifBlock.condition.execute(ctx, policyAuthor).getBooleanValue();
-        if (condition) {
+        if ((condition && !not) || (!condition && not)) {
             return executeBlock(ctx, policyAuthor, ifBlock.block);
         }
 
@@ -112,5 +113,5 @@ public class IfStatement extends PALStatement {
         return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(Expression condition, List<PALStatement> block) implements Serializable { }
+    public record ConditionalBlock(boolean not, Expression condition, List<PALStatement> block) implements Serializable { }
 }

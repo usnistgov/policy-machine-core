@@ -23,6 +23,7 @@ public class IfStmtVisitor extends PALBaseVisitor<IfStatement> {
     public IfStatement visitIfStmt(PALParser.IfStmtContext ctx) {
         // if block
         VisitorContext localVisitorCtx = visitorCtx.copy();
+        boolean isComp = ctx.IS_COMPLEMENT() != null;
         Expression condition = Expression.compile(localVisitorCtx, ctx.condition, Type.bool());
 
         List<PALStatement> block = new ArrayList<>();
@@ -35,20 +36,21 @@ public class IfStmtVisitor extends PALBaseVisitor<IfStatement> {
         // update outer scoped variables
         visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
 
-        IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(condition, block);
+        IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(isComp, condition, block);
 
         // else ifs
         localVisitorCtx = visitorCtx.copy();
         statementVisitor = new StatementVisitor(localVisitorCtx);
         List<IfStatement.ConditionalBlock> elseIfs = new ArrayList<>();
         for (PALParser.ElseIfStmtContext elseIfStmtCtx : ctx.elseIfStmt()) {
+            isComp = elseIfStmtCtx.IS_COMPLEMENT() != null;
             condition = Expression.compile(visitorCtx, elseIfStmtCtx.condition, Type.bool());
             block = new ArrayList<>();
             for (PALParser.StmtContext stmtCtx : elseIfStmtCtx.stmtBlock().stmt()) {
                 PALStatement statement = statementVisitor.visitStmt(stmtCtx);
                 block.add(statement);
             }
-            elseIfs.add(new IfStatement.ConditionalBlock(condition, block));
+            elseIfs.add(new IfStatement.ConditionalBlock(isComp, condition, block));
 
             // update outer scoped variables
             visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
