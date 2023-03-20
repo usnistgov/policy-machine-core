@@ -111,14 +111,26 @@ public class Type implements Serializable {
     }
 
     public Type getArrayType() {
+        if (isAny) {
+            return Type.any();
+        }
+
         return arrayType;
     }
 
     public Type getMapKeyType() {
+        if (isAny) {
+            return Type.any();
+        }
+
         return mapKeyType;
     }
 
     public Type getMapValueType() {
+        if (isAny) {
+            return Type.any();
+        }
+
         return mapValueType;
     }
 
