@@ -13,19 +13,21 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 public class Graph {
 
     private final Map<String, Vertex> graph;
-    private final List<String> pcs;
     private final AccessRightSet resourceAccessRights;
+    private final List<String> pcs;
+    private final List<String> oas;
+    private final List<String> uas;
+    private final List<String> os;
+    private final List<String> us;
 
     public Graph() {
         this.graph = new HashMap<>();
         this.pcs = new ArrayList<>();
+        this.oas = new ArrayList<>();
+        this.uas = new ArrayList<>();
+        this.os = new ArrayList<>();
+        this.us = new ArrayList<>();
         this.resourceAccessRights = new AccessRightSet();
-    }
-
-    public Graph(Map<String, Vertex> nodes, List<String> pcs, AccessRightSet resourceAccessRights) {
-        this.graph = nodes;
-        this.pcs = pcs;
-        this.resourceAccessRights = resourceAccessRights;
     }
 
     public Graph(Graph graph) {
@@ -35,6 +37,10 @@ public class Graph {
         }
 
         this.pcs = new ArrayList<>(graph.pcs);
+        this.oas = new ArrayList<>(graph.oas);
+        this.uas = new ArrayList<>(graph.uas);
+        this.os = new ArrayList<>(graph.os);
+        this.us = new ArrayList<>(graph.us);
         this.resourceAccessRights = new AccessRightSet(graph.getResourceAccessRights());
     }
 
@@ -42,6 +48,14 @@ public class Graph {
         this.graph.put(name, getVertex(name, type, properties));
         if (type == NodeType.PC) {
             this.pcs.add(name);
+        } else if (type == OA){
+            this.oas.add(name);
+        } else if (type == UA){
+            this.uas.add(name);
+        } else if (type == O){
+            this.os.add(name);
+        } else if (type == U){
+            this.us.add(name);
         }
 
         return name;
@@ -104,7 +118,8 @@ public class Graph {
     }
 
     private String addNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... parents) {
-        this.graph.put(name, getVertex(name, type, properties));
+        addNode(name, type, properties);
+
         assign(name, initialParent);
         for (String parent : parents) {
             assign(name, parent);
@@ -141,21 +156,42 @@ public class Graph {
         return this.graph.get(name).getNode();
     }
 
-    public List<String> search(NodeType type, Map<String, String> checkProperties) {
-        List<String> results = new ArrayList<>();
-        // iterate over the nodes to find ones that match the search parameters
-        for (String name : graph.keySet()) {
-            Node node = getNode(name);
-            Map<String, String> nodeProperties = node.getProperties();
-
-            // if the type parameter is not null and the current node type does not equal the type parameter, do not add
-            if (type != ANY && !node.getType().equals(type)
-                    || !hasAllKeys(nodeProperties, checkProperties)
-                    || !valuesMatch(nodeProperties, checkProperties)) {
-                continue;
+    public List<String> search(NodeType type, Map<String, String> properties) {
+        List<String> nodes = new ArrayList<>();
+        if (type != ANY) {
+            if (type == PC) {
+                nodes.addAll(pcs);
+            } else if (type == OA) {
+                nodes.addAll(oas);
+            } else if (type == UA) {
+                nodes.addAll(uas);
+            } else if (type == O) {
+                nodes.addAll(os);
+            } else {
+                nodes.addAll(us);
             }
+        } else {
+            nodes.addAll(pcs);
+            nodes.addAll(uas);
+            nodes.addAll(oas);
+            nodes.addAll(us);
+            nodes.addAll(os);
+        }
 
-            results.add(node.getName());
+        List<String> results = new ArrayList<>();
+        if (properties.isEmpty()) {
+            results.addAll(nodes);
+        } else {
+            for (String n : nodes) {
+                Map<String, String> nodeProperties = graph.get(n).getNode().getProperties();
+
+                if (!hasAllKeys(nodeProperties, properties)
+                        || !valuesMatch(nodeProperties, properties)) {
+                    continue;
+                }
+
+                results.add(n);
+            }
         }
 
         return results;
@@ -217,7 +253,18 @@ public class Graph {
         }
 
         graph.remove(name);
-        pcs.remove(name);
+
+        if (vertex.getNode().getType() == PC) {
+            pcs.remove(name);
+        } else if (vertex.getNode().getType() == OA) {
+            oas.remove(name);
+        } else if (vertex.getNode().getType() == UA) {
+            uas.remove(name);
+        } else if (vertex.getNode().getType() == O) {
+            os.remove(name);
+        } else if (vertex.getNode().getType() == U) {
+            us.remove(name);
+        }
     }
 
     public void assign(String child, String parent) {
