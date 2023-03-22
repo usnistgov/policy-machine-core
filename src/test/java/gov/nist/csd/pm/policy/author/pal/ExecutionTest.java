@@ -419,4 +419,13 @@ public class ExecutionTest {
                 """;
         assertThrows(PMException.class, () -> PALExecutor.compileAndExecutePAL(pap, superUser, input1));
     }
+
+    @Test
+    void testDeleteNonExistentNode() throws PMException {
+        String input = """
+                delete pc 'pc1';
+                """;
+        PAP pap = new PAP(new MemoryPolicyStore());
+        assertDoesNotThrow(() -> PALExecutor.compileAndExecutePAL(pap, superUser, input));
+    }
 }

@@ -99,8 +99,8 @@ createUserOrObjectStmt: CREATE (USER | OBJECT) expression IN expressionArray SEM
 
 setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression SEMI_COLON ;
 
-assignStmt: ASSIGN child=expression TO parent=expression SEMI_COLON ;
-deassignStmt: DEASSIGN child=expression FROM parent=expression SEMI_COLON ;
+assignStmt: ASSIGN childNode=expression TO parentNode=expression SEMI_COLON ;
+deassignStmt: DEASSIGN childNode=expression FROM parentNode=expression SEMI_COLON ;
 
 associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expressionArray SEMI_COLON ;
 dissociateStmt: DISSOCIATE ua=expression AND target=expression SEMI_COLON ;

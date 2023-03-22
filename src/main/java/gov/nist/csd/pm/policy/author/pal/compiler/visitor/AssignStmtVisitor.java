@@ -17,8 +17,8 @@ public class AssignStmtVisitor extends PALBaseVisitor<AssignStatement> {
 
     @Override
     public AssignStatement visitAssignStmt(PALParser.AssignStmtContext ctx) {
-        Expression child = Expression.compile(visitorCtx, ctx.child, Type.string());
-        Expression parent = Expression.compile(visitorCtx, ctx.parent, Type.string());
+        Expression child = Expression.compile(visitorCtx, ctx.childNode, Type.string());
+        Expression parent = Expression.compile(visitorCtx, ctx.parentNode, Type.string());
 
         return new AssignStatement(child, parent);
     }

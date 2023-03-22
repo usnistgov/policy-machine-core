@@ -17,8 +17,8 @@ public class DeassignStmtVisitor extends PALBaseVisitor<DeassignStatement> {
 
     @Override
     public DeassignStatement visitDeassignStmt(PALParser.DeassignStmtContext ctx) {
-        Expression name = Expression.compile(visitorCtx, ctx.child, Type.string());
-        Expression deassignFrom = Expression.compile(visitorCtx, ctx.parent, Type.string());
+        Expression name = Expression.compile(visitorCtx, ctx.childNode, Type.string());
+        Expression deassignFrom = Expression.compile(visitorCtx, ctx.parentNode, Type.string());
         return new DeassignStatement(name, deassignFrom);
     }
 }

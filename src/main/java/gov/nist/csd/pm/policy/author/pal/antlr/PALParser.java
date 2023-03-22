@@ -2255,8 +2255,8 @@ public class PALParser extends Parser {
 	}
 
 	public static class AssignStmtContext extends ParserRuleContext {
-		public ExpressionContext child;
-		public ExpressionContext parent;
+		public ExpressionContext childNode;
+		public ExpressionContext parentNode;
 		public TerminalNode ASSIGN() { return getToken(PALParser.ASSIGN, 0); }
 		public TerminalNode TO() { return getToken(PALParser.TO, 0); }
 		public TerminalNode SEMI_COLON() { return getToken(PALParser.SEMI_COLON, 0); }
@@ -2294,11 +2294,11 @@ public class PALParser extends Parser {
 			setState(311);
 			match(ASSIGN);
 			setState(312);
-			((AssignStmtContext)_localctx).child = expression();
+			((AssignStmtContext)_localctx).childNode = expression();
 			setState(313);
 			match(TO);
 			setState(314);
-			((AssignStmtContext)_localctx).parent = expression();
+			((AssignStmtContext)_localctx).parentNode = expression();
 			setState(315);
 			match(SEMI_COLON);
 			}
@@ -2315,8 +2315,8 @@ public class PALParser extends Parser {
 	}
 
 	public static class DeassignStmtContext extends ParserRuleContext {
-		public ExpressionContext child;
-		public ExpressionContext parent;
+		public ExpressionContext childNode;
+		public ExpressionContext parentNode;
 		public TerminalNode DEASSIGN() { return getToken(PALParser.DEASSIGN, 0); }
 		public TerminalNode FROM() { return getToken(PALParser.FROM, 0); }
 		public TerminalNode SEMI_COLON() { return getToken(PALParser.SEMI_COLON, 0); }
@@ -2354,11 +2354,11 @@ public class PALParser extends Parser {
 			setState(317);
 			match(DEASSIGN);
 			setState(318);
-			((DeassignStmtContext)_localctx).child = expression();
+			((DeassignStmtContext)_localctx).childNode = expression();
 			setState(319);
 			match(FROM);
 			setState(320);
-			((DeassignStmtContext)_localctx).parent = expression();
+			((DeassignStmtContext)_localctx).parentNode = expression();
 			setState(321);
 			match(SEMI_COLON);
 			}
