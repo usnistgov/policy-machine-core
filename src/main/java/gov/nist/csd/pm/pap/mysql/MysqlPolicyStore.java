@@ -369,6 +369,16 @@ public class MysqlPolicyStore extends PolicyStore {
         }
     }
 
+    @Override
+    public boolean prohibitionExists(String label) throws PMException {
+        try {
+            getProhibition(label);
+            return true;
+        } catch (ProhibitionDoesNotExistException e) {
+            return false;
+        }
+    }
+
     private List<ContainerCondition> getContainerConditions(int id) throws SQLException {
         List<ContainerCondition> containers = new ArrayList<>();
         String containerSql = """
@@ -487,13 +497,24 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
+    public boolean obligationExists(String label) throws PMException {
+        try {
+            getObligation(label);
+            return true;
+        } catch (ObligationDoesNotExistException e) {
+            return false;
+        }
+    }
+
+    @Override
     public Obligation getObligation(String label) throws PMException {
         String sql = """
-                select author, rules from obligation where label = label
+                select author, rules from obligation where label = ?
                 """;
 
-        try(Statement stmt = connection.getConnection().createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
+        try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
+            ps.setString(1, label);
+            ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
                 throw new ObligationDoesNotExistException(label);
             }

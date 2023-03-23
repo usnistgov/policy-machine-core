@@ -939,12 +939,6 @@ class PAPTest {
     class UpdateProhibitionTest {
 
         @Test
-        void ProhibitionDoesNotExist() throws PMException {
-            runTest(pap -> assertThrows(ProhibitionDoesNotExistException.class,
-                    () -> pap.updateProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false)));
-        }
-
-        @Test
         void InvalidAccessRights() throws PMException {
             runTest(pap -> {
                 pap.createPolicyClass("pc1");
@@ -1025,12 +1019,6 @@ class PAPTest {
 
         @Nested
         class DeleteProhibitionTest {
-
-            @Test
-            void ProhibitionDoesNotExist() throws PMException {
-                runTest(pap -> assertThrows(ProhibitionDoesNotExistException.class,
-                        () -> pap.updateProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false)));
-            }
 
             @Test
             void Success() throws PMException {

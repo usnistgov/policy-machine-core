@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -427,5 +428,28 @@ public class ExecutionTest {
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         assertDoesNotThrow(() -> PALExecutor.compileAndExecutePAL(pap, superUser, input));
+    }
+
+    @Test
+    void testDeleteProhibition() throws PMException {
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.setResourceAccessRights(new AccessRightSet("read"));
+        pap.createPolicyClass("pc1");
+        pap.createUserAttribute("ua1", "pc1");
+        pap.createObjectAttribute("oa1", "pc1");
+
+        String input = """
+                create prohibition 'p1'
+                deny user attribute "ua1"
+                access rights ["read"]
+                on union of "oa1";
+                """;
+        pap.executePAL(superUser, input);
+
+        input = """
+                delete prohibition 'p1';
+                """;
+        pap.executePAL(superUser, input);
+        assertFalse(pap.getProhibitions().containsKey("p1"));
     }
 }

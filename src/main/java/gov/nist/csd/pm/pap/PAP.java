@@ -200,6 +200,8 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
         return policyStore.getObligations();
     }
 
+
+
     @Override
     public synchronized Obligation getObligation(String label) throws PMException {
         if (!obligationExists(label)) {
@@ -558,10 +560,6 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
 
     @Override
     public synchronized void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        if (!prohibitionExists(label)) {
-            throw new ProhibitionDoesNotExistException(label);
-        }
-
         checkProhibitionParameters(subject, accessRightSet, containerConditions);
 
         policyStore.updateProhibition(label, subject, accessRightSet, intersection, containerConditions);
@@ -594,6 +592,11 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
     }
 
     @Override
+    public boolean prohibitionExists(String label) throws PMException {
+        return policyStore.prohibitionExists(label);
+    }
+
+    @Override
     public synchronized void deleteProhibition(String label) throws PMException {
         if (!prohibitionExists(label)) {
             return;
@@ -604,10 +607,6 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
         policyStore.deleteProhibition(label);
 
         emitEvent(new DeleteProhibitionEvent(prohibition));
-    }
-
-    private boolean prohibitionExists(String label) throws PMException {
-        return getProhibitionOrNull(label) != null;
     }
 
     @Override
@@ -675,18 +674,9 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
         }
     }
 
-    private boolean obligationExists(String label) throws PMException {
-        return getObligationOrNull(label) != null;
-    }
-
-    private Obligation getObligationOrNull(String label) throws PMException {
-        for (Obligation obligation : policyStore.getObligations()) {
-            if (obligation.getLabel().equals(label)) {
-                return obligation;
-            }
-        }
-
-        return null;
+    @Override
+    public boolean obligationExists(String label) throws PMException {
+        return policyStore.obligationExists(label);
     }
 
     @Override

@@ -217,6 +217,11 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     @Override
+    public boolean prohibitionExists(String label) throws PMException {
+        return policy.prohibitionExists(label);
+    }
+
+    @Override
     public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
         return policy.getProhibitionsWithSubject(subject);
     }
@@ -229,6 +234,11 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     @Override
     public List<Obligation> getObligations() throws PMException {
         return policy.getObligations();
+    }
+
+    @Override
+    public boolean obligationExists(String label) throws PMException {
+        return policy.obligationExists(label);
     }
 
     @Override

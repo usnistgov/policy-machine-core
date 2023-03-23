@@ -447,6 +447,19 @@ public class MemoryPolicyStore extends PolicyStore {
     }
 
     @Override
+    public boolean prohibitionExists(String label) throws PMException {
+        for (Map.Entry<String, List<Prohibition>> e : prohibitions.entrySet()) {
+            for (Prohibition p : e.getValue()) {
+                if (p.getLabel().equals(label)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public List<Prohibition> getProhibitionsWithSubject(String subject) {
         List<Prohibition> subjectPros = prohibitions.get(subject);
         if (subjectPros == null) {
@@ -473,6 +486,17 @@ public class MemoryPolicyStore extends PolicyStore {
     @Override
     public List<Obligation> getObligations() {
         return new ArrayList<>(obligations);
+    }
+
+    @Override
+    public boolean obligationExists(String label) throws PMException {
+        for (Obligation o : obligations) {
+            if (o.getLabel().equals(label)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

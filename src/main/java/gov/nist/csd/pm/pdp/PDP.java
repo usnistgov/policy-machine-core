@@ -156,6 +156,11 @@ public abstract class PDP implements PolicyEventEmitter {
         }
 
         @Override
+        public boolean prohibitionExists(String label) throws PMException {
+            return adjudicator.prohibitionExists(label);
+        }
+
+        @Override
         public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
             return adjudicator.getProhibitionsWithSubject(subject);
         }
@@ -168,6 +173,11 @@ public abstract class PDP implements PolicyEventEmitter {
         @Override
         public List<Obligation> getObligations() throws PMException {
             return adjudicator.getObligations();
+        }
+
+        @Override
+        public boolean obligationExists(String label) throws PMException {
+            return adjudicator.obligationExists(label);
         }
 
         @Override

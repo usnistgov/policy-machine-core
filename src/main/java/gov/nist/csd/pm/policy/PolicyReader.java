@@ -27,10 +27,12 @@ public interface PolicyReader {
     List<Association> getAssociationsWithTarget(String target) throws PMException;
 
     Map<String, List<Prohibition>> getProhibitions() throws PMException;
+    boolean prohibitionExists(String label) throws PMException;
     List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException;
     Prohibition getProhibition(String label) throws PMException;
 
     List<Obligation> getObligations() throws PMException;
+    boolean obligationExists(String label) throws PMException;
     Obligation getObligation(String label) throws PMException;
 
     Map<String, FunctionDefinitionStatement> getPALFunctions() throws PMException;

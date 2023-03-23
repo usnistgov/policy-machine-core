@@ -195,6 +195,23 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
     }
 
     @Override
+    public boolean prohibitionExists(String label) throws PMException {
+        boolean exists = pap.prohibitionExists(label);
+        if (!exists) {
+            return false;
+        }
+
+        try {
+            getProhibition(label);
+        } catch (UnauthorizedException e) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+    @Override
     public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
         return filterProhibitions(pap.getProhibitionsWithSubject(subject));
     }
@@ -261,6 +278,22 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
         });
 
         return obligations;
+    }
+
+    @Override
+    public boolean obligationExists(String label) throws PMException {
+        boolean exists = pap.obligationExists(label);
+        if (!exists) {
+            return false;
+        }
+
+        try {
+            getObligation(label);
+        } catch (UnauthorizedException e) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
