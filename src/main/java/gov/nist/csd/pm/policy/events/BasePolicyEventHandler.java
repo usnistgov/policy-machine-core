@@ -97,7 +97,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {
-        policy.deleteObligation(deleteObligationEvent.getLabel());
+        policy.deleteObligation(deleteObligationEvent.getObligation().getLabel());
     }
 
     protected void handleDeleteNodeEvent(DeleteNodeEvent deleteNodeEvent) throws PMException {

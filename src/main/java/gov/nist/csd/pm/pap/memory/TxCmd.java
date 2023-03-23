@@ -303,11 +303,8 @@ interface TxCmd {
     }
 
     class DeleteObligationTxCmd implements TxCmd {
-        private final String name;
         private final Obligation obligationToDelete;
-
-        public DeleteObligationTxCmd(String name, Obligation obligationToDelete) {
-            this.name = name;
+        public DeleteObligationTxCmd(Obligation obligationToDelete) {
             this.obligationToDelete = obligationToDelete;
         }
 

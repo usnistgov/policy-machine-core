@@ -169,7 +169,7 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public void deleteObligation(String label) throws PMException {
-        emitEvent(new TxEvents.MemoryDeleteObligationEvent(label, memoryPolicyStore.getObligation(label)));
+        emitEvent(new TxEvents.MemoryDeleteObligationEvent(memoryPolicyStore.getObligation(label)));
     }
 
     @Override

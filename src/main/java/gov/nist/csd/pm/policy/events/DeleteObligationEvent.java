@@ -10,7 +10,7 @@ public class DeleteObligationEvent implements PolicyEvent {
         this.obligation = obligation;
     }
 
-    public Obligation getLabel() {
+    public Obligation getObligation() {
         return obligation;
     }
 

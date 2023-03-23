@@ -64,7 +64,7 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd {
         } else if (event instanceof TxEvents.MemoryDeleteNodeEvent e) {
             return new DeleteNodeTxCmd(e.getName(), e.getNode(), e.getParents());
         } else if (event instanceof TxEvents.MemoryDeleteObligationEvent e) {
-            return new DeleteObligationTxCmd(e.getLabel(), e.getObligationToDelete());
+            return new DeleteObligationTxCmd(e.getObligationToDelete());
         } else if (event instanceof TxEvents.MemoryDeleteProhibitionEvent e) {
             return new DeleteProhibitionTxCmd(e.getProhibition());
         } else if (event instanceof TxEvents.MemoryDissociateEvent e) {

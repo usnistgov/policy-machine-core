@@ -39,8 +39,8 @@ public class TxEvents {
 
         private Obligation obligationToDelete;
 
-        public MemoryDeleteObligationEvent(String label, Obligation obligationToDelete) {
-            super(label);
+        public MemoryDeleteObligationEvent(Obligation obligationToDelete) {
+            super(obligationToDelete);
             this.obligationToDelete = obligationToDelete;
         }
 
