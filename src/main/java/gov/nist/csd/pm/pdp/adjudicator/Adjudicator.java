@@ -551,6 +551,10 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
 
     @Override
     public void deleteProhibition(String label) throws PMException {
+        if (!prohibitionExists(label)) {
+            return;
+        }
+
         Prohibition prohibition = pap.getProhibition(label);
 
         // check that the user can create a prohibition for the subject
@@ -618,6 +622,10 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
 
     @Override
     public void deleteObligation(String label) throws PMException {
+        if (!obligationExists(label)) {
+            return;
+        }
+
         Obligation obligation = pap.getObligation(label);
         for (Rule rule : obligation.getRules()) {
             EventSubject subject = rule.getEvent().getSubject();
