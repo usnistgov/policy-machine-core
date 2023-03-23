@@ -430,6 +430,10 @@ public abstract class PDP implements PolicyEventEmitter {
 
         @Override
         public void deleteProhibition(String label) throws PMException {
+            if (!prohibitionExists(label)) {
+                return;
+            }
+
             adjudicator.deleteProhibition(label);
 
             Prohibition prohibition = pap.getProhibition(label);
@@ -510,6 +514,10 @@ public abstract class PDP implements PolicyEventEmitter {
 
         @Override
         public void deleteObligation(String label) throws PMException {
+            if (!obligationExists(label)) {
+                return;
+            }
+
             adjudicator.deleteObligation(label);
 
             // get the obligation to use in the EPP before it is deleted
