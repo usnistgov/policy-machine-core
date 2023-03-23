@@ -699,9 +699,11 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
             return;
         }
 
+        Obligation obligation = policyStore.getObligation(label);
+
         policyStore.deleteObligation(label);
 
-        emitEvent(new DeleteObligationEvent(label));
+        emitEvent(new DeleteObligationEvent(obligation));
     }
 
     @Override

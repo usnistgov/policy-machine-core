@@ -432,19 +432,14 @@ public abstract class PDP implements PolicyEventEmitter {
         public void deleteProhibition(String label) throws PMException {
             adjudicator.deleteProhibition(label);
 
+            Prohibition prohibition = pap.getProhibition(label);
+
             pap.deleteProhibition(label);
 
-            emitDeleteProhibitionEvent(label);
+            emitDeleteProhibitionEvent(prohibition);
         }
 
-        private void emitDeleteProhibitionEvent(String label) throws PMException {
-            Prohibition prohibition;
-            try {
-                prohibition = pap.getProhibition(label);
-            } catch (PMException e) {
-                throw new PMException("error getting prohibition " + label + ": " + e.getMessage());
-            }
-
+        private void emitDeleteProhibitionEvent(Prohibition prohibition) throws PMException {
             ProhibitionSubject subject = prohibition.getSubject();
             List<ContainerCondition> containerConditions = prohibition.getContainers();
 
@@ -522,12 +517,12 @@ public abstract class PDP implements PolicyEventEmitter {
 
             pap.deleteObligation(label);
 
-            emitDeleteObligationEvent(label, obligation);
+            emitDeleteObligationEvent(obligation);
         }
 
-        private void emitDeleteObligationEvent(String label, Obligation obligation) throws PMException {
+        private void emitDeleteObligationEvent(Obligation obligation) throws PMException {
             emitObligationEvent(
-                    new DeleteObligationEvent(label),
+                    new DeleteObligationEvent(obligation),
                     obligation.getRules().toArray(Rule[]::new)
             );
         }
