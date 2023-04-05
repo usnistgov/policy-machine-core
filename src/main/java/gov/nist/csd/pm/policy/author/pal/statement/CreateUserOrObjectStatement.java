@@ -44,16 +44,13 @@ public class CreateUserOrObjectStatement extends PALStatement {
 
         String initialParent = "";
         List<String> parents = new ArrayList<>();
-        if (assignToValue.isString()) {
-            initialParent = assignToValue.getStringValue();
-        } else {
-            Value[] arrayValue = assignToValue.getArrayValue();
-            for (Value parentValue : arrayValue) {
-                if (initialParent.isEmpty()) {
-                    initialParent = parentValue.getStringValue();
-                } else {
-                    parents.add(parentValue.getStringValue());
-                }
+
+        Value[] arrayValue = assignToValue.getArrayValue();
+        for (Value parentValue : arrayValue) {
+            if (initialParent.isEmpty()) {
+                initialParent = parentValue.getStringValue();
+            } else {
+                parents.add(parentValue.getStringValue());
             }
         }
 

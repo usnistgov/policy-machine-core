@@ -495,6 +495,21 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
     }
 
     @Override
+    public void assignAll(List<String> children, String target) throws PMException {
+
+    }
+
+    @Override
+    public void deassignAll(List<String> children, String target) throws PMException {
+
+    }
+
+    @Override
+    public void deassignAllFromAndDelete(String target) throws PMException {
+
+    }
+
+    @Override
     public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
         Node targetNode = pap.getNode(target);
 

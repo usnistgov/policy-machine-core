@@ -99,7 +99,7 @@ public class CreateProhibitionStatement extends PALStatement {
             case PROCESS -> subjectStr = "process";
         }
 
-        StringBuilder containerStr = new StringBuilder((isIntersection ? "intersection" : "union") + " of ");
+        StringBuilder containerStr = new StringBuilder((isIntersection ? "intersection" : "union") + " of [");
         int length = containerStr.length();
         for (Container c : containers) {
             if (containerStr.length() != length) {
@@ -107,6 +107,7 @@ public class CreateProhibitionStatement extends PALStatement {
             }
             containerStr.append(c);
         }
+        containerStr.append("]");
 
         return String.format("create prohibition %s deny %s %s access rights %s on %s;", label, subjectStr, subject, accessRights, containerStr);
     }
@@ -140,12 +141,12 @@ public class CreateProhibitionStatement extends PALStatement {
     }
 
     public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {
-        List<Expression> exprs = new ArrayList<>();
+        ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
         for (String ar : prohibition.getAccessRightSet()) {
             if (isAdminAccessRight(ar)) {
-                exprs.add(new Expression(new VariableReference(ar, Type.string())));
+                arrayLiteral.add(new Expression(new VariableReference(ar, Type.string())));
             } else {
-                exprs.add(new Expression(new Literal(ar)));
+                arrayLiteral.add(new Expression(new Literal(ar)));
             }
         }
 
@@ -158,7 +159,7 @@ public class CreateProhibitionStatement extends PALStatement {
                 new Expression(new Literal(prohibition.getLabel())),
                 new Expression(new Literal(prohibition.getSubject().name())),
                 prohibition.getSubject().type(),
-                new Expression(exprs),
+                new Expression(new Literal(arrayLiteral)),
                 prohibition.isIntersection(),
                 containers
         );

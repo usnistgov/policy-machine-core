@@ -38,7 +38,7 @@ public class Scope implements Serializable {
     /**
      * The resources access rights expression for the policy. This is used during compilation.
      */
-    private List<Expression> resourceAccessRightsExpression;
+    private Expression resourceAccessRightsExpression;
 
     /**
      * The resources access rights for the policy. This is used during execution.
@@ -52,7 +52,7 @@ public class Scope implements Serializable {
         this.functions = new HashMap<>();
         this.variables = new HashMap<>();
         this.values = new HashMap<>();
-        this.resourceAccessRightsExpression = new ArrayList<>();
+        this.resourceAccessRightsExpression = null;
         this.resourceAccessRights = new AccessRightSet();
     }
 
@@ -68,12 +68,12 @@ public class Scope implements Serializable {
         return values;
     }
 
-    public List<Expression> getResourceAccessRightsExpression() {
+    public Expression getResourceAccessRightsExpression() {
         return resourceAccessRightsExpression;
     }
 
     public boolean isResourceAccessRightsExpressionSet() {
-        return !resourceAccessRightsExpression.isEmpty();
+        return resourceAccessRightsExpression != null;
     }
 
     public Scope copy() {
@@ -116,7 +116,7 @@ public class Scope implements Serializable {
         values.putAll(palCtx.getConstants());
     }
 
-    public void setResourceAccessRightsExpression(List<Expression> expression) {
+    public void setResourceAccessRightsExpression(Expression expression) {
         this.resourceAccessRightsExpression = expression;
     }
 

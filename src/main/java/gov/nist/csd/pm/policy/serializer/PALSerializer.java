@@ -14,6 +14,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
+import java.sql.Array;
 import java.sql.Statement;
 import java.util.*;
 
@@ -106,11 +107,11 @@ public class PALSerializer implements PolicySerializer {
         StringBuilder pal = new StringBuilder();
 
         // resource access rights
-        List<Expression> arExprs = new ArrayList<>();
+       ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
         for (String ar : policy.getResourceAccessRights()) {
-            arExprs.add(new Expression(new Literal(ar)));
+            arrayLiteral.add(new Expression(new Literal(ar)));
         }
-        pal.append(new SetResourceAccessRightsStatement(arExprs)).append("\n");
+        pal.append(new SetResourceAccessRightsStatement(new Expression(new Literal(arrayLiteral)))).append("\n");
 
         List<String> policyClasses = policy.getPolicyClasses();
         Set<String> attributes = new HashSet<>();
@@ -142,7 +143,7 @@ public class PALSerializer implements PolicySerializer {
                             } else {
                                 pal.append(new AssignStatement(
                                         new Expression(new Literal(child)),
-                                        new Expression(new Literal(parent))
+                                        new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new Literal(parent))}, Type.string())))
                                 )).append("\n");
                             }
 
@@ -158,12 +159,13 @@ public class PALSerializer implements PolicySerializer {
                             if (childNode.getType() == UA) {
                                 List<Association> sourceAssociations = policy.getAssociationsWithSource(child);
                                 for (Association association : sourceAssociations) {
-                                    List<Expression> exprs = new ArrayList<>();
+
+                                    ArrayLiteral arLiteral = new ArrayLiteral(Type.string());
                                     for (String ar : association.getAccessRightSet()) {
                                         if (isAdminAccessRight(ar)) {
-                                            exprs.add(new Expression(new VariableReference(ar, Type.string())));
+                                            arLiteral.add(new Expression(new VariableReference(ar, Type.string())));
                                         } else {
-                                            exprs.add(new Expression(new Literal(ar)));
+                                            arLiteral.add(new Expression(new Literal(ar)));
                                         }
                                     }
 
@@ -171,7 +173,7 @@ public class PALSerializer implements PolicySerializer {
                                     AssociateStatement stmt = new AssociateStatement(
                                             new Expression(new Literal(child)),
                                             new Expression(new Literal(association.getTarget())),
-                                            new Expression(exprs)
+                                            new Expression(new Literal(arLiteral))
                                     );
 
                                     if (!attributes.contains(target)) {
@@ -191,7 +193,7 @@ public class PALSerializer implements PolicySerializer {
                             } else {
                                 pal.append(new AssignStatement(
                                         new Expression(new Literal(child)),
-                                        new Expression(new Literal(parent))
+                                        new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new Literal(parent))}, Type.string())))
                                 )).append("\n");
                             }
                         }
@@ -223,17 +225,13 @@ public class PALSerializer implements PolicySerializer {
             return new CreateAttrStatement(
                     new Expression(new Literal(name)),
                     type,
-                    new Expression(
-                            new Expression(new Literal(parent))
-                    )
+                    new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new Literal(parent))}, Type.string())))
             );
         } else {
             return new CreateUserOrObjectStatement(
                     new Expression(new Literal(name)),
                     type,
-                    new Expression(
-                            new Expression(new Literal(parent))
-                    )
+                    new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new Literal(parent))}, Type.string())))
             );
         }
     }

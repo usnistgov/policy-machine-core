@@ -20,8 +20,8 @@ public class CreateUserOrObjectStmtVisitor extends PALBaseVisitor<CreateUserOrOb
     public CreateUserOrObjectStatement visitCreateUserOrObjectStmt(PALParser.CreateUserOrObjectStmtContext ctx) {
         NodeType type = ctx.OBJECT() != null ?
                 NodeType.O : NodeType.U;
-        Expression name = Expression.compile(visitorCtx, ctx.expression(), Type.string());
-        Expression assignTo = Expression.compileArray(visitorCtx, ctx.expressionArray(), Type.string());
+        Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
+        Expression assignTo = Expression.compile(visitorCtx, ctx.parents, Type.array(Type.string()));
 
         return new CreateUserOrObjectStatement(name, type, assignTo);
     }

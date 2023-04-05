@@ -2,12 +2,13 @@ package gov.nist.csd.pm.policy.author.pal.model.expression;
 
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class MapLiteral {
+public class MapLiteral implements Serializable {
 
     private final Map<Expression, Expression> map;
     private final Type type;

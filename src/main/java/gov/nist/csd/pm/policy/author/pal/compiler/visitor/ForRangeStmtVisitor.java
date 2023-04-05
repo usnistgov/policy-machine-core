@@ -25,9 +25,10 @@ public class ForRangeStmtVisitor extends PALBaseVisitor<ForRangeStatement> {
         int lower = Integer.parseInt(ctx.lower.getText());
         int upper = Integer.parseInt(ctx.upper.getText());
 
+        VisitorContext localVisitorCtx = visitorCtx.copy();
         List<PALStatement> block = new ArrayList<>();
+
         for (PALParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
-            VisitorContext localVisitorCtx = visitorCtx.copy();
 
             try {
                 localVisitorCtx.scope().addVariable(varName, Type.number(), false);

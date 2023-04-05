@@ -109,12 +109,12 @@ public class CreateObligationStatement extends PALStatement {
             }
             case ANY_OF_SET -> {
                 List<String> set = target.anyOfSet();
-                List<Expression> exprs = new ArrayList<>();
+                ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
                 for (String s : set) {
-                    exprs.add(new Expression(new Literal(s)));
+                    arrayLiteral.add(new Expression(new Literal(s)));
                 }
 
-                expression = new Expression(exprs);
+                expression = new Expression(new Literal(arrayLiteral));
                 onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
             }
             case ANY_POLICY_ELEMENT -> onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
@@ -124,12 +124,12 @@ public class CreateObligationStatement extends PALStatement {
     }
 
     private static CreateRuleStatement.PerformsClause getPerformsClause(List<String> operations) {
-        List<Expression> exprs = new ArrayList<>();
+        ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
         for (String op : operations) {
-            exprs.add(new Expression(new Literal(op)));
+            arrayLiteral.add(new Expression(new Literal(op)));
         }
         return new CreateRuleStatement.PerformsClause(
-                new Expression(exprs)
+                new Expression(new Literal(arrayLiteral))
         );
     }
 
@@ -143,12 +143,12 @@ public class CreateObligationStatement extends PALStatement {
                 if (subject.users().size() > 1) {
                     type = CreateRuleStatement.SubjectType.USERS;
 
-                    List<Expression> userExprs = new ArrayList<>();
+                    ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
                     for (String user : subject.users()) {
-                        userExprs.add(new Expression(new Literal(user)));
+                        arrayLiteral.add(new Expression(new Literal(user)));
                     }
 
-                    subjectExpr = new Expression(userExprs.toArray(Expression[]::new));
+                    subjectExpr = new Expression(new Literal(arrayLiteral));
                 } else {
                     type = CreateRuleStatement.SubjectType.USER;
                     subjectExpr = new Expression(new Literal(subject.users().get(0)));

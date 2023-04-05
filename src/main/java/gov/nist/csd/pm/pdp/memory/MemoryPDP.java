@@ -28,13 +28,13 @@ public class MemoryPDP extends PDP {
     }
 
     @Override
-    public PolicyReviewer policyReviewer() throws PMException {
+    public PolicyReviewer reviewer() throws PMException {
         return new MemoryPolicyReviewer(policyEventHandler);
     }
 
     public synchronized void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, pap, new MemoryPolicyReviewer(policyEventHandler), eventListeners);
+            PDPTx pdpTx = new PDPTx(userCtx, pap, new BulkPolicyReviewer(userCtx, pap), eventListeners);
             txRunner.run(pdpTx);
         });
     }

@@ -34,11 +34,11 @@ public class ObligationTest {
 
         String input = """
                 create policy class 'pc1';
-                create oa 'oa1' in 'pc1';
+                create oa 'oa1' in ['pc1'];
                 create obligation 'obligation1' {
                     create rule 'rule1'
                     when any user
-                    performs 'test_event'
+                    performs ['test_event']
                     on 'oa1'
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
@@ -68,12 +68,12 @@ public class ObligationTest {
     void testObligationComplex() throws PMException {
         String pal = """
                 create policy class 'pc1';
-                create oa 'oa1' in 'pc1';
+                create oa 'oa1' in ['pc1'];
                 
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
-                    performs 'create_object_attribute'
+                    performs ['create_object_attribute']
                     on 'oa1'
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];

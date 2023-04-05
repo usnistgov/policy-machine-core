@@ -56,9 +56,8 @@ public class ForeachStmtVisitor extends PALBaseVisitor<ForeachStatement> {
             valueType = iterType.getMapValueType();
         }
 
+        VisitorContext localVisitorCtx = visitorCtx.copy();
         for (PALParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
-            VisitorContext localVisitorCtx = visitorCtx.copy();
-
             try {
                 localVisitorCtx.scope().addVariable(varName, keyType, false);
                 if (valueType != null) {

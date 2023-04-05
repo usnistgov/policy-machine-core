@@ -2,12 +2,13 @@ package gov.nist.csd.pm.policy.author.pal.model.expression;
 
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class ArrayLiteral {
+public class ArrayLiteral implements Serializable {
 
     private final List<Expression> array;
     private final Type type;

@@ -32,7 +32,7 @@ public class CreateProhibitionStmtVisitor extends PALBaseVisitor<CreateProhibiti
             type = ProhibitionSubject.Type.PROCESS;
         }
 
-        Expression accessRights = Expression.compileArray(visitorCtx, ctx.accessRights, Type.string());
+        Expression accessRights = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));
 
         boolean isIntersection = ctx.INTERSECTION() != null;
 

@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.util.List;
 import java.util.Objects;
 
 public class DeassignStatement extends PALStatement {

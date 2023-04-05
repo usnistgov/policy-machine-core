@@ -390,12 +390,6 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#expressionArray}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpressionArray(PALParser.ExpressionArrayContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link PALParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

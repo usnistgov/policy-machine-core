@@ -24,8 +24,7 @@ public class SetResourceAccessRightsStmtVisitor extends PALBaseVisitor<SetResour
             return new SetResourceAccessRightsStatement(visitorCtx.scope().getResourceAccessRightsExpression());
         }
 
-        Expression expression = Expression.compileArray(visitorCtx, ctx.expressionArray(), Type.string());
-        List<Expression> exprList = expression.getExprList();
+        Expression exprList = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));
 
         visitorCtx.scope().setResourceAccessRightsExpression(exprList);
 

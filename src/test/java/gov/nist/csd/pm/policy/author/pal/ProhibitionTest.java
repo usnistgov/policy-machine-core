@@ -23,18 +23,18 @@ class ProhibitionTest {
     @Test
     void testCreateProhibition() throws PMException {
         String input = """
-                set resource access rights 'read', 'write';
+                set resource access rights ['read', 'write'];
                 create pc 'pc1';
-                create oa 'oa1' in 'pc1';
-                create ua 'ua1' in 'pc1';
-                create u 'u1' in 'ua1';
-                create u 'u2' in 'ua1';
-                associate 'ua1' and 'oa1' with 'read', 'write';
+                create oa 'oa1' in ['pc1'];
+                create ua 'ua1' in ['pc1'];
+                create u 'u1' in ['ua1'];
+                create u 'u2' in ['ua1'];
+                associate 'ua1' and 'oa1' with ['read', 'write'];
                 
                 create prohibition 'pro1'
                 deny user 'u1'
-                access rights create_policy_class, 'write'
-                on union of 'oa1';
+                access rights [create_policy_class, 'write']
+                on union of ['oa1'];
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));

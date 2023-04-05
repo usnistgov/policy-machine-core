@@ -756,6 +756,21 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
+    public void assignAll(List<String> children, String target) throws PMException {
+
+    }
+
+    @Override
+    public void deassignAll(List<String> children, String target) throws PMException {
+
+    }
+
+    @Override
+    public void deassignAllFromAndDelete(String target) throws PMException {
+
+    }
+
+    @Override
     public void associate(String ua, String target, AccessRightSet accessRights) throws MysqlPolicyException {
         String sql = """
             INSERT INTO association (start_node_id, end_node_id, operation_set) VALUES (

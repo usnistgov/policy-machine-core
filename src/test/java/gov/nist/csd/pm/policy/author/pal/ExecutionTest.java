@@ -25,31 +25,30 @@ public class ExecutionTest {
 
         String input =
                 """
-                set resource access rights 'read', 'write';
+                set resource access rights ['read', 'write'];
                 
                 create policy class 'pc1';
                 
                 set properties of 'pc1' to {'k': 'v'};
                 
-                create object attribute 'oa1' in 'pc1';
-                create object attribute 'oa2' in 'pc1';
-                create object attribute 'oa3' in 'pc1';
+                create object attribute 'oa1' in ['pc1'];
+                create object attribute 'oa2' in ['pc1'];
+                create object attribute 'oa3' in ['pc1'];
                 
                 let parents = ['oa1', 'oa2', 'oa3'];
                 create object 'o1' in parents;
                 
-                create user attribute 'ua1' in 'pc1';
-                create user attribute 'ua2' in 'pc1';
-                create user attribute 'ua3' in 'pc1';
+                create user attribute 'ua1' in ['pc1'];
+                create user attribute 'ua2' in ['pc1'];
+                create user attribute 'ua3' in ['pc1'];
                 
                 let username = 'u1';
-                create user username in 'ua1';
-                assign username to 'ua2';
-                assign username to 'ua3';
+                create user username in ['ua1'];
+                assign username to ['ua2', 'ua3'];
                 
-                associate 'ua1' and 'oa1' with 'read', 'write';
-                associate 'ua2' and 'oa2' with 'read', 'write';
-                associate 'ua3' and 'oa3' with 'read', 'write';
+                associate 'ua1' and 'oa1' with ['read', 'write'];
+                associate 'ua2' and 'oa2' with ['read', 'write'];
+                associate 'ua3' and 'oa3' with ['read', 'write'];
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
@@ -88,8 +87,7 @@ public class ExecutionTest {
 
         input =
                 """
-                deassign 'u1' from 'ua1';
-                deassign 'u1' from 'ua2';
+                deassign 'u1' from ['ua1', 'ua2'];
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
@@ -105,7 +103,7 @@ public class ExecutionTest {
 
         input =
                 """
-                deassign 'o1' from 'oa1';
+                deassign 'o1' from ['oa1'];
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.getParents("oa1").contains("oa1"));
@@ -442,7 +440,7 @@ public class ExecutionTest {
                 create prohibition 'p1'
                 deny user attribute "ua1"
                 access rights ["read"]
-                on union of "oa1";
+                on union of ["oa1"];
                 """;
         pap.executePAL(superUser, input);
 

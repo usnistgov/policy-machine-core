@@ -232,15 +232,15 @@ public class CreateRuleStatement extends PALStatement {
 
         @Override
         public String toString() {
-            StringBuilder s =  new StringBuilder("performs ");
+            StringBuilder s =  new StringBuilder("performs [");
             StringBuilder eventsStr = new StringBuilder();
-            for (Expression event : events.getExprList()) {
+            for (Expression event : events.getLiteral().getArrayLiteral().getArray()) {
                 if (!eventsStr.isEmpty()) {
                     eventsStr.append(", ");
                 }
                 eventsStr.append(event);
             }
-            return s.append(eventsStr).toString();
+            return s.append(eventsStr).append("]").toString();
         }
 
         public record Event(String eventName, String alias) {

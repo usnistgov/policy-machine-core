@@ -242,6 +242,21 @@ public class MemoryPolicyStore extends PolicyStore {
     }
 
     @Override
+    public void assignAll(List<String> children, String target) throws PMException {
+
+    }
+
+    @Override
+    public void deassignAll(List<String> children, String target) throws PMException {
+
+    }
+
+    @Override
+    public void deassignAllFromAndDelete(String target) throws PMException {
+
+    }
+
+    @Override
     public synchronized void associate(String ua, String target, AccessRightSet accessRights) {
         if (inTx) {
             txPolicyStore.associate(ua, target, accessRights);

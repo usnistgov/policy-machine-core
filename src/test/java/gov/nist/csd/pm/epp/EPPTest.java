@@ -3,6 +3,8 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;
+import gov.nist.csd.pm.policy.author.pal.model.expression.ArrayLiteral;
+import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
@@ -40,11 +43,11 @@ class EPPTest {
 
         String pal = """
                 create pc 'pc1';
-                create oa 'oa1' in 'pc1';
+                create oa 'oa1' in ['pc1'];
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
-                    performs 'create_object_attribute'
+                    performs ['create_object_attribute']
                     on 'oa1'
                     do(evtCtx) {
                         create policy class 'pc2';
@@ -70,11 +73,11 @@ class EPPTest {
 
         String pal = """
                 create pc 'pc1';
-                create oa 'oa1' in 'pc1';
+                create oa 'oa1' in ['pc1'];
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
-                    performs 'create_object_attribute'
+                    performs ['create_object_attribute']
                     on 'oa1'
                     do(evtCtx) {
                         create policy class evtCtx['eventName'];
@@ -120,7 +123,7 @@ class EPPTest {
                                     new CreateUserOrObjectStatement(
                                             new Expression(new VariableReference("o2", Type.string())),
                                             NodeType.O,
-                                            new Expression(new VariableReference("oa1", Type.string()))
+                                            new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("oa1", Type.string()))}, Type.string())))
                                     ),
                                     new CreatePolicyStatement(new Expression(new VariableReference("pc2", Type.string()))))
                     )

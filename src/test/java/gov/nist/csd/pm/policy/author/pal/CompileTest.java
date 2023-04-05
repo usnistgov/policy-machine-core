@@ -16,6 +16,7 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.serializer.PALDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -239,7 +240,7 @@ class CompileTest {
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
-                    performs 'create_object_attribute'
+                    performs ['create_object_attribute']
                     on 'oa1'
                     do(event) {
                         create policy class event['eventName'];
@@ -402,5 +403,53 @@ class CompileTest {
                 testFunc({});
                 """;
         assertDoesNotThrow(() -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
+    }
+
+    @Test
+    void testForLoopLocalVar() throws PMException {
+        String pal = """
+                for i in range [1, 100] {
+                    let x = i;
+                    create pc numToStr(x);
+                }
+                """;
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
+        assertEquals(101, pap.getPolicyClasses().size());
+
+        String pal2 = """
+                for i in range [1, 100] {
+                    let x = i;
+                    create pc numToStr(x);
+                }
+                
+                create oa 'oa1' in x;
+                """;
+        PAP pap2 = new PAP(new MemoryPolicyStore());
+        assertThrows(PALCompilationException.class, () -> pap2.fromString(pal2, new PALDeserializer(new UserContext(SUPER_USER))));
+
+        pal = """
+                create pc 'pc1';
+                create oa 'oa1' in ['pc1'];
+                foreach child in getChildren('pc1') {
+                    let x = 'pc2';
+                    create pc x;
+                }
+                """;
+        pap = new PAP(new MemoryPolicyStore());
+        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
+        assertTrue(pap.nodeExists("pc2"));
+
+        String pal3 = """
+                foreach child in getChildren('pc1') {
+                    let x = 'pc2';
+                    create pc x;
+                }
+                
+                create oa 'oa1' in x;
+                """;
+        PAP pap3 = new PAP(new MemoryPolicyStore());
+        assertThrows(PALCompilationException.class, () -> pap3.fromString(pal3, new PALDeserializer(new UserContext(SUPER_USER))));
+
     }
 }

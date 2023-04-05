@@ -736,18 +736,6 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExpressionArray(PALParser.ExpressionArrayContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExpressionArray(PALParser.ExpressionArrayContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterExpression(PALParser.ExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}

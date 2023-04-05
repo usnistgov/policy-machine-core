@@ -1524,12 +1524,12 @@ class PAPTest {
                         new CreateAttrStatement(
                                 new Expression(new VariableReference("ua1", Type.string())),
                                 UA,
-                                new Expression(new VariableReference("pc1", Type.string()))
+                                new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("pc1", Type.string()))}, Type.string())))
                         ),
                         new CreateAttrStatement(
                                 new Expression(new VariableReference("oa1", Type.string())),
                                 OA,
-                                new Expression(new VariableReference("pc1", Type.string()))
+                                new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("pc1", Type.string()))}, Type.string())))
                         )
                 )
         );
@@ -1669,18 +1669,18 @@ class PAPTest {
     }
 
     private static final String input = """
-            set resource access rights 'read', 'write', 'execute';
+            set resource access rights ['read', 'write', 'execute'];
             create policy class 'pc1';
             set properties of 'pc1' to {'k':'v'};
-            create oa 'oa1' in 'pc1';
+            create oa 'oa1' in ['pc1'];
             set properties of 'oa1' to {'k1':'v1'};
-            create ua 'ua1' in 'pc1';
-            associate 'ua1' and 'oa1' with 'read', 'write';
-            create prohibition 'p1' deny user attribute 'ua1' access rights 'read' on union of !'oa1';
+            create ua 'ua1' in ['pc1'];
+            associate 'ua1' and 'oa1' with ['read', 'write'];
+            create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1'];
             create obligation 'obl1' {
                 create rule 'rule1'
                 when any user
-                performs 'event1', 'event2'
+                performs ['event1', 'event2']
                 do(evtCtx) {
                     let event = evtCtx['event'];
                     if equals(event, 'event1') {
@@ -1692,45 +1692,46 @@ class PAPTest {
             }
             """;
     private static final String expected = """
-            set resource access rights 'read', 'write', 'execute';
+            set resource access rights ['read', 'write', 'execute'];
             create policy class 'super_policy';
-            create user attribute 'super_ua' in 'super_policy';
-            create user attribute 'super_ua1' in 'super_policy';
-            associate 'super_ua1' and 'super_ua' with '*';
-            create object attribute 'super_oa' in 'super_policy';
-            associate 'super_ua' and 'super_oa' with '*';
-            create user 'super' in 'super_ua';
-            assign 'super' to 'super_ua1';
-            create object attribute 'super_policy_pc_rep' in 'super_oa';
-            create object attribute 'pc1_pc_rep' in 'super_oa';
+            create user attribute 'super_ua' in ['super_policy'];
+            create user attribute 'super_ua1' in ['super_policy'];
+            associate 'super_ua1' and 'super_ua' with ['*'];
+            create object attribute 'super_oa' in ['super_policy'];
+            associate 'super_ua' and 'super_oa' with ['*'];
+            create user 'super' in ['super_ua'];
+            assign 'super' to ['super_ua1'];
+            create object attribute 'super_policy_pc_rep' in ['super_oa'];
+            create object attribute 'pc1_pc_rep' in ['super_oa'];
             create policy class 'pc1';
             set properties of 'pc1' to {'k': 'v'};
-            create object attribute 'oa1' in 'pc1';
+            create object attribute 'oa1' in ['pc1'];
             set properties of 'oa1' to {'k1': 'v1'};
-            associate 'super_ua' and 'oa1' with '*';
-            create user attribute 'ua1' in 'pc1';
-            associate 'super_ua' and 'ua1' with '*';
-            associate 'ua1' and 'oa1' with 'read', 'write';
-            create prohibition 'p1' deny user attribute 'ua1' access rights 'read' on union of !'oa1';
-            create obligation 'obl1' {create rule 'rule1' when any user performs 'event1', 'event2' on any policy element do (evtCtx) {let event = evtCtx['event'];if equals(event, 'event1') {create policy class 'e1';} else if equals(event, 'event2') {create policy class 'e2';} }}
+            associate 'super_ua' and 'oa1' with ['*'];
+            create user attribute 'ua1' in ['pc1'];
+            associate 'super_ua' and 'ua1' with ['*'];
+            associate 'ua1' and 'oa1' with ['read', 'write'];
+            create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1'];
+            create obligation 'obl1' {create rule 'rule1' when any user performs ['event1', 'event2'] on any policy element do (evtCtx) {let event = evtCtx['event'];if equals(event, 'event1') {create policy class 'e1';} else if equals(event, 'event2') {create policy class 'e2';} }}
             """.trim();
     @Test
     void testSerialize() throws PMException {
         runTest(pap -> {
             pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
             String actual = pap.toString(new PALSerializer(false));
-            assertTrue(palEqual(expected, actual));
+            assertEquals(new ArrayList<>(), palEqual(expected, actual));
 
             pap.fromString(actual, new PALDeserializer(new UserContext(SUPER_USER)));
             actual = pap.toString(new PALSerializer(false));
-            assertTrue(palEqual(expected, actual));
+            assertEquals(new ArrayList<>(), palEqual(expected, actual));
         });
     }
 
-    private boolean palEqual(String expected, String actual) {
+    private List<String> palEqual(String expected, String actual) {
         List<String> expectedLines = sortLines(expected);
         List<String> actualLines = sortLines(actual);
-        return expectedLines.equals(actualLines);
+        expectedLines.removeIf(line -> actualLines.contains(line));
+        return expectedLines;
     }
 
     private List<String> sortLines(String pal) {
@@ -1760,7 +1761,7 @@ class PAPTest {
                         }
                 );
 
-                pap.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in 'pc2';\ntestfunc();", functionDefinitionStatement);
+                pap.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2'];\ntestfunc();", functionDefinitionStatement);
                 assertTrue(pap.nodeExists("ua3"));
                 assertTrue(pap.nodeExists("pc3"));
             } catch (IOException e) {

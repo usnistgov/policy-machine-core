@@ -81,7 +81,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
             name = Expression.compile(visitorCtx, anyContainedInContext.expression(), Type.string());
             onClauseType = CreateRuleStatement.TargetType.ANY_CONTAINED_IN;
         } else if (onClauseCtx instanceof PALParser.AnyOfSetContext anyOfSetContext) {
-            name = Expression.compileArray(visitorCtx, anyOfSetContext.expressionArray(), Type.string());
+            name = Expression.compile(visitorCtx, anyOfSetContext.expression(), Type.array(Type.string()));
             onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
         } else {
             onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
@@ -90,8 +90,8 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
         return new CreateRuleStatement.OnClause(name, onClauseType);
     }
 
-    private CreateRuleStatement.PerformsClause getPerformsClause(PALParser.ExpressionArrayContext performsClause) {
-        Expression expression = Expression.compileArray(visitorCtx, performsClause, Type.string());
+    private CreateRuleStatement.PerformsClause getPerformsClause(PALParser.ExpressionContext performsClause) {
+        Expression expression = Expression.compile(visitorCtx, performsClause, Type.array(Type.string()));
         return new CreateRuleStatement.PerformsClause(expression);
     }
 
@@ -108,7 +108,7 @@ public class CreateRuleStmtVisitor extends PALBaseVisitor<CreateRuleStatement> {
 
         } else if (ctx instanceof PALParser.UsersListSubjectContext usersListSubjectCtx) {
             type = CreateRuleStatement.SubjectType.USERS;
-            expr = Expression.compileArray(visitorCtx, usersListSubjectCtx.users, Type.string());
+            expr = Expression.compile(visitorCtx, usersListSubjectCtx.users, Type.array(Type.string()));
 
         } else if (ctx instanceof PALParser.UserAttrSubjectContext userAttrSubjectCtx) {
             type = CreateRuleStatement.SubjectType.USER;

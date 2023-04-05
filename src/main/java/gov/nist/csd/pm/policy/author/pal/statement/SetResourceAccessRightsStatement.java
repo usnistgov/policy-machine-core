@@ -6,21 +6,20 @@ import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
-import java.util.List;
-
 public class SetResourceAccessRightsStatement extends PALStatement{
 
-    private final List<Expression> arExprList;
+    private final Expression arExpr;
 
-    public SetResourceAccessRightsStatement(List<Expression> arExprList) {
-        this.arExprList = arExprList;
+    public SetResourceAccessRightsStatement(Expression arExprList) {
+        this.arExpr = arExprList;
     }
 
     @Override
     public Value execute(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
+        Value arValue = arExpr.execute(ctx, policyAuthor);
         AccessRightSet accessRightSet = new AccessRightSet();
-        for (Expression e : arExprList) {
-            accessRightSet.add(e.execute(ctx, policyAuthor).getStringValue());
+        for (Value v : arValue.getArrayValue()) {
+            accessRightSet.add(v.getStringValue());
         }
 
         policyAuthor.setResourceAccessRights(accessRightSet);
@@ -31,7 +30,7 @@ public class SetResourceAccessRightsStatement extends PALStatement{
     @Override
     public String toString() {
         StringBuilder ars = new StringBuilder();
-        for (Expression ar : arExprList) {
+        for (Expression ar : arExpr.getLiteral().getArrayLiteral().getArray()) {
             if (!ars.isEmpty()) {
                 ars.append(", ");
             }
@@ -39,6 +38,6 @@ public class SetResourceAccessRightsStatement extends PALStatement{
             ars.append(String.format("%s", ar));
         }
 
-        return String.format("set resource access rights %s;", ars);
+        return String.format("set resource access rights [%s];", ars);
     }
 }

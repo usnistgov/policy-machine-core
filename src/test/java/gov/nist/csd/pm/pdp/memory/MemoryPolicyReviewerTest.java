@@ -42,7 +42,7 @@ class MemoryPolicyReviewerTest {
             AccessRightSet arset = new AccessRightSet("read", "write");
             pap.associate(ua1, oa1, arset);
 
-            Map<String, AccessRightSet> subgraph = pdp.policyReviewer().getSubgraphAccessRights(new UserContext(u1), oa1);
+            Map<String, AccessRightSet> subgraph = pdp.reviewer().getSubgraphAccessRights(new UserContext(u1), oa1);
             assertEquals(
                     Map.of("o1", arset, "o2", arset, "o3", arset),
                     subgraph
@@ -67,7 +67,7 @@ class MemoryPolicyReviewerTest {
             AccessRightSet arset = new AccessRightSet("read", "write");
             pap.associate(ua1, oa1, arset);
 
-            Map<String, AccessRightSet> accessibleNodes = pdp.policyReviewer().buildCapabilityList(new UserContext(u1));
+            Map<String, AccessRightSet> accessibleNodes = pdp.reviewer().buildCapabilityList(new UserContext(u1));
 
             assertTrue(accessibleNodes.containsKey(oa1));
             assertTrue(accessibleNodes.containsKey(o1));
@@ -95,7 +95,7 @@ class MemoryPolicyReviewerTest {
 
             pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
         @Test
         void testGraph2() throws PMException {
@@ -116,7 +116,7 @@ class MemoryPolicyReviewerTest {
 
             pap.associate(ua1, oa1, new AccessRightSet("read"));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
         @Test
         void testGraph3() throws PMException {
@@ -132,7 +132,7 @@ class MemoryPolicyReviewerTest {
 
             pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
         @Test
         void testGraph4() throws PMException {
@@ -150,7 +150,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("read"));
             pap.associate(ua2, oa1, new AccessRightSet("write"));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
         @Test
         void testGraph5() throws PMException {
@@ -172,7 +172,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
         }
         @Test
         void testGraph6() throws PMException {
@@ -193,7 +193,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("read"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
         }
         @Test
         void testGraph7() throws PMException {
@@ -213,7 +213,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
         @Test
         void testGraph8() throws PMException {
@@ -230,7 +230,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("*"));
 
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -251,7 +251,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa1, new AccessRightSet("read", "write"));
 
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -274,7 +274,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
         @Test
         void testGraph11() throws PMException {
@@ -293,7 +293,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("*"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
         @Test
         void testGraph12() throws PMException {
@@ -312,7 +312,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa1, new AccessRightSet("write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
         @Test
         void testGraph13() throws PMException {
@@ -332,7 +332,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("read"));
 
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.contains("read"));
         }
@@ -354,7 +354,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa1, new AccessRightSet("*"));
 
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -376,7 +376,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("read"));
 
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -397,7 +397,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa1, new AccessRightSet("write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
 
         // removed graph7 due to adding the parent IDs to the createNode, need to always connect to the pap.
@@ -418,7 +418,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
         @Test
         void testGraph19() throws PMException {
@@ -436,7 +436,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("read"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
         @Test
         void testGraph20() throws PMException {
@@ -457,7 +457,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
         }
         @Test
         void testGraph21() throws PMException {
@@ -478,7 +478,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua2, oa2, new AccessRightSet("write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
         @Test
         void testGraph22() throws PMException {
@@ -496,7 +496,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -525,7 +525,7 @@ class MemoryPolicyReviewerTest {
                     true,
                     new ContainerCondition(oa3, false));
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext(u1), o1);
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
             assertEquals(1, list.size());
             assertTrue(list.contains("execute"));
         }
@@ -554,8 +554,8 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition(oa2, true)
             );
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).contains("read"));
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o2).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).contains("read"));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o2).isEmpty());
 
             pap.associate(ua1, oa2, new AccessRightSet("read"));
 
@@ -564,7 +564,7 @@ class MemoryPolicyReviewerTest {
                     false,
                     new ContainerCondition(oa1, false));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1, "1234"), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1, "1234"), o1).isEmpty());
         }
 
         @Test
@@ -591,8 +591,8 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition(oa4, true),
                     new ContainerCondition(oa1, false));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), oa5).isEmpty());
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), oa5).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -617,7 +617,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition(oa1, false),
                     new ContainerCondition(oa2, false));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
 
         @Test
@@ -639,7 +639,7 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, new AccessRightSet("read"));
             pap.associate(ua2, oa1, new AccessRightSet("write"));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext(ua1), oa1).containsAll(Arrays.asList("read", "write")));
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext(ua1), oa1).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -711,22 +711,22 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa2", true)
             );
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o2");
+            list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o2");
             assertTrue(list.contains("read") && list.contains("write"));
 
-            list =pdp.policyReviewer().getAccessRights(new UserContext("u2"), "o2");
+            list =pdp.reviewer().getAccessRights(new UserContext("u2"), "o2");
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pdp.policyReviewer().getAccessRights(new UserContext("u3"), "o2");
+            list = pdp.reviewer().getAccessRights(new UserContext("u3"), "o2");
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pdp.policyReviewer().getAccessRights(new UserContext("u4"), "o1");
+            list = pdp.reviewer().getAccessRights(new UserContext("u4"), "o1");
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pdp.policyReviewer().getAccessRights(new UserContext("u4"), "o2");
+            list = pdp.reviewer().getAccessRights(new UserContext("u4"), "o2");
             assertTrue(list.contains("read") && !list.contains("write"));
         }
 
@@ -746,17 +746,17 @@ class MemoryPolicyReviewerTest {
             pap.associate(ua1, oa1, allAccessRights());
 
 
-            Set<String> list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
+            Set<String> list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
 
             pap.associate(ua1, oa1, allAdminAccessRights());
-            list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
+            list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertFalse(list.containsAll(RWE));
 
             pap.associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
-            list = pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1");
+            list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertFalse(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -780,7 +780,7 @@ class MemoryPolicyReviewerTest {
 
             pap.associate("ua3", "oa1", new AccessRightSet("read"));
 
-            assertTrue(pdp.policyReviewer().getAccessRights(new UserContext("u1"), "o1").isEmpty());
+            assertTrue(pdp.reviewer().getAccessRights(new UserContext("u1"), "o1").isEmpty());
         }
 
         @Test
@@ -798,7 +798,7 @@ class MemoryPolicyReviewerTest {
             pap.createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
                     new ContainerCondition("oa1", false));
 
-            AccessRightSet deniedAccessRights = pdp.policyReviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
+            AccessRightSet deniedAccessRights = pdp.reviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
             assertTrue(deniedAccessRights.contains("read"));
         }
 
@@ -817,7 +817,7 @@ class MemoryPolicyReviewerTest {
             pap.createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
                     new ContainerCondition("oa1", true));
 
-            AccessRightSet deniedAccessRights = pdp.policyReviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
+            AccessRightSet deniedAccessRights = pdp.reviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
             assertFalse(deniedAccessRights.contains("read"));
         }
     }

@@ -48,7 +48,7 @@ public abstract class PDP implements PolicyEventEmitter {
         this.eventListeners = new ArrayList<>();
     }
 
-    public abstract PolicyReviewer policyReviewer() throws PMException;
+    public abstract PolicyReviewer reviewer() throws PMException;
 
     public abstract void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException;
 
@@ -364,6 +364,21 @@ public abstract class PDP implements PolicyEventEmitter {
                     new DeassignEvent(child, parent)));
             emitEvent(new EventContext(userCtx, parent,
                     new DeassignFromEvent(child, parent)));
+        }
+
+        @Override
+        public void assignAll(List<String> children, String target) throws PMException {
+
+        }
+
+        @Override
+        public void deassignAll(List<String> children, String target) throws PMException {
+
+        }
+
+        @Override
+        public void deassignAllFromAndDelete(String target) throws PMException {
+
         }
 
         @Override

@@ -94,15 +94,15 @@ nodeType:
     (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
 createPolicyStmt: CREATE POLICY_CLASS expression SEMI_COLON ;
-createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) expression IN expressionArray SEMI_COLON ;
-createUserOrObjectStmt: CREATE (USER | OBJECT) expression IN expressionArray SEMI_COLON ;
+createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression IN parents=expression SEMI_COLON ;
+createUserOrObjectStmt: CREATE (USER | OBJECT) name=expression IN parents=expression SEMI_COLON ;
 
 setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression SEMI_COLON ;
 
-assignStmt: ASSIGN childNode=expression TO parentNode=expression SEMI_COLON ;
-deassignStmt: DEASSIGN childNode=expression FROM parentNode=expression SEMI_COLON ;
+assignStmt: ASSIGN childNode=expression TO parentNodes=expression SEMI_COLON ;
+deassignStmt: DEASSIGN childNode=expression FROM parentNodes=expression SEMI_COLON ;
 
-associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expressionArray SEMI_COLON ;
+associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expression SEMI_COLON ;
 dissociateStmt: DISSOCIATE ua=expression AND target=expression SEMI_COLON ;
 
 deleteStmt: DELETE deleteType expression SEMI_COLON ;
@@ -112,20 +112,20 @@ createObligationStmt:
 createRuleStmt:
     CREATE RULE ruleName=expression
     WHEN subjectClause
-    PERFORMS performsClause=expressionArray
+    PERFORMS performsClause=expression
     (ON onClause)?
     response ;
 subjectClause:
     ANY_USER #AnyUserSubject
     | USER user=expression #UserSubject
-    | USERS users=expressionArray #UsersListSubject
+    | USERS users=expression #UsersListSubject
     | ANY_USER_WITH_ATTRIBUTE attribute=expression #UserAttrSubject
     | PROCESS process=expression #ProcessSubject ;
 onClause:
     expression #PolicyElement
     | anyPe #AnyPolicyElement
     | anyPe IN expression #AnyContainedIn
-    | anyPe OF expressionArray #AnyOfSet ;
+    | anyPe OF expression #AnyOfSet ;
 anyPe: ANY POLICY_ELEMENT;
 
 response:
@@ -142,19 +142,16 @@ deleteRuleStmt:
 
 createProhibitionStmt:
     CREATE PROHIBITION name=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
-    ACCESS_RIGHTS accessRights=expressionArray
+    ACCESS_RIGHTS accessRights=expression
     ON (INTERSECTION|UNION) OF containers=prohibitionContainerList
     SEMI_COLON ;
 prohibitionContainerList:
-    (prohibitionContainerExpression (COMMA prohibitionContainerExpression)*)?;
+    OPEN_BRACKET (prohibitionContainerExpression (COMMA prohibitionContainerExpression)*)? CLOSE_BRACKET ;
 prohibitionContainerExpression:
     IS_COMPLEMENT? container=expression ;
 
 setResourceAccessRightsStmt:
-    SET_RESOURCE_ACCESS_RIGHTS expressionArray SEMI_COLON;
-
-expressionArray:
-    expression (COMMA expression)* ;
+    SET_RESOURCE_ACCESS_RIGHTS accessRights=expression SEMI_COLON;
 
 expression:
     varRef

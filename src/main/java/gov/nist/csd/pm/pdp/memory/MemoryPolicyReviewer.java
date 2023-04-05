@@ -136,6 +136,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         };
 
         Propagator propagator = (parent, child) -> {
+            System.out.println(parent + "->" + child);
             Map<String, AccessRightSet> parentCtx = visitedNodes.get(parent);
             Map<String, AccessRightSet> nodeCtx = visitedNodes.getOrDefault(child, new HashMap<>());
             for (String name : parentCtx.keySet()) {

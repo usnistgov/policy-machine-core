@@ -646,16 +646,6 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitSetResourceAccessRightsStmt(PALParser.SetResourceAccessRightsStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#expressionArray}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpressionArray(PALParser.ExpressionArrayContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PALParser#expressionArray}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpressionArray(PALParser.ExpressionArrayContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link PALParser#expression}.
 	 * @param ctx the parse tree
 	 */

@@ -19,7 +19,7 @@ public class AssociateStmtVisitor extends PALBaseVisitor<AssociateStatement> {
     public AssociateStatement visitAssociateStmt(PALParser.AssociateStmtContext ctx) {
         Expression ua = Expression.compile(visitorCtx, ctx.ua, Type.string());
         Expression target = Expression.compile(visitorCtx, ctx.target, Type.string());
-        Expression accessRights = Expression.compileArray(visitorCtx, ctx.accessRights, Type.string());
+        Expression accessRights = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));
 
         return new AssociateStatement(ua, target, accessRights);
     }

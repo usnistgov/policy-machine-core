@@ -7,6 +7,8 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.DeassignStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 
+import java.util.List;
+
 public class DeassignStmtVisitor extends PALBaseVisitor<DeassignStatement> {
 
     private final VisitorContext visitorCtx;
@@ -18,7 +20,8 @@ public class DeassignStmtVisitor extends PALBaseVisitor<DeassignStatement> {
     @Override
     public DeassignStatement visitDeassignStmt(PALParser.DeassignStmtContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.childNode, Type.string());
-        Expression deassignFrom = Expression.compile(visitorCtx, ctx.parentNode, Type.string());
-        return new DeassignStatement(name, deassignFrom);
+        Expression parents = Expression.compile(visitorCtx, ctx.parentNodes, Type.array(Type.string()));
+
+        return new DeassignStatement(name, parents);
     }
 }

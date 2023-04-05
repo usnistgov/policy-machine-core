@@ -64,69 +64,12 @@ public class Expression extends PALStatement {
         return expression;
     }
 
-    public static Expression compileArray(VisitorContext visitorCtx,
-                                          PALParser.ExpressionArrayContext expressionArrayCtx, Type allowedType) {
-        // can be an array of the allowed type
-        // or a function or variable that returns the allowed type - but can ONLY be 1
-
-        List<PALParser.ExpressionContext> expressionCtxs = expressionArrayCtx.expression();
-        List<Expression> expressions = new ArrayList<>();
-        for (PALParser.ExpressionContext expressionCtx : expressionCtxs) {
-            Expression compiledExpr = compile(visitorCtx, expressionCtx, allowedType, Type.array(allowedType));
-            expressions.add(compiledExpr);
-        }
-
-        Expression compiled = new Expression();
-        if (expressions.size() > 1) {
-            for (Expression expression : expressions) {
-                Type exprType = Type.any();
-                try {
-                    exprType = expression.getType(visitorCtx.scope());
-                } catch (UnknownFunctionInScopeException | UnknownVariableInScopeException e) {
-                    visitorCtx.errorLog().addError(expressionArrayCtx, e.getMessage());
-                }
-
-                if (!exprType.equals(allowedType)) {
-                    visitorCtx.errorLog().addError(expressionArrayCtx, String.format("expected expression array of type %s but got %s", allowedType, exprType));
-                }
-            }
-
-            compiled = new Expression(expressions);
-        } else {
-            Expression expression = expressions.get(0);
-            Type exprType = Type.any();
-            try {
-                exprType = expression.getType(visitorCtx.scope());
-            } catch (UnknownFunctionInScopeException | UnknownVariableInScopeException e) {
-                visitorCtx.errorLog().addError(expressionArrayCtx, e.getMessage());
-            }
-
-            // if the type of the only expression equals the allowed type then return an expression array with the single expression as an element
-            // if the type is an array of the allowed type (variable or function) then return the expression itself
-            if (exprType.equals(allowedType)) {
-                return new Expression(expression);
-            } else if (!expression.isLiteral && exprType.equals(Type.array(allowedType))) {
-                return expression;
-            } else if (expression.isLiteral && expression.getLiteral().isArrayLiteral() && expression.getLiteral().getType().equals(Type.array(allowedType))) {
-                Literal literal = expression.getLiteral();
-                ArrayLiteral arrayLiteral = literal.getArrayLiteral();
-                return new Expression(Arrays.stream(arrayLiteral.getArray()).toList());
-            } else {
-                visitorCtx.errorLog().addError(expressionArrayCtx, String.format("expected expression array of type %s but got %s", allowedType, exprType));
-            }
-        }
-
-        return compiled;
-    }
-
     private VariableReference variableReference;
     private boolean isVariableReference;
     private FunctionStatement functionCall;
     private boolean isFunctionCall;
     private Literal literal;
     private boolean isLiteral;
-    private List<Expression> exprList;
-    private boolean isList;
 
     public Expression(VariableReference variableReference) {
         this.variableReference = variableReference;
@@ -141,16 +84,6 @@ public class Expression extends PALStatement {
     public Expression(Literal literal) {
         this.literal = literal;
         this.isLiteral = true;
-    }
-
-    public Expression(Expression ... exprs) {
-        this.exprList = new ArrayList<>(List.of(exprs));
-        this.isList = true;
-    }
-
-    public Expression(List<Expression> exprs) {
-        this.exprList = exprs;
-        this.isList = true;
     }
 
     public Expression() {}
@@ -179,33 +112,14 @@ public class Expression extends PALStatement {
         return isLiteral;
     }
 
-    public List<Expression> getExprList() {
-        return exprList;
-    }
-
-    public boolean isList() {
-        return isList;
-    }
-
     @Override
     public String toString() {
         if (isFunctionCall) {
             return functionCall.toString();
         } else if (isLiteral) {
             return literal.toString();
-        } else if (isVariableReference){
-            return variableReference.toString();
         } else {
-            StringBuilder s = new StringBuilder();
-            for (Expression e : exprList) {
-                if (s.length() > 0) {
-                    s.append(", ");
-                }
-
-                s.append(e.toString());
-            }
-
-            return s.toString();
+            return variableReference.toString();
         }
     }
 
@@ -266,16 +180,9 @@ public class Expression extends PALStatement {
             return literal.execute(ctx, policyAuthor);
         } else if (isFunctionCall) {
             return functionCall.execute(ctx, policyAuthor);
-        } else if (isVariableReference) {
+        } else {
             return variableReference.execute(ctx, policyAuthor);
         }
-
-        List<Value> values = new ArrayList<>();
-        for (Expression name : exprList) {
-            values.add(name.execute(ctx, policyAuthor));
-        }
-
-        return new Value(values.toArray(Value[]::new));
     }
 
     @Override

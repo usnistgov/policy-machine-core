@@ -62,7 +62,7 @@ class MemoryPDPTest {
             MemoryPDP memoryPDP = new MemoryPDP(pap, false);
             memoryPDP.runTx(new UserContext(SUPER_USER), policy -> {
                 policy.addPALFunction(functionDefinitionStatement);
-                policy.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in 'pc2';");
+                policy.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2'];");
             });
 
             assertTrue(pap.nodeExists("ua3"));

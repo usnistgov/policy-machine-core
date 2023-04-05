@@ -7,6 +7,8 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.statement.AssignStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 
+import java.util.List;
+
 public class AssignStmtVisitor extends PALBaseVisitor<AssignStatement> {
 
     private final VisitorContext visitorCtx;
@@ -18,8 +20,8 @@ public class AssignStmtVisitor extends PALBaseVisitor<AssignStatement> {
     @Override
     public AssignStatement visitAssignStmt(PALParser.AssignStmtContext ctx) {
         Expression child = Expression.compile(visitorCtx, ctx.childNode, Type.string());
-        Expression parent = Expression.compile(visitorCtx, ctx.parentNode, Type.string());
+        Expression parents = Expression.compile(visitorCtx, ctx.parentNodes, Type.array(Type.string()));
 
-        return new AssignStatement(child, parent);
+        return new AssignStatement(child, parents);
     }
 }

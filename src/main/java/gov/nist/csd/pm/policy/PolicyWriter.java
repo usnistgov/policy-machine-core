@@ -9,6 +9,7 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
+import java.util.List;
 import java.util.Map;
 
 public interface PolicyWriter {
@@ -124,6 +125,31 @@ public interface PolicyWriter {
      * @throws PMException if there is an error deassigning the two nodes.
      */
     void deassign(String child, String parent) throws PMException;
+
+    /**
+     * Assign the children of the given attribute to the target attribute of the same type.
+     * @param children The children to assign to the target.
+     * @param target The target attribute to assign the children to.
+     * @throws PMException
+     */
+    void assignAll(List<String> children, String target) throws PMException;
+
+    /**
+     * Deassign the children of the given attribute from the target attribute of the same type.
+     * @param children The children to deassign from the given target.
+     * @param target The target attribute to deassign the children from.
+     * @throws PMException
+     */
+    void deassignAll(List<String> children, String target) throws PMException;
+
+    /**
+     * Deassign all nodes assigned to the given node and delete the given node. An exception can be thrown if any
+     * of the chidren would be made disconnected
+     * from the rest of the graph.
+     * @param target The node to deassign all children from.
+     * @throws PMException
+     */
+    void deassignAllFromAndDelete(String target) throws PMException;
 
     /**
      * Create an Association between the user attribute and the Target node with the provided access rights. If an association
