@@ -74,9 +74,9 @@ public class PolicyEventHandler {
         }
     }
 
-    public void handleDeassignAllFromAndDeleteEvent(DeassignAllFromAndDeleteEvent e) {}
-    public void handleDeassignAllEvent(DeassignAllEvent e) {}
-    public void handleAssignAllEvent(AssignAllEvent e) {}
+    public void handleDeassignAllFromAndDeleteEvent(DeassignAllFromAndDeleteEvent e) throws PMException {}
+    public void handleDeassignAllEvent(DeassignAllEvent e) throws PMException {}
+    public void handleAssignAllEvent(AssignAllEvent e) throws PMException {}
     public void handleAddConstantEvent(AddConstantEvent e) throws PMException {}
     public void handleAddFunctionEvent(AddFunctionEvent e) throws PMException {}
     public void handleAssignEvent(AssignEvent e) throws PMException {}
