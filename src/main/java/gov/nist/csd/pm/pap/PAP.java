@@ -803,6 +803,13 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
         // verify super policy
         SuperPolicy.verifySuperPolicy(this.policyStore);
 
+        // commit the reset and super policy verification so if the deserialization errors,
+        // the super policy will not be reverted
+        commit();
+
+        // start a new tx to deserialize policy
+        beginTx();
+
         // deserialize using deserializer
         policyDeserializer.deserialize(this, s);
 
