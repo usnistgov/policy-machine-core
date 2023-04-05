@@ -143,8 +143,7 @@ public interface PolicyWriter {
     void deassignAll(List<String> children, String target) throws PMException;
 
     /**
-     * Deassign all nodes assigned to the given node and delete the given node. An exception can be thrown if any
-     * of the chidren would be made disconnected
+     * Deassign all nodes assigned to the given node and delete the given node.
      * from the rest of the graph.
      * @param target The node to deassign all children from.
      * @throws PMException

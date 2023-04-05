@@ -124,17 +124,17 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public void assignAll(List<String> children, String target) throws PMException {
-
+        emitEvent(new AssignAllEvent(children, target));
     }
 
     @Override
     public void deassignAll(List<String> children, String target) throws PMException {
-
+        emitEvent(new DeassignAllEvent(children, target));
     }
 
     @Override
     public void deassignAllFromAndDelete(String target) throws PMException {
-
+        emitEvent(new DeassignAllFromAndDeleteEvent(target));
     }
 
     @Override

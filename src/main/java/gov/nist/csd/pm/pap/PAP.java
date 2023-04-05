@@ -505,17 +505,48 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
 
     @Override
     public void assignAll(List<String> children, String target) throws PMException {
+        beginTx();
 
+        Node targetNode = getNode(target);
+
+        for(String child : children) {
+            Node childNode = getNode(child);
+            Assignment.checkAssignment(childNode.getType(), targetNode.getType());
+        }
+
+        policyStore.assignAll(children, target);
+
+        commit();
+
+        emitEvent(new AssignAllEvent(children, target));
     }
 
     @Override
     public void deassignAll(List<String> children, String target) throws PMException {
+        beginTx();
 
+        Node targetNode = getNode(target);
+
+        for(String child : children) {
+            Node childNode = getNode(child);
+
+            List<String> parents = policyStore.getParents(child);
+            if (parents.contains(target) && parents.size() == 1) {
+                throw new DisconnectedNodeException(child, target);
+            }
+        }
+
+        policyStore.deassignAll(children, target);
+
+        commit();
+
+        emitEvent(new AssignAllEvent(children, target));
     }
 
     @Override
     public void deassignAllFromAndDelete(String target) throws PMException {
-
+        deassignAll(getChildren(target), target);
+        deleteNode(target);
     }
 
     @Override

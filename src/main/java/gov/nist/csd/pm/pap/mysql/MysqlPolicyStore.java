@@ -726,7 +726,7 @@ public class MysqlPolicyStore extends PolicyStore {
         String sql = """
             INSERT INTO assignment (start_node_id, end_node_id) VALUES (
               (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)
-            )
+            ) ON DUPLICATE KEY UPDATE start_node_id=start_node_id
             """;
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
@@ -756,18 +756,48 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    public void assignAll(List<String> children, String target) throws PMException {
+    public void assignAll(List<String> children, String target) throws MysqlPolicyException {
+        try {
+            beginTx();
 
+            for (String c : children) {
+                assign(c, target);
+            }
+
+            commit();
+        } catch (MysqlPolicyException e) {
+            rollback();
+            throw e;
+        }
     }
 
     @Override
-    public void deassignAll(List<String> children, String target) throws PMException {
+    public void deassignAll(List<String> children, String target) throws MysqlPolicyException {
+        try {
+            beginTx();
 
+            for (String c : children) {
+                deassign(c, target);
+            }
+
+            commit();
+        } catch (MysqlPolicyException e) {
+            rollback();
+        }
     }
 
     @Override
-    public void deassignAllFromAndDelete(String target) throws PMException {
+    public void deassignAllFromAndDelete(String target) throws MysqlPolicyException {
+        try {
+            beginTx();
 
+            deassignAll(getChildren(target), target);
+            deleteNode(target);
+
+            commit();
+        } catch (MysqlPolicyException e) {
+            rollback();
+        }
     }
 
     @Override

@@ -243,17 +243,37 @@ public class MemoryPolicyStore extends PolicyStore {
 
     @Override
     public void assignAll(List<String> children, String target) throws PMException {
+        if (inTx) {
+            txPolicyStore.assignAll(children, target);
+        }
 
+        for (String c : children) {
+            graph.assign(c, target);
+        }
     }
 
     @Override
     public void deassignAll(List<String> children, String target) throws PMException {
+        if (inTx) {
+            txPolicyStore.deassignAll(children, target);
+        }
 
+        for (String c : children) {
+            graph.deassign(c, target);
+        }
     }
 
     @Override
     public void deassignAllFromAndDelete(String target) throws PMException {
+        if (inTx) {
+            txPolicyStore.deassignAllFromAndDelete(target);
+        }
 
+        for (String c : getChildren(target)) {
+            graph.deassign(c, target);
+        }
+
+        deleteNode(target);
     }
 
     @Override

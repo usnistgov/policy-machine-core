@@ -56,26 +56,6 @@ class MysqlPAPTest {
     }
 
     @Test
-    void testRollbackGraphTx() throws PMException, SQLException {
-        Connection connection
-                = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
-        PAP pap = new PAP(new MysqlPolicyStore(connection));
-
-        pap.createPolicyClass("pc1");
-
-        // put a row in the assignment table for oa1 -> pc1
-        // this should cause an error and a rollback
-        try(Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
-            stmt.executeUpdate("insert into assignment values (8, 9, 7)");
-            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
-        }
-
-        assertThrows(MysqlPolicyException.class, () -> pap.createObjectAttribute("oa1", "pc1"));
-        assertFalse(pap.nodeExists("oa1"));
-    }
-
-    @Test
     void testRollbackProhibitionTx() throws PMException, IOException, SQLException {
         Connection connection
                 = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());

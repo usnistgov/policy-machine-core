@@ -52,8 +52,10 @@ class MysqlConnection implements Transactional {
     @Override
     public void rollback() throws MysqlPolicyException {
         try {
-            connection.rollback();
-            connection.setAutoCommit(true);
+            if (!connection.getAutoCommit()) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            }
             txCounter = 0;
         } catch (SQLException e) {
             throw new MysqlPolicyException(e.getMessage());

@@ -368,17 +368,29 @@ public abstract class PDP implements PolicyEventEmitter {
 
         @Override
         public void assignAll(List<String> children, String target) throws PMException {
+            adjudicator.assignAll(children, target);
 
+            pap.assignAll(children, target);
+
+            emitEvent(new AssignAllEvent(children, target));
         }
 
         @Override
         public void deassignAll(List<String> children, String target) throws PMException {
+            adjudicator.assignAll(children, target);
 
+            pap.deassignAll(children, target);
+
+            emitEvent(new DeassignAllEvent(children, target));
         }
 
         @Override
         public void deassignAllFromAndDelete(String target) throws PMException {
+            adjudicator.deassignAllFromAndDelete(target);
 
+            pap.deassignAllFromAndDelete(target);
+
+            emitEvent(new DeassignAllFromAndDeleteEvent(target));
         }
 
         @Override

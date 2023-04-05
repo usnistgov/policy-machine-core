@@ -457,7 +457,7 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
             case OA -> ASSIGN_TO_OBJECT_ATTRIBUTE;
             case UA -> ASSIGN_TO_USER_ATTRIBUTE;
             case PC -> ASSIGN_TO_POLICY_CLASS;
-            default -> throw new IllegalArgumentException("cannot assign to a node of type " + childNode.getType());
+            default -> throw new IllegalArgumentException("cannot assign to a node of type " + parentNode.getType());
         };
 
         //check the user can assign the child
@@ -484,7 +484,7 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
             case OA -> DEASSIGN_FROM_OBJECT_ATTRIBUTE;
             case UA -> DEASSIGN_FROM_USER_ATTRIBUTE;
             case PC -> DEASSIGN_FROM_POLICY_CLASS;
-            default -> throw new InvalidAssignmentException("cannot deassign from a node of type " + childNode.getType());
+            default -> throw new InvalidAssignmentException("cannot deassign from a node of type " + parentNode.getType());
         };
 
         //check the user can deassign the child
@@ -496,17 +496,103 @@ public class Adjudicator implements PolicyAuthor, PolicySerializable {
 
     @Override
     public void assignAll(List<String> children, String target) throws PMException {
+        Node parentNode = pap.getNode(target);
 
+        String parentAR = switch (parentNode.getType()) {
+            case OA -> ASSIGN_TO_OBJECT_ATTRIBUTE;
+            case UA -> ASSIGN_TO_USER_ATTRIBUTE;
+            case PC -> ASSIGN_TO_POLICY_CLASS;
+            default -> throw new IllegalArgumentException("cannot assign to a node of type " + parentNode.getType());
+        };
+
+        // check user can assign to parent
+        accessRightChecker.check(userCtx, target, parentAR);
+
+        // check the user can assign each child
+        for (String child : children) {
+            Node childNode = pap.getNode(child);
+
+            String childAR = switch (childNode.getType()) {
+                case OA -> ASSIGN_OBJECT_ATTRIBUTE;
+                case UA -> ASSIGN_USER_ATTRIBUTE;
+                case O -> ASSIGN_OBJECT;
+                case U -> ASSIGN_USER;
+                default -> throw new IllegalArgumentException("cannot assign node of type " + childNode.getType());
+            };
+
+            accessRightChecker.check(userCtx, child, childAR);
+        }
     }
 
     @Override
     public void deassignAll(List<String> children, String target) throws PMException {
+        Node parentNode = pap.getNode(target);
 
+        String parentAR = switch (parentNode.getType()) {
+            case OA -> DEASSIGN_FROM_OBJECT_ATTRIBUTE;
+            case UA -> DEASSIGN_FROM_USER_ATTRIBUTE;
+            case PC -> DEASSIGN_FROM_POLICY_CLASS;
+            default -> throw new InvalidAssignmentException("cannot deassign from a node of type " + parentNode.getType());
+        };
+
+        // check user can deassign from parent
+        accessRightChecker.check(userCtx, target, parentAR);
+
+        // check the user can deassign each child
+        for (String child : children) {
+            Node childNode = pap.getNode(child);
+
+            String childAR = switch (childNode.getType()) {
+                case OA -> DEASSIGN_OBJECT_ATTRIBUTE;
+                case UA -> DEASSIGN_USER_ATTRIBUTE;
+                case O -> DEASSIGN_OBJECT;
+                case U -> DEASSIGN_USER;
+                default -> throw new InvalidAssignmentException("cannot deassign node of type " + childNode.getType());
+            };
+
+            accessRightChecker.check(userCtx, child, childAR);
+        }
     }
 
     @Override
     public void deassignAllFromAndDelete(String target) throws PMException {
+        Node parentNode = pap.getNode(target);
 
+        String parentAR = switch (parentNode.getType()) {
+            case OA -> DEASSIGN_FROM_OBJECT_ATTRIBUTE;
+            case UA -> DEASSIGN_FROM_USER_ATTRIBUTE;
+            case PC -> DEASSIGN_FROM_POLICY_CLASS;
+            default -> throw new InvalidAssignmentException("cannot deassign from a node of type " + parentNode.getType());
+        };
+
+        // check user can deassign from parent
+        accessRightChecker.check(userCtx, target, parentAR);
+
+        parentAR = switch (parentNode.getType()) {
+            case OA -> DELETE_OBJECT_ATTRIBUTE;
+            case UA -> DELETE_USER_ATTRIBUTE;
+            case O -> DELETE_OBJECT;
+            case U -> DELETE_USER;
+            default -> DELETE_POLICY_CLASS;
+        };
+
+        // check the user can delete the target
+        accessRightChecker.check(userCtx, target, parentAR);
+
+        // check the user can deassign each child
+        for (String child : pap.getChildren(target)) {
+            Node childNode = pap.getNode(child);
+
+            String childAR = switch (childNode.getType()) {
+                case OA -> DEASSIGN_OBJECT_ATTRIBUTE;
+                case UA -> DEASSIGN_USER_ATTRIBUTE;
+                case O -> DEASSIGN_OBJECT;
+                case U -> DEASSIGN_USER;
+                default -> throw new InvalidAssignmentException("cannot deassign node of type " + childNode.getType());
+            };
+
+            accessRightChecker.check(userCtx, child, childAR);
+        }
     }
 
     @Override

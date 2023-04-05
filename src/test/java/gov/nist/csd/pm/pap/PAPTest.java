@@ -7,6 +7,8 @@ import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
 import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.author.pal.statement.*;
+import gov.nist.csd.pm.policy.events.BasePolicyEventHandler;
+import gov.nist.csd.pm.policy.events.PolicyEventHandler;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
@@ -1767,6 +1769,126 @@ class PAPTest {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        });
+    }
+
+    @Test
+    void testAssignAll() throws PMException {
+        runTest(pap -> {
+            String pal = """
+                    create pc 'pc1';
+                    create oa 'oa1' in ['pc1'];
+                    create oa 'oa2' in ['pc1'];
+                    create ua 'ua1' in ['pc1'];
+                    
+                    for i in range [1, 10] {
+                        let name = concat(["o", numToStr(i)]);
+                        create object name in ['oa1'];
+                    }
+                    """;
+            pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
+
+            List<String> children = pap.getChildren("oa1");
+            pap.assignAll(children, "oa2");
+
+            assertEquals(10, pap.getChildren("oa2").size());
+
+            assertDoesNotThrow(() -> {
+                pap.assignAll(children, "oa2");
+            });
+
+            // reset policy
+            pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
+
+            // test with illegal assignment
+            children.add("ua1");
+            assertThrows(PMException.class, () -> {
+                pap.assignAll(children, "oa2");
+            });
+            assertTrue(pap.getChildren("oa2").isEmpty());
+
+            // test non existing target
+            assertThrows(PMException.class, () -> {
+                pap.assignAll(children, "oa3");
+            });
+
+            // test non existing child
+            assertThrows(PMException.class, () -> {
+                children.remove("ua1");
+                children.add("oDNE");
+                pap.assignAll(children, "oa2");
+            });
+        });
+    }
+
+    @Test
+    void testDeassignAll() throws PMException {
+        runTest(pap -> {
+            String pal = """
+                    create pc 'pc1';
+                    create oa 'oa1' in ['pc1'];
+                    create oa 'oa2' in ['pc1'];
+                    create ua 'ua1' in ['pc1'];
+                    
+                    for i in range [1, 10] {
+                        let name = concat(["o", numToStr(i)]);
+                        create object name in ['oa1'];
+                    }
+                    
+                    for i in range [1, 5] {
+                        let name = concat(["o", numToStr(i)]); 
+                        assign name to ['oa2'];
+                    }
+                    """;
+            pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
+
+            List<String> toDelete = new ArrayList<>(List.of("o1", "o2", "o3", "o4", "o5"));
+            pap.deassignAll(toDelete, "oa1");
+            assertEquals(5, pap.getChildren("oa1").size());
+
+            toDelete.clear();
+            toDelete.add("oDNE");
+            assertThrows(PMException.class, () -> {
+                pap.deassignAll(toDelete, "oa2");
+            });
+
+            toDelete.clear();
+            toDelete.add("o9");
+            assertDoesNotThrow(() -> {
+                pap.deassignAll(toDelete, "oa2");
+            });
+        });
+    }
+
+    @Test
+    void testDeassignAllAndDelete() throws PMException {
+        runTest(pap -> {
+            String pal = """
+                    create pc 'pc1';
+                    create oa 'oa1' in ['pc1'];
+                    create oa 'oa2' in ['pc1'];
+                    create ua 'ua1' in ['pc1'];
+                    
+                    for i in range [1, 10] {
+                        let name = concat(["o", numToStr(i)]);
+                        create object name in ['oa1'];
+                    }
+                    
+                    for i in range [1, 5] {
+                        let name = concat(["o", numToStr(i)]); 
+                        assign name to ['oa2'];
+                    }
+                    """;
+            pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
+
+            assertThrows(PMException.class, () -> {
+                pap.deassignAllFromAndDelete("oa1");
+            });
+
+            pap.assignAll(pap.getChildren("oa1"), "oa2");
+
+            pap.deassignAllFromAndDelete("oa1");
+            assertFalse(pap.nodeExists("oa1"));
         });
     }
 }
