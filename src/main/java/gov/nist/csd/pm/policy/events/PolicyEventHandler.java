@@ -65,9 +65,18 @@ public class PolicyEventHandler {
             handleUpdateObligationEvent(e);
         } else if (event instanceof UpdateProhibitionEvent e) {
             handleUpdateProhibitionEvent(e);
+        } else if (event instanceof AssignAllEvent e) {
+            handleAssignAllEvent(e);
+        } else if (event instanceof DeassignAllEvent e) {
+            handleDeassignAllEvent(e);
+        } else if (event instanceof DeassignAllFromAndDeleteEvent e) {
+            handleDeassignAllFromAndDeleteEvent(e);
         }
     }
 
+    private void handleDeassignAllFromAndDeleteEvent(DeassignAllFromAndDeleteEvent e) {}
+    private void handleDeassignAllEvent(DeassignAllEvent e) {}
+    private void handleAssignAllEvent(AssignAllEvent e) {}
     public void handleAddConstantEvent(AddConstantEvent e) throws PMException {}
     public void handleAddFunctionEvent(AddFunctionEvent e) throws PMException {}
     public void handleAssignEvent(AssignEvent e) throws PMException {}
