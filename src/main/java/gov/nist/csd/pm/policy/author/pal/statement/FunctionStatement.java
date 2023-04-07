@@ -46,7 +46,7 @@ public class FunctionStatement extends PALStatement {
                     throw new PMException("actual arg value has type " + argValue.getType() + " expected " + formalArg.type());
                 }
 
-                localCtx.scope().addValue(formalArg.name(), argValue);
+                localCtx.scope().putValue(formalArg.name(), argValue);
             }
 
             Value value = new Value();

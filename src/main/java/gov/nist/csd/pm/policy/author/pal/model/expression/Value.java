@@ -18,7 +18,7 @@ public class Value implements Serializable {
     private boolean bValue;
     private boolean isBoolean;
 
-    private Value[] aValue;
+    private List<Value> aValue;
     private boolean isArray;
 
     private Map<Value, Value> mValue;
@@ -88,13 +88,13 @@ public class Value implements Serializable {
         this.type = Type.bool();
     }
 
-    public Value(Value[] value) {
+    public Value(List<Value> value) {
         this.isArray = true;
         this.aValue = value;
-        if (value.length == 0) {
+        if (value.isEmpty()) {
             this.type = Type.any();
         } else {
-            this.type = Type.array(value[0].getType());
+            this.type = Type.array(value.iterator().next().getType());
         }
     }
 
@@ -102,10 +102,10 @@ public class Value implements Serializable {
         this.isArray = true;
         this.type = Type.array(Type.string());
 
-        String[] arr = accessRightSet.toArray(String[]::new);
-        this.aValue = new Value[arr.length];
-        for (int i = 0; i < arr.length; i++) {
-            this.aValue[i] = new Value(arr[i]);
+        this.aValue = new ArrayList<>();
+        Object[] objects = accessRightSet.toArray();
+        for (Object o : objects) {
+            this.aValue.add(new Value(o.toString()));
         }
     }
 
@@ -202,7 +202,7 @@ public class Value implements Serializable {
         return bValue;
     }
 
-    public Value[] getArrayValue() {
+    public List<Value> getArrayValue() {
         if (!isArray) {
             throw new IllegalStateException("expected value to be array but was " + type);
         }
@@ -247,7 +247,7 @@ public class Value implements Serializable {
                 && isNull == value1.isNull
                 && isValue == value1.isValue
                 && Objects.equals(sValue, value1.sValue)
-                && Arrays.equals(aValue, value1.aValue)
+                && Objects.equals(aValue, value1.aValue)
                 && Objects.equals(mValue, value1.mValue)
                 && Objects.equals(value, value1.value)
                 && Objects.equals(type, value1.type)
@@ -261,7 +261,7 @@ public class Value implements Serializable {
         } else if (isBoolean) {
             return Objects.hashCode(bValue);
         } else if (isArray) {
-            return Arrays.hashCode(aValue);
+            return aValue.hashCode();
         } else if (isMap) {
             return mValue.hashCode();
         } else if (isValue) {
@@ -307,13 +307,13 @@ public class Value implements Serializable {
 
     private static Value toArrayValue(Object o) {
         Object[] arr = (Object[])o;
-        Value[] valueArr = new Value[arr.length];
+        List<Value> list = new ArrayList<>();
         for (int i = 0; i < arr.length; i++) {
             Object arrObj = arr[i];
-            valueArr[i] = objectToValue(arrObj);
+            list.add(objectToValue(arrObj));
         }
 
-        return new Value(valueArr);
+        return new Value(list);
     }
 
     private static Value toListValue(List list) {
@@ -322,7 +322,7 @@ public class Value implements Serializable {
             valueList.add(objectToValue(arrObj));
         }
 
-        return new Value(valueList.toArray(new Value[]{}));
+        return new Value(valueList);
     }
 
     private static Value toMapValue(Map m) {
@@ -359,7 +359,7 @@ public class Value implements Serializable {
         } else if (isMap()) {
             return mapToString(getMapValue());
         } else if (isArray()) {
-            return Arrays.toString(getArrayValue());
+            return getArrayValue().toString();
         } else if (isVoid()) {
             return "void";
         } else if (isReturn()) {

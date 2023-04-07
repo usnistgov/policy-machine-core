@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetAssociationsWithTarget extends FunctionDefinitionStatement {
@@ -20,10 +21,10 @@ public class GetAssociationsWithTarget extends FunctionDefinitionStatement {
                 (ctx, author) -> {
                     Value target = ctx.scope().getValue("target");
                     List<Association> associations = author.getAssociationsWithTarget(target.getStringValue());
-                    Value[] associationValues = new Value[associations.size()];
+                    List<Value> associationValues = new ArrayList<>(associations.size());
                     for (int i = 0; i < associations.size(); i++)  {
                         Association association = associations.get(i);
-                        associationValues[i] = Value.objectToValue(association);
+                        associationValues.add(Value.objectToValue(association));
                     }
                     return new Value(associationValues);
                 }

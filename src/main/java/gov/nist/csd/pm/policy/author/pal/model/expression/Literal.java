@@ -6,9 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Literal extends PALStatement {
 
@@ -93,10 +91,9 @@ public class Literal extends PALStatement {
         } else if (isArrayLiteral()) {
             ArrayLiteral arrayLiteral = getArrayLiteral();
             Expression[] exprArr = arrayLiteral.getArray();
-            Value[] values = new Value[exprArr.length];
-            for (int i = 0; i < exprArr.length; i++) {
-                Expression expr = exprArr[i];
-                values[i] = expr.execute(ctx, policyAuthor);
+            List<Value> values = new ArrayList<>(exprArr.length);
+            for (Expression expr : exprArr) {
+                values.add(expr.execute(ctx, policyAuthor));
             }
             return new Value(values);
         } else if (isBooleanLiteral()) {

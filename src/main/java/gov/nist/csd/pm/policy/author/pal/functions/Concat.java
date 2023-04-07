@@ -5,6 +5,8 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 
+import java.util.List;
+
 public class Concat extends FunctionDefinitionStatement {
 
     private static final String ARR_ARG = "arr";
@@ -17,7 +19,7 @@ public class Concat extends FunctionDefinitionStatement {
                         new FormalArgument(ARR_ARG, Type.array(Type.string()))
                 ),
                 (ctx, author) -> {
-                    Value[] arr = ctx.scope().getValue(ARR_ARG).getArrayValue();
+                    List<Value> arr = ctx.scope().getValue(ARR_ARG).getArrayValue();
                     StringBuilder s = new StringBuilder();
                     for (Value v : arr) {
                         s.append(v.getStringValue());

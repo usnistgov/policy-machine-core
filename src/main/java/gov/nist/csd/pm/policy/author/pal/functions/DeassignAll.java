@@ -19,7 +19,7 @@ public class DeassignAll extends FunctionDefinitionStatement {
                 ),
                 (ctx, policy) -> {
                     String target = ctx.scope().getValue("target").getStringValue();
-                    Value[] childrenValues = ctx.scope().getValue("children").getArrayValue();
+                    List<Value> childrenValues = ctx.scope().getValue("children").getArrayValue();
                     List<String> children = new ArrayList<>();
                     for (Value value : childrenValues) {
                         children.add(value.getStringValue());

@@ -39,7 +39,7 @@ public class ForRangeStatement extends PALStatement{
                 throw new RuntimeException(e);
             }
 
-            localExecutionCtx.scope().addValue(varName, new Value(i));
+            localExecutionCtx.scope().putValue(varName, new Value(i));
 
             Value value = executeStatementBlock(localExecutionCtx, policyAuthor, block);
 

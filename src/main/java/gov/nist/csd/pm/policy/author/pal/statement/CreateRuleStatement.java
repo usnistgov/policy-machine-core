@@ -113,7 +113,7 @@ public class CreateRuleStatement extends PALStatement {
             performs = Performs.events(performsValue.getStringValue());
         } else {
             List<String> events = new ArrayList<>();
-            Value[] arrayValue = performsValue.getArrayValue();
+            List<Value> arrayValue = performsValue.getArrayValue();
             for (Value value : arrayValue) {
                 events.add(value.getStringValue());
             }
@@ -141,7 +141,7 @@ public class CreateRuleStatement extends PALStatement {
             }
         } else if (onValue.isArray()) {
             // ANY_OF_SET
-            Value[] values = onValue.getArrayValue();
+            List<Value> values = onValue.getArrayValue();
             List<String> policyElements = new ArrayList<>();
             for (Value value : values) {
                 policyElements.add(value.getStringValue());

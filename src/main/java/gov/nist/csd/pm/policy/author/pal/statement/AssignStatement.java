@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.author.PolicyAuthor;
 
+import java.util.List;
 import java.util.Objects;
 
 public class AssignStatement extends PALStatement {
@@ -36,7 +37,7 @@ public class AssignStatement extends PALStatement {
             String parent = assignToValue.getStringValue();
             policyAuthor.assign(childStringValue, parent);
         } else if (assignToValue.isArray()) {
-            Value[] valueArr = assignToValue.getArrayValue();
+            List<Value> valueArr = assignToValue.getArrayValue();
             for (Value value : valueArr) {
                 String parent = value.getStringValue();
                 policyAuthor.assign(childStringValue, parent);

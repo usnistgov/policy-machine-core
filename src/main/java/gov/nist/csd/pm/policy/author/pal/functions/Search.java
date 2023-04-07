@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,9 @@ public class Search extends FunctionDefinitionStatement {
 
                     List<String> search = author.search(nodeType, properties);
 
-                    Value[] ret = new Value[search.size()];
+                    List<Value> ret = new ArrayList<>(search.size());
                     for (int i = 0; i < search.size(); i++) {
-                        ret[i] = new Value(search.get(i));
+                        ret.add(new Value(search.get(i)));
                     }
 
                     return new Value(ret);

@@ -176,7 +176,7 @@ public class Scope implements Serializable {
         return true;
     }
 
-    public void addValue(String name, Value value) {
+    public void putValue(String name, Value value) {
         this.values.put(name, value);
     }
 

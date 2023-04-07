@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetProhibitionsFor extends FunctionDefinitionStatement {
@@ -20,9 +21,9 @@ public class GetProhibitionsFor extends FunctionDefinitionStatement {
                 (ctx, author) -> {
                     String subject = ctx.scope().getValue("subject").getStringValue();
                     List<Prohibition> prohibitions = author.getProhibitionsWithSubject(subject);
-                    Value[] prohibitionValues = new Value[prohibitions.size()];
-                    for (int i = 0; i < prohibitions.size(); i++) {
-                        prohibitionValues[i] = new Value(Value.objectToValue(prohibitions.get(i)));
+                    List<Value> prohibitionValues = new ArrayList<>(prohibitions.size());
+                    for (Prohibition prohibition : prohibitions) {
+                        prohibitionValues.add(new Value(Value.objectToValue(prohibition)));
                     }
 
                     return new Value(prohibitionValues);

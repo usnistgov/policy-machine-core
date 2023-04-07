@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetParents extends FunctionDefinitionStatement {
@@ -18,9 +19,9 @@ public class GetParents extends FunctionDefinitionStatement {
                 ),
                 (ctx, author) -> {
                     List<String> parents = author.getParents(ctx.scope().getValue("nodeName").getStringValue());
-                    Value[] parentValues = new Value[parents.size()];
+                    List<Value> parentValues = new ArrayList<>(parents.size());
                     for (int i = 0; i < parents.size(); i++) {
-                        parentValues[i] = new Value(parents.get(i));
+                        parentValues.add(new Value(parents.get(i)));
                     }
 
                     return new Value(parentValues);

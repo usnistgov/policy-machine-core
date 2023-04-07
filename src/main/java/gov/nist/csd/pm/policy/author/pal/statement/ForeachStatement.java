@@ -42,7 +42,7 @@ public class ForeachStatement extends PALStatement {
                     throw new RuntimeException(e);
                 }
 
-                localExecutionCtx.scope().addValue(varName, v);
+                localExecutionCtx.scope().putValue(varName, v);
 
                 Value value = executeStatementBlock(localExecutionCtx, policyAuthor, statements);
 
@@ -65,9 +65,9 @@ public class ForeachStatement extends PALStatement {
 
                 Value mapValue = iterValue.getMapValue().get(key);
 
-                localExecutionCtx.scope().addValue(varName, key);
+                localExecutionCtx.scope().putValue(varName, key);
                 if (valueVarName != null) {
-                    localExecutionCtx.scope().addValue(valueVarName, mapValue);
+                    localExecutionCtx.scope().putValue(valueVarName, mapValue);
                 }
 
                 Value value = executeStatementBlock(localExecutionCtx, policyAuthor, statements);

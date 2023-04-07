@@ -60,7 +60,7 @@ public class Response implements Serializable {
     }
 
     public Value execute(PolicyAuthor policyAuthor, EventContext eventCtx) throws PMException {
-        executionCtx.scope().addValue(eventCtxVariable, Value.objectToValue(eventCtx));
+        executionCtx.scope().putValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
         for (PALStatement stmt : stmts) {
             stmt.execute(executionCtx, policyAuthor);

@@ -41,7 +41,7 @@ public class ExecutionContext implements Serializable {
         }
 
         for (String varName : this.scope.values().keySet()) {
-            copy.scope.addValue(varName, this.scope.getValue(varName));
+            copy.scope.putValue(varName, this.scope.getValue(varName));
         }
 
         return copy;

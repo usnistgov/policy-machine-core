@@ -47,7 +47,7 @@ public class CreateAttrStatement extends PALStatement {
         if (assignToValue.isString()) {
             initialParent = assignToValue.getStringValue();
         } else {
-            Value[] arrayValue = assignToValue.getArrayValue();
+            List<Value> arrayValue = assignToValue.getArrayValue();
             for (Value parentValue : arrayValue) {
                 if (initialParent.isEmpty()) {
                     initialParent = parentValue.getStringValue();

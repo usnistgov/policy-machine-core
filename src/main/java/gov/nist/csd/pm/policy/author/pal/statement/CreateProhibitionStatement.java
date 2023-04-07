@@ -65,7 +65,7 @@ public class CreateProhibitionStatement extends PALStatement {
         Value subjectValue = this.subject.execute(ctx, policyAuthor);
         Value permissionsValue = this.accessRights.execute(ctx, policyAuthor);
 
-        Value[] arrayValue = permissionsValue.getArrayValue();
+        List<Value> arrayValue = permissionsValue.getArrayValue();
         AccessRightSet ops = new AccessRightSet();
         for (Value v : arrayValue) {
             ops.add(v.getStringValue());

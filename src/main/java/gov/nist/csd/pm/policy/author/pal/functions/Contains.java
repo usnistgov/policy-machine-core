@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Contains extends FunctionDefinitionStatement {
 
@@ -18,9 +19,9 @@ public class Contains extends FunctionDefinitionStatement {
                         new FormalArgument("element", Type.any())
                 ),
                 (ctx, author) -> {
-                    Value[] valueArr = ctx.scope().getValue("arr").getArrayValue();
+                    List<Value> valueArr = ctx.scope().getValue("arr").getArrayValue();
                     Value element = ctx.scope().getValue("element");
-                    boolean contains = Arrays.asList(valueArr).contains(element);
+                    boolean contains = valueArr.contains(element);
                     return new Value(contains);
                 }
         );

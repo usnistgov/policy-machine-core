@@ -7,6 +7,7 @@ import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.epp.EventContext;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +30,8 @@ class ValueTest {
     void testArrayToValue() throws PMException {
         Value value = Value.objectToValue(new String[]{"hello", "world"});
         assertTrue(value.isArray());
-        assertEquals(new Value("hello"), value.getArrayValue()[0]);
-        assertEquals(new Value("world"), value.getArrayValue()[1]);
+        assertEquals(new Value("hello"), value.getArrayValue().get(0));
+        assertEquals(new Value("world"), value.getArrayValue().get(1));
     }
 
     @Test
@@ -44,8 +45,8 @@ class ValueTest {
     void testListToValue() throws PMException {
         Value value = Value.objectToValue(Arrays.asList("hello", "world"));
         assertTrue(value.isArray());
-        assertEquals(new Value("hello"), value.getArrayValue()[0]);
-        assertEquals(new Value("world"), value.getArrayValue()[1]);
+        assertEquals(new Value("hello"), value.getArrayValue().get(0));
+        assertEquals(new Value("world"), value.getArrayValue().get(1));
     }
 
     @Test
@@ -88,7 +89,7 @@ class ValueTest {
                         new Value("type"), new Value("OA"),
                         new Value("properties"), new Value(new HashMap<>()),
                         new Value("initialParent"), new Value("pc1"),
-                        new Value("additionalParents"), new Value(new Value[]{}),
+                        new Value("additionalParents"), new Value(new ArrayList<>()),
                         new Value("eventName"), new Value("create_object_attribute")
                 ),
                 value.getMapValue()
