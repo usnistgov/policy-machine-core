@@ -26,7 +26,7 @@ class ValueTest {
 
     @Test
     void testArrayToValue() throws PMException {
-        Value value = Value.objectToValue(new String[]{"hello", "world"});
+        Value value = Value.objectToValue(List.of("hello", "world"));
         assertTrue(value.isArray());
         assertEquals(new Value("hello"), value.getArrayValue().get(0));
         assertEquals(new Value("world"), value.getArrayValue().get(1));
