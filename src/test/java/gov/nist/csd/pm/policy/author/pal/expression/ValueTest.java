@@ -7,11 +7,9 @@ import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.epp.EventContext;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import static gov.nist.csd.pm.policy.author.pal.model.expression.Value.valueToObject;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -94,5 +92,23 @@ class ValueTest {
                 ),
                 value.getMapValue()
         );
+    }
+
+    @Test
+    void testToObject() throws PMException {
+        Value v = new Value("hello world");
+        Object o = valueToObject(v);
+        assertTrue(o instanceof String);
+        assertEquals("hello world", o);
+
+        v = new Value(List.of(new Value("1"), new Value("2")));
+        o = valueToObject(v);
+        assertTrue(o instanceof List<?>);
+        assertEquals(List.of("1", "2"), o);
+
+        v = new Value(List.of(new Value(List.of(new Value("1"), new Value("2")))));
+        o = valueToObject(v);
+        assertTrue(o instanceof List<?>);
+        assertEquals(List.of(List.of("1", "2")), o);
     }
 }

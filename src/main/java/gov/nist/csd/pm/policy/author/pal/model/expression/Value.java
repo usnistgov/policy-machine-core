@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal.model.expression;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 
@@ -292,9 +293,7 @@ public class Value implements Serializable {
             return new Value(s);
         } else if (o instanceof Integer i) {
             return new Value(i);
-        } else if (o.getClass().isArray()) {
-            return toArrayValue(o);
-        } else if (o instanceof List list) {
+        } if (o instanceof List list) {
             return toListValue(list);
         } else if (o instanceof Boolean b) {
             return new Value(b);
@@ -388,5 +387,50 @@ public class Value implements Serializable {
         }
 
         return String.format("{%s}", entries);
+    }
+
+    public static Object valueToObject(Value v) throws PMException {
+        if (v == null) {
+            return null;
+        }
+
+        if (v.isString()) {
+            return v.getStringValue();
+        } else if (v.isNumber()) {
+            return v.getNumberValue();
+        } else if (v.isArray()) {
+            return toListObject(v);
+        } else if (v.isBoolean()) {
+            return v.getBooleanValue();
+        } else if (v.isMap()) {
+            return toMapObject(v);
+        }
+
+        throw new PMException("unable to convert value " + v + " to an object");
+    }
+
+    private static Object toMapObject(Value v) throws PMException {
+        Map<Value, Value> mapValue = v.getMapValue();
+        Map<Object, Object> object = new HashMap<>();
+
+        for (Map.Entry<Value, Value> e : mapValue.entrySet()) {
+            Object key = valueToObject(e.getKey());
+            Object value = valueToObject(e.getValue());
+
+            object.put(key, value);
+        }
+
+        return object;
+    }
+
+    private static Object toListObject(Value v) throws PMException {
+        List<Value> list = v.getArrayValue();
+        List<Object> object = new ArrayList<>();
+        for (Value l : list) {
+            Object o = valueToObject(l);
+            object.add(o);
+        }
+
+        return object;
     }
 }
