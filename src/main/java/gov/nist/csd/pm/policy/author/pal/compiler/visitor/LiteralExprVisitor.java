@@ -67,6 +67,9 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
     private Literal parseArrayLiteral(PALParser.ArrayLiteralContext ctx) {
         PALParser.ArrayContext arrayCtx = ctx.array();
         Type elementType = null;
+        if (arrayCtx.expression().isEmpty()) {
+            elementType = Type.any();
+        }
 
         // determine the type of the array literal elements
         // if all the elements are of the same type then that is the element type
