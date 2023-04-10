@@ -28,10 +28,7 @@ import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
 import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.pcRepObjectAttribute;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
@@ -42,11 +39,11 @@ public class PAP implements PolicySync, PolicyEventEmitter, Transactional, Polic
 
     protected PolicyStore policyStore;
 
-    protected List<PolicyEventListener> listeners;
+    protected Set<PolicyEventListener> listeners;
 
     public PAP(PolicyStore policyStore) throws PMException {
         this.policyStore = policyStore;
-        this.listeners = new ArrayList<>();
+        this.listeners = new HashSet<>();
 
         SuperPolicy.verifySuperPolicy(this.policyStore);
     }

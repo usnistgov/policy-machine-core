@@ -11,7 +11,7 @@ import java.util.List;
 public class DeassignAll extends FunctionDefinitionStatement {
     public DeassignAll() {
         super(
-                "DeassignAll",
+                "deassignAll",
                 Type.voidType(),
                 args(
                         new FormalArgument("children", Type.array(Type.string())),
