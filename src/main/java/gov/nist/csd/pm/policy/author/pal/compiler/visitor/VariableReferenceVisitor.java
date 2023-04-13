@@ -85,8 +85,11 @@ public class VariableReferenceVisitor extends PALBaseVisitor<VariableReference> 
             }
 
             Type allowed;
-            Type valueType = null;
-            if (mapVarRef.getType().isMap()) {
+            Type valueType;
+            if (mapVarRef.getType().isAny()) {
+                allowed = Type.any();
+                valueType = Type.any();
+            } else if (mapVarRef.getType().isMap()) {
                 allowed = Type.string();
                 valueType = mapVarRef.getType().getMapValueType();
                 if (valueType == null) {
