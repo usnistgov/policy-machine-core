@@ -14,11 +14,11 @@ import static gov.nist.csd.pm.policy.author.pal.PALFormatter.statementsToString;
 public class ForRangeStatement extends PALStatement{
 
     private final String varName;
-    private final int lower;
-    private final int upper;
+    private final Expression lower;
+    private final Expression upper;
     private final List<PALStatement> block;
 
-    public ForRangeStatement(String varName, int lower, int upper, List<PALStatement> block) {
+    public ForRangeStatement(String varName, Expression lower, Expression upper, List<PALStatement> block) {
         this.varName = varName;
         this.lower = lower;
         this.upper = upper;
@@ -31,7 +31,10 @@ public class ForRangeStatement extends PALStatement{
             return new Value();
         }
 
-        for (int i = lower; i <= upper; i++) {
+        int lowerValue = lower.execute(ctx, policyAuthor).getNumberValue();
+        int upperValue = upper.execute(ctx, policyAuthor).getNumberValue();
+
+        for (int i = lowerValue; i <= upperValue; i++) {
             ExecutionContext localExecutionCtx;
             try {
                 localExecutionCtx = ctx.copy();
@@ -57,7 +60,7 @@ public class ForRangeStatement extends PALStatement{
 
     @Override
     public String toString() {
-        return String.format("for %s in range [%d, %d] {%s}",
+        return String.format("for %s in range [%s, %s] {%s}",
                 varName, lower, upper, statementsToString(block)
         );
     }

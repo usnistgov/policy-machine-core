@@ -1063,8 +1063,8 @@ public class PALParser extends Parser {
 	}
 
 	public static class ForRangeStmtContext extends ParserRuleContext {
-		public Token lower;
-		public Token upper;
+		public ExpressionContext lower;
+		public ExpressionContext upper;
 		public TerminalNode FOR() { return getToken(PALParser.FOR, 0); }
 		public TerminalNode VARIABLE_OR_FUNCTION_NAME() { return getToken(PALParser.VARIABLE_OR_FUNCTION_NAME, 0); }
 		public TerminalNode IN_RANGE() { return getToken(PALParser.IN_RANGE, 0); }
@@ -1074,9 +1074,11 @@ public class PALParser extends Parser {
 		public StmtBlockContext stmtBlock() {
 			return getRuleContext(StmtBlockContext.class,0);
 		}
-		public List<TerminalNode> NUMBER() { return getTokens(PALParser.NUMBER); }
-		public TerminalNode NUMBER(int i) {
-			return getToken(PALParser.NUMBER, i);
+		public List<ExpressionContext> expression() {
+			return getRuleContexts(ExpressionContext.class);
+		}
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
 		}
 		public ForRangeStmtContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1112,11 +1114,11 @@ public class PALParser extends Parser {
 			setState(208);
 			match(OPEN_BRACKET);
 			setState(209);
-			((ForRangeStmtContext)_localctx).lower = match(NUMBER);
+			((ForRangeStmtContext)_localctx).lower = expression();
 			setState(210);
 			match(COMMA);
 			setState(211);
-			((ForRangeStmtContext)_localctx).upper = match(NUMBER);
+			((ForRangeStmtContext)_localctx).upper = expression();
 			setState(212);
 			match(CLOSE_BRACKET);
 			setState(213);
@@ -4490,8 +4492,8 @@ public class PALParser extends Parser {
 		"\u00c8\u00ca\7=\2\2\u00c9\u00c7\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca\u00cb"+
 		"\3\2\2\2\u00cb\u00cc\78\2\2\u00cc\u00cd\5^\60\2\u00cd\u00ce\5,\27\2\u00ce"+
 		"\27\3\2\2\2\u00cf\u00d0\7\67\2\2\u00d0\u00d1\7=\2\2\u00d1\u00d2\7;\2\2"+
-		"\u00d2\u00d3\7H\2\2\u00d3\u00d4\7<\2\2\u00d4\u00d5\7C\2\2\u00d5\u00d6"+
-		"\7<\2\2\u00d6\u00d7\7I\2\2\u00d7\u00d8\5,\27\2\u00d8\31\3\2\2\2\u00d9"+
+		"\u00d2\u00d3\7H\2\2\u00d3\u00d4\5^\60\2\u00d4\u00d5\7C\2\2\u00d5\u00d6"+
+		"\5^\60\2\u00d6\u00d7\7I\2\2\u00d7\u00d8\5,\27\2\u00d8\31\3\2\2\2\u00d9"+
 		"\u00da\7\5\2\2\u00da\u00db\7E\2\2\u00db\33\3\2\2\2\u00dc\u00dd\7\6\2\2"+
 		"\u00dd\u00de\7E\2\2\u00de\35\3\2\2\2\u00df\u00e0\5l\67\2\u00e0\u00e1\7"+
 		"E\2\2\u00e1\37\3\2\2\2\u00e2\u00e4\79\2\2\u00e3\u00e5\7N\2\2\u00e4\u00e3"+

@@ -50,7 +50,7 @@ foreachStmt:
     FOREACH key=VARIABLE_OR_FUNCTION_NAME (COMMA mapValue=VARIABLE_OR_FUNCTION_NAME)? IN expression stmtBlock ;
 
 forRangeStmt:
-    FOR VARIABLE_OR_FUNCTION_NAME IN_RANGE OPEN_BRACKET lower=NUMBER COMMA upper=NUMBER CLOSE_BRACKET stmtBlock ;
+    FOR VARIABLE_OR_FUNCTION_NAME IN_RANGE OPEN_BRACKET lower=expression COMMA upper=expression CLOSE_BRACKET stmtBlock ;
 
 // break
 breakStmt:

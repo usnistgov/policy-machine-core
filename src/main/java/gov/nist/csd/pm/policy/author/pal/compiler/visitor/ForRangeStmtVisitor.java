@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import gov.nist.csd.pm.policy.author.pal.statement.ForRangeStatement;
 import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
 
@@ -22,8 +23,8 @@ public class ForRangeStmtVisitor extends PALBaseVisitor<ForRangeStatement> {
     public ForRangeStatement visitForRangeStmt(PALParser.ForRangeStmtContext ctx) {
         String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
 
-        int lower = Integer.parseInt(ctx.lower.getText());
-        int upper = Integer.parseInt(ctx.upper.getText());
+        Expression lower = Expression.compile(visitorCtx, ctx.lower, Type.number());
+        Expression upper = Expression.compile(visitorCtx, ctx.upper, Type.number());
 
         VisitorContext localVisitorCtx = visitorCtx.copy();
         List<PALStatement> block = new ArrayList<>();
