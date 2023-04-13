@@ -24,7 +24,7 @@ public class ForRangeStmtVisitor extends PALBaseVisitor<ForRangeStatement> {
         String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
 
         boolean lowerBound = ctx.lowerBound.getText().equals("(");
-        boolean upperBound = ctx.lowerBound.getText().equals(")");
+        boolean upperBound = ctx.upperBound.getText().equals(")");
 
         Expression lower = Expression.compile(visitorCtx, ctx.lower, Type.number());
         Expression upper = Expression.compile(visitorCtx, ctx.upper, Type.number());
