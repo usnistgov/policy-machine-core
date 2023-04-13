@@ -15,13 +15,17 @@ public class ForRangeStatement extends PALStatement{
 
     private final String varName;
     private final Expression lower;
+    private boolean lowerBound;
     private final Expression upper;
+    private boolean upperBound;
     private final List<PALStatement> block;
 
-    public ForRangeStatement(String varName, Expression lower, Expression upper, List<PALStatement> block) {
+    public ForRangeStatement(String varName, Expression lower, boolean lowerBound, Expression upper, boolean upperBound, List<PALStatement> block) {
         this.varName = varName;
         this.lower = lower;
+        this.lowerBound = lowerBound;
         this.upper = upper;
+        this.upperBound = upperBound;
         this.block = block;
     }
 
@@ -32,7 +36,14 @@ public class ForRangeStatement extends PALStatement{
         }
 
         int lowerValue = lower.execute(ctx, policyAuthor).getNumberValue();
+        if (lowerBound) {
+            lowerValue++;
+        }
+
         int upperValue = upper.execute(ctx, policyAuthor).getNumberValue();
+        if (upperBound) {
+            upperValue--;
+        }
 
         for (int i = lowerValue; i <= upperValue; i++) {
             ExecutionContext localExecutionCtx;

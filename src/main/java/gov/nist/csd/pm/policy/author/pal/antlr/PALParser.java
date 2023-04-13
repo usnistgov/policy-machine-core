@@ -1063,14 +1063,14 @@ public class PALParser extends Parser {
 	}
 
 	public static class ForRangeStmtContext extends ParserRuleContext {
+		public Token lowerBound;
 		public ExpressionContext lower;
 		public ExpressionContext upper;
+		public Token upperBound;
 		public TerminalNode FOR() { return getToken(PALParser.FOR, 0); }
 		public TerminalNode VARIABLE_OR_FUNCTION_NAME() { return getToken(PALParser.VARIABLE_OR_FUNCTION_NAME, 0); }
 		public TerminalNode IN_RANGE() { return getToken(PALParser.IN_RANGE, 0); }
-		public TerminalNode OPEN_BRACKET() { return getToken(PALParser.OPEN_BRACKET, 0); }
 		public TerminalNode COMMA() { return getToken(PALParser.COMMA, 0); }
-		public TerminalNode CLOSE_BRACKET() { return getToken(PALParser.CLOSE_BRACKET, 0); }
 		public StmtBlockContext stmtBlock() {
 			return getRuleContext(StmtBlockContext.class,0);
 		}
@@ -1080,6 +1080,10 @@ public class PALParser extends Parser {
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
+		public TerminalNode OPEN_BRACKET() { return getToken(PALParser.OPEN_BRACKET, 0); }
+		public TerminalNode OPEN_PAREN() { return getToken(PALParser.OPEN_PAREN, 0); }
+		public TerminalNode CLOSE_BRACKET() { return getToken(PALParser.CLOSE_BRACKET, 0); }
+		public TerminalNode CLOSE_PAREN() { return getToken(PALParser.CLOSE_PAREN, 0); }
 		public ForRangeStmtContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1102,6 +1106,7 @@ public class PALParser extends Parser {
 	public final ForRangeStmtContext forRangeStmt() throws RecognitionException {
 		ForRangeStmtContext _localctx = new ForRangeStmtContext(_ctx, getState());
 		enterRule(_localctx, 22, RULE_forRangeStmt);
+		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -1112,7 +1117,16 @@ public class PALParser extends Parser {
 			setState(207);
 			match(IN_RANGE);
 			setState(208);
-			match(OPEN_BRACKET);
+			((ForRangeStmtContext)_localctx).lowerBound = _input.LT(1);
+			_la = _input.LA(1);
+			if ( !(_la==OPEN_BRACKET || _la==OPEN_PAREN) ) {
+				((ForRangeStmtContext)_localctx).lowerBound = (Token)_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			setState(209);
 			((ForRangeStmtContext)_localctx).lower = expression();
 			setState(210);
@@ -1120,7 +1134,16 @@ public class PALParser extends Parser {
 			setState(211);
 			((ForRangeStmtContext)_localctx).upper = expression();
 			setState(212);
-			match(CLOSE_BRACKET);
+			((ForRangeStmtContext)_localctx).upperBound = _input.LT(1);
+			_la = _input.LA(1);
+			if ( !(_la==CLOSE_BRACKET || _la==CLOSE_PAREN) ) {
+				((ForRangeStmtContext)_localctx).upperBound = (Token)_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			setState(213);
 			stmtBlock();
 			}
@@ -4445,30 +4468,30 @@ public class PALParser extends Parser {
 		"\64\u01f3\3\65\3\65\3\65\3\65\3\65\5\65\u01fb\n\65\3\66\3\66\5\66\u01ff"+
 		"\n\66\3\67\3\67\3\67\38\38\38\38\78\u0208\n8\f8\168\u020b\138\58\u020d"+
 		"\n8\38\38\38\2\29\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
-		"\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhjln\2\b\3\2*+\3\2#\'\3\2$%\3\2&\'\5\2"+
-		"\21\21%%\'\'\3\2\22\23\2\u021f\2s\3\2\2\2\4\u008e\3\2\2\2\6\u0091\3\2"+
-		"\2\2\b\u0098\3\2\2\2\n\u00aa\3\2\2\2\f\u00ac\3\2\2\2\16\u00af\3\2\2\2"+
-		"\20\u00b4\3\2\2\2\22\u00ba\3\2\2\2\24\u00bc\3\2\2\2\26\u00c5\3\2\2\2\30"+
-		"\u00cf\3\2\2\2\32\u00d9\3\2\2\2\34\u00dc\3\2\2\2\36\u00df\3\2\2\2 \u00e2"+
-		"\3\2\2\2\"\u00f1\3\2\2\2$\u00f9\3\2\2\2&\u0101\3\2\2\2(\u0103\3\2\2\2"+
-		"*\u0109\3\2\2\2,\u010d\3\2\2\2.\u0119\3\2\2\2\60\u011b\3\2\2\2\62\u011d"+
-		"\3\2\2\2\64\u0122\3\2\2\2\66\u0129\3\2\2\28\u0130\3\2\2\2:\u0137\3\2\2"+
-		"\2<\u013d\3\2\2\2>\u0143\3\2\2\2@\u014b\3\2\2\2B\u0151\3\2\2\2D\u0156"+
-		"\3\2\2\2F\u0162\3\2\2\2H\u0178\3\2\2\2J\u0184\3\2\2\2L\u0186\3\2\2\2N"+
-		"\u0189\3\2\2\2P\u018f\3\2\2\2R\u019b\3\2\2\2T\u019d\3\2\2\2V\u01a5\3\2"+
-		"\2\2X\u01b3\3\2\2\2Z\u01c1\3\2\2\2\\\u01c5\3\2\2\2^\u01cc\3\2\2\2`\u01ce"+
-		"\3\2\2\2b\u01db\3\2\2\2d\u01e8\3\2\2\2f\u01ec\3\2\2\2h\u01fa\3\2\2\2j"+
-		"\u01fe\3\2\2\2l\u0200\3\2\2\2n\u0203\3\2\2\2pr\5\4\3\2qp\3\2\2\2ru\3\2"+
-		"\2\2sq\3\2\2\2st\3\2\2\2tv\3\2\2\2us\3\2\2\2vw\7\2\2\3w\3\3\2\2\2x\u008f"+
-		"\5\6\4\2y\u008f\5\b\5\2z\u008f\5\20\t\2{\u008f\5\26\f\2|\u008f\5\30\r"+
-		"\2}\u008f\5\32\16\2~\u008f\5\34\17\2\177\u008f\5\36\20\2\u0080\u008f\5"+
-		" \21\2\u0081\u008f\5\62\32\2\u0082\u008f\5\64\33\2\u0083\u008f\5\66\34"+
-		"\2\u0084\u008f\5D#\2\u0085\u008f\5V,\2\u0086\u008f\58\35\2\u0087\u008f"+
-		"\5:\36\2\u0088\u008f\5<\37\2\u0089\u008f\5B\"\2\u008a\u008f\5> \2\u008b"+
-		"\u008f\5@!\2\u008c\u008f\5\\/\2\u008d\u008f\5T+\2\u008ex\3\2\2\2\u008e"+
-		"y\3\2\2\2\u008ez\3\2\2\2\u008e{\3\2\2\2\u008e|\3\2\2\2\u008e}\3\2\2\2"+
-		"\u008e~\3\2\2\2\u008e\177\3\2\2\2\u008e\u0080\3\2\2\2\u008e\u0081\3\2"+
-		"\2\2\u008e\u0082\3\2\2\2\u008e\u0083\3\2\2\2\u008e\u0084\3\2\2\2\u008e"+
+		"\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhjln\2\n\3\2*+\4\2HHLL\4\2IIMM\3\2#\'\3"+
+		"\2$%\3\2&\'\5\2\21\21%%\'\'\3\2\22\23\2\u021f\2s\3\2\2\2\4\u008e\3\2\2"+
+		"\2\6\u0091\3\2\2\2\b\u0098\3\2\2\2\n\u00aa\3\2\2\2\f\u00ac\3\2\2\2\16"+
+		"\u00af\3\2\2\2\20\u00b4\3\2\2\2\22\u00ba\3\2\2\2\24\u00bc\3\2\2\2\26\u00c5"+
+		"\3\2\2\2\30\u00cf\3\2\2\2\32\u00d9\3\2\2\2\34\u00dc\3\2\2\2\36\u00df\3"+
+		"\2\2\2 \u00e2\3\2\2\2\"\u00f1\3\2\2\2$\u00f9\3\2\2\2&\u0101\3\2\2\2(\u0103"+
+		"\3\2\2\2*\u0109\3\2\2\2,\u010d\3\2\2\2.\u0119\3\2\2\2\60\u011b\3\2\2\2"+
+		"\62\u011d\3\2\2\2\64\u0122\3\2\2\2\66\u0129\3\2\2\28\u0130\3\2\2\2:\u0137"+
+		"\3\2\2\2<\u013d\3\2\2\2>\u0143\3\2\2\2@\u014b\3\2\2\2B\u0151\3\2\2\2D"+
+		"\u0156\3\2\2\2F\u0162\3\2\2\2H\u0178\3\2\2\2J\u0184\3\2\2\2L\u0186\3\2"+
+		"\2\2N\u0189\3\2\2\2P\u018f\3\2\2\2R\u019b\3\2\2\2T\u019d\3\2\2\2V\u01a5"+
+		"\3\2\2\2X\u01b3\3\2\2\2Z\u01c1\3\2\2\2\\\u01c5\3\2\2\2^\u01cc\3\2\2\2"+
+		"`\u01ce\3\2\2\2b\u01db\3\2\2\2d\u01e8\3\2\2\2f\u01ec\3\2\2\2h\u01fa\3"+
+		"\2\2\2j\u01fe\3\2\2\2l\u0200\3\2\2\2n\u0203\3\2\2\2pr\5\4\3\2qp\3\2\2"+
+		"\2ru\3\2\2\2sq\3\2\2\2st\3\2\2\2tv\3\2\2\2us\3\2\2\2vw\7\2\2\3w\3\3\2"+
+		"\2\2x\u008f\5\6\4\2y\u008f\5\b\5\2z\u008f\5\20\t\2{\u008f\5\26\f\2|\u008f"+
+		"\5\30\r\2}\u008f\5\32\16\2~\u008f\5\34\17\2\177\u008f\5\36\20\2\u0080"+
+		"\u008f\5 \21\2\u0081\u008f\5\62\32\2\u0082\u008f\5\64\33\2\u0083\u008f"+
+		"\5\66\34\2\u0084\u008f\5D#\2\u0085\u008f\5V,\2\u0086\u008f\58\35\2\u0087"+
+		"\u008f\5:\36\2\u0088\u008f\5<\37\2\u0089\u008f\5B\"\2\u008a\u008f\5> "+
+		"\2\u008b\u008f\5@!\2\u008c\u008f\5\\/\2\u008d\u008f\5T+\2\u008ex\3\2\2"+
+		"\2\u008ey\3\2\2\2\u008ez\3\2\2\2\u008e{\3\2\2\2\u008e|\3\2\2\2\u008e}"+
+		"\3\2\2\2\u008e~\3\2\2\2\u008e\177\3\2\2\2\u008e\u0080\3\2\2\2\u008e\u0081"+
+		"\3\2\2\2\u008e\u0082\3\2\2\2\u008e\u0083\3\2\2\2\u008e\u0084\3\2\2\2\u008e"+
 		"\u0085\3\2\2\2\u008e\u0086\3\2\2\2\u008e\u0087\3\2\2\2\u008e\u0088\3\2"+
 		"\2\2\u008e\u0089\3\2\2\2\u008e\u008a\3\2\2\2\u008e\u008b\3\2\2\2\u008e"+
 		"\u008c\3\2\2\2\u008e\u008d\3\2\2\2\u008f\5\3\2\2\2\u0090\u0092\t\2\2\2"+
@@ -4492,8 +4515,8 @@ public class PALParser extends Parser {
 		"\u00c8\u00ca\7=\2\2\u00c9\u00c7\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca\u00cb"+
 		"\3\2\2\2\u00cb\u00cc\78\2\2\u00cc\u00cd\5^\60\2\u00cd\u00ce\5,\27\2\u00ce"+
 		"\27\3\2\2\2\u00cf\u00d0\7\67\2\2\u00d0\u00d1\7=\2\2\u00d1\u00d2\7;\2\2"+
-		"\u00d2\u00d3\7H\2\2\u00d3\u00d4\5^\60\2\u00d4\u00d5\7C\2\2\u00d5\u00d6"+
-		"\5^\60\2\u00d6\u00d7\7I\2\2\u00d7\u00d8\5,\27\2\u00d8\31\3\2\2\2\u00d9"+
+		"\u00d2\u00d3\t\3\2\2\u00d3\u00d4\5^\60\2\u00d4\u00d5\7C\2\2\u00d5\u00d6"+
+		"\5^\60\2\u00d6\u00d7\t\4\2\2\u00d7\u00d8\5,\27\2\u00d8\31\3\2\2\2\u00d9"+
 		"\u00da\7\5\2\2\u00da\u00db\7E\2\2\u00db\33\3\2\2\2\u00dc\u00dd\7\6\2\2"+
 		"\u00dd\u00de\7E\2\2\u00de\35\3\2\2\2\u00df\u00e0\5l\67\2\u00e0\u00e1\7"+
 		"E\2\2\u00e1\37\3\2\2\2\u00e2\u00e4\79\2\2\u00e3\u00e5\7N\2\2\u00e4\u00e3"+
@@ -4514,11 +4537,11 @@ public class PALParser extends Parser {
 		"\u0113\3\2\2\2\u0111\u010f\3\2\2\2\u0111\u0112\3\2\2\2\u0112\u0114\3\2"+
 		"\2\2\u0113\u0111\3\2\2\2\u0114\u0115\7G\2\2\u0115-\3\2\2\2\u0116\u011a"+
 		"\5\60\31\2\u0117\u011a\7!\2\2\u0118\u011a\7 \2\2\u0119\u0116\3\2\2\2\u0119"+
-		"\u0117\3\2\2\2\u0119\u0118\3\2\2\2\u011a/\3\2\2\2\u011b\u011c\t\3\2\2"+
+		"\u0117\3\2\2\2\u0119\u0118\3\2\2\2\u011a/\3\2\2\2\u011b\u011c\t\5\2\2"+
 		"\u011c\61\3\2\2\2\u011d\u011e\7\3\2\2\u011e\u011f\7#\2\2\u011f\u0120\5"+
 		"^\60\2\u0120\u0121\7E\2\2\u0121\63\3\2\2\2\u0122\u0123\7\3\2\2\u0123\u0124"+
-		"\t\4\2\2\u0124\u0125\5^\60\2\u0125\u0126\78\2\2\u0126\u0127\5^\60\2\u0127"+
-		"\u0128\7E\2\2\u0128\65\3\2\2\2\u0129\u012a\7\3\2\2\u012a\u012b\t\5\2\2"+
+		"\t\6\2\2\u0124\u0125\5^\60\2\u0125\u0126\78\2\2\u0126\u0127\5^\60\2\u0127"+
+		"\u0128\7E\2\2\u0128\65\3\2\2\2\u0129\u012a\7\3\2\2\u012a\u012b\t\7\2\2"+
 		"\u012b\u012c\5^\60\2\u012c\u012d\78\2\2\u012d\u012e\5^\60\2\u012e\u012f"+
 		"\7E\2\2\u012f\67\3\2\2\2\u0130\u0131\7\30\2\2\u0131\u0132\7\31\2\2\u0132"+
 		"\u0133\5^\60\2\u0133\u0134\7\32\2\2\u0134\u0135\5^\60\2\u0135\u0136\7"+
@@ -4556,9 +4579,9 @@ public class PALParser extends Parser {
 		"S\3\2\2\2\u019d\u019e\7\4\2\2\u019e\u019f\7\b\2\2\u019f\u01a0\5^\60\2"+
 		"\u01a0\u01a1\7\27\2\2\u01a1\u01a2\7!\2\2\u01a2\u01a3\5^\60\2\u01a3\u01a4"+
 		"\7E\2\2\u01a4U\3\2\2\2\u01a5\u01a6\7\3\2\2\u01a6\u01a7\7 \2\2\u01a7\u01a8"+
-		"\5^\60\2\u01a8\u01a9\7\37\2\2\u01a9\u01aa\t\6\2\2\u01aa\u01ab\5^\60\2"+
+		"\5^\60\2\u01a8\u01a9\7\37\2\2\u01a9\u01aa\t\b\2\2\u01aa\u01ab\5^\60\2"+
 		"\u01ab\u01ac\7\"\2\2\u01ac\u01ad\5^\60\2\u01ad\u01ae\7\f\2\2\u01ae\u01af"+
-		"\t\7\2\2\u01af\u01b0\7\31\2\2\u01b0\u01b1\5X-\2\u01b1\u01b2\7E\2\2\u01b2"+
+		"\t\t\2\2\u01af\u01b0\7\31\2\2\u01b0\u01b1\5X-\2\u01b1\u01b2\7E\2\2\u01b2"+
 		"W\3\2\2\2\u01b3\u01bc\7H\2\2\u01b4\u01b9\5Z.\2\u01b5\u01b6\7C\2\2\u01b6"+
 		"\u01b8\5Z.\2\u01b7\u01b5\3\2\2\2\u01b8\u01bb\3\2\2\2\u01b9\u01b7\3\2\2"+
 		"\2\u01b9\u01ba\3\2\2\2\u01ba\u01bd\3\2\2\2\u01bb\u01b9\3\2\2\2\u01bc\u01b4"+

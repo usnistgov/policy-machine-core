@@ -23,6 +23,9 @@ public class ForRangeStmtVisitor extends PALBaseVisitor<ForRangeStatement> {
     public ForRangeStatement visitForRangeStmt(PALParser.ForRangeStmtContext ctx) {
         String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
 
+        boolean lowerBound = ctx.lowerBound.getText().equals("(");
+        boolean upperBound = ctx.lowerBound.getText().equals(")");
+
         Expression lower = Expression.compile(visitorCtx, ctx.lower, Type.number());
         Expression upper = Expression.compile(visitorCtx, ctx.upper, Type.number());
 
@@ -44,6 +47,6 @@ public class ForRangeStmtVisitor extends PALBaseVisitor<ForRangeStatement> {
             visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
         }
 
-        return new ForRangeStatement(varName, lower, upper, block);
+        return new ForRangeStatement(varName, lower, lowerBound, upper, upperBound, block);
     }
 }
