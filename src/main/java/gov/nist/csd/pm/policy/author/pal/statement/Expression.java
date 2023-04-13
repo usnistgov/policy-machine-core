@@ -29,8 +29,9 @@ public class Expression extends PALStatement {
                                      Type... allowedTypes) {
         Expression expression;
         if (expressionCtx.literal() != null) {
+            PALParser.LiteralContext litCtx = expressionCtx.literal();
             Literal literal = new LiteralExprVisitor(visitorCtx)
-                    .visitLiteral(expressionCtx.literal());
+                    .visitLiteral(litCtx);
             expression = new Expression(literal);
         } else if (expressionCtx.funcCall() != null) {
             FunctionStatement functionCall = new FunctionCallVisitor(visitorCtx)
@@ -163,6 +164,8 @@ public class Expression extends PALStatement {
     private Type getLiteralType() {
         if (literal.isStringLiteral()) {
             return Type.string();
+        } else if (literal.isNumberLiteral()) {
+          return Type.number();
         } else if (literal.isBooleanLiteral()) {
             return Type.bool();
         } else if (literal.isArrayLiteral()) {

@@ -784,13 +784,13 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMapEntryRef(PALParser.MapEntryRefContext ctx) { }
+	@Override public void enterEntryRef(PALParser.EntryRefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMapEntryRef(PALParser.MapEntryRefContext ctx) { }
+	@Override public void exitEntryRef(PALParser.EntryRefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -815,6 +815,18 @@ public class PALBaseListener implements PALListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBooleanLiteral(PALParser.BooleanLiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNumberLiteral(PALParser.NumberLiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNumberLiteral(PALParser.NumberLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -856,13 +868,13 @@ public class PALBaseListener implements PALListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMapEntryReference(PALParser.MapEntryReferenceContext ctx) { }
+	@Override public void enterEntryReference(PALParser.EntryReferenceContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMapEntryReference(PALParser.MapEntryReferenceContext ctx) { }
+	@Override public void exitEntryReference(PALParser.EntryReferenceContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

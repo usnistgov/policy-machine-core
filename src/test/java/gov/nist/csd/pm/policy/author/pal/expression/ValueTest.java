@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.policy.author.pal.expression;
 
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static gov.nist.csd.pm.policy.author.pal.model.expression.Value.valueToObject;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;

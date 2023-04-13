@@ -117,7 +117,7 @@ public class ObligationTest {
         PALStatement expected = new CreatePolicyStatement(
                 new Expression(
                         new VariableReference(
-                                new MapEntryReference(
+                                new EntryReference(
                                         new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("eventName"))
                                 ),
                                 Type.any()
@@ -131,7 +131,7 @@ public class ObligationTest {
                 "target",
                 new Expression(
                         new VariableReference(
-                                new MapEntryReference(
+                                new EntryReference(
                                         new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("target"))
                                 ),
                                 Type.any()
@@ -145,7 +145,7 @@ public class ObligationTest {
                 "event",
                 new Expression(
                         new VariableReference(
-                                new MapEntryReference(
+                                new EntryReference(
                                         new VariableReference("evtCtx", evtCtxType), new Expression(new Literal("event"))
                                 ),
                                 Type.any()
@@ -161,7 +161,7 @@ public class ObligationTest {
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
                                         new Expression[]{
-                                                new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                                                new Expression(new VariableReference(new EntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
                                                 new Expression(new Literal("_test"))
                                         },
                                         Type.string()
@@ -174,7 +174,7 @@ public class ObligationTest {
         HashMap<Expression, Expression> exprMap = new HashMap<>();
         exprMap.put(new Expression(new Literal("key")), new Expression(new VariableReference("target", Type.any())));
         expected = new SetNodePropertiesStatement(
-                new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                new Expression(new VariableReference(new EntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
                 new Expression(new Literal(new MapLiteral(exprMap, Type.string(), Type.any())))
         );
         assertEquals(expected, stmt);
@@ -188,9 +188,9 @@ public class ObligationTest {
                                         new Expression[]{
                                                 new Expression(
                                                         new VariableReference(
-                                                                new MapEntryReference(
+                                                                new EntryReference(
                                                                         new VariableReference(
-                                                                                new MapEntryReference(
+                                                                                new EntryReference(
                                                                                         new VariableReference("evtCtx", Type.map(Type.string(), Type.any())),
                                                                                         new Expression(new Literal("userCtx"))
                                                                                 ),

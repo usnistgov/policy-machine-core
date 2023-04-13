@@ -4,13 +4,11 @@ import gov.nist.csd.pm.policy.author.pal.antlr.PALBaseVisitor;
 import gov.nist.csd.pm.policy.author.pal.antlr.PALParser;
 import gov.nist.csd.pm.policy.author.pal.compiler.Variable;
 import gov.nist.csd.pm.policy.author.pal.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
-import gov.nist.csd.pm.policy.author.pal.model.expression.MapEntryReference;
+import gov.nist.csd.pm.policy.author.pal.model.expression.EntryReference;
 import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
 import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.author.pal.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.author.pal.statement.Expression;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class VariableReferenceVisitor extends PALBaseVisitor<VariableReference> 
         if (ctx instanceof PALParser.ReferenceByIDContext referenceByIDContext) {
             return visitReferenceByID(referenceByIDContext);
         } else {
-            return visitMapEntryReference((PALParser.MapEntryReferenceContext) ctx);
+            return visitEntryReference((PALParser.EntryReferenceContext) ctx);
         }
     }
 
@@ -47,49 +45,63 @@ public class VariableReferenceVisitor extends PALBaseVisitor<VariableReference> 
     }
 
     @Override
-    public VariableReference visitMapEntryReference(PALParser.MapEntryReferenceContext ctx) {
-        String mapName = ctx.mapEntryRef().VARIABLE_OR_FUNCTION_NAME().getText();
-        Type mapType = Type.map(Type.any(), Type.any());
+    public VariableReference visitEntryReference(PALParser.EntryReferenceContext ctx) {
+        String name = ctx.entryRef().VARIABLE_OR_FUNCTION_NAME().getText();
+        Type type = Type.any();
         try {
-            Variable mapVar = visitorCtx.scope().getVariable(mapName);
-            mapType = mapVar.type();
+            Variable mapVar = visitorCtx.scope().getVariable(name);
+            type = mapVar.type();
         } catch (UnknownVariableInScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
         }
 
-        VariableReference mapVarRef = new VariableReference(mapName, mapType);
-        List<PALParser.ExpressionContext> exprCtxs = ctx.mapEntryRef().expression();
+        VariableReference mapVarRef = new VariableReference(name, type);
+        List<PALParser.ExpressionContext> exprCtxs = ctx.entryRef().expression();
         boolean first = true;
         for (PALParser.ExpressionContext exprCtx : exprCtxs) {
-            Expression expr = Expression.compile(visitorCtx, exprCtx, Type.string());
-            // if the map variable reference is not a map and this is not the first accessor processed, there is an error
+            // if the variable reference is not a map or array and this is not the first accessor processed, there is an error
             // if it is the first accessor than check if the variable id is a map
             if (first) {
-                Type type = Type.any();
+                Type t = Type.any();
+
                 try {
-                    type = visitorCtx.scope().getVariable(mapName).type();
+                    t = visitorCtx.scope().getVariable(name).type();
                 } catch (UnknownVariableInScopeException e) {
                     visitorCtx.errorLog().addError(ctx, e.getMessage());
                 }
-                if (!type.isMap()) {
+                if (!t.isMap() && !t.isArray()) {
                     visitorCtx.errorLog().addError(
                             exprCtx,
-                            "expected map type"
+                            "expected map or array type"
                     );
                 }
             } else {
-                if (!mapVarRef.getType().isMap()) {
+                if (!mapVarRef.getType().isMap() && !mapVarRef.getType().isArray()) {
                     visitorCtx.errorLog().addError(
                             exprCtx,
-                            "expected map type"
+                            "expected map or array type"
                     );
                 }
             }
-            Type type = mapVarRef.getType().getMapValueType();
-            if (type == null) {
-                type = Type.any();
+
+            Type allowed;
+            Type valueType = null;
+            if (mapVarRef.getType().isMap()) {
+                allowed = Type.string();
+                valueType = mapVarRef.getType().getMapValueType();
+                if (valueType == null) {
+                    valueType = Type.any();
+                }
+            } else if (mapVarRef.getType().isArray()) {
+                allowed = Type.number();
+                valueType = mapVarRef.getType().getArrayType();
+            } else {
+                allowed = Type.any();
+                valueType = Type.any();
             }
-            mapVarRef = new VariableReference(new MapEntryReference(mapVarRef, expr), type);
+
+            Expression expr = Expression.compile(visitorCtx, exprCtx, allowed);
+            mapVarRef = new VariableReference(new EntryReference(mapVarRef, expr), valueType);
             first = false;
         }
 

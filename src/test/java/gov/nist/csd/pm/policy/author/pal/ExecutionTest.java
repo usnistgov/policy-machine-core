@@ -450,4 +450,19 @@ public class ExecutionTest {
         pap.executePAL(superUser, input);
         assertFalse(pap.getProhibitions().containsKey("p1"));
     }
+
+    @Test
+    void testArrayGetByIndex() throws PMException {
+        String s = """
+                let x = ["1", "2", "3"];
+                create pc x[1];
+                
+                let y = [["1", "2", "3"]];
+                create pc y[0][0];
+                """;
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.executePAL(new UserContext(SUPER_USER), s);
+        assertTrue(pap.nodeExists("2"));
+        assertTrue(pap.nodeExists("1"));
+    }
 }

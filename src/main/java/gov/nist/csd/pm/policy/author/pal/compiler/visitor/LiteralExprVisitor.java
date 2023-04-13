@@ -27,6 +27,8 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
     public Literal visitLiteral(PALParser.LiteralContext literalCtx) {
         if (literalCtx instanceof PALParser.StringLiteralContext stringLiteralCtx) {
             return parseStringLiteral(stringLiteralCtx);
+        } else if (literalCtx instanceof PALParser.NumberLiteralContext numberLiteralCtx) {
+            return parseNumberLiteral(numberLiteralCtx);
         } else if (literalCtx instanceof PALParser.BooleanLiteralContext booleanLiteralCtx) {
             return parseBooleanLiteral(booleanLiteralCtx);
         } else if (literalCtx instanceof PALParser.ArrayLiteralContext arrayLiteralCtx) {
@@ -34,6 +36,11 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
         } else  {
             return parseMapLiteral((PALParser.MapLiteralContext) literalCtx);
         }
+    }
+
+    @Override
+    public Literal visitNumberLiteral(PALParser.NumberLiteralContext ctx) {
+        return visitLiteral(ctx);
     }
 
     @Override
@@ -54,6 +61,10 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
     @Override
     public Literal visitMapLiteral(PALParser.MapLiteralContext ctx) {
         return visitLiteral(ctx);
+    }
+
+    private Literal parseNumberLiteral(PALParser.NumberLiteralContext ctx) {
+        return new Literal(Integer.parseInt(ctx.NUMBER().getText()));
     }
 
     private Literal parseStringLiteral(PALParser.StringLiteralContext ctx) {
@@ -105,7 +116,7 @@ public class LiteralExprVisitor extends PALBaseVisitor<Literal> {
         for(PALParser.MapEntryContext mapEntryCtx : ctx.map().mapEntry()) {
             Expression keyExpr = Expression.compile(visitorCtx, mapEntryCtx.key);
             Expression valueExpr = Expression.compile(visitorCtx, mapEntryCtx.value);
-            
+
             Type keyExprType = Type.any();
             Type valueExprType = Type.any();
             try {

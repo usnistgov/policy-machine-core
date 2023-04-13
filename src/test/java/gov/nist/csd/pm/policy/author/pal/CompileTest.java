@@ -42,6 +42,7 @@ class CompileTest {
                 let e = true;
                 let f = c['1'];
                 let g = concat([f, ' ', a]);
+                let h = [];
                 """;
         List<PALStatement> stmts = test(pal, new PAP(new MemoryPolicyStore()));
         VarStatement stmt = (VarStatement) stmts.get(0);
@@ -102,8 +103,8 @@ class CompileTest {
 
         stmt = (VarStatement) stmts.get(5);
         assertEquals("f", stmt.getVarName());
-        assertEquals("c", stmt.getExpression().getVariableReference().getMapEntryReference().getMap().getID());
-        assertEquals(k1, stmt.getExpression().getVariableReference().getMapEntryReference().getKey());
+        assertEquals("c", stmt.getExpression().getVariableReference().getEntryReference().getVarRef().getID());
+        assertEquals(k1, stmt.getExpression().getVariableReference().getEntryReference().getKey());
 
         stmt = (VarStatement) stmts.get(6);
         assertEquals("g", stmt.getVarName());
@@ -118,6 +119,13 @@ class CompileTest {
                 )))
         )));
         assertEquals(expectedExpression.toString(), stmt.getExpression().toString());
+
+
+        stmt = (VarStatement) stmts.get(7);
+        assertEquals("h", stmt.getVarName());
+        expectedExpression = new Expression(new Literal(new ArrayLiteral(Type.array(Type.any()))));
+        assertEquals(expectedExpression.toString(), stmt.getExpression().toString());
+        assertEquals(Type.any(), stmt.getExpression().getLiteral().getArrayLiteral().getType());
     }
 
     @Test
@@ -134,7 +142,7 @@ class CompileTest {
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(5, ex.getErrors().size(), ex.getErrors().toString());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("expected []string, got string"));
-        assertTrue(ex.getErrors().get(1).errorMessage().contains("expected map type"));
+        assertTrue(ex.getErrors().get(1).errorMessage().contains("expected map or array type"));
         assertTrue(ex.getErrors().get(2).errorMessage().contains("expression type boolean not allowed, only: [string]"));
         assertTrue(ex.getErrors().get(3).errorMessage().contains("expected map keys to be of the same type but found"));
         assertTrue(ex.getErrors().get(4).errorMessage().contains("expected map keys to be of the same type but found"));
@@ -195,7 +203,7 @@ class CompileTest {
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
-        assertTrue(ex.getErrors().get(0).errorMessage().contains("expected map type"));
+        assertTrue(ex.getErrors().get(0).errorMessage().contains("expected map or array type"));
 
         String pal1 = """
                 let m = {'k1': {'k2': 'v1'}};
@@ -290,7 +298,7 @@ class CompileTest {
         PALStatement expected = new CreatePolicyStatement(
                 new Expression(
                         new VariableReference(
-                                new MapEntryReference(
+                                new EntryReference(
                                         new VariableReference("event", evtCtxType), new Expression(new Literal("eventName"))
                                 ),
                                 Type.any()
@@ -304,7 +312,7 @@ class CompileTest {
                 "target",
                 new Expression(
                         new VariableReference(
-                                new MapEntryReference(
+                                new EntryReference(
                                         new VariableReference("event", evtCtxType), new Expression(new Literal("target"))
                                 ),
                                 Type.any()
@@ -320,7 +328,7 @@ class CompileTest {
                                 "concat",
                                 Arrays.asList(new Expression(new Literal(new ArrayLiteral(
                                         new Expression[]{
-                                                new Expression(new VariableReference(new MapEntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
+                                                new Expression(new VariableReference(new EntryReference(new VariableReference("event", Type.any()), new Expression(new Literal("name"))), Type.any())),
                                                 new Expression(new Literal("_test"))
                                         },
                                         Type.string()
@@ -335,9 +343,9 @@ class CompileTest {
         expected = new SetNodePropertiesStatement(
                 new Expression(
                         new VariableReference(
-                                new MapEntryReference(
+                                new EntryReference(
                                         new VariableReference(
-                                                new MapEntryReference(
+                                                new EntryReference(
                                                         new VariableReference("event", Type.any()),
                                                         new Expression(new Literal("event"))
                                                 ),
@@ -361,9 +369,9 @@ class CompileTest {
                                         new Expression[]{
                                                 new Expression(
                                                         new VariableReference(
-                                                                new MapEntryReference(
+                                                                new EntryReference(
                                                                         new VariableReference(
-                                                                                new MapEntryReference(
+                                                                                new EntryReference(
                                                                                         new VariableReference("event", Type.any()),
                                                                                         new Expression(new Literal("userCtx"))
                                                                                 ),

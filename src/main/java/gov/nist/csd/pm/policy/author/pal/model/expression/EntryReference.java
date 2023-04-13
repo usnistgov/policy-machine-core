@@ -5,18 +5,18 @@ import gov.nist.csd.pm.policy.author.pal.statement.Expression;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class MapEntryReference implements Serializable {
+public class EntryReference implements Serializable {
 
-    private final VariableReference map;
+    private final VariableReference varRef;
     private final Expression key;
 
-    public MapEntryReference(VariableReference map, Expression key) {
-        this.map = map;
+    public EntryReference(VariableReference varRef, Expression key) {
+        this.varRef = varRef;
         this.key = key;
     }
 
-    public VariableReference getMap() {
-        return map;
+    public VariableReference getVarRef() {
+        return varRef;
     }
 
     public Expression getKey() {
@@ -27,18 +27,18 @@ public class MapEntryReference implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MapEntryReference that = (MapEntryReference) o;
-        return Objects.equals(map, that.map)
+        EntryReference that = (EntryReference) o;
+        return Objects.equals(varRef, that.varRef)
                 && Objects.equals(key, that.key);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(map, key);
+        return Objects.hash(varRef, key);
     }
 
     @Override
     public String toString() {
-        return String.format("%s[%s]", map, key);
+        return String.format("%s[%s]", varRef, key);
     }
 }

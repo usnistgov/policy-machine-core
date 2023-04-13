@@ -22,12 +22,21 @@ public class Literal extends PALStatement {
     private boolean isMapLiteral;
     private MapLiteral mapLiteral;
 
+    private boolean isNumberLiteral;
+    private int numberLiteral;
+
     private final Type type;
 
     public Literal(String stringLiteral) {
         this.isStringLiteral = true;
         this.stringLiteral = stringLiteral;
         this.type = Type.string();
+    }
+
+    public Literal(int numberLiteral) {
+        this.isNumberLiteral = true;
+        this.numberLiteral = numberLiteral;
+        this.type = Type.number();
     }
 
     public Literal(boolean booleanLiteral) {
@@ -48,6 +57,10 @@ public class Literal extends PALStatement {
         this.type = mapLiteral.getType();
     }
 
+    public boolean isNumberLiteral() {
+        return isNumberLiteral;
+    }
+
     public boolean isStringLiteral() {
         return isStringLiteral;
     }
@@ -66,6 +79,10 @@ public class Literal extends PALStatement {
 
     public String getStringLiteral() {
         return stringLiteral;
+    }
+
+    public int getNumberLiteral() {
+        return numberLiteral;
     }
 
     public boolean getBooleanLiteral() {
@@ -98,7 +115,7 @@ public class Literal extends PALStatement {
             return new Value(values);
         } else if (isBooleanLiteral()) {
             return new Value(getBooleanLiteral());
-        } else {
+        } else if (isMapLiteral()){
             MapLiteral mapLiteral = getMapLiteral();
             Map<Expression, Expression> map = mapLiteral.getMap();
             Map<Value, Value> values = new HashMap<>();
@@ -107,6 +124,8 @@ public class Literal extends PALStatement {
                 values.put(key.execute(ctx, policyAuthor), expr.execute(ctx, policyAuthor));
             }
             return new Value(values);
+        } else {
+            return new Value(getNumberLiteral());
         }
     }
 
@@ -116,11 +135,13 @@ public class Literal extends PALStatement {
         if (o == null || getClass() != o.getClass()) return false;
         Literal literal = (Literal) o;
         return isStringLiteral == literal.isStringLiteral
+                && isNumberLiteral == literal.isNumberLiteral
                 && isBooleanLiteral == literal.isBooleanLiteral
                 && booleanLiteral == literal.booleanLiteral
                 && isArrayLiteral == literal.isArrayLiteral
                 && isMapLiteral == literal.isMapLiteral
                 && Objects.equals(stringLiteral, literal.stringLiteral)
+                && numberLiteral == literal.numberLiteral
                 && Objects.equals(arrayLiteral, literal.arrayLiteral)
                 && Objects.equals(mapLiteral, literal.mapLiteral)
                 && Objects.equals(type, literal.type);
@@ -130,6 +151,8 @@ public class Literal extends PALStatement {
     public int hashCode() {
         if (isStringLiteral) {
             return stringLiteral.hashCode();
+        } else if (isNumberLiteral) {
+            return Objects.hash(numberLiteral);
         } else if (isBooleanLiteral) {
             return Objects.hash(booleanLiteral);
         } else if (isArrayLiteral) {
@@ -145,6 +168,8 @@ public class Literal extends PALStatement {
             return String.format("'%s'", getStringLiteral());
         } else if (isBooleanLiteral) {
             return String.valueOf(getBooleanLiteral());
+        } else if (isNumberLiteral) {
+            return String.valueOf(getNumberLiteral());
         } else if (isArrayLiteral) {
             return getArrayLiteral().toString();
         } else {

@@ -686,15 +686,15 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitMapEntry(PALParser.MapEntryContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PALParser#mapEntryRef}.
+	 * Enter a parse tree produced by {@link PALParser#entryRef}.
 	 * @param ctx the parse tree
 	 */
-	void enterMapEntryRef(PALParser.MapEntryRefContext ctx);
+	void enterEntryRef(PALParser.EntryRefContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link PALParser#mapEntryRef}.
+	 * Exit a parse tree produced by {@link PALParser#entryRef}.
 	 * @param ctx the parse tree
 	 */
-	void exitMapEntryRef(PALParser.MapEntryRefContext ctx);
+	void exitEntryRef(PALParser.EntryRefContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link PALParser#literal}.
@@ -719,6 +719,18 @@ public interface PALListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBooleanLiteral(PALParser.BooleanLiteralContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code NumberLiteral}
+	 * labeled alternative in {@link PALParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void enterNumberLiteral(PALParser.NumberLiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code NumberLiteral}
+	 * labeled alternative in {@link PALParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void exitNumberLiteral(PALParser.NumberLiteralContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ArrayLiteral}
 	 * labeled alternative in {@link PALParser#literal}.
@@ -756,17 +768,17 @@ public interface PALListener extends ParseTreeListener {
 	 */
 	void exitReferenceByID(PALParser.ReferenceByIDContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MapEntryReference}
+	 * Enter a parse tree produced by the {@code EntryReference}
 	 * labeled alternative in {@link PALParser#varRef}.
 	 * @param ctx the parse tree
 	 */
-	void enterMapEntryReference(PALParser.MapEntryReferenceContext ctx);
+	void enterEntryReference(PALParser.EntryReferenceContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MapEntryReference}
+	 * Exit a parse tree produced by the {@code EntryReference}
 	 * labeled alternative in {@link PALParser#varRef}.
 	 * @param ctx the parse tree
 	 */
-	void exitMapEntryReference(PALParser.MapEntryReferenceContext ctx);
+	void exitEntryReference(PALParser.EntryReferenceContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PALParser#funcCall}.
 	 * @param ctx the parse tree

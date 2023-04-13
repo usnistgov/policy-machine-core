@@ -414,11 +414,11 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMapEntry(PALParser.MapEntryContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PALParser#mapEntryRef}.
+	 * Visit a parse tree produced by {@link PALParser#entryRef}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMapEntryRef(PALParser.MapEntryRefContext ctx);
+	T visitEntryRef(PALParser.EntryRefContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link PALParser#literal}.
@@ -433,6 +433,13 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBooleanLiteral(PALParser.BooleanLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NumberLiteral}
+	 * labeled alternative in {@link PALParser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumberLiteral(PALParser.NumberLiteralContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ArrayLiteral}
 	 * labeled alternative in {@link PALParser#literal}.
@@ -455,12 +462,12 @@ public interface PALVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReferenceByID(PALParser.ReferenceByIDContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MapEntryReference}
+	 * Visit a parse tree produced by the {@code EntryReference}
 	 * labeled alternative in {@link PALParser#varRef}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMapEntryReference(PALParser.MapEntryReferenceContext ctx);
+	T visitEntryReference(PALParser.EntryReferenceContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PALParser#funcCall}.
 	 * @param ctx the parse tree

@@ -165,17 +165,18 @@ map:
     OPEN_CURLY (mapEntry (COMMA mapEntry)*)? CLOSE_CURLY ;
 mapEntry:
     key=expression COLON value=expression ;
-mapEntryRef:
+entryRef:
     VARIABLE_OR_FUNCTION_NAME (OPEN_BRACKET key=expression CLOSE_BRACKET)+;
 
 literal:
     STRING #StringLiteral
     | BOOLEAN #BooleanLiteral
+    | NUMBER #NumberLiteral
     | array #ArrayLiteral
     | map #MapLiteral;
 varRef:
     VARIABLE_OR_FUNCTION_NAME #ReferenceByID
-    | mapEntryRef #MapEntryReference ;
+    | entryRef #EntryReference ;
 
 funcCall:
     VARIABLE_OR_FUNCTION_NAME funcCallArgs ;

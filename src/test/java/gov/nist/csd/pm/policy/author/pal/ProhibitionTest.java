@@ -51,5 +51,11 @@ class ProhibitionTest {
         assertEquals(new AccessRightSet("read"), accessRights);
         accessRights = reviewer.getAccessRights(new UserContext("u2"), "oa1");
         assertEquals(new AccessRightSet("read", "write"), accessRights);
+
+        input = """
+                delete prohibition 'pro1';
+                """;
+        pap.executePAL(new UserContext(SUPER_USER), input);
+        assertTrue(pap.getProhibitionsWithSubject("u1").isEmpty());
     }
 }

@@ -12,8 +12,8 @@ public class VariableReference extends PALStatement {
 
     private boolean isID;
     private String id;
-    private boolean isMapEntryReference;
-    private MapEntryReference mapEntryReference;
+    private boolean isEntryReference;
+    private EntryReference entryReference;
     private final Type type;
 
     public VariableReference(String id, Type type) {
@@ -22,9 +22,9 @@ public class VariableReference extends PALStatement {
         this.type = type;
     }
 
-    public VariableReference(MapEntryReference mapEntryReference, Type type) {
-        this.isMapEntryReference = true;
-        this.mapEntryReference = mapEntryReference;
+    public VariableReference(EntryReference entryReference, Type type) {
+        this.isEntryReference = true;
+        this.entryReference = entryReference;
         this.type = type;
     }
 
@@ -36,12 +36,12 @@ public class VariableReference extends PALStatement {
         return id;
     }
 
-    public boolean isMapEntryReference() {
-        return isMapEntryReference;
+    public boolean isEntryReference() {
+        return isEntryReference;
     }
 
-    public MapEntryReference getMapEntryReference() {
-        return mapEntryReference;
+    public EntryReference getEntryReference() {
+        return entryReference;
     }
 
     public Type getType() {
@@ -58,32 +58,44 @@ public class VariableReference extends PALStatement {
             }
         }
 
-        List<MapEntryReference> refChain = new ArrayList<>();
-        MapEntryReference ref = mapEntryReference;
+        List<EntryReference> refChain = new ArrayList<>();
+        EntryReference ref = entryReference;
         refChain.add(ref);
-        while (!ref.getMap().isID) {
-            MapEntryReference next = ref.getMap().getMapEntryReference();
+        while (!ref.getVarRef().isID) {
+            EntryReference next = ref.getVarRef().getEntryReference();
             refChain.add(0, next);
 
             ref = next;
         }
 
         Value value = null;
-        for (MapEntryReference mer : refChain) {
+        for (EntryReference entRef : refChain) {
             if (value == null) {
-                Value mapValue = mer.getMap().execute(ctx, policyAuthor);
-                Value keyValue = mer.getKey().execute(ctx, policyAuthor);
-                value = mapValue.getMapValue().get(keyValue);
+                Value mapValue = entRef.getVarRef().execute(ctx, policyAuthor);
+                Value keyValue = entRef.getKey().execute(ctx, policyAuthor);
+
+                if (mapValue.isMap()) {
+                    value = mapValue.getMapValue().get(keyValue);
+                } else if (mapValue.isArray()) {
+                    value = mapValue.getArrayValue().get(keyValue.getNumberValue());
+                }
+
                 continue;
             }
 
-            if (!value.isMap()) {
+            if (!value.isMap() && !value.isArray()) {
                 break;
             }
 
-            Map<Value, Value> mapValue = value.getMapValue();
-            Value keyValue = mer.getKey().execute(ctx, policyAuthor);
-            value = mapValue.get(keyValue);
+            if (value.isMap()) {
+                Map<Value, Value> mapValue = value.getMapValue();
+                Value keyValue = entRef.getKey().execute(ctx, policyAuthor);
+                value = mapValue.get(keyValue);
+            } else {
+                List<Value> arrayValue = value.getArrayValue();
+                Value keyValue = entRef.getKey().execute(ctx, policyAuthor);
+                value = arrayValue.get(keyValue.getNumberValue());
+            }
         }
 
         return value;
@@ -95,15 +107,15 @@ public class VariableReference extends PALStatement {
         if (o == null || getClass() != o.getClass()) return false;
         VariableReference that = (VariableReference) o;
         return isID == that.isID
-                && isMapEntryReference == that.isMapEntryReference
+                && isEntryReference == that.isEntryReference
                 && Objects.equals(id, that.id)
-                && Objects.equals(mapEntryReference, that.mapEntryReference)
+                && Objects.equals(entryReference, that.entryReference)
                 && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isID, id, isMapEntryReference, mapEntryReference, type);
+        return Objects.hash(isID, id, isEntryReference, entryReference, type);
     }
 
     @Override
@@ -111,7 +123,7 @@ public class VariableReference extends PALStatement {
         if (isID) {
             return id;
         } else {
-            return mapEntryReference.toString();
+            return entryReference.toString();
         }
     }
 }

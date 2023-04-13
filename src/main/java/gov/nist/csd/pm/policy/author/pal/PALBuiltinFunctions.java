@@ -34,6 +34,7 @@ public class PALBuiltinFunctions {
     private static final FunctionDefinitionStatement deassignAllFromAndDelete = new DeassignAllFromAndDelete();
     private static final FunctionDefinitionStatement append = new Append();
     private static final FunctionDefinitionStatement appendAll = new AppendAll();
+    private static final FunctionDefinitionStatement length = new Length();
 
 
     private static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
@@ -63,6 +64,7 @@ public class PALBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(deassignAllFromAndDelete.getFunctionName(), deassignAllFromAndDelete);
         BUILTIN_FUNCTIONS.put(append.getFunctionName(), append);
         BUILTIN_FUNCTIONS.put(appendAll.getFunctionName(), appendAll);
+        BUILTIN_FUNCTIONS.put(length.getFunctionName(), length);
     }
 
     public static Map<String, FunctionDefinitionStatement> builtinFunctions() {
