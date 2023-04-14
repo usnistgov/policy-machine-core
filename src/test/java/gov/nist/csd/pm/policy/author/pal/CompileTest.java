@@ -32,17 +32,17 @@ class CompileTest {
     @Test
     void testCompileLet() throws PMException {
         String pal = """
-                let a = 'hello world';
-                let b = ['hello', 'world'];
+                let a = 'hello world'
+                let b = ['hello', 'world']
                 let c = {
                             '1': '2',
                             '3': '4'
-                        };
-                let d = {'1': '2', a: b};
-                let e = true;
-                let f = c['1'];
-                let g = concat([f, ' ', a]);
-                let h = [];
+                        }
+                let d = {'1': '2', a: b}
+                let e = true
+                let f = c['1']
+                let g = concat([f, ' ', a])
+                let h = []
                 """;
         List<PALStatement> stmts = test(pal, new PAP(new MemoryPolicyStore()));
         VarStatement stmt = (VarStatement) stmts.get(0);
@@ -131,13 +131,13 @@ class CompileTest {
     @Test
     void testCompileErrors() {
         String pal = """
-                let a = concat('1');
-                let b = a['a'];
-                let c = {'a': 'b'};
-                let d = c[true];
-                let e = {'': '', ['']: {'': ''}, true: ''};
-                let a = b;
-                a = b;
+                let a = concat('1')
+                let b = a['a']
+                let c = {'a': 'b'}
+                let d = c[true]
+                let e = {'': '', ['']: {'': ''}, true: ''}
+                let a = b
+                a = b
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(5, ex.getErrors().size(), ex.getErrors().toString());
@@ -151,9 +151,9 @@ class CompileTest {
     @Test
     void testConstErrors() {
         String pal = """
-                const a = 'hello world';
-                const a = 'test';
-                a = 'test';
+                const a = 'hello world'
+                const a = 'test'
+                a = 'test'
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(2, ex.getErrors().size(), ex.getErrors().toString());
@@ -183,7 +183,7 @@ class CompileTest {
     void testForRangeCompileErrors() throws PMException {
         String pal = """
                 for i in range [1, 5] {
-                    create policy class i;
+                    create policy class i
                 }
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
@@ -198,16 +198,16 @@ class CompileTest {
     @Test
     void testMaps() {
         String pal = """
-                let m = {'k1': {'k2': 'v1'}};
-                let x = m['k1']['k2']['k3'];
+                let m = {'k1': {'k2': 'v1'}}
+                let x = m['k1']['k2']['k3']
                 """;
         PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         assertTrue(ex.getErrors().get(0).errorMessage().contains("expected map or array type"));
 
         String pal1 = """
-                let m = {'k1': {'k2': 'v1'}};
-                create policy class m['k1'];
+                let m = {'k1': {'k2': 'v1'}}
+                create policy class m['k1']
                 """;
         ex = assertThrows(PALCompilationException.class, () -> test(pal1, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
@@ -217,9 +217,9 @@ class CompileTest {
     @Test
     void testMapsSuccess() throws PMException, UnknownVariableInScopeException {
         String pal = """
-                let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}};
-                let x = m['k1']['k1-1']['k1-1-1'];
-                create policy class x;
+                let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}}
+                let x = m['k1']['k1-1']['k1-1-1']
+                create policy class x
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         List<PALStatement> test = test(pal, new PAP(new MemoryPolicyStore()));
@@ -251,13 +251,13 @@ class CompileTest {
                     performs ['create_object_attribute']
                     on 'oa1'
                     do(event) {
-                        create policy class event['eventName'];
-                        let target = event['target'];
+                        create policy class event['eventName']
+                        let target = event['target']
                         
-                        create policy class concat([event['name'], '_test']);
-                        set properties of event['event']['name'] to {'key': target};
+                        create policy class concat([event['name'], '_test'])
+                        set properties of event['event']['name'] to {'key': target}
                         
-                        create policy class concat([event['userCtx']['user'], '_test']);
+                        create policy class concat([event['userCtx']['user'], '_test'])
                     }
                 }
                 """;
@@ -394,9 +394,9 @@ class CompileTest {
     @Test
     void testScopeOrder() {
         String pal = """
-                let x = 'hello';
-                create policy class concat([x, ' ', y]);
-                let y = 'world';
+                let x = 'hello'
+                create policy class concat([x, ' ', y])
+                let y = 'world'
                 """;
         assertThrows(PALCompilationException.class, () -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
     }
@@ -408,7 +408,7 @@ class CompileTest {
                 
                 }
                 
-                testFunc({});
+                testFunc({})
                 """;
         assertDoesNotThrow(() -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
     }
@@ -417,8 +417,8 @@ class CompileTest {
     void testForLoopLocalVar() throws PMException {
         String pal = """
                 for i in range [1, 100] {
-                    let x = i;
-                    create pc numToStr(x);
+                    let x = i
+                    create pc numToStr(x)
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
@@ -427,21 +427,21 @@ class CompileTest {
 
         String pal2 = """
                 for i in range [1, 100] {
-                    let x = i;
-                    create pc numToStr(x);
+                    let x = i
+                    create pc numToStr(x)
                 }
                 
-                create oa 'oa1' in x;
+                create oa 'oa1' in x
                 """;
         PAP pap2 = new PAP(new MemoryPolicyStore());
         assertThrows(PALCompilationException.class, () -> pap2.fromString(pal2, new PALDeserializer(new UserContext(SUPER_USER))));
 
         pal = """
-                create pc 'pc1';
-                create oa 'oa1' in ['pc1'];
+                create pc 'pc1'
+                create oa 'oa1' in ['pc1']
                 foreach child in getChildren('pc1') {
-                    let x = 'pc2';
-                    create pc x;
+                    let x = 'pc2'
+                    create pc x
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -450,11 +450,11 @@ class CompileTest {
 
         String pal3 = """
                 foreach child in getChildren('pc1') {
-                    let x = 'pc2';
-                    create pc x;
+                    let x = 'pc2'
+                    create pc x
                 }
                 
-                create oa 'oa1' in x;
+                create oa 'oa1' in x
                 """;
         PAP pap3 = new PAP(new MemoryPolicyStore());
         assertThrows(PALCompilationException.class, () -> pap3.fromString(pal3, new PALDeserializer(new UserContext(SUPER_USER))));

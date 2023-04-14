@@ -21,10 +21,10 @@ class ExecutePALTest {
                 "testFunc",
                 Type.string(),
                 List.of(),
-                (ctx, policy) -> new Value("create policy class 'pc1';")
+                (ctx, policy) -> new Value("create policy class 'pc1'")
         );
         String pal = """
-                executePAL(testFunc());
+                executePAL(testFunc())
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.addPALFunction(functionDefinitionStatement);

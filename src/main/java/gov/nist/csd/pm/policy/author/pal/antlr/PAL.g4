@@ -27,7 +27,7 @@ stmt: (
 );
 
 // let
-varStmt: (LET | CONST)? VARIABLE_OR_FUNCTION_NAME EQUALS expression SEMI_COLON ;
+varStmt: (LET | CONST)? VARIABLE_OR_FUNCTION_NAME EQUALS expression ;
 
 // function definition
 funcDefStmt:
@@ -39,7 +39,7 @@ formalArg:
 formalArgType:
     varType ;
 funcReturnStmt:
-    (RETURN expression | RETURN) SEMI_COLON ;
+    (RETURN expression | RETURN) ;
 funcReturnType:
     varType #VarReturnType
     | VOID_TYPE #VoidReturnType;
@@ -56,15 +56,15 @@ forRangeStmt:
 
 // break
 breakStmt:
-    BREAK SEMI_COLON ;
+    BREAK ;
 
 // continue
 continueStmt:
-    CONTINUE SEMI_COLON ;
+    CONTINUE ;
 
 // function call
 funcCallStmt:
-    funcCall SEMI_COLON;
+    funcCall;
 
 // if
 ifStmt:
@@ -95,19 +95,19 @@ deleteType:
 nodeType:
     (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
-createPolicyStmt: CREATE POLICY_CLASS expression SEMI_COLON ;
-createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression IN parents=expression SEMI_COLON ;
-createUserOrObjectStmt: CREATE (USER | OBJECT) name=expression IN parents=expression SEMI_COLON ;
+createPolicyStmt: CREATE POLICY_CLASS expression ;
+createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression IN parents=expression ;
+createUserOrObjectStmt: CREATE (USER | OBJECT) name=expression IN parents=expression ;
 
-setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression SEMI_COLON ;
+setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression ;
 
-assignStmt: ASSIGN childNode=expression TO parentNodes=expression SEMI_COLON ;
-deassignStmt: DEASSIGN childNode=expression FROM parentNodes=expression SEMI_COLON ;
+assignStmt: ASSIGN childNode=expression TO parentNodes=expression ;
+deassignStmt: DEASSIGN childNode=expression FROM parentNodes=expression ;
 
-associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expression SEMI_COLON ;
-dissociateStmt: DISSOCIATE ua=expression AND target=expression SEMI_COLON ;
+associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expression ;
+dissociateStmt: DISSOCIATE ua=expression AND target=expression ;
 
-deleteStmt: DELETE deleteType expression SEMI_COLON ;
+deleteStmt: DELETE deleteType expression ;
 
 createObligationStmt:
     CREATE OBLIGATION expression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
@@ -140,20 +140,20 @@ responseStmt:
     | deleteRuleStmt
     ;
 deleteRuleStmt:
-    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression SEMI_COLON ;
+    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression ;
 
 createProhibitionStmt:
     CREATE PROHIBITION name=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
     ACCESS_RIGHTS accessRights=expression
     ON (INTERSECTION|UNION) OF containers=prohibitionContainerList
-    SEMI_COLON ;
+    ;
 prohibitionContainerList:
     OPEN_BRACKET (prohibitionContainerExpression (COMMA prohibitionContainerExpression)*)? CLOSE_BRACKET ;
 prohibitionContainerExpression:
     IS_COMPLEMENT? container=expression ;
 
 setResourceAccessRightsStmt:
-    SET_RESOURCE_ACCESS_RIGHTS accessRights=expression SEMI_COLON;
+    SET_RESOURCE_ACCESS_RIGHTS accessRights=expression;
 
 expression:
     varRef
@@ -258,7 +258,6 @@ LINE_COMMENT : '#' ~'\n'* '\n' -> channel(HIDDEN) ;
 WS : [ \t\n\r]+ -> skip ;
 COMMA: ',' ;
 COLON: ':' ;
-SEMI_COLON: ';' ;
 OPEN_CURLY: '{' ;
 CLOSE_CURLY: '}' ;
 OPEN_BRACKET: '[' ;

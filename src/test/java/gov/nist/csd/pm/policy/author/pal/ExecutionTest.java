@@ -25,30 +25,30 @@ public class ExecutionTest {
 
         String input =
                 """
-                set resource access rights ['read', 'write'];
+                set resource access rights ['read', 'write']
                 
-                create policy class 'pc1';
+                create policy class 'pc1'
                 
-                set properties of 'pc1' to {'k': 'v'};
+                set properties of 'pc1' to {'k': 'v'}
                 
-                create object attribute 'oa1' in ['pc1'];
-                create object attribute 'oa2' in ['pc1'];
-                create object attribute 'oa3' in ['pc1'];
+                create object attribute 'oa1' in ['pc1']
+                create object attribute 'oa2' in ['pc1']
+                create object attribute 'oa3' in ['pc1']
                 
-                let parents = ['oa1', 'oa2', 'oa3'];
-                create object 'o1' in parents;
+                let parents = ['oa1', 'oa2', 'oa3']
+                create object 'o1' in parents
                 
-                create user attribute 'ua1' in ['pc1'];
-                create user attribute 'ua2' in ['pc1'];
-                create user attribute 'ua3' in ['pc1'];
+                create user attribute 'ua1' in ['pc1']
+                create user attribute 'ua2' in ['pc1']
+                create user attribute 'ua3' in ['pc1']
                 
-                let username = 'u1';
-                create user username in ['ua1'];
-                assign username to ['ua2', 'ua3'];
+                let username = 'u1'
+                create user username in ['ua1']
+                assign username to ['ua2', 'ua3']
                 
-                associate 'ua1' and 'oa1' with ['read', 'write'];
-                associate 'ua2' and 'oa2' with ['read', 'write'];
-                associate 'ua3' and 'oa3' with ['read', 'write'];
+                associate 'ua1' and 'oa1' with ['read', 'write']
+                associate 'ua2' and 'oa2' with ['read', 'write']
+                associate 'ua3' and 'oa3' with ['read', 'write']
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
 
@@ -87,7 +87,7 @@ public class ExecutionTest {
 
         input =
                 """
-                deassign 'u1' from ['ua1', 'ua2'];
+                deassign 'u1' from ['ua1', 'ua2']
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
@@ -96,14 +96,14 @@ public class ExecutionTest {
 
         input =
                 """
-                delete user 'u1';
+                delete user 'u1'
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("u1"));
 
         input =
                 """
-                deassign 'o1' from ['oa1'];
+                deassign 'o1' from ['oa1']
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.getParents("oa1").contains("oa1"));
@@ -111,16 +111,16 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object 'o1';
+                delete object 'o1'
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("o1"));
 
         input =
                 """
-                delete user attribute 'ua1';
-                delete user attribute 'ua2';
-                delete user attribute 'ua3';
+                delete user attribute 'ua1'
+                delete user attribute 'ua2'
+                delete user attribute 'ua3'
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("ua1"));
@@ -130,9 +130,9 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object attribute 'oa1';
-                delete object attribute 'oa2';
-                delete object attribute 'oa3';
+                delete object attribute 'oa1'
+                delete object attribute 'oa2'
+                delete object attribute 'oa3'
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("oa1"));
@@ -141,7 +141,7 @@ public class ExecutionTest {
 
         input =
                 """
-                delete policy class 'pc1';
+                delete policy class 'pc1'
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertFalse(pap.nodeExists("pc1"));
@@ -151,23 +151,23 @@ public class ExecutionTest {
     void testIf() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
         String input = """
-                let x = 'test';
-                let y = 'test';
+                let x = 'test'
+                let y = 'test'
                 if equals(x, y) {
-                    create policy class 'pc1';
+                    create policy class 'pc1'
                 }
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertTrue(pap.nodeExists("pc1"));
 
         input = """
-                let x = 'test';
-                let y = 'test';
-                let z = 'test1';
+                let x = 'test'
+                let y = 'test'
+                let z = 'test1'
                 if equals(x, z) {
-                    create policy class 'pc1';
+                    create policy class 'pc1'
                 } else if equals(x, y) {
-                    create policy class 'pc2';
+                    create policy class 'pc2'
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -177,15 +177,15 @@ public class ExecutionTest {
         assertTrue(pap.nodeExists("pc2"));
 
         input = """
-                let x = 'test';
-                let y = 'test1';
-                let z = 'test2';
+                let x = 'test'
+                let y = 'test1'
+                let z = 'test2'
                 if equals(x, z) {
-                    create policy class 'pc1';
+                    create policy class 'pc1'
                 } else if equals(x, y) {
-                    create policy class 'pc2';
+                    create policy class 'pc2'
                 } else {
-                    create policy class 'pc3';
+                    create policy class 'pc3'
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -196,13 +196,13 @@ public class ExecutionTest {
         assertTrue(pap.nodeExists("pc3"));
 
         input = """
-                let x = 'test';
-                let y = 'test1';
-                let z = 'test2';
+                let x = 'test'
+                let y = 'test1'
+                let z = 'test2'
                 if equals(x, y) {
-                    create policy class 'pc1';
+                    create policy class 'pc1'
                 } else {
-                    create policy class 'pc2';
+                    create policy class 'pc2'
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -212,13 +212,13 @@ public class ExecutionTest {
         assertTrue(pap.nodeExists("pc2"));
 
         input = """
-                let x = 'test';
-                let y = 'test1';
-                let z = 'test2';
+                let x = 'test'
+                let y = 'test1'
+                let z = 'test2'
                 if !equals(x, y) {
-                    create policy class 'pc1';
+                    create policy class 'pc1'
                 } else {
-                    create policy class 'pc2';
+                    create policy class 'pc2'
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -233,7 +233,7 @@ public class ExecutionTest {
         PAP pap = new PAP(new MemoryPolicyStore());
         String input = """
                 foreach x in ['pc1', 'pc2', 'pc3'] {
-                    create policy class x;
+                    create policy class x
                 }
                 """;
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
@@ -243,9 +243,9 @@ public class ExecutionTest {
         assertTrue(pap.nodeExists("pc3"));
 
         input = """
-                let m = {'k1': 'pc1', 'k2': 'pc2', 'k3': 'pc3'};
+                let m = {'k1': 'pc1', 'k2': 'pc2', 'k3': 'pc3'}
                 foreach x in m {
-                    create policy class m[x];
+                    create policy class m[x]
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -258,7 +258,7 @@ public class ExecutionTest {
         input = """
                 foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
                     foreach z in y {
-                        create policy class z;
+                        create policy class z
                     }
                 }
                 """;
@@ -272,8 +272,8 @@ public class ExecutionTest {
         input = """
                 foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
                     foreach z in y {
-                        create policy class z;
-                        break;
+                        create policy class z
+                        break
                     }
                 }
                 """;
@@ -287,8 +287,8 @@ public class ExecutionTest {
         input = """
                 foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
                     foreach z in y {
-                        continue;
-                        create policy class z;
+                        continue
+                        create policy class z
                     }
                 }
                 """;
@@ -300,15 +300,15 @@ public class ExecutionTest {
         assertFalse(pap.nodeExists("pc3"));
 
         input = """
-                let a = 'test';
-                let b = 'test';
+                let a = 'test'
+                let b = 'test'
                 foreach x in ['pc1', 'pc2', 'pc3'] {
                     if equals(a, b) {
-                        a = 'test2';
-                        continue;
+                        a = 'test2'
+                        continue
                     }
                     
-                    create policy class x;
+                    create policy class x
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
@@ -323,7 +323,7 @@ public class ExecutionTest {
     void testForRange() throws PMException {
         String input = """
                 for i in range [1, 5] {
-                    create policy class numToStr(i);
+                    create policy class numToStr(i)
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
@@ -337,10 +337,10 @@ public class ExecutionTest {
     void testFunction() throws PMException {
         String input = """
                 function testFunc(any x) {
-                    create policy class x;
+                    create policy class x
                 }
                 
-                testFunc('pc1');
+                testFunc('pc1')
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
@@ -349,22 +349,22 @@ public class ExecutionTest {
 
         String input1 = """
                 function testFunc(any x) {
-                    create policy class x;
+                    create policy class x
                 }
                 
-                testFunc(['pc1']);
+                testFunc(['pc1'])
                 """;
         PAP pap1 = new PAP(new MemoryPolicyStore());
         assertThrows(IllegalStateException.class, () -> PALExecutor.compileAndExecutePAL(pap1, superUser, input1));
 
         input = """
-                let x = 'hello';
+                let x = 'hello'
                 function testFunc() {
-                    x = concat([x, ' world']);
-                    create policy class x;
+                    x = concat([x, ' world'])
+                    create policy class x
                 }
                 
-                testFunc();
+                testFunc()
                 """;
         PALExecutor.compileAndExecutePAL(pap1, superUser, input);
         assertTrue(pap1.nodeExists("hello world"));
@@ -373,9 +373,9 @@ public class ExecutionTest {
     @Test
     void testChangeVariableValue() throws PMException {
         String input = """
-                let a = 'hello world';
-                const b = a;
-                create policy class b;
+                let a = 'hello world'
+                const b = a
+                create policy class b
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
@@ -383,10 +383,10 @@ public class ExecutionTest {
 
         PAP pap1 = new PAP(new MemoryPolicyStore());
         String input1 = """
-                let a = 'hello world';
-                const b = a;
-                a = 'test';
-                create policy class b;
+                let a = 'hello world'
+                const b = a
+                a = 'test'
+                create policy class b
                 """;
         PALExecutor.compileAndExecutePAL(pap1, superUser, input1);
         assertFalse(pap.nodeExists("test"));
@@ -395,9 +395,9 @@ public class ExecutionTest {
     @Test
     void testMaps() throws PMException {
         String input = """
-                let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}};
-                let x = m['k1']['k1-1']['k1-1-1'];
-                create policy class x;
+                let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}}
+                let x = m['k1']['k1-1']['k1-1-1']
+                create policy class x
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
@@ -407,14 +407,14 @@ public class ExecutionTest {
     @Test
     void testArrayWithLiteral() throws PMException {
         String input = """
-                set resource access rights ["read", "write"];
+                set resource access rights ["read", "write"]
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         PALExecutor.compileAndExecutePAL(pap, superUser, input);
         assertTrue(pap.getResourceAccessRights().contains("read"));
 
         String input1 = """
-                set resource access rights [["read", "write"], ["exec"]];
+                set resource access rights [["read", "write"], ["exec"]]
                 """;
         assertThrows(PMException.class, () -> PALExecutor.compileAndExecutePAL(pap, superUser, input1));
     }
@@ -422,7 +422,7 @@ public class ExecutionTest {
     @Test
     void testDeleteNonExistentNode() throws PMException {
         String input = """
-                delete pc 'pc1';
+                delete pc 'pc1'
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         assertDoesNotThrow(() -> PALExecutor.compileAndExecutePAL(pap, superUser, input));
@@ -440,12 +440,12 @@ public class ExecutionTest {
                 create prohibition 'p1'
                 deny user attribute "ua1"
                 access rights ["read"]
-                on union of ["oa1"];
+                on union of ["oa1"]
                 """;
         pap.executePAL(superUser, input);
 
         input = """
-                delete prohibition 'p1';
+                delete prohibition 'p1'
                 """;
         pap.executePAL(superUser, input);
         assertFalse(pap.getProhibitions().containsKey("p1"));
@@ -454,11 +454,11 @@ public class ExecutionTest {
     @Test
     void testArrayGetByIndex() throws PMException {
         String s = """
-                let x = ["1", "2", "3"];
-                create pc x[1];
+                let x = ["1", "2", "3"]
+                create pc x[1]
                 
-                let y = [["1", "2", "3"]];
-                create pc y[0][0];
+                let y = [["1", "2", "3"]]
+                create pc y[0][0]
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.executePAL(new UserContext(SUPER_USER), s);

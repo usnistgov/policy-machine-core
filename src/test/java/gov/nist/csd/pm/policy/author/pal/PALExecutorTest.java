@@ -48,8 +48,8 @@ class PALExecutorTest {
 
         String pal = """
                 
-                test1('');
-                test2('');
+                test1('')
+                test2('')
                 
                 """;
 
