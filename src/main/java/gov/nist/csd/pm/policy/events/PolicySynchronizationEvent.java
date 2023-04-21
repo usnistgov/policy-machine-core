@@ -3,7 +3,7 @@ package gov.nist.csd.pm.policy.events;
 import gov.nist.csd.pm.policy.model.graph.MemoryGraph;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.author.pal.PALContext;
+import gov.nist.csd.pm.policy.pml.PALContext;
 
 import java.util.List;
 import java.util.Map;

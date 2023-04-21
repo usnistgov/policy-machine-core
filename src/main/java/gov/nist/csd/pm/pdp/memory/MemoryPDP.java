@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreEventHandler;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
-import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -39,7 +38,7 @@ public class MemoryPDP extends PDP {
         });
     }
 
-    private static class ReviewerPolicyListener extends MemoryPolicyStoreEventHandler implements PolicyReader {
+    private static class ReviewerPolicyListener extends MemoryPolicyStoreEventHandler {
 
         public ReviewerPolicyListener(MemoryPolicyStore store) {
             super(store);
@@ -63,7 +62,7 @@ public class MemoryPDP extends PDP {
         }
     }
 
-    private static class EmbeddedPolicyListener extends BasePolicyEventHandler implements PolicyReader {
+    private static class EmbeddedPolicyListener extends BasePolicyEventHandler {
 
         public EmbeddedPolicyListener(PAP pap) {
             super(pap);

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
-import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.dag.NoopShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.ShortCircuit;

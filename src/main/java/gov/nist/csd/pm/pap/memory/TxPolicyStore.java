@@ -1,8 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.policy.PolicyWriter;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;

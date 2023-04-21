@@ -1,21 +1,17 @@
 package gov.nist.csd.pm.policy.serializer;
 
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
-import gov.nist.csd.pm.policy.author.pal.PALFormatter;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
-import gov.nist.csd.pm.policy.author.pal.statement.*;
+import gov.nist.csd.pm.policy.pml.PMLFormatter;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.pml.model.expression.*;
+import gov.nist.csd.pm.policy.pml.statement.*;
 
-import java.sql.Array;
-import java.sql.Statement;
 import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
@@ -36,7 +32,7 @@ public class PALSerializer implements PolicySerializer {
     public String serialize(PolicyAuthor policyAuthor) throws PMException {
         String pal = toPAL(policyAuthor);
         if (format) {
-            pal = PALFormatter.format(pal);
+            pal = PMLFormatter.format(pal);
         }
 
         return pal;

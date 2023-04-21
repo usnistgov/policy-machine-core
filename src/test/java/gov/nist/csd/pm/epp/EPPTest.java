@@ -3,13 +3,13 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;
-import gov.nist.csd.pm.policy.author.pal.model.expression.ArrayLiteral;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Literal;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
-import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
-import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.CreateUserOrObjectStatement;
-import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.pml.model.expression.ArrayLiteral;
+import gov.nist.csd.pm.policy.pml.model.expression.Literal;
+import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
+import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
+import gov.nist.csd.pm.policy.pml.statement.CreateUserOrObjectStatement;
+import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;

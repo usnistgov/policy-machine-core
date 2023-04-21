@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.pdp.memory;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
-import gov.nist.csd.pm.policy.PolicyReader;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -14,7 +12,6 @@ import gov.nist.csd.pm.policy.model.graph.dag.UserDagResult;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.policy.model.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
-import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
 

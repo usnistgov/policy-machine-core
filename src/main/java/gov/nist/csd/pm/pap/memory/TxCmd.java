@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;

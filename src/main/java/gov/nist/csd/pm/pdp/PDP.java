@@ -4,10 +4,10 @@ import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.policy.PolicySerializable;
-import gov.nist.csd.pm.policy.author.pal.PALContext;
-import gov.nist.csd.pm.policy.author.pal.PALExecutable;
-import gov.nist.csd.pm.policy.author.pal.PALExecutor;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.PALContext;
+import gov.nist.csd.pm.policy.pml.PALExecutable;
+import gov.nist.csd.pm.policy.pml.PALExecutor;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -21,8 +21,7 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
 import gov.nist.csd.pm.policy.serializer.PolicySerializer;
-import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -77,7 +76,7 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements PolicyAuthor, PolicyEventEmitter, PolicySerializable, PALExecutable {
+    public static class PDPTx implements PolicyEventEmitter, PolicySerializable, PALExecutable, PolicyWriter {
 
         private final UserContext userCtx;
         private final Adjudicator adjudicator;

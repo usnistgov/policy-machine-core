@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
 
 public class AddConstantEvent implements PolicyEvent {
 

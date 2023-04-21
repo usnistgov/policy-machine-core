@@ -1,10 +1,8 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.PolicyReader;
-import gov.nist.csd.pm.policy.author.*;
-import gov.nist.csd.pm.policy.author.pal.PALContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.PALContext;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
@@ -21,7 +19,7 @@ import java.util.Map;
 /**
  * Implements the PolicyEventListener interface to apply policy events to the passed PolicyAuthor.
  */
-public abstract class BasePolicyEventHandler implements PolicyEventListener, PolicyReader {
+public abstract class BasePolicyEventHandler implements PolicyEventListener {
     
     protected PolicyAuthor policy;
 

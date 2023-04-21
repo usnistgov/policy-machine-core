@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 public class AddFunctionEvent implements PolicyEvent {
 

@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Type;
-import gov.nist.csd.pm.policy.author.pal.model.expression.VariableReference;
-import gov.nist.csd.pm.policy.author.pal.statement.Expression;
+import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
+import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
@@ -15,7 +15,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.author.pal.statement.CreatePolicyStatement;
+import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

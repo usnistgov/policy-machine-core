@@ -1,7 +1,6 @@
 package gov.nist.csd.pm;
 
 import gov.nist.csd.pm.policy.PolicySerializable;
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.serializer.PALDeserializer;

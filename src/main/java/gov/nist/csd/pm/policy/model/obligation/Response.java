@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.policy.model.obligation;
 
-import gov.nist.csd.pm.policy.author.pal.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.PALStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.author.PolicyAuthor;
 import gov.nist.csd.pm.epp.EventContext;
 
 import java.io.Serializable;
