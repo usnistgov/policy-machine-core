@@ -1,23 +1,21 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.model.graph.Graph;
+import gov.nist.csd.pm.policy.model.graph.MemoryGraph;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.author.pal.PALContext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class PolicySynchronizationEvent implements PolicyEvent {
 
-    private final Graph graph;
+    private final MemoryGraph graph;
     private final Map<String, List<Prohibition>> prohibitions;
     private final List<Obligation> obligations;
     private final PALContext palCtx;
 
-    public PolicySynchronizationEvent(Graph graph, Map<String, List<Prohibition>> prohibitions,
+    public PolicySynchronizationEvent(MemoryGraph graph, Map<String, List<Prohibition>> prohibitions,
                                       List<Obligation> obligations, PALContext palCtx) {
         this.graph = graph;
         this.prohibitions = prohibitions;
@@ -25,7 +23,7 @@ public class PolicySynchronizationEvent implements PolicyEvent {
         this.palCtx = palCtx;
     }
 
-    public Graph getGraph() {
+    public MemoryGraph getGraph() {
         return graph;
     }
 

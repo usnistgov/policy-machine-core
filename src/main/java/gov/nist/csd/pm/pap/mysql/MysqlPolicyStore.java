@@ -10,7 +10,7 @@ import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.ObligationDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.ProhibitionDoesNotExistException;
-import gov.nist.csd.pm.policy.model.graph.Graph;
+import gov.nist.csd.pm.policy.model.graph.MemoryGraph;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.Properties;
 import gov.nist.csd.pm.policy.model.graph.relationships.Assignment;
@@ -21,8 +21,6 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -1066,8 +1064,8 @@ public class MysqlPolicyStore extends PolicyStore {
         );
     }
 
-    Graph getGraph() throws MysqlPolicyException {
-        Graph graph = new Graph();
+    MemoryGraph getGraph() throws MysqlPolicyException {
+        MemoryGraph graph = new MemoryGraph();
 
         List<Node> nodes = getNodes();
         for (Node node : nodes) {

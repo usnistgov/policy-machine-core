@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.exceptions.ObligationDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.model.graph.Graph;
+import gov.nist.csd.pm.policy.model.graph.MemoryGraph;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
@@ -27,7 +27,7 @@ import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
 public class MemoryPolicyStore extends PolicyStore {
 
-    private Graph graph;
+    private MemoryGraph graph;
     private Map<String, List<Prohibition>> prohibitions;
     private List<Obligation> obligations;
     private PALContext pal;
@@ -37,7 +37,7 @@ public class MemoryPolicyStore extends PolicyStore {
     private TxPolicyStore txPolicyStore;
 
     public MemoryPolicyStore() {
-        graph = new Graph();
+        graph = new MemoryGraph();
         prohibitions = new HashMap<>();
         obligations = new ArrayList<>();
         pal = new PALContext();
@@ -50,9 +50,9 @@ public class MemoryPolicyStore extends PolicyStore {
         pal = event.getPALContext();
     }
 
-    public MemoryPolicyStore(Graph graph, Map<String, List<Prohibition>> prohibitions, List<Obligation> obligations,
+    public MemoryPolicyStore(MemoryGraph graph, Map<String, List<Prohibition>> prohibitions, List<Obligation> obligations,
                              PALContext pal) {
-        this.graph = new Graph(graph);
+        this.graph = new MemoryGraph(graph);
         this.prohibitions = copyProhibitions(prohibitions);
         this.obligations = new ArrayList<>(obligations);
         this.pal = copyPalCtx(pal);
@@ -562,7 +562,7 @@ public class MemoryPolicyStore extends PolicyStore {
 
     @Override
     protected void reset() {
-        graph = new Graph();
+        graph = new MemoryGraph();
         prohibitions = new HashMap<>();
         obligations = new ArrayList<>();
         pal = new PALContext();

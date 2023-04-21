@@ -10,7 +10,7 @@ import java.util.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 
-public class Graph {
+public class MemoryGraph {
 
     private final Map<String, Vertex> graph;
     private final AccessRightSet resourceAccessRights;
@@ -20,7 +20,7 @@ public class Graph {
     private final List<String> os;
     private final List<String> us;
 
-    public Graph() {
+    public MemoryGraph() {
         this.graph = new HashMap<>();
         this.pcs = new ArrayList<>();
         this.oas = new ArrayList<>();
@@ -30,7 +30,7 @@ public class Graph {
         this.resourceAccessRights = new AccessRightSet();
     }
 
-    public Graph(Graph graph) {
+    public MemoryGraph(MemoryGraph graph) {
         this.graph = new HashMap<>();
         for (String n : graph.graph.keySet()) {
             this.graph.put(n, graph.graph.get(n).copy());

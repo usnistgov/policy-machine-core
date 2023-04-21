@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap.memory.dag;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.graph.Graph;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
