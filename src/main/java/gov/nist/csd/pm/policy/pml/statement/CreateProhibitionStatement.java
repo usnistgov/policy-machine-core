@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
@@ -17,7 +16,7 @@ import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
 
-public class CreateProhibitionStatement extends PALStatement {
+public class CreateProhibitionStatement extends PMLStatement {
 
     private final Expression label;
     private final Expression subject;
@@ -80,7 +79,7 @@ public class CreateProhibitionStatement extends PALStatement {
         }
 
 
-        policy.createProhibition(
+        policy.prohibitions().createProhibition(
                 labelValue.getStringValue(),
                 new ProhibitionSubject(subjectValue.getStringValue(), subjectType),
                 ops,
@@ -110,7 +109,7 @@ public class CreateProhibitionStatement extends PALStatement {
         }
         containerStr.append("]");
 
-        return String.format("create prohibition %s deny %s %s access rights %s on %s;", label, subjectStr, subject, accessRights, containerStr);
+        return String.format("create prohibition %s deny %s %s access rights %s on %s", label, subjectStr, subject, accessRights, containerStr);
     }
 
     @Override

@@ -19,24 +19,24 @@ class DepthFirstGraphWalkerTest {
     @BeforeAll
     static void setup() throws PMException {
         pap = new PAP(new MemoryPolicyStore());
-        pap.createPolicyClass("pc1");
-        pap.createObjectAttribute("oa1", "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
-        pap.createObjectAttribute("oa1-1", "oa1");
-        pap.createObjectAttribute("oa1-1-1", "oa1-1");
-        pap.createObjectAttribute("oa1-1-2", "oa1-1");
-        pap.createObjectAttribute("oa1-1-3", "oa1-1");
+        pap.graph().createObjectAttribute("oa1-1", "oa1");
+        pap.graph().createObjectAttribute("oa1-1-1", "oa1-1");
+        pap.graph().createObjectAttribute("oa1-1-2", "oa1-1");
+        pap.graph().createObjectAttribute("oa1-1-3", "oa1-1");
 
-        pap.createObjectAttribute("oa1-2", "oa1");
-        pap.createObjectAttribute("oa1-2-1", "oa1-2");
-        pap.createObjectAttribute("oa1-2-2", "oa1-2");
-        pap.createObjectAttribute("oa1-2-3", "oa1-2");
+        pap.graph().createObjectAttribute("oa1-2", "oa1");
+        pap.graph().createObjectAttribute("oa1-2-1", "oa1-2");
+        pap.graph().createObjectAttribute("oa1-2-2", "oa1-2");
+        pap.graph().createObjectAttribute("oa1-2-3", "oa1-2");
     }
 
     @Test
     void testWalk() throws PMException {
         List<String> visited = new ArrayList<>();
-        DepthFirstGraphWalker bfs = new DepthFirstGraphWalker(pap)
+        DepthFirstGraphWalker bfs = new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.CHILDREN)
                 .withVisitor((node) -> {
                     visited.add(node);
@@ -52,7 +52,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testAllPathsShortCircuit() throws PMException {
         List<String> visited = new ArrayList<>();
-        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap)
+        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.CHILDREN)
                 .withVisitor(node -> {
                     visited.add(node);
@@ -68,7 +68,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testSinglePathShortCircuit() throws PMException {
         List<String> visited = new ArrayList<>();
-        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap)
+        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.CHILDREN)
                 .withVisitor(node -> {
                     visited.add(node);

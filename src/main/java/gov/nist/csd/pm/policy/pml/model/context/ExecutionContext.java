@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.policy.pml.model.context;
 
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
-import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.model.scope.*;
 

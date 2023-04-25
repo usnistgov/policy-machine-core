@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.model.graph.nodes.Node;
+import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.events.*;
@@ -16,9 +19,9 @@ import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
+class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, Obligations, UserDefinedPML {
 
     private final MemoryPolicyStore memoryPolicyStore;
 
@@ -47,6 +50,11 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
     }
 
     @Override
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return null;
+    }
+
+    @Override
     public String createPolicyClass(String name, Map<String, String> properties) {
         emitEvent(new CreatePolicyClassEvent(name, properties));
         return name;
@@ -54,7 +62,7 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public String createPolicyClass(String name) {
-        return createPolicyClass(name, noprops());
+        return createPolicyClass(name, NO_PROPERTIES);
     }
 
     @Override
@@ -65,7 +73,7 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public String createUserAttribute(String name, String parent, String... parents) {
-        return createUserAttribute(name, noprops(), parent, parents);
+        return createUserAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
@@ -76,7 +84,7 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public String createObjectAttribute(String name, String parent, String... parents) {
-        return createObjectAttribute(name, noprops(), parent, parents);
+        return createObjectAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
@@ -87,7 +95,7 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public String createObject(String name, String parent, String... parents) {
-        return createObject(name, noprops(), parent, parents);
+        return createObject(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
@@ -98,17 +106,41 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public String createUser(String name, String parent, String... parents) {
-        return createUser(name, noprops(), parent, parents);
+        return createUser(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
     public void setNodeProperties(String name, Map<String, String> properties) {
-        emitEvent(new TxEvents.MemorySetNodePropertiesEvent(name, memoryPolicyStore.getNode(name).getProperties(), properties));
+        emitEvent(new TxEvents.MemorySetNodePropertiesEvent(name, memoryPolicyStore.graph().getNode(name).getProperties(), properties));
+    }
+
+    @Override
+    public boolean nodeExists(String name) throws PMException {
+        return false;
+    }
+
+    @Override
+    public Node getNode(String name) throws PMException {
+        return null;
+    }
+
+    @Override
+    public List<String> search(NodeType type, Map<String, String> properties) throws PMException {
+        return null;
+    }
+
+    @Override
+    public List<String> getPolicyClasses() throws PMException {
+        return null;
     }
 
     @Override
     public void deleteNode(String name) {
-        emitEvent(new TxEvents.MemoryDeleteNodeEvent(name, memoryPolicyStore.getNode(name), memoryPolicyStore.getParents(name)));
+        emitEvent(new TxEvents.MemoryDeleteNodeEvent(
+                name,
+                memoryPolicyStore.graph().getNode(name),
+                memoryPolicyStore.graph().getParents(name)
+        ));
     }
 
     @Override
@@ -137,6 +169,16 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
     }
 
     @Override
+    public List<String> getParents(String node) throws PMException {
+        return null;
+    }
+
+    @Override
+    public List<String> getChildren(String node) throws PMException {
+        return null;
+    }
+
+    @Override
     public void associate(String ua, String target, AccessRightSet accessRights) {
         emitEvent(new AssociateEvent(ua, target, accessRights));
     }
@@ -144,13 +186,23 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
     @Override
     public void dissociate(String ua, String target) {
         AccessRightSet accessRightSet = new AccessRightSet();
-        for (Association association : memoryPolicyStore.getAssociationsWithSource(ua)) {
+        for (Association association : memoryPolicyStore.graph().getAssociationsWithSource(ua)) {
             if (association.getTarget().equals(target)) {
                 accessRightSet = association.getAccessRightSet();
             }
         }
 
         emitEvent(new TxEvents.MemoryDissociateEvent(ua, target, accessRightSet));
+    }
+
+    @Override
+    public List<Association> getAssociationsWithSource(String ua) throws PMException {
+        return null;
+    }
+
+    @Override
+    public List<Association> getAssociationsWithTarget(String target) throws PMException {
+        return null;
     }
 
     @Override
@@ -162,13 +214,33 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
     public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         emitEvent(new TxEvents.MemoryUpdateProhibitionEvent(
                 new Prohibition(label, subject, accessRightSet, intersection, List.of(containerConditions)),
-                memoryPolicyStore.getProhibition(label)
+                memoryPolicyStore.prohibitions().getProhibition(label)
         ));
     }
 
     @Override
     public void deleteProhibition(String label) throws PMException {
-        emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryPolicyStore.getProhibition(label)));
+        emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryPolicyStore.prohibitions().getProhibition(label)));
+    }
+
+    @Override
+    public Map<String, List<Prohibition>> getProhibitions() throws PMException {
+        return null;
+    }
+
+    @Override
+    public boolean prohibitionExists(String label) throws PMException {
+        return false;
+    }
+
+    @Override
+    public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
+        return null;
+    }
+
+    @Override
+    public Prohibition getProhibition(String label) throws PMException {
+        return null;
     }
 
     @Override
@@ -178,32 +250,70 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
 
     @Override
     public void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
-        emitEvent(new TxEvents.MemoryUpdateObligationEvent(new Obligation(author, label, List.of(rules)), memoryPolicyStore.getObligation(label)));
+        emitEvent(new TxEvents.MemoryUpdateObligationEvent(
+                new Obligation(author, label, List.of(rules)),
+                memoryPolicyStore.obligations().getObligation(label)
+        ));
     }
 
     @Override
     public void deleteObligation(String label) throws PMException {
-        emitEvent(new TxEvents.MemoryDeleteObligationEvent(memoryPolicyStore.getObligation(label)));
+        emitEvent(new TxEvents.MemoryDeleteObligationEvent(memoryPolicyStore.obligations().getObligation(label)));
     }
 
     @Override
-    public void addPALFunction(FunctionDefinitionStatement functionDefinitionStatement) {
+    public List<Obligation> getObligations() throws PMException {
+        return null;
+    }
+
+    @Override
+    public boolean obligationExists(String label) throws PMException {
+        return false;
+    }
+
+    @Override
+    public Obligation getObligation(String label) throws PMException {
+        return null;
+    }
+
+    @Override
+    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) {
         emitEvent(new AddFunctionEvent(functionDefinitionStatement));
     }
 
     @Override
-    public void removePALFunction(String functionName) {
-        emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.getPALFunctions().get(functionName)));
+    public void removeFunction(String functionName) {
+        emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.userDefinedPML().getFunctions().get(functionName)));
     }
 
     @Override
-    public void addPALConstant(String constantName, Value constantValue) {
+    public Map<String, FunctionDefinitionStatement> getFunctions() throws PMException {
+        return null;
+    }
+
+    @Override
+    public FunctionDefinitionStatement getFunction(String name) throws PMException {
+        return null;
+    }
+
+    @Override
+    public void addConstant(String constantName, Value constantValue) {
         emitEvent(new AddConstantEvent(constantName, constantValue));
     }
 
     @Override
-    public void removePALConstant(String constName) {
-        emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.getPALConstants().get(constName)));
+    public void removeConstant(String constName) {
+        emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.userDefinedPML().getConstants().get(constName)));
+    }
+
+    @Override
+    public Map<String, Value> getConstants() throws PMException {
+        return null;
+    }
+
+    @Override
+    public Value getConstant(String name) throws PMException {
+        return null;
     }
 
     @Override
@@ -219,5 +329,25 @@ class TxPolicyStore implements PolicyWriter, PolicyEventEmitter {
     @Override
     public void emitEvent(PolicyEvent event) {
         txPolicyEventListener.handlePolicyEvent(event);
+    }
+
+    @Override
+    public Graph graph() {
+        return this;
+    }
+
+    @Override
+    public Prohibitions prohibitions() {
+        return this;
+    }
+
+    @Override
+    public Obligations obligations() {
+        return this;
+    }
+
+    @Override
+    public UserDefinedPML userDefinedPML() {
+        return this;
     }
 }

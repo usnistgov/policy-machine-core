@@ -29,18 +29,18 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String o1 = pap.createObject("o1", oa1);
-            String o2 = pap.createObject("o2", oa1);
-            String o3 = pap.createObject("o3", oa1);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String o1 = pap.graph().createObject("o1", oa1);
+            String o2 = pap.graph().createObject("o2", oa1);
+            String o3 = pap.graph().createObject("o3", oa1);
 
             AccessRightSet arset = new AccessRightSet("read", "write");
-            pap.associate(ua1, oa1, arset);
+            pap.graph().associate(ua1, oa1, arset);
 
             Map<String, AccessRightSet> subgraph = pdp.reviewer().getSubgraphAccessRights(new UserContext(u1), oa1);
             assertEquals(
@@ -54,18 +54,18 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String o1 = pap.createObject("o1", oa1);
-            String o2 = pap.createObject("o2", oa1);
-            String o3 = pap.createObject("o3", oa1);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String o1 = pap.graph().createObject("o1", oa1);
+            String o2 = pap.graph().createObject("o2", oa1);
+            String o3 = pap.graph().createObject("o3", oa1);
 
             AccessRightSet arset = new AccessRightSet("read", "write");
-            pap.associate(ua1, oa1, arset);
+            pap.graph().associate(ua1, oa1, arset);
 
             Map<String, AccessRightSet> accessibleNodes = pdp.reviewer().buildCapabilityList(new UserContext(u1));
 
@@ -85,15 +85,15 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
@@ -102,19 +102,19 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1, pc2);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1, ua2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1, pc2);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
 
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
         }
@@ -123,14 +123,14 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
@@ -139,16 +139,16 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa1, new AccessRightSet("write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa1, new AccessRightSet("write"));
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
@@ -157,19 +157,19 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc2);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc2);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa2, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
@@ -179,18 +179,18 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc2);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc2);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
-            pap.associate(ua2, oa2, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
@@ -200,17 +200,17 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
@@ -220,14 +220,14 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
 
 
             Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
@@ -239,16 +239,16 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
-            pap.associate(ua2, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua2, oa1, new AccessRightSet("read", "write"));
 
 
             Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
@@ -260,18 +260,18 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc2);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc2);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
-            pap.associate(ua2, oa2, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
@@ -281,16 +281,16 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
@@ -300,16 +300,16 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa1, new AccessRightSet("write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa1, new AccessRightSet("write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
@@ -319,17 +319,17 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String ua1 = pap.createUserAttribute("ua1", ua2);
-            String u1 = pap.createUser("u1", ua1);
-            String oa2 = pap.createObjectAttribute("oa2", pc1);
-            String oa1 = pap.createObjectAttribute("oa1", oa2);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String ua1 = pap.graph().createUserAttribute("ua1", ua2);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", oa2);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
-            pap.associate(ua2, oa2, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
             Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
@@ -341,17 +341,17 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1, pc2);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1, pc2);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
-            pap.associate(ua2, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua2, oa1, new AccessRightSet("*"));
 
 
             Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
@@ -363,17 +363,17 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String ua1 = pap.createUserAttribute("ua1", ua2);
-            String u1 = pap.createUser("u1", ua1);
-            String oa2 = pap.createObjectAttribute("oa2", pc1);
-            String oa1 = pap.createObjectAttribute("oa1", oa2);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String ua1 = pap.graph().createUserAttribute("ua1", ua2);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", oa2);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("*"));
-            pap.associate(ua2, oa2, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("*"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
             Set<String> list = pdp.reviewer().getAccessRights(new UserContext(u1), o1);
@@ -385,37 +385,37 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String ua1 = pap.createUserAttribute("ua1", ua2);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String ua1 = pap.graph().createUserAttribute("ua1", ua2);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa1, new AccessRightSet("write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa1, new AccessRightSet("write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
         }
 
-        // removed graph7 due to adding the parent IDs to the createNode, need to always connect to the pap.
+        // removed graph7 due to adding the parent IDs to the createNode, need to always connect to the pap.graph().
 
         @Test
         void testGraph18() throws PMException {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc1);
-            String o1 = pap.createObject("o1", oa2);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc1);
+            String o1 = pap.graph().createObject("o1", oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
@@ -425,15 +425,15 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
@@ -443,18 +443,18 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa2, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
@@ -464,18 +464,18 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String u1 = pap.createUser("u1", ua1, ua2);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc2);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String u1 = pap.graph().createUser("u1", ua1, ua2);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc2);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa2, new AccessRightSet("write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa2, new AccessRightSet("write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).isEmpty());
@@ -485,15 +485,15 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            String pc1 = pap.createPolicyClass("pc1");
-            String pc2 = pap.createPolicyClass("pc2");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            pap.graph().setResourceAccessRights(RWE);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String pc2 = pap.graph().createPolicyClass("pc2");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
@@ -504,24 +504,24 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa3 = pap.createObjectAttribute("oa3", pc1);
-            String oa4 = pap.createObjectAttribute("oa4", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", oa3);
-            String oa1 = pap.createObjectAttribute("oa1", oa4);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa3 = pap.graph().createObjectAttribute("oa3", pc1);
+            String oa4 = pap.graph().createObjectAttribute("oa4", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", oa3);
+            String oa1 = pap.graph().createObjectAttribute("oa1", oa4);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
-            pap.createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
+            pap.graph().associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
+            pap.prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
                     new ContainerCondition(oa1, false),
                     new ContainerCondition(oa2, false)
             );
 
-            pap.createProhibition("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
+            pap.prohibitions().createProhibition("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
                     true,
                     new ContainerCondition(oa3, false));
 
@@ -535,19 +535,19 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc1);
-            String o1 = pap.createObject("o1", oa1, oa2);
-            String o2 = pap.createObject("o2", oa2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc1);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
+            String o2 = pap.graph().createObject("o2", oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
 
-            pap.createProhibition("deny", ProhibitionSubject.userAttribute(ua1),
+            pap.prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute(ua1),
                     new AccessRightSet("read"),
                     true,
                     new ContainerCondition(oa1, false),
@@ -557,9 +557,9 @@ class MemoryPolicyReviewerTest {
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o1).contains("read"));
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(u1), o2).isEmpty());
 
-            pap.associate(ua1, oa2, new AccessRightSet("read"));
+            pap.graph().associate(ua1, oa2, new AccessRightSet("read"));
 
-            pap.createProhibition("deny-process", ProhibitionSubject.process("1234"),
+            pap.prohibitions().createProhibition("deny-process", ProhibitionSubject.process("1234"),
                     new AccessRightSet("read"),
                     false,
                     new ContainerCondition(oa1, false));
@@ -572,21 +572,21 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", oa1);
-            String oa3 = pap.createObjectAttribute("oa3", oa1);
-            String oa4 = pap.createObjectAttribute("oa4", oa3);
-            String oa5 = pap.createObjectAttribute("oa5", oa2);
-            String o1 = pap.createObject("o1", oa4);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", oa1);
+            String oa3 = pap.graph().createObjectAttribute("oa3", oa1);
+            String oa4 = pap.graph().createObjectAttribute("oa4", oa3);
+            String oa5 = pap.graph().createObjectAttribute("oa5", oa2);
+            String o1 = pap.graph().createObject("o1", oa4);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
-            pap.createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+            pap.prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
                     true,
                     new ContainerCondition(oa4, true),
                     new ContainerCondition(oa1, false));
@@ -600,19 +600,19 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc1);
-            String o1 = pap.createObject("o1", oa1, oa2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc1);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read", "write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            pap.createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+            pap.prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
                     true,
                     new ContainerCondition(oa1, false),
                     new ContainerCondition(oa2, false));
@@ -625,19 +625,19 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua2 = pap.createUserAttribute("ua2", pc1);
-            String ua1 = pap.createUserAttribute("ua1", ua2);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String oa2 = pap.createObjectAttribute("oa2", pc1);
-            String o1 = pap.createObject("o1", oa1, oa2);
-            String o2 = pap.createObject("o2", oa2);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua2 = pap.graph().createUserAttribute("ua2", pc1);
+            String ua1 = pap.graph().createUserAttribute("ua1", ua2);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String oa2 = pap.graph().createObjectAttribute("oa2", pc1);
+            String o1 = pap.graph().createObject("o1", oa1, oa2);
+            String o2 = pap.graph().createObject("o2", oa2);
 
-            pap.associate(ua1, oa1, new AccessRightSet("read"));
-            pap.associate(ua2, oa1, new AccessRightSet("write"));
+            pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.graph().associate(ua2, oa1, new AccessRightSet("write"));
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext(ua1), oa1).containsAll(Arrays.asList("read", "write")));
         }
@@ -647,25 +647,25 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            pap.createPolicyClass("pc1");
-            pap.createObjectAttribute("oa1", "pc1");
-            pap.createObjectAttribute("oa2", "pc1");
-            pap.createObjectAttribute("oa3", "pc1");
-            pap.createObjectAttribute("oa4", "pc1");
-            pap.createObject("o1", "oa1", "oa2", "oa3");
-            pap.createObject("o2", "oa1", "oa4");
+            pap.graph().setResourceAccessRights(RWE);
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createObjectAttribute("oa1", "pc1");
+            pap.graph().createObjectAttribute("oa2", "pc1");
+            pap.graph().createObjectAttribute("oa3", "pc1");
+            pap.graph().createObjectAttribute("oa4", "pc1");
+            pap.graph().createObject("o1", "oa1", "oa2", "oa3");
+            pap.graph().createObject("o2", "oa1", "oa4");
 
-            pap.createUserAttribute("ua1", "pc1");
-            pap.createUser("u1", "ua1");
-            pap.createUser("u2", "ua1");
-            pap.createUser("u3", "ua1");
-            pap.createUser("u4", "ua1");
+            pap.graph().createUserAttribute("ua1", "pc1");
+            pap.graph().createUser("u1", "ua1");
+            pap.graph().createUser("u2", "ua1");
+            pap.graph().createUser("u3", "ua1");
+            pap.graph().createUser("u4", "ua1");
 
-            pap.associate("ua1", "oa1", new AccessRightSet("read", "write"));
+            pap.graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
 
 
-            pap.createProhibition(
+            pap.prohibitions().createProhibition(
                     "p1",
                     ProhibitionSubject.user("u1"),
                     new AccessRightSet("write"),
@@ -675,7 +675,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa3", false)
             );
 
-            pap.createProhibition(
+            pap.prohibitions().createProhibition(
                     "p2",
                     ProhibitionSubject.user("u2"),
                     new AccessRightSet("write"),
@@ -685,7 +685,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa3", false)
             );
 
-            pap.createProhibition(
+            pap.prohibitions().createProhibition(
                     "p3",
                     ProhibitionSubject.user("u3"),
                     new AccessRightSet("write"),
@@ -694,7 +694,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa2", true)
             );
 
-            pap.createProhibition(
+            pap.prohibitions().createProhibition(
                     "p4",
                     ProhibitionSubject.user("u4"),
                     new AccessRightSet("write"),
@@ -703,7 +703,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa2", true)
             );
 
-            pap.createProhibition(
+            pap.prohibitions().createProhibition(
                     "p5",
                     ProhibitionSubject.user("u4"),
                     new AccessRightSet("write"),
@@ -735,27 +735,26 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
+            pap.graph().setResourceAccessRights(RWE);
 
-            String pc1 = pap.createPolicyClass("pc1");
-            String ua1 = pap.createUserAttribute("ua1", pc1);
-            String u1 = pap.createUser("u1", ua1);
-            String oa1 = pap.createObjectAttribute("oa1", pc1);
-            String o1 = pap.createObject("o1", oa1);
+            String pc1 = pap.graph().createPolicyClass("pc1");
+            String ua1 = pap.graph().createUserAttribute("ua1", pc1);
+            String u1 = pap.graph().createUser("u1", ua1);
+            String oa1 = pap.graph().createObjectAttribute("oa1", pc1);
+            String o1 = pap.graph().createObject("o1", oa1);
 
-            pap.associate(ua1, oa1, allAccessRights());
-
+            pap.graph().associate(ua1, oa1, allAccessRights());
 
             Set<String> list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
 
-            pap.associate(ua1, oa1, allAdminAccessRights());
+            pap.graph().associate(ua1, oa1, allAdminAccessRights());
             list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertFalse(list.containsAll(RWE));
 
-            pap.associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
+            pap.graph().associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
             list = pdp.reviewer().getAccessRights(new UserContext("u1"), "o1");
             assertFalse(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
@@ -766,19 +765,19 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(RWE);
-            pap.createPolicyClass("pc1");
-            pap.createPolicyClass("pc2");
-            pap.createUserAttribute("ua3", "pc1");
-            pap.createUserAttribute("ua2", "ua3");
-            pap.createUserAttribute("u1", "ua2");
+            pap.graph().setResourceAccessRights(RWE);
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createPolicyClass("pc2");
+            pap.graph().createUserAttribute("ua3", "pc1");
+            pap.graph().createUserAttribute("ua2", "ua3");
+            pap.graph().createUserAttribute("u1", "ua2");
 
-            pap.createObjectAttribute("oa1", "pc1");
-            pap.createObjectAttribute("oa3", "pc2");
-            pap.assign("oa3", "oa1");
-            pap.createObject("o1", "oa3");
+            pap.graph().createObjectAttribute("oa1", "pc1");
+            pap.graph().createObjectAttribute("oa3", "pc2");
+            pap.graph().assign("oa3", "oa1");
+            pap.graph().createObject("o1", "oa3");
 
-            pap.associate("ua3", "oa1", new AccessRightSet("read"));
+            pap.graph().associate("ua3", "oa1", new AccessRightSet("read"));
 
             assertTrue(pdp.reviewer().getAccessRights(new UserContext("u1"), "o1").isEmpty());
         }
@@ -788,14 +787,14 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(new AccessRightSet("read"));
-            pap.createPolicyClass("pc1");
-            pap.createUserAttribute("ua1", "pc1");
-            pap.createObjectAttribute("oa1", "pc1");
-            pap.createUser("u1", "ua1");
-            pap.associate("ua1", "oa1", new AccessRightSet("read"));
+            pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createUserAttribute("ua1", "pc1");
+            pap.graph().createObjectAttribute("oa1", "pc1");
+            pap.graph().createUser("u1", "ua1");
+            pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
-            pap.createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+            pap.prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
                     new ContainerCondition("oa1", false));
 
             AccessRightSet deniedAccessRights = pdp.reviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
@@ -807,14 +806,14 @@ class MemoryPolicyReviewerTest {
             PAP pap = new PAP(new MemoryPolicyStore());
             PDP pdp = new MemoryPDP(pap, false);
 
-            pap.setResourceAccessRights(new AccessRightSet("read"));
-            pap.createPolicyClass("pc1");
-            pap.createUserAttribute("ua1", "pc1");
-            pap.createObjectAttribute("oa1", "pc1");
-            pap.createUser("u1", "ua1");
-            pap.associate("ua1", "oa1", new AccessRightSet("read"));
+            pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createUserAttribute("ua1", "pc1");
+            pap.graph().createObjectAttribute("oa1", "pc1");
+            pap.graph().createUser("u1", "ua1");
+            pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
-            pap.createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+            pap.prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
                     new ContainerCondition("oa1", true));
 
             AccessRightSet deniedAccessRights = pdp.reviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");

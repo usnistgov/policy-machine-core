@@ -3,9 +3,9 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
-public class StatementVisitor extends PMLBaseVisitor<PALStatement> {
+public class StatementVisitor extends PMLBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -14,8 +14,8 @@ public class StatementVisitor extends PMLBaseVisitor<PALStatement> {
     }
 
     @Override
-    public PALStatement visitStmt(PMLParser.StmtContext ctx) {
-        PALStatement statement = null;
+    public PMLStatement visitStmt(PMLParser.StmtContext ctx) {
+        PMLStatement statement = null;
         if (ctx.varStmt() != null) {
             statement = new VarStmtVisitor(visitorCtx)
                     .visitVarStmt(ctx.varStmt());

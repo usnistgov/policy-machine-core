@@ -5,13 +5,13 @@ import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.model.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.List;
 import java.util.Objects;
 
-public class FunctionInvocationStatement extends PALStatement {
+public class FunctionInvocationStatement extends PMLStatement {
 
     private final String functionName;
     private final List<Expression> actualArgs;
@@ -54,8 +54,8 @@ public class FunctionInvocationStatement extends PALStatement {
                 FunctionExecutor functionExecutor = functionDef.getFunctionExecutor();
                 value = functionExecutor.exec(localCtx, policy);
             } else {
-                List<PALStatement> statements = functionDef.getBody();
-                for (PALStatement stmt : statements) {
+                List<PMLStatement> statements = functionDef.getBody();
+                for (PMLStatement stmt : statements) {
                     value = stmt.execute(localCtx, policy);
                     if (value.isReturn()) {
                         break;
@@ -66,7 +66,7 @@ public class FunctionInvocationStatement extends PALStatement {
             ctx.scope().overwriteValues(localCtx.scope());
 
             return value;
-        } catch (PALScopeException e) {
+        } catch (PMLScopeException e) {
             throw new PMException(e.getMessage());
         }
     }

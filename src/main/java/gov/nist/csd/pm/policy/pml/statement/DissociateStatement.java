@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
-public class DissociateStatement extends PALStatement {
+public class DissociateStatement extends PMLStatement {
 
     private final Expression uaExpr;
     private final Expression targetExpr;
@@ -30,14 +30,14 @@ public class DissociateStatement extends PALStatement {
         String ua = uaExpr.execute(ctx, policy).getStringValue();
         String target = targetExpr.execute(ctx, policy).getStringValue();
 
-        policy.dissociate(ua, target);
+        policy.graph().dissociate(ua, target);
 
         return new Value();
     }
 
     @Override
     public String toString() {
-        return String.format("dissociate %s and %s;", uaExpr, targetExpr);
+        return String.format("dissociate %s and %s", uaExpr, targetExpr);
     }
 
     @Override

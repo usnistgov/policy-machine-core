@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.policy.pml.model.scope;
 
-import gov.nist.csd.pm.policy.pml.PALBuiltinConstants;
-import gov.nist.csd.pm.policy.pml.PALBuiltinFunctions;
-import gov.nist.csd.pm.policy.pml.PALContext;
+import gov.nist.csd.pm.policy.pml.PMLBuiltinConstants;
+import gov.nist.csd.pm.policy.pml.PMLBuiltinFunctions;
+import gov.nist.csd.pm.policy.pml.PMLContext;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
@@ -111,9 +111,9 @@ public class Scope implements Serializable {
         }
     }
 
-    public void loadFromPALContext(PALContext palCtx) {
-        functions.putAll(palCtx.getFunctions());
-        values.putAll(palCtx.getConstants());
+    public void loadFromPMLContext(PMLContext pmlCtx) {
+        functions.putAll(pmlCtx.getFunctions());
+        values.putAll(pmlCtx.getConstants());
     }
 
     public void setResourceAccessRightsExpression(Expression expression) {
@@ -137,7 +137,7 @@ public class Scope implements Serializable {
         if (functions.containsKey(name)) {
             return functions.get(name);
         } else if (isBuiltinFunction(name)) {
-            return PALBuiltinFunctions.builtinFunctions().get(name);
+            return PMLBuiltinFunctions.builtinFunctions().get(name);
         }
 
         throw new UnknownFunctionInScopeException(name);
@@ -160,7 +160,7 @@ public class Scope implements Serializable {
         if (variables.containsKey(name)) {
             return variables.get(name);
         } else if (isBuiltinVariable(name)) {
-            return PALBuiltinConstants.builtinVariables().get(name);
+            return PMLBuiltinConstants.builtinVariables().get(name);
         }
 
         throw new UnknownVariableInScopeException(name);
@@ -184,7 +184,7 @@ public class Scope implements Serializable {
         if (values.containsKey(name)) {
             return values.get(name);
         } else if (isBuiltinValue(name)) {
-            return PALBuiltinConstants.builtinValues().get(name);
+            return PMLBuiltinConstants.builtinValues().get(name);
         } else if (resourceAccessRights.contains(name)) {
             return new Value(name);
         }
@@ -193,14 +193,14 @@ public class Scope implements Serializable {
     }
 
     private boolean isBuiltinVariable(String name) {
-        return PALBuiltinConstants.builtinVariables().containsKey(name);
+        return PMLBuiltinConstants.builtinVariables().containsKey(name);
     }
     private boolean isBuiltinValue(String name) {
-        return PALBuiltinConstants.builtinValues().containsKey(name);
+        return PMLBuiltinConstants.builtinValues().containsKey(name);
     }
 
     private boolean isBuiltinFunction(String name) {
-        return PALBuiltinFunctions.builtinFunctions().containsKey(name);
+        return PMLBuiltinFunctions.builtinFunctions().containsKey(name);
     }
 
     public enum Mode {

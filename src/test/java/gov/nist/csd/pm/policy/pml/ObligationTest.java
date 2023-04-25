@@ -2,10 +2,8 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
-import gov.nist.csd.pm.policy.author.pal.statement.*;
-import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
@@ -15,7 +13,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.pml.model.expression.*;
 import gov.nist.csd.pm.policy.pml.statement.*;
-import gov.nist.csd.pm.policy.serializer.PALDeserializer;
+import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -31,8 +29,8 @@ public class ObligationTest {
     @Test
     void testObligation() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.createPolicyClass("pc1");
-        pap.createObjectAttribute("oa1", "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
         String input = """
                 create policy class 'pc1'
@@ -49,9 +47,9 @@ public class ObligationTest {
                     }
                 }
                 """;
-        pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
+        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
 
-        Obligation obligation1 = pap.getObligation("obligation1");
+        Obligation obligation1 = pap.obligations().getObligation("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
         assertEquals(1, obligation1.getRules().size());
         assertEquals(new UserContext(SUPER_USER), obligation1.getAuthor());
@@ -68,7 +66,7 @@ public class ObligationTest {
 
     @Test
     void testObligationComplex() throws PMException {
-        String pal = """
+        String pml = """
                 create policy class 'pc1';
                 create oa 'oa1' in ['pc1'];
                 
@@ -92,10 +90,10 @@ public class ObligationTest {
 
         UserContext userCtx = new UserContext(SUPER_USER);
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(pal, new PALDeserializer(userCtx));
+        pap.fromString(pml, new PMLDeserializer(userCtx));
 
-        assertEquals(1, pap.getObligations().size());
-        Obligation actual = pap.getObligation("test");
+        assertEquals(1, pap.obligations().getObligations().size());
+        Obligation actual = pap.obligations().getObligation("test");
         assertEquals(1, actual.getRules().size());
         assertEquals("test", actual.getLabel());
         assertEquals(userCtx, actual.getAuthor());
@@ -111,12 +109,12 @@ public class ObligationTest {
         Response response = rule.getResponse();
         assertEquals("evtCtx", response.getEventCtxVariable());
 
-        List<PALStatement> statements = response.getStatements();
+        List<PMLStatement> statements = response.getStatements();
         assertEquals(6, statements.size());
 
-        PALStatement stmt = statements.get(0);
+        PMLStatement stmt = statements.get(0);
         Type evtCtxType = Type.map(Type.string(), Type.any());
-        PALStatement expected = new CreatePolicyStatement(
+        PMLStatement expected = new CreatePolicyStatement(
                 new Expression(
                         new VariableReference(
                                 new EntryReference(

@@ -16,7 +16,7 @@ public class DeassignAllFromAndDelete extends FunctionDefinitionStatement {
                 (ctx, policy) -> {
                     String target = ctx.scope().getValue("target").getStringValue();
 
-                    policy.deassignAllFromAndDelete(target);
+                    policy.graph().deassignAllFromAndDelete(target);
 
                     return new Value();
                 }

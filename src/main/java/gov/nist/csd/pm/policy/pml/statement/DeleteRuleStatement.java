@@ -9,7 +9,7 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 
 import java.util.Objects;
 
-public class DeleteRuleStatement extends PALStatement {
+public class DeleteRuleStatement extends PMLStatement {
 
     private final Expression ruleExpr;
     private final Expression oblExpr;
@@ -32,10 +32,10 @@ public class DeleteRuleStatement extends PALStatement {
         String ruleLabel = ruleExpr.execute(ctx, policy).getStringValue();
         String oblLabel = oblExpr.execute(ctx, policy).getStringValue();
 
-        Obligation obligation = policy.getObligation(oblLabel);
+        Obligation obligation = policy.obligations().getObligation(oblLabel);
         obligation.deleteRule(ruleLabel);
 
-        policy.updateObligation(
+        policy.obligations().updateObligation(
                 obligation.getAuthor(),
                 obligation.getLabel(),
                 obligation.getRules().toArray(new Rule[]{})
@@ -46,7 +46,7 @@ public class DeleteRuleStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("delete rule %s from obligation %s;", ruleExpr, oblExpr);
+        return String.format("delete rule %s from obligation %s", ruleExpr, oblExpr);
     }
 
     @Override

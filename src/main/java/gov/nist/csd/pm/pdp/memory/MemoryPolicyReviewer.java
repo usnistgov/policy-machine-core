@@ -4,7 +4,8 @@ import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -35,14 +36,14 @@ import java.util.regex.Pattern;
 
 import static gov.nist.csd.pm.policy.model.access.UserContext.NO_PROCESS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
 public class MemoryPolicyReviewer extends PolicyReviewer {
 
-    final PolicyReader policyReader;
+    final Policy policy;
 
-    public MemoryPolicyReviewer(PolicyReader policyReader) throws PMException {
-        this.policyReader = policyReader;
+    public MemoryPolicyReviewer(Policy policy) throws PMException {
+        this.policy = policy;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         TargetDagResult targetDagResult = processTargetDAG(target, userDagResult);
 
         // resolve the permissions
-        return resolvePermissions(userDagResult, targetDagResult, target, policyReader.getResourceAccessRights());
+        return resolvePermissions(userDagResult, targetDagResult, target, policy.graph().getResourceAccessRights());
     }
 
     @Override
@@ -100,11 +101,11 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
      * each policy class.
      */
     protected TargetDagResult processTargetDAG(String target, UserDagResult userCtx) throws PMException {
-        if (!policyReader.nodeExists(target)) {
+        if (!policy.graph().nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }
 
-        List<String> policyClasses = policyReader.getPolicyClasses();
+        List<String> policyClasses = policy.graph().getPolicyClasses();
         Map<String, AccessRightSet> borderTargets = userCtx.borderTargets();
         Map<String, Map<String, AccessRightSet>> visitedNodes = new HashMap<>();
         Set<String> reachedTargets = new HashSet<>();
@@ -145,7 +146,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
             visitedNodes.put(child, nodeCtx);
         };
 
-        new DepthFirstGraphWalker(policyReader)
+        new DepthFirstGraphWalker(policy.graph())
                 .withDirection(Direction.PARENTS)
                 .withVisitor(visitor)
                 .withPropagator(propagator)
@@ -164,22 +165,22 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
      * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
      */
     protected UserDagResult processUserDAG(String subject, String process) throws PMException {
-        if (!policyReader.nodeExists(subject)) {
+        if (!policy.graph().nodeExists(subject)) {
             throw new NodeDoesNotExistException(subject);
         }
 
         final Map<String, AccessRightSet> borderTargets = new HashMap<>();
         final Set<String> prohibitionTargets = new HashSet<>();
         // initialize with the prohibitions or the provided process
-        final Set<Prohibition> reachedProhibitions = new HashSet<>(policyReader.getProhibitionsWithSubject(process));
+        final Set<Prohibition> reachedProhibitions = new HashSet<>(policy.prohibitions().getProhibitionsWithSubject(process));
 
         // get the associations for the subject, it the subject is a user, nothing will be returned
         // this is only when a UA is the subject
-        List<Association> subjectAssociations = policyReader.getAssociationsWithSource(subject);
+        List<Association> subjectAssociations = policy.graph().getAssociationsWithSource(subject);
         collectAssociations(subjectAssociations, borderTargets);
 
         Visitor visitor = node -> {
-            List<Prohibition> subjectProhibitions = policyReader.getProhibitionsWithSubject(node);
+            List<Prohibition> subjectProhibitions = policy.prohibitions().getProhibitionsWithSubject(node);
             reachedProhibitions.addAll(subjectProhibitions);
             for (Prohibition prohibition : subjectProhibitions) {
                 List<ContainerCondition> containers = prohibition.getContainers();
@@ -188,24 +189,24 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
                 }
             }
 
-            List<Association> nodeAssociations = policyReader.getAssociationsWithSource(node);
+            List<Association> nodeAssociations = policy.graph().getAssociationsWithSource(node);
             collectAssociations(nodeAssociations, borderTargets);
 
             /*//get the parents of the subject to start bfs on user side
-            List<String> parents = policyReader.getParents(node);
+            List<String> parents = policyReader.graph().getParents(node);
             while (!parents.isEmpty()) {
                 String parent = parents.iterator().next();
-                Node parentNode = policyReader.getNode(parent);
+                Node parentNode = policyReader.graph().getNode(parent);
                 if (parentNode.getType() == UA) {
                     //get the associations the current parent node is the source of
-                    List<Association> nodeAssociations = policyReader.getAssociationsWithSource(parent);
+                    List<Association> nodeAssociations = policyReader.graph().getAssociationsWithSource(parent);
 
                     //collect the target and operation information for each association
                     collectAssociations(nodeAssociations, borderTargets);
                 }
 
                 //add all of the current parent node's parents to the queue
-                parents.addAll(policyReader.getParents(parent));
+                parents.addAll(policyReader.graph().getParents(parent));
 
                 //remove the current parent from the queue
                 parents.remove(parent);
@@ -213,7 +214,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         };
 
         // start the bfs
-        new BreadthFirstGraphWalker(policyReader)
+        new BreadthFirstGraphWalker(policy.graph())
                 .withDirection(Direction.PARENTS)
                 .withVisitor(visitor)
                 .walk(subject);
@@ -239,7 +240,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     private Set<String> getDescendants(String vNode) throws PMException {
         Set<String> ascendants = new HashSet<>();
 
-        List<String> children = policyReader.getChildren(vNode);
+        List<String> children = policy.graph().getChildren(vNode);
         if (children.isEmpty()) {
             return ascendants;
         }
@@ -283,14 +284,14 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     private void putPermissions(Map<String, AccessRightSet> permissionsMap, UserDagResult userDagResult, String target) throws PMException {
         TargetDagResult targetCtx = processTargetDAG(target, userDagResult);
-        AccessRightSet permissions = resolvePermissions(userDagResult, targetCtx, target, policyReader.getResourceAccessRights());
+        AccessRightSet permissions = resolvePermissions(userDagResult, targetCtx, target, policy.graph().getResourceAccessRights());
         permissionsMap.put(target, permissions);
     }
 
     @Override
     public synchronized Map<String, AccessRightSet> buildACL(String target) throws PMException {
         Map<String, AccessRightSet> acl = new HashMap<>();
-        List<String> search = policyReader.search(U, noprops());
+        List<String> search = policy.graph().search(U, NO_PROPERTIES);
         for (String user : search) {
             AccessRightSet list = this.getAccessRights(new UserContext(user), target);
             acl.put(user, list);
@@ -329,8 +330,8 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     @Override
     public synchronized Explain explain(UserContext userCtx, String target) throws PMException {
-        Node userNode = policyReader.getNode(userCtx.getUser());
-        Node targetNode = policyReader.getNode(target);
+        Node userNode = policy.graph().getNode(userCtx.getUser());
+        Node targetNode = policy.graph().getNode(target);
 
         List<EdgePath> userPaths = dfs(userNode.getName());
         List<EdgePath> targetPaths = dfs(targetNode.getName());
@@ -379,7 +380,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     @Override
     public List<String> getAccessibleChildren(UserContext userCtx, String root) throws PMException {
-        List<String> children = policyReader.getChildren(root);
+        List<String> children = policy.graph().getChildren(root);
         children.removeIf(child -> {
             try {
                 return getAccessRights(userCtx, child).isEmpty();
@@ -394,7 +395,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     @Override
     public List<String> getAccessibleParents(UserContext userCtx, String root) throws PMException {
-        List<String> parents = policyReader.getParents(root);
+        List<String> parents = policy.graph().getParents(root);
         parents.removeIf(parent -> {
             try {
                 return getAccessRights(userCtx, parent).isEmpty();
@@ -420,7 +421,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         String crtNode;
 
         // Get u's directly assigned attributes and put them into the queue.
-        List<String> hsAttrs = policyReader.getParents(userCtx.getUser());
+        List<String> hsAttrs = policy.graph().getParents(userCtx.getUser());
         List<String> queue = new ArrayList<>(hsAttrs);
 
         // While the queue has elements, extract an element from the queue
@@ -438,7 +439,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
                     // Find the opsets of this user attribute. Note that the set of containers for this
                     // node (user attribute) may contain not only opsets.
-                    List<Association> assocs = policyReader.getAssociationsWithSource(crtNode);
+                    List<Association> assocs = policy.graph().getAssociationsWithSource(crtNode);
 
                     // Go through the containers and only for opsets do the following.
                     // For each opset ops of ua:
@@ -488,7 +489,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
                 }
                 visited.add(crtNode);
 
-                List<String> hsDescs = policyReader.getParents(crtNode);
+                List<String> hsDescs = policy.graph().getParents(crtNode);
                 queue.addAll(hsDescs);
             }
         }
@@ -529,7 +530,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         // Insert the start node into the queue
         queue.add(node);
 
-        List<String> policyClasses = policyReader.getPolicyClasses();
+        List<String> policyClasses = policy.graph().getPolicyClasses();
 
         // While queue is not empty
         while (!queue.isEmpty()) {
@@ -542,7 +543,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
                 // Extract its direct descendants. If a descendant is an attribute,
                 // insert it into the queue. If it is a pc, add it to reachable,
                 // if not already there
-                List<String> hsContainers = policyReader.getParents(crtNode);
+                List<String> hsContainers = policy.graph().getParents(crtNode);
                 for (String n : hsContainers) {
                     if (policyClasses.contains(n)) {
                         reachable.add(n);
@@ -556,7 +557,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     private boolean inMemUattrHasOpsets(String uaNode) throws PMException {
-        return !policyReader.getAssociationsWithSource(uaNode).isEmpty();
+        return !policy.graph().getAssociationsWithSource(uaNode).isEmpty();
     }
 
     private Set<String> resolvePermissions(Map<String, PolicyClass> paths) throws PMException {
@@ -571,7 +572,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
             }
         }
 
-        return resolveAllowedPermissions(pcPerms, policyReader.getResourceAccessRights());
+        return resolveAllowedPermissions(pcPerms, policy.graph().getResourceAccessRights());
     }
 
     /**
@@ -621,7 +622,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     private boolean isPolicyClass(String node) throws PMException {
-        return policyReader.getPolicyClasses().contains(node);
+        return policy.graph().getPolicyClasses().contains(node);
     }
 
     private Set<Path> computePaths(List<EdgePath> userEdgePaths, EdgePath targetEdgePath, String target) {
@@ -671,10 +672,10 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         final Map<String, List<EdgePath>> propPaths = new HashMap<>();
 
         Visitor visitor = nodeName -> {
-            Node node = policyReader.getNode(nodeName);
+            Node node = policy.graph().getNode(nodeName);
             List<EdgePath> nodePaths = new ArrayList<>();
 
-            for(String parent : policyReader.getParents(nodeName)) {
+            for(String parent : policy.graph().getParents(nodeName)) {
                 Relationship edge = new Relationship(node.getName(), parent);
                 List<EdgePath> parentPaths = propPaths.get(parent);
                 if(parentPaths.isEmpty()) {
@@ -694,9 +695,9 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
                 }
             }
 
-            List<Association> assocs = policyReader.getAssociationsWithSource(node.getName());
+            List<Association> assocs = policy.graph().getAssociationsWithSource(node.getName());
             for(Association association : assocs) {
-                Node targetNode = policyReader.getNode(association.getTarget());
+                Node targetNode = policy.graph().getNode(association.getTarget());
                 EdgePath path = new EdgePath();
                 path.addEdge(new Relationship(node.getName(), targetNode.getName(), association.getAccessRightSet()));
                 nodePaths.add(path);
@@ -715,8 +716,8 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         };
 
         Propagator propagator = (parentNodeName, childNodeName) -> {
-            Node parentNode = policyReader.getNode(parentNodeName);
-            Node childNode = policyReader.getNode(childNodeName);
+            Node parentNode = policy.graph().getNode(parentNodeName);
+            Node childNode = policy.graph().getNode(childNodeName);
             List<EdgePath> childPaths = propPaths.computeIfAbsent(childNode.getName(), k -> new ArrayList<>());
             List<EdgePath> parentPaths = propPaths.get(parentNode.getName());
 
@@ -740,7 +741,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
             }
         };
 
-        new DepthFirstGraphWalker(policyReader)
+        new DepthFirstGraphWalker(policy.graph())
                 .withVisitor(visitor)
                 .withPropagator(propagator)
                 .withDirection(Direction.PARENTS)
@@ -753,11 +754,11 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     public synchronized List<String> getAttributeContainers(String node) throws PMException {
         List<String> attrs = new ArrayList<>();
 
-        new DepthFirstGraphWalker(policyReader)
+        new DepthFirstGraphWalker(policy.graph())
                 .withDirection(Direction.PARENTS)
                 .withVisitor((n) -> {
                     Node visitedNode;
-                    visitedNode = policyReader.getNode(n);
+                    visitedNode = policy.graph().getNode(n);
                     if (visitedNode.getType().equals(UA) ||
                             visitedNode.getType().equals(OA)) {
                         attrs.add(n);
@@ -772,11 +773,11 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     public synchronized List<String> getPolicyClassContainers(String node) throws PMException {
         List<String> attrs = new ArrayList<>();
 
-        new DepthFirstGraphWalker(policyReader)
+        new DepthFirstGraphWalker(policy.graph())
                 .withDirection(Direction.PARENTS)
                 .withVisitor((n) -> {
                     Node visitedNode;
-                    visitedNode = policyReader.getNode(n);
+                    visitedNode = policy.graph().getNode(n);
                     if (visitedNode.getType().equals(PC)) {
                         attrs.add(n);
                     }
@@ -788,15 +789,15 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     @Override
     public synchronized boolean isContained(String subject, String container) throws PMException {
-        if (!policyReader.nodeExists(subject)) {
+        if (!policy.graph().nodeExists(subject)) {
             throw new NodeDoesNotExistException(subject);
-        } else if (!policyReader.nodeExists(container)){
+        } else if (!policy.graph().nodeExists(container)){
             throw new NodeDoesNotExistException(container);
         }
 
         AtomicBoolean found = new AtomicBoolean(false);
 
-        new DepthFirstGraphWalker(policyReader)
+        new DepthFirstGraphWalker(policy.graph())
                 .withDirection(Direction.PARENTS)
                 .withVisitor((n) -> {
                     if (n.equals(container)) {
@@ -812,9 +813,9 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     public synchronized List<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
-        new DepthFirstGraphWalker(policyReader)
+        new DepthFirstGraphWalker(policy.graph())
                 .withVisitor((n) -> {
-                    pros.addAll(policyReader.getProhibitionsWithSubject(n));
+                    pros.addAll(policy.prohibitions().getProhibitionsWithSubject(n));
                 })
                 .withDirection(Direction.PARENTS)
                 .walk(subject);
@@ -826,7 +827,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     public List<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
-        Map<String, List<Prohibition>> prohibitions = policyReader.getProhibitions();
+        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getProhibitions();
         for (String subject : prohibitions.keySet()) {
             List<Prohibition> subjectProhibitions = prohibitions.get(subject);
             for (Prohibition prohibition : subjectProhibitions) {
@@ -842,7 +843,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithAuthor(UserContext userCtx) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policyReader.getObligations()) {
+        for (Obligation obligation : policy.obligations().getObligations()) {
             if (obligation.getAuthor().equals(userCtx)) {
                 obls.add(obligation);
             }
@@ -854,7 +855,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithAttributeInEvent(String attribute) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policyReader.getObligations()) {
+        for (Obligation obligation : policy.obligations().getObligations()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 Target target = rule.getEvent().getTarget();
@@ -882,11 +883,11 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithAttributeInResponse(String attribute) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policyReader.getObligations()) {
+        for (Obligation obligation : policy.obligations().getObligations()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 Response response = rule.getResponse();
-                for (PALStatement statement : response.getStatements()) {
+                for (PMLStatement statement : response.getStatements()) {
                     Pattern p = Pattern.compile("\\b(" + attribute + ")\\b");
                     Matcher m = p.matcher(statement.toString());
                     if (m.find()) {
@@ -902,7 +903,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithEvent(String event) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policyReader.getObligations()) {
+        for (Obligation obligation : policy.obligations().getObligations()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 if (rule.getEvent().getOperations().contains(event)) {
@@ -916,7 +917,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Response> getMatchingEventResponses(EventContext evt) throws PMException {
         List<Response> responses = new ArrayList<>();
-        for (Obligation obligation : policyReader.getObligations()) {
+        for (Obligation obligation : policy.obligations().getObligations()) {
             for (Rule rule : obligation.getRules()) {
                 if (evt.matchesPattern(rule.getEvent(), this)) {
                     responses.add(rule.getResponse());

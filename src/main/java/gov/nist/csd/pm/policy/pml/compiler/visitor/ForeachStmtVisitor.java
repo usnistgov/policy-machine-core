@@ -2,12 +2,12 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.statement.ForeachStatement;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
         Type iterType = Type.any();
         try {
             iterType = iter.getType(visitorCtx.scope());
-        } catch (PALScopeException e) {
+        } catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
         }
 
@@ -46,7 +46,7 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
             }
         }
 
-        List<PALStatement> block = new ArrayList<>();
+        List<PMLStatement> block = new ArrayList<>();
         Type keyType;
         Type valueType = null;
         if (iterType.equals(anyArrayType)) {
@@ -63,11 +63,11 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
                 if (valueType != null) {
                     localVisitorCtx.scope().addVariable(mapValueVarName, valueType, false);
                 }
-            }catch (PALScopeException e) {
+            }catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(ctx, e.getMessage());
             }
 
-            PALStatement statement = new StatementVisitor(localVisitorCtx)
+            PMLStatement statement = new StatementVisitor(localVisitorCtx)
                     .visitStmt(stmtCtx);
             block.add(statement);
 

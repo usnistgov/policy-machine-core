@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.statement.IfStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +26,10 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
         boolean isComp = ctx.IS_COMPLEMENT() != null;
         Expression condition = Expression.compile(localVisitorCtx, ctx.condition, Type.bool());
 
-        List<PALStatement> block = new ArrayList<>();
+        List<PMLStatement> block = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
         for (PMLParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
-            PALStatement statement = statementVisitor.visitStmt(stmtCtx);
+            PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
             block.add(statement);
         }
 
@@ -47,7 +47,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
             condition = Expression.compile(visitorCtx, elseIfStmtCtx.condition, Type.bool());
             block = new ArrayList<>();
             for (PMLParser.StmtContext stmtCtx : elseIfStmtCtx.stmtBlock().stmt()) {
-                PALStatement statement = statementVisitor.visitStmt(stmtCtx);
+                PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
                 block.add(statement);
             }
             elseIfs.add(new IfStatement.ConditionalBlock(isComp, condition, block));
@@ -62,7 +62,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
         block = new ArrayList<>();
         if (ctx.elseStmt() != null) {
             for (PMLParser.StmtContext stmtCtx : ctx.elseStmt().stmtBlock().stmt()) {
-                PALStatement statement = statementVisitor.visitStmt(stmtCtx);
+                PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
                 block.add(statement);
             }
 

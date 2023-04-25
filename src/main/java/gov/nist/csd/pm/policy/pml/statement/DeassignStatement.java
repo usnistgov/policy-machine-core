@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import java.util.List;
 import java.util.Objects;
 
-public class DeassignStatement extends PALStatement {
+public class DeassignStatement extends PMLStatement {
 
     private final Expression child;
     private final Expression deassignFrom;
@@ -35,12 +35,12 @@ public class DeassignStatement extends PALStatement {
 
         if (deassignFromValue.isString()) {
             String parent = deassignFromValue.getStringValue();
-            policy.deassign(childStringValue, parent);
+            policy.graph().deassign(childStringValue, parent);
         } else {
             List<Value> valueArr = deassignFromValue.getArrayValue();
             for (Value value : valueArr) {
                 String parent = value.getStringValue();
-                policy.deassign(childStringValue, parent);
+                policy.graph().deassign(childStringValue, parent);
             }
         }
 
@@ -49,7 +49,7 @@ public class DeassignStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("deassign %s from %s;",
+        return String.format("deassign %s from %s",
                 child,
                 deassignFrom
         );

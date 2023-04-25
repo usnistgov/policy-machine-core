@@ -15,20 +15,20 @@ class TxHandlerRunnerTest {
     void testRunTx() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
         runTx(pap, () -> {
-            pap.createPolicyClass("pc1");
+            pap.graph().createPolicyClass("pc1");
         });
 
-        assertTrue(pap.nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc1"));
 
         assertThrows(NodeNameExistsException.class, () -> runTx(pap, () -> {
-            pap.deleteNode("pc1");
-            pap.createPolicyClass("pc2");
+            pap.graph().deleteNode("pc1");
+            pap.graph().createPolicyClass("pc2");
             // expect error and rollback
-            pap.createPolicyClass("pc2");
+            pap.graph().createPolicyClass("pc2");
         }));
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertFalse(pap.nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
     }
 
 }

@@ -25,7 +25,7 @@ public class AssignAll extends FunctionDefinitionStatement {
                         children.add(value.getStringValue());
                     }
 
-                    policy.assignAll(children, target);
+                    policy.graph().assignAll(children, target);
 
                     return new Value();
                 }

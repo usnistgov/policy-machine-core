@@ -19,7 +19,7 @@ public class ExecutionTest {
     static UserContext superUser = new UserContext(SUPER_USER);
 
     @Test
-    void testGraphPAL() throws PMException {
+    void testGraphPML() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
 
         String input =
@@ -49,71 +49,71 @@ public class ExecutionTest {
                 associate 'ua2' and 'oa2' with ['read', 'write']
                 associate 'ua3' and 'oa3' with ['read', 'write']
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("oa1"));
-        assertTrue(pap.nodeExists("oa2"));
-        assertTrue(pap.nodeExists("oa3"));
-        assertTrue(pap.nodeExists("ua1"));
-        assertTrue(pap.nodeExists("ua2"));
-        assertTrue(pap.nodeExists("ua3"));
-        assertTrue(pap.nodeExists("o1"));
-        assertTrue(pap.nodeExists("u1"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("oa1"));
+        assertTrue(pap.graph().nodeExists("oa2"));
+        assertTrue(pap.graph().nodeExists("oa3"));
+        assertTrue(pap.graph().nodeExists("ua1"));
+        assertTrue(pap.graph().nodeExists("ua2"));
+        assertTrue(pap.graph().nodeExists("ua3"));
+        assertTrue(pap.graph().nodeExists("o1"));
+        assertTrue(pap.graph().nodeExists("u1"));
 
-        assertEquals("v", pap.getNode("pc1").getProperties().get("k"));
+        assertEquals("v", pap.graph().getNode("pc1").getProperties().get("k"));
 
-        List<String> children = pap.getChildren("pc1");
+        List<String> children = pap.graph().getChildren("pc1");
         assertTrue(children.containsAll(Arrays.asList("ua1", "ua2", "ua3")));
-        children = pap.getChildren("pc1");
+        children = pap.graph().getChildren("pc1");
         assertTrue(children.containsAll(Arrays.asList("oa1", "oa2", "oa3")));
 
-        assertTrue(pap.getParents("ua1").contains("pc1"));
-        assertTrue(pap.getParents("ua2").contains("pc1"));
-        assertTrue(pap.getParents("ua3").contains("pc1"));
-        assertTrue(pap.getParents("oa1").contains("pc1"));
-        assertTrue(pap.getParents("oa2").contains("pc1"));
-        assertTrue(pap.getParents("oa3").contains("pc1"));
-        assertTrue(pap.getParents("u1").containsAll(Arrays.asList("ua1", "ua2", "ua3")));
-        assertTrue(pap.getParents("o1").containsAll(Arrays.asList("oa1", "oa2", "oa3")));
+        assertTrue(pap.graph().getParents("ua1").contains("pc1"));
+        assertTrue(pap.graph().getParents("ua2").contains("pc1"));
+        assertTrue(pap.graph().getParents("ua3").contains("pc1"));
+        assertTrue(pap.graph().getParents("oa1").contains("pc1"));
+        assertTrue(pap.graph().getParents("oa2").contains("pc1"));
+        assertTrue(pap.graph().getParents("oa3").contains("pc1"));
+        assertTrue(pap.graph().getParents("u1").containsAll(Arrays.asList("ua1", "ua2", "ua3")));
+        assertTrue(pap.graph().getParents("o1").containsAll(Arrays.asList("oa1", "oa2", "oa3")));
 
         assertEquals(new Association("ua1", "oa1", new AccessRightSet("read", "write")),
-                pap.getAssociationsWithSource("ua1").get(0));
+                pap.graph().getAssociationsWithSource("ua1").get(0));
         assertEquals(new Association("ua2", "oa2", new AccessRightSet("read", "write")),
-                pap.getAssociationsWithSource("ua2").get(0));
+                pap.graph().getAssociationsWithSource("ua2").get(0));
         assertEquals(new Association("ua3", "oa3", new AccessRightSet("read", "write")),
-                pap.getAssociationsWithSource("ua3").get(0));
+                pap.graph().getAssociationsWithSource("ua3").get(0));
 
         input =
                 """
                 deassign 'u1' from ['ua1', 'ua2']
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
-        assertFalse(pap.getChildren("ua1").contains("u1"));
-        assertFalse(pap.getChildren("ua2").contains("u1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
+        assertFalse(pap.graph().getChildren("ua1").contains("u1"));
+        assertFalse(pap.graph().getChildren("ua2").contains("u1"));
 
         input =
                 """
                 delete user 'u1'
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.nodeExists("u1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().nodeExists("u1"));
 
         input =
                 """
                 deassign 'o1' from ['oa1']
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.getParents("oa1").contains("oa1"));
-        assertFalse(pap.getChildren("oa1").contains("o1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().getParents("oa1").contains("oa1"));
+        assertFalse(pap.graph().getChildren("oa1").contains("o1"));
 
         input =
                 """
                 delete object 'o1'
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.nodeExists("o1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().nodeExists("o1"));
 
         input =
                 """
@@ -121,10 +121,10 @@ public class ExecutionTest {
                 delete user attribute 'ua2'
                 delete user attribute 'ua3'
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.nodeExists("ua1"));
-        assertFalse(pap.nodeExists("ua2"));
-        assertFalse(pap.nodeExists("ua3"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().nodeExists("ua1"));
+        assertFalse(pap.graph().nodeExists("ua2"));
+        assertFalse(pap.graph().nodeExists("ua3"));
 
 
         input =
@@ -133,17 +133,17 @@ public class ExecutionTest {
                 delete object attribute 'oa2'
                 delete object attribute 'oa3'
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.nodeExists("oa1"));
-        assertFalse(pap.nodeExists("oa2"));
-        assertFalse(pap.nodeExists("oa3"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().nodeExists("oa1"));
+        assertFalse(pap.graph().nodeExists("oa2"));
+        assertFalse(pap.graph().nodeExists("oa3"));
 
         input =
                 """
                 delete policy class 'pc1'
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertFalse(pap.nodeExists("pc1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().nodeExists("pc1"));
     }
 
     @Test
@@ -156,8 +156,8 @@ public class ExecutionTest {
                     create policy class 'pc1'
                 }
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertTrue(pap.nodeExists("pc1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertTrue(pap.graph().nodeExists("pc1"));
 
         input = """
                 let x = 'test'
@@ -170,10 +170,10 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertFalse(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("pc2"));
+        assertFalse(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc2"));
 
         input = """
                 let x = 'test'
@@ -188,11 +188,11 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertFalse(pap.nodeExists("pc1"));
-        assertFalse(pap.nodeExists("pc2"));
-        assertTrue(pap.nodeExists("pc3"));
+        assertFalse(pap.graph().nodeExists("pc1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
                 let x = 'test'
@@ -205,10 +205,10 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertFalse(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("pc2"));
+        assertFalse(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc2"));
 
         input = """
                 let x = 'test'
@@ -221,10 +221,10 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertFalse(pap.nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
     }
 
     @Test
@@ -235,11 +235,11 @@ public class ExecutionTest {
                     create policy class x
                 }
                 """;
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("pc2"));
-        assertTrue(pap.nodeExists("pc3"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
                 let m = {'k1': 'pc1', 'k2': 'pc2', 'k3': 'pc3'}
@@ -248,11 +248,11 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("pc2"));
-        assertTrue(pap.nodeExists("pc3"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
                 foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
@@ -262,11 +262,11 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("pc2"));
-        assertTrue(pap.nodeExists("pc3"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
                 foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
@@ -277,11 +277,11 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertFalse(pap.nodeExists("pc2"));
-        assertTrue(pap.nodeExists("pc3"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
                 foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
@@ -292,11 +292,11 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertFalse(pap.nodeExists("pc1"));
-        assertFalse(pap.nodeExists("pc2"));
-        assertFalse(pap.nodeExists("pc3"));
+        assertFalse(pap.graph().nodeExists("pc1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
+        assertFalse(pap.graph().nodeExists("pc3"));
 
         input = """
                 let a = 'test'
@@ -311,11 +311,11 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertFalse(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("pc2"));
-        assertTrue(pap.nodeExists("pc3"));
+        assertFalse(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc3"));
     }
 
     @Test
@@ -326,10 +326,10 @@ public class ExecutionTest {
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertEquals(6, pap.getPolicyClasses().size());
-        assertTrue(pap.getPolicyClasses().containsAll(List.of("1", "2", "3", "4", "5")));
+        assertEquals(6, pap.graph().getPolicyClasses().size());
+        assertTrue(pap.graph().getPolicyClasses().containsAll(List.of("1", "2", "3", "4", "5")));
     }
 
     @Test
@@ -342,9 +342,9 @@ public class ExecutionTest {
                 testFunc('pc1')
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertTrue(pap.nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("pc1"));
 
         String input1 = """
                 function testFunc(any x) {
@@ -354,7 +354,7 @@ public class ExecutionTest {
                 testFunc(['pc1'])
                 """;
         PAP pap1 = new PAP(new MemoryPolicyStore());
-        assertThrows(IllegalStateException.class, () -> PALExecutor.compileAndExecutePAL(pap1, superUser, input1));
+        assertThrows(IllegalStateException.class, () -> PMLExecutor.compileAndExecutePML(pap1, superUser, input1));
 
         input = """
                 let x = 'hello'
@@ -365,8 +365,8 @@ public class ExecutionTest {
                 
                 testFunc()
                 """;
-        PALExecutor.compileAndExecutePAL(pap1, superUser, input);
-        assertTrue(pap1.nodeExists("hello world"));
+        PMLExecutor.compileAndExecutePML(pap1, superUser, input);
+        assertTrue(pap1.graph().nodeExists("hello world"));
     }
 
     @Test
@@ -377,8 +377,8 @@ public class ExecutionTest {
                 create policy class b
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertTrue(pap.nodeExists("hello world"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertTrue(pap.graph().nodeExists("hello world"));
 
         PAP pap1 = new PAP(new MemoryPolicyStore());
         String input1 = """
@@ -387,8 +387,8 @@ public class ExecutionTest {
                 a = 'test'
                 create policy class b
                 """;
-        PALExecutor.compileAndExecutePAL(pap1, superUser, input1);
-        assertFalse(pap.nodeExists("test"));
+        PMLExecutor.compileAndExecutePML(pap1, superUser, input1);
+        assertFalse(pap.graph().nodeExists("test"));
     }
 
     @Test
@@ -399,8 +399,8 @@ public class ExecutionTest {
                 create policy class x
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertTrue(pap.getPolicyClasses().contains("v1"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertTrue(pap.graph().getPolicyClasses().contains("v1"));
     }
 
     @Test
@@ -409,13 +409,13 @@ public class ExecutionTest {
                 set resource access rights ["read", "write"]
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        PALExecutor.compileAndExecutePAL(pap, superUser, input);
-        assertTrue(pap.getResourceAccessRights().contains("read"));
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertTrue(pap.graph().getResourceAccessRights().contains("read"));
 
         String input1 = """
                 set resource access rights [["read", "write"], ["exec"]]
                 """;
-        assertThrows(PMException.class, () -> PALExecutor.compileAndExecutePAL(pap, superUser, input1));
+        assertThrows(PMException.class, () -> PMLExecutor.compileAndExecutePML(pap, superUser, input1));
     }
 
     @Test
@@ -424,16 +424,16 @@ public class ExecutionTest {
                 delete pc 'pc1'
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        assertDoesNotThrow(() -> PALExecutor.compileAndExecutePAL(pap, superUser, input));
+        assertDoesNotThrow(() -> PMLExecutor.compileAndExecutePML(pap, superUser, input));
     }
 
     @Test
     void testDeleteProhibition() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.setResourceAccessRights(new AccessRightSet("read"));
-        pap.createPolicyClass("pc1");
-        pap.createUserAttribute("ua1", "pc1");
-        pap.createObjectAttribute("oa1", "pc1");
+        pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
         String input = """
                 create prohibition 'p1'
@@ -441,13 +441,13 @@ public class ExecutionTest {
                 access rights ["read"]
                 on union of ["oa1"]
                 """;
-        pap.executePAL(superUser, input);
+        pap.executePML(superUser, input);
 
         input = """
                 delete prohibition 'p1'
                 """;
-        pap.executePAL(superUser, input);
-        assertFalse(pap.getProhibitions().containsKey("p1"));
+        pap.executePML(superUser, input);
+        assertFalse(pap.prohibitions().getProhibitions().containsKey("p1"));
     }
 
     @Test
@@ -460,8 +460,8 @@ public class ExecutionTest {
                 create pc y[0][0]
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.executePAL(new UserContext(SUPER_USER), s);
-        assertTrue(pap.nodeExists("2"));
-        assertTrue(pap.nodeExists("1"));
+        pap.executePML(new UserContext(SUPER_USER), s);
+        assertTrue(pap.graph().nodeExists("2"));
+        assertTrue(pap.graph().nodeExists("1"));
     }
 }

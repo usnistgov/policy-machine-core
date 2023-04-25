@@ -25,7 +25,7 @@ public class DeassignAll extends FunctionDefinitionStatement {
                         children.add(value.getStringValue());
                     }
 
-                    policy.deassignAll(children, target);
+                    policy.graph().deassignAll(children, target);
 
                     return new Value();
                 }

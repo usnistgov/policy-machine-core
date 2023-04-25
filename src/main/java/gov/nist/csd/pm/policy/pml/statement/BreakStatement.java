@@ -5,7 +5,7 @@ import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public class BreakStatement extends PALStatement {
+public class BreakStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         return Value.breakValue();
@@ -13,6 +13,6 @@ public class BreakStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return "break;";
+        return "break";
     }
 }

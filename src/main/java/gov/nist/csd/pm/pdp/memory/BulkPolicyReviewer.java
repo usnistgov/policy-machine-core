@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp.memory;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -41,7 +42,7 @@ public class BulkPolicyReviewer extends MemoryPolicyReviewer {
 
         TargetDagResult targetDagResult = processTargetDAG(target, userDagResult);
 
-        return resolvePermissions(userDagResult, targetDagResult, target, pap.getResourceAccessRights());
+        return resolvePermissions(userDagResult, targetDagResult, target, pap.graph().getResourceAccessRights());
     }
 
     @Override
@@ -85,7 +86,7 @@ public class BulkPolicyReviewer extends MemoryPolicyReviewer {
             visitedNodes.put(child, nodeCtx);
         };
 
-        new DepthFirstGraphWalker(pap)
+        new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.PARENTS)
                 .withVisitor(visitor)
                 .withPropagator(propagator)
@@ -104,22 +105,22 @@ public class BulkPolicyReviewer extends MemoryPolicyReviewer {
 
         private UserContext userCtx;
         private MemoryPolicyReviewer memoryPolicyReviewer;
-        private PolicyReader policyReader;
+        private Policy policy;
         UserDagResult userDagResult;
         List<String> policyClasses;
-        UserDagEventListener(UserContext userContext, PolicyReader policyReader) throws PMException {
+        UserDagEventListener(UserContext userContext, Policy policy) throws PMException {
             this.userCtx = userContext;
-            this.policyReader = policyReader;
+            this.policy = policy;
 
-            this.memoryPolicyReviewer = new MemoryPolicyReviewer(policyReader);
+            this.memoryPolicyReviewer = new MemoryPolicyReviewer(policy);
             this.userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
-            this.policyClasses = policyReader.getPolicyClasses();
+            this.policyClasses = policy.graph().getPolicyClasses();
         }
 
         @Override
         public void handlePolicyEvent(PolicyEvent event) throws PMException {
             this.userDagResult = memoryPolicyReviewer.processUserDAG(userCtx.getUser(), userCtx.getProcess());
-            this.policyClasses = policyReader.getPolicyClasses();
+            this.policyClasses = policy.graph().getPolicyClasses();
         }
     }
 }

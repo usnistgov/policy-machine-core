@@ -20,7 +20,7 @@ public class GetAssociationsWithTarget extends FunctionDefinitionStatement {
                 ),
                 (ctx, author) -> {
                     Value target = ctx.scope().getValue("target");
-                    List<Association> associations = author.getAssociationsWithTarget(target.getStringValue());
+                    List<Association> associations = author.graph().getAssociationsWithTarget(target.getStringValue());
                     List<Value> associationValues = new ArrayList<>(associations.size());
                     for (int i = 0; i < associations.size(); i++)  {
                         Association association = associations.get(i);

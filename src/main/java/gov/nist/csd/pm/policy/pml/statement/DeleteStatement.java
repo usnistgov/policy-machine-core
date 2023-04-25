@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
-public class DeleteStatement extends PALStatement {
+public class DeleteStatement extends PMLStatement {
 
     private final Type type;
     private final Expression expression;
@@ -29,11 +29,11 @@ public class DeleteStatement extends PALStatement {
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         String name = expression.execute(ctx, policy).getStringValue();
         if (type == Type.PROHIBITION) {
-            policy.deleteProhibition(name);
+            policy.prohibitions().deleteProhibition(name);
         } else if (type == Type.OBLIGATION) {
-            policy.deleteObligation(name);
+            policy.obligations().deleteObligation(name);
         } else {
-            policy.deleteNode(name);
+            policy.graph().deleteNode(name);
         }
 
         return new Value();
@@ -52,7 +52,7 @@ public class DeleteStatement extends PALStatement {
             case USER -> typeStr = "user";
         }
 
-        return String.format("delete %s %s;", typeStr, expression);
+        return String.format("delete %s %s", typeStr, expression);
     }
 
     @Override

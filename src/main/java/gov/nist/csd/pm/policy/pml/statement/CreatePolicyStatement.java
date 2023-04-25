@@ -7,9 +7,9 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-public class CreatePolicyStatement extends PALStatement {
+public class CreatePolicyStatement extends PMLStatement {
 
     private final Expression name;
 
@@ -36,13 +36,13 @@ public class CreatePolicyStatement extends PALStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        policy.createPolicyClass(name.execute(ctx, policy).getStringValue(), noprops());
+        policy.graph().createPolicyClass(name.execute(ctx, policy).getStringValue(), NO_PROPERTIES);
 
         return new Value();
     }
 
     @Override
     public String toString() {
-        return String.format("create policy class %s;", name);
+        return String.format("create policy class %s", name);
     }
 }

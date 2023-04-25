@@ -24,56 +24,56 @@ class MemoryPDPTest {
     @Test
     void testRollback() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.createPolicyClass("pc1");
-        pap.createObjectAttribute("oa1", "pc1");
-        pap.createUserAttribute("ua1", "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
 
         PDP pdp = new MemoryPDP(pap, false);
         assertThrows(NodeNameExistsException.class, () -> {
             pdp.runTx(new UserContext(SUPER_USER), policy -> {
-                policy.createPolicyClass("pc2");
+                policy.graph().createPolicyClass("pc2");
                 // expect error and rollback
-                policy.createObjectAttribute("oa1", "pc2");
+                policy.graph().createObjectAttribute("oa1", "pc2");
             });
         });
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("ua1"));
-        assertTrue(pap.nodeExists("oa1"));
-        assertFalse(pap.nodeExists("pc2"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("ua1"));
+        assertTrue(pap.graph().nodeExists("oa1"));
+        assertFalse(pap.graph().nodeExists("pc2"));
     }
 
     @Test
-    void testExecutePAL() throws PMException {
+    void testExecutePML() throws PMException {
         try {
             PAP pap = new PAP(new MemoryPolicyStore());
-            SamplePolicy.loadSamplePolicyFromPAL(pap);
+            SamplePolicy.loadSamplePolicyFromPML(pap);
 
             FunctionDefinitionStatement functionDefinitionStatement = new FunctionDefinitionStatement(
                     "testfunc",
                     Type.voidType(),
                     List.of(),
                     (ctx, policy) -> {
-                        policy.createPolicyClass("pc3");
+                        policy.graph().createPolicyClass("pc3");
                         return new Value();
                     }
             );
 
             MemoryPDP memoryPDP = new MemoryPDP(pap, false);
             memoryPDP.runTx(new UserContext(SUPER_USER), policy -> {
-                policy.addPALFunction(functionDefinitionStatement);
-                policy.executePAL(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2'];");
+                policy.userDefinedPML().addFunction(functionDefinitionStatement);
+                policy.executePML(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2']");
             });
 
-            assertTrue(pap.nodeExists("ua3"));
+            assertTrue(pap.graph().nodeExists("ua3"));
 
             assertThrows(UnauthorizedException.class, () -> {
                 memoryPDP.runTx(new UserContext("u1"), policy -> {
-                    policy.executePAL(new UserContext("u1"), "testfunc();");
+                    policy.executePML(new UserContext("u1"), "testfunc()");
                 });
             });
 
-            assertFalse(pap.nodeExists("pc3"));
+            assertFalse(pap.graph().nodeExists("pc3"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

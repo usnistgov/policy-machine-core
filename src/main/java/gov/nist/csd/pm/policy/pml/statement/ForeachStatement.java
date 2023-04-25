@@ -3,24 +3,23 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 
 import java.util.List;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.policy.pml.PALExecutor.executeStatementBlock;
+import static gov.nist.csd.pm.policy.pml.PMLExecutor.executeStatementBlock;
 import static gov.nist.csd.pm.policy.pml.PMLFormatter.statementsToString;
 
-public class ForeachStatement extends PALStatement {
+public class ForeachStatement extends PMLStatement {
 
     private final String varName;
     private final String valueVarName;
     private final Expression iter;
-    private final List<PALStatement> statements;
+    private final List<PMLStatement> statements;
 
-    public ForeachStatement(String varName, String valueVarName, Expression iter, List<PALStatement> statements) {
+    public ForeachStatement(String varName, String valueVarName, Expression iter, List<PMLStatement> statements) {
         this.varName = varName;
         this.valueVarName = valueVarName;
         this.iter = iter;
@@ -39,7 +38,7 @@ public class ForeachStatement extends PALStatement {
                 ExecutionContext localExecutionCtx;
                 try {
                     localExecutionCtx = ctx.copy();
-                } catch (PALScopeException e) {
+                } catch (PMLScopeException e) {
                     throw new RuntimeException(e);
                 }
 
@@ -60,7 +59,7 @@ public class ForeachStatement extends PALStatement {
                 ExecutionContext localExecutionCtx;
                 try {
                     localExecutionCtx = ctx.copy();
-                } catch (PALScopeException e) {
+                } catch (PMLScopeException e) {
                     throw new RuntimeException(e);
                 }
 

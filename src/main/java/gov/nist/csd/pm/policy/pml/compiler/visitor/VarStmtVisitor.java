@@ -3,7 +3,7 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.VarStatement;
 
@@ -35,7 +35,7 @@ public class VarStmtVisitor extends PMLBaseVisitor<VarStatement> {
             }
 
             visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), isConst);
-        } catch (PALScopeException e) {
+        } catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
         }
 

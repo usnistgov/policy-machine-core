@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SetNodePropertiesStatement extends PALStatement {
+public class SetNodePropertiesStatement extends PMLStatement {
 
     private final Expression nameExpr;
     private final Expression propertiesExpr;
@@ -36,14 +36,14 @@ public class SetNodePropertiesStatement extends PALStatement {
             properties.put(key.getStringValue(), map.get(key).getStringValue());
         }
 
-        policy.setNodeProperties(name, properties);
+        policy.graph().setNodeProperties(name, properties);
 
         return new Value();
     }
 
     @Override
     public String toString() {
-        return String.format("set properties of %s to %s;", nameExpr, propertiesExpr);
+        return String.format("set properties of %s to %s", nameExpr, propertiesExpr);
     }
 
     @Override

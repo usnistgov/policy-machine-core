@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.pml.model.expression.Literal;
 import gov.nist.csd.pm.policy.pml.model.expression.MapLiteral;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.ArrayLiteral;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
 
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class LiteralExprVisitor extends PMLBaseVisitor<Literal> {
             Type type = Type.any();
             try {
                 type = expr.getType(visitorCtx.scope());
-            } catch (PALScopeException e) {
+            } catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(expressionCtx, e.getMessage());
             }
 
@@ -121,7 +121,7 @@ public class LiteralExprVisitor extends PMLBaseVisitor<Literal> {
             try {
                 keyExprType = keyExpr.getType(visitorCtx.scope());
                 valueExprType = valueExpr.getType(visitorCtx.scope());
-            } catch (PALScopeException e) {
+            } catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(mapEntryCtx, e.getMessage());
             }
 

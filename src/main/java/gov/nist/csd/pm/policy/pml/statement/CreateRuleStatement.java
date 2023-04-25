@@ -2,9 +2,8 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PALExecutionException;
+import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
@@ -13,14 +12,14 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.pml.PMLFormatter;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateRuleStatement extends PALStatement {
+public class CreateRuleStatement extends PMLStatement {
 
     private final Expression name;
     private final SubjectClause subjectClause;
@@ -67,8 +66,8 @@ public class CreateRuleStatement extends PALStatement {
         ExecutionContext ruleCtx;
         try {
             ruleCtx = ctx.copy();
-        } catch (PALScopeException e) {
-            throw new PALExecutionException(e.getMessage());
+        } catch (PMLScopeException e) {
+            throw new PMLExecutionException(e.getMessage());
         }
 
         Rule rule = new Rule(
@@ -84,31 +83,31 @@ public class CreateRuleStatement extends PALStatement {
         return new Value(rule);
     }
 
-    private EventSubject executeEventSubject(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
+    private EventSubject executeEventSubject(ExecutionContext ctx, Policy policy) throws PMException {
         EventSubject subject;
         if (subjectClause.type == SubjectType.USER || subjectClause.type == SubjectType.USERS) {
             List<String> subjectValues = new ArrayList<>();
-            subjectValues.add(subjectClause.expr.execute(ctx, policyAuthor).getStringValue());
+            subjectValues.add(subjectClause.expr.execute(ctx, policy).getStringValue());
             subject = EventSubject.users(subjectValues.toArray(new String[]{}));
         } else if (subjectClause.type == SubjectType.ANY_USER) {
             subject = EventSubject.anyUser();
         } else if (subjectClause.type == SubjectType.USER_ATTR) {
             subject = EventSubject.anyUserWithAttribute(
-                    subjectClause.expr.execute(ctx, policyAuthor).getStringValue()
+                    subjectClause.expr.execute(ctx, policy).getStringValue()
             );
         } else {
             // process
             subject = EventSubject.process(
-                    subjectClause.expr.execute(ctx, policyAuthor).getStringValue()
+                    subjectClause.expr.execute(ctx, policy).getStringValue()
             );
         }
 
         return subject;
     }
 
-    private Performs executePerforms(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
+    private Performs executePerforms(ExecutionContext ctx, Policy policy) throws PMException {
         Performs performs;
-        Value performsValue = performsClause.events.execute(ctx, policyAuthor);
+        Value performsValue = performsClause.events.execute(ctx, policy);
         if (performsValue.isString()) {
             performs = Performs.events(performsValue.getStringValue());
         } else {
@@ -123,11 +122,11 @@ public class CreateRuleStatement extends PALStatement {
         return performs;
     }
 
-    private Target executeTarget(ExecutionContext ctx, PolicyAuthor policyAuthor) throws PMException {
+    private Target executeTarget(ExecutionContext ctx, Policy policy) throws PMException {
         Target target = Target.anyPolicyElement();
         Value onValue;
         if (onClause.nameExpr != null) {
-            onValue = onClause.nameExpr.execute(ctx, policyAuthor);
+            onValue = onClause.nameExpr.execute(ctx, policy);
         } else {
             onValue = new Value();
         }
@@ -307,14 +306,14 @@ public class CreateRuleStatement extends PALStatement {
 
     public static class ResponseBlock implements Serializable {
         private final String evtVar;
-        private final List<PALStatement> statements;
+        private final List<PMLStatement> statements;
 
         public ResponseBlock() {
             this.evtVar = "";
             this.statements = new ArrayList<>();
         }
 
-        public ResponseBlock(String evtVar, List<PALStatement> statements) {
+        public ResponseBlock(String evtVar, List<PMLStatement> statements) {
             this.evtVar = evtVar;
             this.statements = statements;
         }
@@ -323,7 +322,7 @@ public class CreateRuleStatement extends PALStatement {
             return evtVar;
         }
 
-        public List<PALStatement> getStatements() {
+        public List<PMLStatement> getStatements() {
             return statements;
         }
     }

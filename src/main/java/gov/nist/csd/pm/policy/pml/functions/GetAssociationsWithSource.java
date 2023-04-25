@@ -20,7 +20,7 @@ public class GetAssociationsWithSource extends FunctionDefinitionStatement {
                 ),
                 (ctx, author) -> {
                     Value source = ctx.scope().getValue("source");
-                    List<Association> associations = author.getAssociationsWithSource(source.getStringValue());
+                    List<Association> associations = author.graph().getAssociationsWithSource(source.getStringValue());
                     List<Value> associationValues = new ArrayList<>(associations.size());
                     for (int i = 0; i < associations.size(); i++)  {
                         Association association = associations.get(i);

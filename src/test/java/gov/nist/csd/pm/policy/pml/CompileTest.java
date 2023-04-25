@@ -2,11 +2,7 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PALCompilationException;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
-import gov.nist.csd.pm.policy.author.pal.statement.*;
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -15,9 +11,12 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.model.expression.*;
+import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.*;
-import gov.nist.csd.pm.policy.serializer.PALDeserializer;
+import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ class CompileTest {
 
     @Test
     void testCompileLet() throws PMException {
-        String pal = """
+        String pml = """
                 let a = 'hello world'
                 let b = ['hello', 'world']
                 let c = {
@@ -46,7 +45,7 @@ class CompileTest {
                 let g = concat([f, ' ', a])
                 let h = []
                 """;
-        List<PALStatement> stmts = test(pal, new PAP(new MemoryPolicyStore()));
+        List<PMLStatement> stmts = test(pml, new PAP(new MemoryPolicyStore()));
         VarStatement stmt = (VarStatement) stmts.get(0);
         assertEquals("a", stmt.getVarName());
         Assertions.assertEquals("hello world", stmt.getExpression().getLiteral().getStringLiteral());
@@ -132,7 +131,7 @@ class CompileTest {
 
     @Test
     void testCompileErrors() {
-        String pal = """
+        String pml = """
                 let a = concat('1')
                 let b = a['a']
                 let c = {'a': 'b'}
@@ -141,7 +140,7 @@ class CompileTest {
                 let a = b
                 a = b
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
+        PMLCompilationException ex = assertThrows(PMLCompilationException.class, () -> test(pml, new PAP(new MemoryPolicyStore())));
         assertEquals(5, ex.getErrors().size(), ex.getErrors().toString());
         Assertions.assertTrue(ex.getErrors().get(0).errorMessage().contains("expected []string, got string"));
         Assertions.assertTrue(ex.getErrors().get(1).errorMessage().contains("expected map or array type"));
@@ -152,12 +151,12 @@ class CompileTest {
 
     @Test
     void testConstErrors() {
-        String pal = """
+        String pml = """
                 const a = 'hello world'
                 const a = 'test'
                 a = 'test'
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
+        PMLCompilationException ex = assertThrows(PMLCompilationException.class, () -> test(pml, new PAP(new MemoryPolicyStore())));
         assertEquals(2, ex.getErrors().size(), ex.getErrors().toString());
         Assertions.assertTrue(ex.getErrors().get(0).errorMessage().contains("already defined"));
         Assertions.assertTrue(ex.getErrors().get(1).errorMessage().contains("cannot reassign"));
@@ -165,69 +164,69 @@ class CompileTest {
 
     @Test
     void testForeachCompileErrors() {
-        String pal = """
+        String pml = """
                 foreach x, y in ['', ''] {
                 
                 }
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
+        PMLCompilationException ex = assertThrows(PMLCompilationException.class, () -> test(pml, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
 
-        String pal1 = """
+        String pml1 = """
                 foreach x, y in {'k': 'v', 'k1': 'v1'} {
                 
                 }
                 """;
-        assertDoesNotThrow(() -> test(pal1, new PAP(new MemoryPolicyStore())));
+        assertDoesNotThrow(() -> test(pml1, new PAP(new MemoryPolicyStore())));
     }
 
     @Test
     void testForRangeCompileErrors() throws PMException {
-        String pal = """
+        String pml = """
                 for i in range [1, 5] {
                     create policy class i
                 }
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
+        PMLCompilationException ex = assertThrows(PMLCompilationException.class, () -> test(pml, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         Assertions.assertTrue(ex.getErrors().get(0).errorMessage().contains("number not allowed, only: [string]"));
     }
 
-    private List<PALStatement> test(String pal, PolicyAuthor policyAuthor) throws PMException {
-        return PALCompiler.compilePAL(policyAuthor, pal);
+    private List<PMLStatement> test(String pml, Policy policyAuthor) throws PMException {
+        return PMLCompiler.compilePML(policyAuthor, pml);
     }
 
     @Test
     void testMaps() {
-        String pal = """
+        String pml = """
                 let m = {'k1': {'k2': 'v1'}}
                 let x = m['k1']['k2']['k3']
                 """;
-        PALCompilationException ex = assertThrows(PALCompilationException.class, () -> test(pal, new PAP(new MemoryPolicyStore())));
+        PMLCompilationException ex = assertThrows(PMLCompilationException.class, () -> test(pml, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         Assertions.assertTrue(ex.getErrors().get(0).errorMessage().contains("expected map or array type"));
 
-        String pal1 = """
+        String pml1 = """
                 let m = {'k1': {'k2': 'v1'}}
                 create policy class m['k1']
                 """;
-        ex = assertThrows(PALCompilationException.class, () -> test(pal1, new PAP(new MemoryPolicyStore())));
+        ex = assertThrows(PMLCompilationException.class, () -> test(pml1, new PAP(new MemoryPolicyStore())));
         assertEquals(1, ex.getErrors().size());
         Assertions.assertTrue(ex.getErrors().get(0).errorMessage().contains("expression type map[string]string not allowed, only: [string]"));
     }
 
     @Test
     void testMapsSuccess() throws PMException, UnknownVariableInScopeException {
-        String pal = """
+        String pml = """
                 let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}}
                 let x = m['k1']['k1-1']['k1-1-1']
                 create policy class x
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        List<PALStatement> test = test(pal, new PAP(new MemoryPolicyStore()));
+        List<PMLStatement> test = test(pml, new PAP(new MemoryPolicyStore()));
 
         ExecutionContext ctx = new ExecutionContext(new UserContext(SUPER_USER));
-        PALStatement stmt = test.get(0);
+        PMLStatement stmt = test.get(0);
         stmt.execute(ctx, pap);
         Value m = ctx.scope().getValue("m");
         assertTrue(m.isMap());
@@ -246,7 +245,7 @@ class CompileTest {
 
     @Test
     void testCompileObligation() throws PMException {
-        String pal = """
+        String pml = """
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
@@ -267,16 +266,16 @@ class CompileTest {
         UserContext userCtx = new UserContext(SUPER_USER);
         PAP pap = new PAP(new MemoryPolicyStore());
         ExecutionContext ctx = new ExecutionContext(userCtx);
-        pap.createPolicyClass("pc1");
-        pap.createObjectAttribute("oa1", "pc1");
-        List<PALStatement> test = test(pal, pap);
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
+        List<PMLStatement> test = test(pml, pap);
         assertEquals(1, test.size());
 
-        PALStatement stmt = test.get(0);
+        PMLStatement stmt = test.get(0);
         stmt.execute(ctx, pap);
 
-        assertEquals(1, pap.getObligations().size());
-        Obligation actual = pap.getObligation("test");
+        assertEquals(1, pap.obligations().getObligations().size());
+        Obligation actual = pap.obligations().getObligation("test");
         assertEquals(1, actual.getRules().size());
         assertEquals("test", actual.getLabel());
         assertEquals(userCtx, actual.getAuthor());
@@ -291,13 +290,13 @@ class CompileTest {
 
         Response response = rule.getResponse();
 
-        List<PALStatement> statements = response.getStatements();
+        List<PMLStatement> statements = response.getStatements();
         assertEquals(5, statements.size());
 
         stmt = statements.get(0);
 
         Type evtCtxType = Type.map(Type.string(), Type.any());
-        PALStatement expected = new CreatePolicyStatement(
+        PMLStatement expected = new CreatePolicyStatement(
                 new Expression(
                         new VariableReference(
                                 new EntryReference(
@@ -395,39 +394,39 @@ class CompileTest {
 
     @Test
     void testScopeOrder() {
-        String pal = """
+        String pml = """
                 let x = 'hello'
                 create policy class concat([x, ' ', y])
                 let y = 'world'
                 """;
-        assertThrows(PALCompilationException.class, () -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
+        assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new PAP(new MemoryPolicyStore()), pml));
     }
 
     @Test
     void testEmptyMap() {
-        String pal = """
+        String pml = """
                 function testFunc(map[string]string m) {
                 
                 }
                 
                 testFunc({})
                 """;
-        assertDoesNotThrow(() -> PALCompiler.compilePAL(new PAP(new MemoryPolicyStore()), pal));
+        assertDoesNotThrow(() -> PMLCompiler.compilePML(new PAP(new MemoryPolicyStore()), pml));
     }
 
     @Test
     void testForLoopLocalVar() throws PMException {
-        String pal = """
+        String pml = """
                 for i in range [1, 100] {
                     let x = i
                     create pc numToStr(x)
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
-        assertEquals(101, pap.getPolicyClasses().size());
+        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+        assertEquals(101, pap.graph().getPolicyClasses().size());
 
-        String pal2 = """
+        String pml2 = """
                 for i in range [1, 100] {
                     let x = i
                     create pc numToStr(x)
@@ -436,9 +435,9 @@ class CompileTest {
                 create oa 'oa1' in x
                 """;
         PAP pap2 = new PAP(new MemoryPolicyStore());
-        assertThrows(PALCompilationException.class, () -> pap2.fromString(pal2, new PALDeserializer(new UserContext(SUPER_USER))));
+        assertThrows(PMLCompilationException.class, () -> pap2.fromString(pml2, new PMLDeserializer(new UserContext(SUPER_USER))));
 
-        pal = """
+        pml = """
                 create pc 'pc1'
                 create oa 'oa1' in ['pc1']
                 foreach child in getChildren('pc1') {
@@ -447,10 +446,10 @@ class CompileTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(pal, new PALDeserializer(new UserContext(SUPER_USER)));
-        assertTrue(pap.nodeExists("pc2"));
+        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+        assertTrue(pap.graph().nodeExists("pc2"));
 
-        String pal3 = """
+        String pml3 = """
                 foreach child in getChildren('pc1') {
                     let x = 'pc2'
                     create pc x
@@ -459,7 +458,7 @@ class CompileTest {
                 create oa 'oa1' in x
                 """;
         PAP pap3 = new PAP(new MemoryPolicyStore());
-        assertThrows(PALCompilationException.class, () -> pap3.fromString(pal3, new PALDeserializer(new UserContext(SUPER_USER))));
+        assertThrows(PMLCompilationException.class, () -> pap3.fromString(pml3, new PMLDeserializer(new UserContext(SUPER_USER))));
 
     }
 }

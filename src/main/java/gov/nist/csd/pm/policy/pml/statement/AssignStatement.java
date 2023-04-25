@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import java.util.List;
 import java.util.Objects;
 
-public class AssignStatement extends PALStatement {
+public class AssignStatement extends PMLStatement {
 
     private final Expression child;
     private final Expression assignTo;
@@ -35,12 +35,12 @@ public class AssignStatement extends PALStatement {
 
         if (assignToValue.isString()) {
             String parent = assignToValue.getStringValue();
-            policy.assign(childStringValue, parent);
+            policy.graph().assign(childStringValue, parent);
         } else if (assignToValue.isArray()) {
             List<Value> valueArr = assignToValue.getArrayValue();
             for (Value value : valueArr) {
                 String parent = value.getStringValue();
-                policy.assign(childStringValue, parent);
+                policy.graph().assign(childStringValue, parent);
             }
         }
 
@@ -49,7 +49,7 @@ public class AssignStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("assign %s to %s;", child, assignTo);
+        return String.format("assign %s to %s", child, assignTo);
     }
 
     @Override

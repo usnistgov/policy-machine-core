@@ -5,7 +5,7 @@ import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public class ContinueStatement extends PALStatement {
+public class ContinueStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         return Value.continueValue();
@@ -13,6 +13,6 @@ public class ContinueStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return "continue;";
+        return "continue";
     }
 }

@@ -13,7 +13,7 @@ import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 
-public class CreateAttrStatement extends PALStatement {
+public class CreateAttrStatement extends PMLStatement {
 
     private final Expression name;
     private final NodeType type;
@@ -60,14 +60,14 @@ public class CreateAttrStatement extends PALStatement {
         String[] parentsArr = parents.toArray(new String[]{});
 
         if (type == OA) {
-            policy.createObjectAttribute(
+            policy.graph().createObjectAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
             );
         } else {
-            policy.createUserAttribute(
+            policy.graph().createUserAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
@@ -80,7 +80,7 @@ public class CreateAttrStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("create %s %s in %s;",
+        return String.format("create %s %s in %s",
                 (type == OA ? "object attribute" : "user attribute"),
                 name,
                 assignTo

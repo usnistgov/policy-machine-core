@@ -8,7 +8,6 @@ import gov.nist.csd.pm.policy.pml.compiler.visitor.LiteralExprVisitor;
 import gov.nist.csd.pm.policy.pml.compiler.visitor.VariableReferenceVisitor;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.pml.model.expression.Literal;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
@@ -22,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Expression extends PALStatement {
+public class Expression extends PMLStatement {
 
     public static Expression compile(VisitorContext visitorCtx,
                                      PMLParser.ExpressionContext expressionCtx,

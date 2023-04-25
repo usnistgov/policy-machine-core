@@ -58,7 +58,7 @@ public class MemoryPDP extends PDP {
         }
 
         private void handlePolicySync(PolicySynchronizationEvent event) {
-            this.policy = new MemoryPolicyStore(event);
+            this.policy = event.getPolicyStore();
         }
     }
 

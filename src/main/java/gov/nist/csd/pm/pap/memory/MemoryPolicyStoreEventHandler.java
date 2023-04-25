@@ -12,7 +12,7 @@ public class MemoryPolicyStoreEventHandler extends BasePolicyEventHandler {
     @Override
     public synchronized void handlePolicyEvent(PolicyEvent event) throws PMException {
         if (event instanceof PolicySynchronizationEvent policySynchronizationEvent) {
-            policy = new MemoryPolicyStore(policySynchronizationEvent);
+            policy = policySynchronizationEvent.getPolicyStore();
         } else {
             super.handlePolicyEvent(event);
         }

@@ -3,12 +3,12 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolicyVisitor extends PMLBaseVisitor<List<PALStatement>> {
+public class PolicyVisitor extends PMLBaseVisitor<List<PMLStatement>> {
 
     private final VisitorContext visitorCtx;
 
@@ -17,11 +17,11 @@ public class PolicyVisitor extends PMLBaseVisitor<List<PALStatement>> {
     }
 
     @Override
-    public List<PALStatement> visitPml(PMLParser.PmlContext ctx) {
-        List<PALStatement> statements = new ArrayList<>();
+    public List<PMLStatement> visitPml(PMLParser.PmlContext ctx) {
+        List<PMLStatement> statements = new ArrayList<>();
         for (PMLParser.StmtContext stmtCtx : ctx.stmt()) {
             StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
-            PALStatement statement = statementVisitor.visitStmt(stmtCtx);
+            PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
             statements.add(statement);
         }
         return statements;

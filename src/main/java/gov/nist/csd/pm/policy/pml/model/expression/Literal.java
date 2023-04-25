@@ -3,12 +3,12 @@ package gov.nist.csd.pm.policy.pml.model.expression;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.*;
 
-public class Literal extends PALStatement {
+public class Literal extends PMLStatement {
 
     private boolean isStringLiteral;
     private String stringLiteral;

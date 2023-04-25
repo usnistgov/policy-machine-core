@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.policy.model.obligation;
 
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.epp.EventContext;
@@ -14,27 +15,27 @@ import java.util.Objects;
 public class Response implements Serializable {
 
     private final ExecutionContext executionCtx;
-    private final List<PALStatement> stmts;
+    private final List<PMLStatement> stmts;
     private final String eventCtxVariable;
-    public Response(String eventCtxVariable, ExecutionContext executionCtx, List<PALStatement> stmts) {
+    public Response(String eventCtxVariable, ExecutionContext executionCtx, List<PMLStatement> stmts) {
         this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = executionCtx;
         this.stmts = stmts;
     }
 
-    public Response(String eventNameVariable, String eventCtxVariable, ExecutionContext executionCtx, PALStatement... stmts) {
+    public Response(String eventNameVariable, String eventCtxVariable, ExecutionContext executionCtx, PMLStatement... stmts) {
         this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = executionCtx;
         this.stmts = List.of(stmts);
     }
 
-    public Response(UserContext author, PALStatement... stmts) {
+    public Response(UserContext author, PMLStatement... stmts) {
         this.eventCtxVariable = "";
         this.executionCtx = new ExecutionContext(author);
         this.stmts = List.of(stmts);
     }
 
-    public Response(UserContext author, String eventNameVariable, String eventCtxVariable, PALStatement... stmts) {
+    public Response(UserContext author, String eventNameVariable, String eventCtxVariable, PMLStatement... stmts) {
         this.eventCtxVariable = eventCtxVariable;
         this.executionCtx = new ExecutionContext(author);
         this.stmts = List.of(stmts);
@@ -50,7 +51,7 @@ public class Response implements Serializable {
         return eventCtxVariable;
     }
 
-    public List<PALStatement> getStatements() {
+    public List<PMLStatement> getStatements() {
         return stmts;
     }
 
@@ -58,10 +59,10 @@ public class Response implements Serializable {
         return executionCtx;
     }
 
-    public Value execute(PolicyAuthor policyAuthor, EventContext eventCtx) throws PMException {
+    public Value execute(Policy policyAuthor, EventContext eventCtx) throws PMException {
         executionCtx.scope().putValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
-        for (PALStatement stmt : stmts) {
+        for (PMLStatement stmt : stmts) {
             stmt.execute(executionCtx, policyAuthor);
         }
 

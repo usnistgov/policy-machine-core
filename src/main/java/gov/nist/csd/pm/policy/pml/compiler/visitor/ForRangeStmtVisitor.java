@@ -4,10 +4,10 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.ForRangeStatement;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +30,17 @@ public class ForRangeStmtVisitor extends PMLBaseVisitor<ForRangeStatement> {
         Expression upper = Expression.compile(visitorCtx, ctx.upper, Type.number());
 
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        List<PALStatement> block = new ArrayList<>();
+        List<PMLStatement> block = new ArrayList<>();
 
         for (PMLParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
 
             try {
                 localVisitorCtx.scope().addVariable(varName, Type.number(), false);
-            }catch (PALScopeException e) {
+            }catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(ctx, e.getMessage());
             }
 
-            PALStatement statement = new StatementVisitor(localVisitorCtx)
+            PMLStatement statement = new StatementVisitor(localVisitorCtx)
                     .visitStmt(stmtCtx);
             block.add(statement);
 

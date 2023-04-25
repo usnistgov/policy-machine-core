@@ -4,7 +4,7 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
@@ -80,7 +80,7 @@ public class FunctionCallVisitor extends PMLBaseVisitor<FunctionInvocationStatem
                                         actualType + " at arg " + i
                         );
                     }
-                } catch (PALScopeException e) {
+                } catch (PMLScopeException e) {
                     visitorCtx.errorLog().addError(funcCallCtx, e.getMessage());
                 }
             }

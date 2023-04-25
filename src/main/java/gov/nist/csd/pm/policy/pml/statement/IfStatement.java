@@ -3,23 +3,22 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.PALExecutor;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.PMLFormatter;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class IfStatement extends PALStatement {
+public class IfStatement extends PMLStatement {
 
     private final ConditionalBlock ifBlock;
     private final List<ConditionalBlock> ifElseBlocks;
-    private final List<PALStatement> elseBlockStatements;
+    private final List<PMLStatement> elseBlockStatements;
 
-    public IfStatement(ConditionalBlock ifBlock, List<ConditionalBlock> ifElseBlocks, List<PALStatement> elseBlock) {
+    public IfStatement(ConditionalBlock ifBlock, List<ConditionalBlock> ifElseBlocks, List<PMLStatement> elseBlock) {
         this.ifBlock = ifBlock;
         this.ifElseBlocks = ifElseBlocks;
         this.elseBlockStatements = elseBlock;
@@ -33,7 +32,7 @@ public class IfStatement extends PALStatement {
         return ifElseBlocks;
     }
 
-    public List<PALStatement> getElseBlockStatements() {
+    public List<PMLStatement> getElseBlockStatements() {
         return elseBlockStatements;
     }
 
@@ -86,14 +85,14 @@ public class IfStatement extends PALStatement {
         return String.format("if %s {%s}", ifBlock.condition, PMLFormatter.statementsToString(ifBlock.block));
     }
 
-    private Value executeBlock(ExecutionContext ctx, PolicyAuthor policyAuthor, List<PALStatement> block) throws PMException {
+    private Value executeBlock(ExecutionContext ctx, Policy policy, List<PMLStatement> block) throws PMException {
         ExecutionContext copy = null;
         try {
             copy = ctx.copy();
-        } catch (PALScopeException e) {
+        } catch (PMLScopeException e) {
             throw new PMException(e.getMessage());
         }
-        Value value = PALExecutor.executeStatementBlock(copy, policyAuthor, block);
+        Value value = PMLExecutor.executeStatementBlock(copy, policy, block);
 
         ctx.scope().overwriteValues(copy.scope());
 
@@ -113,5 +112,5 @@ public class IfStatement extends PALStatement {
         return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(boolean not, Expression condition, List<PALStatement> block) implements Serializable { }
+    public record ConditionalBlock(boolean not, Expression condition, List<PMLStatement> block) implements Serializable { }
 }

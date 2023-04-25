@@ -3,7 +3,7 @@ package gov.nist.csd.pm.policy.pml;
 import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -27,12 +27,12 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
         return SPACES.repeat(indentLevel);
     }
 
-    public static String format(String pal) {
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(pal));
+    public static String format(String pml) {
+        PMLLexer lexer = new PMLLexer(CharStreams.fromString(pml));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PMLParser parser = new PMLParser(tokens);
 
-        String formatted = new PMLFormatter().visitPal(parser.pal());
+        String formatted = new PMLFormatter().visitPml(parser.pml());
 
         return removeEmptyLines(formatted);
     }
@@ -59,10 +59,10 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
         return ctx.start.getInputStream().getText(interval);
     }
 
-    public static String statementsToString(List<? extends PALStatement> stmts) {
+    public static String statementsToString(List<? extends PMLStatement> stmts) {
         StringBuilder s = new StringBuilder();
 
-        for (PALStatement stmt : stmts) {
+        for (PMLStatement stmt : stmts) {
             s.append(stmt);
         }
 
@@ -70,7 +70,7 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
     }
 
     @Override
-    public String visitPal(PMLParser.PalContext ctx) {
+    public String visitPml(PMLParser.PmlContext ctx) {
         StringBuilder s = new StringBuilder();
         for (PMLParser.StmtContext stmtCtx : ctx.stmt()) {
             s.append(visitStmt(stmtCtx));

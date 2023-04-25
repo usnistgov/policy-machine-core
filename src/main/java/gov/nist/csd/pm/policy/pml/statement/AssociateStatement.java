@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
 import java.util.Objects;
 
-public class AssociateStatement extends PALStatement {
+public class AssociateStatement extends PMLStatement {
 
     private final Expression ua;
     private final Expression target;
@@ -43,7 +43,7 @@ public class AssociateStatement extends PALStatement {
             accessRightSet.add(v.getStringValue());
         }
 
-        policy.associate(
+        policy.graph().associate(
                 uaValue.getStringValue(),
                 targetValue.getStringValue(),
                 accessRightSet
@@ -54,7 +54,7 @@ public class AssociateStatement extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("associate %s and %s with %s;",
+        return String.format("associate %s and %s with %s",
                 ua, target, accessRights);
     }
 

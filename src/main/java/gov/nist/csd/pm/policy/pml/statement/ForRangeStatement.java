@@ -3,23 +3,23 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.PALExecutor;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.PMLFormatter;
 
 import java.util.List;
 
-public class ForRangeStatement extends PALStatement{
+public class ForRangeStatement extends PMLStatement{
 
     private final String varName;
     private final Expression lower;
     private boolean lowerBound;
     private final Expression upper;
     private boolean upperBound;
-    private final List<PALStatement> block;
+    private final List<PMLStatement> block;
 
-    public ForRangeStatement(String varName, Expression lower, boolean lowerBound, Expression upper, boolean upperBound, List<PALStatement> block) {
+    public ForRangeStatement(String varName, Expression lower, boolean lowerBound, Expression upper, boolean upperBound, List<PMLStatement> block) {
         this.varName = varName;
         this.lower = lower;
         this.lowerBound = lowerBound;
@@ -48,13 +48,13 @@ public class ForRangeStatement extends PALStatement{
             ExecutionContext localExecutionCtx;
             try {
                 localExecutionCtx = ctx.copy();
-            } catch (PALScopeException e) {
+            } catch (PMLScopeException e) {
                 throw new RuntimeException(e);
             }
 
             localExecutionCtx.scope().putValue(varName, new Value(i));
 
-            Value value = PALExecutor.executeStatementBlock(localExecutionCtx, policy, block);
+            Value value = PMLExecutor.executeStatementBlock(localExecutionCtx, policy, block);
 
             if (value.isBreak()) {
                 break;

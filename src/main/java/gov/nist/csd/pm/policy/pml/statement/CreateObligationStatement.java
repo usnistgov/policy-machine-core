@@ -2,7 +2,6 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -20,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateObligationStatement extends PALStatement {
+public class CreateObligationStatement extends PMLStatement {
 
     private final Expression name;
-    private final List<PALStatement> ruleStmts;
+    private final List<PMLStatement> ruleStmts;
 
-    public CreateObligationStatement(Expression name, List<PALStatement> ruleStmts) {
+    public CreateObligationStatement(Expression name, List<PMLStatement> ruleStmts) {
         this.name = name;
         this.ruleStmts = ruleStmts;
     }
@@ -37,13 +36,13 @@ public class CreateObligationStatement extends PALStatement {
 
         // execute the create rule statements and add to obligation
         List<Rule> rules = new ArrayList<>();
-        for (PALStatement createRuleStmt : ruleStmts) {
+        for (PMLStatement createRuleStmt : ruleStmts) {
             Value createRuleValue = createRuleStmt.execute(ctx, policy);
             Rule rule = createRuleValue.getRule();
             rules.add(rule);
         }
 
-        policy.createObligation(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
+        policy.obligations().createObligation(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
 
         return new Value();
     }
@@ -73,8 +72,8 @@ public class CreateObligationStatement extends PALStatement {
         );
     }
 
-    private static List<PALStatement> createRuleStatementsFromObligation(List<Rule> rules) {
-        List<PALStatement> createRuleStatements = new ArrayList<>();
+    private static List<PMLStatement> createRuleStatementsFromObligation(List<Rule> rules) {
+        List<PMLStatement> createRuleStatements = new ArrayList<>();
 
         for (Rule rule : rules) {
             EventPattern event = rule.getEvent();

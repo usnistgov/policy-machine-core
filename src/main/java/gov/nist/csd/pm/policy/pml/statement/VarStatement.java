@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
-public class VarStatement extends PALStatement {
+public class VarStatement extends PMLStatement {
 
     private final String varName;
     private final Expression expression;
@@ -48,7 +48,7 @@ public class VarStatement extends PALStatement {
             s = "let ";
         }
 
-        return String.format("%s%s = %s;", s, varName, expression);
+        return String.format("%s%s = %s", s, varName, expression);
     }
 
     @Override

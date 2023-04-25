@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeExcep
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.statement.CreateRuleStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +48,9 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
         PMLParser.ResponseBlockContext responseBlockCtx = ctx.responseBlock();
         List<PMLParser.ResponseStmtContext> responseStmtsCtx = responseBlockCtx.responseStmt();
 
-        List<PALStatement> stmts = new ArrayList<>();
+        List<PMLStatement> stmts = new ArrayList<>();
         for (PMLParser.ResponseStmtContext responseStmtCtx : responseStmtsCtx) {
-            PALStatement stmt = null;
+            PMLStatement stmt = null;
 
             if (responseStmtCtx.stmt() != null) {
                 stmt = new StatementVisitor(localVisitorCtx)

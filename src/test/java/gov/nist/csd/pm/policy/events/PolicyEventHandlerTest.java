@@ -38,7 +38,7 @@ class PolicyEventHandlerTest {
         handler.handle(new DeleteObligationEvent(new Obligation(new UserContext(""), "")));
         handler.handle(new DeleteProhibitionEvent(null));
         handler.handle(new DissociateEvent("", ""));
-        handler.handle(new PolicySynchronizationEvent(null, null, null, null));
+        handler.handle(new PolicySynchronizationEvent(null));
         handler.handle(new RemoveConstantEvent(null));
         handler.handle(new RemoveFunctionEvent(null));
         handler.handle(new RollbackTxEvent(null));

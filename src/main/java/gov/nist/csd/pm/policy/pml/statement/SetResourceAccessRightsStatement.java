@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 
-public class SetResourceAccessRightsStatement extends PALStatement{
+public class SetResourceAccessRightsStatement extends PMLStatement{
 
     private final Expression arExpr;
 
@@ -22,7 +22,7 @@ public class SetResourceAccessRightsStatement extends PALStatement{
             accessRightSet.add(v.getStringValue());
         }
 
-        policy.setResourceAccessRights(accessRightSet);
+        policy.graph().setResourceAccessRights(accessRightSet);
         ctx.scope().setResourceAccessRights(accessRightSet);
         return new Value();
     }
@@ -38,6 +38,6 @@ public class SetResourceAccessRightsStatement extends PALStatement{
             ars.append(String.format("%s", ar));
         }
 
-        return String.format("set resource access rights [%s];", ars);
+        return String.format("set resource access rights [%s]", ars);
     }
 }

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PALExecutionException;
+import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class FunctionDefinitionStatement extends PALStatement {
+public class FunctionDefinitionStatement extends PMLStatement {
 
     public static String name(String name) {
         return name;
@@ -32,7 +32,7 @@ public class FunctionDefinitionStatement extends PALStatement {
     private final String functionName;
     private final Type returnType;
     private final List<FormalArgument> args;
-    private List<PALStatement> statements;
+    private List<PMLStatement> statements;
     private FunctionExecutor functionExecutor;
     private boolean isFuncExec;
 
@@ -44,7 +44,7 @@ public class FunctionDefinitionStatement extends PALStatement {
         this.functionExecutor = functionDefinitionStatement.functionExecutor;
         this.isFuncExec = functionDefinitionStatement.isFuncExec;
     }
-    public FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PALStatement> stmts) {
+    public FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PMLStatement> stmts) {
         this.functionName = functionName;
         this.returnType = returnType;
         this.args = args;
@@ -80,16 +80,16 @@ public class FunctionDefinitionStatement extends PALStatement {
         return args;
     }
 
-    public List<PALStatement> getBody() {
+    public List<PMLStatement> getBody() {
         return statements;
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, Policy policy) throws PALExecutionException {
+    public Value execute(ExecutionContext ctx, Policy policy) throws PMLExecutionException {
         try {
             ctx.scope().addFunction(this);
         } catch (FunctionAlreadyDefinedInScopeException e) {
-            throw new PALExecutionException(e.getMessage());
+            throw new PMLExecutionException(e.getMessage());
         }
 
         return new Value();
@@ -109,15 +109,15 @@ public class FunctionDefinitionStatement extends PALStatement {
     }
 
     private String serializeFormalArgs() {
-        String pal = "";
+        String pml = "";
         for (FormalArgument formalArgument : args) {
-            if (!pal.isEmpty()) {
-                pal += ", ";
+            if (!pml.isEmpty()) {
+                pml += ", ";
             }
 
-            pal += formalArgument.type().toString() + " " + formalArgument.name();
+            pml += formalArgument.type().toString() + " " + formalArgument.name();
         }
-        return pal;
+        return pml;
     }
 
     @Override
@@ -138,7 +138,7 @@ public class FunctionDefinitionStatement extends PALStatement {
         private Type returnType;
         private List<FormalArgument> args;
         private FunctionExecutor functionExecutor;
-        private List<PALStatement> body;
+        private List<PMLStatement> body;
 
         public Builder(String name) {
             this.name = name;
@@ -159,7 +159,7 @@ public class FunctionDefinitionStatement extends PALStatement {
             return this;
         }
 
-        public Builder body(PALStatement ... body) {
+        public Builder body(PMLStatement ... body) {
             this.body = new ArrayList<>(List.of(body));
             return this;
         }

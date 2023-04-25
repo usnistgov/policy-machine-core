@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.allAccessRights;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
 public class SuperPolicy {
@@ -42,61 +42,61 @@ public class SuperPolicy {
         // then use Graph methods to take advantage of the policy emitter
         // internally, the Graph methods will be using a policy store in Tx mode
         runTx(store, () -> {
-            if (!store.nodeExists(SUPER_PC)) {
-                store.createPolicyClass(SUPER_PC);
+            if (!store.graph().nodeExists(SUPER_PC)) {
+                store.graph().createPolicyClass(SUPER_PC);
             }
 
-            if (!store.nodeExists(SUPER_UA)) {
-                store.createUserAttribute(SUPER_UA, SUPER_PC);
-            } else if (!store.getParents(SUPER_UA).contains(SUPER_PC)) {
-                store.assign(SUPER_UA, SUPER_PC);
+            if (!store.graph().nodeExists(SUPER_UA)) {
+                store.graph().createUserAttribute(SUPER_UA, SUPER_PC);
+            } else if (!store.graph().getParents(SUPER_UA).contains(SUPER_PC)) {
+                store.graph().assign(SUPER_UA, SUPER_PC);
             }
 
-            if (!store.nodeExists(SUPER_UA1)) {
-                store.createUserAttribute(SUPER_UA1, SUPER_PC);
-            } else if (!store.getParents(SUPER_UA1).contains(SUPER_PC)) {
-                store.assign(SUPER_UA1, SUPER_PC);
+            if (!store.graph().nodeExists(SUPER_UA1)) {
+                store.graph().createUserAttribute(SUPER_UA1, SUPER_PC);
+            } else if (!store.graph().getParents(SUPER_UA1).contains(SUPER_PC)) {
+                store.graph().assign(SUPER_UA1, SUPER_PC);
             }
 
-            if (!store.nodeExists(SUPER_OA)) {
-                store.createObjectAttribute(SUPER_OA, SUPER_PC);
-            } else if (!store.getParents(SUPER_OA).contains(SUPER_PC)) {
-                store.assign(SUPER_OA, SUPER_PC);
+            if (!store.graph().nodeExists(SUPER_OA)) {
+                store.graph().createObjectAttribute(SUPER_OA, SUPER_PC);
+            } else if (!store.graph().getParents(SUPER_OA).contains(SUPER_PC)) {
+                store.graph().assign(SUPER_OA, SUPER_PC);
             }
 
-            if (!store.nodeExists(SUPER_USER)) {
-                store.createUser(SUPER_USER, SUPER_UA, SUPER_UA1);
+            if (!store.graph().nodeExists(SUPER_USER)) {
+                store.graph().createUser(SUPER_USER, SUPER_UA, SUPER_UA1);
             }
 
-            List<String> parents = store.getParents(SUPER_USER);
+            List<String> parents = store.graph().getParents(SUPER_USER);
             if (!parents.contains(SUPER_UA)) {
-                store.assign(SUPER_USER, SUPER_UA);
+                store.graph().assign(SUPER_USER, SUPER_UA);
             } else if (!parents.contains(SUPER_UA1)) {
-                store.assign(SUPER_USER, SUPER_UA1);
+                store.graph().assign(SUPER_USER, SUPER_UA1);
             }
 
-            if (!store.nodeExists(SUPER_PC_REP)) {
-                store.createObjectAttribute(SUPER_PC_REP, SUPER_OA);
-            } else if (!store.getParents(SUPER_PC_REP).contains(SUPER_OA)) {
-                store.assign(SUPER_PC_REP, SUPER_OA);
+            if (!store.graph().nodeExists(SUPER_PC_REP)) {
+                store.graph().createObjectAttribute(SUPER_PC_REP, SUPER_OA);
+            } else if (!store.graph().getParents(SUPER_PC_REP).contains(SUPER_OA)) {
+                store.graph().assign(SUPER_PC_REP, SUPER_OA);
             }
 
             // associate the super_ua1 and super_ua to provide * rights to the super user on itself
             // if the association already exists this will do nothing
-            store.associate(SUPER_UA1, SUPER_UA, allAccessRights());
+            store.graph().associate(SUPER_UA1, SUPER_UA, allAccessRights());
 
             // associate super ua and super oa
-            store.associate(SUPER_UA, SUPER_OA, allAccessRights());
+            store.graph().associate(SUPER_UA, SUPER_OA, allAccessRights());
 
             // associate the super ua with each policy not super_pc
-            for (String pc : store.getPolicyClasses()) {
+            for (String pc : store.graph().getPolicyClasses()) {
                 if (pc.equals(SUPER_PC)) {
                     continue;
                 }
 
-                List<String> children = store.getChildren(pc);
+                List<String> children = store.graph().getChildren(pc);
                 for (String child : children) {
-                    store.associate(SUPER_UA, child, allAccessRights());
+                    store.graph().associate(SUPER_UA, child, allAccessRights());
                 }
             }
         });
@@ -110,12 +110,12 @@ public class SuperPolicy {
                 return;
             }
 
-            if (!store.nodeExists(SUPER_UA)) {
-                store.createUserAttribute(SUPER_UA, SUPER_PC);
+            if (!store.graph().nodeExists(SUPER_UA)) {
+                store.graph().createUserAttribute(SUPER_UA, SUPER_PC);
                 events.add(new AssignEvent(SUPER_UA, SUPER_PC));
             }
 
-            store.associate(SUPER_UA, child, allAccessRights());
+            store.graph().associate(SUPER_UA, child, allAccessRights());
             events.add(new AssociateEvent(SUPER_UA, child, allAccessRights()));
         });
 
@@ -127,21 +127,21 @@ public class SuperPolicy {
 
         runTx(store, () -> {
             // create pc node
-            store.createPolicyClass(name, properties);
+            store.graph().createPolicyClass(name, properties);
             events.add(new CreatePolicyClassEvent(name, properties));
 
             // create pc rep node in super policy
-            if (!store.nodeExists(SUPER_OA)) {
-                store.createObjectAttribute(SUPER_OA, SUPER_PC);
+            if (!store.graph().nodeExists(SUPER_OA)) {
+                store.graph().createObjectAttribute(SUPER_OA, SUPER_PC);
             }
 
             String pcRep = pcRepObjectAttribute(name);
-            if (store.nodeExists(pcRep)) {
+            if (store.graph().nodeExists(pcRep)) {
                 return;
             }
 
-            store.createObjectAttribute(pcRep, noprops(), SUPER_OA);
-            events.add(new CreateObjectAttributeEvent(pcRep, noprops(), SUPER_OA));
+            store.graph().createObjectAttribute(pcRep, NO_PROPERTIES, SUPER_OA);
+            events.add(new CreateObjectAttributeEvent(pcRep, NO_PROPERTIES, SUPER_OA));
         });
 
         return events;

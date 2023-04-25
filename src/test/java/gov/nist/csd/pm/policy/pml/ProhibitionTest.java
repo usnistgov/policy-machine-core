@@ -9,7 +9,7 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.serializer.PALDeserializer;
+import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -37,9 +37,9 @@ class ProhibitionTest {
                 on union of ['oa1']
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PALDeserializer(new UserContext(SUPER_USER)));
+        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
 
-        Prohibition prohibition = pap.getProhibition("pro1");
+        Prohibition prohibition = pap.prohibitions().getProhibition("pro1");
         assertEquals("pro1", prohibition.getLabel());
         assertEquals(new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), prohibition.getSubject());
         assertEquals(new AccessRightSet(CREATE_POLICY_CLASS, "write"), prohibition.getAccessRightSet());
@@ -55,7 +55,7 @@ class ProhibitionTest {
         input = """
                 delete prohibition 'pro1'
                 """;
-        pap.executePAL(new UserContext(SUPER_USER), input);
-        assertTrue(pap.getProhibitionsWithSubject("u1").isEmpty());
+        pap.executePML(new UserContext(SUPER_USER), input);
+        assertTrue(pap.prohibitions().getProhibitionsWithSubject("u1").isEmpty());
     }
 }

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,9 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
     public CreateObligationStatement visitCreateObligationStmt(PMLParser.CreateObligationStmtContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.expression(), Type.string());
 
-        List<PALStatement> ruleStmts = new ArrayList<>();
+        List<PMLStatement> ruleStmts = new ArrayList<>();
         for (PMLParser.CreateRuleStmtContext ruleStmt : ctx.createRuleStmt()) {
-            PALStatement createRuleStmt = new CreateRuleStmtVisitor(visitorCtx)
+            PMLStatement createRuleStmt = new CreateRuleStmtVisitor(visitorCtx)
                     .visitCreateRuleStmt(ruleStmt);
             ruleStmts.add(createRuleStmt);
         }

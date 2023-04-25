@@ -13,7 +13,7 @@ import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.O;
 
-public class CreateUserOrObjectStatement extends PALStatement {
+public class CreateUserOrObjectStatement extends PMLStatement {
 
     private final Expression name;
     private final NodeType type;
@@ -57,14 +57,14 @@ public class CreateUserOrObjectStatement extends PALStatement {
         String[] parentsArr = parents.toArray(new String[]{});
 
         if (type == O) {
-            policy.createObject(
+            policy.graph().createObject(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
             );
         } else {
-            policy.createUser(
+            policy.graph().createUser(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
@@ -78,7 +78,7 @@ public class CreateUserOrObjectStatement extends PALStatement {
     @Override
     public String toString() {
         return String.format(
-                "create %s %s in %s;",
+                "create %s %s in %s",
                 (type == O ? "object" : "user"),
                 name,
                 assignTo

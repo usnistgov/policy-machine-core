@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
-public class FunctionReturnStmt extends PALStatement {
+public class FunctionReturnStmt extends PMLStatement {
 
     private boolean isVoid;
     private Expression expr;
@@ -42,7 +42,7 @@ public class FunctionReturnStmt extends PALStatement {
 
     @Override
     public String toString() {
-        return String.format("return%s;", (isVoid ? "" : String.format(" %s", expr)));
+        return String.format("return%s", (isVoid ? "" : String.format(" %s", expr)));
     }
 
     @Override

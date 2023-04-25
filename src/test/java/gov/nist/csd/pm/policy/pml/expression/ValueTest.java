@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,7 +49,7 @@ class ValueTest {
     @Test
     void testObjectToValue() throws PMException {
         EventContext testEventCtx = new EventContext(new UserContext("testUser"), "target123",
-                new CreateObjectAttributeEvent("testOA", noprops(), "pc1"));
+                new CreateObjectAttributeEvent("testOA", NO_PROPERTIES, "pc1"));
 
         Value objectToValue = Value.objectToValue(testEventCtx);
         assertTrue(objectToValue.isMap());

@@ -30,11 +30,11 @@ public class Search extends FunctionDefinitionStatement {
                         properties.put(prop.getKey().getStringValue(), prop.getValue().getStringValue());
                     }
 
-                    List<String> search = author.search(nodeType, properties);
+                    List<String> search = author.graph().search(nodeType, properties);
 
                     List<Value> ret = new ArrayList<>(search.size());
-                    for (int i = 0; i < search.size(); i++) {
-                        ret.add(new Value(search.get(i)));
+                    for (String s : search) {
+                        ret.add(new Value(s));
                     }
 
                     return new Value(ret);

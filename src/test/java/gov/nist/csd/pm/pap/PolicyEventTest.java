@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
@@ -34,58 +35,58 @@ public class PolicyEventTest {
         List<PolicyEvent> events = new ArrayList<>();
         pap.addEventListener(events::add, false);
 
-        pap.setResourceAccessRights(new AccessRightSet("read"));
+        pap.graph().setResourceAccessRights(new AccessRightSet("read"));
         assertEquals(1, events.size());
 
-        pap.createPolicyClass("pc1");
+        pap.graph().createPolicyClass("pc1");
         assertEquals(3, events.size());
 
-        pap.createObjectAttribute("oa1", "pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
         assertEquals(5, events.size());
 
-        pap.createUserAttribute("ua1", "pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
         assertEquals(7, events.size());
 
-        pap.createUserAttribute("ua2", "pc1");
+        pap.graph().createUserAttribute("ua2", "pc1");
         assertEquals(9, events.size());
 
-        pap.createObject("o1", "oa1");
+        pap.graph().createObject("o1", "oa1");
         assertEquals(10, events.size());
 
-        pap.createUser("u1", "ua1");
+        pap.graph().createUser("u1", "ua1");
         assertEquals(11, events.size());
 
-        pap.createUser("u2", "ua1");
+        pap.graph().createUser("u2", "ua1");
         assertEquals(12, events.size());
 
-        pap.setNodeProperties("u1", Map.of("k", "v"));
+        pap.graph().setNodeProperties("u1", Map.of("k", "v"));
         assertEquals(13, events.size());
 
-        pap.deleteNode("u1");
+        pap.graph().deleteNode("u1");
         assertEquals(14, events.size());
 
-        pap.assign("u2", "ua2");
+        pap.graph().assign("u2", "ua2");
         assertEquals(15, events.size());
 
-        pap.deassign("u2", "ua2");
+        pap.graph().deassign("u2", "ua2");
         assertEquals(16, events.size());
 
-        pap.associate("ua1", "oa1", new AccessRightSet());
+        pap.graph().associate("ua1", "oa1", new AccessRightSet());
         assertEquals(17, events.size());
 
-        pap.dissociate("ua1", "oa1");
+        pap.graph().dissociate("ua1", "oa1");
         assertEquals(18, events.size());
 
-        pap.createProhibition("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        pap.prohibitions().createProhibition("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
         assertEquals(19, events.size());
 
-        pap.updateProhibition("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        pap.prohibitions().updateProhibition("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
         assertEquals(20, events.size());
 
-        pap.deleteProhibition("label");
+        pap.prohibitions().deleteProhibition("label");
         assertEquals(21, events.size());
 
-        pap.createObligation(
+        pap.obligations().createObligation(
                 new UserContext(SUPER_USER),
                 "label",
                 new Rule(
@@ -102,7 +103,7 @@ public class PolicyEventTest {
         );
         assertEquals(22, events.size());
 
-        pap.updateObligation(new UserContext(SUPER_USER),
+        pap.obligations().updateObligation(new UserContext(SUPER_USER),
                 "label",
                 new Rule(
                         "rule1",
@@ -117,7 +118,7 @@ public class PolicyEventTest {
                 ));
         assertEquals(23, events.size());
 
-        pap.deleteObligation("label");
+        pap.obligations().deleteObligation("label");
         assertEquals(24, events.size());
     }
 

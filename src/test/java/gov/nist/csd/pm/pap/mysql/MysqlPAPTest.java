@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.sql.*;
 
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MysqlPAPTest {
@@ -44,14 +43,14 @@ class MysqlPAPTest {
 
             PAP pap = new PAP(new MysqlPolicyStore(connection));
             pap.beginTx();
-            pap.createPolicyClass("pc1");
-            pap.createObjectAttribute("oa1", "pc1");
+            pap.graph().createPolicyClass("pc1");
+            pap.graph().createObjectAttribute("oa1", "pc1");
             pap.commit();
 
 
             PAP pap2 = new PAP(new MysqlPolicyStore(connection2));
-            assertTrue(pap2.nodeExists("pc1"));
-            assertTrue(pap2.nodeExists("oa1"));
+            assertTrue(pap2.graph().nodeExists("pc1"));
+            assertTrue(pap2.graph().nodeExists("oa1"));
         }
     }
 
@@ -62,9 +61,9 @@ class MysqlPAPTest {
         MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);
 
         PAP pap = new PAP(mysqlPolicyStore);
-        pap.createPolicyClass("pc1");
-        pap.createUserAttribute("ua1", "pc1");
-        pap.createObjectAttribute("oa1", "pc1");
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
         try(Statement stmt = connection.createStatement()) {
             stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
@@ -73,9 +72,9 @@ class MysqlPAPTest {
         }
 
         assertThrows(MysqlPolicyException.class, () ->
-                pap.createProhibition("label", ProhibitionSubject.userAttribute("ua1"),
+                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("ua1"),
                         new AccessRightSet(), false, new ContainerCondition("oa1", true)));
-        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.getProhibition("label"));
+        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.prohibitions().getProhibition("label"));
     }
 
 }

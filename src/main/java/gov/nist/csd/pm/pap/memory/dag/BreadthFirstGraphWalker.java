@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
+import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.dag.NoopShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.ShortCircuit;
@@ -14,15 +15,15 @@ import java.util.*;
 
 public class BreadthFirstGraphWalker implements GraphWalker {
 
-    private final PolicyReader policyReader;
+    private final Graph graph;
     private Direction direction;
     private Visitor visitor;
     private Propagator propagator;
     private ShortCircuit allPathsShortCircuit;
     private ShortCircuit singlePathShortCircuit;
 
-    public BreadthFirstGraphWalker(PolicyReader policyReader) {
-        this.policyReader = policyReader;
+    public BreadthFirstGraphWalker(Graph graph) {
+        this.graph = graph;
         this.visitor = new NoopVisitor();
         this.propagator = new NoopPropagator();
         this.direction = Direction.PARENTS;
@@ -94,9 +95,9 @@ public class BreadthFirstGraphWalker implements GraphWalker {
 
     private List<String> getNextLevel(String node) throws PMException {
         if (direction == Direction.PARENTS) {
-            return policyReader.getParents(node);
+            return graph.getParents(node);
         } else {
-            return policyReader.getChildren(node);
+            return graph.getChildren(node);
         }
     }
 }

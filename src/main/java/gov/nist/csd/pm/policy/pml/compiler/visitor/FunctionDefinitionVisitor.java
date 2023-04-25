@@ -4,13 +4,12 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.author.pal.model.scope.*;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStmt;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.PALScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,7 +29,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         String funcName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
         List<FormalArgument> args = parseFormalArgs(ctx.formalArgList());
         Type returnType = parseReturnType(ctx.funcReturnType());
-        List<PALStatement> body = parseBody(ctx, args);
+        List<PMLStatement> body = parseBody(ctx, args);
 
         FunctionDefinitionStatement functionDefinition = new FunctionDefinitionStatement(funcName, returnType, args, body);
 
@@ -42,7 +41,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         }
 
         // check that the body has a return statement IF the return type is NOT VOID
-        PALStatement lastStmt = null;
+        PMLStatement lastStmt = null;
         if (body.size() > 0) {
             lastStmt = body.get(body.size()-1);
         }
@@ -61,7 +60,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
                 Type retExprType = Type.any();
                 try {
                     retExprType = returnStmt.getExpr().getType(visitorCtx.scope());
-                } catch (PALScopeException e) {
+                } catch (PMLScopeException e) {
                     visitorCtx.errorLog().addError(ctx, e.getMessage());
                 }
                 if (returnStmt.isVoid()) {
@@ -86,7 +85,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         return functionDefinition;
     }
 
-    private List<PALStatement> parseBody(PMLParser.FuncDefStmtContext ctx, List<FormalArgument> args) {
+    private List<PMLStatement> parseBody(PMLParser.FuncDefStmtContext ctx, List<FormalArgument> args) {
         PMLParser.FuncBodyContext funcBodyCtx = ctx.funcBody();
 
         // create a new scope for the function body
@@ -96,13 +95,13 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             // string literal as a placeholder since the actual value is not determined yet
             try {
                 localVisitorCtx.scope().addVariable(formalArgument.name(), formalArgument.type(), false);
-            } catch (PALScopeException e) {
+            } catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(ctx, e.getMessage());
             }
         }
 
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
-        List<PALStatement> stmts = new ArrayList<>();
+        List<PMLStatement> stmts = new ArrayList<>();
         for (PMLParser.StmtContext stmtCtx : funcBodyCtx.stmt()) {
             stmts.add(statementVisitor.visitStmt(stmtCtx));
         }

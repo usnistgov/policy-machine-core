@@ -21,18 +21,18 @@ class PDPTest {
 
         UserContext superUser = new UserContext(SUPER_USER);
         pdp.runTx(superUser, (policy) -> {
-            policy.createPolicyClass("pc1");
-            policy.createUserAttribute("ua1", "pc1");
-            policy.createObjectAttribute("oa1", "pc1");
-            policy.createObjectAttribute("oa2", "pc1");
-            policy.createUser("u1", "ua1");
-            policy.createObject("o1", "oa1");
+            policy.graph().createPolicyClass("pc1");
+            policy.graph().createUserAttribute("ua1", "pc1");
+            policy.graph().createObjectAttribute("oa1", "pc1");
+            policy.graph().createObjectAttribute("oa2", "pc1");
+            policy.graph().createUser("u1", "ua1");
+            policy.graph().createObject("o1", "oa1");
         });
 
         assertThrows(PMException.class, () -> pdp.runTx(new UserContext("u1"), ((policy) ->
-                policy.associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT_ATTRIBUTE)))));
+                policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT_ATTRIBUTE)))));
 
-        assertTrue(pap.nodeExists("pc1"));
-        assertTrue(pap.nodeExists("oa1"));
+        assertTrue(pap.graph().nodeExists("pc1"));
+        assertTrue(pap.graph().nodeExists("oa1"));
     }
 }

@@ -2,13 +2,13 @@ package gov.nist.csd.pm.policy.pml.model.expression;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
-import gov.nist.csd.pm.policy.pml.statement.PALStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.*;
 
-public class VariableReference extends PALStatement {
+public class VariableReference extends PMLStatement {
 
     private boolean isID;
     private String id;
