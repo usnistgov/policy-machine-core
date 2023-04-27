@@ -361,7 +361,7 @@ class PAPTest {
                                         EventSubject.anyUserWithAttribute("ua1"),
                                         new Performs("event1")
                                 ),
-                                new Response()
+                                new Response(new UserContext(""))
                         ),
                         new Rule(
                                 "rule1",
@@ -369,7 +369,7 @@ class PAPTest {
                                         EventSubject.users("ua1"),
                                         new Performs("event1")
                                 ),
-                                new Response()
+                                new Response(new UserContext(""))
                         )
                 );
 
@@ -1175,6 +1175,7 @@ class PAPTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
+                                        new UserContext(SUPER_USER),
                                         new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
@@ -1192,6 +1193,7 @@ class PAPTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
+                                        new UserContext(SUPER_USER),
                                         new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
@@ -1203,6 +1205,7 @@ class PAPTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
+                                        new UserContext(SUPER_USER),
                                         new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
@@ -1235,7 +1238,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1249,7 +1252,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                 });
@@ -1269,7 +1272,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyOfSet("oa1")
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1283,7 +1286,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.policyElement("oa1")
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1297,7 +1300,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyContainedIn("oa1")
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                 });
@@ -1347,7 +1350,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1361,7 +1364,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                 });
@@ -1383,7 +1386,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyOfSet("oa1")
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1397,7 +1400,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.policyElement("oa1")
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1411,7 +1414,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyContainedIn("oa1")
                                             ),
-                                            new Response()
+                                            new Response(new UserContext(SUPER_USER))
                                     )
                             ));
                 });

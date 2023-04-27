@@ -179,7 +179,9 @@ class MemoryPolicyStoreTest {
                                 EventSubject.anyUser(),
                                 Performs.events("test_event")
                         ),
-                        new Response()
+                        new Response(
+                                new UserContext("test")
+                        )
                 )
         );
         List<Obligation> obligations = memoryPolicyStore.obligations().getObligations();
@@ -195,7 +197,9 @@ class MemoryPolicyStoreTest {
                         EventSubject.anyUser(),
                         Performs.events("test_event")
                 ),
-                new Response()
+                new Response(
+                        new UserContext("test")
+                )
         );
 
         memoryPolicyStore.obligations().createObligation(

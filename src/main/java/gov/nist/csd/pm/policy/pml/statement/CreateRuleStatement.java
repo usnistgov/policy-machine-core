@@ -77,7 +77,7 @@ public class CreateRuleStatement extends PMLStatement {
                         performs,
                         target
                 ),
-                new Response(responseBlock.evtVar, responseBlock.getStatements())
+                new Response(responseBlock.evtVar, ruleCtx, responseBlock.getStatements())
         );
 
         return new Value(rule);

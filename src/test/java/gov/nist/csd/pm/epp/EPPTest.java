@@ -118,7 +118,8 @@ class EPPTest {
             policy.obligations().createObligation(new UserContext("u1"), "test",
                     new Rule("rule1",
                             new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
-                            new Response(new CreateUserOrObjectStatement(
+                            new Response(new UserContext("u1"),
+                                    new CreateUserOrObjectStatement(
                                             new Expression(new VariableReference("o2", Type.string())),
                                             NodeType.O,
                                             new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("oa1", Type.string()))}, Type.string())))
