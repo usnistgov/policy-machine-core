@@ -1,11 +1,19 @@
-# Policy Machine Language
+# Policy Machine Language (PML)
 
-## Build Antlr4 source files
+The Policy Machine Language (PML) defines a set of statements that can be used to create NGAC graphs, prohibitions, and obligations. 
+It also supports logic and control statements such as [if](#if) statements and [for](#for) loops.
+
+## ANTLR4
+PML is defined using [ANTLR4](https://www.antlr.org/). The PML grammar is defined [here](/src/main/java/gov/nist/csd/pm/policy/pml/antlr/PML.g4).
+
+To build the ANTLR4 Java files from PML.g4, run:
 `mvn clean generate-sources`
 
-## Language Specification
 
-### Types
+## Examples
+
+### Variable declaration
+Variable types can be one of:
 
 - string
 
@@ -28,7 +36,7 @@
     ```
 
 - array - element type can be any supported type
-    
+
     ```pml
     ["1", "2", "3"]
     ```
@@ -47,36 +55,49 @@
     }
     ```
 
-- any - type will be determined at runtime, an error may occur if the value is used improperly for it's assigned type 
-(i.e. accessing a map key on a string)
+- any - type will be determined at runtime, an error may occur if the value is used improperly for it's assigned type
+  (i.e. accessing a map key on a string)
 
-### Variables
+#### Examples
+
+```pml
+# variable declaration
+let a = "hello world"
+let b = 123
+let c = true
+let d = {
+    "key1": "hello",
+    "key2": "world"
+}
+
+# constant declaration
+const e = "hello world"
+```
+
+### If
+PML does not currently support boolean operations such as 
 
 ```pml
 
 ```
 
+### For
+
 ### Functions
 
-#### Builtin Functions
+#### Definitions
 
-#### Java Functions
+#### Invocation
 
-### For loops
-
-### If statements
-
-### Policy Statements
-
-#### Set Resource Access Rights
-#### Create Policy Class
-#### Create User|Object Attribute
-#### Create User|Object
-#### Set Node Properties
-#### Assign
-#### Deassign
-#### Associate
-#### Dissociate
-#### Create Prohibition
-#### Create Obligation
-#### Delete Node|Prohibition|Obligation|Rule
+### Set Resource Access Rights
+### Create Policy Class
+### Create User|Object Attribute
+### Create User|Object
+### Set Node Properties
+### Assign
+### Deassign
+### Associate
+### Dissociate
+### Create Prohibition
+### Create Obligation
+### Delete Node|Prohibition|Obligation|Rule

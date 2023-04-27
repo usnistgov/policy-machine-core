@@ -162,7 +162,8 @@ statementBlock: OPEN_CURLY statement* CLOSE_CURLY ;
 expression:
     variableReference
     | functionInvoke
-    | literal;
+    | literal
+    | expression (AND_OP | OR_OP | EQUALS_OP | NOT_EQUALS_OP) expression ;
 
 array:
     OPEN_BRACKET (expression (COMMA expression)*)? CLOSE_BRACKET ;
@@ -273,3 +274,7 @@ OPEN_PAREN: '(' ;
 CLOSE_PAREN: ')' ;
 IS_COMPLEMENT: '!' ;
 EQUALS: '=' ;
+AND_OP: '&&' ;
+OR_OP: '||' ;
+EQUALS_OP: '==' ;
+NOT_EQUALS_OP: '!=' ;

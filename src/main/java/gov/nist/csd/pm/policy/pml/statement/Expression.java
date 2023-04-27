@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
+import com.mysql.cj.log.Log;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
@@ -8,10 +9,7 @@ import gov.nist.csd.pm.policy.pml.compiler.visitor.LiteralExprVisitor;
 import gov.nist.csd.pm.policy.pml.compiler.visitor.VariableReferenceVisitor;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Literal;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
+import gov.nist.csd.pm.policy.pml.model.expression.*;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
@@ -36,10 +34,20 @@ public class Expression extends PMLStatement {
             FunctionInvocationStatement functionCall = new FunctionInvokeVisitor(visitorCtx)
                     .visitFunctionInvoke(expressionCtx.functionInvoke());
             expression = new Expression(functionCall);
-        } else {
+        } else if (expressionCtx.variableReference() != null){
             VariableReference varRef = new VariableReferenceVisitor(visitorCtx)
                     .visitVariableReference(expressionCtx.variableReference());
             expression = new Expression(varRef);
+        } else if (expressionCtx.AND_OP() != null || expressionCtx.OR_OP() != null) {
+            Expression left = compile(visitorCtx, expressionCtx.expression().get(0), Type.bool());
+            Expression right = compile(visitorCtx, expressionCtx.expression().get(1), Type.bool());
+
+            expression = new Expression(new LogicalExpression(left, right, expressionCtx.AND_OP() != null));
+        } else {
+            Expression left = compile(visitorCtx, expressionCtx.expression().get(0));
+            Expression right = compile(visitorCtx, expressionCtx.expression().get(1));
+
+            expression = new Expression(new CompareExpression(left, right, expressionCtx.EQUALS_OP() != null));
         }
 
         Type type;
@@ -70,6 +78,10 @@ public class Expression extends PMLStatement {
     private boolean isFunctionCall;
     private Literal literal;
     private boolean isLiteral;
+    private CompareExpression compareExpression;
+    private boolean isCompareExpression;
+    private LogicalExpression logicalExpression;
+    private boolean isLogicalExpression;
 
     public Expression(VariableReference variableReference) {
         this.variableReference = variableReference;
@@ -84,6 +96,16 @@ public class Expression extends PMLStatement {
     public Expression(Literal literal) {
         this.literal = literal;
         this.isLiteral = true;
+    }
+
+    public Expression(CompareExpression compareExpression) {
+        this.compareExpression = compareExpression;
+        this.isCompareExpression = true;
+    }
+
+    public Expression(LogicalExpression logicalExpression) {
+        this.logicalExpression = logicalExpression;
+        this.isLogicalExpression = true;
     }
 
     public Expression() {}
@@ -128,8 +150,10 @@ public class Expression extends PMLStatement {
             return getFunctionCallType(Scope);
         } else if (isLiteral) {
             return getLiteralType();
-        } else {
+        } else if (isVariableReference){
             return getVarRefType(Scope);
+        } else {// (isLogicalExpression || isCompareExpression) {
+            return Type.bool();
         }
     }
 
@@ -164,7 +188,7 @@ public class Expression extends PMLStatement {
         if (literal.isStringLiteral()) {
             return Type.string();
         } else if (literal.isNumberLiteral()) {
-          return Type.number();
+            return Type.number();
         } else if (literal.isBooleanLiteral()) {
             return Type.bool();
         } else if (literal.isArrayLiteral()) {
@@ -182,8 +206,12 @@ public class Expression extends PMLStatement {
             return literal.execute(ctx, policy);
         } else if (isFunctionCall) {
             return functionCall.execute(ctx, policy);
-        } else {
+        } else if (isVariableReference){
             return variableReference.execute(ctx, policy);
+        } else if (isCompareExpression) {
+            return compareExpression.execute(ctx, policy);
+        } else {
+            return logicalExpression.execute(ctx, policy);
         }
     }
 
