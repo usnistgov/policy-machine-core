@@ -39,13 +39,13 @@ public class Expression extends PMLStatement {
                     .visitVariableReference(expressionCtx.variableReference());
             expression = new Expression(varRef);
         } else if (expressionCtx.AND_OP() != null || expressionCtx.OR_OP() != null) {
-            Expression left = compile(visitorCtx, expressionCtx.expression().get(0), Type.bool());
-            Expression right = compile(visitorCtx, expressionCtx.expression().get(1), Type.bool());
+            Expression left = compile(visitorCtx, expressionCtx.left, Type.bool());
+            Expression right = compile(visitorCtx, expressionCtx.right, Type.bool());
 
             expression = new Expression(new LogicalExpression(left, right, expressionCtx.AND_OP() != null));
         } else {
-            Expression left = compile(visitorCtx, expressionCtx.expression().get(0));
-            Expression right = compile(visitorCtx, expressionCtx.expression().get(1));
+            Expression left = compile(visitorCtx, expressionCtx.left);
+            Expression right = compile(visitorCtx, expressionCtx.right);
 
             expression = new Expression(new CompareExpression(left, right, expressionCtx.EQUALS_OP() != null));
         }

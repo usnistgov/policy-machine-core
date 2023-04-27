@@ -163,7 +163,8 @@ expression:
     variableReference
     | functionInvoke
     | literal
-    | expression (AND_OP | OR_OP | EQUALS_OP | NOT_EQUALS_OP) expression ;
+    | left=expression (EQUALS_OP | NOT_EQUALS_OP) right=expression
+    | left=expression (AND_OP | OR_OP) right=expression;
 
 array:
     OPEN_BRACKET (expression (COMMA expression)*)? CLOSE_BRACKET ;

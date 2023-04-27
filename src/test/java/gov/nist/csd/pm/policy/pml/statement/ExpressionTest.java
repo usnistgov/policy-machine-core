@@ -60,21 +60,26 @@ class ExpressionTest {
     @Test
     void testLogicalExpression() throws PMException {
         String pml = """
-                let x = "a";
-                let y = "a";
-                let z = "b";
+                let x = "a"
+                let y = "a"
+                let z = "b"
                 
                 if x == y || x == z {
-                    create pc 'pc1';
+                    create pc 'pc1'
                 }
                 
                 if x == y && x == z {
-                    create pc 'pc2';
+                    create pc 'pc2'
                 }
                 
-                z = "a";
+                z = "a"
                 if x == y && x == z {
-                    create pc 'pc3';
+                    create pc 'pc3'
+                }
+                
+                x = "a" == "a" || "a" == "x"
+                if x {
+                    create pc 'pc4'
                 }
                 """;
 
@@ -84,6 +89,7 @@ class ExpressionTest {
         assertTrue(memoryPolicyStore.graph().nodeExists("pc1"));
         assertFalse(memoryPolicyStore.graph().nodeExists("pc2"));
         assertTrue(memoryPolicyStore.graph().nodeExists("pc3"));
+        assertTrue(memoryPolicyStore.graph().nodeExists("pc4"));
     }
 
 }

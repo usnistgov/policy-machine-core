@@ -75,10 +75,20 @@ const e = "hello world"
 ```
 
 ### If
-PML does not currently support boolean operations such as 
+PML supports logical operators `&&` and `||` as well as comparison operators `==` and `!=`
 
 ```pml
+let x = "a";
+let y = "b";
+let z = "a";
 
+if x == y {
+  # do something
+} else if x == z || y == z {
+  # do something
+} else {
+  # do something
+}
 ```
 
 ### For
