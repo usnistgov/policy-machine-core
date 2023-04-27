@@ -12,7 +12,6 @@ import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.statement.VarStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -59,7 +58,7 @@ class PMLExecutorTest {
         Map<String, FunctionDefinitionStatement> functions = pap.userDefinedPML().getFunctions();
         assertTrue(functions.isEmpty());
 
-        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER), test1, test2));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml, test1, test2);
         assertEquals(2, statements.size());
 
         functions = pap.userDefinedPML().getFunctions();

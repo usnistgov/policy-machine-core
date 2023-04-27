@@ -76,7 +76,7 @@ public class CreateObligationStatement extends PMLStatement {
         List<PMLStatement> createRuleStatements = new ArrayList<>();
 
         for (Rule rule : rules) {
-            EventPattern event = rule.getEvent();
+            EventPattern event = rule.getEventPattern();
 
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
                     new Expression(new Literal(rule.getLabel())),

@@ -184,4 +184,14 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     public UserDefinedPML userDefinedPML() {
         return policy.userDefinedPML();
     }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return policy.serialize();
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return policy.deserialize();
+    }
 }

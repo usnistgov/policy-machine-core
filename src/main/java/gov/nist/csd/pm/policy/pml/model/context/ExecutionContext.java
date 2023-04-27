@@ -9,8 +9,8 @@ import java.util.Objects;
 
 public class ExecutionContext implements Serializable {
 
-    private final UserContext author;
-    private final Scope scope;
+    private UserContext author;
+    private Scope scope;
 
     public ExecutionContext(UserContext author) {
         this.author = author;

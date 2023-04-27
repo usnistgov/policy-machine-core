@@ -20,8 +20,8 @@ public class ForRangeStmtVisitor extends PMLBaseVisitor<ForRangeStatement> {
     }
 
     @Override
-    public ForRangeStatement visitForRangeStmt(PMLParser.ForRangeStmtContext ctx) {
-        String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
+    public ForRangeStatement visitForRangeStatement(PMLParser.ForRangeStatementContext ctx) {
+        String varName = ctx.ID().getText();
 
         boolean lowerBound = ctx.lowerBound.getText().equals("(");
         boolean upperBound = ctx.upperBound.getText().equals(")");
@@ -32,7 +32,7 @@ public class ForRangeStmtVisitor extends PMLBaseVisitor<ForRangeStatement> {
         VisitorContext localVisitorCtx = visitorCtx.copy();
         List<PMLStatement> block = new ArrayList<>();
 
-        for (PMLParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
+        for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
 
             try {
                 localVisitorCtx.scope().addVariable(varName, Type.number(), false);
@@ -41,7 +41,7 @@ public class ForRangeStmtVisitor extends PMLBaseVisitor<ForRangeStatement> {
             }
 
             PMLStatement statement = new StatementVisitor(localVisitorCtx)
-                    .visitStmt(stmtCtx);
+                    .visitStatement(stmtCtx);
             block.add(statement);
 
             visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());

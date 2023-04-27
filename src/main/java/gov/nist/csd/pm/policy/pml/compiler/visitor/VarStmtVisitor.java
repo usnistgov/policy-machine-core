@@ -16,8 +16,8 @@ public class VarStmtVisitor extends PMLBaseVisitor<VarStatement> {
     }
 
     @Override
-    public VarStatement visitVarStmt(PMLParser.VarStmtContext ctx) {
-        String varName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
+    public VarStatement visitVariableDeclarationStatement(PMLParser.VariableDeclarationStatementContext ctx) {
+        String varName = ctx.ID().getText();
         PMLParser.ExpressionContext expressionCtx = ctx.expression();
         Expression expr = Expression.compile(visitorCtx, expressionCtx);
         boolean isConst = ctx.CONST() != null;

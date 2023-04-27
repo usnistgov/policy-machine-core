@@ -120,8 +120,8 @@ class MemoryPolicyStoreTest {
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = memoryPolicyStore.prohibitions().getProhibitionsWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
-        assertEquals("ua1", actual.getSubject().name());
-        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
+        assertEquals("ua1", actual.getSubject().getName());
+        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
@@ -142,8 +142,8 @@ class MemoryPolicyStoreTest {
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = memoryPolicyStore.prohibitions().getProhibitionsWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
-        assertEquals("ua1", actual.getSubject().name());
-        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
+        assertEquals("ua1", actual.getSubject().getName());
+        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
@@ -160,8 +160,8 @@ class MemoryPolicyStoreTest {
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = memoryPolicyStore.prohibitions().getProhibition("label");
         assertEquals("label", actual.getLabel());
-        assertEquals("ua1", actual.getSubject().name());
-        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
+        assertEquals("ua1", actual.getSubject().getName());
+        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
@@ -179,9 +179,7 @@ class MemoryPolicyStoreTest {
                                 EventSubject.anyUser(),
                                 Performs.events("test_event")
                         ),
-                        new Response(
-                                new UserContext("test")
-                        )
+                        new Response()
                 )
         );
         List<Obligation> obligations = memoryPolicyStore.obligations().getObligations();
@@ -197,9 +195,7 @@ class MemoryPolicyStoreTest {
                         EventSubject.anyUser(),
                         Performs.events("test_event")
                 ),
-                new Response(
-                        new UserContext("test")
-                )
+                new Response()
         );
 
         memoryPolicyStore.obligations().createObligation(

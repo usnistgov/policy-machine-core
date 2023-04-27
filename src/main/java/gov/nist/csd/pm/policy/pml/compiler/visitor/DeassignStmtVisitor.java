@@ -16,7 +16,7 @@ public class DeassignStmtVisitor extends PMLBaseVisitor<DeassignStatement> {
     }
 
     @Override
-    public DeassignStatement visitDeassignStmt(PMLParser.DeassignStmtContext ctx) {
+    public DeassignStatement visitDeassignStatement(PMLParser.DeassignStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.childNode, Type.string());
         Expression parents = Expression.compile(visitorCtx, ctx.parentNodes, Type.array(Type.string()));
 

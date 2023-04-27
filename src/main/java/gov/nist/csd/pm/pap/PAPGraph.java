@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -253,7 +252,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     private boolean nodeInProhibition(String name, Prohibition prohibition) {
-        if (prohibition.getSubject().name().equals(name)) {
+        if (prohibition.getSubject().getName().equals(name)) {
             return true;
         }
 
@@ -279,7 +278,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
 
     private boolean nodeInObligation(String name, Obligation obligation) {
         for (Rule rule : obligation.getRules()) {
-            if (nodeInEvent(name, rule.getEvent())) {
+            if (nodeInEvent(name, rule.getEventPattern())) {
                 return true;
             }
         }

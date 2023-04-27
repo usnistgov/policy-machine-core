@@ -21,7 +21,7 @@ import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
+import gov.nist.csd.pm.policy.pml.PMLSerializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -53,7 +53,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
 
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -90,7 +90,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
 
         pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
         assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(
@@ -118,8 +118,7 @@ class EPPTest {
             policy.obligations().createObligation(new UserContext("u1"), "test",
                     new Rule("rule1",
                             new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
-                            new Response(new UserContext("u1"),
-                                    new CreateUserOrObjectStatement(
+                            new Response(new CreateUserOrObjectStatement(
                                             new Expression(new VariableReference("o2", Type.string())),
                                             NodeType.O,
                                             new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("oa1", Type.string()))}, Type.string())))

@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
@@ -21,7 +20,7 @@ class PMLTest {
                 create policy class x
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("helloworld"));
     }
 
@@ -49,7 +48,7 @@ class PMLTest {
                 create policy class a8
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         // 5 accounts for super policy class
         assertEquals(5, pap.graph().getPolicyClasses().size());
     }
@@ -60,7 +59,7 @@ class PMLTest {
                 create policy class 'pc1'
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("pc1"));
     }
 
@@ -72,7 +71,7 @@ class PMLTest {
                 create object attribute 'oa1' in ['pc1']
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("ua1"));
         assertTrue(pap.graph().getParents("ua1").contains("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -91,7 +90,7 @@ class PMLTest {
                 create object 'o1' in ['oa1']
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().nodeExists("u1"));
         assertTrue(pap.graph().getParents("u1").contains("ua1"));
         assertTrue(pap.graph().nodeExists("o1"));
@@ -108,7 +107,7 @@ class PMLTest {
                 set properties of 'ua1' to {'key': 'value'}
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         assertEquals("value", pap.graph().getNode("ua1").getProperties().get("key"));
     }
 
@@ -122,7 +121,7 @@ class PMLTest {
                 assign 'ua1' to ['ua2', 'ua3']
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
         assertTrue(pap.graph().getParents("ua1").contains("ua2"));
         assertTrue(pap.graph().getParents("ua1").contains("ua3"));
     }

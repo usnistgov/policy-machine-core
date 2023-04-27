@@ -8,10 +8,8 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static gov.nist.csd.pm.pap.PAPGraph.checkAccessRightsValid;
 
@@ -58,9 +56,9 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     private void checkProhibitionSubjectExists(ProhibitionSubject subject) throws PMException {
-        if (subject.type() != ProhibitionSubject.Type.PROCESS) {
-            if (!policyStore.graph().nodeExists(subject.name())) {
-                throw new ProhibitionSubjectDoesNotExistException(subject.name());
+        if (subject.getType() != ProhibitionSubject.Type.PROCESS) {
+            if (!policyStore.graph().nodeExists(subject.getName())) {
+                throw new ProhibitionSubjectDoesNotExistException(subject.getName());
             }
         }
     }

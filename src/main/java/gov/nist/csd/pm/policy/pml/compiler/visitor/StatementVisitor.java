@@ -14,74 +14,74 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement> {
     }
 
     @Override
-    public PMLStatement visitStmt(PMLParser.StmtContext ctx) {
+    public PMLStatement visitStatement(PMLParser.StatementContext ctx) {
         PMLStatement statement = null;
-        if (ctx.varStmt() != null) {
+        if (ctx.variableDeclarationStatement() != null) {
             statement = new VarStmtVisitor(visitorCtx)
-                    .visitVarStmt(ctx.varStmt());
-        } else if (ctx.funcDefStmt() != null) {
+                    .visitVariableDeclarationStatement(ctx.variableDeclarationStatement());
+        } else if (ctx.functionDefinitionStatement() != null) {
             statement = new FunctionDefinitionVisitor(visitorCtx)
-                    .visitFuncDefStmt(ctx.funcDefStmt());
-        } else if (ctx.foreachStmt() != null) {
+                    .visitFunctionDefinitionStatement(ctx.functionDefinitionStatement());
+        } else if (ctx.foreachStatement() != null) {
             statement = new ForeachStmtVisitor(visitorCtx)
-                    .visitForeachStmt(ctx.foreachStmt());
-        } else if (ctx.forRangeStmt() != null) {
+                    .visitForeachStatement(ctx.foreachStatement());
+        } else if (ctx.forRangeStatement() != null) {
             statement = new ForRangeStmtVisitor(visitorCtx)
-                    .visitForRangeStmt(ctx.forRangeStmt());
-        } else if (ctx.funcCallStmt() != null) {
-            statement = new FunctionCallVisitor(visitorCtx)
-                    .visitFuncCallStmt(ctx.funcCallStmt());
-        } else if (ctx.ifStmt() != null) {
+                    .visitForRangeStatement(ctx.forRangeStatement());
+        } else if (ctx.functionInvokeStatement() != null) {
+            statement = new FunctionInvokeVisitor(visitorCtx)
+                    .visitFunctionInvokeStatement(ctx.functionInvokeStatement());
+        } else if (ctx.ifStatement() != null) {
             statement = new IfStmtVisitor(visitorCtx)
-                    .visitIfStmt(ctx.ifStmt());
-        } else if (ctx.createAttrStmt() != null) {
+                    .visitIfStatement(ctx.ifStatement());
+        } else if (ctx.createAttributeStatement() != null) {
             statement = new CreateAttrStmtVisitor(visitorCtx)
-                    .visitCreateAttrStmt(ctx.createAttrStmt());
-        } else if (ctx.createPolicyStmt() != null) {
+                    .visitCreateAttributeStatement(ctx.createAttributeStatement());
+        } else if (ctx.createPolicyStatement() != null) {
             statement = new CreatePolicyStmtVisitor(visitorCtx)
-                    .visitCreatePolicyStmt(ctx.createPolicyStmt());
-        } else if (ctx.createUserOrObjectStmt() != null) {
+                    .visitCreatePolicyStatement(ctx.createPolicyStatement());
+        } else if (ctx.createUserOrObjectStatement() != null) {
             statement = new CreateUserOrObjectStmtVisitor(visitorCtx)
-                    .visitCreateUserOrObjectStmt(ctx.createUserOrObjectStmt());
-        } else if (ctx.createProhibitionStmt() != null) {
+                    .visitCreateUserOrObjectStatement(ctx.createUserOrObjectStatement());
+        } else if (ctx.createProhibitionStatement() != null) {
             statement = new CreateProhibitionStmtVisitor(visitorCtx)
-                    .visitCreateProhibitionStmt(ctx.createProhibitionStmt());
-        } else if (ctx.createObligationStmt() != null) {
+                    .visitCreateProhibitionStatement(ctx.createProhibitionStatement());
+        } else if (ctx.createObligationStatement() != null) {
             statement = new CreateObligationStmtVisitor(visitorCtx)
-                    .visitCreateObligationStmt(ctx.createObligationStmt());
-        } else if (ctx.setNodePropsStmt() != null) {
+                    .visitCreateObligationStatement(ctx.createObligationStatement());
+        } else if (ctx.setNodePropertiesStatement() != null) {
             statement = new SetNodePropertiesStmtVisitor(visitorCtx)
-                    .visitSetNodePropsStmt(ctx.setNodePropsStmt());
-        } else if (ctx.assignStmt() != null) {
+                    .visitSetNodePropertiesStatement(ctx.setNodePropertiesStatement());
+        } else if (ctx.assignStatement() != null) {
             statement = new AssignStmtVisitor(visitorCtx)
-                    .visitAssignStmt(ctx.assignStmt());
-        } else if (ctx.deassignStmt() != null) {
+                    .visitAssignStatement(ctx.assignStatement());
+        } else if (ctx.deassignStatement() != null) {
             statement = new DeassignStmtVisitor(visitorCtx)
-                    .visitDeassignStmt(ctx.deassignStmt());
-        } else if (ctx.deleteStmt() != null) {
+                    .visitDeassignStatement(ctx.deassignStatement());
+        } else if (ctx.deleteStatement() != null) {
             statement = new DeleteStmtVisitor(visitorCtx)
-                    .visitDeleteStmt(ctx.deleteStmt());
-        } else if (ctx.associateStmt() != null) {
+                    .visitDeleteStatement(ctx.deleteStatement());
+        } else if (ctx.associateStatement() != null) {
             statement = new AssociateStmtVisitor(visitorCtx)
-                    .visitAssociateStmt(ctx.associateStmt());
-        } else if (ctx.dissociateStmt() != null) {
+                    .visitAssociateStatement(ctx.associateStatement());
+        } else if (ctx.dissociateStatement() != null) {
             statement = new DissociateStmtVisitor(visitorCtx)
-                    .visitDissociateStmt(ctx.dissociateStmt());
-        } else if (ctx.funcReturnStmt() != null) {
+                    .visitDissociateStatement(ctx.dissociateStatement());
+        } else if (ctx.functionReturnStatement() != null) {
             statement = new FunctionReturnStmtVisitor(visitorCtx)
-                    .visitFuncReturnStmt(ctx.funcReturnStmt());
-        } else if (ctx.breakStmt() != null) {
+                    .visitFunctionReturnStatement(ctx.functionReturnStatement());
+        } else if (ctx.breakStatement() != null) {
             statement = new BreakStmtVisitor(visitorCtx)
-                    .visitBreakStmt(ctx.breakStmt());
-        } else if (ctx.continueStmt() != null) {
+                    .visitBreakStatement(ctx.breakStatement());
+        } else if (ctx.continueStatement() != null) {
             statement = new ContinueStmtVisitor(visitorCtx)
-                    .visitContinueStmt(ctx.continueStmt());
-        } else if (ctx.setResourceAccessRightsStmt() != null) {
+                    .visitContinueStatement(ctx.continueStatement());
+        } else if (ctx.setResourceAccessRightsStatement() != null) {
             statement = new SetResourceAccessRightsStmtVisitor(visitorCtx)
-                    .visitSetResourceAccessRightsStmt(ctx.setResourceAccessRightsStmt());
-        } else if (ctx.deleteRuleStmt() != null) {
+                    .visitSetResourceAccessRightsStatement(ctx.setResourceAccessRightsStatement());
+        } else if (ctx.deleteRuleStatement() != null) {
             statement = new DeleteRuleStmtVisitor(visitorCtx)
-                    .visitDeleteRuleStmt(ctx.deleteRuleStmt());
+                    .visitDeleteRuleStatement(ctx.deleteRuleStatement());
         }
 
         return statement;

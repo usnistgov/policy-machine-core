@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import java.util.List;
 import java.util.Map;
 
-public interface Vertex {
+interface Vertex {
 
     Vertex copy();
     void setProperties(Map<String, String> properties);

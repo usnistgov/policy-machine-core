@@ -16,7 +16,7 @@ public class CreatePolicyStmtVisitor extends PMLBaseVisitor<CreatePolicyStatemen
     }
 
     @Override
-    public CreatePolicyStatement visitCreatePolicyStmt(PMLParser.CreatePolicyStmtContext ctx) {
+    public CreatePolicyStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.expression(), Type.string());
         return new CreatePolicyStatement(name);
     }

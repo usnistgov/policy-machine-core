@@ -1,41 +1,19 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.pml.PMLContext;
-import gov.nist.csd.pm.policy.pml.PMLExecutable;
-import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
-import gov.nist.csd.pm.policy.model.graph.nodes.Node;
-import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-import gov.nist.csd.pm.policy.model.obligation.Obligation;
-import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
-import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
-import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
+import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.PMLExecutable;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.policy.model.obligation.event.EventSubject.Type.*;
-import static gov.nist.csd.pm.policy.model.obligation.event.EventSubject.Type.PROCESS;
-import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.*;
-import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.ANY_OF_SET;
 
 public abstract class PDP implements PolicyEventEmitter {
 
@@ -76,7 +54,7 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements PolicyEventEmitter, PolicyEventListener, PolicySerializable, PMLExecutable, Policy {
+    public static class PDPTx implements PolicyEventEmitter, PolicyEventListener, PMLExecutable, Policy {
 
         private final UserContext userCtx;
         private final Adjudicator adjudicator;
@@ -98,20 +76,6 @@ public abstract class PDP implements PolicyEventEmitter {
             this.pdpProhibitions = new PDPProhibitions(userCtx, adjudicator.prohibitions(), pap, this);
             this.pdpObligations = new PDPObligations(userCtx, adjudicator.obligations(), pap, this);
             this.pdpUserDefinedPML = new PDPUserDefinedPML(userCtx, adjudicator.userDefinedPML(), pap, this);
-        }
-
-        @Override
-        public String toString(PolicySerializer policySerializer) throws PMException {
-            adjudicator.toString(policySerializer);
-
-            return pap.toString(policySerializer);
-        }
-
-        @Override
-        public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-            adjudicator.fromString(s, policyDeserializer);
-
-            pap.fromString(s, policyDeserializer);
         }
 
         @Override
@@ -158,6 +122,20 @@ public abstract class PDP implements PolicyEventEmitter {
         @Override
         public UserDefinedPML userDefinedPML() {
             return pdpUserDefinedPML;
+        }
+
+        @Override
+        public PolicySerializer serialize() throws PMException {
+            adjudicator.serialize();
+
+            return pap.serialize();
+        }
+
+        @Override
+        public PolicyDeserializer deserialize() throws PMException {
+            adjudicator.deserialize();
+
+            return pap.deserialize();
         }
 
         @Override

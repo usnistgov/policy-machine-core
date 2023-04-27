@@ -16,7 +16,6 @@ import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.model.expression.*;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.*;
-import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -283,7 +282,7 @@ class CompileTest {
         Rule rule = actual.getRules().get(0);
         assertEquals("rule1", rule.getLabel());
 
-        EventPattern event = rule.getEvent();
+        EventPattern event = rule.getEventPattern();
         assertEquals(EventSubject.anyUser(), event.getSubject());
         assertTrue(event.getOperations().contains("create_object_attribute"));
         assertEquals(Target.policyElement("oa1"), event.getTarget());
@@ -423,7 +422,7 @@ class CompileTest {
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
         assertEquals(101, pap.graph().getPolicyClasses().size());
 
         String pml2 = """
@@ -435,7 +434,7 @@ class CompileTest {
                 create oa 'oa1' in x
                 """;
         PAP pap2 = new PAP(new MemoryPolicyStore());
-        assertThrows(PMLCompilationException.class, () -> pap2.fromString(pml2, new PMLDeserializer(new UserContext(SUPER_USER))));
+        assertThrows(PMLCompilationException.class, () -> pap2.deserialize().fromPML(new UserContext(SUPER_USER), pml2));
 
         pml = """
                 create pc 'pc1'
@@ -446,7 +445,7 @@ class CompileTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
         assertTrue(pap.graph().nodeExists("pc2"));
 
         String pml3 = """
@@ -458,7 +457,7 @@ class CompileTest {
                 create oa 'oa1' in x
                 """;
         PAP pap3 = new PAP(new MemoryPolicyStore());
-        assertThrows(PMLCompilationException.class, () -> pap3.fromString(pml3, new PMLDeserializer(new UserContext(SUPER_USER))));
+        assertThrows(PMLCompilationException.class, () -> pap3.deserialize().fromPML(new UserContext(SUPER_USER), pml3));
 
     }
 }

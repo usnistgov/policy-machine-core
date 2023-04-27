@@ -20,7 +20,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
     }
 
     @Override
-    public IfStatement visitIfStmt(PMLParser.IfStmtContext ctx) {
+    public IfStatement visitIfStatement(PMLParser.IfStatementContext ctx) {
         // if block
         VisitorContext localVisitorCtx = visitorCtx.copy();
         boolean isComp = ctx.IS_COMPLEMENT() != null;
@@ -28,8 +28,8 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
 
         List<PMLStatement> block = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
-        for (PMLParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
-            PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
+        for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
+            PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
             block.add(statement);
         }
 
@@ -42,12 +42,12 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
         localVisitorCtx = visitorCtx.copy();
         statementVisitor = new StatementVisitor(localVisitorCtx);
         List<IfStatement.ConditionalBlock> elseIfs = new ArrayList<>();
-        for (PMLParser.ElseIfStmtContext elseIfStmtCtx : ctx.elseIfStmt()) {
+        for (PMLParser.ElseIfStatementContext elseIfStmtCtx : ctx.elseIfStatement()) {
             isComp = elseIfStmtCtx.IS_COMPLEMENT() != null;
             condition = Expression.compile(visitorCtx, elseIfStmtCtx.condition, Type.bool());
             block = new ArrayList<>();
-            for (PMLParser.StmtContext stmtCtx : elseIfStmtCtx.stmtBlock().stmt()) {
-                PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
+            for (PMLParser.StatementContext stmtCtx : elseIfStmtCtx.statementBlock().statement()) {
+                PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
                 block.add(statement);
             }
             elseIfs.add(new IfStatement.ConditionalBlock(isComp, condition, block));
@@ -60,9 +60,9 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
         localVisitorCtx = visitorCtx.copy();
         statementVisitor = new StatementVisitor(localVisitorCtx);
         block = new ArrayList<>();
-        if (ctx.elseStmt() != null) {
-            for (PMLParser.StmtContext stmtCtx : ctx.elseStmt().stmtBlock().stmt()) {
-                PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
+        if (ctx.elseStatement() != null) {
+            for (PMLParser.StatementContext stmtCtx : ctx.elseStatement().statementBlock().statement()) {
+                PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
                 block.add(statement);
             }
 

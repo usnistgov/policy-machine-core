@@ -21,7 +21,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     @Override
-    public CreateRuleStatement visitCreateRuleStmt(PMLParser.CreateRuleStmtContext ctx) {
+    public CreateRuleStatement visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
 
         CreateRuleStatement.SubjectClause subjectClause = getSubjectClause(ctx.subjectClause());
@@ -38,7 +38,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     private CreateRuleStatement.ResponseBlock getResponse(PMLParser.ResponseContext ctx) throws VariableAlreadyDefinedInScopeException {
-        String evtVar = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
+        String evtVar = ctx.ID().getText();
 
         // create a new local parser scope for the response block
         // add the event name and event context map to the local parser scope
@@ -46,21 +46,21 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
         localVisitorCtx.scope().addVariable(evtVar, Type.map(Type.string(), Type.any()), true);
 
         PMLParser.ResponseBlockContext responseBlockCtx = ctx.responseBlock();
-        List<PMLParser.ResponseStmtContext> responseStmtsCtx = responseBlockCtx.responseStmt();
+        List<PMLParser.ResponseStatementContext> responseStmtsCtx = responseBlockCtx.responseStatement();
 
         List<PMLStatement> stmts = new ArrayList<>();
-        for (PMLParser.ResponseStmtContext responseStmtCtx : responseStmtsCtx) {
+        for (PMLParser.ResponseStatementContext responseStmtCtx : responseStmtsCtx) {
             PMLStatement stmt = null;
 
-            if (responseStmtCtx.stmt() != null) {
+            if (responseStmtCtx.statement() != null) {
                 stmt = new StatementVisitor(localVisitorCtx)
-                        .visitStmt(responseStmtCtx.stmt());
-            } else if (responseStmtCtx.createRuleStmt() != null) {
+                        .visitStatement(responseStmtCtx.statement());
+            } else if (responseStmtCtx.createRuleStatement() != null) {
                 stmt = new CreateRuleStmtVisitor(localVisitorCtx)
-                        .visitCreateRuleStmt(responseStmtCtx.createRuleStmt());
-            } else if (responseStmtCtx.deleteRuleStmt() != null) {
+                        .visitCreateRuleStatement(responseStmtCtx.createRuleStatement());
+            } else if (responseStmtCtx.deleteRuleStatement() != null) {
                 stmt = new DeleteRuleStmtVisitor(localVisitorCtx)
-                        .visitDeleteRuleStmt(responseStmtCtx.deleteRuleStmt());
+                        .visitDeleteRuleStatement(responseStmtCtx.deleteRuleStatement());
             }
 
             stmts.add(stmt);

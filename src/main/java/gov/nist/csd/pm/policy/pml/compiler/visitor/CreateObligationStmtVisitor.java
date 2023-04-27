@@ -20,13 +20,13 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
     }
 
     @Override
-    public CreateObligationStatement visitCreateObligationStmt(PMLParser.CreateObligationStmtContext ctx) {
+    public CreateObligationStatement visitCreateObligationStatement(PMLParser.CreateObligationStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.expression(), Type.string());
 
         List<PMLStatement> ruleStmts = new ArrayList<>();
-        for (PMLParser.CreateRuleStmtContext ruleStmt : ctx.createRuleStmt()) {
+        for (PMLParser.CreateRuleStatementContext ruleStmt : ctx.createRuleStatement()) {
             PMLStatement createRuleStmt = new CreateRuleStmtVisitor(visitorCtx)
-                    .visitCreateRuleStmt(ruleStmt);
+                    .visitCreateRuleStatement(ruleStmt);
             ruleStmts.add(createRuleStmt);
         }
 

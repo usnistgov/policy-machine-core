@@ -27,6 +27,9 @@ public class Target implements Serializable {
     private Type type;
     private List<String> policyElements;
 
+    public Target() {
+    }
+
     public Target(Type type, List<String> policyElements) {
         this.type = type;
         this.policyElements = policyElements;

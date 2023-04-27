@@ -5,7 +5,7 @@ The core components of the NIST Policy Machine, a reference implementation of th
 ## Table of Contents
 1. [Installation](#install-using-maven)
 2. [Basic Usage](#basic-usage)
-3. [Policy Author Language (PAL)](/pal/README.md)
+3. [Policy Author Language (PAL)](/pml/README.md)
 
 ## Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import into projects.

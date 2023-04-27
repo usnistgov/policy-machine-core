@@ -72,56 +72,56 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
     @Override
     public String visitPml(PMLParser.PmlContext ctx) {
         StringBuilder s = new StringBuilder();
-        for (PMLParser.StmtContext stmtCtx : ctx.stmt()) {
-            s.append(visitStmt(stmtCtx));
+        for (PMLParser.StatementContext stmtCtx : ctx.statement()) {
+            s.append(visitStatement(stmtCtx));
         }
         return s.toString();
     }
 
     @Override
-    public String visitStmt(PMLParser.StmtContext ctx) {
-        if (ctx.varStmt() != null) {
-            return visitVarStmt(ctx.varStmt());
-        } else if (ctx.funcDefStmt() != null) {
-            return visitFuncDefStmt(ctx.funcDefStmt());
-        } else if (ctx.foreachStmt() != null) {
-            return visitForeachStmt(ctx.foreachStmt());
-        } else if (ctx.funcCallStmt() != null) {
-            return visitFuncCallStmt(ctx.funcCallStmt());
-        } else if (ctx.ifStmt() != null) {
-            return visitIfStmt(ctx.ifStmt());
-        } else if (ctx.createAttrStmt() != null) {
-            return visitCreateAttrStmt(ctx.createAttrStmt());
-        } else if (ctx.createPolicyStmt() != null) {
-            return visitCreatePolicyStmt(ctx.createPolicyStmt());
-        } else if (ctx.createUserOrObjectStmt() != null) {
-            return visitCreateUserOrObjectStmt(ctx.createUserOrObjectStmt());
-        } else if (ctx.createProhibitionStmt() != null) {
-            return visitCreateProhibitionStmt(ctx.createProhibitionStmt());
-        } else if (ctx.createObligationStmt() != null) {
-            return visitCreateObligationStmt(ctx.createObligationStmt());
-        } else if (ctx.setNodePropsStmt() != null) {
-            return visitSetNodePropsStmt(ctx.setNodePropsStmt());
-        } else if (ctx.assignStmt() != null) {
-            return visitAssignStmt(ctx.assignStmt());
-        } else if (ctx.deassignStmt() != null) {
-            return visitDeassignStmt(ctx.deassignStmt());
-        } else if (ctx.deleteStmt() != null) {
-            return visitDeleteStmt(ctx.deleteStmt());
-        } else if (ctx.associateStmt() != null) {
-            return visitAssociateStmt(ctx.associateStmt());
-        } else if (ctx.dissociateStmt() != null) {
-            return visitDissociateStmt(ctx.dissociateStmt());
-        } else if (ctx.funcReturnStmt() != null) {
-            return visitFuncReturnStmt(ctx.funcReturnStmt());
-        } else if (ctx.breakStmt() != null) {
-            return visitBreakStmt(ctx.breakStmt());
-        } else if (ctx.continueStmt() != null) {
-            return visitContinueStmt(ctx.continueStmt());
-        } else if (ctx.setResourceAccessRightsStmt() != null) {
-            return visitSetResourceAccessRightsStmt(ctx.setResourceAccessRightsStmt());
-        } else if (ctx.deleteRuleStmt() != null) {
-            return visitDeleteRuleStmt(ctx.deleteRuleStmt());
+    public String visitStatement(PMLParser.StatementContext ctx) {
+        if (ctx.variableDeclarationStatement() != null) {
+            return visitVarStmt(ctx.variableDeclarationStatement());
+        } else if (ctx.functionDefinitionStatement() != null) {
+            return visitFuncDefStmt(ctx.functionDefinitionStatement());
+        } else if (ctx.foreachStatement() != null) {
+            return visitForeachStmt(ctx.foreachStatement());
+        } else if (ctx.functionInvokeStatement() != null) {
+            return visitFuncCallStmt(ctx.functionInvokeStatement());
+        } else if (ctx.ifStatement() != null) {
+            return visitIfStmt(ctx.ifStatement());
+        } else if (ctx.createAttributeStatement() != null) {
+            return visitCreateAttributeStatement(ctx.createAttributeStatement());
+        } else if (ctx.createPolicyStatement() != null) {
+            return visitCreatePolicyStatement(ctx.createPolicyStatement());
+        } else if (ctx.createUserOrObjectStatement() != null) {
+            return visitCreateUserOrObjectStatement(ctx.createUserOrObjectStatement());
+        } else if (ctx.createProhibitionStatement() != null) {
+            return visitCreateProhibitionStatement(ctx.createProhibitionStatement());
+        } else if (ctx.createObligationStatement() != null) {
+            return visitCreateObligationStatement(ctx.createObligationStatement());
+        } else if (ctx.setNodePropertiesStatement() != null) {
+            return visitSetNodePropertiesStatement(ctx.setNodePropertiesStatement());
+        } else if (ctx.assignStatement() != null) {
+            return visitAssignStatement(ctx.assignStatement());
+        } else if (ctx.deassignStatement() != null) {
+            return visitDeassignStatement(ctx.deassignStatement());
+        } else if (ctx.deleteStatement() != null) {
+            return visitDeleteStatement(ctx.deleteStatement());
+        } else if (ctx.associateStatement() != null) {
+            return visitAssociateStatement(ctx.associateStatement());
+        } else if (ctx.dissociateStatement() != null) {
+            return visitDissociateStatement(ctx.dissociateStatement());
+        } else if (ctx.functionReturnStatement() != null) {
+            return visitFuncReturnStmt(ctx.functionReturnStatement());
+        } else if (ctx.breakStatement() != null) {
+            return visitBreakStmt(ctx.breakStatement());
+        } else if (ctx.continueStatement() != null) {
+            return visitContinueStmt(ctx.continueStatement());
+        } else if (ctx.setResourceAccessRightsStatement() != null) {
+            return visitSetResourceAccessRightsStatement(ctx.setResourceAccessRightsStatement());
+        } else if (ctx.deleteRuleStatement() != null) {
+            return visitDeleteRuleStatement(ctx.deleteRuleStatement());
         }
 
         return getText(ctx);
@@ -132,13 +132,11 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
         return indent() + text + NEW_LINE;
     }
 
-    @Override
-    public String visitVarStmt(PMLParser.VarStmtContext ctx) {
+    public String visitVarStmt(PMLParser.VariableDeclarationStatementContext ctx) {
         return formatStmt(ctx);
     }
 
-    @Override
-    public String visitFuncDefStmt(PMLParser.FuncDefStmtContext ctx) {
+    public String visitFuncDefStmt(PMLParser.FunctionDefinitionStatementContext ctx) {
         String text = getText(ctx);
         int stmtStartIndex = ctx.start.getStartIndex();
         PMLParser.FuncBodyContext funcBodyCtx = ctx.funcBody();
@@ -146,118 +144,112 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
         int closeCurlyIndex = funcBodyCtx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         String signature = indent() + (text.substring(0, openCurlyIndex + 1).trim()) + NEW_LINE;
 
-        String body = visitStmts(funcBodyCtx.stmt());
+        String body = visitStatements(funcBodyCtx.statement());
 
         String close = "\n" + indent() + text.substring(closeCurlyIndex).trim() + NEW_LINE;
 
         return signature + body + close;
     }
 
-    private String visitStmts(List<PMLParser.StmtContext> stmts) {
+    private String visitStatements(List<PMLParser.StatementContext> stmts) {
         indentLevel++;
         StringBuilder body = new StringBuilder();
-        for (PMLParser.StmtContext stmtCtx : stmts) {
-            body.append(visitStmt(stmtCtx));
+        for (PMLParser.StatementContext stmtCtx : stmts) {
+            body.append(visitStatement(stmtCtx));
         }
         indentLevel--;
 
         return body.toString();
     }
 
-    @Override
-    public String visitFuncReturnStmt(PMLParser.FuncReturnStmtContext ctx) {
+    public String visitFuncReturnStmt(PMLParser.FunctionReturnStatementContext ctx) {
         return formatStmt(ctx);
     }
     
-    @Override
-    public String visitForeachStmt(PMLParser.ForeachStmtContext ctx) {
+    public String visitForeachStmt(PMLParser.ForeachStatementContext ctx) {
         String text = getText(ctx);
         int stmtStartIndex = ctx.start.getStartIndex();
-        PMLParser.StmtBlockContext forStmtsCtx = ctx.stmtBlock();
+        PMLParser.StatementBlockContext forStmtsCtx = ctx.statementBlock();
         int openCurlyIndex = forStmtsCtx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         int closeCurlyIndex = forStmtsCtx.CLOSE_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
         String forloop = indent() + (text.substring(0, openCurlyIndex + 1).trim()) + NEW_LINE;
 
-        String body = visitStmts(ctx.stmtBlock().stmt());
+        String body = visitStatements(ctx.statementBlock().statement());
 
         String close = "\n" + indent() + text.substring(closeCurlyIndex).trim() + NEW_LINE;
 
         return forloop + body + close;
     }
 
-    @Override
-    public String visitBreakStmt(PMLParser.BreakStmtContext ctx) {
+    public String visitBreakStmt(PMLParser.BreakStatementContext ctx) {
         return formatStmt(ctx);
     }
 
-    @Override
-    public String visitContinueStmt(PMLParser.ContinueStmtContext ctx) {
+    public String visitContinueStmt(PMLParser.ContinueStatementContext ctx) {
         return formatStmt(ctx);
     }
 
-    @Override
-    public String visitFuncCallStmt(PMLParser.FuncCallStmtContext ctx) {
+    public String visitFuncCallStmt(PMLParser.FunctionInvokeStatementContext ctx) {
         return formatStmt(ctx);
     }
 
-    @Override
-    public String visitIfStmt(PMLParser.IfStmtContext ctx) {
+    public String visitIfStmt(PMLParser.IfStatementContext ctx) {
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
-        int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
+        int openCurlyIndex = (ctx.statementBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
         String ifStr = indent() + text.substring(0, openCurlyIndex).trim() + " ";
 
-        String ifStmtBlock = visitStmtBlock(ctx.stmtBlock());
+        String ifStmtBlock = visitStatementBlock(ctx.statementBlock());
 
         StringBuilder elseIfStmtBlock = new StringBuilder();
-        for (PMLParser.ElseIfStmtContext elseIfStmtCtx : ctx.elseIfStmt()) {
-            elseIfStmtBlock.append(visitElseIfStmt(elseIfStmtCtx));
+        for (PMLParser.ElseIfStatementContext elseIfStmtCtx : ctx.elseIfStatement()) {
+            elseIfStmtBlock.append(visitElseIfStatement(elseIfStmtCtx));
         }
 
-        String elseStmtBlock = visitElseStmt(ctx.elseStmt());
+        String elseStmtBlock = visitElseStatement(ctx.elseStatement());
 
         return ifStr + ifStmtBlock + elseIfStmtBlock + elseStmtBlock;
     }
 
     @Override
-    public String visitElseIfStmt(PMLParser.ElseIfStmtContext ctx) {
+    public String visitElseIfStatement(PMLParser.ElseIfStatementContext ctx) {
         if (ctx == null) {
             return "";
         }
 
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
-        int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
+        int openCurlyIndex = (ctx.statementBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
         String ifStr = " " + text.substring(0, openCurlyIndex).trim() + " ";
 
-        String stmtBlock = visitStmtBlock(ctx.stmtBlock());
+        String stmtBlock = visitStatementBlock(ctx.statementBlock());
 
         return ifStr + stmtBlock;
     }
 
     @Override
-    public String visitElseStmt(PMLParser.ElseStmtContext ctx) {
+    public String visitElseStatement(PMLParser.ElseStatementContext ctx) {
         if (ctx == null) {
             return "";
         }
 
         String text = getText(ctx);
         int startIndex = ctx.start.getStartIndex();
-        int openCurlyIndex = (ctx.stmtBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
+        int openCurlyIndex = (ctx.statementBlock().OPEN_CURLY().getSymbol().getStartIndex()) - startIndex;
         String elseStr = " " + text.substring(0, openCurlyIndex).trim();
 
-        String stmtBlock = visitStmtBlock(ctx.stmtBlock());
+        String stmtBlock = visitStatementBlock(ctx.statementBlock());
 
         return elseStr + stmtBlock + NEW_LINE;
     }
 
     @Override
-    public String visitStmtBlock(PMLParser.StmtBlockContext ctx) {
+    public String visitStatementBlock(PMLParser.StatementBlockContext ctx) {
         StringBuilder block = new StringBuilder();
 
         indentLevel++;
-        for (PMLParser.StmtContext stmtCtx : ctx.stmt()) {
-            block.append(visitStmt(stmtCtx));
+        for (PMLParser.StatementContext stmtCtx : ctx.statement()) {
+            block.append(visitStatement(stmtCtx));
         }
         indentLevel--;
 
@@ -265,52 +257,52 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
     }
 
     @Override
-    public String visitCreatePolicyStmt(PMLParser.CreatePolicyStmtContext ctx) {
+    public String visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitCreateAttrStmt(PMLParser.CreateAttrStmtContext ctx) {
+    public String visitCreateAttributeStatement(PMLParser.CreateAttributeStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitCreateUserOrObjectStmt(PMLParser.CreateUserOrObjectStmtContext ctx) {
+    public String visitCreateUserOrObjectStatement(PMLParser.CreateUserOrObjectStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitSetNodePropsStmt(PMLParser.SetNodePropsStmtContext ctx) {
+    public String visitSetNodePropertiesStatement(PMLParser.SetNodePropertiesStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitAssignStmt(PMLParser.AssignStmtContext ctx) {
+    public String visitAssignStatement(PMLParser.AssignStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitDeassignStmt(PMLParser.DeassignStmtContext ctx) {
+    public String visitDeassignStatement(PMLParser.DeassignStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitAssociateStmt(PMLParser.AssociateStmtContext ctx) {
+    public String visitAssociateStatement(PMLParser.AssociateStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitDissociateStmt(PMLParser.DissociateStmtContext ctx) {
+    public String visitDissociateStatement(PMLParser.DissociateStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitDeleteStmt(PMLParser.DeleteStmtContext ctx) {
+    public String visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitCreateObligationStmt(PMLParser.CreateObligationStmtContext ctx) {
+    public String visitCreateObligationStatement(PMLParser.CreateObligationStatementContext ctx) {
         String text = getText(ctx);
         int stmtStartIndex = ctx.start.getStartIndex();
         int openCurlyIndex = ctx.OPEN_CURLY().getSymbol().getStartIndex() - stmtStartIndex;
@@ -318,10 +310,10 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
         String create = indent() + (text.substring(0, openCurlyIndex + 1).trim()) + NEW_LINE;
 
         StringBuilder body = new StringBuilder();
-        List<PMLParser.CreateRuleStmtContext> createRuleStmts = ctx.createRuleStmt();
+        List<PMLParser.CreateRuleStatementContext> createRuleStmts = ctx.createRuleStatement();
         indentLevel++;
-        for (PMLParser.CreateRuleStmtContext createRuleStmtCtx : createRuleStmts) {
-            body.append(visitCreateRuleStmt(createRuleStmtCtx));
+        for (PMLParser.CreateRuleStatementContext createRuleStmtCtx : createRuleStmts) {
+            body.append(visitCreateRuleStatement(createRuleStmtCtx));
         }
         indentLevel--;
 
@@ -331,7 +323,7 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
     }
 
     @Override
-    public String visitCreateRuleStmt(PMLParser.CreateRuleStmtContext ctx) {
+    public String visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
         String text = getText(ctx);
         int stmtStartIndex = ctx.start.getStartIndex();
         int whenIndex = ctx.WHEN().getSymbol().getStartIndex() - stmtStartIndex;
@@ -375,43 +367,43 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
     @Override
     public String visitResponseBlock(PMLParser.ResponseBlockContext ctx) {
         indentLevel++;
-        String responseBlock = visitResponseStmts(ctx.responseStmt());
+        String responseBlock = visitResponseStatements(ctx.responseStatement());
         indentLevel--;
 
         return "{" + NEW_LINE + responseBlock + indent() + "}" + NEW_LINE;
     }
 
-    public String visitResponseStmts(List<PMLParser.ResponseStmtContext> ctx) {
+    public String visitResponseStatements(List<PMLParser.ResponseStatementContext> ctx) {
         StringBuilder stmts = new StringBuilder();
-        for (PMLParser.ResponseStmtContext stmtCtx : ctx) {
-            stmts.append(visitResponseStmt(stmtCtx)).append(NEW_LINE);
+        for (PMLParser.ResponseStatementContext stmtCtx : ctx) {
+            stmts.append(visitResponseStatement(stmtCtx)).append(NEW_LINE);
         }
         return stmts.toString();
     }
 
     @Override
-    public String visitResponseStmt(PMLParser.ResponseStmtContext ctx) {
-        if (ctx.stmt() != null) {
-            return visitStmt(ctx.stmt());
-        } else if (ctx.createRuleStmt() != null){
-            return visitCreateRuleStmt(ctx.createRuleStmt());
+    public String visitResponseStatement(PMLParser.ResponseStatementContext ctx) {
+        if (ctx.statement() != null) {
+            return visitStatement(ctx.statement());
+        } else if (ctx.createRuleStatement() != null){
+            return visitCreateRuleStatement(ctx.createRuleStatement());
         } else {
-            return visitDeleteRuleStmt(ctx.deleteRuleStmt());
+            return visitDeleteRuleStatement(ctx.deleteRuleStatement());
         }
     }
 
     @Override
-    public String visitDeleteRuleStmt(PMLParser.DeleteRuleStmtContext ctx) {
+    public String visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitCreateProhibitionStmt(PMLParser.CreateProhibitionStmtContext ctx) {
+    public String visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
         return formatStmt(ctx);
     }
 
     @Override
-    public String visitSetResourceAccessRightsStmt(PMLParser.SetResourceAccessRightsStmtContext ctx) {
+    public String visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
         return formatStmt(ctx);
     }
 }

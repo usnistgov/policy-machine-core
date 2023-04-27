@@ -62,14 +62,14 @@ public class Type implements Serializable {
         return type;
     }
 
-    public static Type toType(PMLParser.VarTypeContext varTypeContext) {
+    public static Type toType(PMLParser.VariableTypeContext varTypeContext) {
         Type type = null;
         if (varTypeContext instanceof PMLParser.StringTypeContext) {
             type = Type.string();
         } else if (varTypeContext instanceof PMLParser.BooleanTypeContext) {
             type = Type.bool();
         } else if (varTypeContext instanceof PMLParser.ArrayVarTypeContext arrayVarTypeCtx) {
-            type = Type.array(toType(arrayVarTypeCtx.arrayType().varType()));
+            type = Type.array(toType(arrayVarTypeCtx.arrayType().variableType()));
         } else if (varTypeContext instanceof PMLParser.MapVarTypeContext mapVarTypeContext) {
             type = Type.map(
                     toType(mapVarTypeContext.mapType().keyType),

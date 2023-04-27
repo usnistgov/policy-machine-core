@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.pap.PolicyStore;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.Obligations;
-import gov.nist.csd.pm.policy.Prohibitions;
-import gov.nist.csd.pm.policy.UserDefinedPML;
+import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -34,7 +31,7 @@ public class MysqlPolicyStore extends PolicyStore {
     static final ObjectReader arsetReader = new ObjectMapper().readerFor(AccessRightSet.class);
     static final ObjectReader userCtxReader = new ObjectMapper().readerFor(UserContext.class);
 
-    private final MysqlConnection connection;
+    protected final MysqlConnection connection;
 
     private final MysqlGraph graph;
     private final MysqlProhibitions prohibitions;
@@ -102,6 +99,16 @@ public class MysqlPolicyStore extends PolicyStore {
     @Override
     public UserDefinedPML userDefinedPML() {
         return userDefinedPML;
+    }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return new MysqlPolicySerializer(this);
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return new MysqlPolicyDeserializer(this);
     }
 
     static int getNodeTypeId(NodeType nodeType) {

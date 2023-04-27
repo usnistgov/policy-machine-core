@@ -176,7 +176,7 @@ public class MysqlGraph implements Graph {
         }
     }
 
-    private Node getNodeFromResultSet(ResultSet rs) throws MysqlPolicyException {
+    protected static Node getNodeFromResultSet(ResultSet rs) throws MysqlPolicyException {
         try {
             String name = rs.getString(1);
             NodeType type = MysqlPolicyStore.getNodeTypeFromId(rs.getInt(2));
@@ -528,87 +528,4 @@ public class MysqlGraph implements Graph {
 
         return name;
     }
-
-    private List<Node> getNodes() throws MysqlPolicyException {
-        List<Node> nodes = new ArrayList<>();
-        String sql = """
-                    SELECT name, node_type_id, properties from node
-                    """;
-        try(PreparedStatement ps = connection.getConnection().prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                nodes.add(getNodeFromResultSet(rs));
-            }
-
-            rs.close();
-
-            return nodes;
-        } catch (SQLException e) {
-            throw new MysqlPolicyException(e.getMessage());
-        }
-    }
-
-    private List<Assignment> getAssignments() throws MysqlPolicyException {
-        List<Assignment> assignments = new ArrayList<>();
-        String sql = """
-                    SELECT child.name, parent.name FROM assignment
-                    join node as child on assignment.start_node_id=child.id
-                    join node as parent on assignment.end_node_id=parent.id;
-                    """;
-        try(PreparedStatement ps = connection.getConnection().prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                assignments.add(getAssignmentFromResultSet(rs));
-            }
-
-            rs.close();
-
-            return assignments;
-        } catch (SQLException e) {
-            throw new MysqlPolicyException(e.getMessage());
-        }
-    }
-
-    private Assignment getAssignmentFromResultSet(ResultSet rs) throws MysqlPolicyException {
-        try {
-            String child = rs.getString(1);
-            String parent = rs.getString(2);
-            return new Assignment(child, parent);
-        } catch (SQLException e) {
-            throw new MysqlPolicyException(e.getMessage());
-        }
-    }
-
-    private List<Association> getAssociations() throws MysqlPolicyException {
-        List<Association> associations = new ArrayList<>();
-        String sql = """
-                    SELECT ua.name, target.name, operation_set FROM association
-                    join node as ua on association.start_node_id=ua.id
-                    join node as target on association.end_node_id=target.id;
-                    """;
-        try(PreparedStatement ps = connection.getConnection().prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                associations.add(getAssociationFromResultSet(rs));
-            }
-
-            rs.close();
-
-            return associations;
-        } catch (SQLException e) {
-            throw new MysqlPolicyException(e.getMessage());
-        }
-    }
-
-    private Association getAssociationFromResultSet(ResultSet rs) throws MysqlPolicyException {
-        try {
-            String ua = rs.getString(1);
-            String target = rs.getString(2);
-            AccessRightSet arset = MysqlPolicyStore.arsetReader.readValue(rs.getString(3));
-            return new Association(ua, target, arset);
-        } catch (SQLException | JsonProcessingException e) {
-            throw new MysqlPolicyException(e.getMessage());
-        }
-    }
-
 }

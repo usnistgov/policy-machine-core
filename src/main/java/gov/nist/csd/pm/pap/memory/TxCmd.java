@@ -30,7 +30,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().deleteNode(name);
         }
     }
@@ -49,7 +49,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().deleteNode(name);
         }
     }
@@ -68,7 +68,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().deleteNode(name);
         }
     }
@@ -87,7 +87,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().deleteNode(name);
         }
     }
@@ -106,7 +106,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().deleteNode(name);
         }
     }
@@ -123,7 +123,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().setNodeProperties(name, oldProperties);
         }
     }
@@ -140,7 +140,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             NodeType type = nodeToDelete.getType();
             Map<String, String> properties = nodeToDelete.getProperties();
             String initialParent = "";
@@ -171,7 +171,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().deassign(child, parent);
         }
     }
@@ -186,7 +186,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().assign(child, parent);
         }
     }
@@ -199,7 +199,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().dissociate(association.getSource(), association.getTarget());
         }
     }
@@ -212,7 +212,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.graph().associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
         }
     }
@@ -259,7 +259,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.prohibitions().createProhibition(
                     prohibitionToDelete.getLabel(),
                     prohibitionToDelete.getSubject(),
@@ -309,7 +309,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.obligations().createObligation(
                     obligationToDelete.getAuthor(),
                     obligationToDelete.getLabel(),
@@ -326,7 +326,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.userDefinedPML().removeFunction(functionDefinitionStatement.getFunctionName());
         }
     }
@@ -339,7 +339,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.userDefinedPML().addFunction(functionDefinitionStatement);
         }
         
@@ -355,7 +355,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.userDefinedPML().removeConstant(constantName);
         }
     }
@@ -370,7 +370,7 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) {
+        public void revert(MemoryPolicyStore store) throws PMException {
             store.userDefinedPML().addConstant(constantName, oldValue);
         }
     }

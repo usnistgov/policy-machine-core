@@ -31,10 +31,10 @@ public class ProhibitionsAdjudicator implements Prohibitions {
 
     @Override
     public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        if (subject.type() == ProhibitionSubject.Type.PROCESS) {
+        if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
             accessRightChecker.check(userCtx, SUPER_PC_REP, CREATE_PROCESS_PROHIBITION);
         } else {
-            accessRightChecker.check(userCtx, subject.name(), CREATE_PROHIBITION);
+            accessRightChecker.check(userCtx, subject.getName(), CREATE_PROHIBITION);
         }
 
 
@@ -59,10 +59,10 @@ public class ProhibitionsAdjudicator implements Prohibitions {
         Prohibition prohibition = pap.prohibitions().getProhibition(label);
 
         // check that the user can create a prohibition for the subject
-        if (prohibition.getSubject().type() == ProhibitionSubject.Type.PROCESS) {
+        if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
             accessRightChecker.check(userCtx, SUPER_PC_REP, DELETE_PROCESS_PROHIBITION);
         } else {
-            accessRightChecker.check(userCtx, prohibition.getSubject().name(), DELETE_PROHIBITION);
+            accessRightChecker.check(userCtx, prohibition.getSubject().getName(), DELETE_PROHIBITION);
         }
 
         // check that the user can create a prohibition for each container in the condition
@@ -115,10 +115,10 @@ public class ProhibitionsAdjudicator implements Prohibitions {
         Prohibition prohibition = pap.prohibitions().getProhibition(label);
 
         // check user has access to subject prohibitions
-        if (prohibition.getSubject().type() == ProhibitionSubject.Type.PROCESS) {
+        if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
             accessRightChecker.check(userCtx, SUPER_PC_REP, GET_PROCESS_PROHIBITIONS);
         } else {
-            accessRightChecker.check(userCtx, prohibition.getSubject().name(), GET_PROHIBITIONS);
+            accessRightChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
         }
 
         // check user has access to each target prohibitions
@@ -133,10 +133,10 @@ public class ProhibitionsAdjudicator implements Prohibitions {
         prohibitions.removeIf(prohibition -> {
             try {
                 // check user has access to subject prohibitions
-                if (prohibition.getSubject().type() == ProhibitionSubject.Type.PROCESS) {
+                if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
                     accessRightChecker.check(userCtx, SUPER_PC_REP, GET_PROCESS_PROHIBITIONS);
                 } else {
-                    accessRightChecker.check(userCtx, prohibition.getSubject().name(), GET_PROHIBITIONS);
+                    accessRightChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
                 }
 
                 // check user has access to each target prohibitions

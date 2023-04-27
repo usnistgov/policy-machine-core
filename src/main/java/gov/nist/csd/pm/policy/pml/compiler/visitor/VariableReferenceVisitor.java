@@ -20,17 +20,17 @@ public class VariableReferenceVisitor extends PMLBaseVisitor<VariableReference> 
         this.visitorCtx = visitorCtx;
     }
 
-    public VariableReference visitVarRef(PMLParser.VarRefContext ctx) {
+    public VariableReference visitVariableReference(PMLParser.VariableReferenceContext ctx) {
         if (ctx instanceof PMLParser.ReferenceByIDContext referenceByIDContext) {
             return visitReferenceByID(referenceByIDContext);
         } else {
-            return visitEntryReference((PMLParser.EntryReferenceContext) ctx);
+            return visitReferenceByEntry((PMLParser.ReferenceByEntryContext) ctx);
         }
     }
 
     @Override
     public VariableReference visitReferenceByID(PMLParser.ReferenceByIDContext ctx) {
-        String id = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
+        String id = ctx.ID().getText();
 
         // check variable id is in scope
         Type type = Type.any();
@@ -45,8 +45,8 @@ public class VariableReferenceVisitor extends PMLBaseVisitor<VariableReference> 
     }
 
     @Override
-    public VariableReference visitEntryReference(PMLParser.EntryReferenceContext ctx) {
-        String name = ctx.entryRef().VARIABLE_OR_FUNCTION_NAME().getText();
+    public VariableReference visitReferenceByEntry(PMLParser.ReferenceByEntryContext ctx) {
+        String name = ctx.entryReference().ID().getText();
         Type type = Type.any();
         try {
             Variable mapVar = visitorCtx.scope().getVariable(name);
@@ -56,7 +56,7 @@ public class VariableReferenceVisitor extends PMLBaseVisitor<VariableReference> 
         }
 
         VariableReference mapVarRef = new VariableReference(name, type);
-        List<PMLParser.ExpressionContext> exprCtxs = ctx.entryRef().expression();
+        List<PMLParser.ExpressionContext> exprCtxs = ctx.entryReference().expression();
         boolean first = true;
         for (PMLParser.ExpressionContext exprCtx : exprCtxs) {
             // if the variable reference is not a map or array and this is not the first accessor processed, there is an error

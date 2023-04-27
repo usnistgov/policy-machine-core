@@ -13,9 +13,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 class PAPObligations implements Obligations, PolicyEventEmitter {
     protected PolicyStore policyStore;
@@ -49,7 +47,7 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
 
     private void checkEventPatternAttributesExist(Rule ... rules) throws PMException {
         for (Rule rule : rules) {
-            EventPattern event = rule.getEvent();
+            EventPattern event = rule.getEventPattern();
 
             // check subject
             EventSubject subject = event.getSubject();

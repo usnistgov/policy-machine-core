@@ -16,7 +16,7 @@ public class SetResourceAccessRightsStmtVisitor extends PMLBaseVisitor<SetResour
     }
 
     @Override
-    public SetResourceAccessRightsStatement visitSetResourceAccessRightsStmt(PMLParser.SetResourceAccessRightsStmtContext ctx) {
+    public SetResourceAccessRightsStatement visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
         if (visitorCtx.scope().isResourceAccessRightsExpressionSet()) {
             visitorCtx.errorLog().addError(ctx, "set resource access rights has already been called");
             return new SetResourceAccessRightsStatement(visitorCtx.scope().getResourceAccessRightsExpression());

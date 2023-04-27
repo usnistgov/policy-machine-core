@@ -16,7 +16,7 @@ public class AssociateStmtVisitor extends PMLBaseVisitor<AssociateStatement> {
     }
 
     @Override
-    public AssociateStatement visitAssociateStmt(PMLParser.AssociateStmtContext ctx) {
+    public AssociateStatement visitAssociateStatement(PMLParser.AssociateStatementContext ctx) {
         Expression ua = Expression.compile(visitorCtx, ctx.ua, Type.string());
         Expression target = Expression.compile(visitorCtx, ctx.target, Type.string());
         Expression accessRights = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));

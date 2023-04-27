@@ -14,29 +14,29 @@ import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionCallVisitor extends PMLBaseVisitor<FunctionInvocationStatement> {
+public class FunctionInvokeVisitor extends PMLBaseVisitor<FunctionInvocationStatement> {
 
     private final VisitorContext visitorCtx;
 
-    public FunctionCallVisitor(VisitorContext visitorCtx) {
+    public FunctionInvokeVisitor(VisitorContext visitorCtx) {
         this.visitorCtx = visitorCtx;
     }
 
     @Override
-    public FunctionInvocationStatement visitFuncCall(PMLParser.FuncCallContext ctx) {
+    public FunctionInvocationStatement visitFunctionInvoke(PMLParser.FunctionInvokeContext ctx) {
         return parse(ctx);
     }
 
     @Override
-    public FunctionInvocationStatement visitFuncCallStmt(PMLParser.FuncCallStmtContext ctx) {
-        return parse(ctx.funcCall());
+    public FunctionInvocationStatement visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
+        return parse(ctx.functionInvoke());
     }
 
-    private FunctionInvocationStatement parse(PMLParser.FuncCallContext funcCallCtx) {
-        String funcName = funcCallCtx.VARIABLE_OR_FUNCTION_NAME().getText();
+    private FunctionInvocationStatement parse(PMLParser.FunctionInvokeContext funcCallCtx) {
+        String funcName = funcCallCtx.ID().getText();
 
         // get actual arg expressions
-        PMLParser.FuncCallArgsContext funcCallArgsCtx = funcCallCtx.funcCallArgs();
+        PMLParser.FunctionInvokeArgsContext funcCallArgsCtx = funcCallCtx.functionInvokeArgs();
         List<Expression> actualArgs = new ArrayList<>();
         for (PMLParser.ExpressionContext exprCtx : funcCallArgsCtx.expression()) {
             Expression expr = Expression.compile(visitorCtx, exprCtx);

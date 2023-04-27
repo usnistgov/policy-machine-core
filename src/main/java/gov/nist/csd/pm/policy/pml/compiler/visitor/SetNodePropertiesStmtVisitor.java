@@ -16,7 +16,7 @@ public class SetNodePropertiesStmtVisitor extends PMLBaseVisitor<SetNodeProperti
     }
 
     @Override
-    public SetNodePropertiesStatement visitSetNodePropsStmt(PMLParser.SetNodePropsStmtContext ctx) {
+    public SetNodePropertiesStatement visitSetNodePropertiesStatement(PMLParser.SetNodePropertiesStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression props = Expression.compile(visitorCtx, ctx.properties, Type.map(Type.string(), Type.string()));
 

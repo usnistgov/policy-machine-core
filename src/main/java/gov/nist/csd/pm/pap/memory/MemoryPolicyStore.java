@@ -1,21 +1,13 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.PolicyStore;
-import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.Obligations;
-import gov.nist.csd.pm.policy.Prohibitions;
-import gov.nist.csd.pm.policy.UserDefinedPML;
-import gov.nist.csd.pm.policy.pml.PMLContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.model.obligation.Obligation;
-import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-import java.util.*;
+import java.io.Serializable;
 
-public class MemoryPolicyStore extends PolicyStore {
+public class MemoryPolicyStore extends PolicyStore implements Serializable {
 
     private MemoryGraph graph;
     private MemoryProhibitions prohibitions;
@@ -40,24 +32,41 @@ public class MemoryPolicyStore extends PolicyStore {
         this.userDefinedPML = new MemoryUserDefinedPML(userDefinedPML);
     }
 
+    MemoryPolicyStore(MemoryGraph graph, MemoryProhibitions prohibitions, MemoryObligations obligations, MemoryUserDefinedPML userDefinedPML) throws PMException {
+        this.graph = graph;
+        this.prohibitions = prohibitions;
+        this.obligations = obligations;
+        this.userDefinedPML = userDefinedPML;
+    }
+
     @Override
-    public MemoryGraph graph() {
+    public Graph graph() {
         return graph;
     }
 
     @Override
-    public MemoryProhibitions prohibitions() {
+    public Prohibitions prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public MemoryObligations obligations() {
+    public Obligations obligations() {
         return obligations;
     }
 
     @Override
-    public MemoryUserDefinedPML userDefinedPML() {
+    public UserDefinedPML userDefinedPML() {
         return userDefinedPML;
+    }
+
+    @Override
+    public PolicySerializer serialize() {
+        return new MemoryPolicySerializer(this);
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() {
+        return new MemoryPolicyDeserializer(this);
     }
 
     @Override

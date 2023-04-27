@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.GraphAdjudicator;
 import gov.nist.csd.pm.pdp.adjudicator.ProhibitionsAdjudicator;
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.events.*;
@@ -40,7 +39,7 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
         );
 
         // emit event for subject
-        emitEvent(new EventContext(userCtx, subject.name(), createProhibitionEvent));
+        emitEvent(new EventContext(userCtx, subject.getName(), createProhibitionEvent));
 
         // emit event for each container specified
         for (ContainerCondition containerCondition : containerConditions) {
@@ -59,7 +58,7 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
         );
 
         // emit event for subject
-        emitEvent(new EventContext(userCtx, subject.name(), updateProhibitionEvent));
+        emitEvent(new EventContext(userCtx, subject.getName(), updateProhibitionEvent));
 
         // emit event for each container specified
         for (ContainerCondition containerCondition : containerConditions) {
@@ -89,7 +88,7 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
         DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition);
 
         // emit event for subject
-        emitEvent(new EventContext(userCtx, subject.name(), deleteProhibitionEvent));
+        emitEvent(new EventContext(userCtx, subject.getName(), deleteProhibitionEvent));
 
         // emit event for each container specified
         for (ContainerCondition containerCondition : containerConditions) {

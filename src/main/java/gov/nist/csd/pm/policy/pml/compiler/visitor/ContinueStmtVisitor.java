@@ -15,7 +15,7 @@ public class ContinueStmtVisitor extends PMLBaseVisitor<ContinueStatement> {
     }
 
     @Override
-    public ContinueStatement visitContinueStmt(PMLParser.ContinueStmtContext ctx) {
+    public ContinueStatement visitContinueStatement(PMLParser.ContinueStatementContext ctx) {
         // check that there is a for loop parent
         if (!inFor(ctx)) {
             visitorCtx.errorLog().addError(
@@ -28,7 +28,7 @@ public class ContinueStmtVisitor extends PMLBaseVisitor<ContinueStatement> {
     }
 
     private boolean inFor(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.ForeachStmtContext) {
+        if (ctx instanceof PMLParser.ForeachStatementContext) {
             return true;
         } else if (ctx == null) {
             return false;

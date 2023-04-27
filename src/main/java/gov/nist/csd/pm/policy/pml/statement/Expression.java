@@ -3,7 +3,7 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
-import gov.nist.csd.pm.policy.pml.compiler.visitor.FunctionCallVisitor;
+import gov.nist.csd.pm.policy.pml.compiler.visitor.FunctionInvokeVisitor;
 import gov.nist.csd.pm.policy.pml.compiler.visitor.LiteralExprVisitor;
 import gov.nist.csd.pm.policy.pml.compiler.visitor.VariableReferenceVisitor;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
@@ -32,13 +32,13 @@ public class Expression extends PMLStatement {
             Literal literal = new LiteralExprVisitor(visitorCtx)
                     .visitLiteral(litCtx);
             expression = new Expression(literal);
-        } else if (expressionCtx.funcCall() != null) {
-            FunctionInvocationStatement functionCall = new FunctionCallVisitor(visitorCtx)
-                    .visitFuncCall(expressionCtx.funcCall());
+        } else if (expressionCtx.functionInvoke() != null) {
+            FunctionInvocationStatement functionCall = new FunctionInvokeVisitor(visitorCtx)
+                    .visitFunctionInvoke(expressionCtx.functionInvoke());
             expression = new Expression(functionCall);
         } else {
             VariableReference varRef = new VariableReferenceVisitor(visitorCtx)
-                    .visitVarRef(expressionCtx.varRef());
+                    .visitVariableReference(expressionCtx.variableReference());
             expression = new Expression(varRef);
         }
 

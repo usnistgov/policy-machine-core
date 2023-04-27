@@ -25,8 +25,8 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     }
 
     @Override
-    public FunctionDefinitionStatement visitFuncDefStmt(PMLParser.FuncDefStmtContext ctx) {
-        String funcName = ctx.VARIABLE_OR_FUNCTION_NAME().getText();
+    public FunctionDefinitionStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+        String funcName = ctx.ID().getText();
         List<FormalArgument> args = parseFormalArgs(ctx.formalArgList());
         Type returnType = parseReturnType(ctx.funcReturnType());
         List<PMLStatement> body = parseBody(ctx, args);
@@ -85,7 +85,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         return functionDefinition;
     }
 
-    private List<PMLStatement> parseBody(PMLParser.FuncDefStmtContext ctx, List<FormalArgument> args) {
+    private List<PMLStatement> parseBody(PMLParser.FunctionDefinitionStatementContext ctx, List<FormalArgument> args) {
         PMLParser.FuncBodyContext funcBodyCtx = ctx.funcBody();
 
         // create a new scope for the function body
@@ -102,8 +102,8 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
 
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
         List<PMLStatement> stmts = new ArrayList<>();
-        for (PMLParser.StmtContext stmtCtx : funcBodyCtx.stmt()) {
-            stmts.add(statementVisitor.visitStmt(stmtCtx));
+        for (PMLParser.StatementContext stmtCtx : funcBodyCtx.statement()) {
+            stmts.add(statementVisitor.visitStatement(stmtCtx));
         }
 
         return stmts;
@@ -113,8 +113,8 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         List<FormalArgument> formalArguments = new ArrayList<>();
         Set<String> argNames = new HashSet<>();
         for (PMLParser.FormalArgContext formalArgCtx : formalArgListCtx.formalArg()) {
-            String name = formalArgCtx.VARIABLE_OR_FUNCTION_NAME().getText();
-            PMLParser.VarTypeContext varTypeContext = formalArgCtx.formalArgType().varType();
+            String name = formalArgCtx.ID().getText();
+            PMLParser.VariableTypeContext varTypeContext = formalArgCtx.formalArgType().variableType();
 
             // check that a formalArg does not clash with an already defined variable
             if (visitorCtx.scope().variableExists(name) || argNames.contains(name)) {
@@ -138,8 +138,8 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             return Type.voidType();
         }
 
-        if (funcReturnTypeCtx instanceof PMLParser.VarReturnTypeContext varReturnTypeCtx) {
-            PMLParser.VarTypeContext varTypeCtx = varReturnTypeCtx.varType();
+        if (funcReturnTypeCtx instanceof PMLParser.VariableReturnTypeContext varReturnTypeCtx) {
+            PMLParser.VariableTypeContext varTypeCtx = varReturnTypeCtx.variableType();
             return Type.toType(varTypeCtx);
         } else if (funcReturnTypeCtx instanceof PMLParser.VoidReturnTypeContext) {
             return Type.voidType();

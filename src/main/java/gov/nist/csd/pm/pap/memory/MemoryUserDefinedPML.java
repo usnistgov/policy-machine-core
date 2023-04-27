@@ -1,22 +1,31 @@
 package gov.nist.csd.pm.pap.memory;
 
+import com.google.gson.Gson;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-class MemoryUserDefinedPML implements UserDefinedPML {
+class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
 
     protected MemoryTx tx;
-    private final Map<String, FunctionDefinitionStatement> functions;
-    private final Map<String, Value> constants;
+    private Map<String, FunctionDefinitionStatement> functions;
+    private Map<String, Value> constants;
 
     public MemoryUserDefinedPML() {
         this.functions = new HashMap<>();
         this.constants = new HashMap<>();
+        this.tx = new MemoryTx(false, 0, null);
+    }
+
+    public MemoryUserDefinedPML(Map<String, FunctionDefinitionStatement> functions, Map<String, Value> constants) {
+        this.functions = functions;
+        this.constants = constants;
         this.tx = new MemoryTx(false, 0, null);
     }
 
@@ -36,7 +45,7 @@ class MemoryUserDefinedPML implements UserDefinedPML {
     }
 
     @Override
-    public void removeFunction(String functionName) {
+    public void removeFunction(String functionName) throws PMException {
         if (tx.active()) {
             tx.policyStore().removeFunction(functionName);
         }
@@ -64,7 +73,7 @@ class MemoryUserDefinedPML implements UserDefinedPML {
     }
 
     @Override
-    public void removeConstant(String constName) {
+    public void removeConstant(String constName) throws PMException {
         if (tx.active()) {
             tx.policyStore().removeConstant(constName);
         }
@@ -81,4 +90,5 @@ class MemoryUserDefinedPML implements UserDefinedPML {
     public Value getConstant(String name) {
         return getConstants().get(name);
     }
+
 }

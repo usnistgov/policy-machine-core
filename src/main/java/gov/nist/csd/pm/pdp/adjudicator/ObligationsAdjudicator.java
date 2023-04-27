@@ -30,10 +30,10 @@ public class ObligationsAdjudicator implements Obligations {
     @Override
     public void createObligation(UserContext author, String label, Rule... rules) throws PMException {
         for (Rule rule : rules) {
-            EventSubject subject = rule.getEvent().getSubject();
+            EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, CREATE_OBLIGATION);
 
-            Target target = rule.getEvent().getTarget();
+            Target target = rule.getEventPattern().getTarget();
             checkTarget(target, CREATE_OBLIGATION);
         }
     }
@@ -76,10 +76,10 @@ public class ObligationsAdjudicator implements Obligations {
     public void deleteObligation(String label) throws PMException {
         Obligation obligation = pap.obligations().getObligation(label);
         for (Rule rule : obligation.getRules()) {
-            EventSubject subject = rule.getEvent().getSubject();
+            EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, DELETE_OBLIGATION);
 
-            Target target = rule.getEvent().getTarget();
+            Target target = rule.getEventPattern().getTarget();
             checkTarget(target, DELETE_OBLIGATION);
         }
     }
@@ -90,10 +90,10 @@ public class ObligationsAdjudicator implements Obligations {
         obligations.removeIf(obligation -> {
             try {
                 for (Rule rule : obligation.getRules()) {
-                    EventSubject subject = rule.getEvent().getSubject();
+                    EventSubject subject = rule.getEventPattern().getSubject();
                     checkSubject(subject, GET_OBLIGATION);
 
-                    Target target = rule.getEvent().getTarget();
+                    Target target = rule.getEventPattern().getTarget();
                     checkTarget(target, GET_OBLIGATION);
                 }
                 return false;
@@ -125,10 +125,10 @@ public class ObligationsAdjudicator implements Obligations {
     public Obligation getObligation(String label) throws PMException {
         Obligation obligation = pap.obligations().getObligation(label);
         for (Rule rule : obligation.getRules()) {
-            EventSubject subject = rule.getEvent().getSubject();
+            EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, GET_OBLIGATION);
 
-            Target target = rule.getEvent().getTarget();
+            Target target = rule.getEventPattern().getTarget();
             checkTarget(target, GET_OBLIGATION);
         }
 

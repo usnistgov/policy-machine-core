@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
+import com.google.gson.Gson;
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.ProhibitionDoesNotExistException;
@@ -8,9 +9,10 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
+import java.io.Serializable;
 import java.util.*;
 
-class MemoryProhibitions implements Prohibitions {
+class MemoryProhibitions implements Prohibitions, Serializable {
 
     protected MemoryTx tx;
     private Map<String, List<Prohibition>> prohibitions;
@@ -36,9 +38,9 @@ class MemoryProhibitions implements Prohibitions {
             tx.policyStore().createProhibition(label, subject, accessRightSet, intersection, containerConditions);
         }
 
-        List<Prohibition> existingPros = prohibitions.getOrDefault(subject.name(), new ArrayList<>());
+        List<Prohibition> existingPros = prohibitions.getOrDefault(subject.getName(), new ArrayList<>());
         existingPros.add(new Prohibition(label, subject, accessRightSet, intersection, Arrays.asList(containerConditions)));
-        prohibitions.put(subject.name(), existingPros);
+        prohibitions.put(subject.getName(), existingPros);
     }
 
     @Override
@@ -117,5 +119,8 @@ class MemoryProhibitions implements Prohibitions {
         throw new ProhibitionDoesNotExistException(label);
     }
 
+    public void fromJson(String json) {
+        this.prohibitions = new Gson().fromJson(json, Map.class);
+    }
 
 }

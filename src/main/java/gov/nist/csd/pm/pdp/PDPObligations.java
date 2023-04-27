@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.GraphAdjudicator;
 import gov.nist.csd.pm.pdp.adjudicator.ObligationsAdjudicator;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.*;
@@ -46,7 +45,7 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
         // emit events for each rule
         for (Rule rule : rules) {
             // emit event for the subject
-            EventSubject subject = rule.getEvent().getSubject();
+            EventSubject subject = rule.getEventPattern().getSubject();
             if (subject.getType() == ANY_USER) {
                 emitEvent(new EventContext(userCtx, "", event));
             } else if (subject.getType() == ANY_USER_WITH_ATTRIBUTE) {
@@ -60,7 +59,7 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
             }
 
             // emit event for each target
-            Target target = rule.getEvent().getTarget();
+            Target target = rule.getEventPattern().getTarget();
             if (target.getType() == POLICY_ELEMENT) {
                 emitEvent(new EventContext(userCtx, target.policyElement(), event));
             } else if (target.getType() == ANY_POLICY_ELEMENT) {

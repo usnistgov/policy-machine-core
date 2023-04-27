@@ -14,6 +14,9 @@ public class Obligation implements Cloneable, Serializable {
     private String label;
     private List<Rule> rules;
 
+    public Obligation() {
+    }
+
     public Obligation(UserContext author, String label) {
         this.author = author;
         this.label = label;

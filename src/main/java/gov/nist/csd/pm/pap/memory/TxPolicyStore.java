@@ -110,7 +110,7 @@ class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, 
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) {
+    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
         emitEvent(new TxEvents.MemorySetNodePropertiesEvent(name, memoryPolicyStore.graph().getNode(name).getProperties(), properties));
     }
 
@@ -135,7 +135,7 @@ class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, 
     }
 
     @Override
-    public void deleteNode(String name) {
+    public void deleteNode(String name) throws PMException {
         emitEvent(new TxEvents.MemoryDeleteNodeEvent(
                 name,
                 memoryPolicyStore.graph().getNode(name),
@@ -184,7 +184,7 @@ class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, 
     }
 
     @Override
-    public void dissociate(String ua, String target) {
+    public void dissociate(String ua, String target) throws PMException {
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Association association : memoryPolicyStore.graph().getAssociationsWithSource(ua)) {
             if (association.getTarget().equals(target)) {
@@ -282,7 +282,7 @@ class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, 
     }
 
     @Override
-    public void removeFunction(String functionName) {
+    public void removeFunction(String functionName) throws PMException {
         emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.userDefinedPML().getFunctions().get(functionName)));
     }
 
@@ -302,7 +302,7 @@ class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, 
     }
 
     @Override
-    public void removeConstant(String constName) {
+    public void removeConstant(String constName) throws PMException {
         emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.userDefinedPML().getConstants().get(constName)));
     }
 
@@ -349,5 +349,15 @@ class TxPolicyStore implements Policy, PolicyEventEmitter, Graph, Prohibitions, 
     @Override
     public UserDefinedPML userDefinedPML() {
         return this;
+    }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return memoryPolicyStore.serialize();
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return memoryPolicyStore.deserialize();
     }
 }

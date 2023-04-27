@@ -15,7 +15,7 @@ public class BreakStmtVisitor extends PMLBaseVisitor<BreakStatement> {
     }
 
     @Override
-    public BreakStatement visitBreakStmt(PMLParser.BreakStmtContext ctx) {
+    public BreakStatement visitBreakStatement(PMLParser.BreakStatementContext ctx) {
         // check that there is a for loop parent
         if (!inFor(ctx)) {
             visitorCtx.errorLog().addError(
@@ -28,7 +28,7 @@ public class BreakStmtVisitor extends PMLBaseVisitor<BreakStatement> {
     }
 
     private boolean inFor(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.ForeachStmtContext) {
+        if (ctx instanceof PMLParser.ForeachStatementContext) {
             return true;
         } else if (ctx == null) {
             return false;

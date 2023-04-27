@@ -1,117 +1,43 @@
 grammar PML;
 
-pml: (stmt)* EOF ;
-stmt: (
-    varStmt
-    | funcDefStmt
-    | funcReturnStmt
-    | foreachStmt
-    | forRangeStmt
-    | breakStmt
-    | continueStmt
-    | funcCallStmt
-    | ifStmt
-    | createPolicyStmt
-    | createAttrStmt
-    | createUserOrObjectStmt
-    | createObligationStmt
-    | createProhibitionStmt
-    | setNodePropsStmt
-    | assignStmt
-    | deassignStmt
-    | deleteStmt
-    | associateStmt
-    | dissociateStmt
-    | setResourceAccessRightsStmt
-    | deleteRuleStmt
-);
+pml: (statement)* EOF ;
+statement: (
+    createPolicyStatement
+    | createAttributeStatement
+    | createUserOrObjectStatement
+    | createObligationStatement
+    | createProhibitionStatement
+    | setNodePropertiesStatement
+    | assignStatement
+    | deassignStatement
+    | associateStatement
+    | dissociateStatement
+    | setResourceAccessRightsStatement
+    | deleteStatement
+    | deleteRuleStatement
+    | variableDeclarationStatement
+    | functionDefinitionStatement
+    | functionReturnStatement
+    | foreachStatement
+    | forRangeStatement
+    | breakStatement
+    | continueStatement
+    | functionInvokeStatement
+    | ifStatement
+) ;
 
-// let
-varStmt: (LET | CONST)? VARIABLE_OR_FUNCTION_NAME EQUALS expression ;
+createPolicyStatement:
+    CREATE POLICY_CLASS expression ;
 
-// function definition
-funcDefStmt:
-    FUNCTION VARIABLE_OR_FUNCTION_NAME OPEN_PAREN formalArgList CLOSE_PAREN funcReturnType? funcBody ;
-formalArgList:
-    (formalArg (COMMA formalArg)*)? ;
-formalArg:
-    formalArgType VARIABLE_OR_FUNCTION_NAME ;
-formalArgType:
-    varType ;
-funcReturnStmt:
-    (RETURN expression | RETURN) ;
-funcReturnType:
-    varType #VarReturnType
-    | VOID_TYPE #VoidReturnType;
-funcBody:
-    OPEN_CURLY stmt* CLOSE_CURLY;
+createAttributeStatement:
+    CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression IN parents=expression ;
 
-foreachStmt:
-    FOREACH key=VARIABLE_OR_FUNCTION_NAME (COMMA mapValue=VARIABLE_OR_FUNCTION_NAME)? IN expression stmtBlock ;
+createUserOrObjectStatement:
+    CREATE (USER | OBJECT) name=expression IN parents=expression ;
 
-forRangeStmt:
-    FOR VARIABLE_OR_FUNCTION_NAME IN_RANGE
-    lowerBound=(OPEN_BRACKET|OPEN_PAREN) lower=expression COMMA upper=expression upperBound=(CLOSE_BRACKET|CLOSE_PAREN)
-    stmtBlock ;
-
-// break
-breakStmt:
-    BREAK ;
-
-// continue
-continueStmt:
-    CONTINUE ;
-
-// function call
-funcCallStmt:
-    funcCall;
-
-// if
-ifStmt:
-    IF (IS_COMPLEMENT)? condition=expression stmtBlock
-    elseIfStmt*
-    elseStmt? ;
-elseIfStmt:
-    ELSE IF (IS_COMPLEMENT)? condition=expression stmtBlock ;
-elseStmt:
-    ELSE stmtBlock ;
-
-varType:
-    STRING_TYPE #StringType
-    | BOOLEAN_TYPE #BooleanType
-    | arrayType #ArrayVarType
-    | mapType #MapVarType
-    | ANY #AnyType ;
-mapType: MAP_TYPE OPEN_BRACKET keyType=varType CLOSE_BRACKET valueType=varType ;
-arrayType: OPEN_BRACKET CLOSE_BRACKET varType ;
-
-stmtBlock: OPEN_CURLY stmt* CLOSE_CURLY ;
-
-// ngac commands
-deleteType:
-    nodeType #DeleteNode
-    | OBLIGATION #DeleteObligation
-    | PROHIBITION #DeleteProhibition ;
-nodeType:
-    (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
-
-createPolicyStmt: CREATE POLICY_CLASS expression ;
-createAttrStmt: CREATE (OBJECT_ATTRIBUTE | USER_ATTRIBUTE) name=expression IN parents=expression ;
-createUserOrObjectStmt: CREATE (USER | OBJECT) name=expression IN parents=expression ;
-
-setNodePropsStmt: SET_PROPERTIES OF name=expression TO properties=expression ;
-
-assignStmt: ASSIGN childNode=expression TO parentNodes=expression ;
-deassignStmt: DEASSIGN childNode=expression FROM parentNodes=expression ;
-
-associateStmt: ASSOCIATE ua=expression AND target=expression WITH accessRights=expression ;
-dissociateStmt: DISSOCIATE ua=expression AND target=expression ;
-
-deleteStmt: DELETE deleteType expression ;
-
-createObligationStmt:
-    CREATE OBLIGATION expression OPEN_CURLY createRuleStmt* CLOSE_CURLY;
-createRuleStmt:
+createObligationStatement:
+    CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
+createRuleStatement:
     CREATE RULE ruleName=expression
     WHEN subjectClause
     PERFORMS performsClause=expression
@@ -129,35 +55,113 @@ onClause:
     | anyPe IN expression #AnyContainedIn
     | anyPe OF expression #AnyOfSet ;
 anyPe: ANY POLICY_ELEMENT;
-
 response:
-    DO OPEN_PAREN VARIABLE_OR_FUNCTION_NAME CLOSE_PAREN responseBlock;
+    DO OPEN_PAREN ID CLOSE_PAREN responseBlock;
 responseBlock:
-    OPEN_CURLY responseStmt* CLOSE_CURLY ;
-responseStmt:
-    stmt
-    | createRuleStmt
-    | deleteRuleStmt
-    ;
-deleteRuleStmt:
-    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression ;
+    OPEN_CURLY responseStatement* CLOSE_CURLY ;
+responseStatement:
+    statement
+    | createRuleStatement
+    | deleteRuleStatement ;
 
-createProhibitionStmt:
+createProhibitionStatement:
     CREATE PROHIBITION name=expression DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
     ACCESS_RIGHTS accessRights=expression
-    ON (INTERSECTION|UNION) OF containers=prohibitionContainerList
-    ;
+    ON (INTERSECTION|UNION) OF containers=prohibitionContainerList ;
 prohibitionContainerList:
     OPEN_BRACKET (prohibitionContainerExpression (COMMA prohibitionContainerExpression)*)? CLOSE_BRACKET ;
 prohibitionContainerExpression:
     IS_COMPLEMENT? container=expression ;
 
-setResourceAccessRightsStmt:
+setNodePropertiesStatement:
+    SET_PROPERTIES OF name=expression TO properties=expression ;
+
+assignStatement:
+    ASSIGN childNode=expression TO parentNodes=expression ;
+
+deassignStatement:
+    DEASSIGN childNode=expression FROM parentNodes=expression ;
+
+associateStatement:
+    ASSOCIATE ua=expression AND target=expression WITH accessRights=expression ;
+
+dissociateStatement:
+    DISSOCIATE ua=expression AND target=expression ;
+
+setResourceAccessRightsStatement:
     SET_RESOURCE_ACCESS_RIGHTS accessRights=expression;
 
+deleteStatement:
+    DELETE deleteType expression ;
+deleteType:
+    nodeType #DeleteNode
+    | OBLIGATION #DeleteObligation
+    | PROHIBITION #DeleteProhibition ;
+nodeType:
+    (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
+
+deleteRuleStatement:
+    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression ;
+
+variableDeclarationStatement:
+    (LET | CONST)? ID EQUALS expression ;
+
+functionDefinitionStatement:
+    FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN funcReturnType? funcBody ;
+formalArgList:
+    (formalArg (COMMA formalArg)*)? ;
+formalArg:
+    formalArgType ID ;
+formalArgType:
+    variableType ;
+functionReturnStatement:
+    (RETURN expression | RETURN) ;
+funcReturnType:
+    variableType #VariableReturnType
+    | VOID_TYPE #VoidReturnType;
+funcBody:
+    OPEN_CURLY statement* CLOSE_CURLY;
+
+foreachStatement:
+    FOREACH key=ID (COMMA mapValue=ID)? IN expression statementBlock ;
+
+forRangeStatement:
+    FOR ID IN_RANGE
+    lowerBound=(OPEN_BRACKET|OPEN_PAREN) lower=expression COMMA upper=expression upperBound=(CLOSE_BRACKET|CLOSE_PAREN)
+    statementBlock ;
+
+breakStatement:
+    BREAK ;
+
+continueStatement:
+    CONTINUE ;
+
+functionInvokeStatement:
+    functionInvoke;
+
+ifStatement:
+    IF (IS_COMPLEMENT)? condition=expression statementBlock
+    elseIfStatement*
+    elseStatement? ;
+elseIfStatement:
+    ELSE IF (IS_COMPLEMENT)? condition=expression statementBlock ;
+elseStatement:
+    ELSE statementBlock ;
+
+variableType:
+    STRING_TYPE #StringType
+    | BOOLEAN_TYPE #BooleanType
+    | arrayType #ArrayVarType
+    | mapType #MapVarType
+    | ANY #AnyType ;
+mapType: MAP_TYPE OPEN_BRACKET keyType=variableType CLOSE_BRACKET valueType=variableType ;
+arrayType: OPEN_BRACKET CLOSE_BRACKET variableType ;
+
+statementBlock: OPEN_CURLY statement* CLOSE_CURLY ;
+
 expression:
-    varRef
-    | funcCall
+    variableReference
+    | functionInvoke
     | literal;
 
 array:
@@ -167,22 +171,23 @@ map:
     OPEN_CURLY (mapEntry (COMMA mapEntry)*)? CLOSE_CURLY ;
 mapEntry:
     key=expression COLON value=expression ;
-entryRef:
-    VARIABLE_OR_FUNCTION_NAME (OPEN_BRACKET key=expression CLOSE_BRACKET)+;
+entryReference:
+    ID (OPEN_BRACKET key=expression CLOSE_BRACKET)+ ;
 
 literal:
     STRING #StringLiteral
     | BOOLEAN #BooleanLiteral
     | NUMBER #NumberLiteral
     | array #ArrayLiteral
-    | map #MapLiteral;
-varRef:
-    VARIABLE_OR_FUNCTION_NAME #ReferenceByID
-    | entryRef #EntryReference ;
+    | map #MapLiteral ;
 
-funcCall:
-    VARIABLE_OR_FUNCTION_NAME funcCallArgs ;
-funcCallArgs:
+variableReference:
+    ID #ReferenceByID
+    | entryReference #ReferenceByEntry ;
+
+functionInvoke:
+    ID functionInvokeArgs ;
+functionInvokeArgs:
     OPEN_PAREN (expression (COMMA expression)*)? CLOSE_PAREN ;
 
 // LEXER RULEs
@@ -250,7 +255,7 @@ ELSE: [e][l][s][e] ;
 IN_RANGE: [i][n][ ][r][a][n][g][e] ;
 
 NUMBER: [0-9]+ ;
-VARIABLE_OR_FUNCTION_NAME: [a-zA-Z0-9_]+ ;
+ID: [a-zA-Z0-9_]+ ;
 STRING: DOUBLE_QUOTE_STRING | SINGLE_QUOTE_STRING ;
 DOUBLE_QUOTE_STRING : '"' ( '\\"' | ~('\n'|'\r') )*? '"' ;
 SINGLE_QUOTE_STRING : '\'' ( '\\\'' | ~('\n'|'\r') )*? '\'' ;

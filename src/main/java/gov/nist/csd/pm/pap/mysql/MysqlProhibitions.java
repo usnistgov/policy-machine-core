@@ -34,7 +34,7 @@ public class MysqlProhibitions implements Prohibitions {
         connection.beginTx();
 
         String sql;
-        if (subject.type() == ProhibitionSubject.Type.PROCESS) {
+        if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
             sql =
                     """
                     insert into prohibition (label, process_id, subject_type, access_rights, is_intersection) values (?,?,?,?,?)
@@ -49,8 +49,8 @@ public class MysqlProhibitions implements Prohibitions {
         int prohibitionID;
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, label);
-            ps.setString(2, subject.name());
-            ps.setInt(3, getProhibitionSubjectTypeId(subject.type()));
+            ps.setString(2, subject.getName());
+            ps.setInt(3, getProhibitionSubjectTypeId(subject.getType()));
             ps.setString(4, MysqlPolicyStore.arsetToJson(accessRightSet));
             ps.setBoolean(5, intersection);
 
@@ -163,9 +163,9 @@ public class MysqlProhibitions implements Prohibitions {
 
             Map<String, List<Prohibition>> prohibitionsMap = new HashMap<>();
             for (Prohibition p : prohibitions) {
-                List<Prohibition> subjPros = prohibitionsMap.getOrDefault(p.getSubject().name(), new ArrayList<>());
+                List<Prohibition> subjPros = prohibitionsMap.getOrDefault(p.getSubject().getName(), new ArrayList<>());
                 subjPros.add(p);
-                prohibitionsMap.put(p.getSubject().name(), subjPros);
+                prohibitionsMap.put(p.getSubject().getName(), subjPros);
             }
 
             return prohibitionsMap;

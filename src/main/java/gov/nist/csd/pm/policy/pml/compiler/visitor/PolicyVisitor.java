@@ -19,9 +19,9 @@ public class PolicyVisitor extends PMLBaseVisitor<List<PMLStatement>> {
     @Override
     public List<PMLStatement> visitPml(PMLParser.PmlContext ctx) {
         List<PMLStatement> statements = new ArrayList<>();
-        for (PMLParser.StmtContext stmtCtx : ctx.stmt()) {
+        for (PMLParser.StatementContext stmtCtx : ctx.statement()) {
             StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
-            PMLStatement statement = statementVisitor.visitStmt(stmtCtx);
+            PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
             statements.add(statement);
         }
         return statements;

@@ -17,261 +17,41 @@ public interface PMLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPml(PMLParser.PmlContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#stmt}.
+	 * Visit a parse tree produced by {@link PMLParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStmt(PMLParser.StmtContext ctx);
+	T visitStatement(PMLParser.StatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#varStmt}.
+	 * Visit a parse tree produced by {@link PMLParser#createPolicyStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitVarStmt(PMLParser.VarStmtContext ctx);
+	T visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#funcDefStmt}.
+	 * Visit a parse tree produced by {@link PMLParser#createAttributeStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFuncDefStmt(PMLParser.FuncDefStmtContext ctx);
+	T visitCreateAttributeStatement(PMLParser.CreateAttributeStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#formalArgList}.
+	 * Visit a parse tree produced by {@link PMLParser#createUserOrObjectStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFormalArgList(PMLParser.FormalArgListContext ctx);
+	T visitCreateUserOrObjectStatement(PMLParser.CreateUserOrObjectStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#formalArg}.
+	 * Visit a parse tree produced by {@link PMLParser#createObligationStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFormalArg(PMLParser.FormalArgContext ctx);
+	T visitCreateObligationStatement(PMLParser.CreateObligationStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#formalArgType}.
+	 * Visit a parse tree produced by {@link PMLParser#createRuleStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFormalArgType(PMLParser.FormalArgTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#funcReturnStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFuncReturnStmt(PMLParser.FuncReturnStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code VarReturnType}
-	 * labeled alternative in {@link PMLParser#funcReturnType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVarReturnType(PMLParser.VarReturnTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code VoidReturnType}
-	 * labeled alternative in {@link PMLParser#funcReturnType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVoidReturnType(PMLParser.VoidReturnTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#funcBody}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFuncBody(PMLParser.FuncBodyContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#foreachStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitForeachStmt(PMLParser.ForeachStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#forRangeStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitForRangeStmt(PMLParser.ForRangeStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#breakStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBreakStmt(PMLParser.BreakStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#continueStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitContinueStmt(PMLParser.ContinueStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#funcCallStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFuncCallStmt(PMLParser.FuncCallStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#ifStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIfStmt(PMLParser.IfStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#elseIfStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElseIfStmt(PMLParser.ElseIfStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#elseStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElseStmt(PMLParser.ElseStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code StringType}
-	 * labeled alternative in {@link PMLParser#varType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStringType(PMLParser.StringTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code BooleanType}
-	 * labeled alternative in {@link PMLParser#varType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBooleanType(PMLParser.BooleanTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ArrayVarType}
-	 * labeled alternative in {@link PMLParser#varType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArrayVarType(PMLParser.ArrayVarTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code MapVarType}
-	 * labeled alternative in {@link PMLParser#varType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMapVarType(PMLParser.MapVarTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code AnyType}
-	 * labeled alternative in {@link PMLParser#varType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAnyType(PMLParser.AnyTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#mapType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMapType(PMLParser.MapTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#arrayType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArrayType(PMLParser.ArrayTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#stmtBlock}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStmtBlock(PMLParser.StmtBlockContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code DeleteNode}
-	 * labeled alternative in {@link PMLParser#deleteType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeleteNode(PMLParser.DeleteNodeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code DeleteObligation}
-	 * labeled alternative in {@link PMLParser#deleteType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeleteObligation(PMLParser.DeleteObligationContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code DeleteProhibition}
-	 * labeled alternative in {@link PMLParser#deleteType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeleteProhibition(PMLParser.DeleteProhibitionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#nodeType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNodeType(PMLParser.NodeTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#createPolicyStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreatePolicyStmt(PMLParser.CreatePolicyStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#createAttrStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreateAttrStmt(PMLParser.CreateAttrStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#createUserOrObjectStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreateUserOrObjectStmt(PMLParser.CreateUserOrObjectStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#setNodePropsStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSetNodePropsStmt(PMLParser.SetNodePropsStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#assignStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssignStmt(PMLParser.AssignStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#deassignStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeassignStmt(PMLParser.DeassignStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#associateStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssociateStmt(PMLParser.AssociateStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#dissociateStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDissociateStmt(PMLParser.DissociateStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#deleteStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeleteStmt(PMLParser.DeleteStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#createObligationStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreateObligationStmt(PMLParser.CreateObligationStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#createRuleStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreateRuleStmt(PMLParser.CreateRuleStmtContext ctx);
+	T visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code AnyUserSubject}
 	 * labeled alternative in {@link PMLParser#subjectClause}.
@@ -354,23 +134,17 @@ public interface PMLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitResponseBlock(PMLParser.ResponseBlockContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#responseStmt}.
+	 * Visit a parse tree produced by {@link PMLParser#responseStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitResponseStmt(PMLParser.ResponseStmtContext ctx);
+	T visitResponseStatement(PMLParser.ResponseStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#deleteRuleStmt}.
+	 * Visit a parse tree produced by {@link PMLParser#createProhibitionStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeleteRuleStmt(PMLParser.DeleteRuleStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PMLParser#createProhibitionStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCreateProhibitionStmt(PMLParser.CreateProhibitionStmtContext ctx);
+	T visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PMLParser#prohibitionContainerList}.
 	 * @param ctx the parse tree
@@ -384,11 +158,237 @@ public interface PMLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProhibitionContainerExpression(PMLParser.ProhibitionContainerExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#setResourceAccessRightsStmt}.
+	 * Visit a parse tree produced by {@link PMLParser#setNodePropertiesStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSetResourceAccessRightsStmt(PMLParser.SetResourceAccessRightsStmtContext ctx);
+	T visitSetNodePropertiesStatement(PMLParser.SetNodePropertiesStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#assignStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignStatement(PMLParser.AssignStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#deassignStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeassignStatement(PMLParser.DeassignStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#associateStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssociateStatement(PMLParser.AssociateStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#dissociateStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDissociateStatement(PMLParser.DissociateStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#setResourceAccessRightsStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#deleteStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteStatement(PMLParser.DeleteStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeleteNode}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteNode(PMLParser.DeleteNodeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeleteObligation}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteObligation(PMLParser.DeleteObligationContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeleteProhibition}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteProhibition(PMLParser.DeleteProhibitionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#nodeType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNodeType(PMLParser.NodeTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#deleteRuleStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#variableDeclarationStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableDeclarationStatement(PMLParser.VariableDeclarationStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#functionDefinitionStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#formalArgList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalArgList(PMLParser.FormalArgListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#formalArg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalArg(PMLParser.FormalArgContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#formalArgType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalArgType(PMLParser.FormalArgTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#functionReturnStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionReturnStatement(PMLParser.FunctionReturnStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code VariableReturnType}
+	 * labeled alternative in {@link PMLParser#funcReturnType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableReturnType(PMLParser.VariableReturnTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code VoidReturnType}
+	 * labeled alternative in {@link PMLParser#funcReturnType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVoidReturnType(PMLParser.VoidReturnTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#funcBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFuncBody(PMLParser.FuncBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#foreachStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForeachStatement(PMLParser.ForeachStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#forRangeStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForRangeStatement(PMLParser.ForRangeStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#breakStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBreakStatement(PMLParser.BreakStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#continueStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitContinueStatement(PMLParser.ContinueStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#functionInvokeStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#ifStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfStatement(PMLParser.IfStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#elseIfStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElseIfStatement(PMLParser.ElseIfStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#elseStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElseStatement(PMLParser.ElseStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StringType}
+	 * labeled alternative in {@link PMLParser#variableType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringType(PMLParser.StringTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code BooleanType}
+	 * labeled alternative in {@link PMLParser#variableType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBooleanType(PMLParser.BooleanTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ArrayVarType}
+	 * labeled alternative in {@link PMLParser#variableType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArrayVarType(PMLParser.ArrayVarTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MapVarType}
+	 * labeled alternative in {@link PMLParser#variableType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMapVarType(PMLParser.MapVarTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AnyType}
+	 * labeled alternative in {@link PMLParser#variableType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAnyType(PMLParser.AnyTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#mapType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMapType(PMLParser.MapTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#arrayType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArrayType(PMLParser.ArrayTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PMLParser#statementBlock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatementBlock(PMLParser.StatementBlockContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PMLParser#expression}.
 	 * @param ctx the parse tree
@@ -414,11 +414,11 @@ public interface PMLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMapEntry(PMLParser.MapEntryContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#entryRef}.
+	 * Visit a parse tree produced by {@link PMLParser#entryReference}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEntryRef(PMLParser.EntryRefContext ctx);
+	T visitEntryReference(PMLParser.EntryReferenceContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link PMLParser#literal}.
@@ -456,28 +456,28 @@ public interface PMLVisitor<T> extends ParseTreeVisitor<T> {
 	T visitMapLiteral(PMLParser.MapLiteralContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ReferenceByID}
-	 * labeled alternative in {@link PMLParser#varRef}.
+	 * labeled alternative in {@link PMLParser#variableReference}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitReferenceByID(PMLParser.ReferenceByIDContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code EntryReference}
-	 * labeled alternative in {@link PMLParser#varRef}.
+	 * Visit a parse tree produced by the {@code ReferenceByEntry}
+	 * labeled alternative in {@link PMLParser#variableReference}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEntryReference(PMLParser.EntryReferenceContext ctx);
+	T visitReferenceByEntry(PMLParser.ReferenceByEntryContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#funcCall}.
+	 * Visit a parse tree produced by {@link PMLParser#functionInvoke}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFuncCall(PMLParser.FuncCallContext ctx);
+	T visitFunctionInvoke(PMLParser.FunctionInvokeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#funcCallArgs}.
+	 * Visit a parse tree produced by {@link PMLParser#functionInvokeArgs}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFuncCallArgs(PMLParser.FuncCallArgsContext ctx);
+	T visitFunctionInvokeArgs(PMLParser.FunctionInvokeArgsContext ctx);
 }

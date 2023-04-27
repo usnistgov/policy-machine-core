@@ -96,7 +96,6 @@ public class PolicyEventTest {
                                 new Performs("test_event")
                         ),
                         new Response(
-                                new UserContext(SUPER_USER),
                                 new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                         )
                 )
@@ -112,7 +111,6 @@ public class PolicyEventTest {
                                 new Performs("test_event")
                         ),
                         new Response(
-                                new UserContext(SUPER_USER),
                                 new CreatePolicyStatement(new Expression(new VariableReference("test_pc2", Type.string())))
                         )
                 ));

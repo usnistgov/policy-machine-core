@@ -31,6 +31,9 @@ public class EventSubject implements Serializable {
     private Type type;
     private List<String> subjects;
 
+    public EventSubject() {
+    }
+
     private EventSubject(Type type, List<String> subjects) {
         this.type = type;
         this.subjects = subjects;

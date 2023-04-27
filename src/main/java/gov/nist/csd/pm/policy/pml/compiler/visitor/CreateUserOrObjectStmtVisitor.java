@@ -17,7 +17,7 @@ public class CreateUserOrObjectStmtVisitor extends PMLBaseVisitor<CreateUserOrOb
     }
 
     @Override
-    public CreateUserOrObjectStatement visitCreateUserOrObjectStmt(PMLParser.CreateUserOrObjectStmtContext ctx) {
+    public CreateUserOrObjectStatement visitCreateUserOrObjectStatement(PMLParser.CreateUserOrObjectStatementContext ctx) {
         NodeType type = ctx.OBJECT() != null ?
                 NodeType.O : NodeType.U;
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());

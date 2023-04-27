@@ -79,10 +79,13 @@ public class Node implements Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Node n) {
-            return this.name.equals(n.name);
+        if (!(o instanceof Node n)) {
+            return false;
         }
-        return false;
+
+        return this.name.equals(n.name)
+                && this.type.equals(n.type)
+                && this.properties.equals(n.properties);
     }
 
     @Override

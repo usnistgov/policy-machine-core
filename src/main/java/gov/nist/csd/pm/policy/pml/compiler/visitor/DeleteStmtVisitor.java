@@ -16,7 +16,7 @@ public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
     }
 
     @Override
-    public DeleteStatement visitDeleteStmt(PMLParser.DeleteStmtContext ctx) {
+    public DeleteStatement visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
         Expression nameExpr = Expression.compile(visitorCtx, ctx.expression(), Type.string());
 
         PMLParser.DeleteTypeContext deleteTypeCtx = ctx.deleteType();

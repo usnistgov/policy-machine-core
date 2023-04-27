@@ -157,8 +157,8 @@ public class CreateProhibitionStatement extends PMLStatement {
 
         return new CreateProhibitionStatement(
                 new Expression(new Literal(prohibition.getLabel())),
-                new Expression(new Literal(prohibition.getSubject().name())),
-                prohibition.getSubject().type(),
+                new Expression(new Literal(prohibition.getSubject().getName())),
+                prohibition.getSubject().getType(),
                 new Expression(new Literal(arrayLiteral)),
                 prohibition.isIntersection(),
                 containers

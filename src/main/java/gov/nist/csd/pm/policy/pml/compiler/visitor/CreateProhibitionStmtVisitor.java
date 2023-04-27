@@ -20,7 +20,7 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
     }
 
     @Override
-    public CreateProhibitionStatement visitCreateProhibitionStmt(PMLParser.CreateProhibitionStmtContext ctx) {
+    public CreateProhibitionStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
         Expression label = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
         ProhibitionSubject.Type type;

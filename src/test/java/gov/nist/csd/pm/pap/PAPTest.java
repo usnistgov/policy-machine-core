@@ -4,6 +4,7 @@ import gov.nist.csd.pm.SamplePolicy;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.mysql.MysqlPolicyStore;
 import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
+import gov.nist.csd.pm.policy.PolicyEquals;
 import gov.nist.csd.pm.policy.pml.model.expression.*;
 import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.exceptions.*;
@@ -28,8 +29,6 @@ import gov.nist.csd.pm.policy.pml.statement.CreateAttrStatement;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
-import gov.nist.csd.pm.policy.serializer.PMLSerializer;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -41,6 +40,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
+import static gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement.args;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PAPTest {
@@ -361,7 +361,7 @@ class PAPTest {
                                         EventSubject.anyUserWithAttribute("ua1"),
                                         new Performs("event1")
                                 ),
-                                new Response(new UserContext(""))
+                                new Response()
                         ),
                         new Rule(
                                 "rule1",
@@ -369,7 +369,7 @@ class PAPTest {
                                         EventSubject.users("ua1"),
                                         new Performs("event1")
                                 ),
-                                new Response(new UserContext(""))
+                                new Response()
                         )
                 );
 
@@ -926,7 +926,7 @@ class PAPTest {
 
                 Prohibition p = pap.prohibitions().getProhibition("label");
                 assertEquals("label", p.getLabel());
-                assertEquals("subject", p.getSubject().name());
+                assertEquals("subject", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                 assertTrue(p.isIntersection());
                 assertEquals(2, p.getContainers().size());
@@ -1009,7 +1009,7 @@ class PAPTest {
 
                 Prohibition p = pap.prohibitions().getProhibition("label");
                 assertEquals("label", p.getLabel());
-                assertEquals("subject2", p.getSubject().name());
+                assertEquals("subject2", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read", "write"), p.getAccessRightSet());
                 assertTrue(p.isIntersection());
                 assertEquals(2, p.getContainers().size());
@@ -1078,7 +1078,7 @@ class PAPTest {
             for (Prohibition p : prohibitions) {
                 if (p.getLabel().equals("label1")) {
                     assertEquals("label1", p.getLabel());
-                    assertEquals("subject", p.getSubject().name());
+                    assertEquals("subject", p.getSubject().getName());
                     assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                     assertTrue(p.isIntersection());
                     assertEquals(2, p.getContainers().size());
@@ -1088,7 +1088,7 @@ class PAPTest {
                     ), p.getContainers());
                 } else if (p.getLabel().equals("label2")) {
                     assertEquals("label2", p.getLabel());
-                    assertEquals("subject", p.getSubject().name());
+                    assertEquals("subject", p.getSubject().getName());
                     assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                     assertTrue(p.isIntersection());
                     assertEquals(2, p.getContainers().size());
@@ -1149,7 +1149,7 @@ class PAPTest {
 
                 Prohibition p = pap.prohibitions().getProhibition("label1");
                 assertEquals("label1", p.getLabel());
-                assertEquals("subject", p.getSubject().name());
+                assertEquals("subject", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                 assertTrue(p.isIntersection());
                 assertEquals(2, p.getContainers().size());
@@ -1175,7 +1175,6 @@ class PAPTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
-                                        new UserContext(SUPER_USER),
                                         new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
@@ -1193,7 +1192,6 @@ class PAPTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
-                                        new UserContext(SUPER_USER),
                                         new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
@@ -1205,7 +1203,6 @@ class PAPTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
-                                        new UserContext(SUPER_USER),
                                         new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
                                 )
                         )
@@ -1238,7 +1235,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1252,7 +1249,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                 });
@@ -1272,7 +1269,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyOfSet("oa1")
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1286,7 +1283,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.policyElement("oa1")
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1300,7 +1297,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyContainedIn("oa1")
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                 });
@@ -1350,7 +1347,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1364,7 +1361,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyPolicyElement()
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                 });
@@ -1386,7 +1383,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyOfSet("oa1")
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1400,7 +1397,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.policyElement("oa1")
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
@@ -1414,7 +1411,7 @@ class PAPTest {
                                                     Performs.events("test_event"),
                                                     Target.anyContainedIn("oa1")
                                             ),
-                                            new Response(new UserContext(SUPER_USER))
+                                            new Response()
                                     )
                             ));
                 });
@@ -1693,8 +1690,14 @@ class PAPTest {
                     }
                 }
             }
+            const testConst = "hello world"
+            function testFunc() void {
+                create pc "pc1"
+            }
             """;
     private static final String expected = """
+            const testConst = 'hello world'
+            function testFunc() void {create policy class 'pc1'}
             set resource access rights ['read', 'write', 'execute']
             create policy class 'super_policy'
             create user attribute 'super_ua' in ['super_policy']
@@ -1720,13 +1723,19 @@ class PAPTest {
     @Test
     void testSerialize() throws PMException {
         runTest(pap -> {
-            pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
-            String actual = pap.toString(new PMLSerializer(false));
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
+            String actual = pap.serialize().toPML();
             assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
 
-            pap.fromString(actual, new PMLDeserializer(new UserContext(SUPER_USER)));
-            actual = pap.toString(new PMLSerializer(false));
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), actual);
+            actual = pap.serialize().toPML();
             assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
+
+            String json = pap.serialize().toJSON();
+            MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+            memoryPolicyStore.deserialize().fromJSON(json);
+            pap.deserialize().fromJSON(json);
+            PolicyEquals.check(pap, memoryPolicyStore);
         });
     }
 
@@ -1787,7 +1796,7 @@ class PAPTest {
                         create object name in ['oa1']
                     }
                     """;
-            pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
 
             List<String> children = pap.graph().getChildren("oa1");
             pap.graph().assignAll(children, "oa2");
@@ -1799,7 +1808,7 @@ class PAPTest {
             });
 
             // reset policy
-            pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
 
             // test with illegal assignment
             children.add("ua1");
@@ -1841,7 +1850,7 @@ class PAPTest {
                         assign name to ['oa2']
                     }
                     """;
-            pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
 
             List<String> toDelete = new ArrayList<>(List.of("o1", "o2", "o3", "o4", "o5"));
             pap.graph().deassignAll(toDelete, "oa1");
@@ -1880,7 +1889,7 @@ class PAPTest {
                         assign name to ['oa2']
                     }
                     """;
-            pap.fromString(pml, new PMLDeserializer(new UserContext(SUPER_USER)));
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
 
             assertThrows(PMException.class, () -> {
                 pap.graph().deassignAllFromAndDelete("oa1");

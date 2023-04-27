@@ -21,7 +21,7 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
     }
 
     @Override
-    public ForeachStatement visitForeachStmt(PMLParser.ForeachStmtContext ctx) {
+    public ForeachStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
         Type anyArrayType = Type.array(Type.any());
         Type anyMapType = Type.map(Type.any(), Type.any());
 
@@ -57,7 +57,7 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
         }
 
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        for (PMLParser.StmtContext stmtCtx : ctx.stmtBlock().stmt()) {
+        for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
             try {
                 localVisitorCtx.scope().addVariable(varName, keyType, false);
                 if (valueType != null) {
@@ -68,7 +68,7 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
             }
 
             PMLStatement statement = new StatementVisitor(localVisitorCtx)
-                    .visitStmt(stmtCtx);
+                    .visitStatement(stmtCtx);
             block.add(statement);
 
             visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());

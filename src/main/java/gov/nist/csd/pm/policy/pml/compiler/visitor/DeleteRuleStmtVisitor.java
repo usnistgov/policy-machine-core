@@ -16,7 +16,7 @@ public class DeleteRuleStmtVisitor extends PMLBaseVisitor<DeleteRuleStatement> {
     }
 
     @Override
-    public DeleteRuleStatement visitDeleteRuleStmt(PMLParser.DeleteRuleStmtContext ctx) {
+    public DeleteRuleStatement visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
         Expression ruleNameExpr = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
         Expression oblNameExpr = Expression.compile(visitorCtx, ctx.obligationName, Type.string());
         return new DeleteRuleStatement(ruleNameExpr, oblNameExpr);

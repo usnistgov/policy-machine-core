@@ -1,39 +1,18 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.pml.PMLContext;
+import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLExecutable;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.events.*;
-import gov.nist.csd.pm.policy.exceptions.*;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
-import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.model.graph.nodes.Node;
-import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.model.graph.relationships.Assignment;
-import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-import gov.nist.csd.pm.policy.model.obligation.Obligation;
-import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
-import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
-import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.pcRepObjectAttribute;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
-
-public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter, Transactional, PolicySerializable, PMLExecutable, Policy {
+public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter, Transactional, PMLExecutable, Policy {
 
     protected PolicyStore policyStore;
 
@@ -74,6 +53,16 @@ public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter,
     @Override
     public UserDefinedPML userDefinedPML() {
         return papUserDefinedPML;
+    }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return policyStore.serialize();
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return new PAPDeserializer(policyStore);
     }
 
     @Override
@@ -128,34 +117,6 @@ public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter,
         policyStore.rollback();
 
         emitEvent(new RollbackTxEvent(this));
-    }
-
-    @Override
-    public synchronized String toString(PolicySerializer policySerializer) throws PMException {
-        return policySerializer.serialize(this);
-    }
-
-    @Override
-    public synchronized void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        beginTx();
-
-        // reset policy store
-        policyStore.reset();
-
-        // verify super policy
-        SuperPolicy.verifySuperPolicy(this.policyStore);
-
-        // commit the reset and super policy verification so if the deserialization errors,
-        // the super policy will not be reverted
-        commit();
-
-        // start a new tx to deserialize policy
-        beginTx();
-
-        // deserialize using deserializer
-        policyDeserializer.deserialize(this, s);
-
-        commit();
     }
 
     @Override

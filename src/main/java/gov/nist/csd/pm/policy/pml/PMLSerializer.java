@@ -1,9 +1,7 @@
-package gov.nist.csd.pm.policy.serializer;
+package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.pml.PMLFormatter;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -12,6 +10,8 @@ import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.pml.model.expression.*;
 import gov.nist.csd.pm.policy.pml.statement.*;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 
 import java.util.*;
 
@@ -19,18 +19,21 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAcces
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 
-public class PMLSerializer implements PolicySerializer {
+public class PMLSerializer implements PMLSerializable {
 
-    private boolean format;
+    private final Policy policy;
 
-    public PMLSerializer(boolean format) {
-        this.format = format;
+    public PMLSerializer(Policy policy) {
+        this.policy = policy;
     }
 
-    private final String SEMI_COLON = ";";
+    @Override
+    public void fromPML(UserContext author, String input, FunctionDefinitionStatement... customFunctions) throws PMException {
+        PMLExecutor.compileAndExecutePML(policy, author, input, customFunctions);
+    }
 
     @Override
-    public String serialize(Policy policy) throws PMException {
+    public String toPML(boolean format) throws PMException {
         String pml = toPML(policy);
         if (format) {
             pml = PMLFormatter.format(pml);
@@ -38,7 +41,7 @@ public class PMLSerializer implements PolicySerializer {
 
         return pml;
     }
-    
+
     private String toPML(Policy policy) throws PMException {
         String pml = "";
         String constants = serializeConstants(policy);
@@ -104,7 +107,7 @@ public class PMLSerializer implements PolicySerializer {
         StringBuilder pml = new StringBuilder();
 
         // resource access rights
-       ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
+        ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
         for (String ar : policy.graph().getResourceAccessRights()) {
             arrayLiteral.add(new Expression(new Literal(ar)));
         }
@@ -237,11 +240,15 @@ public class PMLSerializer implements PolicySerializer {
         StringBuilder pml = new StringBuilder();
         Map<String, FunctionDefinitionStatement> functions = policy.userDefinedPML().getFunctions();
         for (FunctionDefinitionStatement func : functions.values()) {
+            if (func.isFunctionExecutor()) {
+                continue;
+            }
+
             if (!pml.isEmpty()) {
                 pml.append("\n");
             }
 
-            pml.append(func.toString());
+            pml.append(func);
         }
 
         return pml.toString();
@@ -255,7 +262,7 @@ public class PMLSerializer implements PolicySerializer {
                 pml.append("\n");
             }
 
-            pml.append(serializeConstant(c.getKey(), c.getValue())).append(SEMI_COLON);
+            pml.append(serializeConstant(c.getKey(), c.getValue()));
         }
         return pml.toString();
     }

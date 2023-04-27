@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
+import com.google.gson.Gson;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -7,6 +8,7 @@ import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
@@ -14,7 +16,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.U;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-class MemoryGraph implements Graph {
+class MemoryGraph implements Graph, Serializable {
 
     private final Map<String, Vertex> graph;
     private final AccessRightSet resourceAccessRights;
@@ -181,7 +183,7 @@ class MemoryGraph implements Graph {
     }
 
     @Override
-    public synchronized void setNodeProperties(String name, Map<String, String> properties) {
+    public synchronized void setNodeProperties(String name, Map<String, String> properties) throws PMException {
         if (tx.active()) {
             tx.policyStore().setNodeProperties(name, properties);
         }
@@ -248,7 +250,7 @@ class MemoryGraph implements Graph {
     }
 
     @Override
-    public synchronized void deleteNode(String name) {
+    public synchronized void deleteNode(String name) throws PMException {
         if (!graph.containsKey(name)) {
             return;
         }
@@ -375,7 +377,7 @@ class MemoryGraph implements Graph {
     }
 
     @Override
-    public synchronized void dissociate(String ua, String target) {
+    public synchronized void dissociate(String ua, String target) throws PMException {
         if (tx.active()) {
             tx.policyStore().dissociate(ua, target);
         }

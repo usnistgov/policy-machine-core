@@ -16,7 +16,7 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStmt
     }
 
     @Override
-    public FunctionReturnStmt visitFuncReturnStmt(PMLParser.FuncReturnStmtContext ctx) {
+    public FunctionReturnStmt visitFunctionReturnStatement(PMLParser.FunctionReturnStatementContext ctx) {
         // check that the return statement is inside a function
         if (!inFunction(ctx)) {
             visitorCtx.errorLog().addError(
@@ -35,7 +35,7 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStmt
     }
 
     private boolean inFunction(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.FuncDefStmtContext) {
+        if (ctx instanceof PMLParser.FunctionDefinitionStatementContext) {
             return true;
         } else if (ctx == null) {
             return false;

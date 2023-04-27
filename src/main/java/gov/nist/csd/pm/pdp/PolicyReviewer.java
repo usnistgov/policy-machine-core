@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.model.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.policy.model.graph.dag.UserDagResult;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -10,7 +9,6 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import java.util.*;
 
 import gov.nist.csd.pm.policy.review.PolicyReview;
-import gov.nist.csd.pm.policy.tx.Transactional;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 

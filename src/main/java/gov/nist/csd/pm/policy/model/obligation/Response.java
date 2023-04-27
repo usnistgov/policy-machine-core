@@ -9,42 +9,50 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.epp.EventContext;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Response implements Serializable {
 
-    private final ExecutionContext executionCtx;
-    private final List<PMLStatement> stmts;
-    private final String eventCtxVariable;
-    public Response(String eventCtxVariable, ExecutionContext executionCtx, List<PMLStatement> stmts) {
+    private List<PMLStatement> stmts;
+    private String eventCtxVariable;
+
+    public Response() {
+        stmts = new ArrayList<>();
+        eventCtxVariable = "";
+    }
+
+    public Response(String eventCtxVariable, List<PMLStatement> stmts) {
         this.eventCtxVariable = eventCtxVariable;
-        this.executionCtx = executionCtx;
         this.stmts = stmts;
     }
 
-    public Response(String eventNameVariable, String eventCtxVariable, ExecutionContext executionCtx, PMLStatement... stmts) {
+    public Response(String eventCtxVariable, PMLStatement... stmts) {
         this.eventCtxVariable = eventCtxVariable;
-        this.executionCtx = executionCtx;
         this.stmts = List.of(stmts);
     }
 
-    public Response(UserContext author, PMLStatement... stmts) {
+    public Response(PMLStatement... stmts) {
         this.eventCtxVariable = "";
-        this.executionCtx = new ExecutionContext(author);
-        this.stmts = List.of(stmts);
-    }
-
-    public Response(UserContext author, String eventNameVariable, String eventCtxVariable, PMLStatement... stmts) {
-        this.eventCtxVariable = eventCtxVariable;
-        this.executionCtx = new ExecutionContext(author);
         this.stmts = List.of(stmts);
     }
 
     public Response(Response response) {
         this.eventCtxVariable = response.eventCtxVariable;
-        this.executionCtx = response.executionCtx;
         this.stmts = response.stmts;
+    }
+
+    public List<PMLStatement> getStmts() {
+        return stmts;
+    }
+
+    public void setStmts(List<PMLStatement> stmts) {
+        this.stmts = stmts;
+    }
+
+    public void setEventCtxVariable(String eventCtxVariable) {
+        this.eventCtxVariable = eventCtxVariable;
     }
 
     public String getEventCtxVariable() {
@@ -55,11 +63,8 @@ public class Response implements Serializable {
         return stmts;
     }
 
-    public ExecutionContext getExecutionCtx() {
-        return executionCtx;
-    }
-
     public Value execute(Policy policyAuthor, EventContext eventCtx) throws PMException {
+        ExecutionContext executionCtx = new ExecutionContext(eventCtx.getUserCtx());
         executionCtx.scope().putValue(eventCtxVariable, Value.objectToValue(eventCtx));
 
         for (PMLStatement stmt : stmts) {
@@ -74,11 +79,11 @@ public class Response implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Response response = (Response) o;
-        return Objects.equals(executionCtx, response.executionCtx) && Objects.equals(stmts, response.stmts);
+        return Objects.equals(stmts, response.stmts);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(executionCtx, stmts);
+        return Objects.hash(stmts);
     }
 }

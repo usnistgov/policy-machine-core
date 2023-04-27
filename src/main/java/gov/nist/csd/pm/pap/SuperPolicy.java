@@ -94,6 +94,12 @@ public class SuperPolicy {
                     continue;
                 }
 
+                String repOAName = pcRepObjectAttribute(pc);
+
+                if (!store.graph().nodeExists(repOAName)) {
+                    store.graph().createObjectAttribute(repOAName, SUPER_OA);
+                }
+
                 List<String> children = store.graph().getChildren(pc);
                 for (String child : children) {
                     store.graph().associate(SUPER_UA, child, allAccessRights());

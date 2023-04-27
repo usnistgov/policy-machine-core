@@ -17,7 +17,7 @@ public class CreateAttrStmtVisitor extends PMLBaseVisitor<CreateAttrStatement> {
     }
 
     @Override
-    public CreateAttrStatement visitCreateAttrStmt(PMLParser.CreateAttrStmtContext ctx) {
+    public CreateAttrStatement visitCreateAttributeStatement(PMLParser.CreateAttributeStatementContext ctx) {
         NodeType type = ctx.OBJECT_ATTRIBUTE() != null ?
                 NodeType.OA : NodeType.UA;
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());

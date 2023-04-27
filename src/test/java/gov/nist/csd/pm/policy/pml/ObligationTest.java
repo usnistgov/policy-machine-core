@@ -13,7 +13,6 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.pml.model.expression.*;
 import gov.nist.csd.pm.policy.pml.statement.*;
-import gov.nist.csd.pm.policy.serializer.PMLDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public class ObligationTest {
                     }
                 }
                 """;
-        pap.fromString(input, new PMLDeserializer(new UserContext(SUPER_USER)));
+        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
 
         Obligation obligation1 = pap.obligations().getObligation("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
@@ -60,7 +59,7 @@ public class ObligationTest {
                 EventSubject.anyUser(),
                 Performs.events("test_event"),
                 Target.policyElement("oa1")
-        ), rule.getEvent());
+        ), rule.getEventPattern());
         assertEquals(2, rule.getResponse().getStatements().size());
     }
 
@@ -90,7 +89,7 @@ public class ObligationTest {
 
         UserContext userCtx = new UserContext(SUPER_USER);
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.fromString(pml, new PMLDeserializer(userCtx));
+        pap.deserialize().fromPML(userCtx, pml);
 
         assertEquals(1, pap.obligations().getObligations().size());
         Obligation actual = pap.obligations().getObligation("test");
@@ -101,7 +100,7 @@ public class ObligationTest {
         Rule rule = actual.getRules().get(0);
         assertEquals("rule1", rule.getLabel());
 
-        EventPattern event = rule.getEvent();
+        EventPattern event = rule.getEventPattern();
         assertEquals(EventSubject.anyUser(), event.getSubject());
         assertTrue(event.getOperations().contains("create_object_attribute"));
         assertEquals(Target.policyElement("oa1"), event.getTarget());

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
+import com.google.gson.Gson;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.exceptions.ObligationDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -7,11 +8,12 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class MemoryObligations implements Obligations {
+class MemoryObligations implements Obligations, Serializable {
 
     protected MemoryTx tx;
     private List<Obligation> obligations;
@@ -89,5 +91,9 @@ class MemoryObligations implements Obligations {
         }
 
         throw new ObligationDoesNotExistException(label);
+    }
+
+    public void fromJson(String json) {
+        this.obligations = new Gson().fromJson(json, List.class);
     }
 }

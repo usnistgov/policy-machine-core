@@ -858,7 +858,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         for (Obligation obligation : policy.obligations().getObligations()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
-                Target target = rule.getEvent().getTarget();
+                Target target = rule.getEventPattern().getTarget();
                 if (target.getType() == Target.Type.POLICY_ELEMENT) {
                     if (target.policyElement().equals(attribute)) {
                         obls.add(obligation);
@@ -906,7 +906,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         for (Obligation obligation : policy.obligations().getObligations()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
-                if (rule.getEvent().getOperations().contains(event)) {
+                if (rule.getEventPattern().getOperations().contains(event)) {
                     obls.add(obligation);
                 }
             }
@@ -919,7 +919,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         List<Response> responses = new ArrayList<>();
         for (Obligation obligation : policy.obligations().getObligations()) {
             for (Rule rule : obligation.getRules()) {
-                if (evt.matchesPattern(rule.getEvent(), this)) {
+                if (evt.matchesPattern(rule.getEventPattern(), this)) {
                     responses.add(rule.getResponse());
                 }
             }
