@@ -2,9 +2,10 @@ package gov.nist.csd.pm.policy.pml.compiler;
 
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public record Variable(String name, Type type, boolean isConst) {
+public record Variable(String name, Type type, boolean isConst) implements Serializable {
 
     @Override
     public boolean equals(Object o) {

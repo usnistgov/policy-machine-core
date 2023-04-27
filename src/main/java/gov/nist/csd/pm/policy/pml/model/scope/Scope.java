@@ -23,15 +23,13 @@ public class Scope implements Serializable {
 
     /**
      * The variables accessible in the scope.
-     *
-     * Only used if mode is COMPILE
+     * Only used if mode is COMPILE.
      */
     private Map<String, Variable> variables;
 
     /**
      * The values accessible in the scope.
-     *
-     * Only used if mode is EXECUTE
+     * Only used if mode is EXECUTE.
      */
     private final Map<String, Value> values;
 
