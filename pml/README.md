@@ -208,6 +208,9 @@ on union of ["oa1", "oa2"]
 ```
 
 ### Create Obligation
+An obligation response context `ctx` holds information pertaining to the event that triggered the response. The ctx variable
+is of type `map[string]any`.
+
 ```pml
 create obligation 'obl1' {
   create rule 'rule1'
@@ -215,7 +218,7 @@ create obligation 'obl1' {
   performs ["assign", assign_to"]
   on "oa1"
   do(ctx) {
-    # PML statements
+    # response defined in PML
     # ctx will have event information depending on the event that triggers this response
     # ctx could be an "assign" event or "assign_to" event
   }
