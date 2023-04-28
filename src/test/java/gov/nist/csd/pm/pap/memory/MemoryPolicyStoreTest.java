@@ -111,14 +111,14 @@ class MemoryPolicyStoreTest {
         memoryPolicyStore.graph().createPolicyClass("pc1", null);
         memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
         memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        Map<String, List<Prohibition>> prohibitions = memoryPolicyStore.prohibitions().getProhibitions();
+        memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
+        Map<String, List<Prohibition>> prohibitions = memoryPolicyStore.prohibitions().getAll();
         prohibitions.clear();
-        assertEquals(1, memoryPolicyStore.prohibitions().getProhibitions().size());
-        prohibitions = memoryPolicyStore.prohibitions().getProhibitions();
+        assertEquals(1, memoryPolicyStore.prohibitions().getAll().size());
+        prohibitions = memoryPolicyStore.prohibitions().getAll();
         Prohibition p = prohibitions.get("ua1").get(0);
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().getProhibitionsWithSubject("ua1").get(0);
+        Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
         assertEquals("ua1", actual.getSubject().getName());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
@@ -133,14 +133,14 @@ class MemoryPolicyStoreTest {
         memoryPolicyStore.graph().createPolicyClass("pc1", null);
         memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
         memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        List<Prohibition> prohibitions = memoryPolicyStore.prohibitions().getProhibitionsWithSubject("ua1");
+        memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
+        List<Prohibition> prohibitions = memoryPolicyStore.prohibitions().getWithSubject("ua1");
         prohibitions.clear();
-        assertEquals(1, memoryPolicyStore.prohibitions().getProhibitions().size());
-        prohibitions = memoryPolicyStore.prohibitions().getProhibitionsWithSubject("ua1");
+        assertEquals(1, memoryPolicyStore.prohibitions().getAll().size());
+        prohibitions = memoryPolicyStore.prohibitions().getWithSubject("ua1");
         Prohibition p = prohibitions.get(0);
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().getProhibitionsWithSubject("ua1").get(0);
+        Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
         assertEquals("ua1", actual.getSubject().getName());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
@@ -155,10 +155,10 @@ class MemoryPolicyStoreTest {
         memoryPolicyStore.graph().createPolicyClass("pc1", null);
         memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
         memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        Prohibition p = memoryPolicyStore.prohibitions().getProhibition("label");
+        memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
+        Prohibition p = memoryPolicyStore.prohibitions().get("label");
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().getProhibition("label");
+        Prohibition actual = memoryPolicyStore.prohibitions().get("label");
         assertEquals("label", actual.getLabel());
         assertEquals("ua1", actual.getSubject().getName());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
@@ -170,7 +170,7 @@ class MemoryPolicyStoreTest {
 
     @Test
     void getObligations() throws PMException {
-        memoryPolicyStore.obligations().createObligation(
+        memoryPolicyStore.obligations().create(
                 new UserContext("test"),
                 "label",
                 new Rule(
@@ -184,9 +184,9 @@ class MemoryPolicyStoreTest {
                         )
                 )
         );
-        List<Obligation> obligations = memoryPolicyStore.obligations().getObligations();
+        List<Obligation> obligations = memoryPolicyStore.obligations().getAll();
         obligations.clear();
-        assertEquals(1, memoryPolicyStore.obligations().getObligations().size());
+        assertEquals(1, memoryPolicyStore.obligations().getAll().size());
     }
 
     @Test
@@ -202,13 +202,13 @@ class MemoryPolicyStoreTest {
                 )
         );
 
-        memoryPolicyStore.obligations().createObligation(
+        memoryPolicyStore.obligations().create(
                 new UserContext("test"),
                 "label",
                 rule1
         );
 
-        Obligation obligation = memoryPolicyStore.obligations().getObligation("label");
+        Obligation obligation = memoryPolicyStore.obligations().get("label");
         assertEquals("label", obligation.getLabel());
         assertEquals(new UserContext("test"), obligation.getAuthor());
         assertEquals(1, obligation.getRules().size());

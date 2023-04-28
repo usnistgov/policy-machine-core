@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.policy;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -55,15 +54,15 @@ public class PolicyEquals {
         }
 
         // check prohibitions
-        Map<String, List<Prohibition>> aProhibitions = a.prohibitions().getProhibitions();
-        Map<String, List<Prohibition>> bProhibitions = a.prohibitions().getProhibitions();
+        Map<String, List<Prohibition>> aProhibitions = a.prohibitions().getAll();
+        Map<String, List<Prohibition>> bProhibitions = a.prohibitions().getAll();
 
         assertTrue(aProhibitions.keySet().containsAll(bProhibitions.keySet()));
         assertTrue(aProhibitions.values().containsAll(bProhibitions.values()));
 
         // check obligations
-        List<Obligation> aObligations = a.obligations().getObligations();
-        List<Obligation> bObligations = b.obligations().getObligations();
+        List<Obligation> aObligations = a.obligations().getAll();
+        List<Obligation> bObligations = b.obligations().getAll();
 
         assertTrue(aObligations.containsAll(bObligations));
         assertTrue(bObligations.containsAll(aObligations));

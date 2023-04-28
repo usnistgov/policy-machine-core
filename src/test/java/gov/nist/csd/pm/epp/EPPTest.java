@@ -21,7 +21,6 @@ import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.pml.PMLSerializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -115,7 +114,7 @@ class EPPTest {
         });
 
         pdp.runTx(new UserContext("u1"), (policy) -> {
-            policy.obligations().createObligation(new UserContext("u1"), "test",
+            policy.obligations().create(new UserContext("u1"), "test",
                     new Rule("rule1",
                             new EventPattern(EventSubject.anyUser(), events(CREATE_OBJECT_ATTRIBUTE)),
                             new Response(new UserContext("u1"),

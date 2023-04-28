@@ -241,7 +241,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     private void checkIfNodeInProhibition(String name) throws PMException {
-        Map<String, List<Prohibition>> prohibitions = policyStore.prohibitions().getProhibitions();
+        Map<String, List<Prohibition>> prohibitions = policyStore.prohibitions().getAll();
         for (List<Prohibition> subjPros : prohibitions.values()) {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(name, p)) {
@@ -266,7 +266,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     private void checkIfNodeInObligation(String name) throws PMException {
-        List<Obligation> obligations = policyStore.obligations().getObligations();
+        List<Obligation> obligations = policyStore.obligations().getAll();
         for (Obligation obligation : obligations) {
             // if the node is the author of the obligation or referenced in any rules throw an exception
             if (obligation.getAuthor().getUser().equals(name)

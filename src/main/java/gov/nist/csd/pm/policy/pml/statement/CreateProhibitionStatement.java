@@ -79,7 +79,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         }
 
 
-        policy.prohibitions().createProhibition(
+        policy.prohibitions().create(
                 labelValue.getStringValue(),
                 new ProhibitionSubject(subjectValue.getStringValue(), subjectType),
                 ops,

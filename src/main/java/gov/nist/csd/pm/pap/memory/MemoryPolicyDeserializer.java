@@ -2,12 +2,8 @@ package gov.nist.csd.pm.pap.memory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
-import gov.nist.csd.pm.policy.Prohibitions;
-import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.json.JSONGraph;
 import gov.nist.csd.pm.policy.json.JSONPolicy;
@@ -20,12 +16,10 @@ import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.pml.PMLSerializer;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +70,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
             Obligation obligation = SerializationUtils.deserialize(b);
 
             List<Rule> rules = obligation.getRules();
-            memoryPolicyStore.obligations().createObligation(
+            memoryPolicyStore.obligations().create(
                     obligation.getAuthor(),
                     obligation.getLabel(),
                     rules.toArray(new Rule[]{})
@@ -91,7 +85,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
         for (byte[] b : list) {
             Prohibition prohibition = SerializationUtils.deserialize(b);
 
-            memoryPolicyStore.prohibitions().createProhibition(
+            memoryPolicyStore.prohibitions().create(
                     prohibition.getLabel(),
                     prohibition.getSubject(),
                     prohibition.getAccessRightSet(),

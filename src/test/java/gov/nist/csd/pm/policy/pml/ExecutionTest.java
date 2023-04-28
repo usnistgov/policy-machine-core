@@ -447,7 +447,7 @@ public class ExecutionTest {
                 delete prohibition 'p1'
                 """;
         pap.executePML(superUser, input);
-        assertFalse(pap.prohibitions().getProhibitions().containsKey("p1"));
+        assertFalse(pap.prohibitions().getAll().containsKey("p1"));
     }
 
     @Test

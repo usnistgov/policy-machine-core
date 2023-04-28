@@ -30,7 +30,7 @@ public class ProhibitionsAdjudicator implements Prohibitions {
     }
 
     @Override
-    public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
             accessRightChecker.check(userCtx, SUPER_PC_REP, CREATE_PROCESS_PROHIBITION);
         } else {
@@ -50,13 +50,13 @@ public class ProhibitionsAdjudicator implements Prohibitions {
     }
 
     @Override
-    public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        createProhibition(label, subject, accessRightSet, intersection, containerConditions);
+    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        create(label, subject, accessRightSet, intersection, containerConditions);
     }
 
     @Override
-    public void deleteProhibition(String label) throws PMException {
-        Prohibition prohibition = pap.prohibitions().getProhibition(label);
+    public void delete(String label) throws PMException {
+        Prohibition prohibition = pap.prohibitions().get(label);
 
         // check that the user can create a prohibition for the subject
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
@@ -77,8 +77,8 @@ public class ProhibitionsAdjudicator implements Prohibitions {
     }
 
     @Override
-    public Map<String, List<Prohibition>> getProhibitions() throws PMException {
-        Map<String, List<Prohibition>> prohibitions = pap.prohibitions().getProhibitions();
+    public Map<String, List<Prohibition>> getAll() throws PMException {
+        Map<String, List<Prohibition>> prohibitions = pap.prohibitions().getAll();
         Map<String, List<Prohibition>> retProhibitions = new HashMap<>();
         for (String subject : prohibitions.keySet()) {
             List<Prohibition> subjectPros = filterProhibitions(prohibitions.get(subject));
@@ -89,14 +89,14 @@ public class ProhibitionsAdjudicator implements Prohibitions {
     }
 
     @Override
-    public boolean prohibitionExists(String label) throws PMException {
-        boolean exists = pap.prohibitions().prohibitionExists(label);
+    public boolean exists(String label) throws PMException {
+        boolean exists = pap.prohibitions().exists(label);
         if (!exists) {
             return false;
         }
 
         try {
-            getProhibition(label);
+            get(label);
         } catch (UnauthorizedException e) {
             return false;
         }
@@ -106,13 +106,13 @@ public class ProhibitionsAdjudicator implements Prohibitions {
     }
 
     @Override
-    public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
-        return filterProhibitions(pap.prohibitions().getProhibitionsWithSubject(subject));
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
+        return filterProhibitions(pap.prohibitions().getWithSubject(subject));
     }
 
     @Override
-    public Prohibition getProhibition(String label) throws PMException {
-        Prohibition prohibition = pap.prohibitions().getProhibition(label);
+    public Prohibition get(String label) throws PMException {
+        Prohibition prohibition = pap.prohibitions().get(label);
 
         // check user has access to subject prohibitions
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {

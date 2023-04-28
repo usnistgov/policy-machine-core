@@ -273,8 +273,8 @@ class CompileTest {
         PMLStatement stmt = test.get(0);
         stmt.execute(ctx, pap);
 
-        assertEquals(1, pap.obligations().getObligations().size());
-        Obligation actual = pap.obligations().getObligation("test");
+        assertEquals(1, pap.obligations().getAll().size());
+        Obligation actual = pap.obligations().get("test");
         assertEquals(1, actual.getRules().size());
         assertEquals("test", actual.getLabel());
         assertEquals(userCtx, actual.getAuthor());

@@ -28,14 +28,14 @@ class MemoryProhibitions implements Prohibitions, Serializable {
     }
 
     public MemoryProhibitions(Prohibitions prohibitions) throws PMException {
-        this.prohibitions = prohibitions.getProhibitions();
+        this.prohibitions = prohibitions.getAll();
         this.tx = new MemoryTx(false, 0, null);
     }
 
     @Override
-    public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
+    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (tx.active()) {
-            tx.policyStore().createProhibition(label, subject, accessRightSet, intersection, containerConditions);
+            tx.policyStore().prohibitions().create(label, subject, accessRightSet, intersection, containerConditions);
         }
 
         List<Prohibition> existingPros = prohibitions.getOrDefault(subject.getName(), new ArrayList<>());
@@ -44,19 +44,19 @@ class MemoryProhibitions implements Prohibitions, Serializable {
     }
 
     @Override
-    public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (tx.active()) {
-            tx.policyStore().updateProhibition(label, subject, accessRightSet, intersection, containerConditions);
+            tx.policyStore().prohibitions().update(label, subject, accessRightSet, intersection, containerConditions);
         }
 
-        deleteProhibition(label);
-        createProhibition(label, subject, accessRightSet, intersection, containerConditions);
+        delete(label);
+        create(label, subject, accessRightSet, intersection, containerConditions);
     }
 
     @Override
-    public void deleteProhibition(String label) throws PMException {
+    public void delete(String label) throws PMException {
         if (tx.active()) {
-            tx.policyStore().deleteProhibition(label);
+            tx.policyStore().prohibitions().delete(label);
         }
 
         for(String subject : prohibitions.keySet()) {
@@ -73,7 +73,7 @@ class MemoryProhibitions implements Prohibitions, Serializable {
     }
 
     @Override
-    public Map<String, List<Prohibition>> getProhibitions() {
+    public Map<String, List<Prohibition>> getAll() {
         Map<String, List<Prohibition>> retProhibitions = new HashMap<>();
         for (String subject : prohibitions.keySet()) {
             retProhibitions.put(subject, prohibitions.get(subject));
@@ -83,7 +83,7 @@ class MemoryProhibitions implements Prohibitions, Serializable {
     }
 
     @Override
-    public boolean prohibitionExists(String label) throws PMException {
+    public boolean exists(String label) throws PMException {
         for (Map.Entry<String, List<Prohibition>> e : prohibitions.entrySet()) {
             for (Prohibition p : e.getValue()) {
                 if (p.getLabel().equals(label)) {
@@ -96,7 +96,7 @@ class MemoryProhibitions implements Prohibitions, Serializable {
     }
 
     @Override
-    public List<Prohibition> getProhibitionsWithSubject(String subject) {
+    public List<Prohibition> getWithSubject(String subject) {
         List<Prohibition> subjectPros = prohibitions.get(subject);
         if (subjectPros == null) {
             return new ArrayList<>();
@@ -106,7 +106,7 @@ class MemoryProhibitions implements Prohibitions, Serializable {
     }
 
     @Override
-    public Prohibition getProhibition(String label) throws PMException {
+    public Prohibition get(String label) throws PMException {
         for (String subject : prohibitions.keySet()) {
             List<Prohibition> subjectPros = prohibitions.get(subject);
             for (Prohibition p : subjectPros) {

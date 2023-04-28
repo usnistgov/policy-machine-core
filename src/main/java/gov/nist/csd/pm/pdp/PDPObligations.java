@@ -33,10 +33,10 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public void createObligation(UserContext author, String label, Rule... rules) throws PMException {
-        adjudicator.createObligation(author, label, rules);
+    public void create(UserContext author, String label, Rule... rules) throws PMException {
+        adjudicator.create(author, label, rules);
 
-        pap.obligations().createObligation(author, label, rules);
+        pap.obligations().create(author, label, rules);
 
         emitObligationEvent(new CreateObligationEvent(author, label, List.of(rules)), rules);
     }
@@ -75,10 +75,10 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
-        adjudicator.updateObligation(author, label, rules);
+    public void update(UserContext author, String label, Rule... rules) throws PMException {
+        adjudicator.update(author, label, rules);
 
-        pap.obligations().updateObligation(author, label, rules);
+        pap.obligations().update(author, label, rules);
 
         emitObligationEvent(
                 new UpdateObligationEvent(author, label, List.of(rules)),
@@ -87,17 +87,17 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public void deleteObligation(String label) throws PMException {
-        if (!obligationExists(label)) {
+    public void delete(String label) throws PMException {
+        if (!exists(label)) {
             return;
         }
 
-        adjudicator.deleteObligation(label);
+        adjudicator.delete(label);
 
         // get the obligation to use in the EPP before it is deleted
-        Obligation obligation = getObligation(label);
+        Obligation obligation = get(label);
 
-        pap.obligations().deleteObligation(label);
+        pap.obligations().delete(label);
 
         emitDeleteObligationEvent(obligation);
     }
@@ -110,18 +110,18 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public List<Obligation> getObligations() throws PMException {
-        return adjudicator.getObligations();
+    public List<Obligation> getAll() throws PMException {
+        return adjudicator.getAll();
     }
 
     @Override
-    public boolean obligationExists(String label) throws PMException {
-        return adjudicator.obligationExists(label);
+    public boolean exists(String label) throws PMException {
+        return adjudicator.exists(label);
     }
 
     @Override
-    public Obligation getObligation(String label) throws PMException {
-        return adjudicator.getObligation(label);
+    public Obligation get(String label) throws PMException {
+        return adjudicator.get(label);
     }
 
     @Override

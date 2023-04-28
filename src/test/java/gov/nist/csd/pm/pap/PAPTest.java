@@ -40,7 +40,6 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
-import static gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement.args;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PAPTest {
@@ -353,8 +352,8 @@ class PAPTest {
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("ua1", "pc1");
                 pap.graph().createUserAttribute("oa1", "pc1");
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", true));
-                pap.obligations().createObligation(new UserContext(SUPER_USER), "oblLabel",
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", true));
+                pap.obligations().create(new UserContext(SUPER_USER), "oblLabel",
                         new Rule(
                                 "rule1",
                                 new EventPattern(
@@ -882,10 +881,10 @@ class PAPTest {
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("subject", "pc1");
 
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false);
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false);
 
                 assertThrows(ProhibitionExistsException.class,
-                        () -> pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false));
+                        () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false));
             });
         }
 
@@ -896,7 +895,7 @@ class PAPTest {
                 pap.graph().createUserAttribute("subject", "pc1");
 
                 assertThrows(UnknownAccessRightException.class,
-                        () -> pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false));
+                        () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false));
             });
         }
 
@@ -907,7 +906,7 @@ class PAPTest {
                 pap.graph().createUserAttribute("subject", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read"));
                 assertThrows(ProhibitionContainerDoesNotExistException.class,
-                        () -> pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false, new ContainerCondition("oa1", true)));
+                        () -> pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false, new ContainerCondition("oa1", true)));
             });
         }
 
@@ -920,11 +919,11 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa2", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true),
                         new ContainerCondition("oa2", false));
 
-                Prohibition p = pap.prohibitions().getProhibition("label");
+                Prohibition p = pap.prohibitions().get("label");
                 assertEquals("label", p.getLabel());
                 assertEquals("subject", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
@@ -949,11 +948,11 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true));
 
                 assertThrows(UnknownAccessRightException.class,
-                        () -> pap.prohibitions().updateProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("test"), false));
+                        () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("test"), false));
             });
         }
 
@@ -965,12 +964,12 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true));
 
                 assertThrows(ProhibitionSubjectDoesNotExistException.class,
-                        () -> pap.prohibitions().updateProhibition("label", ProhibitionSubject.userAttribute("test"), new AccessRightSet("read"), false));
-                assertDoesNotThrow(() -> pap.prohibitions().updateProhibition("label", ProhibitionSubject.process("subject"), new AccessRightSet("read"), false));
+                        () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("test"), new AccessRightSet("read"), false));
+                assertDoesNotThrow(() -> pap.prohibitions().update("label", ProhibitionSubject.process("subject"), new AccessRightSet("read"), false));
             });
         }
 
@@ -982,11 +981,11 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa1", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true));
 
                 assertThrows(ProhibitionContainerDoesNotExistException.class,
-                        () -> pap.prohibitions().updateProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false, new ContainerCondition("oa3", true)));
+                        () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false, new ContainerCondition("oa3", true)));
             });
         }
 
@@ -1000,14 +999,14 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa2", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true),
                         new ContainerCondition("oa2", false));
-                pap.prohibitions().updateProhibition("label", ProhibitionSubject.userAttribute("subject2"), new AccessRightSet("read", "write"), true,
+                pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject2"), new AccessRightSet("read", "write"), true,
                         new ContainerCondition("oa1", false),
                         new ContainerCondition("oa2", true));
 
-                Prohibition p = pap.prohibitions().getProhibition("label");
+                Prohibition p = pap.prohibitions().get("label");
                 assertEquals("label", p.getLabel());
                 assertEquals("subject2", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read", "write"), p.getAccessRightSet());
@@ -1032,14 +1031,14 @@ class PAPTest {
                     pap.graph().createObjectAttribute("oa2", "pc1");
                     pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                    pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                    pap.prohibitions().create("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                             new ContainerCondition("oa1", true),
                             new ContainerCondition("oa2", false));
 
-                    pap.prohibitions().deleteProhibition("label");
+                    pap.prohibitions().delete("label");
 
                     assertThrows(ProhibitionDoesNotExistException.class,
-                            () -> pap.prohibitions().getProhibition("label"));
+                            () -> pap.prohibitions().get("label"));
                 });
             }
         }
@@ -1060,14 +1059,14 @@ class PAPTest {
 
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true),
                         new ContainerCondition("oa2", false));
-                pap.prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa3", true),
                         new ContainerCondition("oa4", false));
 
-                Map<String, List<Prohibition>> prohibitions = pap.prohibitions().getProhibitions();
+                Map<String, List<Prohibition>> prohibitions = pap.prohibitions().getAll();
                 assertEquals(1, prohibitions.size());
                 assertEquals(2, prohibitions.get("subject").size());
                 checkProhibitions(prohibitions.get("subject"));
@@ -1113,14 +1112,14 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa4", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true),
                         new ContainerCondition("oa2", false));
-                pap.prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa3", true),
                         new ContainerCondition("oa4", false));
 
-                List<Prohibition> prohibitions = pap.prohibitions().getProhibitionsWithSubject("subject");
+                List<Prohibition> prohibitions = pap.prohibitions().getWithSubject("subject");
                 assertEquals(2, prohibitions.size());
                 checkProhibitions(prohibitions);
             });
@@ -1130,7 +1129,7 @@ class PAPTest {
         void GetProhibition() throws PMException {
             runTest(pap -> {
                 assertThrows(ProhibitionDoesNotExistException.class,
-                        () -> pap.prohibitions().getProhibition("label"));
+                        () -> pap.prohibitions().get("label"));
 
                 pap.graph().createPolicyClass("pc1");
                 pap.graph().createUserAttribute("subject", "pc1");
@@ -1140,14 +1139,14 @@ class PAPTest {
                 pap.graph().createObjectAttribute("oa4", "pc1");
                 pap.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-                pap.prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa1", true),
                         new ContainerCondition("oa2", false));
-                pap.prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
+                pap.prohibitions().create("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
                         new ContainerCondition("oa3", true),
                         new ContainerCondition("oa4", false));
 
-                Prohibition p = pap.prohibitions().getProhibition("label1");
+                Prohibition p = pap.prohibitions().get("label1");
                 assertEquals("label1", p.getLabel());
                 assertEquals("subject", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
@@ -1219,7 +1218,7 @@ class PAPTest {
             void AuthorDoesNotExist() throws PMException {
                 runTest(pap -> {
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().createObligation(new UserContext("u1"), obligation1.getLabel(),
+                            () -> pap.obligations().create(new UserContext("u1"), obligation1.getLabel(),
                                     obligation1.getRules().toArray(Rule[]::new)));
                 });
             }
@@ -1228,7 +1227,7 @@ class PAPTest {
             void EventSubjectDoesNotExist() throws PMException {
                 runTest(pap -> {
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().createObligation(
+                            () -> pap.obligations().create(
                                     new UserContext(SUPER_USER),
                                     "label",
                                     new Rule(
@@ -1242,7 +1241,7 @@ class PAPTest {
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().createObligation(
+                            () -> pap.obligations().create(
                                     new UserContext(SUPER_USER),
                                     "label",
                                     new Rule(
@@ -1262,7 +1261,7 @@ class PAPTest {
             void EventTargetDoesNotExist() throws PMException {
                 runTest(pap -> {
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().createObligation(
+                            () -> pap.obligations().create(
                                     new UserContext(SUPER_USER),
                                     "label",
                                     new Rule(
@@ -1276,7 +1275,7 @@ class PAPTest {
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().createObligation(
+                            () -> pap.obligations().create(
                                     new UserContext(SUPER_USER),
                                     "label",
                                     new Rule(
@@ -1290,7 +1289,7 @@ class PAPTest {
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().createObligation(
+                            () -> pap.obligations().create(
                                     new UserContext(SUPER_USER),
                                     "label",
                                     new Rule(
@@ -1309,12 +1308,12 @@ class PAPTest {
             @Test
             void Success() throws PMException {
                 runTest(pap -> {
-                    pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                    pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
 
                     assertThrows(ObligationExistsException.class,
-                            () -> pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel()));
+                            () -> pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel()));
 
-                    Obligation actual = pap.obligations().getObligation(obligation1.getLabel());
+                    Obligation actual = pap.obligations().get(obligation1.getLabel());
                     assertEquals(obligation1, actual);
                 });
             }
@@ -1326,10 +1325,10 @@ class PAPTest {
             @Test
             void AuthorDoesNotExist() throws PMException {
                 runTest(pap -> {
-                    pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                    pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
 
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(new UserContext("u1"), obligation1.getLabel(),
+                            () -> pap.obligations().update(new UserContext("u1"), obligation1.getLabel(),
                                     obligation1.getRules().toArray(Rule[]::new)));
                 });
             }
@@ -1337,10 +1336,10 @@ class PAPTest {
             @Test
             void EventSubjectDoesNotExist() throws PMException {
                 runTest(pap -> {
-                    pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                    pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
 
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(
+                            () -> pap.obligations().update(
                                     new UserContext(SUPER_USER),
                                     obligation1.getLabel(),
                                     new Rule(
@@ -1354,7 +1353,7 @@ class PAPTest {
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(
+                            () -> pap.obligations().update(
                                     new UserContext(SUPER_USER),
                                     obligation1.getLabel(),
                                     new Rule(
@@ -1373,10 +1372,10 @@ class PAPTest {
             @Test
             void EventTargetDoesNotExist() throws PMException {
                 runTest(pap -> {
-                    pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                    pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
 
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(
+                            () -> pap.obligations().update(
                                     new UserContext(SUPER_USER),
                                     obligation1.getLabel(),
                                     new Rule(
@@ -1390,7 +1389,7 @@ class PAPTest {
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(
+                            () -> pap.obligations().update(
                                     new UserContext(SUPER_USER),
                                     obligation1.getLabel(),
                                     new Rule(
@@ -1404,7 +1403,7 @@ class PAPTest {
                                     )
                             ));
                     assertThrows(NodeDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(
+                            () -> pap.obligations().update(
                                     new UserContext(SUPER_USER),
                                     obligation1.getLabel(),
                                     new Rule(
@@ -1424,17 +1423,17 @@ class PAPTest {
             void Success() throws PMException {
                 runTest(pap -> {
                     assertThrows(ObligationDoesNotExistException.class,
-                            () -> pap.obligations().updateObligation(new UserContext(SUPER_USER), obligation1.getLabel()));
+                            () -> pap.obligations().update(new UserContext(SUPER_USER), obligation1.getLabel()));
 
-                    pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                    pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
 
-                    pap.obligations().updateObligation(new UserContext(SUPER_USER), obligation1.getLabel(),
+                    pap.obligations().update(new UserContext(SUPER_USER), obligation1.getLabel(),
                             obligation2.getRules().toArray(Rule[]::new));
 
                     Obligation expected = new Obligation(obligation1);
                     expected.setRules(obligation2.getRules());
 
-                    Obligation actual = pap.obligations().getObligation(obligation1.getLabel());
+                    Obligation actual = pap.obligations().get(obligation1.getLabel());
                     assertEquals(expected, actual);
                 });
             }
@@ -1444,25 +1443,25 @@ class PAPTest {
         @Test
         void DeleteObligation() throws PMException {
             runTest(pap -> {
-                assertDoesNotThrow(() -> pap.obligations().deleteObligation(obligation1.getLabel()));
+                assertDoesNotThrow(() -> pap.obligations().delete(obligation1.getLabel()));
 
-                pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
-                pap.obligations().createObligation(obligation2.getAuthor(), obligation2.getLabel(), obligation2.getRules().toArray(Rule[]::new));
+                pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                pap.obligations().create(obligation2.getAuthor(), obligation2.getLabel(), obligation2.getRules().toArray(Rule[]::new));
 
-                pap.obligations().deleteObligation(obligation1.getLabel());
+                pap.obligations().delete(obligation1.getLabel());
 
                 assertThrows(ObligationDoesNotExistException.class,
-                        () -> pap.obligations().getObligation(obligation1.getLabel()));
+                        () -> pap.obligations().get(obligation1.getLabel()));
             });
         }
 
         @Test
         void GetObligations() throws PMException {
             runTest(pap -> {
-                pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
-                pap.obligations().createObligation(obligation2.getAuthor(), obligation2.getLabel(), obligation2.getRules().toArray(Rule[]::new));
+                pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                pap.obligations().create(obligation2.getAuthor(), obligation2.getLabel(), obligation2.getRules().toArray(Rule[]::new));
 
-                List<Obligation> obligations = pap.obligations().getObligations();
+                List<Obligation> obligations = pap.obligations().getAll();
                 assertEquals(2, obligations.size());
                 for (Obligation obligation : obligations) {
                     if (obligation.getLabel().equals(obligation1.getLabel())) {
@@ -1478,12 +1477,12 @@ class PAPTest {
         void GetObligation() throws PMException {
             runTest(pap -> {
                 assertThrows(ObligationDoesNotExistException.class,
-                        () -> pap.obligations().getObligation(obligation1.getLabel()));
+                        () -> pap.obligations().get(obligation1.getLabel()));
 
-                pap.obligations().createObligation(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
-                pap.obligations().createObligation(obligation2.getAuthor(), obligation2.getLabel(), obligation2.getRules().toArray(Rule[]::new));
+                pap.obligations().create(obligation1.getAuthor(), obligation1.getLabel(), obligation1.getRules().toArray(Rule[]::new));
+                pap.obligations().create(obligation2.getAuthor(), obligation2.getLabel(), obligation2.getRules().toArray(Rule[]::new));
 
-                Obligation obligation = pap.obligations().getObligation(obligation1.getLabel());
+                Obligation obligation = pap.obligations().get(obligation1.getLabel());
                 assertEquals(obligation1, obligation);
             });
         }

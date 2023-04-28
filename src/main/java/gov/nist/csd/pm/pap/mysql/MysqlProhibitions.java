@@ -30,7 +30,7 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws MysqlPolicyException {
+    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws MysqlPolicyException {
         connection.beginTx();
 
         String sql;
@@ -121,12 +121,12 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws MysqlPolicyException {
+    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws MysqlPolicyException {
         connection.beginTx();
 
         try {
-            deleteProhibition(label);
-            createProhibition(label, subject, accessRightSet, intersection, containerConditions);
+            delete(label);
+            create(label, subject, accessRightSet, intersection, containerConditions);
             connection.commit();
         } catch (MysqlPolicyException e) {
             connection.rollback();
@@ -135,7 +135,7 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public void deleteProhibition(String label) throws MysqlPolicyException {
+    public void delete(String label) throws MysqlPolicyException {
         String sql = """
                 delete from prohibition where label = ?
                 """;
@@ -149,7 +149,7 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public Map<String, List<Prohibition>> getProhibitions() throws MysqlPolicyException {
+    public Map<String, List<Prohibition>> getAll() throws MysqlPolicyException {
         String sql = """
                 select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition
                 """;
@@ -175,9 +175,9 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public boolean prohibitionExists(String label) throws PMException {
+    public boolean exists(String label) throws PMException {
         try {
-            getProhibition(label);
+            get(label);
             return true;
         } catch (ProhibitionDoesNotExistException e) {
             return false;
@@ -208,7 +208,7 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public List<Prohibition> getProhibitionsWithSubject(String subject) throws MysqlPolicyException {
+    public List<Prohibition> getWithSubject(String subject) throws MysqlPolicyException {
         String sql = """
                 select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection 
                 from prohibition 
@@ -231,7 +231,7 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public Prohibition getProhibition(String label) throws PMException {
+    public Prohibition get(String label) throws PMException {
         String sql = """
                 select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition where label = ?
                 """;

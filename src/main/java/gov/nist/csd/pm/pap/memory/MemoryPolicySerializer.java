@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.memory;
 
 import com.google.gson.Gson;
 import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.json.JSONGraph;
@@ -18,7 +17,6 @@ import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +73,7 @@ public class MemoryPolicySerializer implements PolicySerializer {
     }
 
     private String obligationsToJson() throws PMException {
-        List<Obligation> obligations = memoryPolicyStore.obligations().getObligations();
+        List<Obligation> obligations = memoryPolicyStore.obligations().getAll();
         List<byte[]> bytes = new ArrayList<>();
         for (Obligation o : obligations) {
             bytes.add(SerializationUtils.serialize(o));
@@ -85,7 +83,7 @@ public class MemoryPolicySerializer implements PolicySerializer {
     }
 
     private String prohibitionsToJson() throws PMException {
-        Map<String, List<Prohibition>> prohibitions = memoryPolicyStore.prohibitions().getProhibitions();
+        Map<String, List<Prohibition>> prohibitions = memoryPolicyStore.prohibitions().getAll();
         List<byte[]> bytes = new ArrayList<>();
         for (List<Prohibition> proList : prohibitions.values()) {
             for (Prohibition p : proList) {

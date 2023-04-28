@@ -29,10 +29,10 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        adjudicator.createProhibition(label, subject, accessRightSet, intersection, containerConditions);
+    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        adjudicator.create(label, subject, accessRightSet, intersection, containerConditions);
 
-        pap.prohibitions().createProhibition(label, subject, accessRightSet, intersection, containerConditions);
+        pap.prohibitions().create(label, subject, accessRightSet, intersection, containerConditions);
 
         CreateProhibitionEvent createProhibitionEvent = new CreateProhibitionEvent(
                 label, subject, accessRightSet, intersection, List.of(containerConditions)
@@ -48,10 +48,10 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        adjudicator.updateProhibition(label, subject, accessRightSet, intersection, containerConditions);
+    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        adjudicator.update(label, subject, accessRightSet, intersection, containerConditions);
 
-        pap.prohibitions().updateProhibition(label, subject, accessRightSet, intersection, containerConditions);
+        pap.prohibitions().update(label, subject, accessRightSet, intersection, containerConditions);
 
         UpdateProhibitionEvent updateProhibitionEvent = new UpdateProhibitionEvent(
                 label, subject, accessRightSet, intersection, List.of(containerConditions)
@@ -67,16 +67,16 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public void deleteProhibition(String label) throws PMException {
-        if (!prohibitionExists(label)) {
+    public void delete(String label) throws PMException {
+        if (!exists(label)) {
             return;
         }
 
-        adjudicator.deleteProhibition(label);
+        adjudicator.delete(label);
 
-        Prohibition prohibition = pap.prohibitions().getProhibition(label);
+        Prohibition prohibition = pap.prohibitions().get(label);
 
-        pap.prohibitions().deleteProhibition(label);
+        pap.prohibitions().delete(label);
 
         emitDeleteProhibitionEvent(prohibition);
     }
@@ -97,23 +97,23 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public Map<String, List<Prohibition>> getProhibitions() throws PMException {
-        return adjudicator.getProhibitions();
+    public Map<String, List<Prohibition>> getAll() throws PMException {
+        return adjudicator.getAll();
     }
 
     @Override
-    public boolean prohibitionExists(String label) throws PMException {
-        return adjudicator.prohibitionExists(label);
+    public boolean exists(String label) throws PMException {
+        return adjudicator.exists(label);
     }
 
     @Override
-    public List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
-        return adjudicator.getProhibitionsWithSubject(subject);
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
+        return adjudicator.getWithSubject(subject);
     }
 
     @Override
-    public Prohibition getProhibition(String label) throws PMException {
-        return adjudicator.getProhibition(label);
+    public Prohibition get(String label) throws PMException {
+        return adjudicator.get(label);
     }
 
     @Override

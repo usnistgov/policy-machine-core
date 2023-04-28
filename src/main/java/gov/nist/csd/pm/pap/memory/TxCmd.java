@@ -226,7 +226,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.prohibitions().deleteProhibition(prohibition.getLabel());
+            store.prohibitions().delete(prohibition.getLabel());
         }
     }
 
@@ -241,7 +241,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.prohibitions().updateProhibition(
+            store.prohibitions().update(
                     oldProhibition.getLabel(),
                     oldProhibition.getSubject(),
                     oldProhibition.getAccessRightSet(),
@@ -260,7 +260,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.prohibitions().createProhibition(
+            store.prohibitions().create(
                     prohibitionToDelete.getLabel(),
                     prohibitionToDelete.getSubject(),
                     prohibitionToDelete.getAccessRightSet(),
@@ -279,7 +279,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.obligations().deleteObligation(obligation.getLabel());
+            store.obligations().delete(obligation.getLabel());
         }
     }
 
@@ -294,7 +294,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.obligations().updateObligation(
+            store.obligations().update(
                     oldObligation.getAuthor(),
                     oldObligation.getLabel(),
                     oldObligation.getRules().toArray(new Rule[]{})
@@ -310,7 +310,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.obligations().createObligation(
+            store.obligations().create(
                     obligationToDelete.getAuthor(),
                     obligationToDelete.getLabel(),
                     obligationToDelete.getRules().toArray(new Rule[]{})

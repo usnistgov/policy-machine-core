@@ -21,8 +21,8 @@ public interface Prohibitions {
      * @param containerConditions the containers to deny the subject access to.
      * @throws PMException
      */
-    void createProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet,
-                           boolean intersection, ContainerCondition... containerConditions) throws PMException;
+    void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet,
+                boolean intersection, ContainerCondition... containerConditions) throws PMException;
 
     /**
      * Update an existing prohibition.
@@ -34,8 +34,8 @@ public interface Prohibitions {
      * @param containerConditions the containers to deny the subject access to.
      * @throws PMException
      */
-    void updateProhibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet,
-                           boolean intersection, ContainerCondition ... containerConditions) throws PMException;
+    void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet,
+                boolean intersection, ContainerCondition ... containerConditions) throws PMException;
 
     /**
      * Delete the prohibition, and remove it from the data structure.
@@ -43,14 +43,14 @@ public interface Prohibitions {
      * @param label The name of the prohibition to delete.
      * @throws PMException
      */
-    void deleteProhibition(String label) throws PMException;
+    void delete(String label) throws PMException;
 
     /**
      * Get all prohibitions.
      * @return All prohibitions.
      * @throws PMException
      */
-    Map<String, List<Prohibition>> getProhibitions() throws PMException;
+    Map<String, List<Prohibition>> getAll() throws PMException;
 
     /**
      * Check if a prohibition exists with the given label.
@@ -58,7 +58,7 @@ public interface Prohibitions {
      * @return True if a prohibition exists with the given label, false otherwise.
      * @throws PMException
      */
-    boolean prohibitionExists(String label) throws PMException;
+    boolean exists(String label) throws PMException;
 
     /**
      * Get prohibitions with the given subject.
@@ -66,7 +66,7 @@ public interface Prohibitions {
      * @return The prohibitions with the given subject.
      * @throws PMException
      */
-    List<Prohibition> getProhibitionsWithSubject(String subject) throws PMException;
+    List<Prohibition> getWithSubject(String subject) throws PMException;
 
     /**
      * Get the prohibition with the given label.
@@ -74,6 +74,6 @@ public interface Prohibitions {
      * @return The prohibition with the given label.
      * @throws PMException
      */
-    Prohibition getProhibition(String label) throws PMException;
+    Prohibition get(String label) throws PMException;
 
 }

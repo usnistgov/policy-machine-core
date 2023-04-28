@@ -516,12 +516,12 @@ class MemoryPolicyReviewerTest {
             String o1 = pap.graph().createObject("o1", oa1, oa2);
 
             pap.graph().associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
-            pap.prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
+            pap.prohibitions().create("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
                     new ContainerCondition(oa1, false),
                     new ContainerCondition(oa2, false)
             );
 
-            pap.prohibitions().createProhibition("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
+            pap.prohibitions().create("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
                     true,
                     new ContainerCondition(oa3, false));
 
@@ -547,7 +547,7 @@ class MemoryPolicyReviewerTest {
 
             pap.graph().associate(ua1, oa1, new AccessRightSet("read"));
 
-            pap.prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute(ua1),
+            pap.prohibitions().create("deny", ProhibitionSubject.userAttribute(ua1),
                     new AccessRightSet("read"),
                     true,
                     new ContainerCondition(oa1, false),
@@ -559,7 +559,7 @@ class MemoryPolicyReviewerTest {
 
             pap.graph().associate(ua1, oa2, new AccessRightSet("read"));
 
-            pap.prohibitions().createProhibition("deny-process", ProhibitionSubject.process("1234"),
+            pap.prohibitions().create("deny-process", ProhibitionSubject.process("1234"),
                     new AccessRightSet("read"),
                     false,
                     new ContainerCondition(oa1, false));
@@ -586,7 +586,7 @@ class MemoryPolicyReviewerTest {
 
             pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
-            pap.prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+            pap.prohibitions().create("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
                     true,
                     new ContainerCondition(oa4, true),
                     new ContainerCondition(oa1, false));
@@ -612,7 +612,7 @@ class MemoryPolicyReviewerTest {
             pap.graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            pap.prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+            pap.prohibitions().create("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
                     true,
                     new ContainerCondition(oa1, false),
                     new ContainerCondition(oa2, false));
@@ -665,7 +665,7 @@ class MemoryPolicyReviewerTest {
             pap.graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
 
 
-            pap.prohibitions().createProhibition(
+            pap.prohibitions().create(
                     "p1",
                     ProhibitionSubject.user("u1"),
                     new AccessRightSet("write"),
@@ -675,7 +675,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa3", false)
             );
 
-            pap.prohibitions().createProhibition(
+            pap.prohibitions().create(
                     "p2",
                     ProhibitionSubject.user("u2"),
                     new AccessRightSet("write"),
@@ -685,7 +685,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa3", false)
             );
 
-            pap.prohibitions().createProhibition(
+            pap.prohibitions().create(
                     "p3",
                     ProhibitionSubject.user("u3"),
                     new AccessRightSet("write"),
@@ -694,7 +694,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa2", true)
             );
 
-            pap.prohibitions().createProhibition(
+            pap.prohibitions().create(
                     "p4",
                     ProhibitionSubject.user("u4"),
                     new AccessRightSet("write"),
@@ -703,7 +703,7 @@ class MemoryPolicyReviewerTest {
                     new ContainerCondition("oa2", true)
             );
 
-            pap.prohibitions().createProhibition(
+            pap.prohibitions().create(
                     "p5",
                     ProhibitionSubject.user("u4"),
                     new AccessRightSet("write"),
@@ -794,7 +794,7 @@ class MemoryPolicyReviewerTest {
             pap.graph().createUser("u1", "ua1");
             pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
-            pap.prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+            pap.prohibitions().create("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
                     new ContainerCondition("oa1", false));
 
             AccessRightSet deniedAccessRights = pdp.reviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");
@@ -813,7 +813,7 @@ class MemoryPolicyReviewerTest {
             pap.graph().createUser("u1", "ua1");
             pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
-            pap.prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+            pap.prohibitions().create("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
                     new ContainerCondition("oa1", true));
 
             AccessRightSet deniedAccessRights = pdp.reviewer().getDeniedAccessRights(new UserContext("u1"), "oa1");

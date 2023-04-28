@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
@@ -77,16 +76,16 @@ public class PolicyEventTest {
         pap.graph().dissociate("ua1", "oa1");
         assertEquals(18, events.size());
 
-        pap.prohibitions().createProhibition("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        pap.prohibitions().create("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
         assertEquals(19, events.size());
 
-        pap.prohibitions().updateProhibition("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
+        pap.prohibitions().update("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
         assertEquals(20, events.size());
 
-        pap.prohibitions().deleteProhibition("label");
+        pap.prohibitions().delete("label");
         assertEquals(21, events.size());
 
-        pap.obligations().createObligation(
+        pap.obligations().create(
                 new UserContext(SUPER_USER),
                 "label",
                 new Rule(
@@ -103,7 +102,7 @@ public class PolicyEventTest {
         );
         assertEquals(22, events.size());
 
-        pap.obligations().updateObligation(new UserContext(SUPER_USER),
+        pap.obligations().update(new UserContext(SUPER_USER),
                 "label",
                 new Rule(
                         "rule1",
@@ -118,7 +117,7 @@ public class PolicyEventTest {
                 ));
         assertEquals(23, events.size());
 
-        pap.obligations().deleteObligation("label");
+        pap.obligations().delete("label");
         assertEquals(24, events.size());
     }
 

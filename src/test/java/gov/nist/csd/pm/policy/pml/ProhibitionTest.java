@@ -38,7 +38,7 @@ class ProhibitionTest {
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
 
-        Prohibition prohibition = pap.prohibitions().getProhibition("pro1");
+        Prohibition prohibition = pap.prohibitions().get("pro1");
         assertEquals("pro1", prohibition.getLabel());
         assertEquals(new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), prohibition.getSubject());
         assertEquals(new AccessRightSet(CREATE_POLICY_CLASS, "write"), prohibition.getAccessRightSet());
@@ -55,6 +55,6 @@ class ProhibitionTest {
                 delete prohibition 'pro1'
                 """;
         pap.executePML(new UserContext(SUPER_USER), input);
-        assertTrue(pap.prohibitions().getProhibitionsWithSubject("u1").isEmpty());
+        assertTrue(pap.prohibitions().getWithSubject("u1").isEmpty());
     }
 }

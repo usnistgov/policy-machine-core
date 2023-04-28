@@ -1,10 +1,8 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.json.JSONGraph;
@@ -12,8 +10,6 @@ import gov.nist.csd.pm.policy.json.JSONPolicy;
 import gov.nist.csd.pm.policy.json.JSONUserDefinedPML;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
-import gov.nist.csd.pm.policy.model.graph.relationships.Assignment;
-import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.pml.PMLSerializer;
@@ -21,9 +17,6 @@ import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,9 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.mysql.MysqlGraph.getNodeFromResultSet;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.ANY;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
 public class MysqlPolicySerializer implements PolicySerializer {
 
@@ -88,7 +78,7 @@ public class MysqlPolicySerializer implements PolicySerializer {
     }
 
     private String obligationsToJson() throws PMException {
-        List<Obligation> obligations = policyStore.obligations().getObligations();
+        List<Obligation> obligations = policyStore.obligations().getAll();
         List<byte[]> bytes = new ArrayList<>();
         for (Obligation o : obligations) {
             bytes.add(SerializationUtils.serialize(o));
@@ -98,7 +88,7 @@ public class MysqlPolicySerializer implements PolicySerializer {
     }
 
     private String prohibitionsToJson() throws PMException {
-        Map<String, List<Prohibition>> prohibitions = policyStore.prohibitions().getProhibitions();
+        Map<String, List<Prohibition>> prohibitions = policyStore.prohibitions().getAll();
         List<byte[]> bytes = new ArrayList<>();
         for (List<Prohibition> proList : prohibitions.values()) {
             for (Prohibition p : proList) {

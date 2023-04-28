@@ -172,7 +172,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         final Map<String, AccessRightSet> borderTargets = new HashMap<>();
         final Set<String> prohibitionTargets = new HashSet<>();
         // initialize with the prohibitions or the provided process
-        final Set<Prohibition> reachedProhibitions = new HashSet<>(policy.prohibitions().getProhibitionsWithSubject(process));
+        final Set<Prohibition> reachedProhibitions = new HashSet<>(policy.prohibitions().getWithSubject(process));
 
         // get the associations for the subject, it the subject is a user, nothing will be returned
         // this is only when a UA is the subject
@@ -180,7 +180,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         collectAssociations(subjectAssociations, borderTargets);
 
         Visitor visitor = node -> {
-            List<Prohibition> subjectProhibitions = policy.prohibitions().getProhibitionsWithSubject(node);
+            List<Prohibition> subjectProhibitions = policy.prohibitions().getWithSubject(node);
             reachedProhibitions.addAll(subjectProhibitions);
             for (Prohibition prohibition : subjectProhibitions) {
                 List<ContainerCondition> containers = prohibition.getContainers();
@@ -815,7 +815,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
         new DepthFirstGraphWalker(policy.graph())
                 .withVisitor((n) -> {
-                    pros.addAll(policy.prohibitions().getProhibitionsWithSubject(n));
+                    pros.addAll(policy.prohibitions().getWithSubject(n));
                 })
                 .withDirection(Direction.PARENTS)
                 .walk(subject);
@@ -827,7 +827,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     public List<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
-        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getProhibitions();
+        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
         for (String subject : prohibitions.keySet()) {
             List<Prohibition> subjectProhibitions = prohibitions.get(subject);
             for (Prohibition prohibition : subjectProhibitions) {
@@ -843,7 +843,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithAuthor(UserContext userCtx) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policy.obligations().getObligations()) {
+        for (Obligation obligation : policy.obligations().getAll()) {
             if (obligation.getAuthor().equals(userCtx)) {
                 obls.add(obligation);
             }
@@ -855,7 +855,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithAttributeInEvent(String attribute) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policy.obligations().getObligations()) {
+        for (Obligation obligation : policy.obligations().getAll()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 Target target = rule.getEventPattern().getTarget();
@@ -883,7 +883,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithAttributeInResponse(String attribute) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policy.obligations().getObligations()) {
+        for (Obligation obligation : policy.obligations().getAll()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 Response response = rule.getResponse();
@@ -903,7 +903,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Obligation> getObligationsWithEvent(String event) throws PMException {
         List<Obligation> obls = new ArrayList<>();
-        for (Obligation obligation : policy.obligations().getObligations()) {
+        for (Obligation obligation : policy.obligations().getAll()) {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 if (rule.getEventPattern().getOperations().contains(event)) {
@@ -917,7 +917,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     @Override
     public synchronized List<Response> getMatchingEventResponses(EventContext evt) throws PMException {
         List<Response> responses = new ArrayList<>();
-        for (Obligation obligation : policy.obligations().getObligations()) {
+        for (Obligation obligation : policy.obligations().getAll()) {
             for (Rule rule : obligation.getRules()) {
                 if (evt.matchesPattern(rule.getEventPattern(), this)) {
                     responses.add(rule.getResponse());

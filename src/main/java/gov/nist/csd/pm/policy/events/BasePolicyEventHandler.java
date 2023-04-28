@@ -1,21 +1,9 @@
 package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.pml.PMLContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
-import gov.nist.csd.pm.policy.model.graph.nodes.Node;
-import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
-import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implements the PolicyEventListener interface to apply policy events to the passed PolicyAuthor.
@@ -62,7 +50,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleUpdateProhibitionEvent(UpdateProhibitionEvent updateProhibitionEvent) throws PMException {
-        policy.prohibitions().updateProhibition(
+        policy.prohibitions().update(
                 updateProhibitionEvent.getName(),
                 updateProhibitionEvent.getSubject(),
                 updateProhibitionEvent.getAccessRightSet(),
@@ -72,7 +60,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleUpdateObligationEvent(UpdateObligationEvent updateObligationEvent) throws PMException {
-        policy.obligations().updateObligation(
+        policy.obligations().update(
                 updateObligationEvent.getAuthor(),
                 updateObligationEvent.getLabel(),
                 updateObligationEvent.getRules().toArray(Rule[]::new)
@@ -92,11 +80,11 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleDeleteProhibitionEvent(DeleteProhibitionEvent deleteProhibitionEvent) throws PMException {
-        policy.prohibitions().deleteProhibition(deleteProhibitionEvent.getProhibition().getLabel());
+        policy.prohibitions().delete(deleteProhibitionEvent.getProhibition().getLabel());
     }
 
     protected void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {
-        policy.obligations().deleteObligation(deleteObligationEvent.getObligation().getLabel());
+        policy.obligations().delete(deleteObligationEvent.getObligation().getLabel());
     }
 
     protected void handleDeleteNodeEvent(DeleteNodeEvent deleteNodeEvent) throws PMException {
@@ -108,7 +96,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleCreateProhibitionEvent(CreateProhibitionEvent createProhibitionEvent) throws PMException {
-        policy.prohibitions().createProhibition(
+        policy.prohibitions().create(
                 createProhibitionEvent.getLabel(),
                 createProhibitionEvent.getSubject(),
                 createProhibitionEvent.getAccessRightSet(),
@@ -118,7 +106,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleCreateObligationEvent(CreateObligationEvent createObligationEvent) throws PMException {
-        policy.obligations().createObligation(createObligationEvent.getAuthor(),
+        policy.obligations().create(createObligationEvent.getAuthor(),
                 createObligationEvent.getLabel(),
                 createObligationEvent.getRules().toArray(Rule[]::new));
     }

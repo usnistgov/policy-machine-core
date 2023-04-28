@@ -72,9 +72,9 @@ class MysqlPAPTest {
         }
 
         assertThrows(MysqlPolicyException.class, () ->
-                pap.prohibitions().createProhibition("label", ProhibitionSubject.userAttribute("ua1"),
+                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"),
                         new AccessRightSet(), false, new ContainerCondition("oa1", true)));
-        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.prohibitions().getProhibition("label"));
+        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.prohibitions().get("label"));
     }
 
 }

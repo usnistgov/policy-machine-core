@@ -32,10 +32,10 @@ public class DeleteRuleStatement extends PMLStatement {
         String ruleLabel = ruleExpr.execute(ctx, policy).getStringValue();
         String oblLabel = oblExpr.execute(ctx, policy).getStringValue();
 
-        Obligation obligation = policy.obligations().getObligation(oblLabel);
+        Obligation obligation = policy.obligations().get(oblLabel);
         obligation.deleteRule(ruleLabel);
 
-        policy.obligations().updateObligation(
+        policy.obligations().update(
                 obligation.getAuthor(),
                 obligation.getLabel(),
                 obligation.getRules().toArray(new Rule[]{})

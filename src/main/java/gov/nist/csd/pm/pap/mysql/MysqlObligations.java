@@ -26,7 +26,7 @@ public class MysqlObligations implements Obligations {
     }
 
     @Override
-    public void createObligation(UserContext author, String label, Rule... rules) throws MysqlPolicyException {
+    public void create(UserContext author, String label, Rule... rules) throws MysqlPolicyException {
         String sql = """
                 insert into obligation (label, author, rules) values (?, ?, ?)
                 """;
@@ -43,12 +43,12 @@ public class MysqlObligations implements Obligations {
     }
 
     @Override
-    public void updateObligation(UserContext author, String label, Rule... rules) throws MysqlPolicyException {
+    public void update(UserContext author, String label, Rule... rules) throws MysqlPolicyException {
         connection.beginTx();
 
         try {
-            deleteObligation(label);
-            createObligation(author, label, rules);
+            delete(label);
+            create(author, label, rules);
             connection.commit();
         } catch (MysqlPolicyException e) {
             connection.rollback();
@@ -57,7 +57,7 @@ public class MysqlObligations implements Obligations {
     }
 
     @Override
-    public void deleteObligation(String label) throws MysqlPolicyException {
+    public void delete(String label) throws MysqlPolicyException {
         String sql = """
                 delete from obligation where label = ?
                 """;
@@ -71,7 +71,7 @@ public class MysqlObligations implements Obligations {
     }
 
     @Override
-    public List<Obligation> getObligations() throws MysqlPolicyException {
+    public List<Obligation> getAll() throws MysqlPolicyException {
         List<Obligation> obligations = new ArrayList<>();
 
         String sql = """
@@ -95,9 +95,9 @@ public class MysqlObligations implements Obligations {
     }
 
     @Override
-    public boolean obligationExists(String label) throws PMException {
+    public boolean exists(String label) throws PMException {
         try {
-            getObligation(label);
+            get(label);
             return true;
         } catch (ObligationDoesNotExistException e) {
             return false;
@@ -105,7 +105,7 @@ public class MysqlObligations implements Obligations {
     }
 
     @Override
-    public Obligation getObligation(String label) throws PMException {
+    public Obligation get(String label) throws PMException {
         String sql = """
                 select author, rules from obligation where label = ?
                 """;

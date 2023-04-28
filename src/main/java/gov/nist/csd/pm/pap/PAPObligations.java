@@ -26,15 +26,15 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void createObligation(UserContext author, String label, Rule... rules) throws PMException {
-        if (obligationExists(label)) {
+    public synchronized void create(UserContext author, String label, Rule... rules) throws PMException {
+        if (exists(label)) {
             throw new ObligationExistsException(label);
         }
 
         checkAuthorExists(author);
         checkEventPatternAttributesExist(rules);
 
-        policyStore.obligations().createObligation(author, label, rules);
+        policyStore.obligations().create(author, label, rules);
 
         emitEvent(new CreateObligationEvent(author, label, List.of(rules)));
     }
@@ -91,49 +91,49 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public boolean obligationExists(String label) throws PMException {
-        return policyStore.obligations().obligationExists(label);
+    public boolean exists(String label) throws PMException {
+        return policyStore.obligations().exists(label);
     }
 
     @Override
-    public synchronized void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
-        if (!obligationExists(label)) {
+    public synchronized void update(UserContext author, String label, Rule... rules) throws PMException {
+        if (!exists(label)) {
             throw new ObligationDoesNotExistException(label);
         }
 
         checkAuthorExists(author);
         checkEventPatternAttributesExist(rules);
 
-        policyStore.obligations().updateObligation(author, label, rules);
+        policyStore.obligations().update(author, label, rules);
 
         emitEvent(new UpdateObligationEvent(author, label, List.of(rules)));
     }
 
     @Override
-    public synchronized void deleteObligation(String label) throws PMException {
-        if (!obligationExists(label)) {
+    public synchronized void delete(String label) throws PMException {
+        if (!exists(label)) {
             return;
         }
 
-        Obligation obligation = policyStore.obligations().getObligation(label);
+        Obligation obligation = policyStore.obligations().get(label);
 
-        policyStore.obligations().deleteObligation(label);
+        policyStore.obligations().delete(label);
 
         emitEvent(new DeleteObligationEvent(obligation));
     }
 
     @Override
-    public synchronized List<Obligation> getObligations() throws PMException {
-        return policyStore.obligations().getObligations();
+    public synchronized List<Obligation> getAll() throws PMException {
+        return policyStore.obligations().getAll();
     }
 
     @Override
-    public synchronized Obligation getObligation(String label) throws PMException {
-        if (!obligationExists(label)) {
+    public synchronized Obligation get(String label) throws PMException {
+        if (!exists(label)) {
             throw new ObligationDoesNotExistException(label);
         }
 
-        return policyStore.obligations().getObligation(label);
+        return policyStore.obligations().get(label);
     }
 
     @Override

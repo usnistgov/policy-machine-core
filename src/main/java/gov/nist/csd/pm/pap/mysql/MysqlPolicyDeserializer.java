@@ -3,13 +3,8 @@ package gov.nist.csd.pm.pap.mysql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import gov.nist.csd.pm.pap.memory.MemoryPolicySerializer;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
-import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.json.JSONGraph;
 import gov.nist.csd.pm.policy.json.JSONPolicy;
@@ -17,22 +12,17 @@ import gov.nist.csd.pm.policy.json.JSONUserDefinedPML;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
-import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.model.graph.nodes.Properties;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.PMLSerializer;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +80,7 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
             Obligation obligation = SerializationUtils.deserialize(b);
 
             List<Rule> rules = obligation.getRules();
-            policyStore.obligations().createObligation(
+            policyStore.obligations().create(
                     obligation.getAuthor(),
                     obligation.getLabel(),
                     rules.toArray(new Rule[]{})
@@ -105,7 +95,7 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
         for (byte[] b : list) {
             Prohibition prohibition = SerializationUtils.deserialize(b);
 
-            policyStore.prohibitions().createProhibition(
+            policyStore.prohibitions().create(
                     prohibition.getLabel(),
                     prohibition.getSubject(),
                     prohibition.getAccessRightSet(),

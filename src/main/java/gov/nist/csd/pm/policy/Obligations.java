@@ -17,7 +17,7 @@ public interface Obligations {
      * @param rules the rules of the obligation.
      * @throws PMException
      */
-    void createObligation(UserContext author, String label, Rule... rules) throws PMException;
+    void create(UserContext author, String label, Rule... rules) throws PMException;
 
     /**
      * Update the obligation with the given label.  If the label in the provided object is not null and different from
@@ -27,21 +27,21 @@ public interface Obligations {
      * @param rules the updated obligation rules
      * @throws PMException
      */
-    void updateObligation(UserContext author, String label, Rule... rules) throws PMException;
+    void update(UserContext author, String label, Rule... rules) throws PMException;
 
     /**
      * Delete the obligation with the given label.
      * @param label the label of the obligation to delete
      * @throws PMException
      */
-    void deleteObligation(String label) throws PMException;
+    void delete(String label) throws PMException;
 
     /**
      * Get all obligations.
      * @return All obligations.
      * @throws PMException
      */
-    List<Obligation> getObligations() throws PMException;
+    List<Obligation> getAll() throws PMException;
 
     /**
      * Check if an obligation exists with the given label.
@@ -49,7 +49,7 @@ public interface Obligations {
      * @return True if the obligation exists with the given label, false otherwise.
      * @throws PMException
      */
-    boolean obligationExists(String label) throws PMException;
+    boolean exists(String label) throws PMException;
 
     /**
      * Get the Obligation object associated with the given label.
@@ -57,6 +57,6 @@ public interface Obligations {
      * @return The Obligation object associated with the given label.
      * @throws PMException
      */
-    Obligation getObligation(String label) throws PMException;
+    Obligation get(String label) throws PMException;
 
 }

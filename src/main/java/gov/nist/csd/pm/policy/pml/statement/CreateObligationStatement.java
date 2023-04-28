@@ -42,7 +42,7 @@ public class CreateObligationStatement extends PMLStatement {
             rules.add(rule);
         }
 
-        policy.obligations().createObligation(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
+        policy.obligations().create(author, nameStr, rules.toArray(rules.toArray(Rule[]::new)));
 
         return new Value();
     }

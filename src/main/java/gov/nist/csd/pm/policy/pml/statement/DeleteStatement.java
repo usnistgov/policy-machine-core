@@ -29,9 +29,9 @@ public class DeleteStatement extends PMLStatement {
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         String name = expression.execute(ctx, policy).getStringValue();
         if (type == Type.PROHIBITION) {
-            policy.prohibitions().deleteProhibition(name);
+            policy.prohibitions().delete(name);
         } else if (type == Type.OBLIGATION) {
-            policy.obligations().deleteObligation(name);
+            policy.obligations().delete(name);
         } else {
             policy.graph().deleteNode(name);
         }

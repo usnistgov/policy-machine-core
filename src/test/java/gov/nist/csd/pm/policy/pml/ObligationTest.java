@@ -48,7 +48,7 @@ public class ObligationTest {
                 """;
         pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
 
-        Obligation obligation1 = pap.obligations().getObligation("obligation1");
+        Obligation obligation1 = pap.obligations().get("obligation1");
         assertEquals("obligation1", obligation1.getLabel());
         assertEquals(1, obligation1.getRules().size());
         assertEquals(new UserContext(SUPER_USER), obligation1.getAuthor());
@@ -91,8 +91,8 @@ public class ObligationTest {
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize().fromPML(userCtx, pml);
 
-        assertEquals(1, pap.obligations().getObligations().size());
-        Obligation actual = pap.obligations().getObligation("test");
+        assertEquals(1, pap.obligations().getAll().size());
+        Obligation actual = pap.obligations().get("test");
         assertEquals(1, actual.getRules().size());
         assertEquals("test", actual.getLabel());
         assertEquals(userCtx, actual.getAuthor());

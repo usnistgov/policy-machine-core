@@ -28,7 +28,7 @@ public class ObligationsAdjudicator implements Obligations {
     }
 
     @Override
-    public void createObligation(UserContext author, String label, Rule... rules) throws PMException {
+    public void create(UserContext author, String label, Rule... rules) throws PMException {
         for (Rule rule : rules) {
             EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, CREATE_OBLIGATION);
@@ -68,13 +68,13 @@ public class ObligationsAdjudicator implements Obligations {
     }
 
     @Override
-    public void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
-        createObligation(author, label, rules);
+    public void update(UserContext author, String label, Rule... rules) throws PMException {
+        create(author, label, rules);
     }
 
     @Override
-    public void deleteObligation(String label) throws PMException {
-        Obligation obligation = pap.obligations().getObligation(label);
+    public void delete(String label) throws PMException {
+        Obligation obligation = pap.obligations().get(label);
         for (Rule rule : obligation.getRules()) {
             EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, DELETE_OBLIGATION);
@@ -85,8 +85,8 @@ public class ObligationsAdjudicator implements Obligations {
     }
 
     @Override
-    public List<Obligation> getObligations() throws PMException {
-        List<Obligation> obligations = pap.obligations().getObligations();
+    public List<Obligation> getAll() throws PMException {
+        List<Obligation> obligations = pap.obligations().getAll();
         obligations.removeIf(obligation -> {
             try {
                 for (Rule rule : obligation.getRules()) {
@@ -106,14 +106,14 @@ public class ObligationsAdjudicator implements Obligations {
     }
 
     @Override
-    public boolean obligationExists(String label) throws PMException {
-        boolean exists = pap.obligations().obligationExists(label);
+    public boolean exists(String label) throws PMException {
+        boolean exists = pap.obligations().exists(label);
         if (!exists) {
             return false;
         }
 
         try {
-            getObligation(label);
+            get(label);
         } catch (UnauthorizedException e) {
             return false;
         }
@@ -122,8 +122,8 @@ public class ObligationsAdjudicator implements Obligations {
     }
 
     @Override
-    public Obligation getObligation(String label) throws PMException {
-        Obligation obligation = pap.obligations().getObligation(label);
+    public Obligation get(String label) throws PMException {
+        Obligation obligation = pap.obligations().get(label);
         for (Rule rule : obligation.getRules()) {
             EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, GET_OBLIGATION);

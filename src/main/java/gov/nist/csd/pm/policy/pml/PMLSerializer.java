@@ -75,7 +75,7 @@ public class PMLSerializer implements PMLSerializable {
     private String serializeObligations(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
 
-        List<Obligation> obligations = policy.obligations().getObligations();
+        List<Obligation> obligations = policy.obligations().getAll();
         for (Obligation o : obligations) {
             if (!pml.isEmpty()) {
                 pml.append("\n");
@@ -89,7 +89,7 @@ public class PMLSerializer implements PMLSerializable {
     private String serializeProhibitions(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
 
-        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getProhibitions();
+        Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
         for (List<Prohibition> subjectPros : prohibitions.values()) {
             for (Prohibition p : subjectPros) {
                 if (!pml.isEmpty()) {

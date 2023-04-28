@@ -29,23 +29,23 @@ class MemoryObligations implements Obligations, Serializable {
     }
 
     public MemoryObligations(Obligations obligations) throws PMException {
-        this.obligations = obligations.getObligations();
+        this.obligations = obligations.getAll();
         this.tx = new MemoryTx(false, 0, null);
     }
 
     @Override
-    public void createObligation(UserContext author, String label, Rule... rules) {
+    public void create(UserContext author, String label, Rule... rules) throws PMException {
         if (tx.active()) {
-            tx.policyStore().createObligation(author, label, rules);
+            tx.policyStore().obligations().create(author, label, rules);
         }
 
         obligations.add(new Obligation(author, label, Arrays.asList(rules)));
     }
 
     @Override
-    public void updateObligation(UserContext author, String label, Rule... rules) throws PMException {
+    public void update(UserContext author, String label, Rule... rules) throws PMException {
         if (tx.active()) {
-            tx.policyStore().updateObligation(author, label, rules);
+            tx.policyStore().obligations().update(author, label, rules);
         }
 
         for (Obligation o : obligations) {
@@ -58,21 +58,21 @@ class MemoryObligations implements Obligations, Serializable {
     }
 
     @Override
-    public void deleteObligation(String label) throws PMException {
+    public void delete(String label) throws PMException {
         if (tx.active()) {
-            tx.policyStore().deleteObligation(label);
+            tx.policyStore().obligations().delete(label);
         }
 
         this.obligations.removeIf(o -> o.getLabel().equals(label));
     }
 
     @Override
-    public List<Obligation> getObligations() {
+    public List<Obligation> getAll() {
         return new ArrayList<>(obligations);
     }
 
     @Override
-    public boolean obligationExists(String label) throws PMException {
+    public boolean exists(String label) throws PMException {
         for (Obligation o : obligations) {
             if (o.getLabel().equals(label)) {
                 return true;
@@ -83,7 +83,7 @@ class MemoryObligations implements Obligations, Serializable {
     }
 
     @Override
-    public Obligation getObligation(String label) throws PMException {
+    public Obligation get(String label) throws PMException {
         for (Obligation obligation : obligations) {
             if (obligation.getLabel().equals(label)) {
                 return obligation.clone();
