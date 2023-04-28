@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
@@ -39,8 +39,8 @@ public class TxEvents {
 
         private Obligation obligationToDelete;
 
-        public MemoryDeleteObligationEvent(String label, Obligation obligationToDelete) {
-            super(label);
+        public MemoryDeleteObligationEvent(Obligation obligationToDelete) {
+            super(obligationToDelete);
             this.obligationToDelete = obligationToDelete;
         }
 

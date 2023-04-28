@@ -91,13 +91,13 @@ CREATE TABLE IF NOT EXISTS `obligation` (
     UNIQUE KEY `obligation_label` (`label`)
     );
 
-CREATE TABLE IF NOT EXISTS `pal_function` (
+CREATE TABLE IF NOT EXISTS `pml_function` (
     `name` varchar(50) NOT NULL,
     `bytes` BLOB NOT NULL,
     PRIMARY KEY (`name`)
 );
 
-CREATE TABLE IF NOT EXISTS `pal_constant` (
+CREATE TABLE IF NOT EXISTS `pml_constant` (
     `name` varchar(50) NOT NULL,
     `value` BLOB NOT NULL,
     PRIMARY KEY (`name`)

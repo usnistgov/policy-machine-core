@@ -1,15 +1,17 @@
 package gov.nist.csd.pm.policy.events;
 
+import gov.nist.csd.pm.policy.model.obligation.Obligation;
+
 public class DeleteObligationEvent implements PolicyEvent {
 
-    private final String label;
+    private final Obligation obligation;
 
-    public DeleteObligationEvent(String label) {
-        this.label = label;
+    public DeleteObligationEvent(Obligation obligation) {
+        this.obligation = obligation;
     }
 
-    public String getLabel() {
-        return label;
+    public Obligation getObligation() {
+        return obligation;
     }
 
     @Override

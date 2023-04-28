@@ -1,35 +1,48 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.pap.store.*;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
-import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
+import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.model.graph.nodes.Node;
+import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.model.obligation.Obligation;
+import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
+import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
-class TxPolicyStore extends PolicyStore {
+import java.util.List;
+import java.util.Map;
 
-    /**
-     * The policy store to operate on during the transaction
-     */
-    protected final MemoryPolicyStore txStore;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
+
+class TxPolicyStore implements Policy, PolicyEventEmitter {
+
+    private final MemoryPolicyStore memoryPolicyStore;
 
     /**
      * An event listener to track the events that occur during the transaction.
      * These events will be committed to the target policy store on commit.
      */
     protected TxPolicyEventListener txPolicyEventListener;
-    private final TxGraph graph;
-    private final TxProhibitions prohibitions;
-    private final TxObligations obligations;
-    private final TxPAL pal;
+
+    private TxGraph txGraph;
+    private TxProhibitions txProhibitions;
+    private TxObligations txObligations;
+    private TxUserDefinedPML txUserDefinedPML;
 
     public TxPolicyStore(MemoryPolicyStore txStore) {
-        this.txStore = txStore;
+        this.memoryPolicyStore = txStore;
         this.txPolicyEventListener = new TxPolicyEventListener();
-        this.graph = new TxGraph(txStore.getGraph(), txPolicyEventListener);
-        this.prohibitions = new TxProhibitions(txStore.getProhibitions(), txPolicyEventListener);
-        this.obligations = new TxObligations(txStore.getObligations(), txPolicyEventListener);
-        this.pal = new TxPAL(txStore.getPAL(), txPolicyEventListener);
+        this.txGraph = new TxGraph();
+        this.txProhibitions = new TxProhibitions();
+        this.txObligations = new TxObligations();
+        this.txUserDefinedPML = new TxUserDefinedPML();
     }
 
     public TxPolicyEventListener getTxPolicyEventListener() {
@@ -41,57 +54,328 @@ class TxPolicyStore extends PolicyStore {
     }
 
     @Override
-    public TxGraph graph() {
-        return graph;
-    }
-
-    @Override
-    public TxProhibitions prohibitions() {
-        return prohibitions;
-    }
-
-    @Override
-    public TxObligations obligations() {
-        return obligations;
-    }
-
-    @Override
-    public TxPAL pal() {
-        return pal;
-    }
-
-    @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return txStore.policySync();
-    }
-
-    @Override
-    public void beginTx() throws PMException {
+    public void addEventListener(PolicyEventListener listener, boolean sync) {
 
     }
 
     @Override
-    public void commit() throws PMException {
+    public void removeEventListener(PolicyEventListener listener) {
 
     }
 
     @Override
-    public void rollback() throws PMException {
-
+    public void emitEvent(PolicyEvent event) {
+        txPolicyEventListener.handlePolicyEvent(event);
     }
 
     @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return txStore.toString(policySerializer);
+    public Graph graph() {
+        return txGraph;
     }
 
     @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        // clear tx events
-        clearEvents();
+    public Prohibitions prohibitions() {
+        return txProhibitions;
+    }
 
-        policyDeserializer.deserialize(this, s);
+    @Override
+    public Obligations obligations() {
+        return txObligations;
+    }
 
-        txPolicyEventListener.handlePolicyEvent(txStore.policySync());
+    @Override
+    public UserDefinedPML userDefinedPML() {
+        return txUserDefinedPML;
+    }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return memoryPolicyStore.serialize();
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return memoryPolicyStore.deserialize();
+    }
+
+    class TxGraph implements Graph {
+        @Override
+        public void setResourceAccessRights(AccessRightSet accessRightSet) {
+            emitEvent(new SetResourceAccessRightsEvent(accessRightSet));
+        }
+
+        @Override
+        public AccessRightSet getResourceAccessRights() {
+            return null;
+        }
+
+        @Override
+        public String createPolicyClass(String name, Map<String, String> properties) {
+            emitEvent(new CreatePolicyClassEvent(name, properties));
+            return name;
+        }
+
+        @Override
+        public String createPolicyClass(String name) {
+            return createPolicyClass(name, NO_PROPERTIES);
+        }
+
+        @Override
+        public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) {
+            emitEvent(new CreateUserAttributeEvent(name, properties, parent, parents));
+            return name;
+        }
+
+        @Override
+        public String createUserAttribute(String name, String parent, String... parents) {
+            return createUserAttribute(name, NO_PROPERTIES, parent, parents);
+        }
+
+        @Override
+        public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) {
+            emitEvent(new CreateObjectAttributeEvent(name, properties, parent, parents));
+            return name;
+        }
+
+        @Override
+        public String createObjectAttribute(String name, String parent, String... parents) {
+            return createObjectAttribute(name, NO_PROPERTIES, parent, parents);
+        }
+
+        @Override
+        public String createObject(String name, Map<String, String> properties, String parent, String... parents) {
+            emitEvent(new CreateObjectEvent(name, properties, parent, parents));
+            return name;
+        }
+
+        @Override
+        public String createObject(String name, String parent, String... parents) {
+            return createObject(name, NO_PROPERTIES, parent, parents);
+        }
+
+        @Override
+        public String createUser(String name, Map<String, String> properties, String parent, String... parents) {
+            emitEvent(new CreateUserEvent(name, properties, parent, parents));
+            return name;
+        }
+
+        @Override
+        public String createUser(String name, String parent, String... parents) {
+            return createUser(name, NO_PROPERTIES, parent, parents);
+        }
+
+        @Override
+        public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
+            emitEvent(new TxEvents.MemorySetNodePropertiesEvent(name, memoryPolicyStore.graph().getNode(name).getProperties(), properties));
+        }
+
+        @Override
+        public boolean nodeExists(String name) {
+            return false;
+        }
+
+        @Override
+        public Node getNode(String name) {
+            return null;
+        }
+
+        @Override
+        public List<String> search(NodeType type, Map<String, String> properties) {
+            return null;
+        }
+
+        @Override
+        public List<String> getPolicyClasses() {
+            return null;
+        }
+
+        @Override
+        public void deleteNode(String name) throws PMException {
+            emitEvent(new TxEvents.MemoryDeleteNodeEvent(
+                    name,
+                    memoryPolicyStore.graph().getNode(name),
+                    memoryPolicyStore.graph().getParents(name)
+            ));
+        }
+
+        @Override
+        public void assign(String child, String parent) {
+            emitEvent(new AssignEvent(child, parent));
+        }
+
+        @Override
+        public void deassign(String child, String parent) {
+            emitEvent(new DeassignEvent(child, parent));
+        }
+
+        @Override
+        public void assignAll(List<String> children, String target) {
+            emitEvent(new AssignAllEvent(children, target));
+        }
+
+        @Override
+        public void deassignAll(List<String> children, String target) {
+            emitEvent(new DeassignAllEvent(children, target));
+        }
+
+        @Override
+        public void deassignAllFromAndDelete(String target) {
+            emitEvent(new DeassignAllFromAndDeleteEvent(target));
+        }
+
+        @Override
+        public List<String> getParents(String node) {
+            return null;
+        }
+
+        @Override
+        public List<String> getChildren(String node) {
+            return null;
+        }
+
+        @Override
+        public void associate(String ua, String target, AccessRightSet accessRights) {
+            emitEvent(new AssociateEvent(ua, target, accessRights));
+        }
+
+        @Override
+        public void dissociate(String ua, String target) throws PMException {
+            AccessRightSet accessRightSet = new AccessRightSet();
+            for (Association association : memoryPolicyStore.graph().getAssociationsWithSource(ua)) {
+                if (association.getTarget().equals(target)) {
+                    accessRightSet = association.getAccessRightSet();
+                }
+            }
+
+            emitEvent(new TxEvents.MemoryDissociateEvent(ua, target, accessRightSet));
+        }
+
+        @Override
+        public List<Association> getAssociationsWithSource(String ua) {
+            return null;
+        }
+
+        @Override
+        public List<Association> getAssociationsWithTarget(String target) {
+            return null;
+        }
+    }
+
+    class TxProhibitions implements Prohibitions {
+        @Override
+        public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
+            emitEvent(new CreateProhibitionEvent(label, subject, accessRightSet, intersection, List.of(containerConditions)));
+        }
+
+        @Override
+        public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+            emitEvent(new TxEvents.MemoryUpdateProhibitionEvent(
+                    new Prohibition(label, subject, accessRightSet, intersection, List.of(containerConditions)),
+                    memoryPolicyStore.prohibitions().get(label)
+            ));
+        }
+
+        @Override
+        public void delete(String label) throws PMException {
+            emitEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryPolicyStore.prohibitions().get(label)));
+        }
+
+        @Override
+        public Map<String, List<Prohibition>> getAll() {
+            return null;
+        }
+
+        @Override
+        public boolean exists(String label) {
+            return false;
+        }
+
+        @Override
+        public List<Prohibition> getWithSubject(String subject) {
+            return null;
+        }
+
+        @Override
+        public Prohibition get(String label) {
+            return null;
+        }
+    }
+
+    class TxObligations implements Obligations {
+        @Override
+        public void create(UserContext author, String label, Rule... rules) {
+            emitEvent(new CreateObligationEvent(author, label, List.of(rules)));
+        }
+
+        @Override
+        public void update(UserContext author, String label, Rule... rules) throws PMException {
+            emitEvent(new TxEvents.MemoryUpdateObligationEvent(
+                    new Obligation(author, label, List.of(rules)),
+                    memoryPolicyStore.obligations().get(label)
+            ));
+        }
+
+        @Override
+        public void delete(String label) throws PMException {
+            emitEvent(new TxEvents.MemoryDeleteObligationEvent(memoryPolicyStore.obligations().get(label)));
+        }
+
+        @Override
+        public List<Obligation> getAll() {
+            return null;
+        }
+
+        @Override
+        public boolean exists(String label) {
+            return false;
+        }
+
+        @Override
+        public Obligation get(String label) {
+            return null;
+        }
+
+    }
+
+    class TxUserDefinedPML implements UserDefinedPML {
+        @Override
+        public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) {
+            emitEvent(new AddFunctionEvent(functionDefinitionStatement));
+        }
+
+        @Override
+        public void removeFunction(String functionName) throws PMException {
+            emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.userDefinedPML().getFunctions().get(functionName)));
+        }
+
+        @Override
+        public Map<String, FunctionDefinitionStatement> getFunctions() {
+            return null;
+        }
+
+        @Override
+        public FunctionDefinitionStatement getFunction(String name) {
+            return null;
+        }
+
+        @Override
+        public void addConstant(String constantName, Value constantValue) {
+            emitEvent(new AddConstantEvent(constantName, constantValue));
+        }
+
+        @Override
+        public void removeConstant(String constName) throws PMException {
+            emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.userDefinedPML().getConstants().get(constName)));
+        }
+
+        @Override
+        public Map<String, Value> getConstants() {
+            return null;
+        }
+
+        @Override
+        public Value getConstant(String name) {
+            return null;
+        }
     }
 }

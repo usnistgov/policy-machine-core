@@ -2,65 +2,69 @@ package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
-import gov.nist.csd.pm.policy.author.*;
+import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.PolicyDeserializer;
+import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC_REP;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.FROM_STRING;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.TO_STRING;
 
-public class Adjudicator extends PolicyAuthor {
+public class Adjudicator implements Policy {
 
     private final UserContext userCtx;
     private final PAP pap;
-    private final PolicyReviewer policyReviewer;
+    private final AccessRightChecker accessRightChecker;
+
+    private final GraphAdjudicator graphAdjudicator;
+    private final ProhibitionsAdjudicator prohibitionsAdjudicator;
+    private final ObligationsAdjudicator obligationsAdjudicator;
+    private final UserDefinedPMLAdjudicator userDefinedPMLAdjudicator;
 
     public Adjudicator(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer) {
         this.userCtx = userCtx;
         this.pap = pap;
-        this.policyReviewer = policyReviewer;
+        this.accessRightChecker = new AccessRightChecker(pap, policyReviewer);
+
+        graphAdjudicator = new GraphAdjudicator(userCtx, pap, accessRightChecker);
+        prohibitionsAdjudicator = new ProhibitionsAdjudicator(userCtx, pap, accessRightChecker);
+        obligationsAdjudicator = new ObligationsAdjudicator(userCtx, pap, accessRightChecker);
+        userDefinedPMLAdjudicator = new UserDefinedPMLAdjudicator(userCtx, pap, accessRightChecker);
     }
 
     @Override
-    public GraphAuthor graph() {
-        return new Graph(userCtx, pap, policyReviewer);
+    public GraphAdjudicator graph() {
+        return graphAdjudicator;
     }
 
     @Override
-    public ProhibitionsAuthor prohibitions() {
-        return new Prohibitions(userCtx, pap, policyReviewer);
+    public ProhibitionsAdjudicator prohibitions() {
+        return prohibitionsAdjudicator;
     }
 
     @Override
-    public ObligationsAuthor obligations() {
-        return new Obligations(userCtx, pap, policyReviewer);
+    public ObligationsAdjudicator obligations() {
+        return obligationsAdjudicator;
     }
 
     @Override
-    public PALAuthor pal() {
-        return new PAL(userCtx, pap, policyReviewer);
+    public UserDefinedPMLAdjudicator userDefinedPML() {
+        return userDefinedPMLAdjudicator;
     }
 
     @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        AccessRightSet accessRights = policyReviewer.getAccessRights(userCtx, SUPER_PC_REP);
-        if (!accessRights.contains(TO_STRING)) {
-            throw new UnauthorizedException(userCtx, SUPER_PC_REP, TO_STRING);
-        }
+    public PolicySerializer serialize() throws PMException {
+        accessRightChecker.check(userCtx, SUPER_PC_REP, TO_STRING);
 
         return null;
     }
 
     @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        AccessRightSet accessRights = policyReviewer.getAccessRights(userCtx, SUPER_PC_REP);
-        if (!accessRights.contains(FROM_STRING)) {
-            throw new UnauthorizedException(userCtx, SUPER_PC_REP, FROM_STRING);
-        }
+    public PolicyDeserializer deserialize() throws PMException {
+        accessRightChecker.check(userCtx, SUPER_PC_REP, FROM_STRING);
+
+        return null;
     }
 }

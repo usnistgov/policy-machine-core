@@ -9,24 +9,32 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import java.util.ArrayList;
 import java.util.List;
 
-class TxPolicyEventListener implements PolicyEventListener, TxCmd<MemoryPolicyStore> {
+class TxPolicyEventListener implements PolicyEventListener, TxCmd {
 
-    private final List<TxCmd<?>> events;
+    private final List<PolicyEvent> events;
 
     public TxPolicyEventListener() {
         events = new ArrayList<>();
     }
 
-    public List<TxCmd<?>> getEvents() {
+    public List<PolicyEvent> getEvents() {
         return events;
     }
 
     @Override
     public void handlePolicyEvent(PolicyEvent event) {
-        this.events.add(0, eventToCmd(event));
+        this.events.add(event);
     }
 
-    private TxCmd<?> eventToCmd(PolicyEvent event) {
+    @Override
+    public void revert(MemoryPolicyStore store) throws PMException {
+        for (int i = events.size()-1; i >= 0; i--) {
+            TxCmd cmd = eventToCmd(events.get(i));
+            cmd.revert(store);
+        }
+    }
+
+    private TxCmd eventToCmd(PolicyEvent event) {
         if (event instanceof AddConstantEvent e) {
             return new AddConstantTxCmd(e.getName(), e.getValue());
         } else if (event instanceof AddFunctionEvent e) {
@@ -56,7 +64,7 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd<MemoryPolicySt
         } else if (event instanceof TxEvents.MemoryDeleteNodeEvent e) {
             return new DeleteNodeTxCmd(e.getName(), e.getNode(), e.getParents());
         } else if (event instanceof TxEvents.MemoryDeleteObligationEvent e) {
-            return new DeleteObligationTxCmd(e.getLabel(), e.getObligationToDelete());
+            return new DeleteObligationTxCmd(e.getObligationToDelete());
         } else if (event instanceof TxEvents.MemoryDeleteProhibitionEvent e) {
             return new DeleteProhibitionTxCmd(e.getProhibition());
         } else if (event instanceof TxEvents.MemoryDissociateEvent e) {
@@ -77,35 +85,5 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd<MemoryPolicySt
         }
 
         return new NoopTxCmd();
-    }
-
-    @Override
-    public void apply(MemoryPolicyStore store) throws PMException {
-        for (TxCmd<?> cmd : events) {
-            if (cmd instanceof GraphTxCmd g) {
-                g.apply(store.getGraph());
-            } else if (cmd instanceof ProhibitionsTxCmd p) {
-                p.apply(store.getProhibitions());
-            } else if (cmd instanceof ObligationsTxCmd p) {
-                p.apply(store.getObligations());
-            } else if (cmd instanceof PALTxCmd p) {
-                p.apply(store.getPAL());
-            }
-        }
-    }
-
-    @Override
-    public void revert(MemoryPolicyStore store) throws PMException {
-        for (TxCmd<?> cmd : events) {
-            if (cmd instanceof GraphTxCmd g) {
-                g.revert(store.getGraph());
-            } else if (cmd instanceof ProhibitionsTxCmd p) {
-                p.revert(store.getProhibitions());
-            } else if (cmd instanceof ObligationsTxCmd p) {
-                p.revert(store.getObligations());
-            } else if (cmd instanceof PALTxCmd p) {
-                p.revert(store.getPAL());
-            }
-        }
     }
 }

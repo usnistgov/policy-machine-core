@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
-import gov.nist.csd.pm.policy.GraphReader;
+import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.graph.dag.AllPathsShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.NoopShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.ShortCircuit;
-import gov.nist.csd.pm.policy.model.graph.dag.SinglePathShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.NoopPropagator;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.policy.model.graph.dag.visitor.NoopVisitor;
@@ -17,14 +15,14 @@ import java.util.*;
 
 public class BreadthFirstGraphWalker implements GraphWalker {
 
-    private final GraphReader graph;
+    private final Graph graph;
     private Direction direction;
     private Visitor visitor;
     private Propagator propagator;
     private ShortCircuit allPathsShortCircuit;
     private ShortCircuit singlePathShortCircuit;
 
-    public BreadthFirstGraphWalker(GraphReader graph) {
+    public BreadthFirstGraphWalker(Graph graph) {
         this.graph = graph;
         this.visitor = new NoopVisitor();
         this.propagator = new NoopPropagator();

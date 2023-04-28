@@ -2,9 +2,10 @@ package gov.nist.csd.pm.policy.model.prohibition;
 
 import gov.nist.csd.pm.policy.exceptions.InvalidProhibitionSubjectException;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class ProhibitionSubject {
+public class ProhibitionSubject implements Serializable {
 
     public static ProhibitionSubject userAttribute(String ua) {
         return new ProhibitionSubject(ua, Type.USER_ATTRIBUTE);
@@ -18,8 +19,10 @@ public class ProhibitionSubject {
         return new ProhibitionSubject(process, Type.PROCESS);
     }
 
-    private final String name;
-    private final Type type;
+    private String name;
+    private Type type;
+
+    public ProhibitionSubject() {}
 
     public ProhibitionSubject(String name, Type type) {
         this.name = name;
@@ -31,12 +34,20 @@ public class ProhibitionSubject {
         this.type = typeFromString(type);
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
-    public Type type() {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Type getType() {
         return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public enum Type {

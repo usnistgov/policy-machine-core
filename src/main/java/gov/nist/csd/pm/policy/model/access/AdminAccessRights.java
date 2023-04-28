@@ -56,7 +56,7 @@ public class AdminAccessRights {
     public static final String SET_RESOURCE_ACCESS_RIGHTS = "set_resource_access_rights";
     public static final String GET_RESOURCE_ACCESS_RIGHTS = "get_resource_access_rights";
 
-    // pal
+    // pml
     public static final String ADD_FUNCTION = "add_function";
     public static final String REMOVE_FUNCTION = "remove_function";
     public static final String GET_FUNCTIONS = "get_functions";
@@ -125,7 +125,7 @@ public class AdminAccessRights {
             SET_RESOURCE_ACCESS_RIGHTS,
             GET_RESOURCE_ACCESS_RIGHTS,
 
-            // pal
+            // pml
             ADD_FUNCTION,
             REMOVE_FUNCTION,
             GET_FUNCTIONS,

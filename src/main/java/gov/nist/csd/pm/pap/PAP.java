@@ -1,70 +1,73 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.store.PolicyStoreConnection;
-import gov.nist.csd.pm.policy.PolicyReader;
-import gov.nist.csd.pm.policy.author.*;
+import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.PMLExecutable;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEventEmitter, Transactional, PolicyReader {
+public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter, Transactional, PMLExecutable, Policy {
 
-    protected PolicyStoreConnection policyStore;
-    protected Graph graph;
-    protected Prohibitions prohibitions;
-    protected Obligations obligations;
-    protected PAL pal;
-    protected List<PolicyEventListener> listeners;
+    protected PolicyStore policyStore;
 
-    protected PAP() {}
+    protected Set<PolicyEventListener> listeners;
 
-    protected PAP(PolicyStoreConnection policyStoreConnection, boolean verifySuperPolicy) throws PMException {
-        init(policyStoreConnection, verifySuperPolicy);
-    }
+    private final PAPGraph papGraph;
+    private final PAPProhibitions papProhibitions;
+    private final PAPObligations papObligations;
+    private final PAPUserDefinedPML papUserDefinedPML;
 
-    protected void init(PolicyStoreConnection policyStoreConnection, boolean verifySuperPolicy) throws PMException {
-        this.policyStore = policyStoreConnection;
-        this.listeners = new ArrayList<>();
+    public PAP(PolicyStore policyStore) throws PMException {
+        this.policyStore = policyStore;
+        this.listeners = new HashSet<>();
 
-        this.graph = new Graph(this.policyStore);
-        if (verifySuperPolicy) {
-            SuperPolicy.verifySuperPolicy(this.graph);
-        }
+        this.papGraph = new PAPGraph(policyStore, this);
+        this.papProhibitions = new PAPProhibitions(policyStore, this);
+        this.papObligations = new PAPObligations(policyStore, this);
+        this.papUserDefinedPML = new PAPUserDefinedPML(policyStore, this);
 
-        this.prohibitions = new Prohibitions(this.policyStore);
-        this.obligations = new Obligations(this.policyStore);
-        this.pal = new PAL(this.policyStore);
+        SuperPolicy.verifySuperPolicy(this.policyStore);
     }
 
     @Override
-    public GraphAuthor graph() {
-        return graph;
+    public Graph graph() {
+        return papGraph;
     }
 
     @Override
-    public ProhibitionsAuthor prohibitions() {
-        return prohibitions;
+    public Prohibitions prohibitions() {
+        return papProhibitions;
     }
 
     @Override
-    public ObligationsAuthor obligations() {
-        return obligations;
+    public Obligations obligations() {
+        return papObligations;
     }
 
     @Override
-    public PALAuthor pal() {
-        return pal;
+    public UserDefinedPML userDefinedPML() {
+        return papUserDefinedPML;
     }
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-        this.graph.addEventListener(listener, false);
-        this.prohibitions.addEventListener(listener, false);
-        this.obligations.addEventListener(listener, false);
-        this.pal.addEventListener(listener, false);
+    public PolicySerializer serialize() throws PMException {
+        return policyStore.serialize();
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return new PAPDeserializer(policyStore);
+    }
+
+    @Override
+    public synchronized void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+        listeners.add(listener);
 
         if (sync) {
             listener.handlePolicyEvent(policyStore.policySync());
@@ -72,43 +75,52 @@ public abstract class PAP extends PolicyAuthor implements PolicySync, PolicyEven
     }
 
     @Override
-    public void removeEventListener(PolicyEventListener listener) {
-        this.graph.removeEventListener(listener);
-        this.prohibitions.removeEventListener(listener);
-        this.obligations.removeEventListener(listener);
-        this.pal.removeEventListener(listener);
+    public synchronized void removeEventListener(PolicyEventListener listener) {
+        listeners.remove(listener);
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
+    public synchronized void emitEvent(PolicyEvent event) throws PMException {
         for (PolicyEventListener listener : listeners) {
             listener.handlePolicyEvent(event);
         }
     }
 
     @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
+    public void handlePolicyEvent(PolicyEvent event) throws PMException {
+        for (PolicyEventListener listener : listeners) {
+            listener.handlePolicyEvent(event);
+        }
+    }
+
+    @Override
+    public synchronized PolicySynchronizationEvent policySync() throws PMException {
         return this.policyStore.policySync();
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public synchronized void beginTx() throws PMException {
         policyStore.beginTx();
 
         emitEvent(new BeginTxEvent());
     }
 
     @Override
-    public void commit() throws PMException {
+    public synchronized void commit() throws PMException {
         policyStore.commit();
 
         emitEvent(new CommitTxEvent());
     }
 
     @Override
-    public void rollback() throws PMException {
+    public synchronized void rollback() throws PMException {
         policyStore.rollback();
 
         emitEvent(new RollbackTxEvent(this));
+    }
+
+    @Override
+    public void executePML(UserContext userContext, String input, FunctionDefinitionStatement... functionDefinitionStatements) throws PMException {
+        PMLExecutor.compileAndExecutePML(this, userContext, input, functionDefinitionStatements);
     }
 }

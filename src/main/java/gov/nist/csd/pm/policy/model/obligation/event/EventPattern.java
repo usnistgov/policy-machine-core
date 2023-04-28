@@ -9,9 +9,12 @@ import java.util.Objects;
 
 public class EventPattern implements Serializable {
 
-    private final EventSubject subject;
-    private final List<String> operations;
-    private final Target target;
+    private EventSubject subject;
+    private List<String> operations;
+    private Target target;
+
+    public EventPattern() {
+    }
 
     public EventPattern(EventSubject subject, Performs performs) {
         this.subject = subject;
@@ -28,6 +31,18 @@ public class EventPattern implements Serializable {
         this.subject = eventPattern.subject;
         this.operations = new ArrayList<>(eventPattern.operations);
         this.target = eventPattern.target;
+    }
+
+    public void setSubject(EventSubject subject) {
+        this.subject = subject;
+    }
+
+    public void setOperations(List<String> operations) {
+        this.operations = operations;
+    }
+
+    public void setTarget(Target target) {
+        this.target = target;
     }
 
     public EventSubject getSubject() {

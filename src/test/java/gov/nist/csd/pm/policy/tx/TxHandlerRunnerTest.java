@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.policy.tx;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.NodeNameExistsException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +13,7 @@ class TxHandlerRunnerTest {
 
     @Test
     void testRunTx() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        PAP pap = new PAP(new MemoryPolicyStore());
         runTx(pap, () -> {
             pap.graph().createPolicyClass("pc1");
         });

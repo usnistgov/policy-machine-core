@@ -1,15 +1,10 @@
 package gov.nist.csd.pm.pdp.memory;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreEventHandler;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
-import gov.nist.csd.pm.policy.GraphReader;
-import gov.nist.csd.pm.policy.ObligationsReader;
-import gov.nist.csd.pm.policy.PolicyReader;
-import gov.nist.csd.pm.policy.ProhibitionsReader;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -19,32 +14,31 @@ public class MemoryPDP extends PDP {
 
     private final BasePolicyEventHandler policyEventHandler;
 
-    public MemoryPDP(MemoryPAP pap) throws PMException {
+    public MemoryPDP(PAP pap, boolean loadPolicyIntoMemory) throws PMException {
         super(pap);
 
-        this.policyEventHandler = new EmbeddedPolicyListener(pap);
-    }
-
-    public MemoryPDP(PAP pap) throws PMException {
-        super(pap);
-
-        this.policyEventHandler = new ReviewerPolicyListener(new MemoryPolicyStore());
-        this.pap.addEventListener(this.policyEventHandler, true);
+        if (loadPolicyIntoMemory) {
+            // load the policy into memory
+            this.policyEventHandler = new ReviewerPolicyListener(new MemoryPolicyStore());
+            this.pap.addEventListener(this.policyEventHandler, true);
+        } else {
+            this.policyEventHandler = new EmbeddedPolicyListener(pap);
+        }
     }
 
     @Override
-    public PolicyReviewer policyReviewer() throws PMException {
+    public PolicyReviewer reviewer() throws PMException {
         return new MemoryPolicyReviewer(policyEventHandler);
     }
 
     public synchronized void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, pap, new MemoryPolicyReviewer(policyEventHandler), eventListeners);
+            PDPTx pdpTx = new PDPTx(userCtx, pap, new BulkPolicyReviewer(userCtx, pap), eventListeners);
             txRunner.run(pdpTx);
         });
     }
 
-    private static class ReviewerPolicyListener extends MemoryPolicyStoreEventHandler implements PolicyReader {
+    private static class ReviewerPolicyListener extends MemoryPolicyStoreEventHandler {
 
         public ReviewerPolicyListener(MemoryPolicyStore store) {
             super(store);
@@ -64,34 +58,19 @@ public class MemoryPDP extends PDP {
         }
 
         private void handlePolicySync(PolicySynchronizationEvent event) {
-            this.policy = new MemoryPolicyStore(event);
+            this.policy = event.getPolicyStore();
         }
     }
 
-    private static class EmbeddedPolicyListener extends BasePolicyEventHandler implements PolicyReader {
+    private static class EmbeddedPolicyListener extends BasePolicyEventHandler {
 
-        public EmbeddedPolicyListener(MemoryPAP pap) {
+        public EmbeddedPolicyListener(PAP pap) {
             super(pap);
         }
 
         @Override
         public void handlePolicyEvent(PolicyEvent event) throws PMException {
             // don't need to handle events as the pap will be updated in real time
-        }
-
-        @Override
-        public GraphReader graph() {
-            return policy.graph();
-        }
-
-        @Override
-        public ProhibitionsReader prohibitions() {
-            return policy.prohibitions();
-        }
-
-        @Override
-        public ObligationsReader obligations() {
-            return policy.obligations();
         }
     }
 }

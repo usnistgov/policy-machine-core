@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.author.pal.model.expression.Value;
-import gov.nist.csd.pm.policy.author.pal.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -33,10 +35,10 @@ class PolicyEventHandlerTest {
         handler.handle(new DeassignEvent("", ""));
         handler.handle(new DeassignFromEvent("", ""));
         handler.handle(new DeleteNodeEvent(""));
-        handler.handle(new DeleteObligationEvent(""));
+        handler.handle(new DeleteObligationEvent(new Obligation(new UserContext(""), "")));
         handler.handle(new DeleteProhibitionEvent(null));
         handler.handle(new DissociateEvent("", ""));
-        handler.handle(new PolicySynchronizationEvent(null, null, null, null));
+        handler.handle(new PolicySynchronizationEvent(null));
         handler.handle(new RemoveConstantEvent(null));
         handler.handle(new RemoveFunctionEvent(null));
         handler.handle(new RollbackTxEvent(null));

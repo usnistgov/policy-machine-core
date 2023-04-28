@@ -26,7 +26,7 @@ class EventProcessor {
             UserContext author = obligation.getAuthor();
             List<Rule> rules = obligation.getRules();
             for(Rule rule : rules) {
-                if(!eventCtx.matchesPattern(rule.getEvent(), pdp.policyReviewer())) {
+                if(!eventCtx.matchesPattern(rule.getEventPattern(), pdp.reviewer())) {
                     continue;
                 }
 

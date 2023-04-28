@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.policy.model.obligation.event;
 
 import gov.nist.csd.pm.pdp.PolicyReviewer;
-import gov.nist.csd.pm.policy.GraphReader;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.io.Serializable;
@@ -27,6 +26,9 @@ public class Target implements Serializable {
 
     private Type type;
     private List<String> policyElements;
+
+    public Target() {
+    }
 
     public Target(Type type, List<String> policyElements) {
         this.type = type;

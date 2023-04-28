@@ -19,8 +19,8 @@ public class PolicyResetSequence {
                 "delete from prohibition_container",
                 "delete from obligation",
                 "delete from resource_access_rights",
-                "delete from pal_function",
-                "delete from pal_constant",
+                "delete from pml_function",
+                "delete from pml_constant",
                 "SET SQL_SAFE_UPDATES = 1",
                 "SET FOREIGN_KEY_CHECKS=1"
         );

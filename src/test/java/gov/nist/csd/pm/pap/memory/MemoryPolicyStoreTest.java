@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,7 +45,7 @@ class MemoryPolicyStoreTest {
 
     @Test
     void getNode() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
+        memoryPolicyStore.graph().createPolicyClass("pc1", NO_PROPERTIES);
         Node pc1 = memoryPolicyStore.graph().getNode("pc1");
         pc1.getProperties().put("test", "test");
 
@@ -117,10 +118,10 @@ class MemoryPolicyStoreTest {
         prohibitions = memoryPolicyStore.prohibitions().getAll();
         Prohibition p = prohibitions.get("ua1").get(0);
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().getAll().get("ua1").get(0);
+        Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
-        assertEquals("ua1", actual.getSubject().name());
-        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
+        assertEquals("ua1", actual.getSubject().getName());
+        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
@@ -141,8 +142,8 @@ class MemoryPolicyStoreTest {
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("label", actual.getLabel());
-        assertEquals("ua1", actual.getSubject().name());
-        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
+        assertEquals("ua1", actual.getSubject().getName());
+        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
@@ -159,8 +160,8 @@ class MemoryPolicyStoreTest {
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = memoryPolicyStore.prohibitions().get("label");
         assertEquals("label", actual.getLabel());
-        assertEquals("ua1", actual.getSubject().name());
-        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().type());
+        assertEquals("ua1", actual.getSubject().getName());
+        assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
@@ -224,6 +225,19 @@ class MemoryPolicyStoreTest {
                 throw new PMException("test");
             });
         } catch (PMException e) { }
+        assertFalse(store.graph().nodeExists("oa1"));
+    }
+
+    @Test
+    void testTx2() throws PMException {
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        store.graph().createPolicyClass("pc1");
+        store.beginTx();
+        store.graph().createObjectAttribute("oa1", "pc1");
+        assertTrue(store.graph().nodeExists("oa1"));
+        store.rollback();
+        assertFalse(store.graph().nodeExists("oa1"));
+        store.commit();
         assertFalse(store.graph().nodeExists("oa1"));
     }
 }

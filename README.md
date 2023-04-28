@@ -5,7 +5,7 @@ The core components of the NIST Policy Machine, a reference implementation of th
 ## Table of Contents
 1. [Installation](#install-using-maven)
 2. [Basic Usage](#basic-usage)
-3. [Policy Author Language (PAL)](/pal/README.md)
+3. [Policy Author Language (PAL)](/pml/README.md)
 
 ## Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import into projects.
@@ -33,30 +33,30 @@ Then, add the maven dependency
 
 ## Basic Usage
 
-### 1. Policy Author Language (PAL) definition
-```java
+### 1. Policy Machine Language (PML) definition
+```pml
 String pal = """
-set resource access rights "read", "write";
+set resource access rights "read", "write"
 
-create policy class "pc1";
-create user attribute "ua1" in "pc1";
-create user attribute "oa1" in "pc1";
-associate "ua1" and "oa1" with "read", "write";
+create policy class "pc1"
+create user attribute "ua1" in "pc1"
+create user attribute "oa1" in "pc1"
+associate "ua1" and "oa1" with "read", "write"
 
-create policy class "pc2";
-assign "ua2" to "pc2";
-create user attribute "oa2" in "pc2";
-associate "ua2" and "oa2" with "read", "write";
+create policy class "pc2"
+assign "ua2" to "pc2"
+create user attribute "oa2" in "pc2"
+associate "ua2" and "oa2" with "read", "write"
 
-create user "u1" in "ua1", "ua2";
-create user "u2" in "ua1", "ua2";
+create user "u1" in "ua1", "ua2"
+create user "u2" in "ua1", "ua2"
 
-create object "o1" in "oa1", "oa2";
+create object "o1" in "oa1", "oa2"
 
 create prohibition "u2-prohibition"
 deny user "u2"
 access rights "write"
-on intersection of "oa1", "oa2";
+on intersection of "oa1", "oa2"
 
 create obligation "o1-obligation" {
     create rule "o1-assignment-rule"
@@ -64,9 +64,9 @@ create obligation "o1-obligation" {
     performs "assign"
     on "o1"
     do(evtCtx) {
-        let parent = evtCtx["parent"];
-        associate "ua1" and parent with "read", "write";
-        associate "ua2" and parent with "read", "write";
+        let parent = evtCtx["parent"]
+        associate "ua1" and parent with "read", "write"
+        associate "ua2" and parent with "read", "write"
     }
 }
 """
@@ -77,10 +77,10 @@ No access checks are done yet, the user is needed to know who the author of any 
 ```java
 UserContext superUser = new UserContext(SUPER_USER);
 PAP pap = new MemoryPAP();
-pap.fromString(input, new PALDeserializer(superUser);
+pap.deserialize().fromPML(superUser, input);
 ```
 
-#### 3. Wrap in a PDP object to add permission checks
+#### 3. Wrap in a PDP object to add administrative permission checks
 ```java
 PDP pdp = new MemoryPDP(pap);
 ```
@@ -103,4 +103,10 @@ UserContext u1 = new UserContext("u1");
 pdp.runTx(u1, (policy) -> {
     policy.graph().createObjectAttribute("newOA", "oa1");
 });
+```
+
+#### 6. Create an EPP to respond to policy events
+An EPP will listen to policy events from the provided PDP and process obligations accordingly.
+```java
+EPP epp = new EPP(pdp, pap);
 ```

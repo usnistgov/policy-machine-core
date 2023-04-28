@@ -1,9 +1,8 @@
 package gov.nist.csd.pm.pap.memory.dag;
 
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.graph.Graph;
-import gov.nist.csd.pm.policy.model.graph.dag.AllPathsShortCircuit;
-import gov.nist.csd.pm.policy.model.graph.dag.SinglePathShortCircuit;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,29 +14,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DepthFirstGraphWalkerTest {
 
-    static Graph graph;
+    static PAP pap;
 
     @BeforeAll
-    static void setup() {
-        graph = new Graph();
-        graph.createPolicyClass("pc1");
-        graph.createObjectAttribute("oa1", "pc1");
+    static void setup() throws PMException {
+        pap = new PAP(new MemoryPolicyStore());
+        pap.graph().createPolicyClass("pc1");
+        pap.graph().createObjectAttribute("oa1", "pc1");
 
-        graph.createObjectAttribute("oa1-1", "oa1");
-        graph.createObjectAttribute("oa1-1-1", "oa1-1");
-        graph.createObjectAttribute("oa1-1-2", "oa1-1");
-        graph.createObjectAttribute("oa1-1-3", "oa1-1");
+        pap.graph().createObjectAttribute("oa1-1", "oa1");
+        pap.graph().createObjectAttribute("oa1-1-1", "oa1-1");
+        pap.graph().createObjectAttribute("oa1-1-2", "oa1-1");
+        pap.graph().createObjectAttribute("oa1-1-3", "oa1-1");
 
-        graph.createObjectAttribute("oa1-2", "oa1");
-        graph.createObjectAttribute("oa1-2-1", "oa1-2");
-        graph.createObjectAttribute("oa1-2-2", "oa1-2");
-        graph.createObjectAttribute("oa1-2-3", "oa1-2");
+        pap.graph().createObjectAttribute("oa1-2", "oa1");
+        pap.graph().createObjectAttribute("oa1-2-1", "oa1-2");
+        pap.graph().createObjectAttribute("oa1-2-2", "oa1-2");
+        pap.graph().createObjectAttribute("oa1-2-3", "oa1-2");
     }
 
     @Test
     void testWalk() throws PMException {
         List<String> visited = new ArrayList<>();
-        DepthFirstGraphWalker bfs = new DepthFirstGraphWalker(graph)
+        DepthFirstGraphWalker bfs = new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.CHILDREN)
                 .withVisitor((node) -> {
                     visited.add(node);
@@ -53,7 +52,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testAllPathsShortCircuit() throws PMException {
         List<String> visited = new ArrayList<>();
-        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(graph)
+        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.CHILDREN)
                 .withVisitor(node -> {
                     visited.add(node);
@@ -69,7 +68,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testSinglePathShortCircuit() throws PMException {
         List<String> visited = new ArrayList<>();
-        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(graph)
+        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap.graph())
                 .withDirection(Direction.CHILDREN)
                 .withVisitor(node -> {
                     visited.add(node);

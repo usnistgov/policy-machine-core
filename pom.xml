@@ -64,12 +64,12 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
                 <configuration>
-                    <sourceDirectory>src/main/java/gov/nist/csd/pm/policy/author/pal/antlr</sourceDirectory>
-                    <outputDirectory>src/main/java/gov/nist/csd/pm/policy/author/pal/antlr</outputDirectory>
+                    <sourceDirectory>src/main/java/gov/nist/csd/pm/policy/pml/antlr</sourceDirectory>
+                    <outputDirectory>src/main/java/gov/nist/csd/pm/policy/pml/antlr</outputDirectory>
                     <visitor>true</visitor>
                     <arguments>
                         <argument>-package</argument>
-                        <argument>gov.nist.csd.pm.policy.author.pal.antlr</argument>
+                        <argument>gov.nist.csd.pm.policy.pml.antlr</argument>
                     </arguments>
                 </configuration>
                 <executions>

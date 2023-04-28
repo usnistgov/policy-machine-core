@@ -10,9 +10,12 @@ import java.util.Objects;
 
 public class Rule implements Serializable {
 
-    private final String label;
-    private final EventPattern eventPattern;
-    private final Response response;
+    private String label;
+    private EventPattern eventPattern;
+    private Response response;
+
+    public Rule() {
+    }
 
     public Rule(String label, EventPattern eventPattern, Response response) {
         this.label = label;
@@ -42,12 +45,24 @@ public class Rule implements Serializable {
         return label;
     }
 
-    public EventPattern getEvent() {
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public EventPattern getEventPattern() {
         return eventPattern;
+    }
+
+    public void setEventPattern(EventPattern eventPattern) {
+        this.eventPattern = eventPattern;
     }
 
     public Response getResponse() {
         return response;
+    }
+
+    public void setResponse(Response response) {
+        this.response = response;
     }
 
     @Override

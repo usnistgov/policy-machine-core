@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.model.graph.nodes;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,10 +10,7 @@ import java.util.Map;
 public class Properties {
     public static final String WILDCARD = "*";
     public static final String REP_PROPERTY = "rep";
-
-    public static Map<String, String> noprops() {
-        return new HashMap<>();
-    }
+    public static final Map<String, String> NO_PROPERTIES = Collections.unmodifiableMap(new HashMap<>());
 
     /**
      * This method receives an array of strings and pairs consecutive parameters as key, value pairs.

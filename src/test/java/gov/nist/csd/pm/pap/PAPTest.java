@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.memory.MemoryPAP;
-import gov.nist.csd.pm.pap.mysql.MysqlPAP;
+import gov.nist.csd.pm.SamplePolicy;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.mysql.MysqlPolicyStore;
 import gov.nist.csd.pm.pap.mysql.MysqlTestEnv;
-import gov.nist.csd.pm.policy.author.pal.model.expression.*;
-import gov.nist.csd.pm.policy.author.pal.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.author.pal.statement.*;
+import gov.nist.csd.pm.policy.PolicyEquals;
+import gov.nist.csd.pm.policy.pml.model.expression.*;
+import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
@@ -24,17 +25,19 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.pml.statement.CreateAttrStatement;
+import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
+import gov.nist.csd.pm.policy.pml.statement.Expression;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.noprops;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
 import static gov.nist.csd.pm.pap.SuperPolicy.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,10 +47,10 @@ class PAPTest {
     private static MysqlTestEnv testEnv;
 
     public void runTest(TestRunner testRunner) throws PMException {
-        testRunner.run(new MemoryPAP());
+        testRunner.run(new PAP(new MemoryPolicyStore()));
 
         try (Connection connection = testEnv.getConnection()) {
-            PAP mysqlPAP = new MysqlPAP(connection);
+            PAP mysqlPAP = new PAP(new MysqlPolicyStore(connection));
             testRunner.run(mysqlPAP);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -89,7 +92,11 @@ class PAPTest {
     class CreatePolicyClassTest {
         @Test
         void NameAlreadyExists() throws PMException {
-            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createPolicyClass(SUPER_PC)));
+            runTest(pap -> {
+                pap.graph().createPolicyClass("pc1");
+                assertDoesNotThrow(() -> pap.graph().createPolicyClass(SUPER_PC));
+                assertThrows(NodeNameExistsException.class, () -> pap.graph().createPolicyClass("pc1"));
+            });
         }
 
         @Test
@@ -152,7 +159,10 @@ class PAPTest {
 
         @Test
         void NameAlreadyExists() throws PMException {
-            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createUserAttribute(SUPER_UA, "pc1")));
+            runTest(pap -> {
+                assertDoesNotThrow(() -> pap.graph().createUserAttribute("ua1", SUPER_UA));
+                assertThrows(NodeNameExistsException.class, () -> pap.graph().createUserAttribute("ua1", "pc1"));
+            });
         }
 
         @Test
@@ -230,7 +240,12 @@ class PAPTest {
 
         @Test
         void NameAlreadyExists() throws PMException {
-            runTest(pap -> assertThrows(NodeNameExistsException.class, () -> pap.graph().createUser(SUPER_USER, "ua1")));
+            runTest(pap -> {
+                pap.graph().createUserAttribute("ua1", SUPER_UA);
+                pap.graph().createUser("u1", SUPER_UA);
+                assertDoesNotThrow(() -> pap.graph().createUser(SUPER_USER, "ua1"));
+                assertThrows(NodeNameExistsException.class, () -> pap.graph().createUser("u1", "ua1"));
+            });
         }
 
         @Test
@@ -263,14 +278,14 @@ class PAPTest {
         @Test
         void NodeDoesNotExist() throws PMException {
             runTest(pap -> assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.graph().setNodeProperties("oa1", noprops())));
+                    () -> pap.graph().setNodeProperties("oa1", NO_PROPERTIES)));
         }
 
         @Test
         void EmptyProperties() throws PMException {
             runTest(pap -> {
                 pap.graph().createPolicyClass("pc1");
-                pap.graph().setNodeProperties("pc1", noprops());
+                pap.graph().setNodeProperties("pc1", NO_PROPERTIES);
 
                 assertTrue(pap.graph().getNode("pc1").getProperties().isEmpty());
             });
@@ -421,7 +436,7 @@ class PAPTest {
             pap.graph().createObjectAttribute("oa2", toProperties("key1", "value1"), "pc1");
             pap.graph().createObjectAttribute("oa3", toProperties("key1", "value1", "key2", "value2"), "pc1");
 
-            List<String> nodes = pap.graph().search(OA, noprops());
+            List<String> nodes = pap.graph().search(OA, NO_PROPERTIES);
             assertEquals(6, nodes.size());
 
             nodes = pap.graph().search(ANY, toProperties("key1", "value1"));
@@ -442,7 +457,7 @@ class PAPTest {
             assertEquals(1, nodes.size());
             nodes = pap.graph().search(OA, toProperties("key1", "value1", "key2", "no_value"));
             assertEquals(0, nodes.size());
-            nodes = pap.graph().search(ANY, noprops());
+            nodes = pap.graph().search(ANY, NO_PROPERTIES);
             assertEquals(11, nodes.size());
         });
     }
@@ -910,7 +925,7 @@ class PAPTest {
 
                 Prohibition p = pap.prohibitions().get("label");
                 assertEquals("label", p.getLabel());
-                assertEquals("subject", p.getSubject().name());
+                assertEquals("subject", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                 assertTrue(p.isIntersection());
                 assertEquals(2, p.getContainers().size());
@@ -924,12 +939,6 @@ class PAPTest {
 
     @Nested
     class UpdateProhibitionTest {
-
-        @Test
-        void ProhibitionDoesNotExist() throws PMException {
-            runTest(pap -> assertThrows(ProhibitionDoesNotExistException.class,
-                    () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false)));
-        }
 
         @Test
         void InvalidAccessRights() throws PMException {
@@ -999,7 +1008,7 @@ class PAPTest {
 
                 Prohibition p = pap.prohibitions().get("label");
                 assertEquals("label", p.getLabel());
-                assertEquals("subject2", p.getSubject().name());
+                assertEquals("subject2", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read", "write"), p.getAccessRightSet());
                 assertTrue(p.isIntersection());
                 assertEquals(2, p.getContainers().size());
@@ -1012,12 +1021,6 @@ class PAPTest {
 
         @Nested
         class DeleteProhibitionTest {
-
-            @Test
-            void ProhibitionDoesNotExist() throws PMException {
-                runTest(pap -> assertThrows(ProhibitionDoesNotExistException.class,
-                        () -> pap.prohibitions().update("label", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false)));
-            }
 
             @Test
             void Success() throws PMException {
@@ -1074,7 +1077,7 @@ class PAPTest {
             for (Prohibition p : prohibitions) {
                 if (p.getLabel().equals("label1")) {
                     assertEquals("label1", p.getLabel());
-                    assertEquals("subject", p.getSubject().name());
+                    assertEquals("subject", p.getSubject().getName());
                     assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                     assertTrue(p.isIntersection());
                     assertEquals(2, p.getContainers().size());
@@ -1084,7 +1087,7 @@ class PAPTest {
                     ), p.getContainers());
                 } else if (p.getLabel().equals("label2")) {
                     assertEquals("label2", p.getLabel());
-                    assertEquals("subject", p.getSubject().name());
+                    assertEquals("subject", p.getSubject().getName());
                     assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                     assertTrue(p.isIntersection());
                     assertEquals(2, p.getContainers().size());
@@ -1145,7 +1148,7 @@ class PAPTest {
 
                 Prohibition p = pap.prohibitions().get("label1");
                 assertEquals("label1", p.getLabel());
-                assertEquals("subject", p.getSubject().name());
+                assertEquals("subject", p.getSubject().getName());
                 assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
                 assertTrue(p.isIntersection());
                 assertEquals(2, p.getContainers().size());
@@ -1509,7 +1512,7 @@ class PAPTest {
     }
 
     @Nested
-    class AddFunction {
+    class addFunction {
 
         FunctionDefinitionStatement testFunc = new FunctionDefinitionStatement(
                 "testFunc",
@@ -1523,12 +1526,12 @@ class PAPTest {
                         new CreateAttrStatement(
                                 new Expression(new VariableReference("ua1", Type.string())),
                                 UA,
-                                new Expression(new VariableReference("pc1", Type.string()))
+                                new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("pc1", Type.string()))}, Type.string())))
                         ),
                         new CreateAttrStatement(
                                 new Expression(new VariableReference("oa1", Type.string())),
                                 OA,
-                                new Expression(new VariableReference("pc1", Type.string()))
+                                new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("pc1", Type.string()))}, Type.string())))
                         )
                 )
         );
@@ -1536,17 +1539,17 @@ class PAPTest {
         @Test
         void functionAlreadyDefined() throws PMException {
             runTest(pap -> {
-                pap.pal().addFunction(testFunc);
-                assertThrows(FunctionAlreadyDefinedException.class, () -> pap.pal().addFunction(testFunc));
+                pap.userDefinedPML().addFunction(testFunc);
+                assertThrows(FunctionAlreadyDefinedException.class, () -> pap.userDefinedPML().addFunction(testFunc));
             });
         }
 
         @Test
         void success() throws PMException {
             runTest(pap -> {
-                pap.pal().addFunction(testFunc);
-                assertTrue(pap.pal().getFunctions().containsKey(testFunc.getFunctionName()));
-                FunctionDefinitionStatement actual = pap.pal().getFunctions().get(testFunc.getFunctionName());
+                pap.userDefinedPML().addFunction(testFunc);
+                assertTrue(pap.userDefinedPML().getFunctions().containsKey(testFunc.getFunctionName()));
+                FunctionDefinitionStatement actual = pap.userDefinedPML().getFunctions().get(testFunc.getFunctionName());
                 assertEquals(testFunc, actual);
             });
         }
@@ -1558,17 +1561,17 @@ class PAPTest {
         @Test
         void functionDoesNotExistNoException() throws PMException {
             runTest(pap -> {
-                assertDoesNotThrow(() -> pap.pal().removeFunction("func"));
+                assertDoesNotThrow(() -> pap.userDefinedPML().removeFunction("func"));
             });
         }
 
         @Test
         void success() throws PMException {
             runTest(pap -> {
-                pap.pal().addFunction(new FunctionDefinitionStatement("testFunc", Type.voidType(), List.of(), List.of()));
-                assertTrue(pap.pal().getFunctions().containsKey("testFunc"));
-                pap.pal().removeFunction("testFunc");
-                assertFalse(pap.pal().getFunctions().containsKey("testFunc"));
+                pap.userDefinedPML().addFunction(new FunctionDefinitionStatement("testFunc", Type.voidType(), List.of(), List.of()));
+                assertTrue(pap.userDefinedPML().getFunctions().containsKey("testFunc"));
+                pap.userDefinedPML().removeFunction("testFunc");
+                assertFalse(pap.userDefinedPML().getFunctions().containsKey("testFunc"));
             });
         }
     }
@@ -1582,10 +1585,10 @@ class PAPTest {
             FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement("testFunc2", Type.voidType(), List.of(), List.of());
 
             runTest(pap -> {
-                pap.pal().addFunction(testFunc1);
-                pap.pal().addFunction(testFunc2);
+                pap.userDefinedPML().addFunction(testFunc1);
+                pap.userDefinedPML().addFunction(testFunc2);
 
-                Map<String, FunctionDefinitionStatement> functions = pap.pal().getFunctions();
+                Map<String, FunctionDefinitionStatement> functions = pap.userDefinedPML().getFunctions();
                 assertTrue(functions.containsKey("testFunc1"));
                 FunctionDefinitionStatement actual = functions.get("testFunc1");
                 assertEquals(testFunc1, actual);
@@ -1604,8 +1607,8 @@ class PAPTest {
         @Test
         void constantAlreadyDefined() throws PMException {
             runTest(pap -> {
-                pap.pal().addConstant("const1", new Value("test"));
-                assertThrows(ConstantAlreadyDefinedException.class, () -> pap.pal().addConstant("const1", new Value("test")));
+                pap.userDefinedPML().addConstant("const1", new Value("test"));
+                assertThrows(ConstantAlreadyDefinedException.class, () -> pap.userDefinedPML().addConstant("const1", new Value("test")));
             });
         }
 
@@ -1614,9 +1617,9 @@ class PAPTest {
             Value expected = new Value("test");
 
             runTest(pap -> {
-                pap.pal().addConstant("const1", expected);
-                assertTrue(pap.pal().getConstants().containsKey("const1"));
-                Value actual = pap.pal().getConstants().get("const1");
+                pap.userDefinedPML().addConstant("const1", expected);
+                assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
+                Value actual = pap.userDefinedPML().getConstants().get("const1");
                 assertEquals(expected, actual);
             });
         }
@@ -1628,17 +1631,17 @@ class PAPTest {
         @Test
         void constantDoesNotExistNoException() throws PMException {
             runTest(pap -> {
-                assertDoesNotThrow(() -> pap.pal().removeConstant("const1"));
+                assertDoesNotThrow(() -> pap.userDefinedPML().removeConstant("const1"));
             });
         }
 
         @Test
         void success() throws PMException {
             runTest(pap -> {
-                pap.pal().addConstant("const1", new Value("test"));
-                assertTrue(pap.pal().getConstants().containsKey("const1"));
-                pap.pal().removeConstant("const1");
-                assertFalse(pap.pal().getConstants().containsKey("const1"));
+                pap.userDefinedPML().addConstant("const1", new Value("test"));
+                assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
+                pap.userDefinedPML().removeConstant("const1");
+                assertFalse(pap.userDefinedPML().getConstants().containsKey("const1"));
             });
         }
     }
@@ -1652,10 +1655,10 @@ class PAPTest {
             Value const2 = new Value("test2");
 
             runTest(pap -> {
-                pap.pal().addConstant("const1", const1);
-                pap.pal().addConstant("const2", const2);
+                pap.userDefinedPML().addConstant("const1", const1);
+                pap.userDefinedPML().addConstant("const2", const2);
 
-                Map<String, Value> constants = pap.pal().getConstants();
+                Map<String, Value> constants = pap.userDefinedPML().getConstants();
                 assertTrue(constants.containsKey("const1"));
                 Value actual = constants.get("const1");
                 assertEquals(const1, actual);
@@ -1665,5 +1668,239 @@ class PAPTest {
                 assertEquals(const2, actual);
             });
         }
+    }
+
+    private static final String input = """
+            set resource access rights ['read', 'write', 'execute']
+            create policy class 'pc1'
+            set properties of 'pc1' to {'k':'v'}
+            create oa 'oa1' in ['pc1']
+            set properties of 'oa1' to {'k1':'v1'}
+            create ua 'ua1' in ['pc1']
+            associate 'ua1' and 'oa1' with ['read', 'write']
+            create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1']
+            create obligation 'obl1' {
+                create rule 'rule1'
+                when any user
+                performs ['event1', 'event2']
+                do(evtCtx) {
+                    let event = evtCtx['event']
+                    if equals(event, 'event1') {
+                        create policy class 'e1'
+                    } else if equals(event, 'event2') {
+                        create policy class 'e2'
+                    }
+                }
+            }
+            const testConst = "hello world"
+            function testFunc() void {
+                create pc "pc1"
+            }
+            """;
+    private static final String expected = """
+            const testConst = 'hello world'
+            function testFunc() void {create policy class 'pc1'}
+            set resource access rights ['read', 'write', 'execute']
+            create policy class 'super_policy'
+            create user attribute 'super_ua' in ['super_policy']
+            create user attribute 'super_ua1' in ['super_policy']
+            associate 'super_ua1' and 'super_ua' with ['*']
+            create object attribute 'super_oa' in ['super_policy']
+            associate 'super_ua' and 'super_oa' with ['*']
+            create user 'super' in ['super_ua']
+            assign 'super' to ['super_ua1']
+            create object attribute 'super_policy_pc_rep' in ['super_oa']
+            create object attribute 'pc1_pc_rep' in ['super_oa']
+            create policy class 'pc1'
+            set properties of 'pc1' to {'k': 'v'}
+            create object attribute 'oa1' in ['pc1']
+            set properties of 'oa1' to {'k1': 'v1'}
+            associate 'super_ua' and 'oa1' with ['*']
+            create user attribute 'ua1' in ['pc1']
+            associate 'super_ua' and 'ua1' with ['*']
+            associate 'ua1' and 'oa1' with ['read', 'write']
+            create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1']
+            create obligation 'obl1' {create rule 'rule1' when any user performs ['event1', 'event2'] on any policy element do (evtCtx) {let event = evtCtx['event']if equals(event, 'event1') {create policy class 'e1'} else if equals(event, 'event2') {create policy class 'e2'} }}
+            """.trim();
+    @Test
+    void testSerialize() throws PMException {
+        runTest(pap -> {
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
+            String actual = pap.serialize().toPML();
+            assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
+
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), actual);
+            actual = pap.serialize().toPML();
+            assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
+
+            String json = pap.serialize().toJSON();
+            MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+            memoryPolicyStore.deserialize().fromJSON(json);
+            pap.deserialize().fromJSON(json);
+            PolicyEquals.check(pap, memoryPolicyStore);
+        });
+    }
+
+    private List<String> pmlEqual(String expected, String actual) {
+        List<String> expectedLines = sortLines(expected);
+        List<String> actualLines = sortLines(actual);
+        expectedLines.removeIf(line -> actualLines.contains(line));
+        return expectedLines;
+    }
+
+    private List<String> sortLines(String pml) {
+        List<String> lines = new ArrayList<>();
+        Scanner sc = new Scanner(pml);
+        while (sc.hasNextLine()) {
+            lines.add(sc.nextLine());
+        }
+
+        Collections.sort(lines);
+        return lines;
+    }
+
+    @Test
+    void testExecutePML() throws PMException {
+        runTest(pap -> {
+            try {
+                SamplePolicy.loadSamplePolicyFromPML(pap);
+
+                FunctionDefinitionStatement functionDefinitionStatement = new FunctionDefinitionStatement(
+                        "testfunc",
+                        Type.voidType(),
+                        List.of(),
+                        (ctx, policy) -> {
+                            policy.graph().createPolicyClass("pc3");
+                            return new Value();
+                        }
+                );
+
+                pap.executePML(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2']\ntestfunc()", functionDefinitionStatement);
+                assertTrue(pap.graph().nodeExists("ua3"));
+                assertTrue(pap.graph().nodeExists("pc3"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Test
+    void testAssignAll() throws PMException {
+        runTest(pap -> {
+            String pml = """
+                    create pc 'pc1'
+                    create oa 'oa1' in ['pc1']
+                    create oa 'oa2' in ['pc1']
+                    create ua 'ua1' in ['pc1']
+                    
+                    for i in range [1, 10] {
+                        let name = concat(["o", numToStr(i)])
+                        create object name in ['oa1']
+                    }
+                    """;
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+
+            List<String> children = pap.graph().getChildren("oa1");
+            pap.graph().assignAll(children, "oa2");
+
+            assertEquals(10, pap.graph().getChildren("oa2").size());
+
+            assertDoesNotThrow(() -> {
+                pap.graph().assignAll(children, "oa2");
+            });
+
+            // reset policy
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+
+            // test with illegal assignment
+            children.add("ua1");
+            assertThrows(PMException.class, () -> {
+                pap.graph().assignAll(children, "oa2");
+            });
+            assertTrue(pap.graph().getChildren("oa2").isEmpty());
+
+            // test non existing target
+            assertThrows(PMException.class, () -> {
+                pap.graph().assignAll(children, "oa3");
+            });
+
+            // test non existing child
+            assertThrows(PMException.class, () -> {
+                children.remove("ua1");
+                children.add("oDNE");
+                pap.graph().assignAll(children, "oa2");
+            });
+        });
+    }
+
+    @Test
+    void testDeassignAll() throws PMException {
+        runTest(pap -> {
+            String pml = """
+                    create pc 'pc1'
+                    create oa 'oa1' in ['pc1']
+                    create oa 'oa2' in ['pc1']
+                    create ua 'ua1' in ['pc1']
+                    
+                    for i in range [1, 10] {
+                        let name = concat(["o", numToStr(i)])
+                        create object name in ['oa1']
+                    }
+                    
+                    for i in range [1, 5] {
+                        let name = concat(["o", numToStr(i)])
+                        assign name to ['oa2']
+                    }
+                    """;
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+
+            List<String> toDelete = new ArrayList<>(List.of("o1", "o2", "o3", "o4", "o5"));
+            pap.graph().deassignAll(toDelete, "oa1");
+            assertEquals(5, pap.graph().getChildren("oa1").size());
+
+            toDelete.clear();
+            toDelete.add("oDNE");
+            assertThrows(PMException.class, () -> {
+                pap.graph().deassignAll(toDelete, "oa2");
+            });
+
+            toDelete.clear();
+            toDelete.add("o9");
+            assertDoesNotThrow(() -> {
+                pap.graph().deassignAll(toDelete, "oa2");
+            });
+        });
+    }
+
+    @Test
+    void testDeassignAllAndDelete() throws PMException {
+        runTest(pap -> {
+            String pml = """
+                    create pc 'pc1'
+                    create oa 'oa1' in ['pc1']
+                    create oa 'oa2' in ['pc1']
+                    create ua 'ua1' in ['pc1']
+                    
+                    for i in range [1, 10] {
+                        let name = concat(["o", numToStr(i)])
+                        create object name in ['oa1']
+                    }
+                    
+                    for i in range [1, 5] {
+                        let name = concat(["o", numToStr(i)])
+                        assign name to ['oa2']
+                    }
+                    """;
+            pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+
+            assertThrows(PMException.class, () -> {
+                pap.graph().deassignAllFromAndDelete("oa1");
+            });
+
+            pap.graph().assignAll(pap.graph().getChildren("oa1"), "oa2");
+
+            pap.graph().deassignAllFromAndDelete("oa1");
+            assertFalse(pap.graph().nodeExists("oa1"));
+        });
     }
 }

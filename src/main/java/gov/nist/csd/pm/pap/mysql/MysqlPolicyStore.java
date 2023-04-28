@@ -3,16 +3,21 @@ package gov.nist.csd.pm.pap.mysql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import gov.nist.csd.pm.pap.store.*;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
+import gov.nist.csd.pm.pap.PolicyStore;
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
@@ -26,35 +31,20 @@ public class MysqlPolicyStore extends PolicyStore {
     static final ObjectReader arsetReader = new ObjectMapper().readerFor(AccessRightSet.class);
     static final ObjectReader userCtxReader = new ObjectMapper().readerFor(UserContext.class);
 
-    private MysqlConnection connection;
+    protected final MysqlConnection connection;
 
-    public MysqlPolicyStore(MysqlConnection connection) throws MysqlPolicyException {
-        this.connection = connection;
-    }
+    private final MysqlGraph graph;
+    private final MysqlProhibitions prohibitions;
+    private final MysqlObligations obligations;
+    private final MysqlUserDefinedPML userDefinedPML;
 
-    @Override
-    public MysqlGraphStore graph() {
-        return new MysqlGraphStore(connection);
-    }
+    public MysqlPolicyStore(Connection connection) {
+        this.connection = new MysqlConnection(connection);
 
-    @Override
-    public MysqlProhibitionsStore prohibitions() {
-        return new MysqlProhibitionsStore(connection);
-    }
-
-    @Override
-    public MysqlObligationsStore obligations() {
-        return new MysqlObligationsStore(connection);
-    }
-
-    @Override
-    public MysqlPALStore pal() {
-        return new MysqlPALStore(connection);
-    }
-
-    @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return connection.policySync();
+        this.graph = new MysqlGraph(this.connection);
+        this.prohibitions = new MysqlProhibitions(this.connection);
+        this.obligations = new MysqlObligations(this.connection);
+        this.userDefinedPML = new MysqlUserDefinedPML(this.connection);
     }
 
     @Override
@@ -63,13 +53,62 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    public void commit() throws PMException {
+    public void commit() throws MysqlPolicyException {
         connection.commit();
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() throws MysqlPolicyException {
         connection.rollback();
+    }
+
+    @Override
+    public PolicySynchronizationEvent policySync() throws PMException {
+        return new PolicySynchronizationEvent(
+                new MemoryPolicyStore(graph, prohibitions, obligations, userDefinedPML)
+        );
+    }
+
+    @Override
+    protected void reset() throws MysqlPolicyException {
+        List<String> sequence = PolicyResetSequence.getSequence();
+        try (Statement stmt = connection.getConnection().createStatement()) {
+            for (String s : sequence) {
+                stmt.executeUpdate(s);
+            }
+        } catch (SQLException e) {
+            throw new MysqlPolicyException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Graph graph() {
+        return graph;
+    }
+
+    @Override
+    public Prohibitions prohibitions() {
+        return prohibitions;
+    }
+
+    @Override
+    public Obligations obligations() {
+        return obligations;
+    }
+
+    @Override
+    public UserDefinedPML userDefinedPML() {
+        return userDefinedPML;
+    }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return new MysqlPolicySerializer(this);
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return new MysqlPolicyDeserializer(this);
     }
 
     static int getNodeTypeId(NodeType nodeType) {
@@ -100,17 +139,5 @@ public class MysqlPolicyStore extends PolicyStore {
 
     public static String arsetToJson(AccessRightSet set) throws JsonProcessingException {
         return objectMapper.writeValueAsString(set);
-    }
-
-    @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return policySerializer.serialize(this);
-    }
-
-    @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        beginTx();
-        policyDeserializer.deserialize(this, s);
-        commit();
     }
 }

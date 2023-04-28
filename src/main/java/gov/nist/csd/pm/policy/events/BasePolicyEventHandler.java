@@ -1,10 +1,6 @@
 package gov.nist.csd.pm.policy.events;
 
-import gov.nist.csd.pm.policy.GraphReader;
-import gov.nist.csd.pm.policy.ObligationsReader;
-import gov.nist.csd.pm.policy.PolicyReader;
-import gov.nist.csd.pm.policy.ProhibitionsReader;
-import gov.nist.csd.pm.policy.author.*;
+import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
@@ -12,11 +8,11 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 /**
  * Implements the PolicyEventListener interface to apply policy events to the passed PolicyAuthor.
  */
-public abstract class BasePolicyEventHandler implements PolicyEventListener, PolicyReader {
+public abstract class BasePolicyEventHandler implements PolicyEventListener, Policy {
     
-    protected PolicyAuthor policy;
+    protected Policy policy;
 
-    protected BasePolicyEventHandler(PolicyAuthor policy) {
+    protected BasePolicyEventHandler(Policy policy) {
         this.policy = policy;
     }
 
@@ -88,7 +84,7 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     protected void handleDeleteObligationEvent(DeleteObligationEvent deleteObligationEvent) throws PMException {
-        policy.obligations().delete(deleteObligationEvent.getLabel());
+        policy.obligations().delete(deleteObligationEvent.getObligation().getLabel());
     }
 
     protected void handleDeleteNodeEvent(DeleteNodeEvent deleteNodeEvent) throws PMException {
@@ -158,17 +154,32 @@ public abstract class BasePolicyEventHandler implements PolicyEventListener, Pol
     }
 
     @Override
-    public GraphReader graph() {
+    public Graph graph() {
         return policy.graph();
     }
 
     @Override
-    public ProhibitionsReader prohibitions() {
+    public Prohibitions prohibitions() {
         return policy.prohibitions();
     }
 
     @Override
-    public ObligationsReader obligations() {
+    public Obligations obligations() {
         return policy.obligations();
+    }
+
+    @Override
+    public UserDefinedPML userDefinedPML() {
+        return policy.userDefinedPML();
+    }
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return policy.serialize();
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return policy.deserialize();
     }
 }

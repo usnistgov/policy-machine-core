@@ -1,58 +1,78 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.pap.store.*;
-import gov.nist.csd.pm.policy.serializer.PolicyDeserializer;
-import gov.nist.csd.pm.policy.serializer.PolicySerializer;
+import gov.nist.csd.pm.pap.PolicyStore;
+import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public class MemoryPolicyStore extends PolicyStore {
+import java.io.Serializable;
 
-    private MemoryGraphStore graph;
-    private MemoryProhibitionsStore prohibitions;
-    private MemoryObligationsStore obligations;
-    private MemoryPALStore pal;
+public class MemoryPolicyStore extends PolicyStore implements Serializable {
+
+    private MemoryGraph graph;
+    private MemoryProhibitions prohibitions;
+    private MemoryObligations obligations;
+    private MemoryUserDefinedPML userDefinedPML;
+
     private boolean inTx;
     private int txCounter;
     private TxPolicyStore txPolicyStore;
 
     public MemoryPolicyStore() {
-        graph = new MemoryGraphStore();
-        prohibitions = new MemoryProhibitionsStore();
-        obligations = new MemoryObligationsStore();
-        pal = new MemoryPALStore();
+        this.graph = new MemoryGraph();
+        this.prohibitions = new MemoryProhibitions();
+        this.obligations = new MemoryObligations();
+        this.userDefinedPML = new MemoryUserDefinedPML();
     }
 
-    public MemoryPolicyStore(PolicySynchronizationEvent event) {
-        graph = new MemoryGraphStore(event.getGraph());
-        prohibitions = new MemoryProhibitionsStore(event.getProhibitions());
-        obligations = new MemoryObligationsStore(event.getObligations());
-        pal = new MemoryPALStore(event.getPALContext());
+    public MemoryPolicyStore(Graph graph, Prohibitions prohibitions, Obligations obligations, UserDefinedPML userDefinedPML) throws PMException {
+        this.graph = new MemoryGraph(graph);
+        this.prohibitions = new MemoryProhibitions(prohibitions);
+        this.obligations = new MemoryObligations(obligations);
+        this.userDefinedPML = new MemoryUserDefinedPML(userDefinedPML);
     }
 
-    MemoryGraphStore getGraph() {
+    MemoryPolicyStore(MemoryGraph graph, MemoryProhibitions prohibitions, MemoryObligations obligations, MemoryUserDefinedPML userDefinedPML) throws PMException {
+        this.graph = graph;
+        this.prohibitions = prohibitions;
+        this.obligations = obligations;
+        this.userDefinedPML = userDefinedPML;
+    }
+
+    @Override
+    public Graph graph() {
         return graph;
     }
 
-    MemoryProhibitionsStore getProhibitions() {
+    @Override
+    public Prohibitions prohibitions() {
         return prohibitions;
     }
 
-    MemoryObligationsStore getObligations() {
+    @Override
+    public Obligations obligations() {
         return obligations;
     }
 
-    MemoryPALStore getPAL() {
-        return pal;
+    @Override
+    public UserDefinedPML userDefinedPML() {
+        return userDefinedPML;
+    }
+
+    @Override
+    public PolicySerializer serialize() {
+        return new MemoryPolicySerializer(this);
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() {
+        return new MemoryPolicyDeserializer(this);
     }
 
     @Override
     public synchronized PolicySynchronizationEvent policySync() {
         return new PolicySynchronizationEvent(
-                new MemoryGraphStore(graph).getGraph(),
-                new MemoryProhibitionsStore(prohibitions.getAll()).getAll(),
-                new MemoryObligationsStore(obligations.getAll()).getAll(),
-                new MemoryPALStore().getContext()
+                this
         );
     }
 
@@ -64,6 +84,12 @@ public class MemoryPolicyStore extends PolicyStore {
 
         inTx = true;
         txCounter++;
+
+        MemoryTx tx = new MemoryTx(true, txCounter, txPolicyStore);
+        graph.tx = tx;
+        prohibitions.tx = tx;
+        obligations.tx = tx;
+        userDefinedPML.tx = tx;
     }
 
     @Override
@@ -72,6 +98,12 @@ public class MemoryPolicyStore extends PolicyStore {
         if(txCounter == 0) {
             inTx = false;
             txPolicyStore.clearEvents();
+
+            MemoryTx tx = new MemoryTx(false, txCounter, txPolicyStore);
+            graph.tx = tx;
+            prohibitions.tx = tx;
+            obligations.tx = tx;
+            userDefinedPML.tx = tx;
         }
     }
 
@@ -80,63 +112,21 @@ public class MemoryPolicyStore extends PolicyStore {
         inTx = false;
         txCounter = 0;
 
+        MemoryTx tx = new MemoryTx(true, txCounter, txPolicyStore);
+        graph.tx = tx;
+        prohibitions.tx = tx;
+        obligations.tx = tx;
+        userDefinedPML.tx = tx;
+
         TxPolicyEventListener txPolicyEventListener = txPolicyStore.getTxPolicyEventListener();
         txPolicyEventListener.revert(this);
     }
 
     @Override
-    public GraphStore graph() {
-        if (inTx) {
-            return txPolicyStore.graph();
-        }
-
-        return graph;
-    }
-
-    @Override
-    public ProhibitionsStore prohibitions() {
-        if (inTx) {
-            return txPolicyStore.prohibitions();
-        }
-
-        return prohibitions;
-    }
-
-    @Override
-    public ObligationsStore obligations() {
-        if (inTx) {
-            return txPolicyStore.obligations();
-        }
-
-        return obligations;
-    }
-
-    @Override
-    public PALStore pal() {
-        if (inTx) {
-            return txPolicyStore.pal();
-        }
-
-        return pal;
-    }
-
-    @Override
-    public String toString(PolicySerializer policySerializer) throws PMException {
-        return policySerializer.serialize(this);
-    }
-
-    @Override
-    public void fromString(String s, PolicyDeserializer policyDeserializer) throws PMException {
-        if (inTx) {
-            policyDeserializer.deserialize(txPolicyStore, s);
-        } else {
-            // clear policy
-            this.graph = new MemoryGraphStore();
-            this.prohibitions = new MemoryProhibitionsStore();
-            this.obligations = new MemoryObligationsStore();
-            this.pal = new MemoryPALStore();
-
-            policyDeserializer.deserialize(this, s);
-        }
+    protected void reset() {
+        graph = new MemoryGraph();
+        prohibitions = new MemoryProhibitions();
+        obligations = new MemoryObligations();
+        userDefinedPML = new MemoryUserDefinedPML();
     }
 }
