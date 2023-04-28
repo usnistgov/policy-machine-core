@@ -75,7 +75,7 @@ const e = "hello world"
 ```
 
 ### If
-PML supports logical operators `&&` and `||` as well as comparison operators `==` and `!=`
+PML supports logical operators `&&` and `||` as well as comparison operators `==` and `!=`.
 
 ```pml
 let x = "a";
@@ -93,21 +93,142 @@ if x == y {
 
 ### For
 
+#### Foreach
+
+```pml
+let arr = ["1", "2", "3"];
+foreach x in arr {
+  # do something with x
+} 
+
+let m = {"k1": "v1", "k2": "v2"}
+foreach key, value in m {
+    # do something
+    # key = map key
+    # value = map value
+}
+```
+
+#### For range
+Iterate from one bound to another. Use `(` or `)` to indicate an exclusive bound and `[` or `]` for an inclusive bound.
+
+```pml
+for i in range [0, 100) {
+  # do something with i
+}
+```
+
 ### Functions
 
-#### Definitions
+#### Definition
+```pml
+function testFunc(string a, map[string]string b, []string c) string {
+
+}
+```
 
 #### Invocation
+```pml
+testFunc("...", {...}, [...])
+```
 
 ### Set Resource Access Rights
+```pml
+set resource access rights ["read", "write"]
+```
+
 ### Create Policy Class
+```pml
+create policy class 'pc1'
+```
+
 ### Create User|Object Attribute
+```pml
+create user attribute 'ua1' in ['pc1', 'pc2']
+create object attribute 'oa1' in ['pc1']
+```
+
 ### Create User|Object
+```pml
+create user 'u1' in ['ua1', 'ua2']
+create object 'o1' in ['oa1']
+```
+
 ### Set Node Properties
+```pml
+set properties of 'oa1' to {"key": "value", "key2": "value2"}
+```
+
 ### Assign
+```pml
+assign 'u1' to ['ua1', 'ua2']
+# or
+assign 'u1' to 'ua1'
+assign 'u1' to 'ua2'
+```
+
 ### Deassign
+```pml
+deassign "u1" from ["ua1", "ua2"];
+# or
+deassign "u1" from "ua1";
+deassign "u1" from "ua2";
+```
+
 ### Associate
+```pml
+associate "ua1" and "oa1" with ["read", "write"]
+```
+
 ### Dissociate
+```pml
+dissociate "ua1" and "oa1"
+```
+
 ### Create Prohibition
+
+```pml
+# user prohibition
+create prohibition 'prohibition1'
+deny user 'u1'
+access rights ["read"]
+on intersection of ["oa1", !"oa2"] # ! denotes complement of attribute
+
+# user attribute prohibition
+create prohibition 'prohibition1'
+deny user attribute 'ua1'
+access rights ["read"]
+on union of ["oa1", "oa2"]
+
+# process prohibition
+create prohibition 'prohibition1'
+deny process '123'
+access rights ["read"]
+on union of ["oa1", "oa2"]
+```
+
 ### Create Obligation
+```pml
+create obligation 'obl1' {
+  create rule 'rule1'
+  when any user
+  performs ["assign", assign_to"]
+  on "oa1"
+  do(ctx) {
+    # PML statements
+    # ctx will have event information depending on the event that triggers this response
+    # ctx could be an "assign" event or "assign_to" event
+  }
+}
+```
+
 ### Delete Node|Prohibition|Obligation|Rule
+```pml
+delete node "oa1"
+
+delete prohibition "prohibition1"
+
+delete obligation "obligation1"
+
+delete rule "rule1" from obligation "obligation1"
+```
