@@ -96,7 +96,7 @@ if x == y {
 #### Foreach
 
 ```pml
-let arr = ["1", "2", "3"];
+let arr = ["1", "2", "3"]
 foreach x in arr {
   # do something with x
 } 
@@ -162,17 +162,11 @@ set properties of 'oa1' to {"key": "value", "key2": "value2"}
 ### Assign
 ```pml
 assign 'u1' to ['ua1', 'ua2']
-# or
-assign 'u1' to 'ua1'
-assign 'u1' to 'ua2'
 ```
 
 ### Deassign
 ```pml
-deassign "u1" from ["ua1", "ua2"];
-# or
-deassign "u1" from "ua1";
-deassign "u1" from "ua2";
+deassign "u1" from ["ua1", "ua2"]
 ```
 
 ### Associate
