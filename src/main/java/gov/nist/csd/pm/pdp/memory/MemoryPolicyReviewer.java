@@ -47,7 +47,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized AccessRightSet getAccessRights(UserContext userCtx, String target) throws PMException {
+    public AccessRightSet getAccessRights(UserContext userCtx, String target) throws PMException {
         AccessRightSet accessRights = new AccessRightSet();
 
         // traverse the user side of the graph to get the associations
@@ -255,7 +255,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized Map<String, AccessRightSet> buildCapabilityList(UserContext userCtx) throws PMException {
+    public Map<String, AccessRightSet> buildCapabilityList(UserContext userCtx) throws PMException {
         Map<String, AccessRightSet> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no OAs are reachable
@@ -289,7 +289,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized Map<String, AccessRightSet> buildACL(String target) throws PMException {
+    public Map<String, AccessRightSet> buildACL(String target) throws PMException {
         Map<String, AccessRightSet> acl = new HashMap<>();
         List<String> search = policy.graph().search(U, NO_PROPERTIES);
         for (String user : search) {
@@ -301,13 +301,13 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized Map<String, AccessRightSet> getBorderAttributes(String user) throws PMException {
+    public Map<String, AccessRightSet> getBorderAttributes(String user) throws PMException {
         return processUserDAG(user, NO_PROCESS)
                 .borderTargets();
     }
 
     @Override
-    public synchronized Map<String, AccessRightSet> getSubgraphAccessRights(UserContext userCtx, String root) throws PMException {
+    public Map<String, AccessRightSet> getSubgraphAccessRights(UserContext userCtx, String root) throws PMException {
         Map<String, AccessRightSet> results = new HashMap<>();
 
         UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
@@ -329,7 +329,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized Explain explain(UserContext userCtx, String target) throws PMException {
+    public Explain explain(UserContext userCtx, String target) throws PMException {
         Node userNode = policy.graph().getNode(userCtx.getUser());
         Node targetNode = policy.graph().getNode(target);
 
@@ -751,7 +751,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<String> getAttributeContainers(String node) throws PMException {
+    public List<String> getAttributeContainers(String node) throws PMException {
         List<String> attrs = new ArrayList<>();
 
         new DepthFirstGraphWalker(policy.graph())
@@ -770,7 +770,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<String> getPolicyClassContainers(String node) throws PMException {
+    public List<String> getPolicyClassContainers(String node) throws PMException {
         List<String> attrs = new ArrayList<>();
 
         new DepthFirstGraphWalker(policy.graph())
@@ -788,7 +788,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized boolean isContained(String subject, String container) throws PMException {
+    public boolean isContained(String subject, String container) throws PMException {
         if (!policy.graph().nodeExists(subject)) {
             throw new NodeDoesNotExistException(subject);
         } else if (!policy.graph().nodeExists(container)){
@@ -810,7 +810,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException {
+    public List<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
         new DepthFirstGraphWalker(policy.graph())
@@ -841,7 +841,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<Obligation> getObligationsWithAuthor(UserContext userCtx) throws PMException {
+    public List<Obligation> getObligationsWithAuthor(UserContext userCtx) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : policy.obligations().getAll()) {
             if (obligation.getAuthor().equals(userCtx)) {
@@ -853,7 +853,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<Obligation> getObligationsWithAttributeInEvent(String attribute) throws PMException {
+    public List<Obligation> getObligationsWithAttributeInEvent(String attribute) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : policy.obligations().getAll()) {
             List<Rule> rules = obligation.getRules();
@@ -881,7 +881,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<Obligation> getObligationsWithAttributeInResponse(String attribute) throws PMException {
+    public List<Obligation> getObligationsWithAttributeInResponse(String attribute) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : policy.obligations().getAll()) {
             List<Rule> rules = obligation.getRules();
@@ -901,7 +901,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public synchronized List<Obligation> getObligationsWithEvent(String event) throws PMException {
+    public List<Obligation> getObligationsWithEvent(String event) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : policy.obligations().getAll()) {
             List<Rule> rules = obligation.getRules();
@@ -915,7 +915,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         return obls;
     }
     @Override
-    public synchronized List<Response> getMatchingEventResponses(EventContext evt) throws PMException {
+    public List<Response> getMatchingEventResponses(EventContext evt) throws PMException {
         List<Response> responses = new ArrayList<>();
         for (Obligation obligation : policy.obligations().getAll()) {
             for (Rule rule : obligation.getRules()) {

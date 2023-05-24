@@ -38,7 +38,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
+    public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
         for (String ar : accessRightSet) {
             if (isAdminAccessRight(ar) || isWildcardAccessRight(ar)) {
                 throw new AdminAccessRightExistsException(ar);
@@ -52,12 +52,12 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized AccessRightSet getResourceAccessRights() throws PMException {
+    public AccessRightSet getResourceAccessRights() throws PMException {
         return policyStore.graph().getResourceAccessRights();
     }
 
     @Override
-    public synchronized String createPolicyClass(String name, Map<String, String> properties) throws PMException {
+    public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
         if (nodeExists(name)) {
             if (SuperPolicy.isSuperPolicyNode(name)) {
                 return name;
@@ -75,47 +75,47 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized String createPolicyClass(String name) throws PMException {
+    public String createPolicyClass(String name) throws PMException {
         return createPolicyClass(name, NO_PROPERTIES);
     }
 
     @Override
-    public synchronized String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, UA, properties, parent, parents);
     }
 
     @Override
-    public synchronized String createUserAttribute(String name, String parent, String... parents) throws PMException {
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
         return createUserAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, OA, properties, parent, parents);
     }
 
     @Override
-    public synchronized String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
         return createObjectAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, O, properties, parent, parents);
     }
 
     @Override
-    public synchronized String createObject(String name, String parent, String... parents) throws PMException {
+    public String createObject(String name, String parent, String... parents) throws PMException {
         return createObject(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         return createNode(name, U, properties, parent, parents);
     }
 
     @Override
-    public synchronized String createUser(String name, String parent, String... parents) throws PMException {
+    public String createUser(String name, String parent, String... parents) throws PMException {
         return createUser(name, NO_PROPERTIES, parent, parents);
     }
 
@@ -175,7 +175,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void setNodeProperties(String name, Map<String, String> properties) throws PMException {
+    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
         if (!nodeExists(name)) {
             throw new NodeDoesNotExistException(name);
         }
@@ -186,12 +186,12 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized boolean nodeExists(String name) throws PMException {
+    public boolean nodeExists(String name) throws PMException {
         return policyStore.graph().nodeExists(name);
     }
 
     @Override
-    public synchronized Node getNode(String name) throws PMException {
+    public Node getNode(String name) throws PMException {
         if (!nodeExists(name)) {
             throw new NodeDoesNotExistException(name);
         }
@@ -200,17 +200,17 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<String> search(NodeType type, Map<String, String> properties) throws PMException {
+    public List<String> search(NodeType type, Map<String, String> properties) throws PMException {
         return policyStore.graph().search(type, properties);
     }
 
     @Override
-    public synchronized List<String> getPolicyClasses() throws PMException {
+    public List<String> getPolicyClasses() throws PMException {
         return policyStore.graph().getPolicyClasses();
     }
 
     @Override
-    public synchronized void deleteNode(String name) throws PMException {
+    public void deleteNode(String name) throws PMException {
         if (!nodeExists(name)) {
             return;
         }
@@ -302,7 +302,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void assign(String child, String parent) throws PMException {
+    public void assign(String child, String parent) throws PMException {
         Node childNode = getNode(child);
         Node parentNode = getNode(parent);
 
@@ -328,7 +328,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
 
 
     @Override
-    public synchronized void deassign(String child, String parent) throws PMException {
+    public void deassign(String child, String parent) throws PMException {
         if ((!nodeExists(child) || !nodeExists(parent))
                 || (!getParents(child).contains(parent))) {
             return;
@@ -391,7 +391,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<String> getChildren(String node) throws PMException {
+    public List<String> getChildren(String node) throws PMException {
         if (!nodeExists(node)) {
             throw new NodeDoesNotExistException(node);
         }
@@ -400,7 +400,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
+    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
         Node uaNode = getNode(ua);
         Node targetNode = getNode(target);
 
@@ -428,7 +428,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void dissociate(String ua, String target) throws PMException {
+    public void dissociate(String ua, String target) throws PMException {
         if ((!nodeExists(ua) || !nodeExists(target))
                 || (!getAssociationsWithSource(ua).contains(new Association(ua, target)))) {
             return;
@@ -440,7 +440,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<String> getParents(String node) throws PMException {
+    public List<String> getParents(String node) throws PMException {
         if (!nodeExists(node)) {
             throw new NodeDoesNotExistException(node);
         }
@@ -449,7 +449,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<Association> getAssociationsWithSource(String ua) throws PMException {
+    public List<Association> getAssociationsWithSource(String ua) throws PMException {
         if (!nodeExists(ua)) {
             throw new NodeDoesNotExistException(ua);
         }
@@ -458,7 +458,7 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<Association> getAssociationsWithTarget(String target) throws PMException {
+    public List<Association> getAssociationsWithTarget(String target) throws PMException {
         if (!nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }

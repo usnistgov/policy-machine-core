@@ -31,7 +31,7 @@ public class MemoryPDP extends PDP {
         return new MemoryPolicyReviewer(policyEventHandler);
     }
 
-    public synchronized void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
+    public void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         TxRunner.runTx(pap, () -> {
             PDPTx pdpTx = new PDPTx(userCtx, pap, new BulkPolicyReviewer(userCtx, pap), eventListeners);
             txRunner.run(pdpTx);
@@ -45,7 +45,7 @@ public class MemoryPDP extends PDP {
         }
 
         @Override
-        public synchronized void handlePolicyEvent(PolicyEvent event) throws PMException {
+        public void handlePolicyEvent(PolicyEvent event) throws PMException {
             // ignore begin and commit events
             // reviewer will operate as all events are added to the policy
             // in the event of rollback it will call policySync to rollback

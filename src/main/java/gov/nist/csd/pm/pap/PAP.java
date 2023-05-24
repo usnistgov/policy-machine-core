@@ -66,7 +66,7 @@ public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter,
     }
 
     @Override
-    public synchronized void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
         listeners.add(listener);
 
         if (sync) {
@@ -75,12 +75,12 @@ public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter,
     }
 
     @Override
-    public synchronized void removeEventListener(PolicyEventListener listener) {
+    public void removeEventListener(PolicyEventListener listener) {
         listeners.remove(listener);
     }
 
     @Override
-    public synchronized void emitEvent(PolicyEvent event) throws PMException {
+    public void emitEvent(PolicyEvent event) throws PMException {
         for (PolicyEventListener listener : listeners) {
             listener.handlePolicyEvent(event);
         }
@@ -94,26 +94,26 @@ public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter,
     }
 
     @Override
-    public synchronized PolicySynchronizationEvent policySync() throws PMException {
+    public PolicySynchronizationEvent policySync() throws PMException {
         return this.policyStore.policySync();
     }
 
     @Override
-    public synchronized void beginTx() throws PMException {
+    public void beginTx() throws PMException {
         policyStore.beginTx();
 
         emitEvent(new BeginTxEvent());
     }
 
     @Override
-    public synchronized void commit() throws PMException {
+    public void commit() throws PMException {
         policyStore.commit();
 
         emitEvent(new CommitTxEvent());
     }
 
     @Override
-    public synchronized void rollback() throws PMException {
+    public void rollback() throws PMException {
         policyStore.rollback();
 
         emitEvent(new RollbackTxEvent(this));
