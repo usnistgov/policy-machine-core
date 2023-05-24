@@ -24,7 +24,7 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (exists(label)) {
             throw new ProhibitionExistsException(label);
         }
@@ -39,7 +39,7 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         checkProhibitionParameters(subject, accessRightSet, containerConditions);
 
         policyStore.prohibitions().update(label, subject, accessRightSet, intersection, containerConditions);
@@ -72,7 +72,7 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void delete(String label) throws PMException {
+    public void delete(String label) throws PMException {
         if (!exists(label)) {
             return;
         }
@@ -85,7 +85,7 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized Map<String, List<Prohibition>> getAll() throws PMException {
+    public Map<String, List<Prohibition>> getAll() throws PMException {
         return policyStore.prohibitions().getAll();
     }
 
@@ -95,12 +95,12 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<Prohibition> getWithSubject(String subject) throws PMException {
+    public List<Prohibition> getWithSubject(String subject) throws PMException {
         return policyStore.prohibitions().getWithSubject(subject);
     }
 
     @Override
-    public synchronized Prohibition get(String label) throws PMException {
+    public Prohibition get(String label) throws PMException {
         Prohibition prohibition = getProhibitionOrNull(label);
         if (prohibition == null) {
             throw new ProhibitionDoesNotExistException(label);

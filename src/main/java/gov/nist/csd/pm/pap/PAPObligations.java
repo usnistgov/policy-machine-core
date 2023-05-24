@@ -26,7 +26,7 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void create(UserContext author, String label, Rule... rules) throws PMException {
+    public void create(UserContext author, String label, Rule... rules) throws PMException {
         if (exists(label)) {
             throw new ObligationExistsException(label);
         }
@@ -96,7 +96,7 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void update(UserContext author, String label, Rule... rules) throws PMException {
+    public void update(UserContext author, String label, Rule... rules) throws PMException {
         if (!exists(label)) {
             throw new ObligationDoesNotExistException(label);
         }
@@ -110,7 +110,7 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized void delete(String label) throws PMException {
+    public void delete(String label) throws PMException {
         if (!exists(label)) {
             return;
         }
@@ -123,12 +123,12 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public synchronized List<Obligation> getAll() throws PMException {
+    public List<Obligation> getAll() throws PMException {
         return policyStore.obligations().getAll();
     }
 
     @Override
-    public synchronized Obligation get(String label) throws PMException {
+    public Obligation get(String label) throws PMException {
         if (!exists(label)) {
             throw new ObligationDoesNotExistException(label);
         }

@@ -7,7 +7,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.io.Serializable;
 
-public class MemoryPolicyStore extends PolicyStore implements Serializable {
+public class MemoryPolicyStore extends PolicyStore {
 
     private MemoryGraph graph;
     private MemoryProhibitions prohibitions;
@@ -70,14 +70,14 @@ public class MemoryPolicyStore extends PolicyStore implements Serializable {
     }
 
     @Override
-    public synchronized PolicySynchronizationEvent policySync() {
+    public PolicySynchronizationEvent policySync() {
         return new PolicySynchronizationEvent(
                 this
         );
     }
 
     @Override
-    public synchronized void beginTx() throws PMException {
+    public void beginTx() throws PMException {
         if (!inTx) {
             txPolicyStore = new TxPolicyStore(this);
         }
@@ -93,7 +93,7 @@ public class MemoryPolicyStore extends PolicyStore implements Serializable {
     }
 
     @Override
-    public synchronized void commit() throws PMException {
+    public void commit() throws PMException {
         txCounter--;
         if(txCounter == 0) {
             inTx = false;
@@ -108,11 +108,11 @@ public class MemoryPolicyStore extends PolicyStore implements Serializable {
     }
 
     @Override
-    public synchronized void rollback() throws PMException {
+    public void rollback() throws PMException {
         inTx = false;
         txCounter = 0;
 
-        MemoryTx tx = new MemoryTx(true, txCounter, txPolicyStore);
+        MemoryTx tx = new MemoryTx(false, txCounter, txPolicyStore);
         graph.tx = tx;
         prohibitions.tx = tx;
         obligations.tx = tx;
@@ -123,10 +123,13 @@ public class MemoryPolicyStore extends PolicyStore implements Serializable {
     }
 
     @Override
-    protected void reset() {
+    protected void reset() throws PMException {
         graph = new MemoryGraph();
         prohibitions = new MemoryProhibitions();
         obligations = new MemoryObligations();
         userDefinedPML = new MemoryUserDefinedPML();
+
+        // a call to rollback will reset tx fields
+        rollback();
     }
 }

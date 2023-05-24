@@ -31,7 +31,7 @@ public class BulkPolicyReviewer extends MemoryPolicyReviewer {
     }
 
     @Override
-    public synchronized AccessRightSet getAccessRights(UserContext userCtx, String target) throws PMException {
+    public AccessRightSet getAccessRights(UserContext userCtx, String target) throws PMException {
         AccessRightSet accessRights = new AccessRightSet();
 
         UserDagResult userDagResult = userDagEventListener.userDagResult;

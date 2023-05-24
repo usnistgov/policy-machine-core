@@ -14,7 +14,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 
-class MemoryGraph implements Graph, Serializable {
+class MemoryGraph implements Graph {
 
     private final Map<String, Vertex> graph;
     private final AccessRightSet resourceAccessRights;
@@ -93,7 +93,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
+    public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().setResourceAccessRights(accessRightSet);
         }
@@ -103,12 +103,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized AccessRightSet getResourceAccessRights() {
+    public AccessRightSet getResourceAccessRights() {
         return new AccessRightSet(resourceAccessRights);
     }
 
     @Override
-    public synchronized String createPolicyClass(String name, Map<String, String> properties) throws PMException {
+    public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().createPolicyClass(name, properties);
         }
@@ -120,12 +120,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized String createPolicyClass(String name) throws PMException {
+    public String createPolicyClass(String name) throws PMException {
         return createPolicyClass(name, NO_PROPERTIES);
     }
 
     @Override
-    public synchronized String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().createUserAttribute(name, properties, parent, parents);
         }
@@ -134,12 +134,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized String createUserAttribute(String name, String parent, String... parents) throws PMException {
+    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
         return createUserAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().createObjectAttribute(name, properties, parent, parents);
         }
@@ -148,12 +148,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
         return createObjectAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().createObject(name, properties, parent, parents);
         }
@@ -162,12 +162,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized String createObject(String name, String parent, String... parents) throws PMException {
+    public String createObject(String name, String parent, String... parents) throws PMException {
         return createObject(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
+    public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().createUser(name, properties, parent, parents);
         }
@@ -176,12 +176,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized String createUser(String name, String parent, String... parents) throws PMException {
+    public String createUser(String name, String parent, String... parents) throws PMException {
         return createUser(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public synchronized void setNodeProperties(String name, Map<String, String> properties) throws PMException {
+    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().setNodeProperties(name, properties);
         }
@@ -190,65 +190,29 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized boolean nodeExists(String name) {
+    public boolean nodeExists(String name) {
         return this.graph.containsKey(name);
     }
 
 
     @Override
-    public synchronized Node getNode(String name) {
+    public Node getNode(String name) {
         return new Node(this.graph.get(name).getNode());
     }
 
     @Override
-    public synchronized List<String> search(NodeType type, Map<String, String> properties) {
-        List<String> nodes = new ArrayList<>();
-        if (type != ANY) {
-            if (type == PC) {
-                nodes.addAll(pcs);
-            } else if (type == OA) {
-                nodes.addAll(oas);
-            } else if (type == UA) {
-                nodes.addAll(uas);
-            } else if (type == O) {
-                nodes.addAll(os);
-            } else {
-                nodes.addAll(us);
-            }
-        } else {
-            nodes.addAll(pcs);
-            nodes.addAll(uas);
-            nodes.addAll(oas);
-            nodes.addAll(us);
-            nodes.addAll(os);
-        }
-
-        List<String> results = new ArrayList<>();
-        if (properties.isEmpty()) {
-            results.addAll(nodes);
-        } else {
-            for (String n : nodes) {
-                Map<String, String> nodeProperties = graph.get(n).getNode().getProperties();
-
-                if (!hasAllKeys(nodeProperties, properties)
-                        || !valuesMatch(nodeProperties, properties)) {
-                    continue;
-                }
-
-                results.add(n);
-            }
-        }
-
-        return results;
+    public List<String> search(NodeType type, Map<String, String> properties) {
+        List<String> nodes = filterByType(type);
+        return filterByProperties(nodes, properties);
     }
 
     @Override
-    public synchronized List<String> getPolicyClasses() {
+    public List<String> getPolicyClasses() {
         return new ArrayList<>(pcs);
     }
 
     @Override
-    public synchronized void deleteNode(String name) throws PMException {
+    public void deleteNode(String name) throws PMException {
         if (!graph.containsKey(name)) {
             return;
         }
@@ -296,7 +260,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void assign(String child, String parent) throws PMException {
+    public void assign(String child, String parent) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().assign(child, parent);
         }
@@ -305,7 +269,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void deassign(String child, String parent) throws PMException {
+    public void deassign(String child, String parent) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().deassign(child, parent);
         }
@@ -314,7 +278,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void assignAll(List<String> children, String target) throws PMException {
+    public void assignAll(List<String> children, String target) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().assignAll(children, target);
         }
@@ -325,7 +289,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void deassignAll(List<String> children, String target) throws PMException {
+    public void deassignAll(List<String> children, String target) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().deassignAll(children, target);
         }
@@ -336,7 +300,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void deassignAllFromAndDelete(String target) throws PMException {
+    public void deassignAllFromAndDelete(String target) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().deassignAllFromAndDelete(target);
         }
@@ -349,19 +313,19 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized List<String> getParents(String node) {
+    public List<String> getParents(String node) {
         return new ArrayList<>(graph.get(node).getParents());
     }
 
 
     @Override
-    public synchronized List<String> getChildren(String node) {
+    public List<String> getChildren(String node) {
         return new ArrayList<>(graph.get(node).getChildren());
     }
 
 
     @Override
-    public synchronized void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
+    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().associate(ua, target, accessRights);
         }
@@ -375,7 +339,7 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized void dissociate(String ua, String target) throws PMException {
+    public void dissociate(String ua, String target) throws PMException {
         if (tx.active()) {
             tx.policyStore().graph().dissociate(ua, target);
         }
@@ -384,12 +348,12 @@ class MemoryGraph implements Graph, Serializable {
     }
 
     @Override
-    public synchronized List<Association> getAssociationsWithSource(String ua) {
+    public List<Association> getAssociationsWithSource(String ua) {
         return new ArrayList<>(graph.get(ua).getOutgoingAssociations());
     }
 
     @Override
-    public synchronized List<Association> getAssociationsWithTarget(String target) {
+    public List<Association> getAssociationsWithTarget(String target) {
         return new ArrayList<>(graph.get(target).getIncomingAssociations());
     }
 
@@ -439,6 +403,51 @@ class MemoryGraph implements Graph, Serializable {
                 return new User(name, properties);
             }
         }
+    }
+
+    private List<String> filterByProperties(List<String> nodes, Map<String, String> properties) {
+        List<String> results = new ArrayList<>();
+        if (properties.isEmpty()) {
+            results.addAll(nodes);
+        } else {
+            for (String n : nodes) {
+                Map<String, String> nodeProperties = graph.get(n).getNode().getProperties();
+
+                if (!hasAllKeys(nodeProperties, properties)
+                        || !valuesMatch(nodeProperties, properties)) {
+                    continue;
+                }
+
+                results.add(n);
+            }
+        }
+
+        return results;
+    }
+
+    private List<String> filterByType(NodeType type) {
+        List<String> nodes = new ArrayList<>();
+        if (type != ANY) {
+            if (type == PC) {
+                nodes.addAll(pcs);
+            } else if (type == OA) {
+                nodes.addAll(oas);
+            } else if (type == UA) {
+                nodes.addAll(uas);
+            } else if (type == O) {
+                nodes.addAll(os);
+            } else {
+                nodes.addAll(us);
+            }
+        } else {
+            nodes.addAll(pcs);
+            nodes.addAll(uas);
+            nodes.addAll(oas);
+            nodes.addAll(us);
+            nodes.addAll(os);
+        }
+
+        return nodes;
     }
 
     private boolean valuesMatch(Map<String, String> nodeProperties, Map<String, String> checkProperties) {
