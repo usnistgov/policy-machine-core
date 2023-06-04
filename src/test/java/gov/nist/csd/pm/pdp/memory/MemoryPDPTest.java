@@ -61,7 +61,7 @@ class MemoryPDPTest {
 
             MemoryPDP memoryPDP = new MemoryPDP(pap, false);
             memoryPDP.runTx(new UserContext(SUPER_USER), policy -> {
-                policy.userDefinedPML().addFunction(functionDefinitionStatement);
+                policy.userDefinedPML().createFunction(functionDefinitionStatement);
                 policy.executePML(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2']");
             });
 

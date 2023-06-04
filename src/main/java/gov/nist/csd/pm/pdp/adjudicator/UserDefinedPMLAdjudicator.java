@@ -24,12 +24,12 @@ public class UserDefinedPMLAdjudicator implements UserDefinedPML {
     }
 
     @Override
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
+    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
         accessRightChecker.check(userCtx, SUPER_PC_REP, ADD_FUNCTION);
     }
 
     @Override
-    public void removeFunction(String functionName) throws PMException {
+    public void deleteFunction(String functionName) throws PMException {
         accessRightChecker.check(userCtx, SUPER_PC_REP, REMOVE_FUNCTION);
     }
 
@@ -46,12 +46,12 @@ public class UserDefinedPMLAdjudicator implements UserDefinedPML {
     }
 
     @Override
-    public void addConstant(String constantName, Value constantValue) throws PMException {
+    public void createConstant(String constantName, Value constantValue) throws PMException {
         accessRightChecker.check(userCtx, SUPER_PC_REP, ADD_CONSTANT);
     }
 
     @Override
-    public void removeConstant(String constName) throws PMException {
+    public void deleteConstant(String constName) throws PMException {
         accessRightChecker.check(userCtx, SUPER_PC_REP, REMOVE_CONSTANT);
     }
 

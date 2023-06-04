@@ -64,11 +64,11 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
                 new Gson().fromJson(userDefinedPML, JSONUserDefinedPML.class);
 
         for (Map.Entry<String, byte[]> e : jsonPML.getFunctions().entrySet()) {
-            policyStore.userDefinedPML().addFunction(SerializationUtils.deserialize(e.getValue()));
+            policyStore.userDefinedPML().createFunction(SerializationUtils.deserialize(e.getValue()));
         }
 
         for (Map.Entry<String, byte[]> e : jsonPML.getConstants().entrySet()) {
-            policyStore.userDefinedPML().addConstant(e.getKey(), SerializationUtils.deserialize(e.getValue()));
+            policyStore.userDefinedPML().createConstant(e.getKey(), SerializationUtils.deserialize(e.getValue()));
         }
     }
 

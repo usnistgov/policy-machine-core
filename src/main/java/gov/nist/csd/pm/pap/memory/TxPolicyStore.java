@@ -339,12 +339,12 @@ class TxPolicyStore implements Policy, PolicyEventEmitter {
 
     class TxUserDefinedPML implements UserDefinedPML {
         @Override
-        public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) {
+        public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) {
             emitEvent(new AddFunctionEvent(functionDefinitionStatement));
         }
 
         @Override
-        public void removeFunction(String functionName) throws PMException {
+        public void deleteFunction(String functionName) throws PMException {
             emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.userDefinedPML().getFunctions().get(functionName)));
         }
 
@@ -359,12 +359,12 @@ class TxPolicyStore implements Policy, PolicyEventEmitter {
         }
 
         @Override
-        public void addConstant(String constantName, Value constantValue) {
+        public void createConstant(String constantName, Value constantValue) {
             emitEvent(new AddConstantEvent(constantName, constantValue));
         }
 
         @Override
-        public void removeConstant(String constName) throws PMException {
+        public void deleteConstant(String constName) throws PMException {
             emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.userDefinedPML().getConstants().get(constName)));
         }
 
