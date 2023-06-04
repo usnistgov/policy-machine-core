@@ -1539,15 +1539,15 @@ class PAPTest {
         @Test
         void functionAlreadyDefined() throws PMException {
             runTest(pap -> {
-                pap.userDefinedPML().addFunction(testFunc);
-                assertThrows(FunctionAlreadyDefinedException.class, () -> pap.userDefinedPML().addFunction(testFunc));
+                pap.userDefinedPML().createFunction(testFunc);
+                assertThrows(FunctionAlreadyDefinedException.class, () -> pap.userDefinedPML().createFunction(testFunc));
             });
         }
 
         @Test
         void success() throws PMException {
             runTest(pap -> {
-                pap.userDefinedPML().addFunction(testFunc);
+                pap.userDefinedPML().createFunction(testFunc);
                 assertTrue(pap.userDefinedPML().getFunctions().containsKey(testFunc.getFunctionName()));
                 FunctionDefinitionStatement actual = pap.userDefinedPML().getFunctions().get(testFunc.getFunctionName());
                 assertEquals(testFunc, actual);
@@ -1561,16 +1561,16 @@ class PAPTest {
         @Test
         void functionDoesNotExistNoException() throws PMException {
             runTest(pap -> {
-                assertDoesNotThrow(() -> pap.userDefinedPML().removeFunction("func"));
+                assertDoesNotThrow(() -> pap.userDefinedPML().deleteFunction("func"));
             });
         }
 
         @Test
         void success() throws PMException {
             runTest(pap -> {
-                pap.userDefinedPML().addFunction(new FunctionDefinitionStatement("testFunc", Type.voidType(), List.of(), List.of()));
+                pap.userDefinedPML().createFunction(new FunctionDefinitionStatement("testFunc", Type.voidType(), List.of(), List.of()));
                 assertTrue(pap.userDefinedPML().getFunctions().containsKey("testFunc"));
-                pap.userDefinedPML().removeFunction("testFunc");
+                pap.userDefinedPML().deleteFunction("testFunc");
                 assertFalse(pap.userDefinedPML().getFunctions().containsKey("testFunc"));
             });
         }
@@ -1585,8 +1585,8 @@ class PAPTest {
             FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement("testFunc2", Type.voidType(), List.of(), List.of());
 
             runTest(pap -> {
-                pap.userDefinedPML().addFunction(testFunc1);
-                pap.userDefinedPML().addFunction(testFunc2);
+                pap.userDefinedPML().createFunction(testFunc1);
+                pap.userDefinedPML().createFunction(testFunc2);
 
                 Map<String, FunctionDefinitionStatement> functions = pap.userDefinedPML().getFunctions();
                 assertTrue(functions.containsKey("testFunc1"));
@@ -1607,8 +1607,8 @@ class PAPTest {
         @Test
         void constantAlreadyDefined() throws PMException {
             runTest(pap -> {
-                pap.userDefinedPML().addConstant("const1", new Value("test"));
-                assertThrows(ConstantAlreadyDefinedException.class, () -> pap.userDefinedPML().addConstant("const1", new Value("test")));
+                pap.userDefinedPML().createConstant("const1", new Value("test"));
+                assertThrows(ConstantAlreadyDefinedException.class, () -> pap.userDefinedPML().createConstant("const1", new Value("test")));
             });
         }
 
@@ -1617,7 +1617,7 @@ class PAPTest {
             Value expected = new Value("test");
 
             runTest(pap -> {
-                pap.userDefinedPML().addConstant("const1", expected);
+                pap.userDefinedPML().createConstant("const1", expected);
                 assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
                 Value actual = pap.userDefinedPML().getConstants().get("const1");
                 assertEquals(expected, actual);
@@ -1631,16 +1631,16 @@ class PAPTest {
         @Test
         void constantDoesNotExistNoException() throws PMException {
             runTest(pap -> {
-                assertDoesNotThrow(() -> pap.userDefinedPML().removeConstant("const1"));
+                assertDoesNotThrow(() -> pap.userDefinedPML().deleteConstant("const1"));
             });
         }
 
         @Test
         void success() throws PMException {
             runTest(pap -> {
-                pap.userDefinedPML().addConstant("const1", new Value("test"));
+                pap.userDefinedPML().createConstant("const1", new Value("test"));
                 assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
-                pap.userDefinedPML().removeConstant("const1");
+                pap.userDefinedPML().deleteConstant("const1");
                 assertFalse(pap.userDefinedPML().getConstants().containsKey("const1"));
             });
         }
@@ -1655,8 +1655,8 @@ class PAPTest {
             Value const2 = new Value("test2");
 
             runTest(pap -> {
-                pap.userDefinedPML().addConstant("const1", const1);
-                pap.userDefinedPML().addConstant("const2", const2);
+                pap.userDefinedPML().createConstant("const1", const1);
+                pap.userDefinedPML().createConstant("const2", const2);
 
                 Map<String, Value> constants = pap.userDefinedPML().getConstants();
                 assertTrue(constants.containsKey("const1"));

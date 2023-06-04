@@ -61,7 +61,7 @@ public class PMLExecutor {
             }
 
             FunctionDefinitionStatement funcDef = topLevelFunctions.get(funcName);
-            policy.userDefinedPML().addFunction(funcDef);
+            policy.userDefinedPML().createFunction(funcDef);
         }
 
         Map<String, Value> topLevelConstants = ctx.scope().values();
@@ -71,7 +71,7 @@ public class PMLExecutor {
             }
 
             Value value = topLevelConstants.get(name);
-            policy.userDefinedPML().addConstant(name, value);
+            policy.userDefinedPML().createConstant(name, value);
         }
     }
 

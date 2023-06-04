@@ -13,14 +13,14 @@ public interface UserDefinedPML {
      * @param functionDefinitionStatement The function definition to add.
      * @throws PMException
      */
-    void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException;
+    void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException;
 
     /**
      * Remove a user defined PML function.
      * @param functionName The name of the function to be removed.
      * @throws PMException
      */
-    void removeFunction(String functionName) throws PMException;
+    void deleteFunction(String functionName) throws PMException;
 
     /**
      * Get all user defined PML functions.
@@ -43,14 +43,14 @@ public interface UserDefinedPML {
      * @param constantValue The value of the constant.
      * @throws PMException
      */
-    void addConstant(String constantName, Value constantValue) throws PMException;
+    void createConstant(String constantName, Value constantValue) throws PMException;
 
     /**
      * Remove a PML constant.
      * @param constName The name of the constant to remove.
      * @throws PMException
      */
-    void removeConstant(String constName) throws PMException;
+    void deleteConstant(String constName) throws PMException;
 
     /**
      * Get all user defined contants.

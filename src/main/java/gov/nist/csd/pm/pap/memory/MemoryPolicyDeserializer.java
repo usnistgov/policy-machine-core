@@ -54,11 +54,11 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
                 new Gson().fromJson(userDefinedPML, JSONUserDefinedPML.class);
 
         for (Map.Entry<String, byte[]> e : jsonPML.getFunctions().entrySet()) {
-            memoryPolicyStore.userDefinedPML().addFunction(SerializationUtils.deserialize(e.getValue()));
+            memoryPolicyStore.userDefinedPML().createFunction(SerializationUtils.deserialize(e.getValue()));
         }
 
         for (Map.Entry<String, byte[]> e : jsonPML.getConstants().entrySet()) {
-            memoryPolicyStore.userDefinedPML().addConstant(e.getKey(), SerializationUtils.deserialize(e.getValue()));
+            memoryPolicyStore.userDefinedPML().createConstant(e.getKey(), SerializationUtils.deserialize(e.getValue()));
         }
     }
 

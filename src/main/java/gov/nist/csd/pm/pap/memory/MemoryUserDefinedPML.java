@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.memory;
 
-import com.google.gson.Gson;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
@@ -8,7 +7,6 @@ import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
@@ -36,18 +34,18 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
     }
 
     @Override
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
+    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
         if (tx.active()) {
-            tx.policyStore().userDefinedPML().addFunction(functionDefinitionStatement);
+            tx.policyStore().userDefinedPML().createFunction(functionDefinitionStatement);
         }
 
         functions.put(functionDefinitionStatement.getFunctionName(), functionDefinitionStatement);
     }
 
     @Override
-    public void removeFunction(String functionName) throws PMException {
+    public void deleteFunction(String functionName) throws PMException {
         if (tx.active()) {
-            tx.policyStore().userDefinedPML().removeFunction(functionName);
+            tx.policyStore().userDefinedPML().deleteFunction(functionName);
         }
 
         functions.remove(functionName);
@@ -64,18 +62,18 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
     }
 
     @Override
-    public void addConstant(String constantName, Value constantValue) throws PMException {
+    public void createConstant(String constantName, Value constantValue) throws PMException {
         if (tx.active()) {
-            tx.policyStore().userDefinedPML().addConstant(constantName, constantValue);
+            tx.policyStore().userDefinedPML().createConstant(constantName, constantValue);
         }
 
         constants.put(constantName, constantValue);
     }
 
     @Override
-    public void removeConstant(String constName) throws PMException {
+    public void deleteConstant(String constName) throws PMException {
         if (tx.active()) {
-            tx.policyStore().userDefinedPML().removeConstant(constName);
+            tx.policyStore().userDefinedPML().deleteConstant(constName);
         }
 
         constants.remove(constName);

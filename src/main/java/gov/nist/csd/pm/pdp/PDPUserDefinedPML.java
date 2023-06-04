@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.GraphAdjudicator;
 import gov.nist.csd.pm.pdp.adjudicator.UserDefinedPMLAdjudicator;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.events.*;
@@ -27,19 +26,19 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
     }
 
     @Override
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        adjudicator.addFunction(functionDefinitionStatement);
+    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
+        adjudicator.createFunction(functionDefinitionStatement);
 
-        pap.userDefinedPML().addFunction(functionDefinitionStatement);
+        pap.userDefinedPML().createFunction(functionDefinitionStatement);
 
         emitEvent(new EventContext(userCtx, new AddFunctionEvent(functionDefinitionStatement)));
     }
 
     @Override
-    public void removeFunction(String functionName) throws PMException {
-        adjudicator.removeFunction(functionName);
+    public void deleteFunction(String functionName) throws PMException {
+        adjudicator.deleteFunction(functionName);
 
-        pap.userDefinedPML().removeFunction(functionName);
+        pap.userDefinedPML().deleteFunction(functionName);
 
         emitEvent(new EventContext(userCtx, new RemoveFunctionEvent(functionName)));
 
@@ -56,20 +55,20 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
     }
 
     @Override
-    public void addConstant(String constantName, Value constantValue) throws PMException {
-        adjudicator.addConstant(constantName, constantValue);
+    public void createConstant(String constantName, Value constantValue) throws PMException {
+        adjudicator.createConstant(constantName, constantValue);
 
-        pap.userDefinedPML().addConstant(constantName, constantValue);
+        pap.userDefinedPML().createConstant(constantName, constantValue);
 
         emitEvent(new EventContext(userCtx, new AddConstantEvent(constantName, constantValue)));
 
     }
 
     @Override
-    public void removeConstant(String constName) throws PMException {
-        adjudicator.removeConstant(constName);
+    public void deleteConstant(String constName) throws PMException {
+        adjudicator.deleteConstant(constName);
 
-        pap.userDefinedPML().removeConstant(constName);
+        pap.userDefinedPML().deleteConstant(constName);
 
         emitEvent(new EventContext(userCtx, new RemoveConstantEvent(constName)));
     }

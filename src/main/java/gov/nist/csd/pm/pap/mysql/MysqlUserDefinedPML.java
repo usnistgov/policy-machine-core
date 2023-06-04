@@ -22,7 +22,7 @@ public class MysqlUserDefinedPML implements UserDefinedPML {
     }
 
     @Override
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws MysqlPolicyException {
+    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws MysqlPolicyException {
         String sql = """
                 insert into pml_function (name, bytes) values (?,?)
                 """;
@@ -36,7 +36,7 @@ public class MysqlUserDefinedPML implements UserDefinedPML {
     }
 
     @Override
-    public void removeFunction(String functionName) throws MysqlPolicyException {
+    public void deleteFunction(String functionName) throws MysqlPolicyException {
         String sql = """
                 delete from pml_function where name=?
                 """;
@@ -94,7 +94,7 @@ public class MysqlUserDefinedPML implements UserDefinedPML {
     }
 
     @Override
-    public void addConstant(String constantName, Value constantValue) throws MysqlPolicyException {
+    public void createConstant(String constantName, Value constantValue) throws MysqlPolicyException {
         String sql = """
                 insert into pml_constant (name, value) values (?,?)
                 """;
@@ -108,7 +108,7 @@ public class MysqlUserDefinedPML implements UserDefinedPML {
     }
 
     @Override
-    public void removeConstant(String constName) throws MysqlPolicyException {
+    public void deleteConstant(String constName) throws MysqlPolicyException {
         String sql = """
                 delete from pml_constant where name=?
                 """;

@@ -8,9 +8,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 class PAPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
     protected PolicyStore policyStore;
@@ -23,19 +21,19 @@ class PAPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
     }
 
     @Override
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
+    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
         if (policyStore.userDefinedPML().getFunctions().containsKey(functionDefinitionStatement.getFunctionName())) {
             throw new FunctionAlreadyDefinedException(functionDefinitionStatement.getFunctionName());
         }
 
-        policyStore.userDefinedPML().addFunction(functionDefinitionStatement);
+        policyStore.userDefinedPML().createFunction(functionDefinitionStatement);
 
         emitEvent(new AddFunctionEvent(functionDefinitionStatement));
     }
 
     @Override
-    public void removeFunction(String functionName) throws PMException {
-        policyStore.userDefinedPML().removeFunction(functionName);
+    public void deleteFunction(String functionName) throws PMException {
+        policyStore.userDefinedPML().deleteFunction(functionName);
 
         emitEvent(new RemoveFunctionEvent(functionName));
     }
@@ -51,19 +49,19 @@ class PAPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
     }
 
     @Override
-    public void addConstant(String constantName, Value constantValue) throws PMException {
+    public void createConstant(String constantName, Value constantValue) throws PMException {
         if (policyStore.userDefinedPML().getConstants().containsKey(constantName)) {
             throw new ConstantAlreadyDefinedException(constantName);
         }
 
-        policyStore.userDefinedPML().addConstant(constantName, constantValue);
+        policyStore.userDefinedPML().createConstant(constantName, constantValue);
 
         emitEvent(new AddConstantEvent(constantName, constantValue));
     }
 
     @Override
-    public void removeConstant(String constName) throws PMException {
-        policyStore.userDefinedPML().removeConstant(constName);
+    public void deleteConstant(String constName) throws PMException {
+        policyStore.userDefinedPML().deleteConstant(constName);
 
         emitEvent(new RemoveConstantEvent(constName));
     }

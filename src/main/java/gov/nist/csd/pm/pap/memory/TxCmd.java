@@ -327,7 +327,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().removeFunction(functionDefinitionStatement.getFunctionName());
+            store.userDefinedPML().deleteFunction(functionDefinitionStatement.getFunctionName());
         }
     }
 
@@ -340,7 +340,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().addFunction(functionDefinitionStatement);
+            store.userDefinedPML().createFunction(functionDefinitionStatement);
         }
         
     }
@@ -356,7 +356,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().removeConstant(constantName);
+            store.userDefinedPML().deleteConstant(constantName);
         }
     }
 
@@ -371,7 +371,7 @@ interface TxCmd {
 
         @Override
         public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().addConstant(constantName, oldValue);
+            store.userDefinedPML().createConstant(constantName, oldValue);
         }
     }
 
