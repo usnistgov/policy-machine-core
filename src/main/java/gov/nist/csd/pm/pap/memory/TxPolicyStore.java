@@ -1,6 +1,11 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.events.graph.*;
+import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
@@ -340,12 +345,12 @@ class TxPolicyStore implements Policy, PolicyEventEmitter {
     class TxUserDefinedPML implements UserDefinedPML {
         @Override
         public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) {
-            emitEvent(new AddFunctionEvent(functionDefinitionStatement));
+            emitEvent(new CreateFunctionEvent(functionDefinitionStatement));
         }
 
         @Override
         public void deleteFunction(String functionName) throws PMException {
-            emitEvent(new TxEvents.MemoryRemoveFunctionEvent(memoryPolicyStore.userDefinedPML().getFunctions().get(functionName)));
+            emitEvent(new TxEvents.MemoryDeleteFunctionEvent(memoryPolicyStore.userDefinedPML().getFunctions().get(functionName)));
         }
 
         @Override
@@ -360,12 +365,12 @@ class TxPolicyStore implements Policy, PolicyEventEmitter {
 
         @Override
         public void createConstant(String constantName, Value constantValue) {
-            emitEvent(new AddConstantEvent(constantName, constantValue));
+            emitEvent(new CreateConstantEvent(constantName, constantValue));
         }
 
         @Override
         public void deleteConstant(String constName) throws PMException {
-            emitEvent(new TxEvents.MemoryRemoveConstantEvent(constName, memoryPolicyStore.userDefinedPML().getConstants().get(constName)));
+            emitEvent(new TxEvents.MemoryDeleteConstantEvent(constName, memoryPolicyStore.userDefinedPML().getConstants().get(constName)));
         }
 
         @Override

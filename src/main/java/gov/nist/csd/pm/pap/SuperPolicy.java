@@ -1,6 +1,10 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.graph.AssignEvent;
+import gov.nist.csd.pm.policy.events.graph.AssociateEvent;
+import gov.nist.csd.pm.policy.events.graph.CreateObjectAttributeEvent;
+import gov.nist.csd.pm.policy.events.graph.CreatePolicyClassEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.ArrayList;

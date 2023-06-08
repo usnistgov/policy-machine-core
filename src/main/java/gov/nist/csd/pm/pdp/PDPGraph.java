@@ -5,6 +5,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.GraphAdjudicator;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.graph.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;

@@ -3,7 +3,7 @@ package gov.nist.csd.pm.policy.pml.expression;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
+import gov.nist.csd.pm.policy.events.graph.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.epp.EventContext;
 import org.junit.jupiter.api.Test;
 

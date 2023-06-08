@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.epp;
 
 import gov.nist.csd.pm.pdp.PolicyReviewer;
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -36,6 +37,9 @@ public class EventContext implements PolicyEvent {
     public String getEventName() {
         return eventName;
     }
+
+    @Override
+    public void apply(Policy policy) throws PMException {}
 
     public String getTarget() {
         return target;

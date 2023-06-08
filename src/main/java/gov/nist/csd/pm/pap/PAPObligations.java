@@ -2,6 +2,9 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
+import gov.nist.csd.pm.policy.events.obligations.DeleteObligationEvent;
+import gov.nist.csd.pm.policy.events.obligations.UpdateObligationEvent;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.ObligationDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.ObligationExistsException;
@@ -119,7 +122,7 @@ class PAPObligations implements Obligations, PolicyEventEmitter {
 
         policyStore.obligations().delete(label);
 
-        emitEvent(new DeleteObligationEvent(obligation));
+        emitEvent(new DeleteObligationEvent(obligation.getLabel()));
     }
 
     @Override

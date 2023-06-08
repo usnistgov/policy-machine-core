@@ -5,6 +5,9 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.ObligationsAdjudicator;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
+import gov.nist.csd.pm.policy.events.obligations.DeleteObligationEvent;
+import gov.nist.csd.pm.policy.events.obligations.UpdateObligationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -104,7 +107,7 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
 
     private void emitDeleteObligationEvent(Obligation obligation) throws PMException {
         emitObligationEvent(
-                new DeleteObligationEvent(obligation),
+                new DeleteObligationEvent(obligation.getLabel()),
                 obligation.getRules().toArray(Rule[]::new)
         );
     }

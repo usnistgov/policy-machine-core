@@ -1,8 +1,16 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.policy.events.graph.DeleteNodeEvent;
+import gov.nist.csd.pm.policy.events.graph.DissociateEvent;
+import gov.nist.csd.pm.policy.events.graph.SetNodePropertiesEvent;
+import gov.nist.csd.pm.policy.events.obligations.DeleteObligationEvent;
+import gov.nist.csd.pm.policy.events.obligations.UpdateObligationEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.DeleteProhibitionEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.UpdateProhibitionEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteFunctionEvent;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -40,7 +48,7 @@ public class TxEvents {
         private Obligation obligationToDelete;
 
         public MemoryDeleteObligationEvent(Obligation obligationToDelete) {
-            super(obligationToDelete);
+            super(obligationToDelete.getLabel());
             this.obligationToDelete = obligationToDelete;
         }
 
@@ -51,8 +59,15 @@ public class TxEvents {
 
     public static class MemoryDeleteProhibitionEvent extends DeleteProhibitionEvent {
 
+        private Prohibition prohibitionToDelete;
+
         public MemoryDeleteProhibitionEvent(Prohibition prohibition) {
-            super(prohibition);
+            super(prohibition.getLabel());
+            prohibitionToDelete = prohibition;
+        }
+
+        public Prohibition getProhibitionToDelete() {
+            return prohibitionToDelete;
         }
     }
 
@@ -70,11 +85,11 @@ public class TxEvents {
         }
     }
 
-    public static class MemoryRemoveConstantEvent extends RemoveConstantEvent {
+    public static class MemoryDeleteConstantEvent extends DeleteConstantEvent {
 
         private Value value;
 
-        public MemoryRemoveConstantEvent(String constantName, Value value) {
+        public MemoryDeleteConstantEvent(String constantName, Value value) {
             super(constantName);
             this.value = value;
         }
@@ -84,11 +99,11 @@ public class TxEvents {
         }
     }
 
-    public static class MemoryRemoveFunctionEvent extends RemoveFunctionEvent {
+    public static class MemoryDeleteFunctionEvent extends DeleteFunctionEvent {
 
         private FunctionDefinitionStatement functionDefinitionStatement;
 
-        public MemoryRemoveFunctionEvent(FunctionDefinitionStatement functionDefinitionStatement) {
+        public MemoryDeleteFunctionEvent(FunctionDefinitionStatement functionDefinitionStatement) {
             super(functionDefinitionStatement.getFunctionName());
             this.functionDefinitionStatement = functionDefinitionStatement;
         }

@@ -1,8 +1,11 @@
 package gov.nist.csd.pm.policy.events;
 
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public class RollbackTxEvent implements PolicySync, PolicyEvent {
+import java.io.Serializable;
+
+public class RollbackTxEvent implements PolicySync, PolicyEvent, Serializable {
 
     private final PolicySync policySync;
 
@@ -18,5 +21,10 @@ public class RollbackTxEvent implements PolicySync, PolicyEvent {
     @Override
     public String getEventName() {
         return "rollback_tx";
+    }
+
+    @Override
+    public void apply(Policy policy) throws PMException {
+
     }
 }

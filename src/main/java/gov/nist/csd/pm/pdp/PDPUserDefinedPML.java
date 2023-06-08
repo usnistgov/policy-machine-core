@@ -5,6 +5,10 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.UserDefinedPMLAdjudicator;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteFunctionEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
@@ -31,7 +35,7 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
 
         pap.userDefinedPML().createFunction(functionDefinitionStatement);
 
-        emitEvent(new EventContext(userCtx, new AddFunctionEvent(functionDefinitionStatement)));
+        emitEvent(new EventContext(userCtx, new CreateFunctionEvent(functionDefinitionStatement)));
     }
 
     @Override
@@ -40,7 +44,7 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
 
         pap.userDefinedPML().deleteFunction(functionName);
 
-        emitEvent(new EventContext(userCtx, new RemoveFunctionEvent(functionName)));
+        emitEvent(new EventContext(userCtx, new DeleteFunctionEvent(functionName)));
 
     }
 
@@ -60,7 +64,7 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
 
         pap.userDefinedPML().createConstant(constantName, constantValue);
 
-        emitEvent(new EventContext(userCtx, new AddConstantEvent(constantName, constantValue)));
+        emitEvent(new EventContext(userCtx, new CreateConstantEvent(constantName, constantValue)));
 
     }
 
@@ -70,7 +74,7 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
 
         pap.userDefinedPML().deleteConstant(constName);
 
-        emitEvent(new EventContext(userCtx, new RemoveConstantEvent(constName)));
+        emitEvent(new EventContext(userCtx, new DeleteConstantEvent(constName)));
     }
 
     @Override

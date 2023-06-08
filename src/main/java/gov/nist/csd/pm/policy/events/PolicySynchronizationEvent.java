@@ -1,10 +1,13 @@
 package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class PolicySynchronizationEvent implements PolicyEvent {
+public class PolicySynchronizationEvent implements PolicyEvent, Serializable {
 
     private final MemoryPolicyStore policyStore;
 
@@ -19,6 +22,11 @@ public class PolicySynchronizationEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "policy_sync";
+    }
+
+    @Override
+    public void apply(Policy policy) throws PMException {
+
     }
 
     @Override

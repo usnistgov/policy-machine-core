@@ -1,6 +1,11 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.graph.*;
+import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -35,9 +40,9 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd {
     }
 
     private TxCmd eventToCmd(PolicyEvent event) {
-        if (event instanceof AddConstantEvent e) {
+        if (event instanceof CreateConstantEvent e) {
             return new AddConstantTxCmd(e.getName(), e.getValue());
-        } else if (event instanceof AddFunctionEvent e) {
+        } else if (event instanceof CreateFunctionEvent e) {
             return new AddFunctionTxCmd(e.getFunctionDefinitionStatement());
         } else if (event instanceof AssignEvent e) {
             return new AssignTxCmd(e.getChild(), e.getParent());
@@ -66,12 +71,12 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd {
         } else if (event instanceof TxEvents.MemoryDeleteObligationEvent e) {
             return new DeleteObligationTxCmd(e.getObligationToDelete());
         } else if (event instanceof TxEvents.MemoryDeleteProhibitionEvent e) {
-            return new DeleteProhibitionTxCmd(e.getProhibition());
+            return new DeleteProhibitionTxCmd(e.getProhibitionToDelete());
         } else if (event instanceof TxEvents.MemoryDissociateEvent e) {
             return new DissociateTxCmd(new Association(e.getUa(), e.getTarget(), e.getAccessRightSet()));
-        } else if (event instanceof TxEvents.MemoryRemoveConstantEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteConstantEvent e) {
             return new RemoveConstantTxCmd(e.getName(), e.getValue());
-        } else if (event instanceof TxEvents.MemoryRemoveFunctionEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteFunctionEvent e) {
             return new RemoveFunctionTxCmd(e.getFunctionDefinitionStatement());
         } else if (event instanceof TxEvents.MemorySetNodePropertiesEvent e) {
             return new SetNodePropertiesTxCmd(e.getName(), e.getOldProps(), e.getProperties());
@@ -79,7 +84,7 @@ class TxPolicyEventListener implements PolicyEventListener, TxCmd {
             return new UpdateObligationTxCmd(new Obligation(e.getAuthor(), e.getLabel(), e.getRules()), e.getOldObl());
         } else if (event instanceof TxEvents.MemoryUpdateProhibitionEvent e) {
             return new UpdateProhibitionTxCmd(
-                    new Prohibition(e.getName(), e.getSubject(), e.getAccessRightSet(), e.isIntersection(), e.getContainers()),
+                    new Prohibition(e.getLabel(), e.getSubject(), e.getAccessRightSet(), e.isIntersection(), e.getContainers()),
                     e.getOldPro()
             );
         }

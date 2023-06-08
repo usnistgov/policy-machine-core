@@ -2,6 +2,9 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.DeleteProhibitionEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.UpdateProhibitionEvent;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
@@ -81,7 +84,7 @@ class PAPProhibitions implements Prohibitions, PolicyEventEmitter {
 
         policyStore.prohibitions().delete(label);
 
-        emitEvent(new DeleteProhibitionEvent(prohibition));
+        emitEvent(new DeleteProhibitionEvent(prohibition.getLabel()));
     }
 
     @Override

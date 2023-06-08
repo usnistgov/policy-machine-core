@@ -10,7 +10,7 @@ import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.CreateUserOrObjectStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.events.CreateObjectAttributeEvent;
+import gov.nist.csd.pm.policy.events.graph.CreateObjectAttributeEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;

@@ -5,15 +5,16 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreEventHandler;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.*;
-import gov.nist.csd.pm.policy.events.handler.BasePolicyEventHandler;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.tx.TxRunner;
 
 public class MemoryPDP extends PDP {
 
-    private final BasePolicyEventHandler policyEventHandler;
+    private final PDPEventListener policyEventHandler;
+    private final MemoryPolicyReviewer memoryPolicyReviewer;
 
     public MemoryPDP(PAP pap, boolean loadPolicyIntoMemory) throws PMException {
         super(pap);
@@ -25,11 +26,13 @@ public class MemoryPDP extends PDP {
         } else {
             this.policyEventHandler = new EmbeddedPolicyListener(pap);
         }
+
+        this.memoryPolicyReviewer = new MemoryPolicyReviewer(policyEventHandler.policy);
     }
 
     @Override
     public PolicyReviewer reviewer() throws PMException {
-        return new MemoryPolicyReviewer(policyEventHandler);
+        return memoryPolicyReviewer;
     }
 
     public void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
@@ -39,7 +42,7 @@ public class MemoryPDP extends PDP {
         });
     }
 
-    private static class ReviewerPolicyListener extends MemoryPolicyStoreEventHandler {
+    private static class ReviewerPolicyListener extends PDPEventListener {
 
         public ReviewerPolicyListener(MemoryPolicyStore store) {
             super(store);
@@ -52,18 +55,16 @@ public class MemoryPDP extends PDP {
             // in the event of rollback it will call policySync to rollback
 
             if (event instanceof RollbackTxEvent rollbackTxEvent) {
-                handlePolicySync(rollbackTxEvent.policySync());
+                policy = rollbackTxEvent.policySync().getPolicyStore();
+            } else if (event instanceof PolicySynchronizationEvent policySynchronizationEvent) {
+                policy = policySynchronizationEvent.getPolicyStore();
             } else {
-                super.handlePolicyEvent(event);
+                event.apply(policy);
             }
-        }
-
-        private void handlePolicySync(PolicySynchronizationEvent event) {
-            this.policy = event.getPolicyStore();
         }
     }
 
-    private static class EmbeddedPolicyListener extends BasePolicyEventHandler {
+    private static class EmbeddedPolicyListener extends PDPEventListener {
 
         public EmbeddedPolicyListener(PAP pap) {
             super(pap);
@@ -72,6 +73,15 @@ public class MemoryPDP extends PDP {
         @Override
         public void handlePolicyEvent(PolicyEvent event) throws PMException {
             // don't need to handle events as the pap will be updated in real time
+        }
+    }
+
+    private abstract static class PDPEventListener implements PolicyEventListener {
+
+        Policy policy;
+
+        public PDPEventListener(Policy policy) {
+            this.policy = policy;
         }
     }
 }

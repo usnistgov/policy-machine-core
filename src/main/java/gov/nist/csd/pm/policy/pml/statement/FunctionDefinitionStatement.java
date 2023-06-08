@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
@@ -9,11 +12,16 @@ import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.model.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.PMLFormatter;
+import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 
 public class FunctionDefinitionStatement extends PMLStatement {
 
@@ -125,7 +133,12 @@ public class FunctionDefinitionStatement extends PMLStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FunctionDefinitionStatement that = (FunctionDefinitionStatement) o;
-        return isFuncExec == that.isFuncExec && Objects.equals(functionName, that.functionName) && Objects.equals(returnType, that.returnType) && Objects.equals(args, that.args) && Objects.equals(statements, that.statements) && Objects.equals(functionExecutor, that.functionExecutor);
+        return isFuncExec == that.isFuncExec &&
+                Objects.equals(functionName, that.functionName) &&
+                Objects.equals(returnType, that.returnType) &&
+                Objects.equals(args, that.args) &&
+                Objects.equals(statements, that.statements) &&
+                Arrays.equals(SerializationUtils.serialize(functionExecutor), SerializationUtils.serialize(that.functionExecutor));
     }
 
     @Override

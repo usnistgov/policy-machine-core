@@ -2,6 +2,10 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteFunctionEvent;
 import gov.nist.csd.pm.policy.exceptions.ConstantAlreadyDefinedException;
 import gov.nist.csd.pm.policy.exceptions.FunctionAlreadyDefinedException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -28,14 +32,14 @@ class PAPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
 
         policyStore.userDefinedPML().createFunction(functionDefinitionStatement);
 
-        emitEvent(new AddFunctionEvent(functionDefinitionStatement));
+        emitEvent(new CreateFunctionEvent(functionDefinitionStatement));
     }
 
     @Override
     public void deleteFunction(String functionName) throws PMException {
         policyStore.userDefinedPML().deleteFunction(functionName);
 
-        emitEvent(new RemoveFunctionEvent(functionName));
+        emitEvent(new DeleteFunctionEvent(functionName));
     }
 
     @Override
@@ -56,14 +60,14 @@ class PAPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
 
         policyStore.userDefinedPML().createConstant(constantName, constantValue);
 
-        emitEvent(new AddConstantEvent(constantName, constantValue));
+        emitEvent(new CreateConstantEvent(constantName, constantValue));
     }
 
     @Override
     public void deleteConstant(String constName) throws PMException {
         policyStore.userDefinedPML().deleteConstant(constName);
 
-        emitEvent(new RemoveConstantEvent(constName));
+        emitEvent(new DeleteConstantEvent(constName));
     }
 
     @Override

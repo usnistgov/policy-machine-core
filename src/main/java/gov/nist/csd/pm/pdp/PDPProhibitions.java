@@ -5,6 +5,9 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.adjudicator.ProhibitionsAdjudicator;
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.DeleteProhibitionEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.UpdateProhibitionEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -85,7 +88,7 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
         ProhibitionSubject subject = prohibition.getSubject();
         List<ContainerCondition> containerConditions = prohibition.getContainers();
 
-        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition);
+        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition.getLabel());
 
         // emit event for subject
         emitEvent(new EventContext(userCtx, subject.getName(), deleteProhibitionEvent));
