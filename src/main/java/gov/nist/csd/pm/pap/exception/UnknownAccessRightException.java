@@ -1,0 +1,9 @@
+package gov.nist.csd.pm.pap.exception;
+
+import gov.nist.csd.pm.common.exception.PMException;
+
+public class UnknownAccessRightException extends PMException {
+    public UnknownAccessRightException(String ar) {
+        super("unknown access right \"" + ar + "\"");
+    }
+}

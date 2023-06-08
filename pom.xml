@@ -7,18 +7,30 @@
     <groupId>com.github.PM-Master</groupId>
     <artifactId>policy-machine-core</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.0</version>
+    <version>3.0</version>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <version>3.3.0</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -64,12 +76,12 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
                 <configuration>
-                    <sourceDirectory>src/main/java/gov/nist/csd/pm/policy/pml/antlr</sourceDirectory>
-                    <outputDirectory>src/main/java/gov/nist/csd/pm/policy/pml/antlr</outputDirectory>
+                    <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
+                    <outputDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
                     <visitor>true</visitor>
                     <arguments>
                         <argument>-package</argument>
-                        <argument>gov.nist.csd.pm.policy.pml.antlr</argument>
+                        <argument>gov.nist.csd.pm.pap.pml.antlr</argument>
                     </arguments>
                 </configuration>
                 <executions>
@@ -106,46 +118,24 @@
             <version>5.9.0</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- mysql dependencies-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.30</version>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mysql</artifactId>
-            <version>1.17.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>1.17.4</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- jackson -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.14.0</version>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>3.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>8.5.13</version>
         </dependency>
     </dependencies>
 
     <properties>
-        <antlr.version>4.8</antlr.version>
+        <antlr.version>4.13.1</antlr.version>
     </properties>
 </project>

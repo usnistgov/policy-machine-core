@@ -1,0 +1,36 @@
+# Topics for the NIST Open Source Portal <https://code.nist.gov>
+#
+# Set the topic tags for your open source repository from the nested
+# list below. Un-comment the relevant lines:
+#
+#     remove the `#` character *and* the space immediately after it
+#
+# so that the YAML syntax remains valid. You may delete everything
+# that does not apply, and add new topics from the NIST Taxonomy
+# <https://data.nist.gov/od/id/691DDF3315711C14E0532457068146BE1907>
+#
+# For example, a valid version of this file would be (note the `:`
+# and `---`, they are important!) as follows:
+#
+# ---
+# categories:
+#   - scientific-software
+#
+# themes:
+#   - Information Technology
+#       - Software research
+#           - Software performance
+#
+# Since scientific-software is most common it is left as the default
+# category. Feel free to comment it with a hash (#) if it does not
+# apply. There is no default theme; select as many as are relevant.
+# Make sure to remove unwanted categories as the final topics are
+# produced from this file.
+
+---
+categories:
+  - scientific-software
+
+themes:
+  - Information Technology
+      - Identity and access management
