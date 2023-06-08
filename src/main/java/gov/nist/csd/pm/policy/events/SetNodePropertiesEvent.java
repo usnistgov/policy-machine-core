@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.events;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class SetNodePropertiesEvent implements PolicyEvent {
 
@@ -23,5 +24,18 @@ public class SetNodePropertiesEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "set_node_properties";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SetNodePropertiesEvent that = (SetNodePropertiesEvent) o;
+        return Objects.equals(name, that.name) && Objects.equals(properties, that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, properties);
     }
 }

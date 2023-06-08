@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.handler.BasePolicyEventHandler;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 public class MemoryPolicyStoreEventHandler extends BasePolicyEventHandler {

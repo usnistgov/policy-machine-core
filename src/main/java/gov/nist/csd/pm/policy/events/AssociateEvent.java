@@ -2,6 +2,8 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
+import java.util.Objects;
+
 public class AssociateEvent implements PolicyEvent {
 
     private final String ua;
@@ -29,5 +31,18 @@ public class AssociateEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "associate";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssociateEvent that = (AssociateEvent) o;
+        return Objects.equals(ua, that.ua) && Objects.equals(target, that.target) && Objects.equals(accessRightSet, that.accessRightSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ua, target, accessRightSet);
     }
 }

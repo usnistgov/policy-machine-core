@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CreateProhibitionEvent implements PolicyEvent {
 
@@ -45,5 +46,18 @@ public class CreateProhibitionEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "create_prohibition";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CreateProhibitionEvent that = (CreateProhibitionEvent) o;
+        return intersection == that.intersection && Objects.equals(label, that.label) && Objects.equals(subject, that.subject) && Objects.equals(containers, that.containers) && Objects.equals(accessRightSet, that.accessRightSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(label, subject, containers, accessRightSet, intersection);
     }
 }

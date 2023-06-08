@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CreateObligationEvent implements PolicyEvent {
 
@@ -32,5 +33,18 @@ public class CreateObligationEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "create_obligation";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CreateObligationEvent that = (CreateObligationEvent) o;
+        return Objects.equals(author, that.author) && Objects.equals(label, that.label) && Objects.equals(rules, that.rules);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(author, label, rules);
     }
 }

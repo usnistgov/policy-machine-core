@@ -1,5 +1,6 @@
-package gov.nist.csd.pm.policy.events;
+package gov.nist.csd.pm.policy.events.handler;
 
+import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 public class PolicyEventHandler {

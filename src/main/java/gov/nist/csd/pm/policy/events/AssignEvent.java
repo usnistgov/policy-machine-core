@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.policy.events;
 
+import java.util.Objects;
+
 public class AssignEvent implements PolicyEvent {
 
     private final String child;
@@ -21,5 +23,18 @@ public class AssignEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "assign";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssignEvent that = (AssignEvent) o;
+        return Objects.equals(child, that.child) && Objects.equals(parent, that.parent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(child, parent);
     }
 }

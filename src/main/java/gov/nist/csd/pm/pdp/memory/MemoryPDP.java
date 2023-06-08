@@ -6,6 +6,7 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStoreEventHandler;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.handler.BasePolicyEventHandler;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.tx.TxRunner;

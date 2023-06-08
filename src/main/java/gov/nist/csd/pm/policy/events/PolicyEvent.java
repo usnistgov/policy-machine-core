@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.policy.events;
 
-public interface PolicyEvent {
+import java.io.Serializable;
+
+public interface PolicyEvent extends Serializable {
 
     String getEventName();
 

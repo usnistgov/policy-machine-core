@@ -2,6 +2,8 @@ package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
+import java.util.Objects;
+
 public class SetResourceAccessRightsEvent implements PolicyEvent {
 
     private final AccessRightSet accessRightSet;
@@ -17,5 +19,18 @@ public class SetResourceAccessRightsEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "set_resource_access_rights";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SetResourceAccessRightsEvent that = (SetResourceAccessRightsEvent) o;
+        return Objects.equals(accessRightSet, that.accessRightSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accessRightSet);
     }
 }

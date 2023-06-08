@@ -6,7 +6,9 @@ import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-public interface FunctionExecutor {
+import java.io.Serializable;
+
+public interface FunctionExecutor extends Serializable {
 
     Value exec(ExecutionContext ctx, Policy policy) throws PMException, PMLScopeException;
 
