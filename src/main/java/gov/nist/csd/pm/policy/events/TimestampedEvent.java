@@ -37,6 +37,14 @@ public class TimestampedEvent implements Serializable {
         this.bytes = bytes;
     }
 
+    public byte[] getHash() {
+        return hash;
+    }
+
+    public void setHash(byte[] hash) {
+        this.hash = hash;
+    }
+
     public byte[] serialize() {
         return SerializationUtils.serialize(this);
     }
