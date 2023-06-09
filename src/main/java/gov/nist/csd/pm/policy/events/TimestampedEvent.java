@@ -21,6 +21,12 @@ public class TimestampedEvent implements Serializable {
         this.hash = hashEvent();
     }
 
+    public TimestampedEvent(long timestamp, byte[] bytes, byte[] hash) throws NoSuchAlgorithmException {
+        this.timestamp = timestamp;
+        this.bytes = bytes;
+        this.hash = hash;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
