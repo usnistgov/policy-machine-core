@@ -39,20 +39,20 @@ public class MemoryPolicyStore extends PolicyStore {
         this.userDefinedPML = userDefinedPML;
     }
 
-    public void setGraph(MemoryGraph graph) {
-        this.graph = graph;
+    public void setGraph(Graph graph) {
+        this.graph = (MemoryGraph) graph;
     }
 
-    public void setProhibitions(MemoryProhibitions prohibitions) {
-        this.prohibitions = prohibitions;
+    public void setProhibitions(Prohibitions prohibitions) {
+        this.prohibitions = (MemoryProhibitions) prohibitions;
     }
 
-    public void setObligations(MemoryObligations obligations) {
-        this.obligations = obligations;
+    public void setObligations(Obligations obligations) {
+        this.obligations = (MemoryObligations) obligations;
     }
 
-    public void setUserDefinedPML(MemoryUserDefinedPML userDefinedPML) {
-        this.userDefinedPML = userDefinedPML;
+    public void setUserDefinedPML(UserDefinedPML userDefinedPML) {
+        this.userDefinedPML = (MemoryUserDefinedPML) userDefinedPML;
     }
 
     @Override
