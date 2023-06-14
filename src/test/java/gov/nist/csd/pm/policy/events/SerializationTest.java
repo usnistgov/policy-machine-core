@@ -22,15 +22,16 @@ import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import org.apache.commons.lang3.SerializationException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 
+import java.io.NotSerializableException;
 import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SerializationTest {
 
@@ -79,4 +80,20 @@ public class SerializationTest {
         CreateObligationEvent actual = SerializationUtils.deserialize(serialize);
         assertEquals(expected, actual);
     }
+
+    @Test
+    void testFuncExecDoestNotSerialize() throws PMException {
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        CreateFunctionEvent createFunctionEvent = new CreateFunctionEvent(new FunctionDefinitionStatement(
+                "test_func",
+                Type.string(),
+                List.of(new FormalArgument("arg1", Type.string())),
+                (ctx, policy) -> new Value("hello world")
+        ));
+
+        createFunctionEvent.apply(memoryPolicyStore);
+
+        assertThrows(SerializationException.class, () -> memoryPolicyStore.serialize().toJSON());
+    }
+
 }
