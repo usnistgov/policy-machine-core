@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.policy.events;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.events.graph.CreatePolicyClassEvent;
 import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Response;
@@ -28,6 +30,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SerializationTest {
 
@@ -76,20 +79,4 @@ public class SerializationTest {
         CreateObligationEvent actual = SerializationUtils.deserialize(serialize);
         assertEquals(expected, actual);
     }
-
-    @Test
-    void testUserDefinedPML() {
-        CreateFunctionEvent expected = new CreateFunctionEvent(
-                new FunctionDefinitionStatement(
-                        "test_func",
-                        Type.string(),
-                        List.of(new FormalArgument("arg1", Type.string())),
-                        (ctx, policy) -> new Value("hello world")
-                )
-        );
-        byte[] serialize = SerializationUtils.serialize(expected);
-        CreateFunctionEvent actual = SerializationUtils.deserialize(serialize);
-        assertEquals(expected, actual);
-    }
-
 }

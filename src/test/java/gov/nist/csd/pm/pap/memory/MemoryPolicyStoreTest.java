@@ -240,4 +240,15 @@ class MemoryPolicyStoreTest {
         store.commit();
         assertFalse(store.graph().nodeExists("oa1"));
     }
+
+    @Test
+    void testSetGraph() throws PMException {
+        MemoryPolicyStore policyStore = new MemoryPolicyStore();
+
+        MemoryPolicyStore memoryPolicyStore1 = new MemoryPolicyStore();
+        memoryPolicyStore1.graph().createPolicyClass("pc1");
+
+        policyStore.setGraph((MemoryGraph) memoryPolicyStore1.graph());
+        assertTrue(policyStore.graph().nodeExists("pc1"));
+    }
 }

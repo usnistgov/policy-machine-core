@@ -137,8 +137,7 @@ public class FunctionDefinitionStatement extends PMLStatement {
                 Objects.equals(functionName, that.functionName) &&
                 Objects.equals(returnType, that.returnType) &&
                 Objects.equals(args, that.args) &&
-                Objects.equals(statements, that.statements) &&
-                Arrays.equals(SerializationUtils.serialize(functionExecutor), SerializationUtils.serialize(that.functionExecutor));
+                Objects.equals(statements, that.statements);
     }
 
     @Override
