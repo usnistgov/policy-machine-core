@@ -34,8 +34,6 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     public PAPGraph(PolicyStore policyStore, PolicyEventListener listener) throws PMException {
         this.policyStore = policyStore;
         this.listener = listener;
-
-        SuperPolicy.verifySuperPolicy(this.policyStore);
     }
 
     @Override
