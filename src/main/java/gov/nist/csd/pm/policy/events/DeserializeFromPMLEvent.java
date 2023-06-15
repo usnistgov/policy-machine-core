@@ -19,7 +19,7 @@ public class DeserializeFromPMLEvent implements PolicyEvent{
 
     @Override
     public String getEventName() {
-        return "deserialize_from_";
+        return "deserialize_from_pml";
     }
 
     @Override
