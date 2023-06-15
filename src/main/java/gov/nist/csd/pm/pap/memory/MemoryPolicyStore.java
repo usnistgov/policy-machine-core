@@ -39,6 +39,14 @@ public class MemoryPolicyStore extends PolicyStore {
         this.userDefinedPML = userDefinedPML;
     }
 
+    public TxPolicyStore getTxPolicyStore() {
+        return txPolicyStore;
+    }
+
+    public boolean isInTx() {
+        return inTx;
+    }
+
     public void setGraph(Graph graph) {
         this.graph = (MemoryGraph) graph;
     }

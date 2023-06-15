@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-class TxPolicyStore implements Policy, PolicyEventEmitter {
+public class TxPolicyStore implements Policy, PolicyEventEmitter {
 
     private final MemoryPolicyStore memoryPolicyStore;
 
