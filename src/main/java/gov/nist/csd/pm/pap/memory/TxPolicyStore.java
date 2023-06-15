@@ -50,8 +50,8 @@ public class TxPolicyStore implements Policy, PolicyEventEmitter {
         this.txUserDefinedPML = new TxUserDefinedPML();
     }
 
-    public TxPolicyEventListener getTxPolicyEventListener() {
-        return txPolicyEventListener;
+    public List<PolicyEvent> getTxEvents() {
+        return txPolicyEventListener.getEvents();
     }
 
     public void clearEvents() {
