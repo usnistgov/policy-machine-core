@@ -54,6 +54,10 @@ public class TxPolicyStore implements Policy, PolicyEventEmitter {
         return txPolicyEventListener.getEvents();
     }
 
+    protected TxPolicyEventListener getTxPolicyEventListener() {
+        return txPolicyEventListener;
+    }
+
     public void clearEvents() {
         txPolicyEventListener = new TxPolicyEventListener();
     }
