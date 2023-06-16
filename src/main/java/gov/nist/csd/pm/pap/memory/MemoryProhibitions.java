@@ -32,6 +32,10 @@ class MemoryProhibitions implements Prohibitions, Serializable {
         this.tx = new MemoryTx(false, 0, null);
     }
 
+    public void clear() {
+        this.prohibitions.clear();
+    }
+
     @Override
     public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (tx.isActive()) {

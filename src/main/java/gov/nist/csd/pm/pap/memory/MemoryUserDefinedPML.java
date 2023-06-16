@@ -33,6 +33,11 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
         this.tx = new MemoryTx(false, 0, null);
     }
 
+    public void clear() {
+        this.functions.clear();
+        this.constants.clear();
+    }
+
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
         if (tx.isActive()) {

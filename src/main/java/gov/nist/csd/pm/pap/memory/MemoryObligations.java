@@ -33,6 +33,10 @@ class MemoryObligations implements Obligations, Serializable {
         this.tx = new MemoryTx(false, 0, null);
     }
 
+    public void clear() {
+        this.obligations.clear();
+    }
+
     @Override
     public void create(UserContext author, String label, Rule... rules) throws PMException {
         if (tx.isActive()) {

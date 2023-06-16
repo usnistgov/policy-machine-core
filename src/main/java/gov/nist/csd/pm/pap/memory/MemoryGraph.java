@@ -92,6 +92,16 @@ class MemoryGraph implements Graph {
         }
     }
 
+    public void clear() {
+        graph.clear();
+        resourceAccessRights.clear();
+        pcs.clear();
+        oas.clear();
+        uas.clear();
+        us.clear();
+        os.clear();
+    }
+
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
         if (tx.isActive()) {

@@ -122,11 +122,10 @@ public class MemoryPolicyStore extends PolicyStore {
             inTx = false;
             txPolicyStore.clearEvents();
 
-            MemoryTx tx = new MemoryTx(false, txCounter, txPolicyStore);
-            graph.tx = tx;
-            prohibitions.tx = tx;
-            obligations.tx = tx;
-            userDefinedPML.tx = tx;
+            graph.tx.set(false, txCounter, txPolicyStore);
+            prohibitions.tx.set(false, txCounter, txPolicyStore);
+            obligations.tx.set(false, txCounter, txPolicyStore);
+            userDefinedPML.tx.set(false, txCounter, txPolicyStore);
         }
     }
 
@@ -135,11 +134,10 @@ public class MemoryPolicyStore extends PolicyStore {
         inTx = false;
         txCounter = 0;
 
-        MemoryTx tx = new MemoryTx(false, txCounter, txPolicyStore);
-        graph.tx = tx;
-        prohibitions.tx = tx;
-        obligations.tx = tx;
-        userDefinedPML.tx = tx;
+        graph.tx.set(false, txCounter, txPolicyStore);
+        prohibitions.tx.set(false, txCounter, txPolicyStore);
+        obligations.tx.set(false, txCounter, txPolicyStore);
+        userDefinedPML.tx.set(false, txCounter, txPolicyStore);
 
         TxPolicyEventListener txPolicyEventListener = txPolicyStore.getTxPolicyEventListener();
         txPolicyEventListener.revert(this);
@@ -147,9 +145,9 @@ public class MemoryPolicyStore extends PolicyStore {
 
     @Override
     protected void reset() throws PMException {
-        graph = new MemoryGraph();
-        prohibitions = new MemoryProhibitions();
-        obligations = new MemoryObligations();
-        userDefinedPML = new MemoryUserDefinedPML();
+        graph.clear();
+        prohibitions.clear();
+        obligations.clear();
+        userDefinedPML.clear();
     }
 }
