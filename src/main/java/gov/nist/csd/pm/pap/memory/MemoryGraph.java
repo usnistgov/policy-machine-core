@@ -94,8 +94,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().setResourceAccessRights(accessRightSet);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().setResourceAccessRights(accessRightSet);
         }
 
         this.resourceAccessRights.clear();
@@ -109,8 +109,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().createPolicyClass(name, properties);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().createPolicyClass(name, properties);
         }
 
         this.graph.put(name, getVertex(name, PC, properties));
@@ -126,8 +126,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().createUserAttribute(name, properties, parent, parents);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().createUserAttribute(name, properties, parent, parents);
         }
 
         return addNode(name, UA, properties, parent, parents);
@@ -140,8 +140,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().createObjectAttribute(name, properties, parent, parents);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().createObjectAttribute(name, properties, parent, parents);
         }
 
         return addNode(name, OA, properties, parent, parents);
@@ -154,8 +154,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().createObject(name, properties, parent, parents);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().createObject(name, properties, parent, parents);
         }
 
         return addNode(name, O, properties, parent, parents);
@@ -168,8 +168,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().createUser(name, properties, parent, parents);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().createUser(name, properties, parent, parents);
         }
 
         return addNode(name, U, properties, parent, parents);
@@ -182,8 +182,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().setNodeProperties(name, properties);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().setNodeProperties(name, properties);
         }
 
         this.graph.get(name).setProperties(properties);
@@ -217,8 +217,8 @@ class MemoryGraph implements Graph {
             return;
         }
 
-        if (tx.active()) {
-            tx.policyStore().graph().deleteNode(name);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().deleteNode(name);
         }
 
         Vertex vertex = graph.get(name);
@@ -261,8 +261,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void assign(String child, String parent) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().assign(child, parent);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().assign(child, parent);
         }
 
         assignInternal(child, parent);
@@ -270,8 +270,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void deassign(String child, String parent) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().deassign(child, parent);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().deassign(child, parent);
         }
 
         deassignInternal(child, parent);
@@ -279,8 +279,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void assignAll(List<String> children, String target) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().assignAll(children, target);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().assignAll(children, target);
         }
 
         for (String c : children) {
@@ -290,8 +290,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void deassignAll(List<String> children, String target) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().deassignAll(children, target);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().deassignAll(children, target);
         }
 
         for (String c : children) {
@@ -301,8 +301,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void deassignAllFromAndDelete(String target) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().deassignAllFromAndDelete(target);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().deassignAllFromAndDelete(target);
         }
 
         for (String c : getChildren(target)) {
@@ -326,8 +326,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().associate(ua, target, accessRights);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().associate(ua, target, accessRights);
         }
 
         if (containsEdge(ua, target)) {
@@ -340,8 +340,8 @@ class MemoryGraph implements Graph {
 
     @Override
     public void dissociate(String ua, String target) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().graph().dissociate(ua, target);
+        if (tx.isActive()) {
+            tx.getPolicyStore().graph().dissociate(ua, target);
         }
 
         dissociateInternal(ua, target);

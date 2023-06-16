@@ -109,11 +109,10 @@ public class MemoryPolicyStore extends PolicyStore {
         inTx = true;
         txCounter++;
 
-        MemoryTx tx = new MemoryTx(true, txCounter, txPolicyStore);
-        graph.tx = tx;
-        prohibitions.tx = tx;
-        obligations.tx = tx;
-        userDefinedPML.tx = tx;
+        graph.tx.set(true, txCounter, txPolicyStore);
+        prohibitions.tx.set(true, txCounter, txPolicyStore);
+        obligations.tx.set(true, txCounter, txPolicyStore);
+        userDefinedPML.tx.set(true, txCounter, txPolicyStore);
     }
 
     @Override

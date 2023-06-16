@@ -35,8 +35,8 @@ class MemoryObligations implements Obligations, Serializable {
 
     @Override
     public void create(UserContext author, String label, Rule... rules) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().obligations().create(author, label, rules);
+        if (tx.isActive()) {
+            tx.getPolicyStore().obligations().create(author, label, rules);
         }
 
         obligations.add(new Obligation(author, label, Arrays.asList(rules)));
@@ -44,8 +44,8 @@ class MemoryObligations implements Obligations, Serializable {
 
     @Override
     public void update(UserContext author, String label, Rule... rules) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().obligations().update(author, label, rules);
+        if (tx.isActive()) {
+            tx.getPolicyStore().obligations().update(author, label, rules);
         }
 
         for (Obligation o : obligations) {
@@ -59,8 +59,8 @@ class MemoryObligations implements Obligations, Serializable {
 
     @Override
     public void delete(String label) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().obligations().delete(label);
+        if (tx.isActive()) {
+            tx.getPolicyStore().obligations().delete(label);
         }
 
         this.obligations.removeIf(o -> o.getLabel().equals(label));

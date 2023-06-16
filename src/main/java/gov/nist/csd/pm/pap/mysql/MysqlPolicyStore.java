@@ -23,9 +23,6 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
 public class MysqlPolicyStore extends PolicyStore {
 
-    public static final String MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String MYSQL_SCHEMA = "pm_core";
-
     static final ObjectMapper objectMapper = new ObjectMapper();
     static final ObjectReader hashmapReader = new ObjectMapper().readerFor(HashMap.class);
     static final ObjectReader arsetReader = new ObjectMapper().readerFor(AccessRightSet.class);

@@ -35,8 +35,8 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
 
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().userDefinedPML().createFunction(functionDefinitionStatement);
+        if (tx.isActive()) {
+            tx.getPolicyStore().userDefinedPML().createFunction(functionDefinitionStatement);
         }
 
         functions.put(functionDefinitionStatement.getFunctionName(), functionDefinitionStatement);
@@ -44,8 +44,8 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
 
     @Override
     public void deleteFunction(String functionName) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().userDefinedPML().deleteFunction(functionName);
+        if (tx.isActive()) {
+            tx.getPolicyStore().userDefinedPML().deleteFunction(functionName);
         }
 
         functions.remove(functionName);
@@ -63,8 +63,8 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
 
     @Override
     public void createConstant(String constantName, Value constantValue) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().userDefinedPML().createConstant(constantName, constantValue);
+        if (tx.isActive()) {
+            tx.getPolicyStore().userDefinedPML().createConstant(constantName, constantValue);
         }
 
         constants.put(constantName, constantValue);
@@ -72,8 +72,8 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
 
     @Override
     public void deleteConstant(String constName) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().userDefinedPML().deleteConstant(constName);
+        if (tx.isActive()) {
+            tx.getPolicyStore().userDefinedPML().deleteConstant(constName);
         }
 
         constants.remove(constName);

@@ -34,8 +34,8 @@ class MemoryProhibitions implements Prohibitions, Serializable {
 
     @Override
     public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().prohibitions().create(label, subject, accessRightSet, intersection, containerConditions);
+        if (tx.isActive()) {
+            tx.getPolicyStore().prohibitions().create(label, subject, accessRightSet, intersection, containerConditions);
         }
 
         List<Prohibition> existingPros = prohibitions.getOrDefault(subject.getName(), new ArrayList<>());
@@ -45,8 +45,8 @@ class MemoryProhibitions implements Prohibitions, Serializable {
 
     @Override
     public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().prohibitions().update(label, subject, accessRightSet, intersection, containerConditions);
+        if (tx.isActive()) {
+            tx.getPolicyStore().prohibitions().update(label, subject, accessRightSet, intersection, containerConditions);
         }
 
         delete(label);
@@ -55,8 +55,8 @@ class MemoryProhibitions implements Prohibitions, Serializable {
 
     @Override
     public void delete(String label) throws PMException {
-        if (tx.active()) {
-            tx.policyStore().prohibitions().delete(label);
+        if (tx.isActive()) {
+            tx.getPolicyStore().prohibitions().delete(label);
         }
 
         for(String subject : prohibitions.keySet()) {
