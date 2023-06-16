@@ -152,8 +152,5 @@ public class MemoryPolicyStore extends PolicyStore {
         prohibitions = new MemoryProhibitions();
         obligations = new MemoryObligations();
         userDefinedPML = new MemoryUserDefinedPML();
-
-        // a call to rollback will reset tx fields
-        rollback();
     }
 }

@@ -37,10 +37,15 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
     public void fromJSON(String json) throws PMException {
         JSONPolicy jsonPolicy = JSONPolicy.fromJson(json);
 
+        memoryPolicyStore.beginTx();
+        memoryPolicyStore.reset();
+
         graphFromJson(jsonPolicy.getGraph());
         prohibitionsFromJson(jsonPolicy.getProhibitions());
         obligationsFromJson(jsonPolicy.getObligations());
         userDefinedPMLFromJson(jsonPolicy.getUserDefinedPML());
+
+        memoryPolicyStore.commit();
     }
 
     @Override
@@ -98,17 +103,19 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
     private void graphFromJson(String json) {
         JSONGraph jsonGraph = new Gson().fromJson(json, JSONGraph.class);
 
+        MemoryGraph graph = (MemoryGraph) memoryPolicyStore.graph();
+
         for (Node node : jsonGraph.getNodes()) {
-            ((MemoryGraph)memoryPolicyStore.graph()).addNode(node.getName(), node.getType(), node.getProperties());
+            graph.addNode(node.getName(), node.getType(), node.getProperties());
         }
 
         for (String[] assignment : jsonGraph.getAssignments()) {
-            ((MemoryGraph)memoryPolicyStore.graph()).assignInternal(assignment[0], assignment[1]);
+            graph.assignInternal(assignment[0], assignment[1]);
         }
 
         for (Map.Entry<String, Map<String, AccessRightSet>> e : jsonGraph.getAssociations().entrySet()) {
             for (Map.Entry<String, AccessRightSet> e2 : e.getValue().entrySet()) {
-                ((MemoryGraph)memoryPolicyStore.graph()).associateInternal(e.getKey(), e2.getKey(), e2.getValue());
+                graph.associateInternal(e.getKey(), e2.getKey(), e2.getValue());
             }
         }
     }

@@ -15,15 +15,9 @@ class PAPDeserializer implements PolicyDeserializer {
 
     @Override
     public void fromJSON(String json) throws PMException {
-        // start a new tx to deserialize policy
-        policyStore.beginTx();
-
-        policyStore.reset();
-
         // deserialize using deserializer
+        // tx logic is handled by the policy store
         policyStore.deserialize().fromJSON(json);
-
-        policyStore.commit();
     }
 
     @Override

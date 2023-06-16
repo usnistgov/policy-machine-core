@@ -41,6 +41,7 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
         JSONPolicy jsonPolicy = new Gson().fromJson(json, JSONPolicy.class);
 
         policyStore.beginTx();
+        policyStore.reset();
 
         insertGraph(new Gson().fromJson(jsonPolicy.getGraph(), JSONGraph.class));
         insertProhibitions(jsonPolicy.getProhibitions());
