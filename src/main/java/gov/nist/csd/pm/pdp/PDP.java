@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
 import gov.nist.csd.pm.policy.events.PolicyEventListener;
+import gov.nist.csd.pm.policy.events.ResetPolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLExecutable;
@@ -54,7 +55,7 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements PolicyEventEmitter, PolicyEventListener, PMLExecutable, Policy {
+    public static class PDPTx implements Policy, PolicyEventListener, PMLExecutable, PolicyEventEmitter {
 
         private final UserContext userCtx;
         private final Adjudicator adjudicator;
@@ -136,6 +137,13 @@ public abstract class PDP implements PolicyEventEmitter {
             adjudicator.deserialize();
 
             return pap.deserialize();
+        }
+
+        @Override
+        public void reset() throws PMException {
+            adjudicator.reset();
+
+            pap.reset();
         }
 
         @Override

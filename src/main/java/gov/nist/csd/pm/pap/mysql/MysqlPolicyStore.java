@@ -67,15 +67,20 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    protected void reset() throws MysqlPolicyException {
+    public void reset() throws MysqlPolicyException {
+        beginTx();
+
         List<String> sequence = PolicyResetSequence.getSequence();
         try (Statement stmt = connection.getConnection().createStatement()) {
             for (String s : sequence) {
                 stmt.executeUpdate(s);
             }
         } catch (SQLException e) {
+            rollback();
             throw new MysqlPolicyException(e.getMessage());
         }
+
+        commit();
     }
 
     @Override

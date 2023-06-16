@@ -66,6 +66,7 @@ public class AdminAccessRights {
     public static final String GET_CONTEXT = "get_context";
     public static final String TO_STRING = "to_string";
     public static final String FROM_STRING = "from_string";
+    public static final String RESET = "reset";
     public static final String ALL_ACCESS_RIGHTS = "*";
     public static final String ALL_ADMIN_ACCESS_RIGHTS = "*a";
     public static final String ALL_RESOURCE_ACCESS_RIGHTS = "*r";
@@ -133,8 +134,11 @@ public class AdminAccessRights {
             REMOVE_CONSTANT,
             GET_CONSTANTS,
             GET_CONTEXT,
+
             TO_STRING,
-            FROM_STRING
+            FROM_STRING,
+
+            RESET
     );
 
     private static final AccessRightSet WILDCARD_ACCESS_RIGHTS_SET = new AccessRightSet(

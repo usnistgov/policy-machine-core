@@ -107,6 +107,13 @@ public class TxPolicyStore implements Policy, PolicyEventEmitter {
         return memoryPolicyStore.deserialize();
     }
 
+    @Override
+    public void reset() throws PMException {
+        memoryPolicyStore.reset();
+        clearEvents();
+        emitEvent(new ResetPolicyEvent());
+    }
+
     class TxGraph implements Graph {
         @Override
         public void setResourceAccessRights(AccessRightSet accessRightSet) {

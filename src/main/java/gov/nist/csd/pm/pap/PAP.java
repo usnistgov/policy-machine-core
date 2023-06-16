@@ -66,6 +66,11 @@ public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter,
     }
 
     @Override
+    public void reset() throws PMException {
+        policyStore.reset();
+    }
+
+    @Override
     public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
         listeners.add(listener);
 

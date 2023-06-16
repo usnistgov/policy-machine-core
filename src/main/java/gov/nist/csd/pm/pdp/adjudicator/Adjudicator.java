@@ -9,8 +9,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 
 import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_PC_REP;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.FROM_STRING;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.TO_STRING;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
 public class Adjudicator implements Policy {
 
@@ -66,5 +65,10 @@ public class Adjudicator implements Policy {
         accessRightChecker.check(userCtx, SUPER_PC_REP, FROM_STRING);
 
         return null;
+    }
+
+    @Override
+    public void reset() throws PMException {
+        accessRightChecker.check(userCtx, SUPER_PC_REP, RESET);
     }
 }

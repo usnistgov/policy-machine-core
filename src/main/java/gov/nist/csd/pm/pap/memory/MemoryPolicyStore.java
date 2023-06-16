@@ -2,10 +2,12 @@ package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.PolicyStore;
 import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-import java.io.Serializable;
+import java.util.List;
 
 public class MemoryPolicyStore extends PolicyStore {
 
@@ -39,8 +41,8 @@ public class MemoryPolicyStore extends PolicyStore {
         this.userDefinedPML = userDefinedPML;
     }
 
-    public TxPolicyStore getTxPolicyStore() {
-        return txPolicyStore;
+    public List<PolicyEvent> getTxEvents() {
+        return txPolicyStore.getTxEvents();
     }
 
     public boolean isInTx() {
@@ -144,7 +146,7 @@ public class MemoryPolicyStore extends PolicyStore {
     }
 
     @Override
-    protected void reset() throws PMException {
+    public void reset() throws PMException {
         graph.clear();
         prohibitions.clear();
         obligations.clear();
