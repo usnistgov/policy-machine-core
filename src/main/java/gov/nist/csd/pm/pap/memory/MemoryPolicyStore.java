@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.PolicyEventListener;
 import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
+import gov.nist.csd.pm.policy.events.ResetPolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.List;
@@ -151,5 +152,9 @@ public class MemoryPolicyStore extends PolicyStore {
         prohibitions.clear();
         obligations.clear();
         userDefinedPML.clear();
+
+        if (inTx) {
+            txPolicyStore.emitEvent(new ResetPolicyEvent());
+        }
     }
 }
