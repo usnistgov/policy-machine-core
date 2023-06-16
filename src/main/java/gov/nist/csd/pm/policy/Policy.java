@@ -9,4 +9,5 @@ public interface Policy {
     UserDefinedPML userDefinedPML();
     PolicySerializer serialize() throws PMException;
     PolicyDeserializer deserialize() throws PMException;
+    void reset() throws PMException;
 }
