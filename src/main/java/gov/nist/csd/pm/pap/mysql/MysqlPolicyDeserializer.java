@@ -105,7 +105,9 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
         }
     }
 
-    private void insertGraph(JSONGraph jsonGraph) throws MysqlPolicyException {
+    private void insertGraph(JSONGraph jsonGraph) throws PMException {
+        policyStore.graph().setResourceAccessRights(jsonGraph.getResourceAccessRights());
+
         String sql = """
                     INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)
                     """;
