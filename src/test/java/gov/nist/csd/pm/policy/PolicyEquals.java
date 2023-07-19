@@ -17,9 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PolicyEquals {
 
     public static void check(Policy a, Policy b) throws PMException {
-        // check nodes
-        // assignments
-        // associations
+        assertEquals(a.graph().getResourceAccessRights(), b.graph().getResourceAccessRights());
+
         List<String> aNodes = a.graph().search(NodeType.ANY, NO_PROPERTIES);
         List<String> bNodes = b.graph().search(NodeType.ANY, NO_PROPERTIES);
         assertTrue(aNodes.containsAll(bNodes));

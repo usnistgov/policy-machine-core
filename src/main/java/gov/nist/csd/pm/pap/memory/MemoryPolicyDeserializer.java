@@ -95,8 +95,10 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
         }
     }
 
-    private void graphFromJson(String json) {
+    private void graphFromJson(String json) throws PMException {
         JSONGraph jsonGraph = new Gson().fromJson(json, JSONGraph.class);
+
+        ((MemoryGraph)memoryPolicyStore.graph()).setResourceAccessRights(jsonGraph.getResourceAccessRights());
 
         for (Node node : jsonGraph.getNodes()) {
             ((MemoryGraph)memoryPolicyStore.graph()).addNode(node.getName(), node.getType(), node.getProperties());
