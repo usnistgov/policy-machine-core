@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
@@ -21,11 +19,6 @@ public class DeleteNodeEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "delete_node";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.graph().deleteNode(name);
     }
 
     @Override

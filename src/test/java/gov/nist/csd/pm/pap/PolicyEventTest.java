@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PolicyEventTest {
@@ -30,6 +30,7 @@ public class PolicyEventTest {
     @Test
     void testEvents() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
+        pap.bootstrap(new SuperUserBootstrapper());
 
         List<PolicyEvent> events = new ArrayList<>();
         pap.addEventListener(events::add, false);
@@ -41,49 +42,49 @@ public class PolicyEventTest {
         assertEquals(3, events.size());
 
         pap.graph().createObjectAttribute("oa1", "pc1");
-        assertEquals(5, events.size());
+        assertEquals(4, events.size());
 
         pap.graph().createUserAttribute("ua1", "pc1");
-        assertEquals(7, events.size());
+        assertEquals(5, events.size());
 
         pap.graph().createUserAttribute("ua2", "pc1");
-        assertEquals(9, events.size());
+        assertEquals(6, events.size());
 
         pap.graph().createObject("o1", "oa1");
-        assertEquals(10, events.size());
+        assertEquals(7, events.size());
 
         pap.graph().createUser("u1", "ua1");
-        assertEquals(11, events.size());
+        assertEquals(8, events.size());
 
         pap.graph().createUser("u2", "ua1");
-        assertEquals(12, events.size());
+        assertEquals(9, events.size());
 
         pap.graph().setNodeProperties("u1", Map.of("k", "v"));
-        assertEquals(13, events.size());
+        assertEquals(10, events.size());
 
         pap.graph().deleteNode("u1");
-        assertEquals(14, events.size());
+        assertEquals(11, events.size());
 
         pap.graph().assign("u2", "ua2");
-        assertEquals(15, events.size());
+        assertEquals(12, events.size());
 
         pap.graph().deassign("u2", "ua2");
-        assertEquals(16, events.size());
+        assertEquals(13, events.size());
 
         pap.graph().associate("ua1", "oa1", new AccessRightSet());
-        assertEquals(17, events.size());
+        assertEquals(14, events.size());
 
         pap.graph().dissociate("ua1", "oa1");
-        assertEquals(18, events.size());
+        assertEquals(15, events.size());
 
         pap.prohibitions().create("label", ProhibitionSubject.user("ua1"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
-        assertEquals(19, events.size());
+        assertEquals(16, events.size());
 
         pap.prohibitions().update("label", ProhibitionSubject.user("ua2"), new AccessRightSet("read"), false, new ContainerCondition("oa1", false));
-        assertEquals(20, events.size());
+        assertEquals(17, events.size());
 
         pap.prohibitions().delete("label");
-        assertEquals(21, events.size());
+        assertEquals(18, events.size());
 
         pap.obligations().create(
                 new UserContext(SUPER_USER),
@@ -100,7 +101,7 @@ public class PolicyEventTest {
                         )
                 )
         );
-        assertEquals(22, events.size());
+        assertEquals(19, events.size());
 
         pap.obligations().update(new UserContext(SUPER_USER),
                 "label",
@@ -115,10 +116,10 @@ public class PolicyEventTest {
                                 new CreatePolicyStatement(new Expression(new VariableReference("test_pc2", Type.string())))
                         )
                 ));
-        assertEquals(23, events.size());
+        assertEquals(20, events.size());
 
         pap.obligations().delete("label");
-        assertEquals(24, events.size());
+        assertEquals(21, events.size());
     }
 
 }

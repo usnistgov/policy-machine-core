@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

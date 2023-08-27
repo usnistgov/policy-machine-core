@@ -9,6 +9,4 @@ public interface PolicyEvent extends Serializable {
 
     String getEventName();
 
-    void apply(Policy policy) throws PMException;
-
 }

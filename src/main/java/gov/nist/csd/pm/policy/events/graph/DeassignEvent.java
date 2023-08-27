@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
@@ -27,11 +25,6 @@ public class DeassignEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "deassign";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.graph().deassign(child, parent);
     }
 
     @Override

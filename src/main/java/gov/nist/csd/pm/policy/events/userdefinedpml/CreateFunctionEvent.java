@@ -24,7 +24,6 @@ public class CreateFunctionEvent implements PolicyEvent {
         return "add_function";
     }
 
-    @Override
     public void apply(Policy policy) throws PMException {
         policy.userDefinedPML().createFunction(functionDefinitionStatement);
     }

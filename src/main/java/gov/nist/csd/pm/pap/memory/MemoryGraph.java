@@ -1,95 +1,86 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.GraphStore;
+import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.policy.exceptions.*;
+import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
+import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentException;
+import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.tx.Transactional;
 
-import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 
-class MemoryGraph implements Graph {
+class MemoryGraph extends MemoryStore<TxGraph> implements GraphStore, Transactional, BaseMemoryTx {
 
-    private final Map<String, Vertex> graph;
-    private final AccessRightSet resourceAccessRights;
-    private final List<String> pcs;
-    private final List<String> oas;
-    private final List<String> uas;
-    private final List<String> os;
-    private final List<String> us;
+    private Map<String, Vertex> graph;
+    private AccessRightSet resourceAccessRights;
+    private List<String> pcs;
+    private List<String> oas;
+    private List<String> uas;
+    private List<String> os;
+    private List<String> us;
 
-    protected MemoryTx tx;
+    protected MemoryTx<TxGraph> tx;
+
+    private MemoryProhibitions memoryProhibitions;
+    private MemoryObligations memoryObligations;
 
     public MemoryGraph() {
-        this.graph = new HashMap<>();
-        this.pcs = new ArrayList<>();
-        this.oas = new ArrayList<>();
-        this.uas = new ArrayList<>();
-        this.os = new ArrayList<>();
-        this.us = new ArrayList<>();
-        this.resourceAccessRights = new AccessRightSet();
-        tx = new MemoryTx(false, 0, null);
-    }
-
-    public MemoryGraph(MemoryGraph graph) {
-        this.graph = new HashMap<>();
-        for (String n : graph.graph.keySet()) {
-            this.graph.put(n, graph.graph.get(n).copy());
-        }
-
-        this.pcs = new ArrayList<>(graph.pcs);
-        this.oas = new ArrayList<>(graph.oas);
-        this.uas = new ArrayList<>(graph.uas);
-        this.os = new ArrayList<>(graph.os);
-        this.us = new ArrayList<>(graph.us);
-        this.resourceAccessRights = new AccessRightSet(graph.getResourceAccessRights());
-        this.tx = new MemoryTx(false, 0, null);
+        initGraph();
     }
 
     public MemoryGraph(Graph graph) throws PMException {
-        this.graph = new HashMap<>();
-        this.pcs = new ArrayList<>();
-        this.oas = new ArrayList<>();
-        this.uas = new ArrayList<>();
-        this.os = new ArrayList<>();
-        this.us = new ArrayList<>();
-        this.resourceAccessRights = new AccessRightSet(graph.getResourceAccessRights());
-        this.tx = new MemoryTx(false, 0, null);
+        initGraph();
+        buildFromGraph(graph);
+    }
 
-        List<String> nodes = graph.search(ANY, NO_PROPERTIES);
-        
-        // add nodes to graph
-        List<String> uas = new ArrayList<>();
-        for (String n : nodes) {
-            Node node = graph.getNode(n);
-            addNode(n, node.getType(), node.getProperties());
-            
-            if (node.getType() == UA) {
-                uas.add(n);
-            }
-        }
+    private void initGraph() {
+        graph = new HashMap<>();
+        pcs = new ArrayList<>();
+        oas = new ArrayList<>();
+        uas = new ArrayList<>();
+        os = new ArrayList<>();
+        us = new ArrayList<>();
+        resourceAccessRights = new AccessRightSet();
+    }
 
-        // add assignments to graph
-        for (String n : nodes) {
-            List<String> parents = graph.getParents(n);
-            for (String p : parents) {
-                assignInternal(n, p);
-            }
+    @Override
+    public void beginTx() throws PMException {
+        if (tx == null) {
+            tx = new MemoryTx<>(false, 0, new TxGraph(new TxPolicyEventTracker(), this));
         }
-        
-        // add associations to graph
-        for (String ua : uas) {
-            List<Association> assocs = graph.getAssociationsWithSource(ua);
-            for (Association a : assocs) {
-                associate(ua, a.getTarget(), a.getAccessRightSet());
-            }
-        }
+        tx.beginTx();
+    }
+
+    @Override
+    public void commit() throws PMException {
+        tx.commit();
+    }
+
+    @Override
+    public void rollback() throws PMException {
+        tx.getStore().rollback();
+
+        tx.rollback();
+    }
+
+    public void setMemoryProhibitions(MemoryProhibitions memoryProhibitions) {
+        this.memoryProhibitions = memoryProhibitions;
+    }
+
+    public void setMemoryObligations(MemoryObligations memoryObligations) {
+        this.memoryObligations = memoryObligations;
     }
 
     public void clear() {
@@ -103,13 +94,15 @@ class MemoryGraph implements Graph {
     }
 
     @Override
-    public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().setResourceAccessRights(accessRightSet);
-        }
+    public void setResourceAccessRights(AccessRightSet accessRightSet)
+    throws AdminAccessRightExistsException, PMBackendException {
+        checkSetResourceAccessRightsInput(accessRightSet);
 
-        this.resourceAccessRights.clear();
-        this.resourceAccessRights.addAll(accessRightSet);
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.setResourceAccessRights(accessRightSet));
+
+        resourceAccessRights.clear();
+        resourceAccessRights.addAll(accessRightSet);
     }
 
     @Override
@@ -118,96 +111,120 @@ class MemoryGraph implements Graph {
     }
 
     @Override
-    public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().createPolicyClass(name, properties);
-        }
+    public String createPolicyClass(String name, Map<String, String> properties)
+    throws NodeNameExistsException, PMBackendException {
+        checkCreatePolicyClassInput(name);
 
-        this.graph.put(name, getVertex(name, PC, properties));
-        this.pcs.add(name);
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createPolicyClass(name, properties));
+
+        // create pc node
+        createNodeInternal(name, PC, properties);
+
+        // create pc rep oa
+        String oa = AdminPolicy.policyClassObjectAttributeName(name);
+        createNodeInternal(oa, OA, properties);
+
+        // assign the oa to the pc
+        assignInternal(oa, name);
 
         return name;
     }
 
     @Override
-    public String createPolicyClass(String name) throws PMException {
+    public String createPolicyClass(String name) throws NodeNameExistsException, PMBackendException {
         return createPolicyClass(name, NO_PROPERTIES);
     }
 
     @Override
-    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().createUserAttribute(name, properties, parent, parents);
-        }
+    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createUserAttribute(name, properties, parent, parents));
 
-        return addNode(name, UA, properties, parent, parents);
+        return createNode(name, UA, properties, parent, parents);
     }
 
     @Override
-    public String createUserAttribute(String name, String parent, String... parents) throws PMException {
+    public String createUserAttribute(String name, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
         return createUserAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().createObjectAttribute(name, properties, parent, parents);
-        }
+    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createObjectAttribute(name, properties, parent, parents));
 
-        return addNode(name, OA, properties, parent, parents);
+        return createNode(name, OA, properties, parent, parents);
     }
 
     @Override
-    public String createObjectAttribute(String name, String parent, String... parents) throws PMException {
+    public String createObjectAttribute(String name, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
         return createObjectAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().createObject(name, properties, parent, parents);
-        }
+    public String createObject(String name, Map<String, String> properties, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createObject(name, properties, parent, parents));
 
-        return addNode(name, O, properties, parent, parents);
+        return createNode(name, O, properties, parent, parents);
     }
 
     @Override
-    public String createObject(String name, String parent, String... parents) throws PMException {
+    public String createObject(String name, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
         return createObject(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().createUser(name, properties, parent, parents);
-        }
+    public String createUser(String name, Map<String, String> properties, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createUser(name, properties, parent, parents));
 
-        return addNode(name, U, properties, parent, parents);
+        return createNode(name, U, properties, parent, parents);
     }
 
     @Override
-    public String createUser(String name, String parent, String... parents) throws PMException {
+    public String createUser(String name, String parent, String... parents)
+    throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
         return createUser(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().setNodeProperties(name, properties);
-        }
+    public void setNodeProperties(String name, Map<String, String> properties)
+    throws NodeDoesNotExistException, PMBackendException {
+        checkSetNodePropertiesInput(name);
 
-        this.graph.get(name).setProperties(properties);
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.setNodeProperties(name, properties));
+
+        graph.get(name).setProperties(properties);
     }
 
     @Override
     public boolean nodeExists(String name) {
-        return this.graph.containsKey(name);
+        return graph.containsKey(name);
     }
 
-
     @Override
-    public Node getNode(String name) {
-        return new Node(this.graph.get(name).getNode());
+    public Node getNode(String name) throws NodeDoesNotExistException, PMBackendException {
+        checkGetNodeInput(name);
+
+        return new Node(graph.get(name).getNode());
     }
 
     @Override
@@ -222,36 +239,238 @@ class MemoryGraph implements Graph {
     }
 
     @Override
-    public void deleteNode(String name) throws PMException {
-        if (!graph.containsKey(name)) {
+    public void deleteNode(String name)
+    throws NodeHasChildrenException, NodeReferencedInProhibitionException, NodeReferencedInObligationException,
+           PMBackendException {
+        if (!checkDeleteNodeInput(name, memoryProhibitions, memoryObligations)) {
             return;
         }
 
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().deleteNode(name);
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.deleteNode(name));
+
+        NodeType type = graph.get(name).getNode().getType();
+
+        runInternalTx(() -> {
+            if (type == PC) {
+                String rep = AdminPolicy.policyClassObjectAttributeName(name);
+                deleteNode(rep);
+            }
+
+            deleteInternal(name);
+        });
+    }
+
+    @Override
+    public void assign(String child, String parent)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, AssignmentCausesLoopException {
+        if (!checkAssignInput(child, parent)) {
+            return;
         }
 
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.assign(child, parent));
+
+        assignInternal(child, parent);
+    }
+
+    @Override
+    public void deassign(String child, String parent) throws PMBackendException, NodeDoesNotExistException {
+        if (!checkDeassignInput(child, parent)) {
+            return;
+        }
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.deassign(child, parent));
+
+        deassignInternal(child, parent);
+    }
+
+    @Override
+    public void assignAll(List<String> children, String target) throws PMBackendException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.assignAll(children, target));
+
+        runInternalTx(() -> {
+            for (String c : children) {
+                assign(c, target);
+            }
+        });
+    }
+
+    @Override
+    public void deassignAll(List<String> children, String target) throws PMBackendException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.deassignAll(children, target));
+
+        runInternalTx(() -> {
+            for (String c : children) {
+                deassign(c, target);
+            }
+        });
+    }
+
+    @Override
+    public void deassignAllFromAndDelete(String target) throws PMBackendException {
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.deassignAllFromAndDelete(target));
+
+        runInternalTx(() -> {
+            for (String c : getChildren(target)) {
+                deassign(c, target);
+            }
+
+            deleteNode(target);
+        });
+    }
+
+    @Override
+    public List<String> getParents(String node) throws NodeDoesNotExistException, PMBackendException {
+        checkGetParentsInput(node);
+
+        return new ArrayList<>(graph.get(node).getParents());
+    }
+
+
+    @Override
+    public List<String> getChildren(String node) throws NodeDoesNotExistException, PMBackendException {
+        checkGetChildrenInput(node);
+
+        return new ArrayList<>(graph.get(node).getChildren());
+    }
+
+
+    @Override
+    public void associate(String ua, String target, AccessRightSet accessRights)
+    throws InvalidAssociationException, UnknownAccessRightException, NodeDoesNotExistException, PMBackendException {
+        checkAssociateInput(ua, target, accessRights);
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.associate(ua, target, accessRights));
+
+        if (containsEdge(ua, target)) {
+            // remove the existing association edge in order to update it
+            dissociateInternal(ua, target);
+        }
+
+        associateInternal(ua, target, accessRights);
+    }
+
+    @Override
+    public void dissociate(String ua, String target) throws NodeDoesNotExistException, PMBackendException {
+        if (!checkDissociateInput(ua, target)) {
+            return;
+        }
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.dissociate(ua, target));
+
+        dissociateInternal(ua, target);
+    }
+
+    @Override
+    public List<Association> getAssociationsWithSource(String ua) throws NodeDoesNotExistException, PMBackendException {
+        checkGetAssociationsWithSourceInput(ua);
+
+        return new ArrayList<>(graph.get(ua).getOutgoingAssociations());
+    }
+
+    @Override
+    public List<Association> getAssociationsWithTarget(String target)
+    throws NodeDoesNotExistException, PMBackendException {
+        checkGetAssociationsWithTargetInput(target);
+
+        return new ArrayList<>(graph.get(target).getIncomingAssociations());
+    }
+
+    private void buildFromGraph(Graph graph) throws PMException {
+        List<String> nodes = graph.search(ANY, NO_PROPERTIES);
+
+        // add nodes to graph
+        List<String> uas = new ArrayList<>();
+        for (String n : nodes) {
+            Node node = graph.getNode(n);
+            createNodeInternal(n, node.getType(), node.getProperties());
+
+            if (node.getType() == UA) {
+                uas.add(n);
+            }
+        }
+
+        // add assignments to graph
+        for (String n : nodes) {
+            List<String> parents = graph.getParents(n);
+            for (String p : parents) {
+                assignInternal(n, p);
+            }
+        }
+
+        // add associations to graph
+        for (String ua : uas) {
+            List<Association> assocs = graph.getAssociationsWithSource(ua);
+            for (Association a : assocs) {
+                associate(ua, a.getTarget(), a.getAccessRightSet());
+            }
+        }
+    }
+
+    private String createNode(String name, NodeType type, Map<String, String> properties, String parent,
+                              String... additionalParents)
+    throws NodeNameExistsException, PMBackendException, NodeDoesNotExistException, InvalidAssignmentException,
+           AssignmentCausesLoopException {
+        checkCreateNodeInput(name, type, parent, additionalParents);
+
+        createNodeInternal(name, type, properties);
+
+        runInternalTx(() -> {
+            assignInternal(name, parent);
+
+            for (String additionalParent : additionalParents) {
+                assignInternal(name, additionalParent);
+            }
+        });
+
+        return name;
+    }
+
+    protected void createNodeInternal(String name, NodeType type, Map<String, String> properties)
+    throws NodeNameExistsException {
+        if (nodeExists(name)) {
+            throw new NodeNameExistsException(name);
+        }
+
+        // add node to graph
+        graph.put(name, getVertex(name, type, properties));
+        if (type == NodeType.PC) {
+            pcs.add(name);
+        } else if (type == OA) {
+            oas.add(name);
+        } else if (type == UA) {
+            uas.add(name);
+        } else if (type == O) {
+            os.add(name);
+        } else if (type == U) {
+            us.add(name);
+        }
+    }
+
+    private void deleteInternal(String name) {
         Vertex vertex = graph.get(name);
 
-        List<String> children = vertex.getChildren();
         List<String> parents = vertex.getParents();
         List<Association> incomingAssociations = vertex.getIncomingAssociations();
         List<Association> outgoingAssociations = vertex.getOutgoingAssociations();
 
-        for (String child : children) {
-            graph.get(child).removeAssignment(child, name);
-        }
-
         for (String parent : parents) {
-            graph.get(parent).removeAssignment(name, parent);
+            graph.get(parent).deleteAssignment(name, parent);
         }
 
         for (Association association : incomingAssociations) {
-            graph.get(association.getSource()).removeAssociation(association.getSource(), association.getTarget());
+            graph.get(association.getSource()).deleteAssociation(association.getSource(), association.getTarget());
         }
 
         for (Association association : outgoingAssociations) {
-            graph.get(association.getTarget()).removeAssociation(association.getSource(), association.getTarget());
+            graph.get(association.getTarget()).deleteAssociation(association.getSource(), association.getTarget());
         }
 
         graph.remove(name);
@@ -269,148 +488,22 @@ class MemoryGraph implements Graph {
         }
     }
 
-    @Override
-    public void assign(String child, String parent) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().assign(child, parent);
-        }
-
-        assignInternal(child, parent);
-    }
-
-    @Override
-    public void deassign(String child, String parent) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().deassign(child, parent);
-        }
-
-        deassignInternal(child, parent);
-    }
-
-    @Override
-    public void assignAll(List<String> children, String target) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().assignAll(children, target);
-        }
-
-        for (String c : children) {
-            assignInternal(c, target);
-        }
-    }
-
-    @Override
-    public void deassignAll(List<String> children, String target) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().deassignAll(children, target);
-        }
-
-        for (String c : children) {
-            deassignInternal(c, target);
-        }
-    }
-
-    @Override
-    public void deassignAllFromAndDelete(String target) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().deassignAllFromAndDelete(target);
-        }
-
-        for (String c : getChildren(target)) {
-            deassignInternal(c, target);
-        }
-
-        deleteNode(target);
-    }
-
-    @Override
-    public List<String> getParents(String node) {
-        return new ArrayList<>(graph.get(node).getParents());
-    }
-
-
-    @Override
-    public List<String> getChildren(String node) {
-        return new ArrayList<>(graph.get(node).getChildren());
-    }
-
-
-    @Override
-    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().associate(ua, target, accessRights);
-        }
-
-        if (containsEdge(ua, target)) {
-            // remove the existing association edge in order to update it
-            dissociateInternal(ua, target);
-        }
-
-        associateInternal(ua, target, accessRights);
-    }
-
-    @Override
-    public void dissociate(String ua, String target) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().graph().dissociate(ua, target);
-        }
-
-        dissociateInternal(ua, target);
-    }
-
-    @Override
-    public List<Association> getAssociationsWithSource(String ua) {
-        return new ArrayList<>(graph.get(ua).getOutgoingAssociations());
-    }
-
-    @Override
-    public List<Association> getAssociationsWithTarget(String target) {
-        return new ArrayList<>(graph.get(target).getIncomingAssociations());
-    }
-
-    public String addNode(String name, NodeType type, Map<String, String> properties) {
-        this.graph.put(name, getVertex(name, type, properties));
-        if (type == NodeType.PC) {
-            this.pcs.add(name);
-        } else if (type == OA){
-            this.oas.add(name);
-        } else if (type == UA){
-            this.uas.add(name);
-        } else if (type == O){
-            this.os.add(name);
-        } else if (type == U){
-            this.us.add(name);
-        }
-
-        return name;
-    }
-
-    private String addNode(String name, NodeType type, Map<String, String> properties, String initialParent, String ... parents) throws PMException {
-        addNode(name, type, properties);
-
-        assign(name, initialParent);
-        for (String parent : parents) {
-            assign(name, parent);
-        }
-
-        return name;
-    }
-
     private Vertex getVertex(String name, NodeType type, Map<String, String> properties) {
-        switch (type){
+        switch (type) {
             case PC -> {
-                return new PolicyClass(name, properties);
+                return new VertexPolicyClass(name, properties);
             }
             case OA -> {
-                return new ObjectAttribute(name, properties);
+                return new VertexObjectAttribute(name, properties);
             }
             case UA -> {
-                return new UserAttribute(name, properties);
+                return new VertexUserAttribute(name, properties);
             }
             case O -> {
-                return new Object(name, properties);
+                return new VertexObject(name, properties);
             }
             default -> {
-                return new User(name, properties);
+                return new VertexUser(name, properties);
             }
         }
     }
@@ -483,7 +576,7 @@ class MemoryGraph implements Graph {
         return true;
     }
 
-    public void assignInternal(String child, String parent) {
+    protected void assignInternal(String child, String parent) {
         if (graph.get(child).getParents().contains(parent)) {
             return;
         }
@@ -492,27 +585,27 @@ class MemoryGraph implements Graph {
         graph.get(parent).addAssignment(child, parent);
     }
 
-    public void deassignInternal(String child, String parent) {
-        graph.get(child).removeAssignment(child, parent);
-        graph.get(parent).removeAssignment(child, parent);
+    private void deassignInternal(String child, String parent) {
+        graph.get(child).deleteAssignment(child, parent);
+        graph.get(parent).deleteAssignment(child, parent);
     }
 
-    public void associateInternal(String ua, String target, AccessRightSet accessRights) {
+    protected void associateInternal(String ua, String target, AccessRightSet accessRights) {
         graph.get(ua).addAssociation(ua, target, accessRights);
         graph.get(target).addAssociation(ua, target, accessRights);
     }
 
-    public void dissociateInternal(String ua, String target) {
-        graph.get(ua).removeAssociation(ua, target);
-        graph.get(target).removeAssociation(ua, target);
+    private void dissociateInternal(String ua, String target) {
+        graph.get(ua).deleteAssociation(ua, target);
+        graph.get(target).deleteAssociation(ua, target);
     }
 
-    public boolean containsEdge(String source, String target) {
+    private boolean containsEdge(String source, String target) {
         return graph.get(source).getParents().contains(target)
                 || graph.get(source).getOutgoingAssociations().contains(new Association(source, target));
     }
 
-    public List<Node> getNodes() {
+    private List<Node> getNodes() {
         Collection<Vertex> values = graph.values();
         List<Node> nodes = new ArrayList<>();
         for (Vertex v : values) {

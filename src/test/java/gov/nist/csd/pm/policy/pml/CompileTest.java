@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompileTest {

@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
+import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.epp.EventListener;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.ProhibitionsAdjudicator;
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
@@ -18,13 +19,13 @@ import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import java.util.List;
 import java.util.Map;
 
-class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
+class PDPProhibitions implements Prohibitions, EventEmitter {
     private UserContext userCtx;
-    private ProhibitionsAdjudicator adjudicator;
+    private AdjudicatorProhibitions adjudicator;
     private PAP pap;
-    private PolicyEventListener listener;
+    private EventListener listener;
 
-    public PDPProhibitions(UserContext userCtx, ProhibitionsAdjudicator adjudicator, PAP pap, PolicyEventListener listener) {
+    public PDPProhibitions(UserContext userCtx, AdjudicatorProhibitions adjudicator, PAP pap, EventListener listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -32,13 +33,13 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        adjudicator.create(label, subject, accessRightSet, intersection, containerConditions);
+    public void create(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        adjudicator.create(id, subject, accessRightSet, intersection, containerConditions);
 
-        pap.prohibitions().create(label, subject, accessRightSet, intersection, containerConditions);
+        pap.prohibitions().create(id, subject, accessRightSet, intersection, containerConditions);
 
         CreateProhibitionEvent createProhibitionEvent = new CreateProhibitionEvent(
-                label, subject, accessRightSet, intersection, List.of(containerConditions)
+                id, subject, accessRightSet, intersection, List.of(containerConditions)
         );
 
         // emit event for subject
@@ -51,13 +52,13 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        adjudicator.update(label, subject, accessRightSet, intersection, containerConditions);
+    public void update(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        adjudicator.update(id, subject, accessRightSet, intersection, containerConditions);
 
-        pap.prohibitions().update(label, subject, accessRightSet, intersection, containerConditions);
+        pap.prohibitions().update(id, subject, accessRightSet, intersection, containerConditions);
 
         UpdateProhibitionEvent updateProhibitionEvent = new UpdateProhibitionEvent(
-                label, subject, accessRightSet, intersection, List.of(containerConditions)
+                id, subject, accessRightSet, intersection, List.of(containerConditions)
         );
 
         // emit event for subject
@@ -70,16 +71,16 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public void delete(String label) throws PMException {
-        if (!exists(label)) {
+    public void delete(String id) throws PMException {
+        if (!exists(id)) {
             return;
         }
 
-        adjudicator.delete(label);
+        adjudicator.delete(id);
 
-        Prohibition prohibition = pap.prohibitions().get(label);
+        Prohibition prohibition = pap.prohibitions().get(id);
 
-        pap.prohibitions().delete(label);
+        pap.prohibitions().delete(id);
 
         emitDeleteProhibitionEvent(prohibition);
     }
@@ -88,7 +89,7 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
         ProhibitionSubject subject = prohibition.getSubject();
         List<ContainerCondition> containerConditions = prohibition.getContainers();
 
-        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition.getLabel());
+        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition.getId());
 
         // emit event for subject
         emitEvent(new EventContext(userCtx, subject.getName(), deleteProhibitionEvent));
@@ -105,8 +106,8 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public boolean exists(String label) throws PMException {
-        return adjudicator.exists(label);
+    public boolean exists(String id) throws PMException {
+        return adjudicator.exists(id);
     }
 
     @Override
@@ -115,22 +116,22 @@ class PDPProhibitions implements Prohibitions, PolicyEventEmitter {
     }
 
     @Override
-    public Prohibition get(String label) throws PMException {
-        return adjudicator.get(label);
+    public Prohibition get(String id) throws PMException {
+        return adjudicator.get(id);
     }
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-
-    }
-
-    @Override
-    public void removeEventListener(PolicyEventListener listener) {
+    public void addEventListener(EventListener listener) {
 
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
-        this.listener.handlePolicyEvent(event);
+    public void removeEventListener(EventListener listener) {
+
+    }
+
+    @Override
+    public void emitEvent(EventContext event) throws PMException {
+        this.listener.processEvent(event);
     }
 }

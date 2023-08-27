@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
 import java.util.Objects;
@@ -34,11 +32,6 @@ public class AssociateEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "associate";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.graph().associate(ua, target, accessRightSet);
     }
 
     @Override

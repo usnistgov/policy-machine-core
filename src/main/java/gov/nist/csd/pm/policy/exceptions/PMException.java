@@ -11,26 +11,16 @@ import java.util.Stack;
 public class PMException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    private String message;
-
-    private StackTraceElement[] stackTrace;
-
-    public PMException(String msg, StackTraceElement ... stackTraceElements) {
-        this.message = msg;
-        this.stackTrace = stackTraceElements;
+    public PMException(String msg) {
+        super(msg);
     }
 
     public PMException(Exception e) {
-        this.message = e.getMessage();
-        this.stackTrace = e.getStackTrace();
+        super(e);
     }
 
-    public String getMessage() {
-        return message;
+    public PMException(String message, Exception e) {
+        super(message, e);
     }
 
-    @Override
-    public StackTraceElement[] getStackTrace() {
-        return stackTrace;
-    }
 }

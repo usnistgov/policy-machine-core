@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import gov.nist.csd.pm.pap.ProhibitionsStore;
 import gov.nist.csd.pm.policy.Prohibitions;
-import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.exceptions.ProhibitionDoesNotExistException;
+import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
@@ -21,7 +21,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.*;
 import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.USER;
 
-public class MysqlProhibitions implements Prohibitions {
+public class MysqlProhibitions implements ProhibitionsStore {
 
     private MysqlConnection connection;
 
@@ -30,25 +30,28 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public void create(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws MysqlPolicyException {
+    public void create(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions)
+    throws PMBackendException, UnknownAccessRightException, ProhibitionExistsException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException {
+        checkCreateInput(new MysqlGraph(connection), id, subject, accessRightSet, intersection, containerConditions);
+
         connection.beginTx();
 
         String sql;
         if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
             sql =
                     """
-                    insert into prohibition (label, process_id, subject_type, access_rights, is_intersection) values (?,?,?,?,?)
+                    insert into prohibition (id, process_id, subject_type, access_rights, is_intersection) values (?,?,?,?,?)
                     """;
         } else {
             sql =
                     """
-                    insert into prohibition (label, node_id, subject_type, access_rights, is_intersection) values (?,(select id from node where name = ?),?,?,?)
+                    insert into prohibition (id, node_id, subject_type, access_rights, is_intersection) values (?,(select id from node where name = ?),?,?,?)
                     """;
         }
 
         int prohibitionID;
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, label);
+            ps.setString(1, id);
             ps.setString(2, subject.getName());
             ps.setInt(3, getProhibitionSubjectTypeId(subject.getType()));
             ps.setString(4, MysqlPolicyStore.arsetToJson(accessRightSet));
@@ -88,45 +91,20 @@ public class MysqlProhibitions implements Prohibitions {
         connection.commit();
     }
 
-    private int getProhibitionSubjectTypeId(ProhibitionSubject.Type type) {
-        switch (type) {
-            case USER -> {
-                return 1;
-            }
-            case USER_ATTRIBUTE -> {
-                return 2;
-            }
-            case PROCESS -> {
-                return 3;
-            }
-        }
-
-        return 0;
-    }
-
-    private ProhibitionSubject.Type getProhibitionSubjectTypeFromId(int id) {
-        switch (id) {
-            case 1 -> {
-                return USER;
-            }
-            case 2 -> {
-                return USER_ATTRIBUTE;
-            }
-            case 3 -> {
-                return PROCESS;
-            }
-        }
-
-        return USER;
-    }
-
     @Override
-    public void update(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws MysqlPolicyException {
+    public void update(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions)
+    throws PMBackendException, UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException {
         connection.beginTx();
 
         try {
-            delete(label);
-            create(label, subject, accessRightSet, intersection, containerConditions);
+            delete(id);
+
+            try {
+                create(id, subject, accessRightSet, intersection, containerConditions);
+            } catch (ProhibitionExistsException e) {
+                throw new PMBackendException(e);
+            }
+
             connection.commit();
         } catch (MysqlPolicyException e) {
             connection.rollback();
@@ -135,13 +113,17 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public void delete(String label) throws MysqlPolicyException {
+    public void delete(String id) throws PMBackendException {
+        if (!checkDeleteInput(id)) {
+            return;
+        }
+
         String sql = """
-                delete from prohibition where label = ?
+                delete from prohibition where id = ?
                 """;
 
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, label);
+            ps.setString(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new MysqlPolicyException(e.getMessage());
@@ -151,7 +133,7 @@ public class MysqlProhibitions implements Prohibitions {
     @Override
     public Map<String, List<Prohibition>> getAll() throws MysqlPolicyException {
         String sql = """
-                select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition
+                select id, id, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition
                 """;
 
         try(Statement stmt = connection.getConnection().createStatement();
@@ -175,9 +157,9 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public boolean exists(String label) throws PMException {
+    public boolean exists(String id) throws MysqlPolicyException {
         try {
-            get(label);
+            get(id);
             return true;
         } catch (ProhibitionDoesNotExistException e) {
             return false;
@@ -210,7 +192,7 @@ public class MysqlProhibitions implements Prohibitions {
     @Override
     public List<Prohibition> getWithSubject(String subject) throws MysqlPolicyException {
         String sql = """
-                select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection 
+                select id, id, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection 
                 from prohibition 
                 where node_id = (select id from node where name = ?) || process_id = ?
                 """;
@@ -231,18 +213,18 @@ public class MysqlProhibitions implements Prohibitions {
     }
 
     @Override
-    public Prohibition get(String label) throws PMException {
+    public Prohibition get(String id) throws MysqlPolicyException, ProhibitionDoesNotExistException {
         String sql = """
-                select id, label, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition where label = ?
+                select id, id, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition where id = ?
                 """;
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, label);
+            ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
 
             List<Prohibition> prohibitions = getProhibitionsFromResultSet(rs);
             if (prohibitions.isEmpty()) {
-                throw new ProhibitionDoesNotExistException(label);
+                throw new ProhibitionDoesNotExistException(id);
             }
 
             rs.close();
@@ -253,13 +235,45 @@ public class MysqlProhibitions implements Prohibitions {
         }
     }
 
+    private int getProhibitionSubjectTypeId(ProhibitionSubject.Type type) {
+        switch (type) {
+            case USER -> {
+                return 1;
+            }
+            case USER_ATTRIBUTE -> {
+                return 2;
+            }
+            case PROCESS -> {
+                return 3;
+            }
+        }
+
+        return 0;
+    }
+
+    private ProhibitionSubject.Type getProhibitionSubjectTypeFromId(int id) {
+        switch (id) {
+            case 1 -> {
+                return USER;
+            }
+            case 2 -> {
+                return USER_ATTRIBUTE;
+            }
+            case 3 -> {
+                return PROCESS;
+            }
+        }
+
+        return USER;
+    }
+
     private List<Prohibition> getProhibitionsFromResultSet(ResultSet rs) throws MysqlPolicyException {
         List<Prohibition> prohibitions = new ArrayList<>();
 
         try {
             while (rs.next()) {
                 int id = rs.getInt(1);
-                String label = rs.getString(2);
+                String id = rs.getString(2);
                 String node = rs.getString(3);
                 String process = rs.getString(4);
                 ProhibitionSubject.Type type = getProhibitionSubjectTypeFromId(rs.getInt(5));
@@ -268,7 +282,7 @@ public class MysqlProhibitions implements Prohibitions {
 
                 List<ContainerCondition> containers = getContainerConditions(id);
 
-                prohibitions.add(new Prohibition(label, new ProhibitionSubject(type == PROCESS ? process : node, type), arset, isIntersection, containers));
+                prohibitions.add(new Prohibition(id, new ProhibitionSubject(type == PROCESS ? process : node, type), arset, isIntersection, containers));
             }
 
             return prohibitions;

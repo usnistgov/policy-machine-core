@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class Prohibition implements Serializable {
 
-    private String label;
+    private String id;
     private ProhibitionSubject      subject;
     private List<ContainerCondition> containers;
     private AccessRightSet accessRightSet;
@@ -20,12 +20,12 @@ public class Prohibition implements Serializable {
 
     }
 
-    public Prohibition(String label, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, List<ContainerCondition> containers) {
+    public Prohibition(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, List<ContainerCondition> containers) {
         if (subject == null) {
             throw new IllegalArgumentException("Prohibition subject cannot be null");
         }
 
-        this.label = label;
+        this.id = id;
         this.subject = subject;
 
         if (containers == null) {
@@ -44,19 +44,19 @@ public class Prohibition implements Serializable {
     }
 
     public Prohibition(Prohibition prohibition) {
-        this.label = prohibition.getLabel();
+        this.id = prohibition.getId();
         this.subject = new ProhibitionSubject(prohibition.getSubject().getName(), prohibition.getSubject().getType());
         this.containers = new ArrayList<>(prohibition.containers);
         this.accessRightSet = new AccessRightSet(prohibition.getAccessRightSet());
         this.intersection = prohibition.isIntersection();
     }
 
-    public String getLabel() {
-        return label;
+    public String getId() {
+        return id;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public ProhibitionSubject getSubject() {
@@ -96,10 +96,10 @@ public class Prohibition implements Serializable {
             return false;
         }
 
-        return this.getLabel().equals(p.getLabel());
+        return this.getId().equals(p.getId());
     }
 
     public int hashCode() {
-        return Objects.hash(label);
+        return Objects.hash(id);
     }
 }

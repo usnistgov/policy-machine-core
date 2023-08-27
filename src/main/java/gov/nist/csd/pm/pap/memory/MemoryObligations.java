@@ -1,36 +1,37 @@
 package gov.nist.csd.pm.pap.memory;
 
-import com.google.gson.Gson;
+import gov.nist.csd.pm.pap.ObligationsStore;
 import gov.nist.csd.pm.policy.Obligations;
-import gov.nist.csd.pm.policy.exceptions.ObligationDoesNotExistException;
-import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.tx.Transactional;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class MemoryObligations implements Obligations, Serializable {
+class MemoryObligations extends MemoryStore<TxObligations> implements ObligationsStore, Transactional, BaseMemoryTx {
 
-    protected MemoryTx tx;
+    protected MemoryTx<TxObligations> tx;
     private List<Obligation> obligations;
+    private MemoryGraph graph;
 
     public MemoryObligations() {
         this.obligations = new ArrayList<>();
-        this.tx = new MemoryTx(false, 0, null);
     }
 
     public MemoryObligations(List<Obligation> obligations) {
         this.obligations = obligations;
-        this.tx = new MemoryTx(false, 0, null);
     }
 
     public MemoryObligations(Obligations obligations) throws PMException {
         this.obligations = obligations.getAll();
-        this.tx = new MemoryTx(false, 0, null);
+    }
+
+    public void setMemoryGraph(MemoryGraph graph) {
+        this.graph = graph;
     }
 
     public void clear() {
@@ -38,36 +39,62 @@ class MemoryObligations implements Obligations, Serializable {
     }
 
     @Override
-    public void create(UserContext author, String label, Rule... rules) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().obligations().create(author, label, rules);
+    public void beginTx() throws PMException {
+        if (tx == null) {
+            tx = new MemoryTx<>(false, 0, new TxObligations(new TxPolicyEventTracker(), this));
         }
 
-        obligations.add(new Obligation(author, label, Arrays.asList(rules)));
+        tx.beginTx();
     }
 
     @Override
-    public void update(UserContext author, String label, Rule... rules) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().obligations().update(author, label, rules);
-        }
+    public void commit() throws PMException {
+        tx.commit();
+    }
+
+    @Override
+    public void rollback() throws PMException {
+        tx.getStore().rollback();
+
+        tx.rollback();
+    }
+
+    @Override
+    public void create(UserContext author, String id, Rule... rules) throws ObligationIdExistsException, NodeDoesNotExistException, PMBackendException {
+        checkCreateInput(graph, author, id, rules);
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.create(author, id, rules));
+
+        obligations.add(new Obligation(author, id, Arrays.asList(rules)));
+    }
+
+    @Override
+    public void update(UserContext author, String id, Rule... rules) throws ObligationDoesNotExistException, NodeDoesNotExistException, PMBackendException {
+        checkUpdateInput(graph, author, id, rules);
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.update(author, id, rules));
 
         for (Obligation o : obligations) {
-            if (o.getLabel().equals(label)) {
+            if (o.getId().equals(id)) {
                 o.setAuthor(author);
-                o.setLabel(label);
+                o.setId(id);
                 o.setRules(List.of(rules));
             }
         }
     }
 
     @Override
-    public void delete(String label) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().obligations().delete(label);
+    public void delete(String id) throws PMBackendException {
+        if (!checkDeleteInput(id)) {
+            return;
         }
 
-        this.obligations.removeIf(o -> o.getLabel().equals(label));
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.delete(id));
+
+        this.obligations.removeIf(o -> o.getId().equals(id));
     }
 
     @Override
@@ -76,9 +103,9 @@ class MemoryObligations implements Obligations, Serializable {
     }
 
     @Override
-    public boolean exists(String label) throws PMException {
+    public boolean exists(String id) {
         for (Obligation o : obligations) {
-            if (o.getLabel().equals(label)) {
+            if (o.getId().equals(id)) {
                 return true;
             }
         }
@@ -87,17 +114,16 @@ class MemoryObligations implements Obligations, Serializable {
     }
 
     @Override
-    public Obligation get(String label) throws PMException {
+    public Obligation get(String id) throws ObligationDoesNotExistException, PMBackendException {
+        checkGetInput(id);
+
         for (Obligation obligation : obligations) {
-            if (obligation.getLabel().equals(label)) {
+            if (obligation.getId().equals(id)) {
                 return obligation.clone();
             }
         }
 
-        throw new ObligationDoesNotExistException(label);
-    }
-
-    public void fromJson(String json) {
-        this.obligations = new Gson().fromJson(json, List.class);
+        // this shouldn't be reached due to the checkGet call, but just to be safe
+        throw new ObligationDoesNotExistException(id);
     }
 }

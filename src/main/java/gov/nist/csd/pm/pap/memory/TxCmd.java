@@ -1,5 +1,12 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.pap.GraphStore;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
+import gov.nist.csd.pm.policy.events.graph.*;
+import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
+import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
+import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -15,33 +22,190 @@ import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 
-interface TxCmd {
+abstract class TxCmd<T extends MemoryStore<?>> {
 
-    void revert(MemoryPolicyStore store) throws PMException;
-    
-    class CreatePolicyClassTxCmd implements TxCmd {
+    private Type type;
+
+    public TxCmd(Type type) {
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public abstract void rollback(T store) throws PMException;
+
+    enum Type {
+        GRAPH,
+        PROHIBITIONS,
+        OBLIGATIONS,
+        USER_DEFINED_PML
+    }
+
+
+    static TxCmd<?> eventToCmd(PolicyEvent event) throws UnsupportedPolicyEvent {
+        if (event instanceof CreateConstantEvent e) {
+            return new TxCmd.AddConstantTxCmd(
+                    e.getName(),
+                    e.getValue()
+            );
+
+        } else if (event instanceof CreateFunctionEvent e) {
+            return new TxCmd.AddFunctionTxCmd(
+                    e.getFunctionDefinitionStatement()
+            );
+
+        } else if (event instanceof AssignEvent e) {
+            return new TxCmd.AssignTxCmd(
+                    e.getChild(),
+                    e.getParent()
+            );
+
+        } else if (event instanceof AssignToEvent e) {
+            return new TxCmd.AssignTxCmd(
+                    e.getChild(),
+                    e.getParent()
+            );
+
+        } else if (event instanceof AssociateEvent e) {
+            return new TxCmd.AssociateTxCmd(
+                    new Association(e.getUa(), e.getTarget(), e.getAccessRightSet())
+            );
+
+        } else if (event instanceof CreateObjectAttributeEvent e) {
+            return new TxCmd.CreateObjectAttributeTxCmd(
+                    e.getName(),
+                    e.getProperties(),
+                    e.getInitialParent(),
+                    e.getAdditionalParents()
+            );
+
+        } else if (event instanceof CreateObjectEvent e) {
+            return new TxCmd.CreateObjectTxCmd(
+                    e.getName(),
+                    e.getProperties(),
+                    e.getInitialParent(),
+                    e.getAdditionalParents()
+            );
+
+        } else if (event instanceof CreateObligationEvent e) {
+            return new TxCmd.CreateObligationTxCmd(
+                    new Obligation(e.getAuthor(), e.getId(), e.getRules())
+            );
+
+        } else if (event instanceof CreatePolicyClassEvent e) {
+            return new TxCmd.CreatePolicyClassTxCmd(
+                    e.getName(),
+                    e.getProperties()
+            );
+
+        } else if (event instanceof CreateProhibitionEvent e) {
+            return new TxCmd.CreateProhibitionTxCmd(
+                    new Prohibition(e.getId(), e.getSubject(), e.getAccessRightSet(), e.isIntersection(), e.getContainers())
+            );
+
+        } else if (event instanceof CreateUserAttributeEvent e) {
+            return new TxCmd.CreateUserAttributeTxCmd(
+                    e.getName(),
+                    e.getProperties(),
+                    e.getInitialParent(),
+                    e.getAdditionalParents()
+            );
+
+        } else if (event instanceof CreateUserEvent e) {
+            return new TxCmd.CreateUserTxCmd(
+                    e.getName(),
+                    e.getProperties(),
+                    e.getInitialParent(),
+                    e.getAdditionalParents()
+            );
+
+        } else if (event instanceof DeassignEvent e) {
+            return new TxCmd.DeassignTxCmd(
+                    e.getChild(),
+                    e.getParent()
+            );
+
+        } else if (event instanceof TxEvents.MemoryDeleteNodeEvent e) {
+            return new TxCmd.DeleteNodeTxCmd(
+                    e.getName(),
+                    e.getNode(),
+                    e.getParents()
+            );
+
+        } else if (event instanceof TxEvents.MemoryDeleteObligationEvent e) {
+            return new TxCmd.DeleteObligationTxCmd(
+                    e.getObligationToDelete()
+            );
+
+        } else if (event instanceof TxEvents.MemoryDeleteProhibitionEvent e) {
+            return new TxCmd.DeleteProhibitionTxCmd(
+                    e.getProhibitionToDelete()
+            );
+
+        } else if (event instanceof TxEvents.MemoryDissociateEvent e) {
+            return new TxCmd.DissociateTxCmd(
+                    new Association(e.getUa(), e.getTarget(), e.getAccessRightSet())
+            );
+
+        } else if (event instanceof TxEvents.MemoryDeleteConstantEvent e) {
+            return new TxCmd.RemoveConstantTxCmd(
+                    e.getName(),
+                    e.getValue()
+            );
+
+        } else if (event instanceof TxEvents.MemoryDeleteFunctionEvent e) {
+            return new TxCmd.RemoveFunctionTxCmd(e.getFunctionDefinitionStatement());
+
+        } else if (event instanceof TxEvents.MemorySetNodePropertiesEvent e) {
+            return new TxCmd.SetNodePropertiesTxCmd(
+                    e.getName(),
+                    e.getOldProps(),
+                    e.getProperties()
+            );
+
+        } else if (event instanceof TxEvents.MemoryUpdateObligationEvent e) {
+            return new TxCmd.UpdateObligationTxCmd(
+                    new Obligation(e.getAuthor(), e.getId(), e.getRules()), e.getOldObl()
+            );
+
+        } else if (event instanceof TxEvents.MemoryUpdateProhibitionEvent e) {
+            return new TxCmd.UpdateProhibitionTxCmd(
+                    new Prohibition(e.getId(), e.getSubject(), e.getAccessRightSet(), e.isIntersection(), e.getContainers()),
+                    e.getOldPro()
+            );
+
+        }
+
+       throw new UnsupportedPolicyEvent(event);
+    }
+
+    static class CreatePolicyClassTxCmd extends TxCmd<MemoryGraph> {
             
         private String name;
         private Map<String, String> properties;
 
         public CreatePolicyClassTxCmd(String name, Map<String, String> properties) {
+            super(Type.GRAPH);
             this.name = name;
             this.properties = properties;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().deleteNode(name);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.deleteNode(name);
         }
     }
 
-    class CreateObjectAttributeTxCmd implements TxCmd {
+    static class CreateObjectAttributeTxCmd extends TxCmd<MemoryGraph> {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
         private final String[] parents;
 
         public CreateObjectAttributeTxCmd(String name, Map<String, String> properties, String parent, String... parents) {
+            super(Type.GRAPH);
             this.name = name;
             this.properties = properties;
             this.parent = parent;
@@ -49,18 +213,19 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().deleteNode(name);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.deleteNode(name);
         }
     }
 
-    class CreateUserAttributeTxCmd implements TxCmd {
+    static class CreateUserAttributeTxCmd extends TxCmd<MemoryGraph> {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
         private final String[] parents;
 
         public CreateUserAttributeTxCmd(String name, Map<String, String> properties, String parent, String... parents) {
+            super(Type.GRAPH);
             this.name = name;
             this.properties = properties;
             this.parent = parent;
@@ -68,18 +233,19 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().deleteNode(name);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.deleteNode(name);
         }
     }
 
-    class CreateObjectTxCmd implements TxCmd {
+    static class CreateObjectTxCmd extends TxCmd<MemoryGraph> {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
         private final String[] parents;
 
         public CreateObjectTxCmd(String name, Map<String, String> properties, String parent, String... parents) {
+            super(Type.GRAPH);
             this.name = name;
             this.properties = properties;
             this.parent = parent;
@@ -87,18 +253,19 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().deleteNode(name);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.deleteNode(name);
         }
     }
 
-    class CreateUserTxCmd implements TxCmd {
+    static class CreateUserTxCmd extends TxCmd<MemoryGraph> {
         private final String name;
         private final Map<String, String> properties;
         private final String parent;
         private final String[] parents;
 
         public CreateUserTxCmd(String name, Map<String, String> properties, String parent, String... parents) {
+            super(Type.GRAPH);
             this.name = name;
             this.properties = properties;
             this.parent = parent;
@@ -106,41 +273,43 @@ interface TxCmd {
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().deleteNode(name);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.deleteNode(name);
         }
     }
 
-    class SetNodePropertiesTxCmd implements TxCmd {
+    static class SetNodePropertiesTxCmd extends TxCmd<MemoryGraph> {
         private final String name;
         private final Map<String, String> oldProperties;
         private final Map<String, String> newProperties;
 
         public SetNodePropertiesTxCmd(String name, Map<String, String> oldProperties, Map<String, String> newProperties) {
+            super(Type.GRAPH);
             this.name = name;
             this.oldProperties = oldProperties;
             this.newProperties = newProperties;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().setNodeProperties(name, oldProperties);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.setNodeProperties(name, oldProperties);
         }
     }
 
-    class DeleteNodeTxCmd implements TxCmd {
+    static class DeleteNodeTxCmd extends TxCmd<MemoryGraph> {
         private final String name;
         private final Node nodeToDelete;
         private final List<String> parents;
 
         public DeleteNodeTxCmd(String name, Node nodeToDelete, List<String> parents) {
+            super(Type.GRAPH);
             this.name = name;
             this.nodeToDelete = nodeToDelete;
             this.parents = parents;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
+        public void rollback(MemoryGraph store) throws PMException {
             NodeType type = nodeToDelete.getType();
             Map<String, String> properties = nodeToDelete.getProperties();
             String initialParent = "";
@@ -152,97 +321,103 @@ interface TxCmd {
             }
 
             switch (type) {
-                case PC -> store.graph().createPolicyClass(name, properties);
-                case OA -> store.graph().createObjectAttribute(name, properties, initialParent, parentsArr);
-                case UA -> store.graph().createUserAttribute(name, properties, initialParent, parentsArr);
-                case O -> store.graph().createObject(name, properties, initialParent, parentsArr);
-                case U -> store.graph().createUser(name, properties, initialParent, parentsArr);
+                case PC -> store.createPolicyClass(name, properties);
+                case OA -> store.createObjectAttribute(name, properties, initialParent, parentsArr);
+                case UA -> store.createUserAttribute(name, properties, initialParent, parentsArr);
+                case O -> store.createObject(name, properties, initialParent, parentsArr);
+                case U -> store.createUser(name, properties, initialParent, parentsArr);
             }
         }
     }
 
-    final class AssignTxCmd implements TxCmd {
+    static final class AssignTxCmd extends TxCmd<MemoryGraph> {
         private final String child;
         private final String parent;
 
         public AssignTxCmd(String child, String parent) {
+            super(Type.GRAPH);
             this.child = child;
             this.parent = parent;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().deassign(child, parent);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.deassign(child, parent);
         }
     }
 
-    class DeassignTxCmd implements TxCmd {
+    static class DeassignTxCmd extends TxCmd<MemoryGraph> {
         private final String child;
         private final String parent;
 
         public DeassignTxCmd(String child, String parent) {
+            super(Type.GRAPH);
             this.child = child;
             this.parent = parent;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().assign(child, parent);
+        public void rollback(MemoryGraph store) throws PMException {
+            store.assign(child, parent);
         }
     }
 
-    class AssociateTxCmd implements TxCmd {
+    static class AssociateTxCmd extends TxCmd<MemoryGraph> {
         private final Association association;
 
         public AssociateTxCmd(Association association) {
+            super(Type.GRAPH);
             this.association = association;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().dissociate(association.getSource(), association.getTarget());
+        public void rollback(MemoryGraph store) throws PMException {
+            store.dissociate(association.getSource(), association.getTarget());
         }
     }
 
-    class DissociateTxCmd implements TxCmd {
+    static class DissociateTxCmd extends TxCmd<MemoryGraph> {
         private final Association association;
 
         public DissociateTxCmd(Association association) {
+            super(Type.GRAPH);
             this.association = association;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.graph().associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
+        public void rollback(MemoryGraph store) throws PMException {
+            store.associate(association.getSource(), association.getTarget(), association.getAccessRightSet());
         }
     }
 
-    class CreateProhibitionTxCmd implements TxCmd {
+    static class CreateProhibitionTxCmd extends TxCmd<MemoryProhibitions> {
         private final Prohibition prohibition;
 
         public CreateProhibitionTxCmd(Prohibition prohibition) {
+            super(Type.PROHIBITIONS);
             this.prohibition = prohibition;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.prohibitions().delete(prohibition.getLabel());
+        public void rollback(MemoryProhibitions store) throws PMException {
+            store.delete(prohibition.getId());
         }
     }
 
-    class UpdateProhibitionTxCmd implements TxCmd {
+    static class UpdateProhibitionTxCmd extends TxCmd<MemoryProhibitions> {
         private final Prohibition newProhibition;
         private final Prohibition oldProhibition;
 
         public UpdateProhibitionTxCmd(Prohibition newProhibition, Prohibition oldProhibition) {
+            super(Type.PROHIBITIONS);
             this.newProhibition = newProhibition;
             this.oldProhibition = oldProhibition;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.prohibitions().update(
-                    oldProhibition.getLabel(),
+        public void rollback(MemoryProhibitions store) throws PMException {
+            store.update(
+                    oldProhibition.getId(),
                     oldProhibition.getSubject(),
                     oldProhibition.getAccessRightSet(),
                     oldProhibition.isIntersection(),
@@ -251,17 +426,18 @@ interface TxCmd {
         }
     }
 
-    class DeleteProhibitionTxCmd implements TxCmd {
+    static class DeleteProhibitionTxCmd extends TxCmd<MemoryProhibitions> {
         private final Prohibition prohibitionToDelete;
 
         public DeleteProhibitionTxCmd(Prohibition prohibitionToDelete) {
+            super(Type.PROHIBITIONS);
             this.prohibitionToDelete = prohibitionToDelete;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.prohibitions().create(
-                    prohibitionToDelete.getLabel(),
+        public void rollback(MemoryProhibitions store) throws PMException {
+            store.create(
+                    prohibitionToDelete.getId(),
                     prohibitionToDelete.getSubject(),
                     prohibitionToDelete.getAccessRightSet(),
                     prohibitionToDelete.isIntersection(),
@@ -270,118 +446,115 @@ interface TxCmd {
         }
     }
 
-    class CreateObligationTxCmd implements TxCmd {
+    static class CreateObligationTxCmd extends TxCmd<MemoryObligations> {
         private final Obligation obligation;
 
         public CreateObligationTxCmd(Obligation obligation) {
+            super(Type.OBLIGATIONS);
             this.obligation = obligation;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.obligations().delete(obligation.getLabel());
+        public void rollback(MemoryObligations store) throws PMException {
+            store.delete(obligation.getId());
         }
     }
 
-    class UpdateObligationTxCmd implements TxCmd {
+    static class UpdateObligationTxCmd extends TxCmd<MemoryObligations> {
         private final Obligation newObligation;
         private final Obligation oldObligation;
 
         public UpdateObligationTxCmd(Obligation newObligation, Obligation oldObligation) {
+            super(Type.OBLIGATIONS);
             this.newObligation = newObligation;
             this.oldObligation = oldObligation;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.obligations().update(
+        public void rollback(MemoryObligations store) throws PMException {
+            store.update(
                     oldObligation.getAuthor(),
-                    oldObligation.getLabel(),
+                    oldObligation.getId(),
                     oldObligation.getRules().toArray(new Rule[]{})
             );
         }
     }
 
-    class DeleteObligationTxCmd implements TxCmd {
+    static class DeleteObligationTxCmd extends TxCmd<MemoryObligations> {
         private final Obligation obligationToDelete;
         public DeleteObligationTxCmd(Obligation obligationToDelete) {
+            super(Type.OBLIGATIONS);
             this.obligationToDelete = obligationToDelete;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.obligations().create(
+        public void rollback(MemoryObligations store) throws PMException {
+            store.create(
                     obligationToDelete.getAuthor(),
-                    obligationToDelete.getLabel(),
+                    obligationToDelete.getId(),
                     obligationToDelete.getRules().toArray(new Rule[]{})
             );
         }
     }
 
-    class AddFunctionTxCmd implements TxCmd {
+    static class AddFunctionTxCmd extends TxCmd<MemoryUserDefinedPML> {
         private final FunctionDefinitionStatement functionDefinitionStatement;
 
         public AddFunctionTxCmd(FunctionDefinitionStatement functionDefinitionStatement) {
+            super(Type.USER_DEFINED_PML);
             this.functionDefinitionStatement = functionDefinitionStatement;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().deleteFunction(functionDefinitionStatement.getFunctionName());
+        public void rollback(MemoryUserDefinedPML store) throws PMException {
+            store.deleteFunction(functionDefinitionStatement.getFunctionName());
         }
     }
 
-    class RemoveFunctionTxCmd implements TxCmd {
+    static class RemoveFunctionTxCmd extends TxCmd<MemoryUserDefinedPML> {
         private final FunctionDefinitionStatement functionDefinitionStatement;
 
         public RemoveFunctionTxCmd(FunctionDefinitionStatement functionDefinitionStatement) {
+            super(Type.USER_DEFINED_PML);
             this.functionDefinitionStatement = functionDefinitionStatement;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().createFunction(functionDefinitionStatement);
+        public void rollback(MemoryUserDefinedPML store) throws PMException {
+            store.createFunction(functionDefinitionStatement);
         }
         
     }
 
-    class AddConstantTxCmd implements TxCmd {
+    static class AddConstantTxCmd extends TxCmd<MemoryUserDefinedPML> {
         private final String constantName;
         private final Value value;
 
         public AddConstantTxCmd(String constantName, Value value) {
+            super(Type.USER_DEFINED_PML);
             this.constantName = constantName;
             this.value = value;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().deleteConstant(constantName);
+        public void rollback(MemoryUserDefinedPML store) throws PMException {
+            store.deleteConstant(constantName);
         }
     }
 
-    class RemoveConstantTxCmd implements TxCmd {
+    static class RemoveConstantTxCmd extends TxCmd<MemoryUserDefinedPML> {
         private final String constantName;
         private final Value oldValue;
 
         public RemoveConstantTxCmd(String constantName, Value oldValue) {
+            super(Type.USER_DEFINED_PML);
             this.constantName = constantName;
             this.oldValue = oldValue;
         }
 
         @Override
-        public void revert(MemoryPolicyStore store) throws PMException {
-            store.userDefinedPML().createConstant(constantName, oldValue);
-        }
-    }
-
-    class NoopTxCmd implements TxCmd {
-        public NoopTxCmd() {
-        }
-
-        @Override
-        public void revert(MemoryPolicyStore store) {
-
+        public void rollback(MemoryUserDefinedPML store) throws PMException {
+            store.createConstant(constantName, oldValue);
         }
     }
 }

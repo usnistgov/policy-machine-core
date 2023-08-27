@@ -1,36 +1,39 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.pap.UserDefinedPMLStore;
 import gov.nist.csd.pm.policy.UserDefinedPML;
-import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.tx.Transactional;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
+class MemoryUserDefinedPML extends MemoryStore<TxUserDefinedPML> implements UserDefinedPMLStore, Transactional, BaseMemoryTx {
 
-    protected MemoryTx tx;
+    protected MemoryTx<TxUserDefinedPML> tx;
     private Map<String, FunctionDefinitionStatement> functions;
     private Map<String, Value> constants;
+    private MemoryGraph graph;
 
     public MemoryUserDefinedPML() {
         this.functions = new HashMap<>();
         this.constants = new HashMap<>();
-        this.tx = new MemoryTx(false, 0, null);
     }
 
     public MemoryUserDefinedPML(Map<String, FunctionDefinitionStatement> functions, Map<String, Value> constants) {
         this.functions = functions;
         this.constants = constants;
-        this.tx = new MemoryTx(false, 0, null);
     }
 
     public MemoryUserDefinedPML(UserDefinedPML userDefinedPML) throws PMException {
         this.functions = userDefinedPML.getFunctions();
         this.constants = userDefinedPML.getConstants();
-        this.tx = new MemoryTx(false, 0, null);
+    }
+
+    public void setMemoryGraph(MemoryGraph graph) {
+        this.graph = graph;
     }
 
     public void clear() {
@@ -39,19 +42,43 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
     }
 
     @Override
-    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().userDefinedPML().createFunction(functionDefinitionStatement);
+    public void beginTx() throws PMException {
+        if (tx == null) {
+            tx = new MemoryTx<>(false, 0, new TxUserDefinedPML(new TxPolicyEventTracker(), this));
         }
+        tx.beginTx();
+    }
+
+    @Override
+    public void commit() throws PMException {
+        tx.commit();
+    }
+
+    @Override
+    public void rollback() throws PMException {
+        tx.getStore().rollback();
+
+        tx.rollback();
+    }
+
+    @Override
+    public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMLFunctionAlreadyDefinedException, PMBackendException {
+        checkCreateFunctionInput(functionDefinitionStatement.getFunctionName());
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createFunction(functionDefinitionStatement));
 
         functions.put(functionDefinitionStatement.getFunctionName(), functionDefinitionStatement);
     }
 
     @Override
-    public void deleteFunction(String functionName) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().userDefinedPML().deleteFunction(functionName);
+    public void deleteFunction(String functionName) throws PMBackendException {
+        if (!checkDeleteFunctionInput(functionName)) {
+            return;
         }
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.deleteFunction(functionName));
 
         functions.remove(functionName);
     }
@@ -62,24 +89,30 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
     }
 
     @Override
-    public FunctionDefinitionStatement getFunction(String name) throws PMException {
-        return getFunctions().get(name);
+    public FunctionDefinitionStatement getFunction(String name) throws PMLFunctionNotDefinedException {
+        checkGetFunctionInput(name);
+
+        return functions.get(name);
     }
 
     @Override
-    public void createConstant(String constantName, Value constantValue) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().userDefinedPML().createConstant(constantName, constantValue);
-        }
+    public void createConstant(String constantName, Value constantValue) throws PMLConstantAlreadyDefinedException, PMBackendException {
+        checkCreateConstantInput(constantName);
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.createConstant(constantName, constantValue));
 
         constants.put(constantName, constantValue);
     }
 
     @Override
-    public void deleteConstant(String constName) throws PMException {
-        if (tx.isActive()) {
-            tx.getPolicyStore().userDefinedPML().deleteConstant(constName);
+    public void deleteConstant(String constName) throws PMBackendException {
+        if (!checkDeleteConstantInput(constName)) {
+            return;
         }
+
+        // log the command if in a tx
+        handleTxIfActive(tx -> tx.deleteConstant(constName));
 
         constants.remove(constName);
     }
@@ -90,8 +123,47 @@ class MemoryUserDefinedPML implements UserDefinedPML, Serializable {
     }
 
     @Override
-    public Value getConstant(String name) {
-        return getConstants().get(name);
+    public Value getConstant(String name) throws PMLConstantNotDefinedException {
+        checkGetConstantInput(name);
+
+        return constants.get(name);
     }
 
+    @Override
+    public void checkCreateFunctionInput(String name) throws PMLFunctionAlreadyDefinedException {
+        if (functions.containsKey(name)) {
+            throw new PMLFunctionAlreadyDefinedException(name);
+        }
+    }
+
+    @Override
+    public boolean checkDeleteFunctionInput(String name) {
+        return functions.containsKey(name);
+    }
+
+    @Override
+    public void checkGetFunctionInput(String name) throws PMLFunctionNotDefinedException {
+        if (functions.containsKey(name)) {
+            throw new PMLFunctionNotDefinedException(name);
+        }
+    }
+
+    @Override
+    public void checkCreateConstantInput(String name) throws PMLConstantAlreadyDefinedException {
+        if (constants.containsKey(name)) {
+            throw new PMLConstantAlreadyDefinedException(name);
+        }
+    }
+
+    @Override
+    public boolean checkDeleteConstantInput(String name) {
+        return constants.containsKey(name);
+    }
+
+    @Override
+    public void checkGetConstantInput(String name) throws PMLConstantNotDefinedException {
+        if (constants.containsKey(name)) {
+            throw new PMLConstantNotDefinedException(name);
+        }
+    }
 }

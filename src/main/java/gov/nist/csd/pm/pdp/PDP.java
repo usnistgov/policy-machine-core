@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.pdp;
 
+import gov.nist.csd.pm.epp.EventContext;
+import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.epp.EventListener;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.Adjudicator;
 import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.events.PolicyEventEmitter;
-import gov.nist.csd.pm.policy.events.PolicyEventListener;
-import gov.nist.csd.pm.policy.events.ResetPolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLExecutable;
@@ -16,10 +15,10 @@ import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PDP implements PolicyEventEmitter {
+public abstract class PDP implements EventEmitter {
 
     protected final PAP pap;
-    protected final List<PolicyEventListener> eventListeners;
+    protected final List<EventListener> eventListeners;
 
     protected PDP(PAP pap) {
         this.pap = pap;
@@ -31,23 +30,19 @@ public abstract class PDP implements PolicyEventEmitter {
     public abstract void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException;
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+    public void addEventListener(EventListener listener) {
         eventListeners.add(listener);
-
-        if (sync) {
-            listener.handlePolicyEvent(pap.policySync());
-        }
     }
 
     @Override
-    public void removeEventListener(PolicyEventListener listener) {
+    public void removeEventListener(EventListener listener) {
         eventListeners.remove(listener);
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
-        for (PolicyEventListener listener : eventListeners) {
-            listener.handlePolicyEvent(event);
+    public void emitEvent(EventContext event) throws PMException {
+        for (EventListener listener : eventListeners) {
+            listener.processEvent(event);
         }
     }
 
@@ -55,20 +50,18 @@ public abstract class PDP implements PolicyEventEmitter {
         void run(PDPTx policy) throws PMException;
     }
 
-    public static class PDPTx implements Policy, PolicyEventListener, PMLExecutable, PolicyEventEmitter {
+    public static class PDPTx implements Policy, PMLExecutable, EventEmitter, EventListener {
 
-        private final UserContext userCtx;
         private final Adjudicator adjudicator;
         private final PAP pap;
-        private List<PolicyEventListener> epps;
+        private final List<EventListener> epps;
 
-        private PDPGraph pdpGraph;
-        private PDPProhibitions pdpProhibitions;
-        private PDPObligations pdpObligations;
-        private PDPUserDefinedPML pdpUserDefinedPML;
+        private final PDPGraph pdpGraph;
+        private final PDPProhibitions pdpProhibitions;
+        private final PDPObligations pdpObligations;
+        private final PDPUserDefinedPML pdpUserDefinedPML;
 
-        public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<PolicyEventListener> epps) throws PMException {
-            this.userCtx = userCtx;
+        public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<EventListener> epps) throws PMException {
             this.adjudicator = new Adjudicator(userCtx, pap, policyReviewer);
             this.pap = pap;
             this.epps = epps;
@@ -80,23 +73,26 @@ public abstract class PDP implements PolicyEventEmitter {
         }
 
         @Override
-        public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+        public void addEventListener(EventListener listener) {
             epps.add(listener);
-            
-            if (sync) {
-                listener.handlePolicyEvent(pap.policySync());
-            }
         }
 
         @Override
-        public void removeEventListener(PolicyEventListener listener) {
+        public void removeEventListener(EventListener listener) {
             epps.remove(listener);
         }
 
         @Override
-        public void emitEvent(PolicyEvent event) throws PMException {
-            for (PolicyEventListener epp : epps) {
-                epp.handlePolicyEvent(event);
+        public void emitEvent(EventContext event) throws PMException {
+            for (EventListener epp : epps) {
+                epp.processEvent(event);
+            }
+        }
+
+        @Override
+        public void processEvent(EventContext eventCtx) throws PMException {
+            for (EventListener epp : epps) {
+                epp.processEvent(eventCtx);
             }
         }
 
@@ -144,13 +140,6 @@ public abstract class PDP implements PolicyEventEmitter {
             adjudicator.reset();
 
             pap.reset();
-        }
-
-        @Override
-        public void handlePolicyEvent(PolicyEvent event) throws PMException {
-            for (PolicyEventListener listener : epps) {
-                listener.handlePolicyEvent(event);
-            }
         }
     }
 }

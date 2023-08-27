@@ -18,8 +18,8 @@ interface Vertex {
     List<Association> getIncomingAssociations();
 
     void addAssignment(String child, String parent);
-    void removeAssignment(String child, String parent);
+    void deleteAssignment(String child, String parent);
     void addAssociation(String ua, String target, AccessRightSet accessRightSet);
-    void removeAssociation(String ua, String target);
+    void deleteAssociation(String ua, String target);
 
 }

@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
+import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.epp.EventListener;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.UserDefinedPMLAdjudicator;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
@@ -16,13 +17,13 @@ import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.util.Map;
 
-class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
+class PDPUserDefinedPML implements UserDefinedPML, EventEmitter {
     private UserContext userCtx;
-    private UserDefinedPMLAdjudicator adjudicator;
+    private AdjudicatorUserDefinedPML adjudicator;
     private PAP pap;
-    private PolicyEventListener listener;
+    private EventListener listener;
 
-    public PDPUserDefinedPML(UserContext userCtx, UserDefinedPMLAdjudicator adjudicator, PAP pap, PolicyEventListener listener) {
+    public PDPUserDefinedPML(UserContext userCtx, AdjudicatorUserDefinedPML adjudicator, PAP pap, gov.nist.csd.pm.epp.EventListener listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -88,17 +89,17 @@ class PDPUserDefinedPML implements UserDefinedPML, PolicyEventEmitter {
     }
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+    public void addEventListener(EventListener listener) {
 
     }
 
     @Override
-    public void removeEventListener(PolicyEventListener listener) {
+    public void removeEventListener(EventListener listener) {
 
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
-        this.listener.handlePolicyEvent(event);
+    public void emitEvent(EventContext event) throws PMException {
+        this.listener.processEvent(event);
     }
 }

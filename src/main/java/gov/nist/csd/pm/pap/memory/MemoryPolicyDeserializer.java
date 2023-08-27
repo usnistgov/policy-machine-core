@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
+import gov.nist.csd.pm.policy.exceptions.NodeNameExistsException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.json.JSONGraph;
 import gov.nist.csd.pm.policy.json.JSONPolicy;
@@ -77,7 +78,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
             List<Rule> rules = obligation.getRules();
             memoryPolicyStore.obligations().create(
                     obligation.getAuthor(),
-                    obligation.getLabel(),
+                    obligation.getId(),
                     rules.toArray(new Rule[]{})
             );
         }
@@ -91,7 +92,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
             Prohibition prohibition = SerializationUtils.deserialize(b);
 
             memoryPolicyStore.prohibitions().create(
-                    prohibition.getLabel(),
+                    prohibition.getId(),
                     prohibition.getSubject(),
                     prohibition.getAccessRightSet(),
                     prohibition.isIntersection(),
@@ -100,13 +101,13 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
         }
     }
 
-    private void graphFromJson(String json) {
+    private void graphFromJson(String json) throws NodeNameExistsException {
         JSONGraph jsonGraph = new Gson().fromJson(json, JSONGraph.class);
 
-        MemoryGraph graph = (MemoryGraph) memoryPolicyStore.graph();
+        MemoryGraph graph = memoryPolicyStore.graph();
 
         for (Node node : jsonGraph.getNodes()) {
-            graph.addNode(node.getName(), node.getType(), node.getProperties());
+            graph.createNodeInternal(node.getName(), node.getType(), node.getProperties());
         }
 
         for (String[] assignment : jsonGraph.getAssignments()) {

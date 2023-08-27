@@ -1,16 +1,14 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import gov.nist.csd.pm.pap.GraphStore;
 import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
-import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.nodes.Properties;
-import gov.nist.csd.pm.policy.model.graph.relationships.Assignment;
-import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-import gov.nist.csd.pm.policy.model.graph.relationships.Relationship;
+import gov.nist.csd.pm.policy.model.graph.relationships.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,11 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isWildcardAccessRight;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.U;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-public class MysqlGraph implements Graph {
+public class MysqlGraph implements GraphStore {
 
     private MysqlConnection connection;
 
@@ -32,7 +32,10 @@ public class MysqlGraph implements Graph {
         this.connection = connection;
     }
     @Override
-    public void setResourceAccessRights(AccessRightSet accessRightSet) throws MysqlPolicyException {
+    public void setResourceAccessRights(AccessRightSet accessRightSet)
+    throws MysqlPolicyException, AdminAccessRightExistsException {
+        checkSetResourceAccessRightsInput(accessRightSet);
+
         try {
             String sql = """
                 insert into resource_access_rights (id, access_rights) values (1, ?) ON DUPLICATE KEY UPDATE access_rights = (?);
@@ -68,57 +71,69 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public String createPolicyClass(String name, Map<String, String> properties) throws MysqlPolicyException {
+    public String createPolicyClass(String name, Map<String, String> properties)
+    throws PMBackendException, NodeNameExistsException {
         return createPolicyClassNode(name, properties);
     }
 
     @Override
-    public String createPolicyClass(String name) throws MysqlPolicyException {
+    public String createPolicyClass(String name) throws PMBackendException, NodeNameExistsException {
         return createPolicyClass(name, NO_PROPERTIES);
     }
 
     @Override
-    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents) throws MysqlPolicyException {
+    public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createNode(name, UA, properties, parent, parents);
     }
 
     @Override
-    public String createUserAttribute(String name, String parent, String... parents) throws MysqlPolicyException {
+    public String createUserAttribute(String name, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createUserAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents) throws MysqlPolicyException {
+    public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createNode(name, OA, properties, parent, parents);
     }
 
     @Override
-    public String createObjectAttribute(String name, String parent, String... parents) throws MysqlPolicyException {
+    public String createObjectAttribute(String name, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createObjectAttribute(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public String createObject(String name, Map<String, String> properties, String parent, String... parents) throws MysqlPolicyException {
+    public String createObject(String name, Map<String, String> properties, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createNode(name, O, properties, parent, parents);
     }
 
     @Override
-    public String createObject(String name, String parent, String... parents) throws MysqlPolicyException {
+    public String createObject(String name, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createObject(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public String createUser(String name, Map<String, String> properties, String parent, String... parents) throws MysqlPolicyException {
+    public String createUser(String name, Map<String, String> properties, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createNode(name, U, properties, parent, parents);
     }
 
     @Override
-    public String createUser(String name, String parent, String... parents) throws MysqlPolicyException {
+    public String createUser(String name, String parent, String... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
         return createUser(name, NO_PROPERTIES, parent, parents);
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) throws MysqlPolicyException {
+    public void setNodeProperties(String name, Map<String, String> properties)
+    throws PMBackendException, NodeDoesNotExistException {
+        checkSetNodePropertiesInput(name);
+
         String sql = """
                     UPDATE node SET properties=? WHERE NAME=?
                     """;
@@ -155,7 +170,9 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public Node getNode(String name) throws PMException {
+    public Node getNode(String name) throws NodeDoesNotExistException, PMBackendException {
+        checkGetNodeInput(name);
+
         String sql = """
                     SELECT name, node_type_id, properties FROM node WHERE name = ?
                     """;
@@ -250,7 +267,12 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void deleteNode(String name) throws MysqlPolicyException {
+    public void deleteNode(String name)
+    throws PMBackendException, NodeHasChildrenException, NodeReferencedInProhibitionException, NodeReferencedInObligationException {
+        if (!checkDeleteNodeInput(name, new MysqlProhibitions(connection), new MysqlObligations(connection))) {
+            return;
+        }
+
         String sql = """
                     DELETE FROM node WHERE NAME=?
                     """;
@@ -263,7 +285,12 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void assign(String child, String parent) throws MysqlPolicyException {
+    public void assign(String child, String parent)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, AssignmentCausesLoopException {
+        if (!checkAssignInput(child, parent)) {
+            return;
+        }
+
         String sql = """
             INSERT INTO assignment (start_node_id, end_node_id) VALUES (
               (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)
@@ -280,7 +307,11 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void deassign(String child, String parent) throws MysqlPolicyException {
+    public void deassign(String child, String parent) throws PMBackendException, NodeDoesNotExistException {
+        if (!checkDeassignInput(child, parent)) {
+            return;
+        }
+
         String sql = """
             DELETE FROM assignment
             WHERE start_node_id = (SELECT id FROM node WHERE name=?)
@@ -297,7 +328,8 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void assignAll(List<String> children, String target) throws MysqlPolicyException {
+    public void assignAll(List<String> children, String target)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, AssignmentCausesLoopException {
         try {
             connection.beginTx();
 
@@ -313,7 +345,7 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void deassignAll(List<String> children, String target) throws MysqlPolicyException {
+    public void deassignAll(List<String> children, String target) throws PMBackendException, NodeDoesNotExistException {
         try {
             connection.beginTx();
 
@@ -324,11 +356,13 @@ public class MysqlGraph implements Graph {
             connection.commit();
         } catch (MysqlPolicyException e) {
             connection.rollback();
+            throw e;
         }
     }
 
     @Override
-    public void deassignAllFromAndDelete(String target) throws MysqlPolicyException {
+    public void deassignAllFromAndDelete(String target)
+    throws PMBackendException, NodeDoesNotExistException, NodeHasChildrenException, NodeReferencedInProhibitionException, NodeReferencedInObligationException {
         try {
             connection.beginTx();
 
@@ -338,11 +372,43 @@ public class MysqlGraph implements Graph {
             connection.commit();
         } catch (MysqlPolicyException e) {
             connection.rollback();
+            throw e;
         }
     }
 
     @Override
-    public List<String> getChildren(String node) throws MysqlPolicyException {
+    public List<String> getParents(String node) throws PMBackendException, NodeDoesNotExistException {
+        checkGetParentsInput(node);
+
+        List<String> parents = new ArrayList<>();
+
+        String sql = """
+                    select parents.name from node
+                    join assignment on node.id=assignment.start_node_id
+                    join node as parents on parents.id=assignment.end_node_id
+                    where node.name = ?;
+                    """;
+
+        try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
+            ps.setString(1, node);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                parents.add(rs.getString(1));
+            }
+
+            rs.close();
+
+            return parents;
+        } catch (SQLException e) {
+            throw new MysqlPolicyException(e.getMessage());
+        }
+    }
+
+
+    @Override
+    public List<String> getChildren(String node) throws PMBackendException, NodeDoesNotExistException {
+        checkGetChildrenInput(node);
+
         List<String> children = new ArrayList<>();
 
         String sql = """
@@ -368,7 +434,10 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void associate(String ua, String target, AccessRightSet accessRights) throws MysqlPolicyException {
+    public void associate(String ua, String target, AccessRightSet accessRights)
+    throws PMBackendException, UnknownAccessRightException, NodeDoesNotExistException, InvalidAssociationException {
+        checkAssociateInput(ua, target, accessRights);
+
         String sql = """
             INSERT INTO association (start_node_id, end_node_id, operation_set) VALUES (
               (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?), ?
@@ -389,7 +458,11 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public void dissociate(String ua, String target) throws MysqlPolicyException {
+    public void dissociate(String ua, String target) throws PMBackendException, NodeDoesNotExistException {
+        if (!checkDissociateInput(ua, target)) {
+            return;
+        }
+
         String sql = """
             DELETE FROM association
             WHERE start_node_id = (SELECT id FROM node WHERE name=?)
@@ -406,33 +479,9 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public List<String> getParents(String node) throws MysqlPolicyException {
-        List<String> parents = new ArrayList<>();
+    public List<Association> getAssociationsWithSource(String ua) throws PMBackendException, NodeDoesNotExistException {
+        checkGetAssociationsWithSourceInput(ua);
 
-        String sql = """
-                    select parents.name from node
-                    join assignment on node.id=assignment.start_node_id
-                    join node as parents on parents.id=assignment.end_node_id
-                    where node.name = ?;
-                    """;
-
-        try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, node);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                parents.add(rs.getString(1));
-            }
-
-            rs.close();
-
-            return parents;
-        } catch (SQLException e) {
-            throw new MysqlPolicyException(e.getMessage());
-        }
-    }
-
-    @Override
-    public List<Association> getAssociationsWithSource(String ua) throws MysqlPolicyException {
         List<Association> associations = new ArrayList<>();
 
         String sql = """
@@ -459,7 +508,10 @@ public class MysqlGraph implements Graph {
     }
 
     @Override
-    public List<Association> getAssociationsWithTarget(String target) throws MysqlPolicyException {
+    public List<Association> getAssociationsWithTarget(String target)
+    throws PMBackendException, NodeDoesNotExistException {
+        checkGetAssociationsWithTargetInput(target);
+
         List<Association> associations = new ArrayList<>();
 
         String sql = """
@@ -485,7 +537,10 @@ public class MysqlGraph implements Graph {
         return associations;
     }
 
-    private String createPolicyClassNode(String name, Map<String, String> properties) throws MysqlPolicyException {
+    private String createPolicyClassNode(String name, Map<String, String> properties)
+    throws PMBackendException, NodeNameExistsException {
+        checkCreatePolicyClassInput(name);
+
         String sql = """
                     INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)
                     """;
@@ -502,7 +557,10 @@ public class MysqlGraph implements Graph {
     }
 
     private String createNode(String name, NodeType type, Map<String, String> properties,
-                              String initialParent, String ... parents) throws MysqlPolicyException {
+                              String initialParent, String ... parents)
+    throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {
+        checkCreateNodeInput(name, type, initialParent, parents);
+
         connection.beginTx();
 
         String sql = """

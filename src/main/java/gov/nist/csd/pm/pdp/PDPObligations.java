@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
+import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.epp.EventListener;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.ObligationsAdjudicator;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
@@ -22,13 +23,13 @@ import static gov.nist.csd.pm.policy.model.obligation.event.EventSubject.Type.PR
 import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.*;
 import static gov.nist.csd.pm.policy.model.obligation.event.Target.Type.ANY_OF_SET;
 
-class PDPObligations implements Obligations, PolicyEventEmitter {
+class PDPObligations implements Obligations, EventEmitter {
     private UserContext userCtx;
-    private ObligationsAdjudicator adjudicator;
+    private AdjudicatorObligations adjudicator;
     private PAP pap;
-    private PolicyEventListener listener;
+    private EventListener listener;
 
-    public PDPObligations(UserContext userCtx, ObligationsAdjudicator adjudicator, PAP pap, PolicyEventListener listener) {
+    public PDPObligations(UserContext userCtx, AdjudicatorObligations adjudicator, PAP pap, gov.nist.csd.pm.epp.EventListener listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -36,12 +37,12 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public void create(UserContext author, String label, Rule... rules) throws PMException {
-        adjudicator.create(author, label, rules);
+    public void create(UserContext author, String id, Rule... rules) throws PMException {
+        adjudicator.create(author, id, rules);
 
-        pap.obligations().create(author, label, rules);
+        pap.obligations().create(author, id, rules);
 
-        emitObligationEvent(new CreateObligationEvent(author, label, List.of(rules)), rules);
+        emitObligationEvent(new CreateObligationEvent(author, id, List.of(rules)), rules);
     }
 
     private void emitObligationEvent(PolicyEvent event, Rule... rules) throws PMException {
@@ -78,36 +79,36 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public void update(UserContext author, String label, Rule... rules) throws PMException {
-        adjudicator.update(author, label, rules);
+    public void update(UserContext author, String id, Rule... rules) throws PMException {
+        adjudicator.update(author, id, rules);
 
-        pap.obligations().update(author, label, rules);
+        pap.obligations().update(author, id, rules);
 
         emitObligationEvent(
-                new UpdateObligationEvent(author, label, List.of(rules)),
+                new UpdateObligationEvent(author, id, List.of(rules)),
                 rules
         );
     }
 
     @Override
-    public void delete(String label) throws PMException {
-        if (!exists(label)) {
+    public void delete(String id) throws PMException {
+        if (!exists(id)) {
             return;
         }
 
-        adjudicator.delete(label);
+        adjudicator.delete(id);
 
         // get the obligation to use in the EPP before it is deleted
-        Obligation obligation = get(label);
+        Obligation obligation = get(id);
 
-        pap.obligations().delete(label);
+        pap.obligations().delete(id);
 
         emitDeleteObligationEvent(obligation);
     }
 
     private void emitDeleteObligationEvent(Obligation obligation) throws PMException {
         emitObligationEvent(
-                new DeleteObligationEvent(obligation.getLabel()),
+                new DeleteObligationEvent(obligation.getId()),
                 obligation.getRules().toArray(Rule[]::new)
         );
     }
@@ -118,27 +119,27 @@ class PDPObligations implements Obligations, PolicyEventEmitter {
     }
 
     @Override
-    public boolean exists(String label) throws PMException {
-        return adjudicator.exists(label);
+    public boolean exists(String id) throws PMException {
+        return adjudicator.exists(id);
     }
 
     @Override
-    public Obligation get(String label) throws PMException {
-        return adjudicator.get(label);
+    public Obligation get(String id) throws PMException {
+        return adjudicator.get(id);
     }
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-
-    }
-
-    @Override
-    public void removeEventListener(PolicyEventListener listener) {
+    public void addEventListener(EventListener listener) {
 
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
-        this.listener.handlePolicyEvent(event);
+    public void removeEventListener(EventListener listener) {
+
+    }
+
+    @Override
+    public void emitEvent(EventContext event) throws PMException {
+        this.listener.processEvent(event);
     }
 }

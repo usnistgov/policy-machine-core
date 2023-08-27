@@ -1,9 +1,5 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -28,11 +24,6 @@ public class AssignAllEvent extends GraphEvent {
     @Override
     public String getEventName() {
         return "assign_all";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.graph().assignAll(children, target);
     }
 
     @Override

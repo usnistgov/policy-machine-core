@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +17,7 @@ class PDPTest {
     @Test
     void testRunTx() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        PDP pdp = new MemoryPDP(pap, false);
+        PDP pdp = new MemoryPDP(pap);
 
         UserContext superUser = new UserContext(SUPER_USER);
         pdp.runTx(superUser, (policy) -> {

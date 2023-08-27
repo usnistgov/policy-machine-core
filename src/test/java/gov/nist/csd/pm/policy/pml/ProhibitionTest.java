@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.memory.MemoryPolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.CREATE_POLICY_CLASS;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,6 +37,7 @@ class ProhibitionTest {
                 on union of ['oa1']
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
+        pap.bootstrap(new SuperUserBootstrapper());
         pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
 
         Prohibition prohibition = pap.prohibitions().get("pro1");
@@ -46,9 +48,9 @@ class ProhibitionTest {
         assertEquals(List.of(new ContainerCondition("oa1", false)), prohibition.getContainers());
 
         MemoryPolicyReviewer reviewer = new MemoryPolicyReviewer(pap);
-        AccessRightSet accessRights = reviewer.getAccessRights(new UserContext("u1"), "oa1");
+        AccessRightSet accessRights = reviewer.getPrivileges(new UserContext("u1"), "oa1");
         assertEquals(new AccessRightSet("read"), accessRights);
-        accessRights = reviewer.getAccessRights(new UserContext("u2"), "oa1");
+        accessRights = reviewer.getPrivileges(new UserContext("u2"), "oa1");
         assertEquals(new AccessRightSet("read", "write"), accessRights);
 
         input = """

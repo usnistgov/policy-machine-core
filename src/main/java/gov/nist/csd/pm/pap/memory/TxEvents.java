@@ -48,7 +48,7 @@ public class TxEvents {
         private Obligation obligationToDelete;
 
         public MemoryDeleteObligationEvent(Obligation obligationToDelete) {
-            super(obligationToDelete.getLabel());
+            super(obligationToDelete.getId());
             this.obligationToDelete = obligationToDelete;
         }
 
@@ -62,7 +62,7 @@ public class TxEvents {
         private Prohibition prohibitionToDelete;
 
         public MemoryDeleteProhibitionEvent(Prohibition prohibition) {
-            super(prohibition.getLabel());
+            super(prohibition.getId());
             prohibitionToDelete = prohibition;
         }
 
@@ -132,7 +132,7 @@ public class TxEvents {
         private Obligation oldObl;
 
         public MemoryUpdateObligationEvent(Obligation newObl, Obligation oldObl) {
-            super(newObl.getAuthor(), newObl.getLabel(), newObl.getRules());
+            super(newObl.getAuthor(), newObl.getId(), newObl.getRules());
             this.oldObl = oldObl;
         }
 
@@ -146,7 +146,7 @@ public class TxEvents {
         private Prohibition oldPro;
 
         public MemoryUpdateProhibitionEvent(Prohibition newPro, Prohibition oldPro) {
-            super(newPro.getLabel(), newPro.getSubject(), newPro.getAccessRightSet(), newPro.isIntersection(), newPro.getContainers());
+            super(newPro.getId(), newPro.getSubject(), newPro.getAccessRightSet(), newPro.isIntersection(), newPro.getContainers());
             this.oldPro = oldPro;
         }
 

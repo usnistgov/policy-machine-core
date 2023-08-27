@@ -1,22 +1,28 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.tx.Transactional;
+
 import java.util.Objects;
 
-public class MemoryTx {
+/**
+ * @param <T> The BaseMemoryTx instance that will run the tx's for this class.
+ */
+public class MemoryTx<T extends BaseMemoryTx> implements Transactional {
     private boolean active;
     private int counter;
-    private TxPolicyStore policyStore;
+    private T store;
 
-    public MemoryTx(boolean active, int counter, TxPolicyStore policyStore) {
+    public MemoryTx(boolean active, int counter, T store) {
         this.active = active;
         this.counter = counter;
-        this.policyStore = policyStore;
+        this.store = store;
     }
 
-    public void set(boolean active, int counter, TxPolicyStore policyStore) {
+    public void set(boolean active, int counter, T policyStore) {
         this.active = active;
         this.counter = counter;
-        this.policyStore = policyStore;
+        this.store = policyStore;
     }
 
     public boolean isActive() {
@@ -35,12 +41,30 @@ public class MemoryTx {
         this.counter = counter;
     }
 
-    public TxPolicyStore getPolicyStore() {
-        return policyStore;
+    public T getStore() {
+        return store;
     }
 
-    public void setPolicyStore(TxPolicyStore policyStore) {
-        this.policyStore = policyStore;
+    public void setStore(T store) {
+        this.store = store;
+    }
+
+    @Override
+    public void beginTx() throws PMException {
+        active = true;
+        counter++;
+    }
+
+    @Override
+    public void commit() throws PMException {
+        counter--;
+        active = counter != 0;
+    }
+
+    @Override
+    public void rollback() throws PMException {
+        counter--;
+        active = counter != 0;
     }
 
     @Override
@@ -50,12 +74,12 @@ public class MemoryTx {
         var that = (MemoryTx) obj;
         return this.active == that.active &&
                 this.counter == that.counter &&
-                Objects.equals(this.policyStore, that.policyStore);
+                Objects.equals(this.store, that.store);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(active, counter, policyStore);
+        return Objects.hash(active, counter, store);
     }
 
     @Override
@@ -63,7 +87,6 @@ public class MemoryTx {
         return "MemoryTx[" +
                 "active=" + active + ", " +
                 "counter=" + counter + ", " +
-                "policyStore=" + policyStore + ']';
+                "policyStore=" + store + ']';
     }
-
 }

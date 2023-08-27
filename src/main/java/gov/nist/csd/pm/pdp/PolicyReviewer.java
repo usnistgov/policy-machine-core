@@ -70,7 +70,7 @@ public abstract class PolicyReviewer implements PolicyReview {
             // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
             if (permissions.contains(ALL_ADMIN_ACCESS_RIGHTS)) {
                 permissions.remove(ALL_ADMIN_ACCESS_RIGHTS);
-                permissions.addAll(allAccessRights());
+                permissions.addAll(allAdminAccessRights());
             }
             if (permissions.contains(ALL_RESOURCE_ACCESS_RIGHTS)) {
                 permissions.remove(ALL_RESOURCE_ACCESS_RIGHTS);

@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Map;
 import java.util.Objects;
@@ -28,11 +26,6 @@ public class SetNodePropertiesEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "set_node_properties";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.graph().setNodeProperties(name, properties);
     }
 
     @Override

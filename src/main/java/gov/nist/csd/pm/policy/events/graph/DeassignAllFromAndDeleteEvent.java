@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
@@ -21,11 +19,6 @@ public class DeassignAllFromAndDeleteEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "deassign_all_from_and_delete";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.graph().deassignAllFromAndDelete(node);
     }
 
     @Override

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp.memory;
 
 import gov.nist.csd.pm.SamplePolicy;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryPDPTest {
@@ -24,11 +25,12 @@ class MemoryPDPTest {
     @Test
     void testRollback() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
+        pap.bootstrap(new SuperUserBootstrapper());
         pap.graph().createPolicyClass("pc1");
         pap.graph().createObjectAttribute("oa1", "pc1");
         pap.graph().createUserAttribute("ua1", "pc1");
 
-        PDP pdp = new MemoryPDP(pap, false);
+        PDP pdp = new MemoryPDP(pap);
         assertThrows(NodeNameExistsException.class, () -> {
             pdp.runTx(new UserContext(SUPER_USER), policy -> {
                 policy.graph().createPolicyClass("pc2");
@@ -59,7 +61,7 @@ class MemoryPDPTest {
                     }
             );
 
-            MemoryPDP memoryPDP = new MemoryPDP(pap, false);
+            MemoryPDP memoryPDP = new MemoryPDP(pap);
             memoryPDP.runTx(new UserContext(SUPER_USER), policy -> {
                 policy.userDefinedPML().createFunction(functionDefinitionStatement);
                 policy.executePML(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2']");

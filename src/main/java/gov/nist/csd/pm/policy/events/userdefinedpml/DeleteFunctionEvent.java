@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.policy.events.userdefinedpml;
 
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.Objects;
 
@@ -21,11 +19,6 @@ public class DeleteFunctionEvent implements PolicyEvent {
     @Override
     public String getEventName() {
         return "remove_function";
-    }
-
-    @Override
-    public void apply(Policy policy) throws PMException {
-        policy.userDefinedPML().deleteFunction(functionName);
     }
 
     @Override

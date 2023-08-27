@@ -9,7 +9,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 
-public class EventContext implements PolicyEvent {
+public class EventContext {
 
     private final UserContext userCtx;
     private final String eventName;
@@ -37,9 +37,6 @@ public class EventContext implements PolicyEvent {
     public String getEventName() {
         return eventName;
     }
-
-    @Override
-    public void apply(Policy policy) throws PMException {}
 
     public String getTarget() {
         return target;

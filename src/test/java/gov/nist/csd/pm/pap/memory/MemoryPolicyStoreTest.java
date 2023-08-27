@@ -251,4 +251,15 @@ class MemoryPolicyStoreTest {
         policyStore.setGraph((MemoryGraph) memoryPolicyStore1.graph());
         assertTrue(policyStore.graph().nodeExists("pc1"));
     }
+
+    @Test
+    void test() throws PMException {
+        MemoryGraph memoryGraph = new MemoryGraph();
+        memoryGraph.createPolicyClass("pc1");
+        memoryGraph.createObjectAttribute("oa1", "pc1");
+        memoryGraph.createObjectAttribute("oa2", "pc1");
+        memoryGraph.createObjectAttribute("oa3", "pc1");
+
+        memoryGraph.deleteNode("pc1");
+    }
 }

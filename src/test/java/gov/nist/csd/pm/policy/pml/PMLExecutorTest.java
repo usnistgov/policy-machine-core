@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.pml.model.expression.Literal;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperPolicy.SUPER_USER;
+import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PMLExecutorTest {
@@ -58,6 +59,7 @@ class PMLExecutorTest {
         Map<String, FunctionDefinitionStatement> functions = pap.userDefinedPML().getFunctions();
         assertTrue(functions.isEmpty());
 
+        pap.bootstrap(new SuperUserBootstrapper());
         pap.deserialize().fromPML(new UserContext(SUPER_USER), pml, test1, test2);
         assertEquals(2, statements.size());
 

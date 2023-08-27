@@ -18,16 +18,16 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAcces
 
 public class CreateProhibitionStatement extends PMLStatement {
 
-    private final Expression label;
+    private final Expression id;
     private final Expression subject;
     private final ProhibitionSubject.Type subjectType;
     private final Expression accessRights;
     private final boolean isIntersection;
     private final List<Container> containers;
 
-    public CreateProhibitionStatement(Expression label, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
+    public CreateProhibitionStatement(Expression id, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
                                       boolean isIntersection, List<Container> containers) {
-        this.label = label;
+        this.id = id;
         this.subject = subject;
         this.subjectType = subjectType;
         this.accessRights = accessRights;
@@ -35,8 +35,8 @@ public class CreateProhibitionStatement extends PMLStatement {
         this.containers = containers;
     }
 
-    public Expression getLabel() {
-        return label;
+    public Expression getId() {
+        return id;
     }
 
     public Expression getSubject() {
@@ -61,7 +61,7 @@ public class CreateProhibitionStatement extends PMLStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        Value labelValue = this.label .execute(ctx, policy);
+        Value idValue = this.id .execute(ctx, policy);
         Value subjectValue = this.subject.execute(ctx, policy);
         Value permissionsValue = this.accessRights.execute(ctx, policy);
 
@@ -80,7 +80,7 @@ public class CreateProhibitionStatement extends PMLStatement {
 
 
         policy.prohibitions().create(
-                labelValue.getStringValue(),
+                idValue.getStringValue(),
                 new ProhibitionSubject(subjectValue.getStringValue(), subjectType),
                 ops,
                 isIntersection,
@@ -109,7 +109,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         }
         containerStr.append("]");
 
-        return String.format("create prohibition %s deny %s %s access rights %s on %s", label, subjectStr, subject, accessRights, containerStr);
+        return String.format("create prohibition %s deny %s %s access rights %s on %s", id, subjectStr, subject, accessRights, containerStr);
     }
 
     @Override
@@ -117,12 +117,12 @@ public class CreateProhibitionStatement extends PMLStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateProhibitionStatement that = (CreateProhibitionStatement) o;
-        return isIntersection == that.isIntersection && Objects.equals(label, that.label) && Objects.equals(subject, that.subject) && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers, that.containers);
+        return isIntersection == that.isIntersection && Objects.equals(id, that.id) && Objects.equals(subject, that.subject) && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers, that.containers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(label, subject, accessRights, isIntersection, containers);
+        return Objects.hash(id, subject, accessRights, isIntersection, containers);
     }
 
     public static class Container implements Serializable {
@@ -156,7 +156,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         }
 
         return new CreateProhibitionStatement(
-                new Expression(new Literal(prohibition.getLabel())),
+                new Expression(new Literal(prohibition.getId())),
                 new Expression(new Literal(prohibition.getSubject().getName())),
                 prohibition.getSubject().getType(),
                 new Expression(new Literal(arrayLiteral)),

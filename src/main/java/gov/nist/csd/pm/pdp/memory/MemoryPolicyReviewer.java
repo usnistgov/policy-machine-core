@@ -47,7 +47,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public AccessRightSet getAccessRights(UserContext userCtx, String target) throws PMException {
+    public AccessRightSet getPrivileges(UserContext userCtx, String target) throws PMException {
         AccessRightSet accessRights = new AccessRightSet();
 
         // traverse the user side of the graph to get the associations
@@ -64,7 +64,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public AccessRightSet getDeniedAccessRights(UserContext userCtx, String target) throws PMException {
+    public AccessRightSet getDeniedPrivileges(UserContext userCtx, String target) throws PMException {
         AccessRightSet accessRights = new AccessRightSet();
 
         // traverse the user side of the graph to get the associations
@@ -293,7 +293,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         Map<String, AccessRightSet> acl = new HashMap<>();
         List<String> search = policy.graph().search(U, NO_PROPERTIES);
         for (String user : search) {
-            AccessRightSet list = this.getAccessRights(new UserContext(user), target);
+            AccessRightSet list = this.getPrivileges(new UserContext(user), target);
             acl.put(user, list);
         }
 
@@ -307,7 +307,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
     }
 
     @Override
-    public Map<String, AccessRightSet> getSubgraphAccessRights(UserContext userCtx, String root) throws PMException {
+    public Map<String, AccessRightSet> getSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
         Map<String, AccessRightSet> results = new HashMap<>();
 
         UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
@@ -383,7 +383,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         List<String> children = policy.graph().getChildren(root);
         children.removeIf(child -> {
             try {
-                return getAccessRights(userCtx, child).isEmpty();
+                return getPrivileges(userCtx, child).isEmpty();
             } catch (PMException e) {
                 e.printStackTrace();
                 return true;
@@ -398,7 +398,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
         List<String> parents = policy.graph().getParents(root);
         parents.removeIf(parent -> {
             try {
-                return getAccessRights(userCtx, parent).isEmpty();
+                return getPrivileges(userCtx, parent).isEmpty();
             } catch (PMException e) {
                 e.printStackTrace();
                 return true;

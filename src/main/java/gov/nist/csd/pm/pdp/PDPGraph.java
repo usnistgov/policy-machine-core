@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
+import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.epp.EventListener;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.adjudicator.GraphAdjudicator;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.events.graph.*;
@@ -19,14 +20,14 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-class PDPGraph implements Graph, PolicyEventEmitter {
+class PDPGraph implements Graph, EventEmitter {
 
     private UserContext userCtx;
-    private GraphAdjudicator adjudicator;
+    private AdjudicatorGraph adjudicator;
     private PAP pap;
-    private PolicyEventListener listener;
+    private EventListener listener;
 
-    public PDPGraph(UserContext userCtx, GraphAdjudicator adjudicator, PAP pap, PolicyEventListener listener) {
+    public PDPGraph(UserContext userCtx, AdjudicatorGraph adjudicator, PAP pap, EventListener listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -232,7 +233,7 @@ class PDPGraph implements Graph, PolicyEventEmitter {
 
         pap.graph().assignAll(children, target);
 
-        emitEvent(new AssignAllEvent(children, target));
+        emitEvent(new EventContext(userCtx, target, new AssignAllEvent(children, target)));
     }
 
     @Override
@@ -241,7 +242,7 @@ class PDPGraph implements Graph, PolicyEventEmitter {
 
         pap.graph().deassignAll(children, target);
 
-        emitEvent(new DeassignAllEvent(children, target));
+        emitEvent(new EventContext(userCtx, target, new DeassignAllEvent(children, target)));
     }
 
     @Override
@@ -250,7 +251,7 @@ class PDPGraph implements Graph, PolicyEventEmitter {
 
         pap.graph().deassignAllFromAndDelete(target);
 
-        emitEvent(new DeassignAllFromAndDeleteEvent(target));
+        emitEvent(new EventContext(userCtx, target, new DeassignAllFromAndDeleteEvent(target)));
     }
 
     @Override
@@ -299,17 +300,17 @@ class PDPGraph implements Graph, PolicyEventEmitter {
 
 
     @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
+    public void addEventListener(EventListener listener) {
 
     }
 
     @Override
-    public void removeEventListener(PolicyEventListener listener) {
+    public void removeEventListener(EventListener listener) {
 
     }
 
     @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
-        this.listener.handlePolicyEvent(event);
+    public void emitEvent(EventContext event) throws PMException {
+        this.listener.processEvent(event);
     }
 }

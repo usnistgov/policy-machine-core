@@ -21,7 +21,7 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
 
     @Override
     public CreateProhibitionStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
-        Expression label = Expression.compile(visitorCtx, ctx.name, Type.string());
+        Expression id = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
         ProhibitionSubject.Type type;
         if (ctx.USER() != null) {
@@ -44,6 +44,6 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
             containers.add(new CreateProhibitionStatement.Container(isComplement, name));
         }
 
-        return new CreateProhibitionStatement(label, subject, type, accessRights, isIntersection, containers);
+        return new CreateProhibitionStatement(id, subject, type, accessRights, isIntersection, containers);
     }
 }

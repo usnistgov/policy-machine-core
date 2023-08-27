@@ -32,6 +32,9 @@ class EventProcessor {
 
                 Response response = rule.getResponse();
 
+                /*check that the author can "trigger_event" on the evetnt context
+                        probably add method to event context to make a decision on an impl basis*/
+
                 // need to run pdp tx as author
                 pdp.runTx(author, txPDP -> response.execute(txPDP, eventCtx));
             }
