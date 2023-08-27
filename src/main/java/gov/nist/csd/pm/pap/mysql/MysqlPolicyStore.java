@@ -4,9 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.pap.PolicyStore;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.events.PolicySynchronizationEvent;
+import gov.nist.csd.pm.policy.PolicyDeserializer;
+import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -60,13 +59,6 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return new PolicySynchronizationEvent(
-                new MemoryPolicyStore(graph, prohibitions, obligations, userDefinedPML)
-        );
-    }
-
-    @Override
     public void reset() throws MysqlPolicyException {
         beginTx();
 
@@ -84,22 +76,22 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    public Graph graph() {
+    public MysqlGraph graph() {
         return graph;
     }
 
     @Override
-    public Prohibitions prohibitions() {
+    public MysqlProhibitions prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public Obligations obligations() {
+    public MysqlObligations obligations() {
         return obligations;
     }
 
     @Override
-    public UserDefinedPML userDefinedPML() {
+    public MysqlUserDefinedPML userDefinedPML() {
         return userDefinedPML;
     }
 

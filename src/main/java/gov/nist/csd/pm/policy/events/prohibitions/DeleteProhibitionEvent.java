@@ -6,14 +6,14 @@ import java.util.Objects;
 
 public class DeleteProhibitionEvent implements PolicyEvent {
 
-    private final String id;
+    private final String name;
 
-    public DeleteProhibitionEvent(String id) {
-        this.id = id;
+    public DeleteProhibitionEvent(String name) {
+        this.name = name;
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
     @Override
@@ -26,11 +26,11 @@ public class DeleteProhibitionEvent implements PolicyEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeleteProhibitionEvent that = (DeleteProhibitionEvent) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(name);
     }
 }

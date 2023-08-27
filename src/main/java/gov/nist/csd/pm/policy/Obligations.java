@@ -13,36 +13,36 @@ import java.util.List;
 public interface Obligations {
 
     /**
-     * Create a new obligation with the given author, id, and rules. The author of the obligation is the user that the
+     * Create a new obligation with the given author, name, and rules. The author of the obligation is the user that the
      * responses will be executed as in the EPP. This means the author will need the privileges to carry out each action
      * in the response at the time it's executed. If they do not have sufficient privileges no action in the response
      * will be executed.
      *
      * @param author The user/process that is creating the obligation.
-     * @param id The id of the obligation.
+     * @param name The name of the obligation.
      * @param rules The rules of the obligation.
      * @throws PMException If there is an error during the execution process related to the policy machine implementation.
      */
-    void create(UserContext author, String id, Rule... rules) throws PMException;
+    void create(UserContext author, String name, Rule... rules) throws PMException;
 
     /**
-     * Update the obligation with the given id. This will overwrite any existing rules to the rules provided.
+     * Update the obligation with the given name. This will overwrite any existing rules to the rules provided.
      *
      * @param author The user/process that created the obligation.
-     * @param id The id of the obligation to update.
+     * @param name The name of the obligation to update.
      * @param rules The updated obligation rules.
      * @throws PMException If there is an error during the execution process related to the policy machine implementation.
      */
-    void update(UserContext author, String id, Rule... rules) throws PMException;
+    void update(UserContext author, String name, Rule... rules) throws PMException;
 
     /**
-     * Delete the obligation with the given id. If the obligation exists, no exception is thrown as this is
+     * Delete the obligation with the given name. If the obligation exists, no exception is thrown as this is
      * the desired state.
      *
-     * @param id The id of the obligation to delete.
+     * @param name The name of the obligation to delete.
      * @throws PMException If there is an error during the execution process related to the policy machine implementation.
      */
-    void delete(String id) throws PMException;
+    void delete(String name) throws PMException;
 
     /**
      * Get all obligations.
@@ -53,21 +53,21 @@ public interface Obligations {
     List<Obligation> getAll() throws PMException;
 
     /**
-     * Check if an obligation exists with the given id.
+     * Check if an obligation exists with the given name.
      *
-     * @param id The obligation to check.
-     * @return True if the obligation exists with the given id, false otherwise.
+     * @param name The obligation to check.
+     * @return True if the obligation exists with the given name, false otherwise.
      * @throws PMException If there is an error during the execution process related to the policy machine implementation.
      */
-    boolean exists(String id) throws PMException;
+    boolean exists(String name) throws PMException;
 
     /**
-     * Get the obligation associated with the given id.
+     * Get the obligation associated with the given name.
      *
-     * @param id The id of the obligation to get.
-     * @return The obligation object associated with the given id.
+     * @param name The name of the obligation to get.
+     * @return The obligation object associated with the given name.
      * @throws PMException If there is an error during the execution process related to the policy machine implementation.
      */
-    Obligation get(String id) throws PMException;
+    Obligation get(String name) throws PMException;
 
 }

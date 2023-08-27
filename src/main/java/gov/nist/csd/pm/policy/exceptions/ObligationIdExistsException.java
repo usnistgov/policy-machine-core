@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.exceptions;
 
 public class ObligationIdExistsException extends PMException{
-    public ObligationIdExistsException(String id) {
-        super("obligation with id " + id + " already exists");
+    public ObligationIdExistsException(String name) {
+        super("obligation with name " + name + " already exists");
     }
 }

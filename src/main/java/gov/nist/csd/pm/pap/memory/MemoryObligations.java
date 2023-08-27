@@ -60,41 +60,41 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
     }
 
     @Override
-    public void create(UserContext author, String id, Rule... rules) throws ObligationIdExistsException, NodeDoesNotExistException, PMBackendException {
-        checkCreateInput(graph, author, id, rules);
+    public void create(UserContext author, String name, Rule... rules) throws ObligationIdExistsException, NodeDoesNotExistException, PMBackendException {
+        checkCreateInput(graph, author, name, rules);
 
         // log the command if in a tx
-        handleTxIfActive(tx -> tx.create(author, id, rules));
+        handleTxIfActive(tx -> tx.create(author, name, rules));
 
-        obligations.add(new Obligation(author, id, Arrays.asList(rules)));
+        obligations.add(new Obligation(author, name, Arrays.asList(rules)));
     }
 
     @Override
-    public void update(UserContext author, String id, Rule... rules) throws ObligationDoesNotExistException, NodeDoesNotExistException, PMBackendException {
-        checkUpdateInput(graph, author, id, rules);
+    public void update(UserContext author, String name, Rule... rules) throws ObligationDoesNotExistException, NodeDoesNotExistException, PMBackendException {
+        checkUpdateInput(graph, author, name, rules);
 
         // log the command if in a tx
-        handleTxIfActive(tx -> tx.update(author, id, rules));
+        handleTxIfActive(tx -> tx.update(author, name, rules));
 
         for (Obligation o : obligations) {
-            if (o.getId().equals(id)) {
+            if (o.getId().equals(name)) {
                 o.setAuthor(author);
-                o.setId(id);
+                o.setId(name);
                 o.setRules(List.of(rules));
             }
         }
     }
 
     @Override
-    public void delete(String id) throws PMBackendException {
-        if (!checkDeleteInput(id)) {
+    public void delete(String name) throws PMBackendException {
+        if (!checkDeleteInput(name)) {
             return;
         }
 
         // log the command if in a tx
-        handleTxIfActive(tx -> tx.delete(id));
+        handleTxIfActive(tx -> tx.delete(name));
 
-        this.obligations.removeIf(o -> o.getId().equals(id));
+        this.obligations.removeIf(o -> o.getId().equals(name));
     }
 
     @Override
@@ -103,9 +103,9 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
     }
 
     @Override
-    public boolean exists(String id) {
+    public boolean exists(String name) {
         for (Obligation o : obligations) {
-            if (o.getId().equals(id)) {
+            if (o.getId().equals(name)) {
                 return true;
             }
         }
@@ -114,16 +114,16 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
     }
 
     @Override
-    public Obligation get(String id) throws ObligationDoesNotExistException, PMBackendException {
-        checkGetInput(id);
+    public Obligation get(String name) throws ObligationDoesNotExistException, PMBackendException {
+        checkGetInput(name);
 
         for (Obligation obligation : obligations) {
-            if (obligation.getId().equals(id)) {
+            if (obligation.getId().equals(name)) {
                 return obligation.clone();
             }
         }
 
         // this shouldn't be reached due to the checkGet call, but just to be safe
-        throw new ObligationDoesNotExistException(id);
+        throw new ObligationDoesNotExistException(name);
     }
 }

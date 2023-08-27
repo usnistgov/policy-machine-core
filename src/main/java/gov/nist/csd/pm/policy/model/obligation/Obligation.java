@@ -11,21 +11,21 @@ import java.util.Objects;
 public class Obligation implements Cloneable, Serializable {
 
     private UserContext author;
-    private String id;
+    private String name;
     private List<Rule> rules;
 
     public Obligation() {
     }
 
-    public Obligation(UserContext author, String id) {
+    public Obligation(UserContext author, String name) {
         this.author = author;
-        this.id = id;
+        this.name = name;
         this.rules = new ArrayList<>();
     }
 
-    public Obligation(UserContext author, String id, List<Rule> rules) {
+    public Obligation(UserContext author, String name, List<Rule> rules) {
         this.author = author;
-        this.id = id;
+        this.name = name;
         this.rules = new ArrayList<>();
         for (Rule rule : rules) {
             this.rules.add(new Rule(rule));
@@ -33,7 +33,7 @@ public class Obligation implements Cloneable, Serializable {
     }
 
     public Obligation(Obligation obligation) {
-        this.id = obligation.id;
+        this.name = obligation.name;
         this.rules = new ArrayList<>();
         for (Rule rule : obligation.getRules()) {
             this.rules.add(new Rule(rule));
@@ -47,21 +47,21 @@ public class Obligation implements Cloneable, Serializable {
         try {
             o = (Obligation) super.clone();
         } catch (CloneNotSupportedException e) {
-            return new Obligation(this.author, this.id);
+            return new Obligation(this.author, this.name);
         }
 
         o.author = this.author;
-        o.id = this.id;
+        o.name = this.name;
         return o;
     }
 
-    public Obligation addRule(String id, EventPattern eventPattern, Response response) {
-        rules.add(new Rule(id, eventPattern, response));
+    public Obligation addRule(String name, EventPattern eventPattern, Response response) {
+        rules.add(new Rule(name, eventPattern, response));
         return this;
     }
 
-    public void deleteRule(String id) {
-        rules.removeIf(rule -> rule.getId().equals(id));
+    public void deleteRule(String name) {
+        rules.removeIf(rule -> rule.getId().equals(name));
     }
 
     public UserContext getAuthor() {
@@ -73,11 +73,11 @@ public class Obligation implements Cloneable, Serializable {
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String name) {
+        this.name = name;
     }
 
     public List<Rule> getRules() {
@@ -108,11 +108,11 @@ public class Obligation implements Cloneable, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Obligation that = (Obligation) o;
-        return Objects.equals(author, that.author) && Objects.equals(id, that.id) && Objects.equals(rules, that.rules);
+        return Objects.equals(author, that.author) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, id, rules);
+        return Objects.hash(author, name, rules);
     }
 }

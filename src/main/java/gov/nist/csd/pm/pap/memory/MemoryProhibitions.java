@@ -60,37 +60,37 @@ class MemoryProhibitions extends MemoryStore<TxProhibitions> implements Prohibit
     }
 
     @Override
-    public void create(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws ProhibitionExistsException, UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException, PMBackendException {
-        checkCreateInput(graph, id, subject, accessRightSet, intersection, containerConditions);
+    public void create(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws ProhibitionExistsException, UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException, PMBackendException {
+        checkCreateInput(graph, name, subject, accessRightSet, intersection, containerConditions);
 
         // log the command if in a tx
-        handleTxIfActive(tx -> tx.create(id, subject, accessRightSet, intersection, containerConditions));
+        handleTxIfActive(tx -> tx.create(name, subject, accessRightSet, intersection, containerConditions));
 
         // add the prohibition to the data structure
-        createInternal(id, subject, accessRightSet, intersection, containerConditions);
+        createInternal(name, subject, accessRightSet, intersection, containerConditions);
     }
 
     @Override
-    public void update(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException, PMBackendException, ProhibitionDoesNotExistException {
-        checkUpdateInput(graph, id, subject, accessRightSet, intersection, containerConditions);
+    public void update(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException, PMBackendException, ProhibitionDoesNotExistException {
+        checkUpdateInput(graph, name, subject, accessRightSet, intersection, containerConditions);
 
         // log the command if in a tx
-        handleTxIfActive(tx -> tx.update(id, subject, accessRightSet, intersection, containerConditions));
+        handleTxIfActive(tx -> tx.update(name, subject, accessRightSet, intersection, containerConditions));
 
-        deleteInternal(id);
-        createInternal(id, subject, accessRightSet, intersection, containerConditions);
+        deleteInternal(name);
+        createInternal(name, subject, accessRightSet, intersection, containerConditions);
     }
 
     @Override
-    public void delete(String id) throws PMBackendException {
-        if (!checkDeleteInput(id)) {
+    public void delete(String name) throws PMBackendException {
+        if (!checkDeleteInput(name)) {
             return;
         }
 
         // log the command if in a tx
-        handleTxIfActive(tx -> tx.delete(id));
+        handleTxIfActive(tx -> tx.delete(name));
 
-        deleteInternal(id);
+        deleteInternal(name);
     }
 
     @Override
@@ -104,10 +104,10 @@ class MemoryProhibitions extends MemoryStore<TxProhibitions> implements Prohibit
     }
 
     @Override
-    public boolean exists(String id) {
+    public boolean exists(String name) {
         for (Map.Entry<String, List<Prohibition>> e : prohibitions.entrySet()) {
             for (Prohibition p : e.getValue()) {
-                if (p.getId().equals(id)) {
+                if (p.getId().equals(name)) {
                     return true;
                 }
             }
@@ -127,34 +127,34 @@ class MemoryProhibitions extends MemoryStore<TxProhibitions> implements Prohibit
     }
 
     @Override
-    public Prohibition get(String id) throws ProhibitionDoesNotExistException, PMBackendException {
-        checkGetInput(id);
+    public Prohibition get(String name) throws ProhibitionDoesNotExistException, PMBackendException {
+        checkGetInput(name);
 
         for (String subject : prohibitions.keySet()) {
             List<Prohibition> subjectPros = prohibitions.get(subject);
             for (Prohibition p : subjectPros) {
-                if (p.getId().equals(id)) {
+                if (p.getId().equals(name)) {
                     return p;
                 }
             }
         }
 
-        throw new ProhibitionDoesNotExistException(id);
+        throw new ProhibitionDoesNotExistException(name);
     }
 
-    private void createInternal(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
+    private void createInternal(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
         List<Prohibition> existingPros = prohibitions.getOrDefault(subject.getName(), new ArrayList<>());
-        existingPros.add(new Prohibition(id, subject, accessRightSet, intersection, Arrays.asList(containerConditions)));
+        existingPros.add(new Prohibition(name, subject, accessRightSet, intersection, Arrays.asList(containerConditions)));
         prohibitions.put(subject.getName(), existingPros);
     }
 
-    private void deleteInternal(String id) {
+    private void deleteInternal(String name) {
         for(String subject : prohibitions.keySet()) {
             List<Prohibition> ps = prohibitions.get(subject);
             Iterator<Prohibition> iterator = ps.iterator();
             while (iterator.hasNext()) {
                 Prohibition p = iterator.next();
-                if(p.getId().equals(id)) {
+                if(p.getId().equals(name)) {
                     iterator.remove();
                     prohibitions.put(subject, ps);
                 }

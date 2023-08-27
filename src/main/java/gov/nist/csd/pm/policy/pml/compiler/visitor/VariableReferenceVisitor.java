@@ -30,18 +30,18 @@ public class VariableReferenceVisitor extends PMLBaseVisitor<VariableReference> 
 
     @Override
     public VariableReference visitReferenceByID(PMLParser.ReferenceByIDContext ctx) {
-        String id = ctx.ID().getText();
+        String name = ctx.ID().getText();
 
-        // check variable id is in scope
+        // check variable name is in scope
         Type type = Type.any();
         try {
-            Variable variable = visitorCtx.scope().getVariable(id);
+            Variable variable = visitorCtx.scope().getVariable(name);
             type = variable.type();
         } catch (UnknownVariableInScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
         }
 
-        return new VariableReference(id, type);
+        return new VariableReference(name, type);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class VariableReferenceVisitor extends PMLBaseVisitor<VariableReference> 
         boolean first = true;
         for (PMLParser.ExpressionContext exprCtx : exprCtxs) {
             // if the variable reference is not a map or array and this is not the first accessor processed, there is an error
-            // if it is the first accessor than check if the variable id is a map
+            // if it is the first accessor than check if the variable name is a map
             if (first) {
                 Type t = Type.any();
 

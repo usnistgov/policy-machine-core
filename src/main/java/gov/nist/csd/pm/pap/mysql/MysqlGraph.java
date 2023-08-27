@@ -24,7 +24,7 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.U;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-public class MysqlGraph implements GraphStore {
+class MysqlGraph implements GraphStore {
 
     private MysqlConnection connection;
 

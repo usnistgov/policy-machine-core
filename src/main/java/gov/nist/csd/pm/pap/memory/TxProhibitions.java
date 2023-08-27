@@ -32,21 +32,21 @@ public class TxProhibitions implements Prohibitions, BaseMemoryTx {
     }
 
     @Override
-    public void create(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
-        txPolicyEventTracker.trackPolicyEvent(new CreateProhibitionEvent(id, subject, accessRightSet, intersection, List.of(containerConditions)));
+    public void create(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
+        txPolicyEventTracker.trackPolicyEvent(new CreateProhibitionEvent(name, subject, accessRightSet, intersection, List.of(containerConditions)));
     }
 
     @Override
-    public void update(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public void update(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryUpdateProhibitionEvent(
-                new Prohibition(id, subject, accessRightSet, intersection, List.of(containerConditions)),
-                memoryProhibitions.get(id)
+                new Prohibition(name, subject, accessRightSet, intersection, List.of(containerConditions)),
+                memoryProhibitions.get(name)
         ));
     }
 
     @Override
-    public void delete(String id) throws PMException {
-        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryProhibitions.get(id)));
+    public void delete(String name) throws PMException {
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryProhibitions.get(name)));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class TxProhibitions implements Prohibitions, BaseMemoryTx {
     }
 
     @Override
-    public boolean exists(String id) {
+    public boolean exists(String name) {
         return false;
     }
 
@@ -65,7 +65,7 @@ public class TxProhibitions implements Prohibitions, BaseMemoryTx {
     }
 
     @Override
-    public Prohibition get(String id) {
+    public Prohibition get(String name) {
         return null;
     }
 }

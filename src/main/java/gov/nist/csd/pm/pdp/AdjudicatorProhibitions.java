@@ -30,7 +30,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
     }
 
     @Override
-    public void create(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+    public void create(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
             accessRightChecker.check(userCtx, AdminPolicy.ADMIN_POLICY_TARGET, CREATE_PROCESS_PROHIBITION);
         } else {
@@ -50,13 +50,13 @@ public class AdjudicatorProhibitions implements Prohibitions {
     }
 
     @Override
-    public void update(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        create(id, subject, accessRightSet, intersection, containerConditions);
+    public void update(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        create(name, subject, accessRightSet, intersection, containerConditions);
     }
 
     @Override
-    public void delete(String id) throws PMException {
-        Prohibition prohibition = pap.prohibitions().get(id);
+    public void delete(String name) throws PMException {
+        Prohibition prohibition = pap.prohibitions().get(name);
 
         // check that the user can create a prohibition for the subject
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
@@ -89,14 +89,14 @@ public class AdjudicatorProhibitions implements Prohibitions {
     }
 
     @Override
-    public boolean exists(String id) throws PMException {
-        boolean exists = pap.prohibitions().exists(id);
+    public boolean exists(String name) throws PMException {
+        boolean exists = pap.prohibitions().exists(name);
         if (!exists) {
             return false;
         }
 
         try {
-            get(id);
+            get(name);
         } catch (UnauthorizedException e) {
             return false;
         }
@@ -111,8 +111,8 @@ public class AdjudicatorProhibitions implements Prohibitions {
     }
 
     @Override
-    public Prohibition get(String id) throws PMException {
-        Prohibition prohibition = pap.prohibitions().get(id);
+    public Prohibition get(String name) throws PMException {
+        Prohibition prohibition = pap.prohibitions().get(name);
 
         // check user has access to subject prohibitions
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {

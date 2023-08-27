@@ -10,12 +10,12 @@ import java.util.Objects;
 public class UpdateObligationEvent implements PolicyEvent {
 
     private UserContext author;
-    private String id;
+    private String name;
     private List<Rule> rules;
 
-    public UpdateObligationEvent(UserContext author, String id, List<Rule> rules) {
+    public UpdateObligationEvent(UserContext author, String name, List<Rule> rules) {
         this.author = author;
-        this.id = id;
+        this.name = name;
         this.rules = rules;
     }
 
@@ -24,7 +24,7 @@ public class UpdateObligationEvent implements PolicyEvent {
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
     public List<Rule> getRules() {
@@ -41,11 +41,11 @@ public class UpdateObligationEvent implements PolicyEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UpdateObligationEvent that = (UpdateObligationEvent) o;
-        return Objects.equals(author, that.author) && Objects.equals(id, that.id) && Objects.equals(rules, that.rules);
+        return Objects.equals(author, that.author) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, id, rules);
+        return Objects.hash(author, name, rules);
     }
 }

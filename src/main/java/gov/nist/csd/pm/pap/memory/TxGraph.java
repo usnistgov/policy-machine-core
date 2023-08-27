@@ -186,7 +186,7 @@ class TxGraph implements Graph, BaseMemoryTx {
     }
 
     @Override
-    public void dissociate(String ua, String target) throws NodeDoesNotExistException {
+    public void dissociate(String ua, String target) throws NodeDoesNotExistException, PMBackendException {
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Association association : memoryGraph.getAssociationsWithSource(ua)) {
             if (association.getTarget().equals(target)) {

@@ -37,12 +37,12 @@ class PDPObligations implements Obligations, EventEmitter {
     }
 
     @Override
-    public void create(UserContext author, String id, Rule... rules) throws PMException {
-        adjudicator.create(author, id, rules);
+    public void create(UserContext author, String name, Rule... rules) throws PMException {
+        adjudicator.create(author, name, rules);
 
-        pap.obligations().create(author, id, rules);
+        pap.obligations().create(author, name, rules);
 
-        emitObligationEvent(new CreateObligationEvent(author, id, List.of(rules)), rules);
+        emitObligationEvent(new CreateObligationEvent(author, name, List.of(rules)), rules);
     }
 
     private void emitObligationEvent(PolicyEvent event, Rule... rules) throws PMException {
@@ -79,29 +79,29 @@ class PDPObligations implements Obligations, EventEmitter {
     }
 
     @Override
-    public void update(UserContext author, String id, Rule... rules) throws PMException {
-        adjudicator.update(author, id, rules);
+    public void update(UserContext author, String name, Rule... rules) throws PMException {
+        adjudicator.update(author, name, rules);
 
-        pap.obligations().update(author, id, rules);
+        pap.obligations().update(author, name, rules);
 
         emitObligationEvent(
-                new UpdateObligationEvent(author, id, List.of(rules)),
+                new UpdateObligationEvent(author, name, List.of(rules)),
                 rules
         );
     }
 
     @Override
-    public void delete(String id) throws PMException {
-        if (!exists(id)) {
+    public void delete(String name) throws PMException {
+        if (!exists(name)) {
             return;
         }
 
-        adjudicator.delete(id);
+        adjudicator.delete(name);
 
         // get the obligation to use in the EPP before it is deleted
-        Obligation obligation = get(id);
+        Obligation obligation = get(name);
 
-        pap.obligations().delete(id);
+        pap.obligations().delete(name);
 
         emitDeleteObligationEvent(obligation);
     }
@@ -119,13 +119,13 @@ class PDPObligations implements Obligations, EventEmitter {
     }
 
     @Override
-    public boolean exists(String id) throws PMException {
-        return adjudicator.exists(id);
+    public boolean exists(String name) throws PMException {
+        return adjudicator.exists(name);
     }
 
     @Override
-    public Obligation get(String id) throws PMException {
-        return adjudicator.get(id);
+    public Obligation get(String name) throws PMException {
+        return adjudicator.get(name);
     }
 
     @Override

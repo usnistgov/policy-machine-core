@@ -11,14 +11,14 @@ import java.util.*;
 public class VariableReference extends PMLStatement {
 
     private boolean isID;
-    private String id;
+    private String name;
     private boolean isEntryReference;
     private EntryReference entryReference;
     private final Type type;
 
-    public VariableReference(String id, Type type) {
+    public VariableReference(String name, Type type) {
         this.isID = true;
-        this.id = id;
+        this.name = name;
         this.type = type;
     }
 
@@ -33,7 +33,7 @@ public class VariableReference extends PMLStatement {
     }
 
     public String getID() {
-        return id;
+        return name;
     }
 
     public boolean isEntryReference() {
@@ -52,7 +52,7 @@ public class VariableReference extends PMLStatement {
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         if (isID) {
             try {
-                return ctx.scope().getValue(id);
+                return ctx.scope().getValue(name);
             } catch (UnknownVariableInScopeException e) {
                 throw new PMException(e.getMessage());
             }
@@ -108,20 +108,20 @@ public class VariableReference extends PMLStatement {
         VariableReference that = (VariableReference) o;
         return isID == that.isID
                 && isEntryReference == that.isEntryReference
-                && Objects.equals(id, that.id)
+                && Objects.equals(name, that.name)
                 && Objects.equals(entryReference, that.entryReference)
                 && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isID, id, isEntryReference, entryReference, type);
+        return Objects.hash(isID, name, isEntryReference, entryReference, type);
     }
 
     @Override
     public String toString() {
         if (isID) {
-            return id;
+            return name;
         } else {
             return entryReference.toString();
         }

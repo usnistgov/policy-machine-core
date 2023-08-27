@@ -6,14 +6,14 @@ import java.util.Objects;
 
 public class DeleteObligationEvent implements PolicyEvent {
 
-    private final String id;
+    private final String name;
 
-    public DeleteObligationEvent(String id) {
-        this.id = id;
+    public DeleteObligationEvent(String name) {
+        this.name = name;
     }
 
     public String getObligation() {
-        return id;
+        return name;
     }
 
     @Override
@@ -26,11 +26,11 @@ public class DeleteObligationEvent implements PolicyEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeleteObligationEvent that = (DeleteObligationEvent) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(name);
     }
 }

@@ -18,16 +18,16 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.isAdminAcces
 
 public class CreateProhibitionStatement extends PMLStatement {
 
-    private final Expression id;
+    private final Expression name;
     private final Expression subject;
     private final ProhibitionSubject.Type subjectType;
     private final Expression accessRights;
     private final boolean isIntersection;
     private final List<Container> containers;
 
-    public CreateProhibitionStatement(Expression id, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
+    public CreateProhibitionStatement(Expression name, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
                                       boolean isIntersection, List<Container> containers) {
-        this.id = id;
+        this.name = name;
         this.subject = subject;
         this.subjectType = subjectType;
         this.accessRights = accessRights;
@@ -36,7 +36,7 @@ public class CreateProhibitionStatement extends PMLStatement {
     }
 
     public Expression getId() {
-        return id;
+        return name;
     }
 
     public Expression getSubject() {
@@ -61,7 +61,7 @@ public class CreateProhibitionStatement extends PMLStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        Value idValue = this.id .execute(ctx, policy);
+        Value idValue = this.name .execute(ctx, policy);
         Value subjectValue = this.subject.execute(ctx, policy);
         Value permissionsValue = this.accessRights.execute(ctx, policy);
 
@@ -109,7 +109,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         }
         containerStr.append("]");
 
-        return String.format("create prohibition %s deny %s %s access rights %s on %s", id, subjectStr, subject, accessRights, containerStr);
+        return String.format("create prohibition %s deny %s %s access rights %s on %s", name, subjectStr, subject, accessRights, containerStr);
     }
 
     @Override
@@ -117,12 +117,12 @@ public class CreateProhibitionStatement extends PMLStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateProhibitionStatement that = (CreateProhibitionStatement) o;
-        return isIntersection == that.isIntersection && Objects.equals(id, that.id) && Objects.equals(subject, that.subject) && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers, that.containers);
+        return isIntersection == that.isIntersection && Objects.equals(name, that.name) && Objects.equals(subject, that.subject) && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers, that.containers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, subject, accessRights, isIntersection, containers);
+        return Objects.hash(name, subject, accessRights, isIntersection, containers);
     }
 
     public static class Container implements Serializable {

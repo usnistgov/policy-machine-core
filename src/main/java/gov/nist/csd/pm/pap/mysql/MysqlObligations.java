@@ -17,7 +17,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MysqlObligations implements ObligationsStore {
+class MysqlObligations implements ObligationsStore {
 
     private MysqlConnection connection;
 
@@ -26,16 +26,16 @@ public class MysqlObligations implements ObligationsStore {
     }
 
     @Override
-    public void create(UserContext author, String id, Rule... rules)
+    public void create(UserContext author, String name, Rule... rules)
     throws PMBackendException, ObligationIdExistsException, NodeDoesNotExistException {
-        checkCreateInput(new MysqlGraph(connection), author, id, rules);
+        checkCreateInput(new MysqlGraph(connection), author, name, rules);
 
         String sql = """
-                insert into obligation (id, author, rules) values (?, ?, ?)
+                insert into obligation (name, author, rules) values (?, ?, ?)
                 """;
 
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, id);
+            ps.setString(1, name);
             ps.setString(2, MysqlPolicyStore.objectMapper.writeValueAsString(author));
             ps.setBytes(3, serializeRules(rules));
 
@@ -46,17 +46,17 @@ public class MysqlObligations implements ObligationsStore {
     }
 
     @Override
-    public void update(UserContext author, String id, Rule... rules)
+    public void update(UserContext author, String name, Rule... rules)
     throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException {
-        checkUpdateInput(new MysqlGraph(connection), author, id, rules);
+        checkUpdateInput(new MysqlGraph(connection), author, name, rules);
 
         connection.beginTx();
 
         try {
-            delete(id);
+            delete(name);
 
             try {
-                create(author, id, rules);
+                create(author, name, rules);
             } catch (ObligationIdExistsException e) {
                 throw new PMBackendException(e);
             }
@@ -69,13 +69,13 @@ public class MysqlObligations implements ObligationsStore {
     }
 
     @Override
-    public void delete(String id) throws MysqlPolicyException {
+    public void delete(String name) throws MysqlPolicyException {
         String sql = """
-                delete from obligation where id = ?
+                delete from obligation where name = ?
                 """;
 
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, id);
+            ps.setString(1, name);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new MysqlPolicyException(e.getMessage());
@@ -87,17 +87,17 @@ public class MysqlObligations implements ObligationsStore {
         List<Obligation> obligations = new ArrayList<>();
 
         String sql = """
-                select id, author, rules from obligation;
+                select name, author, rules from obligation;
                 """;
 
         try(Statement stmt = connection.getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                String id = rs.getString(1);
+                String name = rs.getString(1);
                 UserContext author = MysqlPolicyStore.userCtxReader.readValue(rs.getString(2));
                 Rule[] rules = deserializeRules(rs.getBlob(3).getBinaryStream().readAllBytes());
 
-                obligations.add(new Obligation(author, id, List.of(rules)));
+                obligations.add(new Obligation(author, name, List.of(rules)));
             }
 
             return obligations;
@@ -107,9 +107,9 @@ public class MysqlObligations implements ObligationsStore {
     }
 
     @Override
-    public boolean exists(String id) throws MysqlPolicyException {
+    public boolean exists(String name) throws MysqlPolicyException {
         try {
-            get(id);
+            get(name);
             return true;
         } catch (ObligationDoesNotExistException e) {
             return false;
@@ -117,22 +117,22 @@ public class MysqlObligations implements ObligationsStore {
     }
 
     @Override
-    public Obligation get(String id) throws ObligationDoesNotExistException, MysqlPolicyException {
+    public Obligation get(String name) throws ObligationDoesNotExistException, MysqlPolicyException {
         String sql = """
-                select author, rules from obligation where id = ?
+                select author, rules from obligation where name = ?
                 """;
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, id);
+            ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
-                throw new ObligationDoesNotExistException(id);
+                throw new ObligationDoesNotExistException(name);
             }
 
             UserContext author = MysqlPolicyStore.userCtxReader.readValue(rs.getString(1));
             Rule[] rules = deserializeRules(rs.getBlob(2).getBinaryStream().readAllBytes());
 
-            return new Obligation(author, id, List.of(rules));
+            return new Obligation(author, name, List.of(rules));
         } catch (SQLException | IOException e) {
             throw new MysqlPolicyException(e.getMessage());
         }

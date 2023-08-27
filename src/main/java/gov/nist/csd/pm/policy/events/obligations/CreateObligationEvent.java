@@ -9,12 +9,12 @@ import java.util.Objects;
 public class CreateObligationEvent extends ObligationsEvent {
 
     private final UserContext author;
-    private final String id;
+    private final String name;
     private final List<Rule> rules;
 
-    public CreateObligationEvent(UserContext author, String id, List<Rule> rules) {
+    public CreateObligationEvent(UserContext author, String name, List<Rule> rules) {
         this.author = author;
-        this.id = id;
+        this.name = name;
         this.rules = rules;
     }
 
@@ -23,7 +23,7 @@ public class CreateObligationEvent extends ObligationsEvent {
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
     public List<Rule> getRules() {
@@ -40,11 +40,11 @@ public class CreateObligationEvent extends ObligationsEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateObligationEvent that = (CreateObligationEvent) o;
-        return Objects.equals(author, that.author) && Objects.equals(id, that.id) && Objects.equals(rules, that.rules);
+        return Objects.equals(author, that.author) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, id, rules);
+        return Objects.hash(author, name, rules);
     }
 }

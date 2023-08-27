@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class Prohibition implements Serializable {
 
-    private String id;
+    private String name;
     private ProhibitionSubject      subject;
     private List<ContainerCondition> containers;
     private AccessRightSet accessRightSet;
@@ -20,12 +20,12 @@ public class Prohibition implements Serializable {
 
     }
 
-    public Prohibition(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, List<ContainerCondition> containers) {
+    public Prohibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, List<ContainerCondition> containers) {
         if (subject == null) {
             throw new IllegalArgumentException("Prohibition subject cannot be null");
         }
 
-        this.id = id;
+        this.name = name;
         this.subject = subject;
 
         if (containers == null) {
@@ -44,7 +44,7 @@ public class Prohibition implements Serializable {
     }
 
     public Prohibition(Prohibition prohibition) {
-        this.id = prohibition.getId();
+        this.name = prohibition.getId();
         this.subject = new ProhibitionSubject(prohibition.getSubject().getName(), prohibition.getSubject().getType());
         this.containers = new ArrayList<>(prohibition.containers);
         this.accessRightSet = new AccessRightSet(prohibition.getAccessRightSet());
@@ -52,11 +52,11 @@ public class Prohibition implements Serializable {
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String name) {
+        this.name = name;
     }
 
     public ProhibitionSubject getSubject() {
@@ -100,6 +100,6 @@ public class Prohibition implements Serializable {
     }
 
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(name);
     }
 }

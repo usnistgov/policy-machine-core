@@ -33,13 +33,13 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     }
 
     @Override
-    public void create(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        adjudicator.create(id, subject, accessRightSet, intersection, containerConditions);
+    public void create(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        adjudicator.create(name, subject, accessRightSet, intersection, containerConditions);
 
-        pap.prohibitions().create(id, subject, accessRightSet, intersection, containerConditions);
+        pap.prohibitions().create(name, subject, accessRightSet, intersection, containerConditions);
 
         CreateProhibitionEvent createProhibitionEvent = new CreateProhibitionEvent(
-                id, subject, accessRightSet, intersection, List.of(containerConditions)
+                name, subject, accessRightSet, intersection, List.of(containerConditions)
         );
 
         // emit event for subject
@@ -52,13 +52,13 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     }
 
     @Override
-    public void update(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
-        adjudicator.update(id, subject, accessRightSet, intersection, containerConditions);
+    public void update(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
+        adjudicator.update(name, subject, accessRightSet, intersection, containerConditions);
 
-        pap.prohibitions().update(id, subject, accessRightSet, intersection, containerConditions);
+        pap.prohibitions().update(name, subject, accessRightSet, intersection, containerConditions);
 
         UpdateProhibitionEvent updateProhibitionEvent = new UpdateProhibitionEvent(
-                id, subject, accessRightSet, intersection, List.of(containerConditions)
+                name, subject, accessRightSet, intersection, List.of(containerConditions)
         );
 
         // emit event for subject
@@ -71,16 +71,16 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     }
 
     @Override
-    public void delete(String id) throws PMException {
-        if (!exists(id)) {
+    public void delete(String name) throws PMException {
+        if (!exists(name)) {
             return;
         }
 
-        adjudicator.delete(id);
+        adjudicator.delete(name);
 
-        Prohibition prohibition = pap.prohibitions().get(id);
+        Prohibition prohibition = pap.prohibitions().get(name);
 
-        pap.prohibitions().delete(id);
+        pap.prohibitions().delete(name);
 
         emitDeleteProhibitionEvent(prohibition);
     }
@@ -106,8 +106,8 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     }
 
     @Override
-    public boolean exists(String id) throws PMException {
-        return adjudicator.exists(id);
+    public boolean exists(String name) throws PMException {
+        return adjudicator.exists(name);
     }
 
     @Override
@@ -116,8 +116,8 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     }
 
     @Override
-    public Prohibition get(String id) throws PMException {
-        return adjudicator.get(id);
+    public Prohibition get(String name) throws PMException {
+        return adjudicator.get(name);
     }
 
     @Override

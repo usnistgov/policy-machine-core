@@ -10,43 +10,43 @@ import java.util.Objects;
 
 public class Rule implements Serializable {
 
-    private String id;
+    private String name;
     private EventPattern eventPattern;
     private Response response;
 
     public Rule() {
     }
 
-    public Rule(String id, EventPattern eventPattern, Response response) {
-        this.id = id;
+    public Rule(String name, EventPattern eventPattern, Response response) {
+        this.name = name;
         this.eventPattern = eventPattern;
         this.response = response;
     }
 
-    public Rule(String id, EventSubject subject, Performs performs, Target target, Response response) {
-        this.id = id;
+    public Rule(String name, EventSubject subject, Performs performs, Target target, Response response) {
+        this.name = name;
         this.eventPattern = new EventPattern(subject, performs, target);
         this.response = response;
     }
 
-    public Rule(String id, EventSubject subject, Performs performs, Response response) {
-        this.id = id;
+    public Rule(String name, EventSubject subject, Performs performs, Response response) {
+        this.name = name;
         this.eventPattern = new EventPattern(subject, performs);
         this.response = response;
     }
 
     public Rule(Rule rule) {
-        this.id = rule.id;
+        this.name = rule.name;
         this.eventPattern = new EventPattern(rule.eventPattern);
         this.response = new Response(rule.response);
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String name) {
+        this.name = name;
     }
 
     public EventPattern getEventPattern() {
@@ -70,11 +70,11 @@ public class Rule implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rule rule = (Rule) o;
-        return id.equals(rule.id) && eventPattern.equals(rule.eventPattern) && response.equals(rule.response);
+        return name.equals(rule.name) && eventPattern.equals(rule.eventPattern) && response.equals(rule.response);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, eventPattern, response);
+        return Objects.hash(name, eventPattern, response);
     }
 }

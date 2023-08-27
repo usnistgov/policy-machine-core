@@ -20,8 +20,8 @@ public class TxObligations implements Obligations, BaseMemoryTx {
         this.memoryObligations = memoryObligations;
     }
     @Override
-    public void create(UserContext author, String id, Rule... rules) {
-        txPolicyEventTracker.trackPolicyEvent(new CreateObligationEvent(author, id, List.of(rules)));
+    public void create(UserContext author, String name, Rule... rules) {
+        txPolicyEventTracker.trackPolicyEvent(new CreateObligationEvent(author, name, List.of(rules)));
     }
 
     @Override
@@ -33,16 +33,16 @@ public class TxObligations implements Obligations, BaseMemoryTx {
         }
     }
     @Override
-    public void update(UserContext author, String id, Rule... rules) throws PMException {
+    public void update(UserContext author, String name, Rule... rules) throws PMException {
         txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryUpdateObligationEvent(
-                new Obligation(author, id, List.of(rules)),
-                memoryObligations.get(id)
+                new Obligation(author, name, List.of(rules)),
+                memoryObligations.get(name)
         ));
     }
 
     @Override
-    public void delete(String id) throws PMException {
-        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteObligationEvent(memoryObligations.get(id)));
+    public void delete(String name) throws PMException {
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteObligationEvent(memoryObligations.get(name)));
     }
 
     @Override
@@ -51,12 +51,12 @@ public class TxObligations implements Obligations, BaseMemoryTx {
     }
 
     @Override
-    public boolean exists(String id) {
+    public boolean exists(String name) {
         return false;
     }
 
     @Override
-    public Obligation get(String id) {
+    public Obligation get(String name) {
         return null;
     }
 

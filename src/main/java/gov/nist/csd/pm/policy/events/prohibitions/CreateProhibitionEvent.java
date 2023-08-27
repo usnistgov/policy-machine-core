@@ -10,14 +10,14 @@ import java.util.Objects;
 
 public class CreateProhibitionEvent implements PolicyEvent {
 
-    private final String id;
+    private final String name;
     private final ProhibitionSubject      subject;
     private final List<ContainerCondition> containers;
     private final AccessRightSet accessRightSet;
     private final boolean      intersection;
 
-    public CreateProhibitionEvent(String id, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, List<ContainerCondition> containers) {
-        this.id = id;
+    public CreateProhibitionEvent(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, List<ContainerCondition> containers) {
+        this.name = name;
         this.subject = subject;
         this.accessRightSet = accessRightSet;
         this.intersection = intersection;
@@ -25,7 +25,7 @@ public class CreateProhibitionEvent implements PolicyEvent {
     }
 
     public String getId() {
-        return id;
+        return name;
     }
 
     public ProhibitionSubject getSubject() {
@@ -54,11 +54,11 @@ public class CreateProhibitionEvent implements PolicyEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateProhibitionEvent that = (CreateProhibitionEvent) o;
-        return intersection == that.intersection && Objects.equals(id, that.id) && Objects.equals(subject, that.subject) && Objects.equals(containers, that.containers) && Objects.equals(accessRightSet, that.accessRightSet);
+        return intersection == that.intersection && Objects.equals(name, that.name) && Objects.equals(subject, that.subject) && Objects.equals(containers, that.containers) && Objects.equals(accessRightSet, that.accessRightSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, subject, containers, accessRightSet, intersection);
+        return Objects.hash(name, subject, containers, accessRightSet, intersection);
     }
 }

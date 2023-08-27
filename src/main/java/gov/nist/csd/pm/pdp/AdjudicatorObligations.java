@@ -28,7 +28,7 @@ public class AdjudicatorObligations implements Obligations {
     }
 
     @Override
-    public void create(UserContext author, String id, Rule... rules) throws PMException {
+    public void create(UserContext author, String name, Rule... rules) throws PMException {
         for (Rule rule : rules) {
             EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, CREATE_OBLIGATION);
@@ -68,13 +68,13 @@ public class AdjudicatorObligations implements Obligations {
     }
 
     @Override
-    public void update(UserContext author, String id, Rule... rules) throws PMException {
-        create(author, id, rules);
+    public void update(UserContext author, String name, Rule... rules) throws PMException {
+        create(author, name, rules);
     }
 
     @Override
-    public void delete(String id) throws PMException {
-        Obligation obligation = pap.obligations().get(id);
+    public void delete(String name) throws PMException {
+        Obligation obligation = pap.obligations().get(name);
         for (Rule rule : obligation.getRules()) {
             EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, DELETE_OBLIGATION);
@@ -106,14 +106,14 @@ public class AdjudicatorObligations implements Obligations {
     }
 
     @Override
-    public boolean exists(String id) throws PMException {
-        boolean exists = pap.obligations().exists(id);
+    public boolean exists(String name) throws PMException {
+        boolean exists = pap.obligations().exists(name);
         if (!exists) {
             return false;
         }
 
         try {
-            get(id);
+            get(name);
         } catch (UnauthorizedException e) {
             return false;
         }
@@ -122,8 +122,8 @@ public class AdjudicatorObligations implements Obligations {
     }
 
     @Override
-    public Obligation get(String id) throws PMException {
-        Obligation obligation = pap.obligations().get(id);
+    public Obligation get(String name) throws PMException {
+        Obligation obligation = pap.obligations().get(name);
         for (Rule rule : obligation.getRules()) {
             EventSubject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, GET_OBLIGATION);
