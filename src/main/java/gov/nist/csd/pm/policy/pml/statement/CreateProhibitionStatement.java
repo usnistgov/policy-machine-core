@@ -35,7 +35,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         this.containers = containers;
     }
 
-    public Expression getId() {
+    public Expression getName() {
         return name;
     }
 
@@ -156,7 +156,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         }
 
         return new CreateProhibitionStatement(
-                new Expression(new Literal(prohibition.getId())),
+                new Expression(new Literal(prohibition.getName())),
                 new Expression(new Literal(prohibition.getSubject().getName())),
                 prohibition.getSubject().getType(),
                 new Expression(new Literal(arrayLiteral)),

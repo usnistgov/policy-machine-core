@@ -14,19 +14,19 @@ import java.util.Map;
 public class TxUserDefinedPML implements UserDefinedPML, BaseMemoryTx {
 
     private final TxPolicyEventTracker txPolicyEventTracker;
-    private final MemoryUserDefinedPML memoryUserDefinedPML;
+    private final MemoryUserDefinedPMLStore memoryUserDefinedPMLStore;
 
-    public TxUserDefinedPML(TxPolicyEventTracker txPolicyEventTracker, MemoryUserDefinedPML memoryUserDefinedPML) {
+    public TxUserDefinedPML(TxPolicyEventTracker txPolicyEventTracker, MemoryUserDefinedPMLStore memoryUserDefinedPMLStore) {
         this.txPolicyEventTracker = txPolicyEventTracker;
-        this.memoryUserDefinedPML = memoryUserDefinedPML;
+        this.memoryUserDefinedPMLStore = memoryUserDefinedPMLStore;
     }
 
     @Override
     public void rollback() throws PMException {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryUserDefinedPML> txCmd = (TxCmd<MemoryUserDefinedPML>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryUserDefinedPML);
+            TxCmd<MemoryUserDefinedPMLStore> txCmd = (TxCmd<MemoryUserDefinedPMLStore>) TxCmd.eventToCmd(event);
+            txCmd.rollback(memoryUserDefinedPMLStore);
         }
     }
 
@@ -37,7 +37,7 @@ public class TxUserDefinedPML implements UserDefinedPML, BaseMemoryTx {
 
     @Override
     public void deleteFunction(String functionName) throws PMException {
-        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteFunctionEvent(memoryUserDefinedPML.getFunctions().get(functionName)));
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteFunctionEvent(memoryUserDefinedPMLStore.getFunctions().get(functionName)));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class TxUserDefinedPML implements UserDefinedPML, BaseMemoryTx {
 
     @Override
     public void deleteConstant(String constName) throws PMException {
-        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteConstantEvent(constName, memoryUserDefinedPML.getConstants().get(constName)));
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteConstantEvent(constName, memoryUserDefinedPMLStore.getConstants().get(constName)));
     }
 
     @Override

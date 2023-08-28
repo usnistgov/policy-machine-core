@@ -45,7 +45,7 @@ public class SerializationTest {
     @Test
     void testProhibitionEvent() {
         CreateProhibitionEvent expected = new CreateProhibitionEvent(
-                "label",
+                "pro1",
                 new ProhibitionSubject("u1", ProhibitionSubject.Type.USER),
                 new AccessRightSet("read"),
                 false,

@@ -19,19 +19,19 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 class TxGraph implements Graph, BaseMemoryTx {
 
     private final TxPolicyEventTracker txPolicyEventTracker;
-    private final MemoryGraph memoryGraph;
+    private final MemoryGraphStore memoryGraphStore;
 
-    public TxGraph(TxPolicyEventTracker txPolicyEventTracker, MemoryGraph memoryGraph) {
+    public TxGraph(TxPolicyEventTracker txPolicyEventTracker, MemoryGraphStore memoryGraphStore) {
         this.txPolicyEventTracker = txPolicyEventTracker;
-        this.memoryGraph = memoryGraph;
+        this.memoryGraphStore = memoryGraphStore;
     }
 
     @Override
     public void rollback() throws PMException {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryGraph> txCmd = (TxCmd<MemoryGraph>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryGraph);
+            TxCmd<MemoryGraphStore> txCmd = (TxCmd<MemoryGraphStore>) TxCmd.eventToCmd(event);
+            txCmd.rollback(memoryGraphStore);
         }
     }
 
@@ -103,7 +103,7 @@ class TxGraph implements Graph, BaseMemoryTx {
     @Override
     public void setNodeProperties(String name, Map<String, String> properties) throws PMBackendException {
         try {
-            Map<String, String> oldProperties = memoryGraph.getNode(name).getProperties();
+            Map<String, String> oldProperties = memoryGraphStore.getNode(name).getProperties();
             txPolicyEventTracker.trackPolicyEvent(
                     new TxEvents.MemorySetNodePropertiesEvent(name, oldProperties, properties)
             );
@@ -137,8 +137,8 @@ class TxGraph implements Graph, BaseMemoryTx {
         try {
             txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteNodeEvent(
                     name,
-                    memoryGraph.getNode(name),
-                    memoryGraph.getParents(name)
+                    memoryGraphStore.getNode(name),
+                    memoryGraphStore.getParents(name)
             ));
         } catch (NodeDoesNotExistException e) {
             throw new PMBackendException(e);
@@ -188,7 +188,7 @@ class TxGraph implements Graph, BaseMemoryTx {
     @Override
     public void dissociate(String ua, String target) throws NodeDoesNotExistException, PMBackendException {
         AccessRightSet accessRightSet = new AccessRightSet();
-        for (Association association : memoryGraph.getAssociationsWithSource(ua)) {
+        for (Association association : memoryGraphStore.getAssociationsWithSource(ua)) {
             if (association.getTarget().equals(target)) {
                 accessRightSet = association.getAccessRightSet();
             }

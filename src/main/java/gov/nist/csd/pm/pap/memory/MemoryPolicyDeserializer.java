@@ -51,8 +51,13 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
 
     @Override
     public void fromPML(UserContext author, String pml, FunctionDefinitionStatement... customFunctions) throws PMException {
+        memoryPolicyStore.beginTx();
+        memoryPolicyStore.reset();
+
         PMLSerializer pmlSerializer = new PMLSerializer(memoryPolicyStore);
         pmlSerializer.fromPML(author, pml, customFunctions);
+
+        memoryPolicyStore.commit();
     }
 
     private void userDefinedPMLFromJson(String userDefinedPML) throws PMException {
@@ -78,7 +83,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
             List<Rule> rules = obligation.getRules();
             memoryPolicyStore.obligations().create(
                     obligation.getAuthor(),
-                    obligation.getId(),
+                    obligation.getName(),
                     rules.toArray(new Rule[]{})
             );
         }
@@ -92,7 +97,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
             Prohibition prohibition = SerializationUtils.deserialize(b);
 
             memoryPolicyStore.prohibitions().create(
-                    prohibition.getId(),
+                    prohibition.getName(),
                     prohibition.getSubject(),
                     prohibition.getAccessRightSet(),
                     prohibition.isIntersection(),
@@ -104,7 +109,7 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
     private void graphFromJson(String json) throws NodeNameExistsException {
         JSONGraph jsonGraph = new Gson().fromJson(json, JSONGraph.class);
 
-        MemoryGraph graph = memoryPolicyStore.graph();
+        MemoryGraphStore graph = (MemoryGraphStore) memoryPolicyStore.graph();
 
         for (Node node : jsonGraph.getNodes()) {
             graph.createNodeInternal(node.getName(), node.getType(), node.getProperties());

@@ -2,9 +2,7 @@ package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.GraphStore;
-import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.policy.exceptions.*;
-import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentException;
 import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 import gov.nist.csd.pm.policy.Graph;
@@ -15,13 +13,12 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
 
-class MemoryGraph extends MemoryStore<TxGraph> implements GraphStore, Transactional, BaseMemoryTx {
+class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Transactional, BaseMemoryTx {
 
     private Map<String, Vertex> graph;
     private AccessRightSet resourceAccessRights;
@@ -33,14 +30,14 @@ class MemoryGraph extends MemoryStore<TxGraph> implements GraphStore, Transactio
 
     protected MemoryTx<TxGraph> tx;
 
-    private MemoryProhibitions memoryProhibitions;
-    private MemoryObligations memoryObligations;
+    private MemoryProhibitionsStore memoryProhibitionsStore;
+    private MemoryObligationsStore memoryObligationsStore;
 
-    public MemoryGraph() {
+    public MemoryGraphStore() {
         initGraph();
     }
 
-    public MemoryGraph(Graph graph) throws PMException {
+    public MemoryGraphStore(Graph graph) throws PMException {
         initGraph();
         buildFromGraph(graph);
     }
@@ -75,12 +72,12 @@ class MemoryGraph extends MemoryStore<TxGraph> implements GraphStore, Transactio
         tx.rollback();
     }
 
-    public void setMemoryProhibitions(MemoryProhibitions memoryProhibitions) {
-        this.memoryProhibitions = memoryProhibitions;
+    public void setMemoryProhibitions(MemoryProhibitionsStore memoryProhibitionsStore) {
+        this.memoryProhibitionsStore = memoryProhibitionsStore;
     }
 
-    public void setMemoryObligations(MemoryObligations memoryObligations) {
-        this.memoryObligations = memoryObligations;
+    public void setMemoryObligations(MemoryObligationsStore memoryObligationsStore) {
+        this.memoryObligationsStore = memoryObligationsStore;
     }
 
     public void clear() {
@@ -242,7 +239,7 @@ class MemoryGraph extends MemoryStore<TxGraph> implements GraphStore, Transactio
     public void deleteNode(String name)
     throws NodeHasChildrenException, NodeReferencedInProhibitionException, NodeReferencedInObligationException,
            PMBackendException {
-        if (!checkDeleteNodeInput(name, memoryProhibitions, memoryObligations)) {
+        if (!checkDeleteNodeInput(name, memoryProhibitionsStore, memoryObligationsStore)) {
             return;
         }
 

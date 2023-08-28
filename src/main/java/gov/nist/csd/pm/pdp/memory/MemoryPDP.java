@@ -24,7 +24,7 @@ public class MemoryPDP extends PDP {
 
     public void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, pap, new MemoryPolicyReviewer(pap), eventListeners);
+            PDPTx pdpTx = new PDPTx(userCtx, pap, new MemoryPolicyReviewer(pap), eventProcessors);
             txRunner.run(pdpTx);
         });
     }

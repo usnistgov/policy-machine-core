@@ -2,10 +2,9 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
-import gov.nist.csd.pm.epp.EventListener;
+import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Prohibitions;
-import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.DeleteProhibitionEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.UpdateProhibitionEvent;
@@ -23,9 +22,9 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     private UserContext userCtx;
     private AdjudicatorProhibitions adjudicator;
     private PAP pap;
-    private EventListener listener;
+    private EventProcessor listener;
 
-    public PDPProhibitions(UserContext userCtx, AdjudicatorProhibitions adjudicator, PAP pap, EventListener listener) {
+    public PDPProhibitions(UserContext userCtx, AdjudicatorProhibitions adjudicator, PAP pap, EventProcessor listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -89,7 +88,7 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
         ProhibitionSubject subject = prohibition.getSubject();
         List<ContainerCondition> containerConditions = prohibition.getContainers();
 
-        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition.getId());
+        DeleteProhibitionEvent deleteProhibitionEvent = new DeleteProhibitionEvent(prohibition.getName());
 
         // emit event for subject
         emitEvent(new EventContext(userCtx, subject.getName(), deleteProhibitionEvent));
@@ -121,12 +120,12 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
     }
 
     @Override
-    public void addEventListener(EventListener listener) {
+    public void addEventListener(EventProcessor listener) {
 
     }
 
     @Override
-    public void removeEventListener(EventListener listener) {
+    public void removeEventListener(EventProcessor listener) {
 
     }
 

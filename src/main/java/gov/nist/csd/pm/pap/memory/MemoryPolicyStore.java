@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.pap.PolicyStore;
+import gov.nist.csd.pm.pap.*;
 import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -9,30 +9,30 @@ import java.util.List;
 
 public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
 
-    private MemoryGraph graph;
-    private MemoryProhibitions prohibitions;
-    private MemoryObligations obligations;
-    private MemoryUserDefinedPML userDefinedPML;
+    private MemoryGraphStore graph;
+    private MemoryProhibitionsStore prohibitions;
+    private MemoryObligationsStore obligations;
+    private MemoryUserDefinedPMLStore userDefinedPML;
 
     private boolean inTx;
     private int txCounter;
     private TxPolicyStore txPolicyStore;
 
     public MemoryPolicyStore() {
-        this.graph = new MemoryGraph();
-        this.prohibitions = new MemoryProhibitions();
-        this.obligations = new MemoryObligations();
-        this.userDefinedPML = new MemoryUserDefinedPML();
+        this.graph = new MemoryGraphStore();
+        this.prohibitions = new MemoryProhibitionsStore();
+        this.obligations = new MemoryObligationsStore();
+        this.userDefinedPML = new MemoryUserDefinedPMLStore();
     }
 
     public MemoryPolicyStore(Graph graph, Prohibitions prohibitions, Obligations obligations, UserDefinedPML userDefinedPML) throws PMException {
-        this.graph = new MemoryGraph(graph);
-        this.prohibitions = new MemoryProhibitions(prohibitions);
-        this.obligations = new MemoryObligations(obligations);
-        this.userDefinedPML = new MemoryUserDefinedPML(userDefinedPML);
+        this.graph = new MemoryGraphStore(graph);
+        this.prohibitions = new MemoryProhibitionsStore(prohibitions);
+        this.obligations = new MemoryObligationsStore(obligations);
+        this.userDefinedPML = new MemoryUserDefinedPMLStore(userDefinedPML);
     }
 
-    MemoryPolicyStore(MemoryGraph graph, MemoryProhibitions prohibitions, MemoryObligations obligations, MemoryUserDefinedPML userDefinedPML) throws PMException {
+    MemoryPolicyStore(MemoryGraphStore graph, MemoryProhibitionsStore prohibitions, MemoryObligationsStore obligations, MemoryUserDefinedPMLStore userDefinedPML) throws PMException {
         this.graph = graph;
         this.prohibitions = prohibitions;
         this.obligations = obligations;
@@ -56,38 +56,38 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
     }
 
     public void setGraph(Graph graph) {
-        this.graph = (MemoryGraph) graph;
+        this.graph = (MemoryGraphStore) graph;
     }
 
     public void setProhibitions(Prohibitions prohibitions) {
-        this.prohibitions = (MemoryProhibitions) prohibitions;
+        this.prohibitions = (MemoryProhibitionsStore) prohibitions;
     }
 
     public void setObligations(Obligations obligations) {
-        this.obligations = (MemoryObligations) obligations;
+        this.obligations = (MemoryObligationsStore) obligations;
     }
 
     public void setUserDefinedPML(UserDefinedPML userDefinedPML) {
-        this.userDefinedPML = (MemoryUserDefinedPML) userDefinedPML;
+        this.userDefinedPML = (MemoryUserDefinedPMLStore) userDefinedPML;
     }
 
     @Override
-    public MemoryGraph graph() {
+    public GraphStore graph() {
         return graph;
     }
 
     @Override
-    public MemoryProhibitions prohibitions() {
+    public ProhibitionsStore prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public MemoryObligations obligations() {
+    public ObligationsStore obligations() {
         return obligations;
     }
 
     @Override
-    public MemoryUserDefinedPML userDefinedPML() {
+    public UserDefinedPMLStore userDefinedPML() {
         return userDefinedPML;
     }
 

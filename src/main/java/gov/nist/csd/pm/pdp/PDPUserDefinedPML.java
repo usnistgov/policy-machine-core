@@ -2,10 +2,9 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
-import gov.nist.csd.pm.epp.EventListener;
+import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.UserDefinedPML;
-import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteConstantEvent;
@@ -21,9 +20,9 @@ class PDPUserDefinedPML implements UserDefinedPML, EventEmitter {
     private UserContext userCtx;
     private AdjudicatorUserDefinedPML adjudicator;
     private PAP pap;
-    private EventListener listener;
+    private EventProcessor listener;
 
-    public PDPUserDefinedPML(UserContext userCtx, AdjudicatorUserDefinedPML adjudicator, PAP pap, gov.nist.csd.pm.epp.EventListener listener) {
+    public PDPUserDefinedPML(UserContext userCtx, AdjudicatorUserDefinedPML adjudicator, PAP pap, EventProcessor listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -89,12 +88,12 @@ class PDPUserDefinedPML implements UserDefinedPML, EventEmitter {
     }
 
     @Override
-    public void addEventListener(EventListener listener) {
+    public void addEventListener(EventProcessor listener) {
 
     }
 
     @Override
-    public void removeEventListener(EventListener listener) {
+    public void removeEventListener(EventProcessor listener) {
 
     }
 

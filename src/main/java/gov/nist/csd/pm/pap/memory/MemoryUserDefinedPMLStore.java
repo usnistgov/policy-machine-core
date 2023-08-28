@@ -10,29 +10,29 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
-class MemoryUserDefinedPML extends MemoryStore<TxUserDefinedPML> implements UserDefinedPMLStore, Transactional, BaseMemoryTx {
+class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements UserDefinedPMLStore, Transactional, BaseMemoryTx {
 
     protected MemoryTx<TxUserDefinedPML> tx;
     private Map<String, FunctionDefinitionStatement> functions;
     private Map<String, Value> constants;
-    private MemoryGraph graph;
+    private MemoryGraphStore graph;
 
-    public MemoryUserDefinedPML() {
+    public MemoryUserDefinedPMLStore() {
         this.functions = new HashMap<>();
         this.constants = new HashMap<>();
     }
 
-    public MemoryUserDefinedPML(Map<String, FunctionDefinitionStatement> functions, Map<String, Value> constants) {
+    public MemoryUserDefinedPMLStore(Map<String, FunctionDefinitionStatement> functions, Map<String, Value> constants) {
         this.functions = functions;
         this.constants = constants;
     }
 
-    public MemoryUserDefinedPML(UserDefinedPML userDefinedPML) throws PMException {
+    public MemoryUserDefinedPMLStore(UserDefinedPML userDefinedPML) throws PMException {
         this.functions = userDefinedPML.getFunctions();
         this.constants = userDefinedPML.getConstants();
     }
 
-    public void setMemoryGraph(MemoryGraph graph) {
+    public void setMemoryGraph(MemoryGraphStore graph) {
         this.graph = graph;
     }
 

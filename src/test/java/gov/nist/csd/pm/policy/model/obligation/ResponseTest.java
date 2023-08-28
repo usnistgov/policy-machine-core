@@ -41,7 +41,7 @@ class ResponseTest {
         pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
         MemoryPDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
-        epp.handlePolicyEvent(new EventContext(new UserContext("u1"), "oa1", new AssignToEvent("o1", "oa1")));
+        epp.getEventProcessor().processEvent(new EventContext(new UserContext("u1"), "oa1", new AssignToEvent("o1", "oa1")));
         assertTrue(pap.graph().nodeExists("hello world"));
     }
 

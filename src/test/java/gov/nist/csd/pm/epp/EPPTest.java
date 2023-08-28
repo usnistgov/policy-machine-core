@@ -160,7 +160,7 @@ class EPPTest {
 
         EventContext eventCtx = new EventContext(new UserContext(SUPER_USER), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"));
         assertThrows(PMRuntimeException.class, () -> {
-            epp.handlePolicyEvent(eventCtx);
+            epp.getEventProcessor().processEvent(eventCtx);
         });
 
         assertFalse(pap.graph().nodeExists("o2"));

@@ -83,7 +83,7 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
             List<Rule> rules = obligation.getRules();
             policyStore.obligations().create(
                     obligation.getAuthor(),
-                    obligation.getId(),
+                    obligation.getName(),
                     rules.toArray(new Rule[]{})
             );
         }
@@ -97,7 +97,7 @@ public class MysqlPolicyDeserializer implements PolicyDeserializer {
             Prohibition prohibition = SerializationUtils.deserialize(b);
 
             policyStore.prohibitions().create(
-                    prohibition.getId(),
+                    prohibition.getName(),
                     prohibition.getSubject(),
                     prohibition.getAccessRightSet(),
                     prohibition.isIntersection(),

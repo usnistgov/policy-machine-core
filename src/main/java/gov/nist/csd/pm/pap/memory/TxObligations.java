@@ -13,11 +13,11 @@ import java.util.List;
 public class TxObligations implements Obligations, BaseMemoryTx {
 
     private final TxPolicyEventTracker txPolicyEventTracker;
-    private final MemoryObligations memoryObligations;
+    private final MemoryObligationsStore memoryObligationsStore;
 
-    public TxObligations(TxPolicyEventTracker txPolicyEventTracker, MemoryObligations memoryObligations) {
+    public TxObligations(TxPolicyEventTracker txPolicyEventTracker, MemoryObligationsStore memoryObligationsStore) {
         this.txPolicyEventTracker = txPolicyEventTracker;
-        this.memoryObligations = memoryObligations;
+        this.memoryObligationsStore = memoryObligationsStore;
     }
     @Override
     public void create(UserContext author, String name, Rule... rules) {
@@ -28,21 +28,21 @@ public class TxObligations implements Obligations, BaseMemoryTx {
     public void rollback() throws PMException {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryObligations> txCmd = (TxCmd<MemoryObligations>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryObligations);
+            TxCmd<MemoryObligationsStore> txCmd = (TxCmd<MemoryObligationsStore>) TxCmd.eventToCmd(event);
+            txCmd.rollback(memoryObligationsStore);
         }
     }
     @Override
     public void update(UserContext author, String name, Rule... rules) throws PMException {
         txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryUpdateObligationEvent(
                 new Obligation(author, name, List.of(rules)),
-                memoryObligations.get(name)
+                memoryObligationsStore.get(name)
         ));
     }
 
     @Override
     public void delete(String name) throws PMException {
-        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteObligationEvent(memoryObligations.get(name)));
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteObligationEvent(memoryObligationsStore.get(name)));
     }
 
     @Override

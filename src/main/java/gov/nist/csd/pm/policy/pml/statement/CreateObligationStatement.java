@@ -67,7 +67,7 @@ public class CreateObligationStatement extends PMLStatement {
 
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         return new CreateObligationStatement(
-                new Expression(new Literal(obligation.getId())),
+                new Expression(new Literal(obligation.getName())),
                 createRuleStatementsFromObligation(obligation.getRules())
         );
     }
@@ -79,7 +79,7 @@ public class CreateObligationStatement extends PMLStatement {
             EventPattern event = rule.getEventPattern();
 
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                    new Expression(new Literal(rule.getId())),
+                    new Expression(new Literal(rule.getName())),
                     getSubjectClause(event.getSubject()),
                     getPerformsClause(event.getOperations()),
                     getOnClause(event),

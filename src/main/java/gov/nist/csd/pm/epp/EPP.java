@@ -3,7 +3,6 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
@@ -13,24 +12,24 @@ import java.util.List;
 
 public class EPP {
 
-    private final EventListener eventListener;
+    private final EPPEventProcessor eventListener;
 
     public EPP(PDP pdp, PAP pap) throws PMException {
-        eventListener = new EPPEventListener(pdp, pap);
+        eventListener = new EPPEventProcessor(pdp, pap);
 
         pdp.addEventListener(eventListener);
     }
 
-    public EventListener getEventListener() {
+    public EPPEventProcessor getEventProcessor() {
         return eventListener;
     }
 
-    static class EPPEventListener implements EventListener {
+    public static class EPPEventProcessor implements EventProcessor {
 
         private PDP pdp;
         private PAP pap;
 
-        public EPPEventListener(PDP pdp, PAP pap) {
+        public EPPEventProcessor(PDP pdp, PAP pap) {
             this.pdp = pdp;
             this.pap = pap;
         }

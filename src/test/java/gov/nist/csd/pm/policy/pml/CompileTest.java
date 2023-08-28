@@ -276,11 +276,11 @@ class CompileTest {
         assertEquals(1, pap.obligations().getAll().size());
         Obligation actual = pap.obligations().get("test");
         assertEquals(1, actual.getRules().size());
-        assertEquals("test", actual.getLabel());
+        assertEquals("test", actual.getName());
         assertEquals(userCtx, actual.getAuthor());
 
         Rule rule = actual.getRules().get(0);
-        assertEquals("rule1", rule.getLabel());
+        assertEquals("rule1", rule.getName());
 
         EventPattern event = rule.getEventPattern();
         assertEquals(EventSubject.anyUser(), event.getSubject());

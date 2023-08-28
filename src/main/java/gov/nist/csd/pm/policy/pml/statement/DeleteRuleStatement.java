@@ -29,15 +29,15 @@ public class DeleteRuleStatement extends PMLStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        String ruleId = ruleExpr.execute(ctx, policy).getStringValue();
-        String oblId = oblExpr.execute(ctx, policy).getStringValue();
+        String ruleName = ruleExpr.execute(ctx, policy).getStringValue();
+        String oblName = oblExpr.execute(ctx, policy).getStringValue();
 
-        Obligation obligation = policy.obligations().get(oblId);
-        obligation.deleteRule(ruleId);
+        Obligation obligation = policy.obligations().get(oblName);
+        obligation.deleteRule(ruleName);
 
         policy.obligations().update(
                 obligation.getAuthor(),
-                obligation.getId(),
+                obligation.getName(),
                 obligation.getRules().toArray(new Rule[]{})
         );
 

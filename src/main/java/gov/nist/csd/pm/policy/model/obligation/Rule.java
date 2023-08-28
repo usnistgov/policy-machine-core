@@ -41,11 +41,11 @@ public class Rule implements Serializable {
         this.response = new Response(rule.response);
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 
-    public void setId(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.util.List;
 
-public class TxPolicyStore implements Policy, BaseMemoryTx {
+class TxPolicyStore implements Policy, BaseMemoryTx {
 
     private final MemoryPolicyStore memoryPolicyStore;
 
@@ -20,10 +20,10 @@ public class TxPolicyStore implements Policy, BaseMemoryTx {
     public TxPolicyStore(MemoryPolicyStore txStore) {
         memoryPolicyStore = txStore;
         txPolicyEventTracker = new TxPolicyEventTracker();
-        txGraph = new TxGraph(txPolicyEventTracker, txStore.graph());
-        txProhibitions = new TxProhibitions(txPolicyEventTracker, txStore.prohibitions());
-        txObligations = new TxObligations(txPolicyEventTracker, txStore.obligations());
-        txUserDefinedPML = new TxUserDefinedPML(txPolicyEventTracker, txStore.userDefinedPML());
+        txGraph = new TxGraph(txPolicyEventTracker, (MemoryGraphStore) txStore.graph());
+        txProhibitions = new TxProhibitions(txPolicyEventTracker, (MemoryProhibitionsStore) txStore.prohibitions());
+        txObligations = new TxObligations(txPolicyEventTracker, (MemoryObligationsStore) txStore.obligations());
+        txUserDefinedPML = new TxUserDefinedPML(txPolicyEventTracker, (MemoryUserDefinedPMLStore) txStore.userDefinedPML());
     }
 
     public List<PolicyEvent> getTxEvents() {

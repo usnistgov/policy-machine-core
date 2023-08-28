@@ -15,19 +15,19 @@ import java.util.Map;
 public class TxProhibitions implements Prohibitions, BaseMemoryTx {
 
     private final TxPolicyEventTracker txPolicyEventTracker;
-    private final MemoryProhibitions memoryProhibitions;
+    private final MemoryProhibitionsStore memoryProhibitionsStore;
 
-    public TxProhibitions(TxPolicyEventTracker txPolicyEventTracker, MemoryProhibitions memoryProhibitions) {
+    public TxProhibitions(TxPolicyEventTracker txPolicyEventTracker, MemoryProhibitionsStore memoryProhibitionsStore) {
         this.txPolicyEventTracker = txPolicyEventTracker;
-        this.memoryProhibitions = memoryProhibitions;
+        this.memoryProhibitionsStore = memoryProhibitionsStore;
     }
 
     @Override
     public void rollback() throws PMException {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryProhibitions> txCmd = (TxCmd<MemoryProhibitions>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryProhibitions);
+            TxCmd<MemoryProhibitionsStore> txCmd = (TxCmd<MemoryProhibitionsStore>) TxCmd.eventToCmd(event);
+            txCmd.rollback(memoryProhibitionsStore);
         }
     }
 
@@ -40,13 +40,13 @@ public class TxProhibitions implements Prohibitions, BaseMemoryTx {
     public void update(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryUpdateProhibitionEvent(
                 new Prohibition(name, subject, accessRightSet, intersection, List.of(containerConditions)),
-                memoryProhibitions.get(name)
+                memoryProhibitionsStore.get(name)
         ));
     }
 
     @Override
     public void delete(String name) throws PMException {
-        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryProhibitions.get(name)));
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryDeleteProhibitionEvent(memoryProhibitionsStore.get(name)));
     }
 
     @Override

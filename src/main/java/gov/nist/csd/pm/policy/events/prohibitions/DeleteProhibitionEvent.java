@@ -12,7 +12,7 @@ public class DeleteProhibitionEvent implements PolicyEvent {
         this.name = name;
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 

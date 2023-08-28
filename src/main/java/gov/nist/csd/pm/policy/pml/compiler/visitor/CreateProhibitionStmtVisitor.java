@@ -40,8 +40,8 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
         for (PMLParser.ProhibitionContainerExpressionContext contExprCtx : ctx.containers.prohibitionContainerExpression()) {
             boolean isComplement =
                     contExprCtx.IS_COMPLEMENT() != null && contExprCtx.IS_COMPLEMENT().getText().equals("!");
-            Expression name = Expression.compile(visitorCtx, contExprCtx.container, Type.string());
-            containers.add(new CreateProhibitionStatement.Container(isComplement, name));
+            Expression ccName = Expression.compile(visitorCtx, contExprCtx.container, Type.string());
+            containers.add(new CreateProhibitionStatement.Container(isComplement, ccName));
         }
 
         return new CreateProhibitionStatement(name, subject, type, accessRights, isIntersection, containers);

@@ -472,7 +472,7 @@ public interface GraphStore extends Graph {
         for (List<Prohibition> subjPros : allProhibitions.values()) {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(name, p)) {
-                    throw new NodeReferencedInProhibitionException(name, p.getId());
+                    throw new NodeReferencedInProhibitionException(name, p.getName());
                 }
             }
         }
@@ -493,7 +493,7 @@ public interface GraphStore extends Graph {
         for (Obligation obligation : obligations) {
             // if the node is the author of the obligation or referenced in any rules throw an exception
             if (obligation.getAuthor().getUser().equals(name) || nodeInObligation(name, obligation)) {
-                throw new NodeReferencedInObligationException(name, obligation.getId());
+                throw new NodeReferencedInObligationException(name, obligation.getName());
             }
         }
     }

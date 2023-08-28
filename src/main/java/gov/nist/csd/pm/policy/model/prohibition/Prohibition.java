@@ -44,18 +44,18 @@ public class Prohibition implements Serializable {
     }
 
     public Prohibition(Prohibition prohibition) {
-        this.name = prohibition.getId();
+        this.name = prohibition.getName();
         this.subject = new ProhibitionSubject(prohibition.getSubject().getName(), prohibition.getSubject().getType());
         this.containers = new ArrayList<>(prohibition.containers);
         this.accessRightSet = new AccessRightSet(prohibition.getAccessRightSet());
         this.intersection = prohibition.isIntersection();
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 
-    public void setId(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -96,7 +96,7 @@ public class Prohibition implements Serializable {
             return false;
         }
 
-        return this.getId().equals(p.getId());
+        return this.getName().equals(p.getName());
     }
 
     public int hashCode() {

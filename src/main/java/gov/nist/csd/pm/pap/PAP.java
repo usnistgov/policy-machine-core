@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLExecutable;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
@@ -107,5 +108,13 @@ public class PAP implements Transactional, PMLExecutable, Policy {
     @Override
     public void executePML(UserContext userContext, String input, FunctionDefinitionStatement... functionDefinitionStatements) throws PMException {
         PMLExecutor.compileAndExecutePML(this, userContext, input, functionDefinitionStatements);
+    }
+
+    @Override
+    public void executePMLFunction(UserContext userContext, String functionName, Value... args) throws PMException {
+        String pml = String.format("%s(%s)", functionName, PMLExecutable.valuesToArgs(args));
+
+        // execute function as pml
+        PMLExecutor.compileAndExecutePML(this, userContext, pml);
     }
 }

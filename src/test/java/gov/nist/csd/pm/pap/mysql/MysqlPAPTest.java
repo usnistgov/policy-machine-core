@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PAPTest;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -16,7 +17,7 @@ import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MysqlPAPTest {
+class MysqlPAPTest extends PAPTest {
 
     static MysqlTestEnv testEnv;
 
@@ -33,7 +34,29 @@ class MysqlPAPTest {
 
     @AfterEach
     void reset() throws SQLException {
+        connection.close();
         testEnv.reset();
+    }
+
+    private Connection connection;
+
+    @Override
+    public PAP getPAP() throws PMException {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                throw new PMException(e);
+            }
+        }
+
+        try {
+            connection = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
+        } catch (SQLException e) {
+            throw new PMException(e);
+        }
+
+        return new PAP(new MysqlPolicyStore(connection));
     }
 
     @Test
@@ -72,9 +95,9 @@ class MysqlPAPTest {
         }
 
         assertThrows(MysqlPolicyException.class, () ->
-                pap.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"),
+                pap.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"),
                         new AccessRightSet(), false, new ContainerCondition("oa1", true)));
-        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.prohibitions().get("label"));
+        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.prohibitions().get("pro1"));
     }
 
 }

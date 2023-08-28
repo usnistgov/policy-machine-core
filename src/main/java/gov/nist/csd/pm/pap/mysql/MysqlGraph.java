@@ -556,6 +556,13 @@ class MysqlGraph implements GraphStore {
         return name;
     }
 
+    @Override
+    public void checkAssignmentDoesNotCreateLoop(String child, String parent)
+    throws AssignmentCausesLoopException, PMBackendException {
+        // TODO embed detection in mysql for better performance than using default impl
+        GraphStore.super.checkAssignmentDoesNotCreateLoop(child, parent);
+    }
+
     private String createNode(String name, NodeType type, Map<String, String> properties,
                               String initialParent, String ... parents)
     throws PMBackendException, NodeDoesNotExistException, InvalidAssignmentException, NodeNameExistsException, AssignmentCausesLoopException {

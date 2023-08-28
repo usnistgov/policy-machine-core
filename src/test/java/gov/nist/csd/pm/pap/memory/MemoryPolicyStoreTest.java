@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
+import gov.nist.csd.pm.pap.PolicyStore;
+import gov.nist.csd.pm.pap.PolicyStoreTest;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -14,7 +16,6 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -25,101 +26,99 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemoryPolicyStoreTest {
+class MemoryPolicyStoreTest extends PolicyStoreTest {
 
-    MemoryPolicyStore memoryPolicyStore;
-
-    @BeforeEach
-    void setUp() {
-        memoryPolicyStore = new MemoryPolicyStore();
+    @Override
+    public PolicyStore getPolicyStore() {
+        return new MemoryPolicyStore();
     }
 
     @Test
     void getResourceAccessRights() throws PMException {
-        memoryPolicyStore.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
-        AccessRightSet resourceAccessRights = memoryPolicyStore.graph().getResourceAccessRights();
+        policyStore.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
+        AccessRightSet resourceAccessRights = policyStore.graph().getResourceAccessRights();
         resourceAccessRights.add("test");
 
-        assertFalse(memoryPolicyStore.graph().getResourceAccessRights().contains("test"));
+        assertFalse(policyStore.graph().getResourceAccessRights().contains("test"));
     }
 
     @Test
     void getNode() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", NO_PROPERTIES);
-        Node pc1 = memoryPolicyStore.graph().getNode("pc1");
+        policyStore.graph().createPolicyClass("pc1", NO_PROPERTIES);
+        Node pc1 = policyStore.graph().getNode("pc1");
         pc1.getProperties().put("test", "test");
 
-        assertFalse(memoryPolicyStore.graph().getNode("pc1").getProperties().containsKey("test"));
+        assertFalse(policyStore.graph().getNode("pc1").getProperties().containsKey("test"));
     }
 
     @Test
     void getPolicyClasses() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createPolicyClass("pc2", null);
-        List<String> policyClasses = memoryPolicyStore.graph().getPolicyClasses();
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createPolicyClass("pc2", null);
+        List<String> policyClasses = policyStore.graph().getPolicyClasses();
         policyClasses.add("test");
-        assertFalse(memoryPolicyStore.graph().getPolicyClasses().contains("test"));
+        assertFalse(policyStore.graph().getPolicyClasses().contains("test"));
     }
 
     @Test
     void getChildren() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa2", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa3", "pc1");
-        List<String> children = memoryPolicyStore.graph().getChildren("pc1");
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.graph().createObjectAttribute("oa2", "pc1");
+        policyStore.graph().createObjectAttribute("oa3", "pc1");
+        List<String> children = policyStore.graph().getChildren("pc1");
         children.add("test");
-        assertFalse(memoryPolicyStore.graph().getChildren("pc1").contains("test"));
+        assertFalse(policyStore.graph().getChildren("pc1").contains("test"));
     }
 
     @Test
     void getParents() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa2", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa3", "pc1");
-        memoryPolicyStore.graph().createObject("o1", "oa1", "oa2", "oa3");
-        List<String> parents = memoryPolicyStore.graph().getParents("o1");
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.graph().createObjectAttribute("oa2", "pc1");
+        policyStore.graph().createObjectAttribute("oa3", "pc1");
+        policyStore.graph().createObject("o1", "oa1", "oa2", "oa3");
+        List<String> parents = policyStore.graph().getParents("o1");
         parents.add("test");
-        assertFalse(memoryPolicyStore.graph().getParents("o1").contains("test"));
+        assertFalse(policyStore.graph().getParents("o1").contains("test"));
     }
 
     @Test
     void getAssociationsWithSource() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.graph().associate("ua1", "oa1", new AccessRightSet());
-        List<Association> assocs = memoryPolicyStore.graph().getAssociationsWithSource("ua1");
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.graph().associate("ua1", "oa1", new AccessRightSet());
+        List<Association> assocs = policyStore.graph().getAssociationsWithSource("ua1");
         assocs.clear();
-        assertFalse(memoryPolicyStore.graph().getAssociationsWithSource("ua1").isEmpty());
+        assertFalse(policyStore.graph().getAssociationsWithSource("ua1").isEmpty());
     }
 
     @Test
     void getAssociationsWithTarget() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.graph().associate("ua1", "oa1", new AccessRightSet());
-        List<Association> assocs = memoryPolicyStore.graph().getAssociationsWithTarget("oa1");
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.graph().associate("ua1", "oa1", new AccessRightSet());
+        List<Association> assocs = policyStore.graph().getAssociationsWithTarget("oa1");
         assocs.clear();
-        assertFalse(memoryPolicyStore.graph().getAssociationsWithTarget("oa1").isEmpty());
+        assertFalse(policyStore.graph().getAssociationsWithTarget("oa1").isEmpty());
     }
 
     @Test
     void getProhibitions() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        Map<String, List<Prohibition>> prohibitions = memoryPolicyStore.prohibitions().getAll();
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
+        Map<String, List<Prohibition>> prohibitions = policyStore.prohibitions().getAll();
         prohibitions.clear();
-        assertEquals(1, memoryPolicyStore.prohibitions().getAll().size());
-        prohibitions = memoryPolicyStore.prohibitions().getAll();
+        assertEquals(1, policyStore.prohibitions().getAll().size());
+        prohibitions = policyStore.prohibitions().getAll();
         Prohibition p = prohibitions.get("ua1").get(0);
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
-        assertEquals("label", actual.getLabel());
+        Prohibition actual = policyStore.prohibitions().getWithSubject("ua1").get(0);
+        assertEquals("pro1", actual.getName());
         assertEquals("ua1", actual.getSubject().getName());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
@@ -130,18 +129,18 @@ class MemoryPolicyStoreTest {
 
     @Test
     void getProhibitionsFor() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        List<Prohibition> prohibitions = memoryPolicyStore.prohibitions().getWithSubject("ua1");
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
+        List<Prohibition> prohibitions = policyStore.prohibitions().getWithSubject("ua1");
         prohibitions.clear();
-        assertEquals(1, memoryPolicyStore.prohibitions().getAll().size());
-        prohibitions = memoryPolicyStore.prohibitions().getWithSubject("ua1");
+        assertEquals(1, policyStore.prohibitions().getAll().size());
+        prohibitions = policyStore.prohibitions().getWithSubject("ua1");
         Prohibition p = prohibitions.get(0);
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().getWithSubject("ua1").get(0);
-        assertEquals("label", actual.getLabel());
+        Prohibition actual = policyStore.prohibitions().getWithSubject("ua1").get(0);
+        assertEquals("pro1", actual.getName());
         assertEquals("ua1", actual.getSubject().getName());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
@@ -152,14 +151,14 @@ class MemoryPolicyStoreTest {
 
     @Test
     void getProhibition() throws PMException {
-        memoryPolicyStore.graph().createPolicyClass("pc1", null);
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
-        memoryPolicyStore.prohibitions().create("label", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
-        Prohibition p = memoryPolicyStore.prohibitions().get("label");
+        policyStore.graph().createPolicyClass("pc1", null);
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createObjectAttribute("oa1", "pc1");
+        policyStore.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
+        Prohibition p = policyStore.prohibitions().get("pro1");
         p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
-        Prohibition actual = memoryPolicyStore.prohibitions().get("label");
-        assertEquals("label", actual.getLabel());
+        Prohibition actual = policyStore.prohibitions().get("pro1");
+        assertEquals("pro1", actual.getName());
         assertEquals("ua1", actual.getSubject().getName());
         assertEquals(ProhibitionSubject.Type.USER_ATTRIBUTE, actual.getSubject().getType());
         assertEquals(new AccessRightSet(), actual.getAccessRightSet());
@@ -170,9 +169,9 @@ class MemoryPolicyStoreTest {
 
     @Test
     void getObligations() throws PMException {
-        memoryPolicyStore.obligations().create(
+        policyStore.obligations().create(
                 new UserContext("test"),
-                "label",
+                "obl1",
                 new Rule(
                         "rule1",
                         new EventPattern(
@@ -184,9 +183,9 @@ class MemoryPolicyStoreTest {
                         )
                 )
         );
-        List<Obligation> obligations = memoryPolicyStore.obligations().getAll();
+        List<Obligation> obligations = policyStore.obligations().getAll();
         obligations.clear();
-        assertEquals(1, memoryPolicyStore.obligations().getAll().size());
+        assertEquals(1, policyStore.obligations().getAll().size());
     }
 
     @Test
@@ -202,14 +201,14 @@ class MemoryPolicyStoreTest {
                 )
         );
 
-        memoryPolicyStore.obligations().create(
+        policyStore.obligations().create(
                 new UserContext("test"),
-                "label",
+                "obl1",
                 rule1
         );
 
-        Obligation obligation = memoryPolicyStore.obligations().get("label");
-        assertEquals("label", obligation.getLabel());
+        Obligation obligation = policyStore.obligations().get("obl1");
+        assertEquals("obl1", obligation.getName());
         assertEquals(new UserContext("test"), obligation.getAuthor());
         assertEquals(1, obligation.getRules().size());
         assertEquals(rule1, obligation.getRules().get(0));
@@ -217,7 +216,7 @@ class MemoryPolicyStoreTest {
 
     @Test
     void testTx() throws PMException {
-        MemoryPolicyStore store = new MemoryPolicyStore();
+        PolicyStore store = new MemoryPolicyStore();
         store.graph().createPolicyClass("pc1");
         try {
             runTx(store, () -> {
@@ -230,7 +229,7 @@ class MemoryPolicyStoreTest {
 
     @Test
     void testTx2() throws PMException {
-        MemoryPolicyStore store = new MemoryPolicyStore();
+        PolicyStore store = new MemoryPolicyStore();
         store.graph().createPolicyClass("pc1");
         store.beginTx();
         store.graph().createObjectAttribute("oa1", "pc1");
@@ -245,21 +244,21 @@ class MemoryPolicyStoreTest {
     void testSetGraph() throws PMException {
         MemoryPolicyStore policyStore = new MemoryPolicyStore();
 
-        MemoryPolicyStore memoryPolicyStore1 = new MemoryPolicyStore();
-        memoryPolicyStore1.graph().createPolicyClass("pc1");
+        MemoryPolicyStore policyStore1 = new MemoryPolicyStore();
+        policyStore1.graph().createPolicyClass("pc1");
 
-        policyStore.setGraph((MemoryGraph) memoryPolicyStore1.graph());
+        policyStore.setGraph(policyStore1.graph());
         assertTrue(policyStore.graph().nodeExists("pc1"));
     }
 
     @Test
     void test() throws PMException {
-        MemoryGraph memoryGraph = new MemoryGraph();
-        memoryGraph.createPolicyClass("pc1");
-        memoryGraph.createObjectAttribute("oa1", "pc1");
-        memoryGraph.createObjectAttribute("oa2", "pc1");
-        memoryGraph.createObjectAttribute("oa3", "pc1");
+        MemoryGraphStore memoryGraphStore = new MemoryGraphStore();
+        memoryGraphStore.createPolicyClass("pc1");
+        memoryGraphStore.createObjectAttribute("oa1", "pc1");
+        memoryGraphStore.createObjectAttribute("oa2", "pc1");
+        memoryGraphStore.createObjectAttribute("oa3", "pc1");
 
-        memoryGraph.deleteNode("pc1");
+        memoryGraphStore.deleteNode("pc1");
     }
 }

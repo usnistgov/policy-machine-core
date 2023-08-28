@@ -16,13 +16,13 @@ public interface ObligationsStore extends Obligations {
     /**
      * See {@link Obligations#create(UserContext, String, Rule...)} <p>
      *
-     * @throws ObligationIdExistsException If an obligation with the provided name already exists.
+     * @throws ObligationNameExistsException If an obligation with the provided name already exists.
      * @throws NodeDoesNotExistException   If any node defined in the provided event patterns does not exist.
      * @throws PMBackendException          If there is an error executing the command in the PIP.
      */
     @Override
     void create(UserContext author, String name, Rule... rules)
-    throws ObligationIdExistsException, NodeDoesNotExistException, PMBackendException;
+    throws ObligationNameExistsException, NodeDoesNotExistException, PMBackendException;
 
     /**
      * See {@link Obligations#update(UserContext, String, Rule...)} <p>
@@ -76,14 +76,14 @@ public interface ObligationsStore extends Obligations {
      * @param name         The name of the obligation.
      * @param rules      The rules of the obligation.
      * @throws PMBackendException          If there is an error in the backend implementation.
-     * @throws ObligationIdExistsException If an obligation already exists with the specified name
+     * @throws ObligationNameExistsException If an obligation already exists with the specified name
      * @throws NodeDoesNotExistException   If the author or any specified policy elements in the event patterns don't
      * exist.
      */
     default void checkCreateInput(GraphStore graphStore, UserContext author, String name, Rule... rules)
-    throws PMBackendException, ObligationIdExistsException, NodeDoesNotExistException {
+    throws PMBackendException, ObligationNameExistsException, NodeDoesNotExistException {
         if (exists(name)) {
-            throw new ObligationIdExistsException(name);
+            throw new ObligationNameExistsException(name);
         }
 
         checkAuthorExists(graphStore, author);

@@ -27,7 +27,7 @@ class MysqlObligations implements ObligationsStore {
 
     @Override
     public void create(UserContext author, String name, Rule... rules)
-    throws PMBackendException, ObligationIdExistsException, NodeDoesNotExistException {
+    throws PMBackendException, ObligationNameExistsException, NodeDoesNotExistException {
         checkCreateInput(new MysqlGraph(connection), author, name, rules);
 
         String sql = """
@@ -57,7 +57,7 @@ class MysqlObligations implements ObligationsStore {
 
             try {
                 create(author, name, rules);
-            } catch (ObligationIdExistsException e) {
+            } catch (ObligationNameExistsException e) {
                 throw new PMBackendException(e);
             }
 

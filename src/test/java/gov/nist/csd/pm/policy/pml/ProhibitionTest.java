@@ -41,7 +41,7 @@ class ProhibitionTest {
         pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
 
         Prohibition prohibition = pap.prohibitions().get("pro1");
-        assertEquals("pro1", prohibition.getLabel());
+        assertEquals("pro1", prohibition.getName());
         assertEquals(new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), prohibition.getSubject());
         assertEquals(new AccessRightSet(CREATE_POLICY_CLASS, "write"), prohibition.getAccessRightSet());
         assertFalse(prohibition.isIntersection());

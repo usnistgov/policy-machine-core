@@ -24,7 +24,7 @@ public class UpdateProhibitionEvent implements PolicyEvent {
         this.containers = containers;
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 

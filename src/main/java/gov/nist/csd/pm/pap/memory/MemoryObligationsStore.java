@@ -12,25 +12,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class MemoryObligations extends MemoryStore<TxObligations> implements ObligationsStore, Transactional, BaseMemoryTx {
+class MemoryObligationsStore extends MemoryStore<TxObligations> implements ObligationsStore, Transactional, BaseMemoryTx {
 
     protected MemoryTx<TxObligations> tx;
     private List<Obligation> obligations;
-    private MemoryGraph graph;
+    private MemoryGraphStore graph;
 
-    public MemoryObligations() {
+    public MemoryObligationsStore() {
         this.obligations = new ArrayList<>();
     }
 
-    public MemoryObligations(List<Obligation> obligations) {
+    public MemoryObligationsStore(List<Obligation> obligations) {
         this.obligations = obligations;
     }
 
-    public MemoryObligations(Obligations obligations) throws PMException {
+    public MemoryObligationsStore(Obligations obligations) throws PMException {
         this.obligations = obligations.getAll();
     }
 
-    public void setMemoryGraph(MemoryGraph graph) {
+    public void setMemoryGraph(MemoryGraphStore graph) {
         this.graph = graph;
     }
 
@@ -60,7 +60,7 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
     }
 
     @Override
-    public void create(UserContext author, String name, Rule... rules) throws ObligationIdExistsException, NodeDoesNotExistException, PMBackendException {
+    public void create(UserContext author, String name, Rule... rules) throws ObligationNameExistsException, NodeDoesNotExistException, PMBackendException {
         checkCreateInput(graph, author, name, rules);
 
         // log the command if in a tx
@@ -77,9 +77,9 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
         handleTxIfActive(tx -> tx.update(author, name, rules));
 
         for (Obligation o : obligations) {
-            if (o.getId().equals(name)) {
+            if (o.getName().equals(name)) {
                 o.setAuthor(author);
-                o.setId(name);
+                o.setName(name);
                 o.setRules(List.of(rules));
             }
         }
@@ -94,7 +94,7 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
         // log the command if in a tx
         handleTxIfActive(tx -> tx.delete(name));
 
-        this.obligations.removeIf(o -> o.getId().equals(name));
+        this.obligations.removeIf(o -> o.getName().equals(name));
     }
 
     @Override
@@ -105,7 +105,7 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
     @Override
     public boolean exists(String name) {
         for (Obligation o : obligations) {
-            if (o.getId().equals(name)) {
+            if (o.getName().equals(name)) {
                 return true;
             }
         }
@@ -118,7 +118,7 @@ class MemoryObligations extends MemoryStore<TxObligations> implements Obligation
         checkGetInput(name);
 
         for (Obligation obligation : obligations) {
-            if (obligation.getId().equals(name)) {
+            if (obligation.getName().equals(name)) {
                 return obligation.clone();
             }
         }

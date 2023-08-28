@@ -23,7 +23,7 @@ public class UpdateObligationEvent implements PolicyEvent {
         return author;
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 

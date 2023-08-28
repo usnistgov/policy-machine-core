@@ -49,12 +49,12 @@ public class ObligationTest {
         pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
 
         Obligation obligation1 = pap.obligations().get("obligation1");
-        assertEquals("obligation1", obligation1.getLabel());
+        assertEquals("obligation1", obligation1.getName());
         assertEquals(1, obligation1.getRules().size());
         assertEquals(new UserContext(SUPER_USER), obligation1.getAuthor());
 
         Rule rule = obligation1.getRules().get(0);
-        assertEquals("rule1", rule.getLabel());
+        assertEquals("rule1", rule.getName());
         assertEquals(new EventPattern(
                 EventSubject.anyUser(),
                 Performs.events("test_event"),
@@ -94,11 +94,11 @@ public class ObligationTest {
         assertEquals(1, pap.obligations().getAll().size());
         Obligation actual = pap.obligations().get("test");
         assertEquals(1, actual.getRules().size());
-        assertEquals("test", actual.getLabel());
+        assertEquals("test", actual.getName());
         assertEquals(userCtx, actual.getAuthor());
 
         Rule rule = actual.getRules().get(0);
-        assertEquals("rule1", rule.getLabel());
+        assertEquals("rule1", rule.getName());
 
         EventPattern event = rule.getEventPattern();
         assertEquals(EventSubject.anyUser(), event.getSubject());

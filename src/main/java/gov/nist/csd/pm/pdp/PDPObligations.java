@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
-import gov.nist.csd.pm.epp.EventListener;
+import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.*;
@@ -27,9 +27,9 @@ class PDPObligations implements Obligations, EventEmitter {
     private UserContext userCtx;
     private AdjudicatorObligations adjudicator;
     private PAP pap;
-    private EventListener listener;
+    private EventProcessor listener;
 
-    public PDPObligations(UserContext userCtx, AdjudicatorObligations adjudicator, PAP pap, gov.nist.csd.pm.epp.EventListener listener) {
+    public PDPObligations(UserContext userCtx, AdjudicatorObligations adjudicator, PAP pap, EventProcessor listener) {
         this.userCtx = userCtx;
         this.adjudicator = adjudicator;
         this.pap = pap;
@@ -108,7 +108,7 @@ class PDPObligations implements Obligations, EventEmitter {
 
     private void emitDeleteObligationEvent(Obligation obligation) throws PMException {
         emitObligationEvent(
-                new DeleteObligationEvent(obligation.getId()),
+                new DeleteObligationEvent(obligation.getName()),
                 obligation.getRules().toArray(Rule[]::new)
         );
     }
@@ -129,12 +129,12 @@ class PDPObligations implements Obligations, EventEmitter {
     }
 
     @Override
-    public void addEventListener(EventListener listener) {
+    public void addEventListener(EventProcessor listener) {
 
     }
 
     @Override
-    public void removeEventListener(EventListener listener) {
+    public void removeEventListener(EventProcessor listener) {
 
     }
 

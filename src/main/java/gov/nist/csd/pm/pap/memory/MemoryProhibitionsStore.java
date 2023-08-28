@@ -12,25 +12,25 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 import java.util.*;
 
 
-class MemoryProhibitions extends MemoryStore<TxProhibitions> implements ProhibitionsStore, Transactional, BaseMemoryTx {
+class MemoryProhibitionsStore extends MemoryStore<TxProhibitions> implements ProhibitionsStore, Transactional, BaseMemoryTx {
 
     protected MemoryTx<TxProhibitions> tx;
     private Map<String, List<Prohibition>> prohibitions;
-    private MemoryGraph graph;
+    private MemoryGraphStore graph;
 
-    public MemoryProhibitions() {
+    public MemoryProhibitionsStore() {
         this.prohibitions = new HashMap<>();
     }
 
-    public MemoryProhibitions(Map<String, List<Prohibition>> prohibitions) {
+    public MemoryProhibitionsStore(Map<String, List<Prohibition>> prohibitions) {
         this.prohibitions = prohibitions;
     }
 
-    public MemoryProhibitions(Prohibitions prohibitions) throws PMException {
+    public MemoryProhibitionsStore(Prohibitions prohibitions) throws PMException {
         this.prohibitions = prohibitions.getAll();
     }
 
-    public void setMemoryGraph(MemoryGraph graph) {
+    public void setMemoryGraph(MemoryGraphStore graph) {
         this.graph = graph;
     }
 
@@ -107,7 +107,7 @@ class MemoryProhibitions extends MemoryStore<TxProhibitions> implements Prohibit
     public boolean exists(String name) {
         for (Map.Entry<String, List<Prohibition>> e : prohibitions.entrySet()) {
             for (Prohibition p : e.getValue()) {
-                if (p.getId().equals(name)) {
+                if (p.getName().equals(name)) {
                     return true;
                 }
             }
@@ -133,7 +133,7 @@ class MemoryProhibitions extends MemoryStore<TxProhibitions> implements Prohibit
         for (String subject : prohibitions.keySet()) {
             List<Prohibition> subjectPros = prohibitions.get(subject);
             for (Prohibition p : subjectPros) {
-                if (p.getId().equals(name)) {
+                if (p.getName().equals(name)) {
                     return p;
                 }
             }
@@ -154,7 +154,7 @@ class MemoryProhibitions extends MemoryStore<TxProhibitions> implements Prohibit
             Iterator<Prohibition> iterator = ps.iterator();
             while (iterator.hasNext()) {
                 Prohibition p = iterator.next();
-                if(p.getId().equals(name)) {
+                if(p.getName().equals(name)) {
                     iterator.remove();
                     prohibitions.put(subject, ps);
                 }

@@ -22,7 +22,7 @@ public class CreateObligationEvent extends ObligationsEvent {
         return author;
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 

@@ -61,7 +61,7 @@ public class Obligation implements Cloneable, Serializable {
     }
 
     public void deleteRule(String name) {
-        rules.removeIf(rule -> rule.getId().equals(name));
+        rules.removeIf(rule -> rule.getName().equals(name));
     }
 
     public UserContext getAuthor() {
@@ -72,11 +72,11 @@ public class Obligation implements Cloneable, Serializable {
         this.author = userCtx;
     }
 
-    public String getId() {
+    public String getName() {
         return name;
     }
 
-    public void setId(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -84,9 +84,9 @@ public class Obligation implements Cloneable, Serializable {
         return rules;
     }
 
-    public Rule getRule(String ruleId) {
+    public Rule getRule(String ruleName) {
         for (Rule rule : rules) {
-            if (rule.getId().equals(ruleId)) {
+            if (rule.getName().equals(ruleName)) {
                 return rule;
             }
         }
