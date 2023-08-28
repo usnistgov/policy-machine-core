@@ -362,12 +362,18 @@ class MysqlGraph implements GraphStore {
 
     @Override
     public void deassignAllFromAndDelete(String target)
-    throws PMBackendException, NodeDoesNotExistException, NodeHasChildrenException, NodeReferencedInProhibitionException, NodeReferencedInObligationException {
+    throws PMBackendException, NodeDoesNotExistException, NodeReferencedInProhibitionException, NodeReferencedInObligationException {
         try {
             connection.beginTx();
 
             deassignAll(getChildren(target), target);
-            deleteNode(target);
+            try {
+                deleteNode(target);
+            } catch (NodeHasChildrenException e) {
+                // the target should not have any nodes assigned to it after the deassignAll call, if it does then something
+                // went wrong in deassignAll.
+                throw new PMBackendException(e);
+            }
 
             connection.commit();
         } catch (MysqlPolicyException e) {

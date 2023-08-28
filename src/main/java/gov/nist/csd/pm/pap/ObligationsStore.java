@@ -9,11 +9,23 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Target;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * ObligationsStore extends the {@link Obligations} interface and outlines how a concrete implementation of the interface
+ * at the Policy Administration Point (PAP) level of the Policy Machine should behave including input validation and
+ * expected exceptions.
+ */
 public interface ObligationsStore extends Obligations {
 
     /**
+     * Create a new obligation with the given author, name, and rules. The author of the obligation is the user that the
+     * responses will be executed as in the EPP. This means the author will need the privileges to carry out each action
+     * in the response at the time it's executed. If they do not have sufficient privileges no action in the response
+     * will be executed. <p>
+     *
      * See {@link Obligations#create(UserContext, String, Rule...)} <p>
      *
      * @throws ObligationNameExistsException If an obligation with the provided name already exists.
@@ -25,17 +37,24 @@ public interface ObligationsStore extends Obligations {
     throws ObligationNameExistsException, NodeDoesNotExistException, PMBackendException;
 
     /**
+     * Update the author and rules of the obligation with the given name. This will overwrite any existing rules to the rules
+     * provided and update the existing author. <p>
+     *
      * See {@link Obligations#update(UserContext, String, Rule...)} <p>
      *
      * @throws ObligationDoesNotExistException If the obligation does not exist.
+     * @throws ObligationRuleNameExistsException If two rules have the same name.
      * @throws NodeDoesNotExistException       If any node defined in the provided event patterns does not exist.
      * @throws PMBackendException              If there is an error executing the command in the PIP.
      */
     @Override
     void update(UserContext author, String name, Rule... rules)
-    throws ObligationDoesNotExistException, NodeDoesNotExistException, PMBackendException;
+    throws ObligationDoesNotExistException, ObligationRuleNameExistsException, NodeDoesNotExistException, PMBackendException;
 
     /**
+     * Delete the obligation with the given name. If the obligation exists, no exception is thrown as this is
+     * the desired state. <p>
+     *
      * See {@link Obligations#delete(String)} <p>
      *
      * @throws PMBackendException If there is an error executing the command in the PIP.
@@ -103,9 +122,19 @@ public interface ObligationsStore extends Obligations {
      * don't exist.
      */
     default void checkUpdateInput(GraphStore graphStore, UserContext author, String name, Rule... rules)
-    throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException {
+    throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException, ObligationRuleNameExistsException {
         if (!exists(name)) {
             throw new ObligationDoesNotExistException(name);
+        }
+
+        // check that there are no duplicate rule names
+        Set<String> ruleNames = new HashSet<>();
+        for (Rule rule : rules) {
+            if (ruleNames.contains(rule.getName())) {
+                throw new ObligationRuleNameExistsException(name, rule.getName());
+            }
+
+            ruleNames.add(rule.getName());
         }
 
         checkAuthorExists(graphStore, author);

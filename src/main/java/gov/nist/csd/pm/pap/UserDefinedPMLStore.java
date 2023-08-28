@@ -7,6 +7,11 @@ import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.util.Map;
 
+/**
+ * UserDefinedPMLStore extends the {@link UserDefinedPML} interface and outlines how a concrete implementation of the
+ * interface at the Policy Administration Point (PAP) level of the Policy Machine should behave including input
+ * validation and expected exceptions.
+ */
 public interface UserDefinedPMLStore extends UserDefinedPML {
 
     /**

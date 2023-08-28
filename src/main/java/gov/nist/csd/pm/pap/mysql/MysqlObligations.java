@@ -47,7 +47,7 @@ class MysqlObligations implements ObligationsStore {
 
     @Override
     public void update(UserContext author, String name, Rule... rules)
-    throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException {
+    throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException, ObligationRuleNameExistsException {
         checkUpdateInput(new MysqlGraph(connection), author, name, rules);
 
         connection.beginTx();

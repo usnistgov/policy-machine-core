@@ -12,9 +12,17 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.GraphStore.checkAccessRightsValid;
 
+/**
+ * ProhibitionsStore extends the {@link Prohibitions} interface and outlines how a concrete implementation of the interface
+ * at the Policy Administration Point (PAP) level of the Policy Machine should behave including input validation and
+ * expected exceptions.
+ */
 public interface ProhibitionsStore extends Prohibitions {
 
     /**
+     * Create a new prohibition. An exception will be thrown if the subject does not exist (user or user attribute only),
+     * any container does not exist, or any access right provided is unknown to the policy. <p>
+     *
      * See {@link Prohibitions#create(String, ProhibitionSubject, AccessRightSet, boolean, ContainerCondition...)} <p>
      *
      * @throws ProhibitionExistsException If a prohibition with the given name already exists.
@@ -30,6 +38,9 @@ public interface ProhibitionsStore extends Prohibitions {
             ProhibitionContainerDoesNotExistException, UnknownAccessRightException, PMBackendException;
 
     /**
+     * Update an existing prohibition. An exception will be thrown if the subject does not exist (user or user attribute only),
+     * any container does not exist, or any access right provided is unknown to the policy. <p>
+     *
      * See {@link Prohibitions#update(String, ProhibitionSubject, AccessRightSet, boolean, ContainerCondition...)} <p>
      *
      * @throws ProhibitionDoesNotExistException If a prohibition with the given name does not exist.
@@ -45,6 +56,8 @@ public interface ProhibitionsStore extends Prohibitions {
             ProhibitionContainerDoesNotExistException, UnknownAccessRightException, PMBackendException;
 
     /**
+     * Delete the prohibition with the given name. No exception will be thrown if the prohibition does not exist. <p>
+     *
      * See {@link Prohibitions#delete(String)} <p>
      *
      * @throws PMBackendException If there is an error executing the command in the PIP.
@@ -99,7 +112,8 @@ public interface ProhibitionsStore extends Prohibitions {
      * @throws ProhibitionSubjectDoesNotExistException If the subject node does not exist.
      * @throws ProhibitionContainerDoesNotExistException If the container node does not exist.
      */
-    default void checkCreateInput(GraphStore graph, String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection , ContainerCondition ... containerConditions)
+    default void checkCreateInput(GraphStore graph, String name, ProhibitionSubject subject, AccessRightSet accessRightSet,
+                                  boolean intersection, ContainerCondition ... containerConditions)
     throws PMBackendException, ProhibitionExistsException, UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException {
         if (exists(name)) {
             throw new ProhibitionExistsException(name);
@@ -142,7 +156,7 @@ public interface ProhibitionsStore extends Prohibitions {
      * Check if the prohibition exists. If it doesn't, return false to indicate to the caller that execution should not
      * proceed.
      *
-     * @param name The name of the obligation.
+     * @param name The name of the prohibition.
      * @return True if the execution should proceed, false otherwise.
      * @throws PMBackendException If there is an error in the backend implementation.
      */
@@ -155,14 +169,14 @@ public interface ProhibitionsStore extends Prohibitions {
     }
 
     /**
-     * Check if the obligation exists.
-     * @param name The obligation id.
+     * Check if the prohibition exists.
+     * @param name The prohibition name.
      * @throws PMBackendException If there is an error in the backend implementation.
      * @throws ProhibitionDoesNotExistException If the prohibition does not exist.
      */
-    default void checkGetInput(String id) throws PMBackendException, ProhibitionDoesNotExistException {
-        if (!exists(id)) {
-            throw new ProhibitionDoesNotExistException(id);
+    default void checkGetInput(String name) throws PMBackendException, ProhibitionDoesNotExistException {
+        if (!exists(name)) {
+            throw new ProhibitionDoesNotExistException(name);
         }
     }
 

@@ -26,6 +26,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.wildcardAccessRights;
 
+/**
+ * GraphStore extends the {@link Graph} interface and outlines how a concrete implementation of the interface
+ * at the Policy Administration Point (PAP) level of the Policy Machine should behave including input validation and
+ * expected exceptions.
+ */
 public interface GraphStore extends Graph {
 
     /**
@@ -48,7 +53,11 @@ public interface GraphStore extends Graph {
     AccessRightSet getResourceAccessRights() throws PMBackendException;
 
     /**
-     * See {@link Graph#createPolicyClass(String, Map)} <p>
+     * Create a policy class in the graph. This method should also create an object attribute that represents the
+     * policy class in {@link gov.nist.csd.pm.pap.AdminPolicy#POLICY_CLASSES_OA}. This object attribute can be used in
+     * the future to create associations with the policy class itself which is not a supported relation in NGAC. <p>
+     *
+     * See {@link Graph#createPolicyClass(String)} <p>
      *
      * @throws NodeNameExistsException If a node of any type already exists with the provided name.
      * @throws PMBackendException      If there is an error executing the command in the PIP.
@@ -182,6 +191,11 @@ public interface GraphStore extends Graph {
     List<String> getPolicyClasses() throws PMBackendException;
 
     /**
+     * Delete the node with the given name from the graph. If the node is a policy class this will also delete the
+     * representative object attribute. An exception will be thrown if the node has any nodes assigned to it or if
+     * the node is defined in a prohibition or an obligation event pattern. If the node does not exist, no exception
+     * will be thrown as this is the desired state. <p>
+     *
      * See {@link Graph#deleteNode(String)}  <p>
      *
      * @throws NodeHasChildrenException             If the node being deleted still has nodes assigned to it.
@@ -194,6 +208,9 @@ public interface GraphStore extends Graph {
                                         NodeReferencedInObligationException, PMBackendException;
 
     /**
+     * The child and parent nodes must both already exist in the graph, and the types must make a valid assignment. If
+     * the child is already assigned to the parent, no exception will be thrown as this is the desired state. <p>
+     *
      * See {@link Graph#assign(String, String)}  <p>
      *
      * @throws NodeDoesNotExistException  If either node does not exist.
@@ -205,6 +222,9 @@ public interface GraphStore extends Graph {
     throws NodeDoesNotExistException, InvalidAssignmentException, PMBackendException, AssignmentCausesLoopException;
 
     /**
+     * Delete an assignment. An exception will be thrown if either node does not exist. If the assignment doesn't exist,
+     * no exception will be thrown as this is the desired state. <p>
+     *
      * See {@link Graph#deassign(String, String)}  <p>
      *
      * @throws NodeDoesNotExistException If either node does not exist.
@@ -214,6 +234,9 @@ public interface GraphStore extends Graph {
     void deassign(String child, String parent) throws NodeDoesNotExistException, PMBackendException;
 
     /**
+     * All children and the parent nodes must both already exist in the graph, and the types must make a valid assignment.
+     * If any of the children is already assigned to the parent, no exception will be thrown as this is the desired state. <p>
+     *
      * See {@link Graph#assignAll(List, String)}  <p>
      *
      * @throws NodeDoesNotExistException If any of the nodes or the target node does not exist.
@@ -224,6 +247,9 @@ public interface GraphStore extends Graph {
     throws NodeDoesNotExistException, InvalidAssignmentException, PMBackendException, AssignmentCausesLoopException;
 
     /**
+     * Deassign all the children from the target. If any of the nodes do not exist an exception will be thrown. If any
+     * of the assignments do not exist, no exception will be thrown as this is the desired state. <p>
+     *
      * See {@link Graph#deassignAll(List, String)} <p>
      *
      * @throws NodeDoesNotExistException If any of the nodes or the target node does not exist.
@@ -233,14 +259,19 @@ public interface GraphStore extends Graph {
     void deassignAll(List<String> children, String target) throws NodeDoesNotExistException, PMBackendException;
 
     /**
+     * Deassign all the children from the target, then delete the target node. If the node is still referenced in a
+     * prohibition or obligation an exception will be thrown. <p>
+     *
      * See {@link Graph#deassignAllFromAndDelete(String)}  <p>
      *
      * @throws NodeDoesNotExistException If the target node does not exist.
      * @throws PMBackendException        If there is an error executing the command in the PIP.
+     * @throws NodeReferencedInProhibitionException If the node to delete is referenced in a prohibition.
+     * @throws NodeReferencedInObligationException If the node to delete is referenced in an obligation.
      */
     @Override
     void deassignAllFromAndDelete(String target)
-    throws NodeDoesNotExistException, PMBackendException, NodeHasChildrenException, NodeReferencedInProhibitionException,
+    throws NodeDoesNotExistException, PMBackendException, NodeReferencedInProhibitionException,
            NodeReferencedInObligationException;
 
     /**
@@ -262,6 +293,11 @@ public interface GraphStore extends Graph {
     List<String> getChildren(String node) throws NodeDoesNotExistException, PMBackendException;
 
     /**
+     * Create an association between the user attribute and the target node with the provided access rights.
+     * If an association already exists between these two nodes, overwrite the existing access rights with the ones
+     * provided. Associations can only begin at a user attribute but can point to either an object or user attribute. If
+     * either node does not exist or a provided access right is unknown to the policy an exception will be thrown. <p>
+     *
      * See {@link Graph#associate(String, String, AccessRightSet)}  <p>
      *
      * @throws NodeDoesNotExistException   If either node does not exist.
@@ -273,6 +309,10 @@ public interface GraphStore extends Graph {
     throws NodeDoesNotExistException, InvalidAssociationException, PMBackendException, UnknownAccessRightException;
 
     /**
+     * Delete the association between the user attribute and target node.  If either of the nodes does not exist an
+     * exception will be thrown. If the association does not exist no exception will be thrown as this is the desired
+     * state. <p>
+     *
      * See {@link Graph#dissociate(String, String)}  <p>
      *
      * @throws NodeDoesNotExistException If either node does not exist.

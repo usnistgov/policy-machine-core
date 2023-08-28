@@ -70,7 +70,8 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
     }
 
     @Override
-    public void update(UserContext author, String name, Rule... rules) throws ObligationDoesNotExistException, NodeDoesNotExistException, PMBackendException {
+    public void update(UserContext author, String name, Rule... rules)
+    throws ObligationDoesNotExistException, NodeDoesNotExistException, PMBackendException, ObligationRuleNameExistsException {
         checkUpdateInput(graph, author, name, rules);
 
         // log the command if in a tx
