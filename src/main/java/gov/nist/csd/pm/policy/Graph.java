@@ -199,32 +199,6 @@ public interface Graph {
     void deassign(String child, String parent) throws PMException;
 
     /**
-     * Assign all nodes in the given list to the target node.
-     *
-     * @param nodes The nodes to assign to the target.
-     * @param target The target node to assign the nodes to.
-     * @throws PMException If there is an error during the execution process at the implementation level.
-     */
-    void assignAll(List<String> nodes, String target) throws PMException;
-
-    /**
-     * Deassign all nodes in the given list from the target node.
-     *
-     * @param nodes The nodes to deassign from the target.
-     * @param target The target node to deassign the nodes from.
-     * @throws PMException If there is an error during the execution process at the implementation level.
-     */
-    void deassignAll(List<String> nodes, String target) throws PMException;
-
-    /**
-     * Deassign all children from the target node, then delete the target node.
-     *
-     * @param target The target node to deassign it's children.
-     * @throws PMException If there is an error during the execution process at the implementation level.
-     */
-    void deassignAllFromAndDelete(String target) throws PMException;
-
-    /**
      * Get the parents of the given node.
      *
      * @param node The node to get the parents of.

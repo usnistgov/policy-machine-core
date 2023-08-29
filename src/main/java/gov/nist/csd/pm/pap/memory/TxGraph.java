@@ -156,21 +156,6 @@ class TxGraph implements Graph, BaseMemoryTx {
     }
 
     @Override
-    public void assignAll(List<String> children, String target) {
-        txPolicyEventTracker.trackPolicyEvent(new AssignAllEvent(children, target));
-    }
-
-    @Override
-    public void deassignAll(List<String> children, String target) {
-        txPolicyEventTracker.trackPolicyEvent(new DeassignAllEvent(children, target));
-    }
-
-    @Override
-    public void deassignAllFromAndDelete(String target) {
-        txPolicyEventTracker.trackPolicyEvent(new DeassignAllFromAndDeleteEvent(target));
-    }
-
-    @Override
     public List<String> getParents(String node) {
         return null;
     }

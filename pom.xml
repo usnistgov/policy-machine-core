@@ -135,8 +135,6 @@
             <version>1.17.4</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

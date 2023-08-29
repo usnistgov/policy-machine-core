@@ -28,9 +28,6 @@ public class PMLBuiltinFunctions {
     private static final FunctionDefinitionStatement nodeExists = new NodeExists();
     private static final FunctionDefinitionStatement getNode = new GetNode();
     private static final FunctionDefinitionStatement search = new Search();
-    private static final FunctionDefinitionStatement assignAll = new AssignAll();
-    private static final FunctionDefinitionStatement deassignAll = new DeassignAll();
-    private static final FunctionDefinitionStatement deassignAllFromAndDelete = new DeassignAllFromAndDelete();
     private static final FunctionDefinitionStatement append = new Append();
     private static final FunctionDefinitionStatement appendAll = new AppendAll();
     private static final FunctionDefinitionStatement length = new Length();
@@ -57,9 +54,6 @@ public class PMLBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(nodeExists.getFunctionName(), nodeExists);
         BUILTIN_FUNCTIONS.put(getNode.getFunctionName(), getNode);
         BUILTIN_FUNCTIONS.put(search.getFunctionName(), search);
-        BUILTIN_FUNCTIONS.put(assignAll.getFunctionName(), assignAll);
-        BUILTIN_FUNCTIONS.put(deassignAll.getFunctionName(), deassignAll);
-        BUILTIN_FUNCTIONS.put(deassignAllFromAndDelete.getFunctionName(), deassignAllFromAndDelete);
         BUILTIN_FUNCTIONS.put(append.getFunctionName(), append);
         BUILTIN_FUNCTIONS.put(appendAll.getFunctionName(), appendAll);
         BUILTIN_FUNCTIONS.put(length.getFunctionName(), length);

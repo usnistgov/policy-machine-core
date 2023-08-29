@@ -8,7 +8,7 @@ import java.util.List;
 public class AdminPolicy {
 
     public static final String ADMIN_POLICY = "admin policy";
-    public static final String POLICY_CLASSES_OA = policyClassObjectAttributeName(ADMIN_POLICY);
+    public static final String POLICY_CLASSES_OA = "policy classes";
     public static final String PML_FUNCTIONS_TARGET = "pml functions target";
     public static final String PML_CONSTANTS_TARGET = "pml constants target";
     public static final String ADMIN_POLICY_TARGET = "admin policy target";
@@ -25,18 +25,26 @@ public class AdminPolicy {
 
         if (!policy.graph().nodeExists(POLICY_CLASSES_OA)) {
             policy.graph().createObjectAttribute(POLICY_CLASSES_OA, ADMIN_POLICY);
+        } else if (!policy.graph().getParents(POLICY_CLASSES_OA).contains(ADMIN_POLICY)) {
+            policy.graph().assign(POLICY_CLASSES_OA, ADMIN_POLICY);
         }
 
         if (!policy.graph().nodeExists(PML_FUNCTIONS_TARGET)) {
             policy.graph().createObjectAttribute(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
+        } else if (!policy.graph().getParents(PML_FUNCTIONS_TARGET).contains(ADMIN_POLICY)) {
+            policy.graph().assign(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
         }
 
         if (!policy.graph().nodeExists(PML_CONSTANTS_TARGET)) {
             policy.graph().createObjectAttribute(PML_CONSTANTS_TARGET, ADMIN_POLICY);
+        } else if (!policy.graph().getParents(PML_CONSTANTS_TARGET).contains(ADMIN_POLICY)) {
+            policy.graph().assign(PML_CONSTANTS_TARGET, ADMIN_POLICY);
         }
 
         if (!policy.graph().nodeExists(ADMIN_POLICY_TARGET)) {
             policy.graph().createObjectAttribute(ADMIN_POLICY_TARGET, ADMIN_POLICY);
+        } else if (!policy.graph().getParents(ADMIN_POLICY_TARGET).contains(ADMIN_POLICY)) {
+            policy.graph().assign(ADMIN_POLICY_TARGET, ADMIN_POLICY);
         }
 
         verifyPolicyClasses(policy);

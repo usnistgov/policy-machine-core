@@ -59,6 +59,8 @@ class MysqlPAPTest extends PAPTest {
         return new PAP(new MysqlPolicyStore(connection));
     }
 
+
+
     @Test
     void testTx() throws SQLException, PMException {
         try (Connection connection = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
@@ -78,7 +80,7 @@ class MysqlPAPTest extends PAPTest {
     }
 
     @Test
-    void testRollbackProhibitionTx() throws PMException, IOException, SQLException {
+    void testRollbackProhibitionTx() throws PMException, SQLException {
         Connection connection
                 = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
         MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);

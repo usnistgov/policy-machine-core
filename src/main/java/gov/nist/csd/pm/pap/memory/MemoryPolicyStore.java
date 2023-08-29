@@ -23,6 +23,8 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
         this.prohibitions = new MemoryProhibitionsStore();
         this.obligations = new MemoryObligationsStore();
         this.userDefinedPML = new MemoryUserDefinedPMLStore();
+
+        initStores();
     }
 
     public MemoryPolicyStore(Graph graph, Prohibitions prohibitions, Obligations obligations, UserDefinedPML userDefinedPML) throws PMException {
@@ -30,16 +32,11 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
         this.prohibitions = new MemoryProhibitionsStore(prohibitions);
         this.obligations = new MemoryObligationsStore(obligations);
         this.userDefinedPML = new MemoryUserDefinedPMLStore(userDefinedPML);
+
+        initStores();
     }
 
-    MemoryPolicyStore(MemoryGraphStore graph, MemoryProhibitionsStore prohibitions, MemoryObligationsStore obligations, MemoryUserDefinedPMLStore userDefinedPML) throws PMException {
-        this.graph = graph;
-        this.prohibitions = prohibitions;
-        this.obligations = obligations;
-        this.userDefinedPML = userDefinedPML;
-    }
-
-    private void init() {
+    private void initStores() {
         this.graph.setMemoryProhibitions(prohibitions);
         this.graph.setMemoryObligations(obligations);
         this.prohibitions.setMemoryGraph(graph);
@@ -161,5 +158,7 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
         prohibitions.clear();
         obligations.clear();
         userDefinedPML.clear();
+
+        graph.initializeAdminPolicy();
     }
 }

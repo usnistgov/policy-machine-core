@@ -29,7 +29,7 @@ public interface ObligationsStore extends Obligations {
      * See {@link Obligations#create(UserContext, String, Rule...)} <p>
      *
      * @throws ObligationNameExistsException If an obligation with the provided name already exists.
-     * @throws NodeDoesNotExistException   If any node defined in the provided event patterns does not exist.
+     * @throws NodeDoesNotExistException   If the author or any node defined in the provided event patterns does not exist.
      * @throws PMBackendException          If there is an error executing the command in the PIP.
      */
     @Override
@@ -52,7 +52,7 @@ public interface ObligationsStore extends Obligations {
     throws ObligationDoesNotExistException, ObligationRuleNameExistsException, NodeDoesNotExistException, PMBackendException;
 
     /**
-     * Delete the obligation with the given name. If the obligation exists, no exception is thrown as this is
+     * Delete the obligation with the given name. If the obligation does not exist, no exception is thrown as this is
      * the desired state. <p>
      *
      * See {@link Obligations#delete(String)} <p>

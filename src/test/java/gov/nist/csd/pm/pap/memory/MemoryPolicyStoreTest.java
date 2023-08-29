@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.PolicyStore;
-import gov.nist.csd.pm.pap.PolicyStoreTest;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -26,12 +25,9 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemoryPolicyStoreTest extends PolicyStoreTest {
+class MemoryPolicyStoreTest {
 
-    @Override
-    public PolicyStore getPolicyStore() {
-        return new MemoryPolicyStore();
-    }
+    MemoryPolicyStore policyStore = new MemoryPolicyStore();
 
     @Test
     void getResourceAccessRights() throws PMException {
@@ -138,7 +134,6 @@ class MemoryPolicyStoreTest extends PolicyStoreTest {
         assertEquals(1, policyStore.prohibitions().getAll().size());
         prohibitions = policyStore.prohibitions().getWithSubject("ua1");
         Prohibition p = prohibitions.get(0);
-        p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = policyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("pro1", actual.getName());
         assertEquals("ua1", actual.getSubject().getName());
@@ -156,7 +151,6 @@ class MemoryPolicyStoreTest extends PolicyStoreTest {
         policyStore.graph().createObjectAttribute("oa1", "pc1");
         policyStore.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
         Prohibition p = policyStore.prohibitions().get("pro1");
-        p = new Prohibition("test", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), false, Collections.singletonList(new ContainerCondition("oa2", true)));
         Prohibition actual = policyStore.prohibitions().get("pro1");
         assertEquals("pro1", actual.getName());
         assertEquals("ua1", actual.getSubject().getName());

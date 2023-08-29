@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.nist.csd.pm.pap.ProhibitionsStore;
-import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
@@ -23,7 +22,7 @@ import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.U
 
 class MysqlProhibitions implements ProhibitionsStore {
 
-    private MysqlConnection connection;
+    private final MysqlConnection connection;
 
     public MysqlProhibitions(MysqlConnection mysqlConnection) {
         this.connection = mysqlConnection;
@@ -45,7 +44,7 @@ class MysqlProhibitions implements ProhibitionsStore {
         } else {
             sql =
                     """
-                    insert into prohibition (name, node_id, subject_type, access_rights, is_intersection) values (?,(select name from node where name = ?),?,?,?)
+                    insert into prohibition (name, node_id, subject_type, access_rights, is_intersection) values (?,(select id from node where name = ?),?,?,?)
                     """;
         }
 
@@ -133,7 +132,8 @@ class MysqlProhibitions implements ProhibitionsStore {
     @Override
     public Map<String, List<Prohibition>> getAll() throws MysqlPolicyException {
         String sql = """
-                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition
+                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, 
+                subject_type, access_rights, is_intersection from prohibition
                 """;
 
         try(Statement stmt = connection.getConnection().createStatement();
@@ -215,7 +215,9 @@ class MysqlProhibitions implements ProhibitionsStore {
     @Override
     public Prohibition get(String name) throws MysqlPolicyException, ProhibitionDoesNotExistException {
         String sql = """
-                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection from prohibition where id = ?
+                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, 
+                       subject_type, access_rights, is_intersection 
+                from prohibition where name = ?
                 """;
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
@@ -282,7 +284,8 @@ class MysqlProhibitions implements ProhibitionsStore {
 
                 List<ContainerCondition> containers = getContainerConditions(id);
 
-                prohibitions.add(new Prohibition(name, new ProhibitionSubject(type == PROCESS ? process : node, type), arset, isIntersection, containers));
+                prohibitions.add(new Prohibition(name, new ProhibitionSubject(type == PROCESS ? process : node, type),
+                        arset, isIntersection, containers));
             }
 
             return prohibitions;

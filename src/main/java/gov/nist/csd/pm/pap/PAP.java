@@ -17,9 +17,7 @@ public class PAP implements Transactional, PMLExecutable, Policy {
 
     public PAP(PolicyStore policyStore) throws PMException {
         this.policyStore = policyStore;
-
-        // enable policy class admin by default
-        AdminPolicy.enable(policyStore);
+        this.policyStore.graph().initializeAdminPolicy();
     }
 
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
@@ -27,7 +25,7 @@ public class PAP implements Transactional, PMLExecutable, Policy {
             throw new PMException("policy is not empty");
         }
 
-        AdminPolicy.enable(policyStore);
+        policyStore.graph().initializeAdminPolicy();
 
         bootstrapper.bootstrap(this);
     }

@@ -34,6 +34,18 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.wildcardAcce
 public interface GraphStore extends Graph {
 
     /**
+     * Initialize the Admin Policy using the constants in {@link AdminPolicy}. This method should:
+     * Create the {@link AdminPolicy#ADMIN_POLICY} policy class.<p>
+     * Create the {@link AdminPolicy#POLICY_CLASSES_OA} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicy#ADMIN_POLICY_TARGET} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicy#PML_CONSTANTS_TARGET} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicy#PML_FUNCTIONS_TARGET} in the ADMIN_POLICY policy class.<p>
+     *
+     * @throws PMBackendException              If there is an error executing the command in the PIP.
+     */
+    void initializeAdminPolicy() throws PMBackendException;
+
+    /**
      * See {@link Graph#setResourceAccessRights(AccessRightSet)} <p>
      *
      * @throws AdminAccessRightExistsException If a provided access right is already defined as an administrative
@@ -228,51 +240,12 @@ public interface GraphStore extends Graph {
      * See {@link Graph#deassign(String, String)}  <p>
      *
      * @throws NodeDoesNotExistException If either node does not exist.
+     * @throws DisconnectedNodeException If deassinging the child node from the parent would cause the child node to be
+     *                                  disconnected from the graph.
      * @throws PMBackendException        If there is an error executing the command in the PIP.
      */
     @Override
-    void deassign(String child, String parent) throws NodeDoesNotExistException, PMBackendException;
-
-    /**
-     * All children and the parent nodes must both already exist in the graph, and the types must make a valid assignment.
-     * If any of the children is already assigned to the parent, no exception will be thrown as this is the desired state. <p>
-     *
-     * See {@link Graph#assignAll(List, String)}  <p>
-     *
-     * @throws NodeDoesNotExistException If any of the nodes or the target node does not exist.
-     * @throws PMBackendException        If there is an error executing the command in the PIP.
-     */
-    @Override
-    void assignAll(List<String> children, String target)
-    throws NodeDoesNotExistException, InvalidAssignmentException, PMBackendException, AssignmentCausesLoopException;
-
-    /**
-     * Deassign all the children from the target. If any of the nodes do not exist an exception will be thrown. If any
-     * of the assignments do not exist, no exception will be thrown as this is the desired state. <p>
-     *
-     * See {@link Graph#deassignAll(List, String)} <p>
-     *
-     * @throws NodeDoesNotExistException If any of the nodes or the target node does not exist.
-     * @throws PMBackendException        If there is an error executing the command in the PIP.
-     */
-    @Override
-    void deassignAll(List<String> children, String target) throws NodeDoesNotExistException, PMBackendException;
-
-    /**
-     * Deassign all the children from the target, then delete the target node. If the node is still referenced in a
-     * prohibition or obligation an exception will be thrown. <p>
-     *
-     * See {@link Graph#deassignAllFromAndDelete(String)}  <p>
-     *
-     * @throws NodeDoesNotExistException If the target node does not exist.
-     * @throws PMBackendException        If there is an error executing the command in the PIP.
-     * @throws NodeReferencedInProhibitionException If the node to delete is referenced in a prohibition.
-     * @throws NodeReferencedInObligationException If the node to delete is referenced in an obligation.
-     */
-    @Override
-    void deassignAllFromAndDelete(String target)
-    throws NodeDoesNotExistException, PMBackendException, NodeReferencedInProhibitionException,
-           NodeReferencedInObligationException;
+    void deassign(String child, String parent) throws NodeDoesNotExistException, DisconnectedNodeException, PMBackendException;
 
     /**
      * See {@link Graph#getParents(String)}  <p>
@@ -420,16 +393,23 @@ public interface GraphStore extends Graph {
             throw new NodeNameExistsException(name);
         }
 
+        // when creating a node the only loop that can occur is to itself
+        if (name.equals(parent)) {
+            throw new AssignmentCausesLoopException(name, parent);
+        }
+
         // check assign inputs
         // getNode will ensure parent node exists
         Node parentNode = getNode(parent);
         Assignment.checkAssignment(type, parentNode.getType());
-        checkAssignmentDoesNotCreateLoop(name, parent);
 
         for (String p : parents) {
+            if (name.equals(p)) {
+                throw new AssignmentCausesLoopException(name, p);
+            }
+
             parentNode = getNode(p);
             Assignment.checkAssignment(type, parentNode.getType());
-            checkAssignmentDoesNotCreateLoop(name, p);
         }
     }
 
@@ -582,15 +562,20 @@ public interface GraphStore extends Graph {
      * @throws PMBackendException        If there is an error in the backend implementation.
      */
     default boolean checkDeassignInput(String child, String parent)
-    throws PMBackendException, NodeDoesNotExistException {
+    throws PMBackendException, NodeDoesNotExistException, DisconnectedNodeException {
         if (!nodeExists(child)) {
             throw new NodeDoesNotExistException(child);
         } else if (!nodeExists(parent)) {
             throw new NodeDoesNotExistException(parent);
         }
 
-        if (!getParents(child).contains(parent)) {
+        List<String> parents = getParents(child);
+        if (!parents.contains(parent)) {
             return false;
+        }
+
+        if (parents.size() == 1) {
+            throw new DisconnectedNodeException(child, parent);
         }
 
         return true;

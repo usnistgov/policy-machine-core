@@ -228,33 +228,6 @@ class PDPGraph implements Graph, EventEmitter {
     }
 
     @Override
-    public void assignAll(List<String> children, String target) throws PMException {
-        adjudicator.assignAll(children, target);
-
-        pap.graph().assignAll(children, target);
-
-        emitEvent(new EventContext(userCtx, target, new AssignAllEvent(children, target)));
-    }
-
-    @Override
-    public void deassignAll(List<String> children, String target) throws PMException {
-        adjudicator.assignAll(children, target);
-
-        pap.graph().deassignAll(children, target);
-
-        emitEvent(new EventContext(userCtx, target, new DeassignAllEvent(children, target)));
-    }
-
-    @Override
-    public void deassignAllFromAndDelete(String target) throws PMException {
-        adjudicator.deassignAllFromAndDelete(target);
-
-        pap.graph().deassignAllFromAndDelete(target);
-
-        emitEvent(new EventContext(userCtx, target, new DeassignAllFromAndDeleteEvent(target)));
-    }
-
-    @Override
     public List<String> getChildren(String node) throws PMException {
         return adjudicator.getChildren(node);
     }

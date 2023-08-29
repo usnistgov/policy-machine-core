@@ -13,18 +13,13 @@ import java.util.Map;
 class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements UserDefinedPMLStore, Transactional, BaseMemoryTx {
 
     protected MemoryTx<TxUserDefinedPML> tx;
-    private Map<String, FunctionDefinitionStatement> functions;
-    private Map<String, Value> constants;
+    private final Map<String, FunctionDefinitionStatement> functions;
+    private final Map<String, Value> constants;
     private MemoryGraphStore graph;
 
     public MemoryUserDefinedPMLStore() {
         this.functions = new HashMap<>();
         this.constants = new HashMap<>();
-    }
-
-    public MemoryUserDefinedPMLStore(Map<String, FunctionDefinitionStatement> functions, Map<String, Value> constants) {
-        this.functions = functions;
-        this.constants = constants;
     }
 
     public MemoryUserDefinedPMLStore(UserDefinedPML userDefinedPML) throws PMException {
@@ -143,7 +138,7 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
 
     @Override
     public void checkGetFunctionInput(String name) throws PMLFunctionNotDefinedException {
-        if (functions.containsKey(name)) {
+        if (!functions.containsKey(name)) {
             throw new PMLFunctionNotDefinedException(name);
         }
     }
@@ -162,7 +157,7 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
 
     @Override
     public void checkGetConstantInput(String name) throws PMLConstantNotDefinedException {
-        if (constants.containsKey(name)) {
+        if (!constants.containsKey(name)) {
             throw new PMLConstantNotDefinedException(name);
         }
     }

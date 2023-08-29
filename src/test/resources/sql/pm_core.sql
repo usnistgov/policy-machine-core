@@ -61,14 +61,14 @@ CREATE TABLE IF NOT EXISTS `prohibition_type` (
 
 CREATE TABLE IF NOT EXISTS `prohibition` (
                                              `id` int(11) NOT NULL AUTO_INCREMENT,
-                                             `label` varchar(50) NOT NULL,
+                                             `name` varchar(50) NOT NULL,
                                              `node_id` int(11),
                                              `process_id` varchar(50),
                                              `subject_type` int(11) NOT NULL,
                                              `is_intersection` int(1) NOT NULL,
                                              `access_rights` json NOT NULL,
                                              PRIMARY KEY (`id`),
-                                             UNIQUE KEY `prohibition_label` (`label`),
+                                             UNIQUE KEY `prohibition_label` (`name`),
                                              CONSTRAINT `fk_prohibition_node_id` FOREIGN KEY (`node_id`) REFERENCES `node` (`id`) ON DELETE CASCADE,
                                              CONSTRAINT `fk_prohibition_type_id` FOREIGN KEY (`subject_type`) REFERENCES `prohibition_type` (`id`)
 );
@@ -84,11 +84,11 @@ CREATE TABLE IF NOT EXISTS `prohibition_container` (
 
 CREATE TABLE IF NOT EXISTS `obligation` (
                                             `id` int(11) NOT NULL AUTO_INCREMENT,
-                                            `label` varchar(50) NOT NULL,
+                                            `name` varchar(50) NOT NULL,
                                             `author` json NOT NULL,
                                             `rules` BLOB NOT NULL,
                                             PRIMARY KEY(`id`),
-                                            UNIQUE KEY `obligation_label` (`label`)
+                                            UNIQUE KEY `obligation_label` (`name`)
 );
 
 CREATE TABLE IF NOT EXISTS `pml_function` (

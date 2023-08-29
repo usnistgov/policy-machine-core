@@ -14,6 +14,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.AdminPolicy.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
@@ -91,6 +92,45 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     }
 
     @Override
+    public void initializeAdminPolicy() throws PMBackendException {
+        try {
+            if (!nodeExists(ADMIN_POLICY)) {
+                createNodeInternal(ADMIN_POLICY, PC, NO_PROPERTIES);
+            }
+
+            if (!nodeExists(POLICY_CLASSES_OA)) {
+                createNodeInternal(POLICY_CLASSES_OA, OA, NO_PROPERTIES);
+                assignInternal(POLICY_CLASSES_OA, ADMIN_POLICY);
+            } else if (!getParents(POLICY_CLASSES_OA).contains(ADMIN_POLICY)) {
+                assign(POLICY_CLASSES_OA, ADMIN_POLICY);
+            }
+
+            if (!nodeExists(PML_FUNCTIONS_TARGET)) {
+                createNodeInternal(PML_FUNCTIONS_TARGET, OA, NO_PROPERTIES);
+                assignInternal(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
+            } else if (!getParents(PML_FUNCTIONS_TARGET).contains(ADMIN_POLICY)) {
+                assign(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
+            }
+
+            if (!nodeExists(PML_CONSTANTS_TARGET)) {
+                createNodeInternal(PML_CONSTANTS_TARGET, OA, NO_PROPERTIES);
+                assignInternal(PML_CONSTANTS_TARGET, ADMIN_POLICY);
+            } else if (!getParents(PML_CONSTANTS_TARGET).contains(ADMIN_POLICY)) {
+                assign(PML_CONSTANTS_TARGET, ADMIN_POLICY);
+            }
+
+            if (!nodeExists(ADMIN_POLICY_TARGET)) {
+                createNodeInternal(ADMIN_POLICY_TARGET, OA, NO_PROPERTIES);
+                assignInternal(ADMIN_POLICY_TARGET, ADMIN_POLICY);
+            } else if (!getParents(ADMIN_POLICY_TARGET).contains(ADMIN_POLICY)) {
+                assign(ADMIN_POLICY_TARGET, ADMIN_POLICY);
+            }
+        } catch(PMException e) {
+            throw new PMBackendException("error initializing admin policy", e);
+        }
+    }
+
+    @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet)
     throws AdminAccessRightExistsException, PMBackendException {
         checkSetResourceAccessRightsInput(accessRightSet);
@@ -122,8 +162,12 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         String oa = AdminPolicy.policyClassObjectAttributeName(name);
         createNodeInternal(oa, OA, properties);
 
-        // assign the oa to the pc
-        assignInternal(oa, name);
+        // assign the oa to the pcs oa
+        try {
+            assign(oa, POLICY_CLASSES_OA);
+        } catch (NodeDoesNotExistException | InvalidAssignmentException | AssignmentCausesLoopException e) {
+            throw new PMBackendException("could not assign " + oa + " to " + POLICY_CLASSES_OA, e);
+        }
 
         return name;
     }
@@ -272,7 +316,8 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     }
 
     @Override
-    public void deassign(String child, String parent) throws PMBackendException, NodeDoesNotExistException {
+    public void deassign(String child, String parent)
+    throws PMBackendException, NodeDoesNotExistException, DisconnectedNodeException {
         if (!checkDeassignInput(child, parent)) {
             return;
         }
@@ -281,44 +326,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         handleTxIfActive(tx -> tx.deassign(child, parent));
 
         deassignInternal(child, parent);
-    }
-
-    @Override
-    public void assignAll(List<String> children, String target) throws PMBackendException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.assignAll(children, target));
-
-        runInternalTx(() -> {
-            for (String c : children) {
-                assign(c, target);
-            }
-        });
-    }
-
-    @Override
-    public void deassignAll(List<String> children, String target) throws PMBackendException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.deassignAll(children, target));
-
-        runInternalTx(() -> {
-            for (String c : children) {
-                deassign(c, target);
-            }
-        });
-    }
-
-    @Override
-    public void deassignAllFromAndDelete(String target) throws PMBackendException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.deassignAllFromAndDelete(target));
-
-        runInternalTx(() -> {
-            for (String c : getChildren(target)) {
-                deassign(c, target);
-            }
-
-            deleteNode(target);
-        });
     }
 
     @Override
