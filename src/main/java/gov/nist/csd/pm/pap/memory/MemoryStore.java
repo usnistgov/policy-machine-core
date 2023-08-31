@@ -9,11 +9,15 @@ public abstract class MemoryStore<T extends BaseMemoryTx> implements Transaction
     protected MemoryTx<T> tx;
 
     public MemoryStore() {
-        tx = null;
+        tx = new MemoryTx<>();
+    }
+
+    public void setTx(boolean active, int counter, T policyStore) {
+        this.tx.set(active, counter, policyStore);
     }
 
     public boolean inTx() {
-        return tx != null && tx.isActive();
+        return tx.isActive();
     }
 
     protected void runInternalTx(MemoryTxRunner txRunner) throws PMBackendException {

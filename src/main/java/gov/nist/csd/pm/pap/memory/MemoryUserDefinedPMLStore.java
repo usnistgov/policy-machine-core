@@ -12,7 +12,6 @@ import java.util.Map;
 
 class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements UserDefinedPMLStore, Transactional, BaseMemoryTx {
 
-    protected MemoryTx<TxUserDefinedPML> tx;
     private final Map<String, FunctionDefinitionStatement> functions;
     private final Map<String, Value> constants;
     private MemoryGraphStore graph;

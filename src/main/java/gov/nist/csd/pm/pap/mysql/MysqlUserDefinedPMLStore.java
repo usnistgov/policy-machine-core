@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.mysql;
 
 import gov.nist.csd.pm.pap.UserDefinedPMLStore;
-import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
@@ -14,11 +13,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-class MysqlUserDefinedPML implements UserDefinedPMLStore {
+class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
 
-    private MysqlConnection connection;
+    private final MysqlConnection connection;
 
-    public MysqlUserDefinedPML(MysqlConnection connection) {
+    public MysqlUserDefinedPMLStore(MysqlConnection connection) {
         this.connection = connection;
     }
 
@@ -253,5 +252,4 @@ class MysqlUserDefinedPML implements UserDefinedPMLStore {
             throw new MysqlPolicyException(e.getMessage());
         }
     }
-
 }

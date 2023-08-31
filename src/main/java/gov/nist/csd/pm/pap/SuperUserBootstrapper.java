@@ -2,8 +2,6 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
-import java.util.HashMap;
-
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.allAccessRights;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
 
@@ -30,14 +28,14 @@ public class SuperUserBootstrapper implements PolicyBootstrapper {
             // create the superuser and assign to both UAs
             pap.graph().createUser(SUPER_USER, SUPER_UA, SUPER_UA1);
 
-            // associate the super_ua and super_ua1 to provide * rights to the super user on itself
+            // associate the super_ua and super_ua1 to provide * rights to the super ser on itself
             // if the association already exists this will do nothing
             pap.graph().associate(SUPER_UA, SUPER_UA1, allAccessRights());
 
-            pap.graph().associate(SUPER_UA, AdminPolicy.ADMIN_POLICY_TARGET, allAccessRights());
-            pap.graph().associate(SUPER_UA, AdminPolicy.POLICY_CLASSES_OA, allAccessRights());
-            pap.graph().associate(SUPER_UA, AdminPolicy.PML_FUNCTIONS_TARGET, allAccessRights());
-            pap.graph().associate(SUPER_UA, AdminPolicy.PML_CONSTANTS_TARGET, allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicy.Node.POLICY_CLASSES_OA.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), allAccessRights());
         });
     }
 

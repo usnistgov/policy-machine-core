@@ -20,18 +20,18 @@ import java.util.Map;
 import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.*;
 import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.USER;
 
-class MysqlProhibitions implements ProhibitionsStore {
+class MysqlProhibitionsStore implements ProhibitionsStore {
 
     private final MysqlConnection connection;
 
-    public MysqlProhibitions(MysqlConnection mysqlConnection) {
+    public MysqlProhibitionsStore(MysqlConnection mysqlConnection) {
         this.connection = mysqlConnection;
     }
 
     @Override
     public void create(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions)
     throws PMBackendException, UnknownAccessRightException, ProhibitionExistsException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException {
-        checkCreateInput(new MysqlGraph(connection), name, subject, accessRightSet, intersection, containerConditions);
+        checkCreateInput(new MysqlGraphStore(connection), name, subject, accessRightSet, intersection, containerConditions);
 
         connection.beginTx();
 

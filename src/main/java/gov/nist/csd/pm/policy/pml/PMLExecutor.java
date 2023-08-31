@@ -41,8 +41,7 @@ public class PMLExecutor {
             try {
                 stmt.execute(ctx, policy);
             } catch (PMException e) {
-                System.err.println(e.getMessage() + ": " + stmt);
-                throw e;
+                throw new PMLExecutionException(stmt, e);
             }
         }
 

@@ -3,11 +3,17 @@ package gov.nist.csd.pm.pap.memory;
 import gov.nist.csd.pm.pap.*;
 import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.*;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
 
+import java.util.HashMap;
 import java.util.List;
 
-public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
+import static gov.nist.csd.pm.pap.AdminPolicy.*;
+import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
+import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
+
+public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Verifier {
 
     private MemoryGraphStore graph;
     private MemoryProhibitionsStore prohibitions;
@@ -18,13 +24,15 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
     private int txCounter;
     private TxPolicyStore txPolicyStore;
 
-    public MemoryPolicyStore() {
+    public MemoryPolicyStore() throws PMException {
         this.graph = new MemoryGraphStore();
         this.prohibitions = new MemoryProhibitionsStore();
         this.obligations = new MemoryObligationsStore();
         this.userDefinedPML = new MemoryUserDefinedPMLStore();
 
         initStores();
+
+        verify(this, graph);
     }
 
     public MemoryPolicyStore(Graph graph, Prohibitions prohibitions, Obligations obligations, UserDefinedPML userDefinedPML) throws PMException {
@@ -34,6 +42,8 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
         this.userDefinedPML = new MemoryUserDefinedPMLStore(userDefinedPML);
 
         initStores();
+
+        verify(this, this.graph);
     }
 
     private void initStores() {
@@ -107,24 +117,27 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
         inTx = true;
         txCounter++;
 
-        graph.tx.set(true, txCounter, txPolicyStore.graph());
-        prohibitions.tx.set(true, txCounter, txPolicyStore.prohibitions());
-        obligations.tx.set(true, txCounter, txPolicyStore.obligations());
-        userDefinedPML.tx.set(true, txCounter, txPolicyStore.userDefinedPML());
+
+        graph.setTx(true, txCounter, txPolicyStore.graph());
+        prohibitions.setTx(true, txCounter, txPolicyStore.prohibitions());
+        obligations.setTx(true, txCounter, txPolicyStore.obligations());
+        userDefinedPML.setTx(true, txCounter, txPolicyStore.userDefinedPML());
     }
 
     @Override
     public void commit() throws PMException {
         txCounter--;
-        if(txCounter == 0) {
-            inTx = false;
-            txPolicyStore.clearEvents();
-
-            graph.tx.set(false, txCounter, txPolicyStore.graph());
-            prohibitions.tx.set(false, txCounter, txPolicyStore.prohibitions());
-            obligations.tx.set(false, txCounter, txPolicyStore.obligations());
-            userDefinedPML.tx.set(false, txCounter, txPolicyStore.userDefinedPML());
+        if(txCounter != 0) {
+            return;
         }
+
+        inTx = false;
+        txPolicyStore.clearEvents();
+
+        graph.tx.set(false, txCounter, txPolicyStore.graph());
+        prohibitions.tx.set(false, txCounter, txPolicyStore.prohibitions());
+        obligations.tx.set(false, txCounter, txPolicyStore.obligations());
+        userDefinedPML.tx.set(false, txCounter, txPolicyStore.userDefinedPML());
     }
 
     @Override
@@ -159,6 +172,31 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx {
         obligations.clear();
         userDefinedPML.clear();
 
-        graph.initializeAdminPolicy();
+        verify(this, graph);
+    }
+
+    @Override
+    public void verifyAdminPolicyClassNode() {
+        graph.createNodeInternal(Node.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
+    }
+
+    @Override
+    public void verifyAdminPolicyAttribute(Node node, Node parent) throws PMException {
+        if (!graph.nodeExists(node.nodeName())) {
+            graph.createNodeInternal(node.nodeName(), OA, new HashMap<>());
+        }
+
+        if (!graph.getParents(node.nodeName()).contains(parent.nodeName())) {
+            graph.assignInternal(node.nodeName(), parent.nodeName());
+        }
+    }
+
+    @Override
+    public void verifyAdminPolicyConstant(Node constant) throws PMException {
+        try {
+            userDefinedPML.createConstant(constant.constantName(), new Value(constant.nodeName()));
+        } catch (PMLConstantAlreadyDefinedException e) {
+            // ignore this exception as the admin policy constant already existing is not an error
+        }
     }
 }

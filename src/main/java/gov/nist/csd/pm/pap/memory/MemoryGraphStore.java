@@ -14,7 +14,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.AdminPolicy.*;
+import static gov.nist.csd.pm.pap.AdminPolicy.Node.POLICY_CLASSES_OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
@@ -28,8 +28,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     private List<String> uas;
     private List<String> os;
     private List<String> us;
-
-    protected MemoryTx<TxGraph> tx;
 
     private MemoryProhibitionsStore memoryProhibitionsStore;
     private MemoryObligationsStore memoryObligationsStore;
@@ -92,45 +90,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     }
 
     @Override
-    public void initializeAdminPolicy() throws PMBackendException {
-        try {
-            if (!nodeExists(ADMIN_POLICY)) {
-                createNodeInternal(ADMIN_POLICY, PC, NO_PROPERTIES);
-            }
-
-            if (!nodeExists(POLICY_CLASSES_OA)) {
-                createNodeInternal(POLICY_CLASSES_OA, OA, NO_PROPERTIES);
-                assignInternal(POLICY_CLASSES_OA, ADMIN_POLICY);
-            } else if (!getParents(POLICY_CLASSES_OA).contains(ADMIN_POLICY)) {
-                assign(POLICY_CLASSES_OA, ADMIN_POLICY);
-            }
-
-            if (!nodeExists(PML_FUNCTIONS_TARGET)) {
-                createNodeInternal(PML_FUNCTIONS_TARGET, OA, NO_PROPERTIES);
-                assignInternal(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
-            } else if (!getParents(PML_FUNCTIONS_TARGET).contains(ADMIN_POLICY)) {
-                assign(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
-            }
-
-            if (!nodeExists(PML_CONSTANTS_TARGET)) {
-                createNodeInternal(PML_CONSTANTS_TARGET, OA, NO_PROPERTIES);
-                assignInternal(PML_CONSTANTS_TARGET, ADMIN_POLICY);
-            } else if (!getParents(PML_CONSTANTS_TARGET).contains(ADMIN_POLICY)) {
-                assign(PML_CONSTANTS_TARGET, ADMIN_POLICY);
-            }
-
-            if (!nodeExists(ADMIN_POLICY_TARGET)) {
-                createNodeInternal(ADMIN_POLICY_TARGET, OA, NO_PROPERTIES);
-                assignInternal(ADMIN_POLICY_TARGET, ADMIN_POLICY);
-            } else if (!getParents(ADMIN_POLICY_TARGET).contains(ADMIN_POLICY)) {
-                assign(ADMIN_POLICY_TARGET, ADMIN_POLICY);
-            }
-        } catch(PMException e) {
-            throw new PMBackendException("error initializing admin policy", e);
-        }
-    }
-
-    @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet)
     throws AdminAccessRightExistsException, PMBackendException {
         checkSetResourceAccessRightsInput(accessRightSet);
@@ -155,19 +114,15 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         // log the command if in a tx
         handleTxIfActive(tx -> tx.createPolicyClass(name, properties));
 
-        // create pc node
-        createNodeInternal(name, PC, properties);
+        runInternalTx(() -> {
+            // create pc node
+            createNodeInternal(name, PC, properties);
 
-        // create pc rep oa
-        String oa = AdminPolicy.policyClassObjectAttributeName(name);
-        createNodeInternal(oa, OA, properties);
-
-        // assign the oa to the pcs oa
-        try {
-            assign(oa, POLICY_CLASSES_OA);
-        } catch (NodeDoesNotExistException | InvalidAssignmentException | AssignmentCausesLoopException e) {
-            throw new PMBackendException("could not assign " + oa + " to " + POLICY_CLASSES_OA, e);
-        }
+            // create pc rep oa
+            String pcTarget = AdminPolicy.policyClassTargetName(name);
+            createNodeInternal(pcTarget, OA, properties);
+            assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
+        });
 
         return name;
     }
@@ -294,11 +249,11 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
 
         runInternalTx(() -> {
             if (type == PC) {
-                String rep = AdminPolicy.policyClassObjectAttributeName(name);
-                deleteNode(rep);
+                String rep = AdminPolicy.policyClassTargetName(name);
+                deleteNodeInternal(rep);
             }
 
-            deleteInternal(name);
+            deleteNodeInternal(name);
         });
     }
 
@@ -437,12 +392,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         return name;
     }
 
-    protected void createNodeInternal(String name, NodeType type, Map<String, String> properties)
-    throws NodeNameExistsException {
-        if (nodeExists(name)) {
-            throw new NodeNameExistsException(name);
-        }
-
+    protected void createNodeInternal(String name, NodeType type, Map<String, String> properties) {
         // add node to graph
         graph.put(name, getVertex(name, type, properties));
         if (type == NodeType.PC) {
@@ -458,7 +408,31 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         }
     }
 
-    private void deleteInternal(String name) {
+    protected void assignInternal(String child, String parent) {
+        if (graph.get(child).getParents().contains(parent)) {
+            return;
+        }
+
+        graph.get(child).addAssignment(child, parent);
+        graph.get(parent).addAssignment(child, parent);
+    }
+
+    private void deassignInternal(String child, String parent) {
+        graph.get(child).deleteAssignment(child, parent);
+        graph.get(parent).deleteAssignment(child, parent);
+    }
+
+    protected void associateInternal(String ua, String target, AccessRightSet accessRights) {
+        graph.get(ua).addAssociation(ua, target, accessRights);
+        graph.get(target).addAssociation(ua, target, accessRights);
+    }
+
+    private void dissociateInternal(String ua, String target) {
+        graph.get(ua).deleteAssociation(ua, target);
+        graph.get(target).deleteAssociation(ua, target);
+    }
+
+    private void deleteNodeInternal(String name) {
         Vertex vertex = graph.get(name);
 
         List<String> parents = vertex.getParents();
@@ -578,30 +552,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         }
 
         return true;
-    }
-
-    protected void assignInternal(String child, String parent) {
-        if (graph.get(child).getParents().contains(parent)) {
-            return;
-        }
-
-        graph.get(child).addAssignment(child, parent);
-        graph.get(parent).addAssignment(child, parent);
-    }
-
-    private void deassignInternal(String child, String parent) {
-        graph.get(child).deleteAssignment(child, parent);
-        graph.get(parent).deleteAssignment(child, parent);
-    }
-
-    protected void associateInternal(String ua, String target, AccessRightSet accessRights) {
-        graph.get(ua).addAssociation(ua, target, accessRights);
-        graph.get(target).addAssociation(ua, target, accessRights);
-    }
-
-    private void dissociateInternal(String ua, String target) {
-        graph.get(ua).deleteAssociation(ua, target);
-        graph.get(target).deleteAssociation(ua, target);
     }
 
     private boolean containsEdge(String source, String target) {

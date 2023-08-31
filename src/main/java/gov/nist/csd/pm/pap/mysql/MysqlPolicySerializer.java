@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
+import gov.nist.csd.pm.pap.PMLSerializer;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -12,7 +13,6 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.mysql.MysqlGraph.getNodeFromResultSet;
+import static gov.nist.csd.pm.pap.mysql.MysqlGraphStore.getNodeFromResultSet;
 
 public class MysqlPolicySerializer implements PolicySerializer {
 

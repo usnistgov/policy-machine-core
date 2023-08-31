@@ -25,12 +25,12 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.PML_FUNCTIONS_TARGET, ADD_FUNCTION);
+        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(), CREATE_FUNCTION);
     }
 
     @Override
     public void deleteFunction(String functionName) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.PML_FUNCTIONS_TARGET, REMOVE_FUNCTION);
+        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(), DELETE_FUNCTION);
     }
 
     @Override
@@ -47,12 +47,12 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public void createConstant(String constantName, Value constantValue) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.PML_CONSTANTS_TARGET, ADD_CONSTANT);
+        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), CREATE_CONSTANT);
     }
 
     @Override
     public void deleteConstant(String constName) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.PML_CONSTANTS_TARGET, REMOVE_CONSTANT);
+        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), DELETE_CONSTANT);
     }
 
     @Override

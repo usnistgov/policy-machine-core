@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.events.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class TxPolicyEventTracker {
 
@@ -15,7 +16,11 @@ class TxPolicyEventTracker {
     }
 
     public List<PolicyEvent> getEvents() {
-        return events.stream().sorted(Collections.reverseOrder()).toList();
+        List<PolicyEvent> copy = new ArrayList<>(events);
+
+        Collections.reverse(copy);
+
+        return copy;
     }
 
     public void trackPolicyEvent(PolicyEvent event) {

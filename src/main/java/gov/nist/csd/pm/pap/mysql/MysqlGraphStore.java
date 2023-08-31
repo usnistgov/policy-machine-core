@@ -18,56 +18,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminPolicy.*;
+import static gov.nist.csd.pm.pap.AdminPolicy.Node.POLICY_CLASSES_OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.U;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-class MysqlGraph implements GraphStore {
+class MysqlGraphStore implements GraphStore {
 
     private MysqlConnection connection;
 
-    public MysqlGraph(MysqlConnection connection) {
+    public MysqlGraphStore(MysqlConnection connection) {
         this.connection = connection;
-    }
-
-    @Override
-    public void initializeAdminPolicy() throws PMBackendException {
-        try {
-            if (!nodeExists(ADMIN_POLICY)) {
-                createNodeInternal(ADMIN_POLICY, PC, NO_PROPERTIES);
-            }
-
-            if (!nodeExists(POLICY_CLASSES_OA)) {
-                createNodeInternal(POLICY_CLASSES_OA, OA, NO_PROPERTIES);
-                assignInternal(POLICY_CLASSES_OA, ADMIN_POLICY);
-            } else if (!getParents(POLICY_CLASSES_OA).contains(ADMIN_POLICY)) {
-                assign(POLICY_CLASSES_OA, ADMIN_POLICY);
-            }
-
-            if (!nodeExists(PML_FUNCTIONS_TARGET)) {
-                createNodeInternal(PML_FUNCTIONS_TARGET, OA, NO_PROPERTIES);
-                assignInternal(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
-            } else if (!getParents(PML_FUNCTIONS_TARGET).contains(ADMIN_POLICY)) {
-                assign(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
-            }
-
-            if (!nodeExists(PML_CONSTANTS_TARGET)) {
-                createNodeInternal(PML_CONSTANTS_TARGET, OA, NO_PROPERTIES);
-                assignInternal(PML_CONSTANTS_TARGET, ADMIN_POLICY);
-            } else if (!getParents(PML_CONSTANTS_TARGET).contains(ADMIN_POLICY)) {
-                assign(PML_CONSTANTS_TARGET, ADMIN_POLICY);
-            }
-
-            if (!nodeExists(ADMIN_POLICY_TARGET)) {
-                createNodeInternal(ADMIN_POLICY_TARGET, OA, NO_PROPERTIES);
-                assignInternal(ADMIN_POLICY_TARGET, ADMIN_POLICY);
-            } else if (!getParents(ADMIN_POLICY_TARGET).contains(ADMIN_POLICY)) {
-                assign(ADMIN_POLICY_TARGET, ADMIN_POLICY);
-            }
-        } catch(PMException e) {
-            throw new PMBackendException("error initializing admin policy", e);
-        }
     }
 
     @Override
@@ -308,7 +269,7 @@ class MysqlGraph implements GraphStore {
     @Override
     public void deleteNode(String name)
     throws PMBackendException, NodeHasChildrenException, NodeReferencedInProhibitionException, NodeReferencedInObligationException {
-        if (!checkDeleteNodeInput(name, new MysqlProhibitions(connection), new MysqlObligations(connection))) {
+        if (!checkDeleteNodeInput(name, new MysqlProhibitionsStore(connection), new MysqlObligationsStore(connection))) {
             return;
         }
 
@@ -332,7 +293,7 @@ class MysqlGraph implements GraphStore {
 
         if (node.getType() == PC) {
             try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-                ps.setString(1, AdminPolicy.policyClassObjectAttributeName(name));
+                ps.setString(1, AdminPolicy.policyClassTargetName(name));
                 ps.execute();
             } catch (SQLException e) {
                 throw new MysqlPolicyException(e.getMessage());
@@ -556,9 +517,9 @@ class MysqlGraph implements GraphStore {
         createNodeInternal(name, PC, properties);
 
         // create rep OA
-        String repOA = AdminPolicy.policyClassObjectAttributeName(name);
-        createNodeInternal(repOA, OA, properties);
-        assignInternal(repOA, POLICY_CLASSES_OA);
+        String pcTarget = AdminPolicy.policyClassTargetName(name);
+        createNodeInternal(pcTarget, OA, properties);
+        assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
 
         connection.commit();
 
@@ -595,7 +556,7 @@ class MysqlGraph implements GraphStore {
         return name;
     }
 
-    private void createNodeInternal(String name, NodeType type, Map<String, String> properties) throws MysqlPolicyException {
+    protected void createNodeInternal(String name, NodeType type, Map<String, String> properties) throws MysqlPolicyException {
         String sql = """
                     INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)
                     """;
@@ -609,7 +570,7 @@ class MysqlGraph implements GraphStore {
         }
     }
 
-    private void assignInternal(String child, String parent) throws MysqlPolicyException {
+    protected void assignInternal(String child, String parent) throws MysqlPolicyException {
         String sql = """
             INSERT INTO assignment (start_node_id, end_node_id) VALUES (
               (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)

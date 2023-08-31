@@ -342,7 +342,7 @@ public class ExecutionTest {
         pap.bootstrap(new SuperUserBootstrapper());
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
-        assertEquals(6, pap.graph().getPolicyClasses().size());
+        assertEquals(7, pap.graph().getPolicyClasses().size());
         assertTrue(pap.graph().getPolicyClasses().containsAll(List.of("1", "2", "3", "4", "5")));
     }
 
@@ -369,7 +369,7 @@ public class ExecutionTest {
                 testFunc(['pc1'])
                 """;
         PAP pap1 = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        pap1.bootstrap(new SuperUserBootstrapper());
         assertThrows(IllegalStateException.class, () -> PMLExecutor.compileAndExecutePML(pap1, superUser, input1));
 
         input = """
@@ -398,7 +398,7 @@ public class ExecutionTest {
         assertTrue(pap.graph().nodeExists("hello world"));
 
         PAP pap1 = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        pap1.bootstrap(new SuperUserBootstrapper());
         String input1 = """
                 let a = 'hello world'
                 const b = a

@@ -139,7 +139,8 @@ class EPPTest {
             policy.graph().createObjectAttribute("oa1", "pc1");
             policy.graph().createUser("u1", "ua1");
             policy.graph().createObject("o1", "oa1");
-            policy.graph().associate("ua1", AdminPolicy.ADMIN_POLICY_TARGET, new AccessRightSet(CREATE_OBLIGATION));
+            policy.graph().associate("ua1", AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(),
+                                     new AccessRightSet(CREATE_OBLIGATION));
             policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
         });
 

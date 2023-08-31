@@ -27,7 +27,7 @@ public class AccessRightChecker {
         Node targetNode = pap.graph().getNode(target);
 
         if (targetNode.getType().equals(PC)) {
-            target = AdminPolicy.policyClassObjectAttributeName(target);
+            target = AdminPolicy.policyClassTargetName(target);
         }
 
         AccessRightSet accessRights = policyReviewer.getPrivileges(userCtx, target);

@@ -14,7 +14,6 @@ import java.util.*;
 
 class MemoryProhibitionsStore extends MemoryStore<TxProhibitions> implements ProhibitionsStore, Transactional, BaseMemoryTx {
 
-    protected MemoryTx<TxProhibitions> tx;
     private Map<String, List<Prohibition>> prohibitions;
     private MemoryGraphStore graph;
 

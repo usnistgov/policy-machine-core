@@ -44,8 +44,8 @@ public class AdminAccessRights {
     public static final String GET_PROCESS_PROHIBITIONS = "get_process_prohibitions";
     public static final String ADD_CONTAINER_TO_PROHIBITION = "add_container_to_prohibition";
     public static final String ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION = "add_container_complement_to_prohibition";
-    public static final String REMOVE_CONTAINER_FROM_PROHIBITION = "remove_container_to_prohibition";
-    public static final String REMOVE_CONTAINER_COMPLEMENT_FROM_PROHIBITION = "remove_container_complement_to_prohibition";
+    public static final String DELETE_CONTAINER_FROM_PROHIBITION = "delete_container_from_prohibition";
+    public static final String DELETE_CONTAINER_COMPLEMENT_FROM_PROHIBITION = "delete_container_complement_from_prohibition";
     public static final String DELETE_PROHIBITION = "delete_prohibition";
 
     // obligations
@@ -57,11 +57,11 @@ public class AdminAccessRights {
     public static final String GET_RESOURCE_ACCESS_RIGHTS = "get_resource_access_rights";
 
     // pml
-    public static final String ADD_FUNCTION = "add_function";
-    public static final String REMOVE_FUNCTION = "remove_function";
+    public static final String CREATE_FUNCTION = "create_function";
+    public static final String DELETE_FUNCTION = "delete_function";
     public static final String GET_FUNCTIONS = "get_functions";
-    public static final String ADD_CONSTANT = "add_constant";
-    public static final String REMOVE_CONSTANT = "remove_constant";
+    public static final String CREATE_CONSTANT = "create_constant";
+    public static final String DELETE_CONSTANT = "delete_constant";
     public static final String GET_CONSTANTS = "get_constants";
     public static final String GET_CONTEXT = "get_context";
     public static final String TO_STRING = "to_string";
@@ -114,8 +114,8 @@ public class AdminAccessRights {
             GET_PROCESS_PROHIBITIONS,
             ADD_CONTAINER_TO_PROHIBITION,
             ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION,
-            REMOVE_CONTAINER_FROM_PROHIBITION,
-            REMOVE_CONTAINER_COMPLEMENT_FROM_PROHIBITION,
+            DELETE_CONTAINER_FROM_PROHIBITION,
+            DELETE_CONTAINER_COMPLEMENT_FROM_PROHIBITION,
             DELETE_PROHIBITION,
 
             // obligations
@@ -127,11 +127,11 @@ public class AdminAccessRights {
             GET_RESOURCE_ACCESS_RIGHTS,
 
             // pml
-            ADD_FUNCTION,
-            REMOVE_FUNCTION,
+            CREATE_FUNCTION,
+            DELETE_FUNCTION,
             GET_FUNCTIONS,
-            ADD_CONSTANT,
-            REMOVE_CONSTANT,
+            CREATE_CONSTANT,
+            DELETE_CONSTANT,
             GET_CONSTANTS,
             GET_CONTEXT,
 

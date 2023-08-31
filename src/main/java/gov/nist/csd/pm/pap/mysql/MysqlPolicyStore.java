@@ -7,9 +7,11 @@ import gov.nist.csd.pm.pap.PolicyStore;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMLConstantAlreadyDefinedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,9 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pap.AdminPolicy.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
-public class MysqlPolicyStore extends PolicyStore {
+public class MysqlPolicyStore extends PolicyStore implements Verifier {
 
     static final ObjectMapper objectMapper = new ObjectMapper();
     static final ObjectReader hashmapReader = new ObjectMapper().readerFor(HashMap.class);
@@ -29,18 +32,20 @@ public class MysqlPolicyStore extends PolicyStore {
 
     protected final MysqlConnection connection;
 
-    private final MysqlGraph graph;
-    private final MysqlProhibitions prohibitions;
-    private final MysqlObligations obligations;
-    private final MysqlUserDefinedPML userDefinedPML;
+    private final MysqlGraphStore graph;
+    private final MysqlProhibitionsStore prohibitions;
+    private final MysqlObligationsStore obligations;
+    private final MysqlUserDefinedPMLStore userDefinedPML;
 
-    public MysqlPolicyStore(Connection connection) {
+    public MysqlPolicyStore(Connection connection) throws PMException {
         this.connection = new MysqlConnection(connection);
 
-        this.graph = new MysqlGraph(this.connection);
-        this.prohibitions = new MysqlProhibitions(this.connection);
-        this.obligations = new MysqlObligations(this.connection);
-        this.userDefinedPML = new MysqlUserDefinedPML(this.connection);
+        this.graph = new MysqlGraphStore(this.connection);
+        this.prohibitions = new MysqlProhibitionsStore(this.connection);
+        this.obligations = new MysqlObligationsStore(this.connection);
+        this.userDefinedPML = new MysqlUserDefinedPMLStore(this.connection);
+
+        verify(this, graph);
     }
 
     @Override
@@ -59,7 +64,7 @@ public class MysqlPolicyStore extends PolicyStore {
     }
 
     @Override
-    public void reset() throws MysqlPolicyException {
+    public void reset() throws PMException {
         beginTx();
 
         List<String> sequence = PolicyResetSequence.getSequence();
@@ -72,26 +77,28 @@ public class MysqlPolicyStore extends PolicyStore {
             throw new MysqlPolicyException(e.getMessage());
         }
 
+        verify(this, graph);
+
         commit();
     }
 
     @Override
-    public MysqlGraph graph() {
+    public MysqlGraphStore graph() {
         return graph;
     }
 
     @Override
-    public MysqlProhibitions prohibitions() {
+    public MysqlProhibitionsStore prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public MysqlObligations obligations() {
+    public MysqlObligationsStore obligations() {
         return obligations;
     }
 
     @Override
-    public MysqlUserDefinedPML userDefinedPML() {
+    public MysqlUserDefinedPMLStore userDefinedPML() {
         return userDefinedPML;
     }
 
@@ -133,5 +140,30 @@ public class MysqlPolicyStore extends PolicyStore {
 
     public static String arsetToJson(AccessRightSet set) throws JsonProcessingException {
         return objectMapper.writeValueAsString(set);
+    }
+
+    @Override
+    public void verifyAdminPolicyClassNode() throws PMException {
+        graph.createNodeInternal(Node.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
+    }
+
+    @Override
+    public void verifyAdminPolicyAttribute(Node node, Node parent) throws PMException {
+        if (!graph.nodeExists(node.nodeName())) {
+            graph.createNodeInternal(node.nodeName(), OA, new HashMap<>());
+        }
+
+        if (!graph.getParents(node.nodeName()).contains(parent.nodeName())) {
+            graph.assignInternal(node.nodeName(), parent.nodeName());
+        }
+    }
+
+    @Override
+    public void verifyAdminPolicyConstant(Node constant) throws PMException {
+        try {
+            userDefinedPML.createConstant(constant.constantName(), new Value(constant.nodeName()));
+        } catch (PMLConstantAlreadyDefinedException e) {
+            // ignore this exception as the admin policy constant already existing is not an error
+        }
     }
 }

@@ -3,8 +3,11 @@ package gov.nist.csd.pm.pap.memory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import gov.nist.csd.pm.pap.PMLSerializer;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
+import gov.nist.csd.pm.policy.exceptions.AdminAccessRightExistsException;
 import gov.nist.csd.pm.policy.exceptions.NodeNameExistsException;
+import gov.nist.csd.pm.policy.exceptions.PMBackendException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.json.JSONGraph;
 import gov.nist.csd.pm.policy.json.JSONPolicy;
@@ -16,7 +19,6 @@ import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -52,7 +54,6 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
     @Override
     public void fromPML(UserContext author, String pml, FunctionDefinitionStatement... customFunctions) throws PMException {
         memoryPolicyStore.beginTx();
-        memoryPolicyStore.reset();
 
         PMLSerializer pmlSerializer = new PMLSerializer(memoryPolicyStore);
         pmlSerializer.fromPML(author, pml, customFunctions);
@@ -106,10 +107,13 @@ public class MemoryPolicyDeserializer implements PolicyDeserializer {
         }
     }
 
-    private void graphFromJson(String json) throws NodeNameExistsException {
+    private void graphFromJson(String json)
+            throws NodeNameExistsException, AdminAccessRightExistsException, PMBackendException {
         JSONGraph jsonGraph = new Gson().fromJson(json, JSONGraph.class);
 
         MemoryGraphStore graph = (MemoryGraphStore) memoryPolicyStore.graph();
+
+        graph.setResourceAccessRights(jsonGraph.getResourceAccessRights());
 
         for (Node node : jsonGraph.getNodes()) {
             graph.createNodeInternal(node.getName(), node.getType(), node.getProperties());

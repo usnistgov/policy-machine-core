@@ -29,6 +29,9 @@ class MemoryPolicyStoreTest {
 
     MemoryPolicyStore policyStore = new MemoryPolicyStore();
 
+    MemoryPolicyStoreTest() throws PMException {
+    }
+
     @Test
     void getResourceAccessRights() throws PMException {
         policyStore.graph().setResourceAccessRights(new AccessRightSet("read", "write"));

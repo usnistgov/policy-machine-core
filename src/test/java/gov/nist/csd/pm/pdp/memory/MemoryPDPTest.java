@@ -5,6 +5,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
@@ -69,11 +70,12 @@ class MemoryPDPTest {
 
             assertTrue(pap.graph().nodeExists("ua3"));
 
-            assertThrows(UnauthorizedException.class, () -> {
+            PMLExecutionException e = assertThrows(PMLExecutionException.class, () -> {
                 memoryPDP.runTx(new UserContext("u1"), policy -> {
                     policy.executePML(new UserContext("u1"), "testfunc()");
                 });
             });
+            assertEquals(UnauthorizedException.class, e.getCause().getClass());
 
             assertFalse(pap.graph().nodeExists("pc3"));
         } catch (IOException e) {

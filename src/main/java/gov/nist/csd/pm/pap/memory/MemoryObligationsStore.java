@@ -14,7 +14,6 @@ import java.util.List;
 
 class MemoryObligationsStore extends MemoryStore<TxObligations> implements ObligationsStore, Transactional, BaseMemoryTx {
 
-    protected MemoryTx<TxObligations> tx;
     private List<Obligation> obligations;
     private MemoryGraphStore graph;
 

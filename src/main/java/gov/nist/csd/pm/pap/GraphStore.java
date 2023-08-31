@@ -34,18 +34,6 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.wildcardAcce
 public interface GraphStore extends Graph {
 
     /**
-     * Initialize the Admin Policy using the constants in {@link AdminPolicy}. This method should:
-     * Create the {@link AdminPolicy#ADMIN_POLICY} policy class.<p>
-     * Create the {@link AdminPolicy#POLICY_CLASSES_OA} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy#ADMIN_POLICY_TARGET} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy#PML_CONSTANTS_TARGET} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy#PML_FUNCTIONS_TARGET} in the ADMIN_POLICY policy class.<p>
-     *
-     * @throws PMBackendException              If there is an error executing the command in the PIP.
-     */
-    void initializeAdminPolicy() throws PMBackendException;
-
-    /**
      * See {@link Graph#setResourceAccessRights(AccessRightSet)} <p>
      *
      * @throws AdminAccessRightExistsException If a provided access right is already defined as an administrative
@@ -66,8 +54,11 @@ public interface GraphStore extends Graph {
 
     /**
      * Create a policy class in the graph. This method should also create an object attribute that represents the
-     * policy class in {@link gov.nist.csd.pm.pap.AdminPolicy#POLICY_CLASSES_OA}. This object attribute can be used in
-     * the future to create associations with the policy class itself which is not a supported relation in NGAC. <p>
+     * policy class in {@link AdminPolicy#POLICY_CLASSES_OA}. This object attribute can be used in
+     * the future to create associations with the policy class itself which is not a supported relation in NGAC.
+     * If the provided name equals {@link AdminPolicy#ADMIN_POLICY} then this method should also create the
+     * {@link AdminPolicy#POLICY_CLASSES_OA} node and assign it to ADMIN_POLICY before creating
+     * {@link AdminPolicy#ADMIN_POLICY_TARGET} <p>
      *
      * See {@link Graph#createPolicyClass(String)} <p>
      *
@@ -675,7 +666,7 @@ public interface GraphStore extends Graph {
      *
      * @param target The target node.
      * @throws PMBackendException        If there is an error in the backend implementation.
-     * @throws NodeDoesNotExistException If the source node does not exist.
+     * @throws NodeDoesNotExistException If the target node does not exist.
      */
     default void checkGetAssociationsWithTargetInput(String target) throws PMBackendException, NodeDoesNotExistException {
         if (!nodeExists(target)) {

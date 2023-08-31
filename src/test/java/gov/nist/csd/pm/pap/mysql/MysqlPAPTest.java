@@ -59,8 +59,6 @@ class MysqlPAPTest extends PAPTest {
         return new PAP(new MysqlPolicyStore(connection));
     }
 
-
-
     @Test
     void testTx() throws SQLException, PMException {
         try (Connection connection = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());

@@ -1,9 +1,21 @@
 set resource access rights ["read", "write"]
 
+create policy class 'super_policy'
+create user attribute 'super_ua' in ['super_policy']
+associate 'super_ua' and ADMIN_POLICY_TARGET with ['*']
+associate 'super_ua' and POLICY_CLASSES_OA with ['*']
+associate 'super_ua' and PML_FUNCTIONS_TARGET with ['*']
+associate 'super_ua' and PML_CONSTANTS_TARGET with ['*']
+create user attribute 'super_ua1' in ['super_policy']
+associate 'super_ua' and 'super_ua1' with ['*']
+create user 'super' in ['super_ua']
+assign 'super' to ['super_ua1']
+
 create policy class "pc1"
 create user attribute "ua1" in ["pc1"]
-create user attribute "oa1" in ["pc1"]
-associate "ua1" and "oa1" with ["read", "write"]
+set properties of "ua1" to {"k": "v", "k1": "v1"}
+create object attribute "oa1" in ["pc1"]
+associate "ua1" and "oa1" with ["read", "write", "create_policy_class"]
 
 create policy class "pc2"
 create user attribute "ua2" in ["pc2"]

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.policy.pml.model.scope;
 
-import gov.nist.csd.pm.policy.pml.PMLBuiltinConstants;
 import gov.nist.csd.pm.policy.pml.PMLBuiltinFunctions;
 import gov.nist.csd.pm.policy.pml.PMLContext;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
@@ -112,6 +111,15 @@ public class Scope implements Serializable {
     public void loadFromPMLContext(PMLContext pmlCtx) {
         functions.putAll(pmlCtx.getFunctions());
         values.putAll(pmlCtx.getConstants());
+
+        // if the mode is COMPILE add the constants as variables which will be used during the compilation of
+        // statements
+        if (mode == Mode.COMPILE) {
+            Map<String, Value> constants = pmlCtx.getConstants();
+            for (Map.Entry<String, Value> constant : constants.entrySet()) {
+                variables.put(constant.getKey(), new Variable(constant.getKey(), Type.string(), true));
+            }
+        }
     }
 
     public void setResourceAccessRightsExpression(Expression expression) {
@@ -142,8 +150,7 @@ public class Scope implements Serializable {
     }
 
     public void addVariable(String name, Type type, boolean isConst) throws VariableAlreadyDefinedInScopeException {
-        if (constantExists(name)
-                || isBuiltinVariable(name)) {
+        if (constantExists(name)) {
             throw new VariableAlreadyDefinedInScopeException(name);
         }
 
@@ -157,8 +164,6 @@ public class Scope implements Serializable {
     public Variable getVariable(String name) throws UnknownVariableInScopeException {
         if (variables.containsKey(name)) {
             return variables.get(name);
-        } else if (isBuiltinVariable(name)) {
-            return PMLBuiltinConstants.builtinVariables().get(name);
         }
 
         throw new UnknownVariableInScopeException(name);
@@ -181,20 +186,11 @@ public class Scope implements Serializable {
     public Value getValue(String name) throws UnknownVariableInScopeException {
         if (values.containsKey(name)) {
             return values.get(name);
-        } else if (isBuiltinValue(name)) {
-            return PMLBuiltinConstants.builtinValues().get(name);
-        } else if (resourceAccessRights.contains(name)) {
+        }else if (resourceAccessRights.contains(name)) {
             return new Value(name);
         }
 
         throw new UnknownVariableInScopeException(name);
-    }
-
-    private boolean isBuiltinVariable(String name) {
-        return PMLBuiltinConstants.builtinVariables().containsKey(name);
-    }
-    private boolean isBuiltinValue(String name) {
-        return PMLBuiltinConstants.builtinValues().containsKey(name);
     }
 
     private boolean isBuiltinFunction(String name) {

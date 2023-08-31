@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
 import com.google.gson.Gson;
+import gov.nist.csd.pm.pap.PMLSerializer;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -12,7 +13,6 @@ import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;

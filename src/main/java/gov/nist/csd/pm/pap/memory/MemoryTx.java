@@ -13,6 +13,12 @@ public class MemoryTx<T extends BaseMemoryTx> implements Transactional {
     private int counter;
     private T store;
 
+    public MemoryTx() {
+        active = false;
+        counter = 0;
+        store = null;
+    }
+
     public MemoryTx(boolean active, int counter, T store) {
         this.active = active;
         this.counter = counter;

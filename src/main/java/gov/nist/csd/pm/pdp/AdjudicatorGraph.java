@@ -35,7 +35,7 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.ADMIN_POLICY_TARGET, SET_RESOURCE_ACCESS_RIGHTS);
+        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), SET_RESOURCE_ACCESS_RIGHTS);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.POLICY_CLASSES_OA, CREATE_POLICY_CLASS);
+        accessRightChecker.check(userCtx, AdminPolicy.Node.POLICY_CLASSES_OA.nodeName(), CREATE_POLICY_CLASS);
 
         return null;
     }
@@ -169,7 +169,7 @@ public class AdjudicatorGraph implements Graph {
         List<String> policyClasses = pap.graph().getPolicyClasses();
         policyClasses.removeIf(pc -> {
             try {
-                accessRightChecker.check(userCtx, AdminPolicy.policyClassObjectAttributeName(pc));
+                accessRightChecker.check(userCtx, AdminPolicy.policyClassTargetName(pc));
                 return false;
             } catch (PMException e) {
                 return true;
@@ -184,7 +184,7 @@ public class AdjudicatorGraph implements Graph {
         NodeType nodeType = pap.graph().getNode(name).getType();
 
         if (nodeType == PC) {
-            accessRightChecker.check(userCtx, AdminPolicy.policyClassObjectAttributeName(name), DELETE_POLICY_CLASS);
+            accessRightChecker.check(userCtx, AdminPolicy.policyClassTargetName(name), DELETE_POLICY_CLASS);
             return;
         }
 

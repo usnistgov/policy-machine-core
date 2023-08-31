@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.mysql;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.nist.csd.pm.pap.ObligationsStore;
-import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -17,18 +16,18 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-class MysqlObligations implements ObligationsStore {
+class MysqlObligationsStore implements ObligationsStore {
 
     private MysqlConnection connection;
 
-    public MysqlObligations(MysqlConnection mysqlConnection) {
+    public MysqlObligationsStore(MysqlConnection mysqlConnection) {
         this.connection = mysqlConnection;
     }
 
     @Override
     public void create(UserContext author, String name, Rule... rules)
     throws PMBackendException, ObligationNameExistsException, NodeDoesNotExistException {
-        checkCreateInput(new MysqlGraph(connection), author, name, rules);
+        checkCreateInput(new MysqlGraphStore(connection), author, name, rules);
 
         String sql = """
                 insert into obligation (name, author, rules) values (?, ?, ?)
@@ -48,7 +47,7 @@ class MysqlObligations implements ObligationsStore {
     @Override
     public void update(UserContext author, String name, Rule... rules)
     throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException, ObligationRuleNameExistsException {
-        checkUpdateInput(new MysqlGraph(connection), author, name, rules);
+        checkUpdateInput(new MysqlGraphStore(connection), author, name, rules);
 
         connection.beginTx();
 

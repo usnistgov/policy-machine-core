@@ -41,29 +41,37 @@ public class AdjudicatorObligations implements Obligations {
     private void checkTarget(Target target, String accessRight) throws PMException {
         if (target.getType() == Target.Type.POLICY_ELEMENT) {
             accessRightChecker.check(userCtx, target.policyElement(), accessRight);
+
         } else if (target.getType() == Target.Type.ANY_POLICY_ELEMENT) {
-            accessRightChecker.check(userCtx, AdminPolicy.ADMIN_POLICY_TARGET, accessRight);
+            accessRightChecker.check(userCtx, AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), accessRight);
+
         } else if (target.getType() == Target.Type.ANY_CONTAINED_IN) {
             accessRightChecker.check(userCtx, target.anyContainedIn(), accessRight);
+
         } else if (target.getType() == Target.Type.ANY_OF_SET) {
             for (String policyElement : target.anyOfSet()) {
                 accessRightChecker.check(userCtx, policyElement, accessRight);
             }
+
         }
     }
 
     private void checkSubject(EventSubject subject, String accessRight) throws PMException {
         if (subject.getType() == EventSubject.Type.ANY_USER) {
-            accessRightChecker.check(userCtx, AdminPolicy.ADMIN_POLICY_TARGET, accessRight);
+            accessRightChecker.check(userCtx, AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), accessRight);
+
         } else if (subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE) {
             accessRightChecker.check(userCtx, subject.anyUserWithAttribute(), accessRight);
+
         } else if (subject.getType() == EventSubject.Type.PROCESS) {
             // need permissions on super object create a process obligation
-            accessRightChecker.check(userCtx, AdminPolicy.ADMIN_POLICY_TARGET, accessRight);
+            accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), accessRight);
+
         } else if (subject.getType() == EventSubject.Type.USERS) {
             for (String user : subject.users()) {
                 accessRightChecker.check(userCtx, user, accessRight);
             }
+
         }
     }
 
