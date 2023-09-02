@@ -22,9 +22,9 @@ import java.util.Objects;
 public class CreateObligationStatement extends PMLStatement {
 
     private final Expression name;
-    private final List<PMLStatement> ruleStmts;
+    private final List<CreateRuleStatement> ruleStmts;
 
-    public CreateObligationStatement(Expression name, List<PMLStatement> ruleStmts) {
+    public CreateObligationStatement(Expression name, List<CreateRuleStatement> ruleStmts) {
         this.name = name;
         this.ruleStmts = ruleStmts;
     }
@@ -72,8 +72,8 @@ public class CreateObligationStatement extends PMLStatement {
         );
     }
 
-    private static List<PMLStatement> createRuleStatementsFromObligation(List<Rule> rules) {
-        List<PMLStatement> createRuleStatements = new ArrayList<>();
+    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) {
+        List<CreateRuleStatement> createRuleStatements = new ArrayList<>();
 
         for (Rule rule : rules) {
             EventPattern event = rule.getEventPattern();

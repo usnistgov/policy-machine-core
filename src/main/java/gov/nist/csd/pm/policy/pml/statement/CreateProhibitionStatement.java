@@ -152,7 +152,7 @@ public class CreateProhibitionStatement extends PMLStatement {
 
         List<Container> containers = new ArrayList<>();
         for (ContainerCondition cc : prohibition.getContainers()) {
-            containers.add(new Container(cc.complement(), new Expression(new Literal(cc.name()))));
+            containers.add(new Container(cc.isComplement(), new Expression(new Literal(cc.getName()))));
         }
 
         return new CreateProhibitionStatement(

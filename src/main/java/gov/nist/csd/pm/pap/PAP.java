@@ -88,7 +88,7 @@ public class PAP implements Transactional, PMLExecutable, Policy {
 
     @Override
     public PolicyDeserializer deserialize() throws PMException {
-        return new Deserializer(policyStore);
+        return policyStore.deserialize();
     }
 
     @Override

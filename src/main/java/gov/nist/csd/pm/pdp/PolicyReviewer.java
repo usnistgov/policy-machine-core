@@ -98,8 +98,8 @@ public abstract class PolicyReviewer implements PolicyReview {
         boolean addOps = false;
 
         for (ContainerCondition containerCondition : containers) {
-            String contName = containerCondition.name();
-            boolean isComplement = containerCondition.complement();
+            String contName = containerCondition.getName();
+            boolean isComplement = containerCondition.isComplement();
 
             if (target.equals(contName)) {
                 // if the prohibition is UNION and the target is the container then the prohibition is satisfied

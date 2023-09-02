@@ -159,14 +159,16 @@ public abstract class PAPTest {
         String actual = pap.serialize().toPML();
         assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
 
+        pap.reset();
+
         pap.deserialize().fromPML(new UserContext(SUPER_USER), actual);
         actual = pap.serialize().toPML();
         assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
 
         String json = pap.serialize().toJSON();
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        memoryPolicyStore.deserialize().fromJSON(json);
-        pap.deserialize().fromJSON(json);
+        memoryPolicyStore.deserialize().fromJSON(new UserContext(SUPER_USER), json);
+        pap.deserialize().fromJSON(new UserContext(SUPER_USER), json);
         PolicyEquals.check(pap, memoryPolicyStore);
     }
 
@@ -210,7 +212,6 @@ public abstract class PAPTest {
             throw new RuntimeException(e);
         }
     }
-
 
     @Test
     void testAdminPolicyCreatedInConstructor() throws PMException {

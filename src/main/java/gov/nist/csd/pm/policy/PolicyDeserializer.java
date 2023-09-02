@@ -6,7 +6,7 @@ import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 public interface PolicyDeserializer {
 
-    void fromJSON(String json) throws PMException;
+    void fromJSON(UserContext author, String json, FunctionDefinitionStatement ... customFunctions) throws PMException;
 
     void fromPML(UserContext author, String pml, FunctionDefinitionStatement ... customFunctions) throws PMException;
 

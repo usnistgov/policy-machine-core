@@ -102,16 +102,6 @@ public class MysqlPolicyStore extends PolicyStore implements Verifier {
         return userDefinedPML;
     }
 
-    @Override
-    public PolicySerializer serialize() throws PMException {
-        return new MysqlPolicySerializer(this);
-    }
-
-    @Override
-    public PolicyDeserializer deserialize() throws PMException {
-        return new MysqlPolicyDeserializer(this);
-    }
-
     static int getNodeTypeId(NodeType nodeType) {
         // values are mapped to values in node_type table
         return switch (nodeType) {

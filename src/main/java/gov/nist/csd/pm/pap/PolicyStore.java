@@ -1,6 +1,10 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.pap.serialization.PolicyStoreDeserializer;
+import gov.nist.csd.pm.pap.serialization.PolicyStoreSerializer;
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.PolicyDeserializer;
+import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
@@ -31,5 +35,14 @@ public abstract class PolicyStore implements Policy, Transactional {
      */
     @Override
     public abstract void reset() throws PMException;
-    
+
+    @Override
+    public PolicySerializer serialize() throws PMException {
+        return new PolicyStoreSerializer(this);
+    }
+
+    @Override
+    public PolicyDeserializer deserialize() throws PMException {
+        return new PolicyStoreDeserializer(this);
+    }
 }

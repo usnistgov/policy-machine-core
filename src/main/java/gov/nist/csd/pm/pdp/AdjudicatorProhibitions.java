@@ -40,10 +40,10 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
         // check that the user can create a prohibition for each container in the condition
         for (ContainerCondition contCond : containerConditions) {
-            accessRightChecker.check(userCtx, contCond.name(), ADD_CONTAINER_TO_PROHIBITION);
+            accessRightChecker.check(userCtx, contCond.getName(), ADD_CONTAINER_TO_PROHIBITION);
 
             // there is another access right needed if the condition is a complement
-            if (contCond.complement()) {
+            if (contCond.isComplement()) {
                 accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION);
             }
         }
@@ -67,10 +67,10 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
         // check that the user can create a prohibition for each container in the condition
         for (ContainerCondition contCond : prohibition.getContainers()) {
-            accessRightChecker.check(userCtx, contCond.name(), DELETE_CONTAINER_FROM_PROHIBITION);
+            accessRightChecker.check(userCtx, contCond.getName(), DELETE_CONTAINER_FROM_PROHIBITION);
 
             // there is another access right needed if the condition is a complement
-            if (contCond.complement()) {
+            if (contCond.isComplement()) {
                 accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), DELETE_CONTAINER_COMPLEMENT_FROM_PROHIBITION);
             }
         }
@@ -123,7 +123,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
         // check user has access to each target prohibitions
         for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            accessRightChecker.check(userCtx, containerCondition.name(), GET_PROHIBITIONS);
+            accessRightChecker.check(userCtx, containerCondition.getName(), GET_PROHIBITIONS);
         }
 
         return prohibition;
@@ -142,7 +142,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
                 // check user has access to each target prohibitions
                 for (ContainerCondition containerCondition : prohibition.getContainers()) {
-                    accessRightChecker.check(userCtx, containerCondition.name(), GET_PROHIBITIONS);
+                    accessRightChecker.check(userCtx, containerCondition.getName(), GET_PROHIBITIONS);
                 }
 
                 return false;

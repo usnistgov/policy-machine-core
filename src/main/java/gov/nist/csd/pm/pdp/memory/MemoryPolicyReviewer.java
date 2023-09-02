@@ -185,7 +185,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
             for (Prohibition prohibition : subjectProhibitions) {
                 List<ContainerCondition> containers = prohibition.getContainers();
                 for (ContainerCondition cont : containers) {
-                    prohibitionTargets.add(cont.name());
+                    prohibitionTargets.add(cont.getName());
                 }
             }
 

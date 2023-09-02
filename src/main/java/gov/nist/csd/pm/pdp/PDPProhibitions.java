@@ -46,7 +46,7 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
 
         // emit event for each container specified
         for (ContainerCondition containerCondition : containerConditions) {
-            emitEvent(new EventContext(userCtx, containerCondition.name(), createProhibitionEvent));
+            emitEvent(new EventContext(userCtx, containerCondition.getName(), createProhibitionEvent));
         }
     }
 
@@ -65,7 +65,7 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
 
         // emit event for each container specified
         for (ContainerCondition containerCondition : containerConditions) {
-            emitEvent(new EventContext(userCtx, containerCondition.name(), updateProhibitionEvent));
+            emitEvent(new EventContext(userCtx, containerCondition.getName(), updateProhibitionEvent));
         }
     }
 
@@ -95,7 +95,7 @@ class PDPProhibitions implements Prohibitions, EventEmitter {
 
         // emit event for each container specified
         for (ContainerCondition containerCondition : containerConditions) {
-            emitEvent(new EventContext(userCtx, containerCondition.name(), deleteProhibitionEvent));
+            emitEvent(new EventContext(userCtx, containerCondition.getName(), deleteProhibitionEvent));
         }
     }
 

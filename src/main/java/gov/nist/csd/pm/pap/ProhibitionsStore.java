@@ -192,8 +192,8 @@ public interface ProhibitionsStore extends Prohibitions {
     default void checkProhibitionContainersExist(GraphStore graph, ContainerCondition ... containerConditions)
     throws ProhibitionContainerDoesNotExistException, PMBackendException {
         for (ContainerCondition container : containerConditions) {
-            if (!graph.nodeExists(container.name())) {
-                throw new ProhibitionContainerDoesNotExistException(container.name());
+            if (!graph.nodeExists(container.getName())) {
+                throw new ProhibitionContainerDoesNotExistException(container.getName());
             }
         }
     }

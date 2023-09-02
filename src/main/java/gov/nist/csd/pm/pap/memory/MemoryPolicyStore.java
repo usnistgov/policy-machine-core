@@ -99,16 +99,6 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
     }
 
     @Override
-    public PolicySerializer serialize() {
-        return new MemoryPolicySerializer(this);
-    }
-
-    @Override
-    public PolicyDeserializer deserialize() {
-        return new MemoryPolicyDeserializer(this);
-    }
-
-    @Override
     public void beginTx() throws PMException {
         if (!inTx) {
             txPolicyStore = new TxPolicyStore(this);

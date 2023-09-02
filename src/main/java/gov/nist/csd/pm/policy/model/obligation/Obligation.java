@@ -2,6 +2,10 @@ package gov.nist.csd.pm.policy.model.obligation;
 
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.model.expression.Literal;
+import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
+import gov.nist.csd.pm.policy.pml.statement.CreateRuleStatement;
+import gov.nist.csd.pm.policy.pml.statement.Expression;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -114,5 +118,10 @@ public class Obligation implements Cloneable, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(author, name, rules);
+    }
+
+    @Override
+    public String toString() {
+        return CreateObligationStatement.fromObligation(this).toString();
     }
 }

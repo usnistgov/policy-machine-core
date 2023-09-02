@@ -149,6 +149,10 @@ public class Scope implements Serializable {
         throw new UnknownFunctionInScopeException(name);
     }
 
+    public void removeFunction(String name) {
+        functions.remove(name);
+    }
+
     public void addVariable(String name, Type type, boolean isConst) throws VariableAlreadyDefinedInScopeException {
         if (constantExists(name)) {
             throw new VariableAlreadyDefinedInScopeException(name);

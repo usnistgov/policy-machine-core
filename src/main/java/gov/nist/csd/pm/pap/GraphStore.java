@@ -691,7 +691,7 @@ public interface GraphStore extends Graph {
         }
 
         for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            if (containerCondition.name().equals(name)) {
+            if (containerCondition.getName().equals(name)) {
                 return true;
             }
         }

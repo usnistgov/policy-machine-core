@@ -75,8 +75,8 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             for (ContainerCondition containerCondition : containerConditions) {
                 ps.setInt(1, prohibitionID);
-                ps.setString(2, containerCondition.name());
-                ps.setInt(3, containerCondition.complement() ? 1 : 0);
+                ps.setString(2, containerCondition.getName());
+                ps.setInt(3, containerCondition.isComplement() ? 1 : 0);
 
                 ps.addBatch();
             }

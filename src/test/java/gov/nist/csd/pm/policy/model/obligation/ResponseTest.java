@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.model.obligation;
 
+import com.google.gson.Gson;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
@@ -43,6 +44,8 @@ class ResponseTest {
         EPP epp = new EPP(pdp, pap);
         epp.getEventProcessor().processEvent(new EventContext(new UserContext("u1"), "oa1", new AssignToEvent("o1", "oa1")));
         assertTrue(pap.graph().nodeExists("hello world"));
+
+        System.out.print(new Gson().toJson(pap.obligations().get("obl1")));
     }
 
 }
