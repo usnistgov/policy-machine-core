@@ -4,6 +4,8 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
@@ -33,11 +35,14 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
 
         FunctionDefinitionStatement functionDefinition = new FunctionDefinitionStatement(funcName, returnType, args, body);
 
-        // add function to scope
-        try {
-            visitorCtx.scope().addFunction(functionDefinition);
-        } catch (FunctionAlreadyDefinedInScopeException e) {
-            visitorCtx.errorLog().addError(ctx, e.getMessage());
+        // add args as variables in scope
+        Scope localScope = visitorCtx.scope().copy();
+        for (FormalArgument arg : args) {
+            try {
+                localScope.addVariable(arg.name(), arg.type(), false);
+            } catch (VariableAlreadyDefinedInScopeException e) {
+                visitorCtx.errorLog().addError(ctx, e.getMessage());
+            }
         }
 
         // check that the body has a return statement IF the return type is NOT VOID
@@ -59,7 +64,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             if (lastStmt instanceof FunctionReturnStmt returnStmt) {
                 Type retExprType = Type.any();
                 try {
-                    retExprType = returnStmt.getExpr().getType(visitorCtx.scope());
+                    retExprType = returnStmt.getExpr().getType(localScope);
                 } catch (PMLScopeException e) {
                     visitorCtx.errorLog().addError(ctx, e.getMessage());
                 }
@@ -80,6 +85,13 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
                         "function missing return statement at end of function body"
                 );
             }
+        }
+
+        // add function to scope
+        try {
+            visitorCtx.scope().addFunction(functionDefinition);
+        } catch (FunctionAlreadyDefinedInScopeException e) {
+            visitorCtx.errorLog().addError(ctx, e.getMessage());
         }
 
         return functionDefinition;

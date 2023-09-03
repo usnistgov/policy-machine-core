@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
@@ -486,5 +487,39 @@ public class ExecutionTest {
         pap.executePML(new UserContext(SUPER_USER), s);
         assertTrue(pap.graph().nodeExists("2"));
         assertTrue(pap.graph().nodeExists("1"));
+    }
+
+    @Test
+    void testReturnValue() throws PMException {
+        String pml = """
+                function testFunc(string s) string {
+                    return s
+                }
+                
+                create policy class testFunc('test')
+                """;
+
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        assertTrue(pap.graph().nodeExists("test"));
+    }
+
+    @Test
+    void testOverwriteFunctionArg() throws PMException {
+        String pml = """
+                function testFunc(string s) string {
+                    s = 'test2'
+                    return s
+                }
+                
+                create policy class testFunc('test')
+                """;
+
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        assertFalse(pap.graph().nodeExists("test"));
+        assertTrue(pap.graph().nodeExists("test2"));
     }
 }

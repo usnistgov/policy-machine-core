@@ -3,6 +3,7 @@ package gov.nist.csd.pm.policy.pml;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.memory.MemoryPolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -38,7 +39,7 @@ class ProhibitionTest {
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.bootstrap(new SuperUserBootstrapper());
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
+        pap.deserialize(new UserContext(SUPER_USER), input, new PMLDeserializer());
 
         Prohibition prohibition = pap.prohibitions().get("pro1");
         assertEquals("pro1", prohibition.getName());

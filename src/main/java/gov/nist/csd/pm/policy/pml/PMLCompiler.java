@@ -13,8 +13,11 @@ import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 public class PMLCompiler {
@@ -33,15 +36,16 @@ public class PMLCompiler {
             }
         }
 
+        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
+
         PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(pmlErrorHandler);
+
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PMLParser parser = new PMLParser(tokens);
-        parser.addErrorListener(new BaseErrorListener() {
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                errorLog.addError(line, charPositionInLine, offendingSymbol.toString().length(), msg);
-            }
-        });
+        parser.removeErrorListeners();
+        parser.addErrorListener(pmlErrorHandler);
 
         PolicyVisitor policyVisitor = new PolicyVisitor(new VisitorContext(scope, errorLog));
         List<PMLStatement> stmts = new ArrayList<>();
@@ -50,6 +54,8 @@ public class PMLCompiler {
         } catch (Exception e) {
             errorLog.addError(parser.pml(), e.getMessage());
         }
+
+        errorLog.addErrors(pmlErrorHandler.getErrors());
 
         // throw an exception if there are any errors from parsing
         if (!errorLog.getErrors().isEmpty()) {

@@ -64,8 +64,8 @@ public class AdminAccessRights {
     public static final String DELETE_CONSTANT = "delete_constant";
     public static final String GET_CONSTANTS = "get_constants";
     public static final String GET_CONTEXT = "get_context";
-    public static final String TO_STRING = "to_string";
-    public static final String FROM_STRING = "from_string";
+    public static final String SERIALIZE_POLICY = "serialize_policy";
+    public static final String DESERIALIZE_POLICY = "deserialize_policy";
     public static final String RESET = "reset";
     public static final String ALL_ACCESS_RIGHTS = "*";
     public static final String ALL_ADMIN_ACCESS_RIGHTS = "*a";
@@ -135,8 +135,8 @@ public class AdminAccessRights {
             GET_CONSTANTS,
             GET_CONTEXT,
 
-            TO_STRING,
-            FROM_STRING,
+            SERIALIZE_POLICY,
+            DESERIALIZE_POLICY,
 
             RESET
     );

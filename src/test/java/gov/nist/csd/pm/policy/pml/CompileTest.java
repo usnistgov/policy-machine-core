@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -422,7 +423,7 @@ class CompileTest {
                 }
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
         assertEquals(101, pap.graph().getPolicyClasses().size());
 
         String pml2 = """
@@ -434,7 +435,7 @@ class CompileTest {
                 create oa 'oa1' in x
                 """;
         PAP pap2 = new PAP(new MemoryPolicyStore());
-        assertThrows(PMLCompilationException.class, () -> pap2.deserialize().fromPML(new UserContext(SUPER_USER), pml2));
+        assertThrows(PMLCompilationException.class, () -> pap2.deserialize(new UserContext(SUPER_USER), pml2, new PMLDeserializer()));
 
         pml = """
                 create pc 'pc1'
@@ -445,7 +446,7 @@ class CompileTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
         assertTrue(pap.graph().nodeExists("pc2"));
 
         String pml3 = """
@@ -457,7 +458,6 @@ class CompileTest {
                 create oa 'oa1' in x
                 """;
         PAP pap3 = new PAP(new MemoryPolicyStore());
-        assertThrows(PMLCompilationException.class, () -> pap3.deserialize().fromPML(new UserContext(SUPER_USER), pml3));
-
+        assertThrows(PMLCompilationException.class, () -> pap3.deserialize(new UserContext(SUPER_USER), pml3, new PMLDeserializer()));
     }
 }

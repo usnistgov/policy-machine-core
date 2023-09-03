@@ -6,6 +6,7 @@ import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;
 import gov.nist.csd.pm.policy.events.graph.AssignToEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -39,7 +40,7 @@ class ResponseTest {
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.bootstrap(new SuperUserBootstrapper());
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
         MemoryPDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.getEventProcessor().processEvent(new EventContext(new UserContext("u1"), "oa1", new AssignToEvent("o1", "oa1")));

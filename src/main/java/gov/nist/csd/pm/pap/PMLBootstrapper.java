@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
@@ -18,6 +19,6 @@ public class PMLBootstrapper implements PolicyBootstrapper{
 
     @Override
     public void bootstrap(PAP pap) throws PMException {
-        pap.deserialize().fromPML(author, pml, customFunctions);
+        pap.deserialize(author, pml, new PMLDeserializer(customFunctions));
     }
 }

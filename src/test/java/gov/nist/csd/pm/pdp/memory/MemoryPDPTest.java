@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pdp.memory;
 
-import gov.nist.csd.pm.SamplePolicy;
+import gov.nist.csd.pm.util.SamplePolicy;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;

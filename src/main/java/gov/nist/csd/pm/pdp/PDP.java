@@ -130,17 +130,18 @@ public abstract class PDP implements EventEmitter {
         }
 
         @Override
-        public PolicySerializer serialize() throws PMException {
-            adjudicator.serialize();
+        public String serialize(PolicySerializer policySerializer) throws PMException {
+            adjudicator.serialize(policySerializer);
 
-            return pap.serialize();
+            return pap.serialize(policySerializer);
         }
 
         @Override
-        public PolicyDeserializer deserialize() throws PMException {
-            adjudicator.deserialize();
+        public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
+                throws PMException {
+            adjudicator.deserialize(author, input, policyDeserializer);
 
-            return pap.deserialize();
+            pap.deserialize(author, input, policyDeserializer);
         }
 
         @Override

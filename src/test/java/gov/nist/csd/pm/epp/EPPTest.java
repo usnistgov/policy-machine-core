@@ -4,6 +4,7 @@ import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;
 import gov.nist.csd.pm.policy.pml.model.expression.ArrayLiteral;
 import gov.nist.csd.pm.policy.pml.model.expression.Literal;
@@ -56,7 +57,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
 
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
@@ -118,7 +119,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml);
+        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
         assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(

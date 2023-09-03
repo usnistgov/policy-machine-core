@@ -1,8 +1,5 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
-import gov.nist.csd.pm.policy.model.graph.nodes.Node;
-import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-
 import java.util.List;
 import java.util.Map;
 

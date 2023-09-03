@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.mysql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.PolicyStore;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.PolicySerializer;
@@ -134,7 +135,9 @@ public class MysqlPolicyStore extends PolicyStore implements Verifier {
 
     @Override
     public void verifyAdminPolicyClassNode() throws PMException {
-        graph.createNodeInternal(Node.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
+        if (!graph.nodeExists(Node.ADMIN_POLICY_TARGET.nodeName())) {
+            graph.createNodeInternal(Node.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
+        }
     }
 
     @Override

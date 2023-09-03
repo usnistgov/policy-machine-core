@@ -3,6 +3,7 @@ package gov.nist.csd.pm.policy.pml;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.pml.model.expression.Literal;
 import gov.nist.csd.pm.policy.pml.model.expression.Type;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
@@ -60,7 +61,7 @@ class PMLExecutorTest {
         assertTrue(functions.isEmpty());
 
         pap.bootstrap(new SuperUserBootstrapper());
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), pml, test1, test2);
+        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer(test1, test2));
         assertEquals(2, statements.size());
 
         functions = pap.userDefinedPML().getFunctions();

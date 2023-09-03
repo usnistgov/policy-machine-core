@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.events.graph.CreatePolicyClassEvent;
 import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
@@ -92,7 +93,7 @@ public class SerializationTest {
 
         createFunctionEvent.apply(memoryPolicyStore);
 
-        assertThrows(SerializationException.class, () -> memoryPolicyStore.serialize().toJSON());
+        assertThrows(SerializationException.class, () -> memoryPolicyStore.serialize(new PMLSerializer()));
     }
 
 }

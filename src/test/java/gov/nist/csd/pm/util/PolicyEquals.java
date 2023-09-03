@@ -1,11 +1,15 @@
-package gov.nist.csd.pm.policy;
+package gov.nist.csd.pm.util;
 
+import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import org.testcontainers.shaded.com.google.common.util.concurrent.AsyncFunction;
 
 import java.util.List;
 import java.util.Map;
@@ -55,7 +59,7 @@ public class PolicyEquals {
 
         // check prohibitions
         Map<String, List<Prohibition>> aProhibitions = a.prohibitions().getAll();
-        Map<String, List<Prohibition>> bProhibitions = a.prohibitions().getAll();
+        Map<String, List<Prohibition>> bProhibitions = b.prohibitions().getAll();
 
         assertTrue(aProhibitions.keySet().containsAll(bProhibitions.keySet()));
         assertTrue(aProhibitions.values().containsAll(bProhibitions.values()));
@@ -66,6 +70,15 @@ public class PolicyEquals {
 
         assertTrue(aObligations.containsAll(bObligations));
         assertTrue(bObligations.containsAll(aObligations));
+
+        // check user defined pml
+        Map<String, Value> aConstants = a.userDefinedPML().getConstants();
+        Map<String, Value> bConstants = b.userDefinedPML().getConstants();
+        assertEquals(aConstants, bConstants);
+
+        Map<String, FunctionDefinitionStatement> aFunctions = a.userDefinedPML().getFunctions();
+        Map<String, FunctionDefinitionStatement> bFunctions = b.userDefinedPML().getFunctions();
+        assertEquals(aFunctions, bFunctions);
     }
 
 }

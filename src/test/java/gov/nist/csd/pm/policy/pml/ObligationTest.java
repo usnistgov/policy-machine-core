@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
@@ -46,7 +47,7 @@ public class ObligationTest {
                     }
                 }
                 """;
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
+        pap.deserialize(new UserContext(SUPER_USER), input, new PMLDeserializer());
 
         Obligation obligation1 = pap.obligations().get("obligation1");
         assertEquals("obligation1", obligation1.getName());
@@ -89,7 +90,7 @@ public class ObligationTest {
 
         UserContext userCtx = new UserContext(SUPER_USER);
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.deserialize().fromPML(userCtx, pml);
+        pap.deserialize(userCtx, pml, new PMLDeserializer());
 
         assertEquals(1, pap.obligations().getAll().size());
         Obligation actual = pap.obligations().get("test");

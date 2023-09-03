@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.SamplePolicy;
-import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.PolicyEquals;
+import gov.nist.csd.pm.util.SamplePolicy;
+import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -39,6 +39,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
+import static gov.nist.csd.pm.util.PMLEquals.check;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest {
@@ -70,6 +71,23 @@ public abstract class PAPTest {
         pap.graph().deleteNode("ua1");
         pap.rollback();
         assertTrue(pap.graph().nodeExists("ua1"));
+    }
+
+    @Nested
+    class Serialization {
+
+        @Test
+        void testErrorDuringDeserializationCausesRollback() throws PMException {
+            String pml = """
+                    create pc 'pc1'
+                    create ua 'ua1' in ['pc2']
+                    """;
+
+            assertThrows(PMException.class, () -> pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer()));
+            assertFalse(pap.graph().nodeExists("pc1"));
+            assertFalse(pap.graph().nodeExists("ua1"));
+        }
+
     }
 
     private static final String input = """
@@ -155,40 +173,17 @@ public abstract class PAPTest {
             """.trim();
     @Test
     void testSerialize() throws PMException {
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), input);
-        String actual = pap.serialize().toPML();
-        assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
+        UserContext userContext = new UserContext(SUPER_USER);
+        pap.deserialize(userContext, input, new PMLDeserializer());
+        String actual = pap.serialize(new PMLSerializer(false));
+        assertEquals(new ArrayList<>(), check(expected, actual));
 
-        pap.reset();
-
-        pap.deserialize().fromPML(new UserContext(SUPER_USER), actual);
-        actual = pap.serialize().toPML();
-        assertEquals(new ArrayList<>(), pmlEqual(expected, actual));
-
-        String json = pap.serialize().toJSON();
-        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        memoryPolicyStore.deserialize().fromJSON(new UserContext(SUPER_USER), json);
-        pap.deserialize().fromJSON(new UserContext(SUPER_USER), json);
-        PolicyEquals.check(pap, memoryPolicyStore);
+        assertThrows(PMException.class, () -> {
+            pap.deserialize(new UserContext("unknown user"), input, new PMLDeserializer());
+        });
     }
 
-    private List<String> pmlEqual(String expected, String actual) {
-        List<String> expectedLines = sortLines(expected);
-        List<String> actualLines = sortLines(actual);
-        expectedLines.removeIf(line -> actualLines.contains(line));
-        return expectedLines;
-    }
 
-    private List<String> sortLines(String pml) {
-        List<String> lines = new ArrayList<>();
-        Scanner sc = new Scanner(pml);
-        while (sc.hasNextLine()) {
-            lines.add(sc.nextLine());
-        }
-
-        Collections.sort(lines);
-        return lines;
-    }
 
     @Test
     void testExecutePML() throws PMException {
@@ -1241,9 +1236,13 @@ public abstract class PAPTest {
         class UpdateProhibitionTest {
 
             @Test
-            void testProhibitionDoesNotExistException() {
+            void testProhibitionDoesNotExistException() throws PMException {
+                pap.graph().createPolicyClass("pc");
+                pap.graph().createUserAttribute("ua", "pc");
+
                 assertThrows(ProhibitionDoesNotExistException.class,
-                             () -> pap.prohibitions().update("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("test"), false));
+                             () -> pap.prohibitions().update("pro1", ProhibitionSubject.userAttribute("ua"), new AccessRightSet(
+                                     CREATE_POLICY_CLASS), false));
             }
 
 

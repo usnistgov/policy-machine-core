@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.memory;
 import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 
 import java.util.List;
 
@@ -59,13 +60,14 @@ class TxPolicyStore implements Policy, BaseMemoryTx {
     }
 
     @Override
-    public PolicySerializer serialize() throws PMException {
-        return memoryPolicyStore.serialize();
+    public String serialize(PolicySerializer policySerializer) throws PMException {
+        return memoryPolicyStore.serialize(policySerializer);
     }
 
     @Override
-    public PolicyDeserializer deserialize() throws PMException {
-        return memoryPolicyStore.deserialize();
+    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
+            throws PMException {
+        memoryPolicyStore.deserialize(author, input, policyDeserializer);
     }
 
     @Override

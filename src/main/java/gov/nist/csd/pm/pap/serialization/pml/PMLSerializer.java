@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.serialization.pml;
 import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.dag.propagator.Propagator;
 import gov.nist.csd.pm.policy.model.graph.dag.visitor.Visitor;
@@ -21,9 +22,24 @@ import java.util.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
-public class PMLSerializer {
+public class PMLSerializer implements PolicySerializer {
 
-    public static String toPML(Policy policy, boolean format) throws PMException {
+    private boolean format;
+
+    public PMLSerializer(boolean format) {
+        this.format = format;
+    }
+
+    public PMLSerializer() {
+        this.format = false;
+    }
+
+    public void setFormat(boolean format) {
+        this.format = format;
+    }
+
+    @Override
+    public String serialize(Policy policy) throws PMException {
         String pml = toPML(policy);
         if (format) {
             pml = PMLFormatter.format(pml);
@@ -32,7 +48,7 @@ public class PMLSerializer {
         return pml;
     }
 
-    private static String toPML(Policy policy) throws PMException {
+    private String toPML(Policy policy) throws PMException {
         String pml = "";
         pml += "# constants\n";
         String constants = serializeConstants(policy);
@@ -67,7 +83,7 @@ public class PMLSerializer {
         return pml.trim();
     }
 
-    private static String serializeObligations(Policy policy) throws PMException {
+    private String serializeObligations(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
 
         List<Obligation> obligations = policy.obligations().getAll();
@@ -81,7 +97,7 @@ public class PMLSerializer {
         return pml.toString();
     }
 
-    private static String serializeProhibitions(Policy policy) throws PMException {
+    private String serializeProhibitions(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
 
         Map<String, List<Prohibition>> prohibitions = policy.prohibitions().getAll();
@@ -98,7 +114,7 @@ public class PMLSerializer {
         return pml.toString();
     }
 
-    private static String serializeGraph(Policy policy) throws PMException {
+    private String serializeGraph(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
 
         // resource access rights
@@ -128,8 +144,8 @@ public class PMLSerializer {
         return pml.toString().trim();
     }
 
-    private static void buildPCStatements(Policy policy, List<ComparableStatement> comparableStatements,
-                                          Map<AssociateStatement, List<Expression>> delayedAssociations, String pc)
+    private void buildPCStatements(Policy policy, List<ComparableStatement> comparableStatements,
+                                   Map<AssociateStatement, List<Expression>> delayedAssociations, String pc)
             throws PMException {
         comparableStatements.add(new ComparableCommentStatement("policy class: " + pc));
 
@@ -195,7 +211,7 @@ public class PMLSerializer {
         }
     }
 
-    private static List<ComparableAssociateStatement> relationsToAssociationStatements(List<Relations> relationsList,
+    private List<ComparableAssociateStatement> relationsToAssociationStatements(List<Relations> relationsList,
                                                                                        Map<AssociateStatement,
                                                                                                List<Expression>> delayedAssociations) {
         List<ComparableAssociateStatement> stmts = new ArrayList<>();
@@ -228,9 +244,8 @@ public class PMLSerializer {
         return stmts;
     }
 
-    private static List<ComparableStatement> relationsToCreateAttrStatements(Policy policy,
-                                                                             List<Relations> relationsList,
-                                                                             NodeType type) throws PMException {
+    private List<ComparableStatement> relationsToCreateAttrStatements(Policy policy, List<Relations> relationsList, NodeType type)
+            throws PMException {
         List<ComparableStatement> stmts = new ArrayList<>();
 
         for (Relations relations : relationsList) {
@@ -248,8 +263,7 @@ public class PMLSerializer {
 
             stmts.add(stmt);
 
-            SetNodePropertiesStatement setNodePropertiesStatement = buildSetNodePropertiesStatement(
-                    policy, relations.name);
+            SetNodePropertiesStatement setNodePropertiesStatement = buildSetNodePropertiesStatement(policy, relations.name);
             if (setNodePropertiesStatement == null) {
                 continue;
             }
@@ -272,7 +286,7 @@ public class PMLSerializer {
         return new Expression(new Literal(name));
     }
 
-    private static Expression[] setToExpressionArray(Set<String> set) {
+    private Expression[] setToExpressionArray(Set<String> set) {
         Expression[] expressions = new Expression[set.size()];
         int i = 0;
         for (String s : set) {
@@ -283,7 +297,7 @@ public class PMLSerializer {
         return expressions;
     }
 
-    private static List<Relations> getAttributeRelations(Policy policy, String pc, NodeType type) throws PMException {
+    private List<Relations> getAttributeRelations(Policy policy, String pc, NodeType type) throws PMException {
         Map<String, Relations> relationsMap = new HashMap<>();
         walk(
                 policy,
@@ -328,7 +342,7 @@ public class PMLSerializer {
         }
     }
 
-    private static List<PMLStatement> buildUsersAndObjectsCreateStatements(Policy policy) throws PMException {
+    private List<PMLStatement> buildUsersAndObjectsCreateStatements(Policy policy) throws PMException {
         List<PMLStatement> statements = new ArrayList<>();
         statements.add(new EmptyStatement());
         statements.add(new SingleLineCommentStatement("users"));
@@ -355,7 +369,7 @@ public class PMLSerializer {
         }
     }
 
-    private static void addStatements(Policy policy, List<PMLStatement> statements, NodeType type) throws PMException {
+    private void addStatements(Policy policy, List<PMLStatement> statements, NodeType type) throws PMException {
         List<String> search = policy.graph().search(type, NO_PROPERTIES);
         for (String object : search) {
             PMLStatement statement = buildCreateUserOrObjectStatement(policy, object, type);
@@ -370,8 +384,7 @@ public class PMLSerializer {
         }
     }
 
-    private static CreateUserOrObjectStatement buildCreateUserOrObjectStatement(Policy policy, String name,
-                                                                                NodeType type) throws PMException {
+    private CreateUserOrObjectStatement buildCreateUserOrObjectStatement(Policy policy, String name, NodeType type) throws PMException {
         // the name expression
         Expression nameExpr = new Expression(new Literal(name));
 
@@ -390,7 +403,7 @@ public class PMLSerializer {
         return new CreateUserOrObjectStatement(nameExpr, type, assignTo);
     }
 
-    private static SetNodePropertiesStatement buildSetNodePropertiesStatement(Policy policy, String name)
+    private SetNodePropertiesStatement buildSetNodePropertiesStatement(Policy policy, String name)
             throws PMException {
         Map<String, String> properties = policy.graph().getNode(name).getProperties();
         if (properties.isEmpty()) {
@@ -411,7 +424,7 @@ public class PMLSerializer {
         );
     }
 
-    private static Expression nodeNameToExpression(String nodeName) {
+    private Expression nodeNameToExpression(String nodeName) {
         if (AdminPolicy.isAdminPolicyNodeName(nodeName)) {
             nodeName = AdminPolicy.Node.fromNodeName(nodeName).constantName();
         }
@@ -419,7 +432,7 @@ public class PMLSerializer {
         return new Expression(new Literal(nodeName));
     }
 
-    private static void walk(Policy policy, String pc, Visitor visitor, Propagator propagator) throws PMException {
+    private void walk(Policy policy, String pc, Visitor visitor, Propagator propagator) throws PMException {
         new DepthFirstGraphWalker(policy.graph())
                 .withVisitor(visitor)
                 .withPropagator(propagator)
@@ -427,7 +440,7 @@ public class PMLSerializer {
                 .walk(pc);
     }
 
-    private static String serializeFunctions(Policy policy) throws PMException {
+    private String serializeFunctions(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
         Map<String, FunctionDefinitionStatement> functions = policy.userDefinedPML().getFunctions();
         for (FunctionDefinitionStatement func : functions.values()) {
@@ -445,7 +458,7 @@ public class PMLSerializer {
         return pml.toString();
     }
 
-    private static String serializeConstants(Policy policy) throws PMException {
+    private String serializeConstants(Policy policy) throws PMException {
         StringBuilder pml = new StringBuilder();
         Map<String, Value> constants = policy.userDefinedPML().getConstants();
         for (Map.Entry<String, Value> c : constants.entrySet()) {

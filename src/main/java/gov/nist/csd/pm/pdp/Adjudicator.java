@@ -53,17 +53,16 @@ class Adjudicator implements Policy {
     }
 
     @Override
-    public PolicySerializer serialize() throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), TO_STRING);
+    public String serialize(PolicySerializer serializer) throws PMException {
+        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), SERIALIZE_POLICY);
 
         return null;
     }
 
     @Override
-    public PolicyDeserializer deserialize() throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), FROM_STRING);
-
-        return null;
+    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
+            throws PMException {
+        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), DESERIALIZE_POLICY);
     }
 
     @Override

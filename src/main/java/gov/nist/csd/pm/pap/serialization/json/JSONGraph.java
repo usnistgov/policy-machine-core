@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap.serialization.json;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
 import java.util.List;
-import java.util.Map;
 
 public class JSONGraph {
 

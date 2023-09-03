@@ -82,13 +82,14 @@ public class PAP implements Transactional, PMLExecutable, Policy {
     }
 
     @Override
-    public PolicySerializer serialize() throws PMException {
-        return policyStore.serialize();
+    public String serialize(PolicySerializer serializer) throws PMException {
+        return policyStore.serialize(serializer);
     }
 
     @Override
-    public PolicyDeserializer deserialize() throws PMException {
-        return policyStore.deserialize();
+    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
+            throws PMException {
+        policyStore.deserialize(author, input, policyDeserializer);
     }
 
     @Override

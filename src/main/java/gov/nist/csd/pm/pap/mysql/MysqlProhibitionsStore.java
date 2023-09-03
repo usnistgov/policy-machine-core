@@ -92,7 +92,10 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     @Override
     public void update(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions)
-    throws PMBackendException, UnknownAccessRightException, ProhibitionSubjectDoesNotExistException, ProhibitionContainerDoesNotExistException {
+            throws PMBackendException, UnknownAccessRightException, ProhibitionSubjectDoesNotExistException,
+                   ProhibitionContainerDoesNotExistException, ProhibitionDoesNotExistException {
+        checkUpdateInput(new MysqlGraphStore(connection), name, subject, accessRightSet, intersection, containerConditions);
+
         connection.beginTx();
 
         try {

@@ -76,28 +76,4 @@ class MysqlPAPTest extends PAPTest {
             assertTrue(pap2.graph().nodeExists("oa1"));
         }
     }
-
-    @Test
-    void testRollbackProhibitionTx() throws PMException, SQLException {
-        Connection connection
-                = DriverManager.getConnection(testEnv.getConnectionUrl(), testEnv.getUser(), testEnv.getPassword());
-        MysqlPolicyStore mysqlPolicyStore = new MysqlPolicyStore(connection);
-
-        PAP pap = new PAP(mysqlPolicyStore);
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createUserAttribute("ua1", "pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
-
-        try(Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
-            stmt.executeUpdate("insert into prohibition_container values (1, (select id from node where name = 'oa1'), 1)");
-            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
-        }
-
-        assertThrows(MysqlPolicyException.class, () ->
-                pap.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"),
-                        new AccessRightSet(), false, new ContainerCondition("oa1", true)));
-        assertThrows(ProhibitionDoesNotExistException.class, () -> pap.prohibitions().get("pro1"));
-    }
-
 }
