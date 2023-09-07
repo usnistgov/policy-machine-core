@@ -21,13 +21,19 @@ public class JSONSerializer implements PolicySerializer {
 
     @Override
     public String serialize(Policy policy) throws PMException {
+        return buildJSONPolicy(policy)
+                .toString();
+    }
+
+    public JSONPolicy buildJSONPolicy(Policy policy) throws PMException {
         return new JSONPolicy(
                 buildGraphJSON(policy),
                 buildProhibitionsJSON(policy),
                 buildObligationsJSON(policy),
                 buildUserDefinedPML(policy)
-        ).toString();
+        );
     }
+
 
     private JSONUserDefinedPML buildUserDefinedPML(Policy policy) throws PMException {
         Map<String, FunctionDefinitionStatement> functions = policy.userDefinedPML().getFunctions();
@@ -201,7 +207,6 @@ public class JSONSerializer implements PolicySerializer {
             }
 
             associations.addAll(nodeAssociations);
-            existingAttrs.add(child);
 
             JSONNode jsonNode = new JSONNode();
             jsonNode.setName(child);
@@ -209,6 +214,8 @@ public class JSONSerializer implements PolicySerializer {
             if (!node.getProperties().isEmpty() && !existingAttrs.contains(child)) {
                 jsonNode.setProperties(node.getProperties());
             }
+
+            existingAttrs.add(child);
 
             List<JSONNode> childAttrs = getAttributes(policy, associations, delayedAssociations, existingAttrs, child, type);
             if (!childAttrs.isEmpty()) {

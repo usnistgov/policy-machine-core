@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.allAccessRights;
 import static gov.nist.csd.pm.policy.tx.TxRunner.runTx;
@@ -30,7 +31,7 @@ public class SuperUserBootstrapper implements PolicyBootstrapper {
 
             // associate the super_ua and super_ua1 to provide * rights to the super ser on itself
             // if the association already exists this will do nothing
-            pap.graph().associate(SUPER_UA, SUPER_UA1, allAccessRights());
+            pap.graph().associate(SUPER_UA1, SUPER_UA, allAccessRights());
 
             pap.graph().associate(SUPER_UA, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), allAccessRights());
             pap.graph().associate(SUPER_UA, AdminPolicy.Node.POLICY_CLASSES_OA.nodeName(), allAccessRights());

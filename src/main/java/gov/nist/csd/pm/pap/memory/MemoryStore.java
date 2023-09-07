@@ -20,23 +20,18 @@ public abstract class MemoryStore<T extends BaseMemoryTx> implements Transaction
         return tx.isActive();
     }
 
-    protected void runInternalTx(MemoryTxRunner txRunner) throws PMBackendException {
-        try {
-            beginTx();
-            txRunner.runTx();
-            commit();
-        } catch (PMException e) {
-            try {
-                rollback();
-            } catch (PMException ex) {
-                throw new PMBackendException(ex);
-            }
-            throw new PMBackendException(e);
-        }
+    public abstract void beginTx();
+    public abstract void commit();
+    public abstract void rollback();
+
+    protected void runInternalTx(MemoryTxRunner txRunner) {
+        beginTx();
+        txRunner.runTx();
+        commit();
     }
 
     protected interface MemoryTxRunner {
-        void runTx() throws PMException;
+        void runTx();
     }
 
     protected void handleTxIfActive(MemoryTxGraphHandler<T> handler) throws PMBackendException {

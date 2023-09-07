@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
@@ -25,13 +26,19 @@ public class TxObligations implements Obligations, BaseMemoryTx {
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryObligationsStore> txCmd = (TxCmd<MemoryObligationsStore>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryObligationsStore);
+            try {
+                TxCmd<MemoryObligationsStore> txCmd = (TxCmd<MemoryObligationsStore>) TxCmd.eventToCmd(event);
+                txCmd.rollback(memoryObligationsStore);
+            } catch (PMException e) {
+                // throw runtime exception because there is noway back if the rollback fails
+                throw new PMRuntimeException("", e);
+            }
         }
     }
+
     @Override
     public void update(UserContext author, String name, Rule... rules) throws PMException {
         txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemoryUpdateObligationEvent(

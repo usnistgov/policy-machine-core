@@ -34,7 +34,7 @@ class ProhibitionTest {
                 
                 create prohibition 'pro1'
                 deny user 'u1'
-                access rights [create_policy_class, 'write']
+                access rights ['create_policy_class', 'write']
                 on union of ['oa1']
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());

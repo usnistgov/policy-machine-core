@@ -399,7 +399,20 @@ public class PMLFormatter extends PMLBaseVisitor<String> {
 
     @Override
     public String visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
-        return formatStmt(ctx);
+        String text = getText(ctx);
+        int stmtStartIndex = ctx.start.getStartIndex();
+        int denyIndex = ctx.DENY().getSymbol().getStartIndex() - stmtStartIndex;
+        String create = indent() + (text.substring(0, denyIndex).trim()) + NEW_LINE;
+
+        int arsIndex = ctx.ACCESS_RIGHTS().getSymbol().getStartIndex() - stmtStartIndex;
+        String deny = indent() + (text.substring(denyIndex, arsIndex).trim()) + NEW_LINE;
+
+        int onIndex = ctx.ON().getSymbol().getStartIndex() - stmtStartIndex;
+        String accessRights = indent() + (text.substring(arsIndex, onIndex).trim()) + NEW_LINE;
+
+        String on = indent() + (text.substring(onIndex)) + NEW_LINE;
+
+        return create + deny + accessRights + on;
     }
 
     @Override

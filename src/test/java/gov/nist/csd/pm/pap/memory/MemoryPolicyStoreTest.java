@@ -166,8 +166,11 @@ class MemoryPolicyStoreTest {
 
     @Test
     void getObligations() throws PMException {
+        policyStore.graph().createPolicyClass("pc1");
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createUser("u1", "ua1");
         policyStore.obligations().create(
-                new UserContext("test"),
+                new UserContext("u1"),
                 "obl1",
                 new Rule(
                         "rule1",
@@ -198,15 +201,18 @@ class MemoryPolicyStoreTest {
                 )
         );
 
+        policyStore.graph().createPolicyClass("pc1");
+        policyStore.graph().createUserAttribute("ua1", "pc1");
+        policyStore.graph().createUser("u1", "ua1");
         policyStore.obligations().create(
-                new UserContext("test"),
+                new UserContext("u1"),
                 "obl1",
                 rule1
         );
 
         Obligation obligation = policyStore.obligations().get("obl1");
         assertEquals("obl1", obligation.getName());
-        assertEquals(new UserContext("test"), obligation.getAuthor());
+        assertEquals(new UserContext("u1"), obligation.getAuthor());
         assertEquals(1, obligation.getRules().size());
         assertEquals(rule1, obligation.getRules().get(0));
     }
@@ -246,16 +252,5 @@ class MemoryPolicyStoreTest {
 
         policyStore.setGraph(policyStore1.graph());
         assertTrue(policyStore.graph().nodeExists("pc1"));
-    }
-
-    @Test
-    void test() throws PMException {
-        MemoryGraphStore memoryGraphStore = new MemoryGraphStore();
-        memoryGraphStore.createPolicyClass("pc1");
-        memoryGraphStore.createObjectAttribute("oa1", "pc1");
-        memoryGraphStore.createObjectAttribute("oa2", "pc1");
-        memoryGraphStore.createObjectAttribute("oa3", "pc1");
-
-        memoryGraphStore.deleteNode("pc1");
     }
 }

@@ -87,6 +87,12 @@ public class ExecutionTest {
         assertEquals(new Association("ua3", "oa3", new AccessRightSet("read", "write")),
                 pap.graph().getAssociationsWithSource("ua3").get(0));
 
+        input = """
+                dissociate 'ua1' and 'oa1'
+                """;
+        PMLExecutor.compileAndExecutePML(pap, superUser, input);
+        assertFalse(pap.graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "oa1")));
+
         input =
                 """
                 deassign 'u1' from ['ua1', 'ua2']

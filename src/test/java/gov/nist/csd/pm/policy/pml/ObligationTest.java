@@ -29,12 +29,11 @@ public class ObligationTest {
     @Test
     void testObligation() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
-
         String input = """
                 create policy class 'pc1'
                 create oa 'oa1' in ['pc1']
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
                 create obligation 'obligation1' {
                     create rule 'rule1'
                     when any user
@@ -47,12 +46,12 @@ public class ObligationTest {
                     }
                 }
                 """;
-        pap.deserialize(new UserContext(SUPER_USER), input, new PMLDeserializer());
+        pap.deserialize(new UserContext("u1"), input, new PMLDeserializer());
 
         Obligation obligation1 = pap.obligations().get("obligation1");
         assertEquals("obligation1", obligation1.getName());
         assertEquals(1, obligation1.getRules().size());
-        assertEquals(new UserContext(SUPER_USER), obligation1.getAuthor());
+        assertEquals(new UserContext("u1"), obligation1.getAuthor());
 
         Rule rule = obligation1.getRules().get(0);
         assertEquals("rule1", rule.getName());
@@ -67,8 +66,10 @@ public class ObligationTest {
     @Test
     void testObligationComplex() throws PMException {
         String pml = """
-                create policy class 'pc1';
-                create oa 'oa1' in ['pc1'];
+                create policy class 'pc1'
+                create oa 'oa1' in ['pc1']
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
                 
                 create obligation 'test' {
                     create rule 'rule1'
@@ -76,19 +77,19 @@ public class ObligationTest {
                     performs ['create_object_attribute']
                     on 'oa1'
                     do(evtCtx) {
-                        create policy class evtCtx['eventName'];
-                        let target = evtCtx['target'];
+                        create policy class evtCtx['eventName']
+                        let target = evtCtx['target']
                         
-                        let event = evtCtx['event'];
-                        create policy class concat([event['name'], '_test']);
-                        set properties of event['name'] to {'key': target};
+                        let event = evtCtx['event']
+                        create policy class concat([event['name'], '_test'])
+                        set properties of event['name'] to {'key': target}
                         
-                        create policy class concat([evtCtx['userCtx']['user'], '_test']);
+                        create policy class concat([evtCtx['userCtx']['user'], '_test'])
                     }
                 }
                 """;
 
-        UserContext userCtx = new UserContext(SUPER_USER);
+        UserContext userCtx = new UserContext("u1");
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(userCtx, pml, new PMLDeserializer());
 

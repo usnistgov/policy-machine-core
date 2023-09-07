@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.memory;
 import gov.nist.csd.pm.policy.events.graph.DeleteNodeEvent;
 import gov.nist.csd.pm.policy.events.graph.DissociateEvent;
 import gov.nist.csd.pm.policy.events.graph.SetNodePropertiesEvent;
+import gov.nist.csd.pm.policy.events.graph.SetResourceAccessRightsEvent;
 import gov.nist.csd.pm.policy.events.obligations.DeleteObligationEvent;
 import gov.nist.csd.pm.policy.events.obligations.UpdateObligationEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.DeleteProhibitionEvent;
@@ -22,6 +23,27 @@ import java.util.Map;
 public class TxEvents {
 
     private TxEvents() {}
+
+    public static class MemorySetResourceAccessRightsEvent extends SetResourceAccessRightsEvent {
+
+        private AccessRightSet oldAccessRights;
+        private AccessRightSet newAccessRights;
+
+        public MemorySetResourceAccessRightsEvent(AccessRightSet oldAccessRights, AccessRightSet newAccessRights) {
+            super(newAccessRights);
+
+            this.oldAccessRights = oldAccessRights;
+            this.newAccessRights = newAccessRights;
+        }
+
+        public AccessRightSet getOldAccessRights() {
+            return oldAccessRights;
+        }
+
+        public AccessRightSet getNewAccessRights() {
+            return newAccessRights;
+        }
+    }
 
     public static class MemoryDeleteNodeEvent extends DeleteNodeEvent {
 

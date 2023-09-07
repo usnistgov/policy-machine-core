@@ -138,6 +138,23 @@ public class CreateProhibitionStatement extends PMLStatement {
         public String toString() {
             return (isComplement ? "!" : "") + name;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Container container = (Container) o;
+            return isComplement == container.isComplement && Objects.equals(name, container.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(isComplement, name);
+        }
     }
 
     public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {

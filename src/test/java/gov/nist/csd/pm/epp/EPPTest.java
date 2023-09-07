@@ -45,24 +45,28 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
 
         String pml = """
-                create pc 'pc1';
-                create oa 'oa1' in ['pc1'];
+                create pc 'pc1'
+                create oa 'oa1' in ['pc1']
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
+                associate 'ua1' and 'oa1' with ['*']
+                associate 'ua1' and POLICY_CLASSES_OA with ['*']
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
                     performs ['create_object_attribute']
                     on 'oa1'
                     do(evtCtx) {
-                        create policy class 'pc2';
+                        create policy class 'pc2'
                     }
                 }
                 """;
-        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
 
-        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
+        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
 
         assertTrue(pap.graph().nodeExists("pc2"));
 
@@ -71,25 +75,17 @@ class EPPTest {
     @Test
     void testAccessingEventContextInResponse() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
 
         PDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         String pml = """
-                create policy class 'admin policy'
-                create object attribute 'policy classes' in ['admin policy']
-                create object attribute 'pml functions' in ['admin policy']
-                create object attribute 'pml constants' in ['admin policy']
-                create object attribute 'admin policy target' in ['admin policy']
-                create object attribute 'admin policy_pc_rep' in ['policy classes']
-                create object attribute 'super_policy_pc_rep' in ['policy classes']
                 create policy class 'super_policy'
                 create user attribute 'super_ua' in ['super_policy']
-                associate 'super_ua' and 'admin policy target' with ['*']
-                associate 'super_ua' and 'policy classes' with ['*']
-                associate 'super_ua' and 'pml functions' with ['*']
-                associate 'super_ua' and 'pml constants' with ['*']
+                associate 'super_ua' and ADMIN_POLICY_TARGET with ['*']
+                associate 'super_ua' and POLICY_CLASSES_OA with ['*']
+                associate 'super_ua' and PML_FUNCTIONS_TARGET with ['*']
+                associate 'super_ua' and PML_CONSTANTS_TARGET with ['*']
                 create user attribute 'super_ua1' in ['super_policy']
                 associate 'super_ua' and 'super_ua1' with ['*']
                 create user 'super' in ['super_ua']
@@ -97,7 +93,7 @@ class EPPTest {
                 
                 create pc 'pc1'
                 create ua 'ua1' in ['pc1']
-                create u  'super' in ['ua1']
+                assign 'super' to ['ua1']
                 create oa 'oa1' in ['pc1']
                 
                 associate 'ua1' and 'oa1' with ['*a']
@@ -134,15 +130,18 @@ class EPPTest {
         PDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        pdp.runTx(new UserContext(SUPER_USER), (policy) -> {
+        pap.runTx((policy) -> {
             policy.graph().createPolicyClass("pc1");
             policy.graph().createUserAttribute("ua1", "pc1");
+            policy.graph().associate("super_ua", "ua1", new AccessRightSet("*"));
+            policy.graph().associate("super_ua", AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), new AccessRightSet("*"));
             policy.graph().createObjectAttribute("oa1", "pc1");
             policy.graph().createUser("u1", "ua1");
             policy.graph().createObject("o1", "oa1");
             policy.graph().associate("ua1", AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(),
                                      new AccessRightSet(CREATE_OBLIGATION));
             policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
+            policy.graph().associate("ua1", AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext("u1"), (policy) -> {
@@ -161,7 +160,7 @@ class EPPTest {
         });
 
         EventContext eventCtx = new EventContext(new UserContext(SUPER_USER), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"));
-        assertThrows(PMRuntimeException.class, () -> {
+        assertThrows(PMException.class, () -> {
             epp.getEventProcessor().processEvent(eventCtx);
         });
 

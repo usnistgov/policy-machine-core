@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.events.graph.*;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMBackendException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -27,17 +28,25 @@ class TxGraph implements Graph, BaseMemoryTx {
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryGraphStore> txCmd = (TxCmd<MemoryGraphStore>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryGraphStore);
+            try {
+                TxCmd<MemoryGraphStore> txCmd = (TxCmd<MemoryGraphStore>) TxCmd.eventToCmd(event);
+                txCmd.rollback(memoryGraphStore);
+            } catch (PMException e) {
+                // throw runtime exception because there is noway back if the rollback fails
+                throw new PMRuntimeException("", e);
+            }
         }
     }
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) {
-        txPolicyEventTracker.trackPolicyEvent(new SetResourceAccessRightsEvent(accessRightSet));
+        txPolicyEventTracker.trackPolicyEvent(new TxEvents.MemorySetResourceAccessRightsEvent(
+                memoryGraphStore.getResourceAccessRights(),
+                accessRightSet)
+        );
     }
 
     @Override

@@ -257,7 +257,7 @@ ELSE: [e][l][s][e] ;
 IN_RANGE: [i][n][ ][r][a][n][g][e] ;
 
 NUMBER: [0-9]+ ;
-ID: [a-zA-Z0-9_]+ ;
+ID: [*a-zA-Z0-9_]+ ;
 STRING: DOUBLE_QUOTE_STRING | SINGLE_QUOTE_STRING ;
 DOUBLE_QUOTE_STRING : '"' ( '\\"' | ~('\n'|'\r') )*? '"' ;
 SINGLE_QUOTE_STRING : '\'' ( '\\\'' | ~('\n'|'\r') )*? '\'' ;

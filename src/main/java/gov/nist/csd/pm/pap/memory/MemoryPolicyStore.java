@@ -54,10 +54,6 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
         this.userDefinedPML.setMemoryGraph(graph);
     }
 
-    public List<PolicyEvent> getTxEvents() {
-        return txPolicyStore.getTxEvents();
-    }
-
     public boolean isInTx() {
         return inTx;
     }
@@ -153,6 +149,8 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
                 txCmd.rollback(userDefinedPML);
             }
         }
+
+        txPolicyStore.clearEvents();
     }
 
     @Override

@@ -4,8 +4,12 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.AdminAccessRightExistsException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.UnknownAccessRightException;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
@@ -245,7 +249,7 @@ class CompileTest {
 
     @Test
     void testCompileObligation() throws PMException {
-        String pml = """
+        String pml = """       
                 create obligation 'test' {
                     create rule 'rule1'
                     when any user
@@ -263,15 +267,17 @@ class CompileTest {
                 }
                 """;
 
-        UserContext userCtx = new UserContext(SUPER_USER);
         PAP pap = new PAP(new MemoryPolicyStore());
-        ExecutionContext ctx = new ExecutionContext(userCtx);
         pap.graph().createPolicyClass("pc1");
         pap.graph().createObjectAttribute("oa1", "pc1");
+        pap.graph().createUserAttribute("ua1", "pc1");
+        pap.graph().createUser("u1", "ua1");
         List<PMLStatement> test = test(pml, pap);
         assertEquals(1, test.size());
 
         PMLStatement stmt = test.get(0);
+        UserContext userCtx = new UserContext("u1");
+        ExecutionContext ctx = new ExecutionContext(userCtx);
         stmt.execute(ctx, pap);
 
         assertEquals(1, pap.obligations().getAll().size());
@@ -459,5 +465,79 @@ class CompileTest {
                 """;
         PAP pap3 = new PAP(new MemoryPolicyStore());
         assertThrows(PMLCompilationException.class, () -> pap3.deserialize(new UserContext(SUPER_USER), pml3, new PMLDeserializer()));
+    }
+
+    @Test
+    void testAccessRights() throws PMException {
+        String pml = """
+                const a = 'a'
+                const b = 'b'
+                const c = 'c'
+                
+                set resource access rights [a, b, c]
+                
+                create pc 'pc1'
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
+                create oa 'oa1' in ['pc1']
+                
+                associate 'ua1' and 'oa1' with [a, b, create_policy_class, *r, *a, *]
+                create prohibition 'p1'
+                deny user attribute 'ua1'
+                access rights [b]
+                on union of [!'oa1']
+                """;
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        List<Association> ua1 = pap.graph().getAssociationsWithSource("ua1");
+        assertEquals(1, ua1.size());
+        assertEquals(new AccessRightSet("a", "b", "create_policy_class", "*r", "*a", "*"), ua1.get(0).getAccessRightSet());
+
+        String pml2 = """
+                set resource access rights [create_policy_class, b, c]
+                
+                create pc 'pc1'
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
+                create oa 'oa1' in ['pc1']
+                
+                associate 'ua1' and 'oa1' with [b, create_policy_class]
+                """;
+        assertThrows(PMLCompilationException.class, () -> pap.deserialize(new UserContext("u1"), pml2, new PMLDeserializer()));
+
+        String pml3 = """
+                set resource access rights [b, c]
+                
+                create pc 'pc1'
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
+                create oa 'oa1' in ['pc1']
+                
+                associate 'ua1' and 'oa1' with [b, create_policy_class]
+                """;
+        assertThrows(PMLCompilationException.class, () -> pap.deserialize(new UserContext("u1"), pml3, new PMLDeserializer()));
+
+        pap.graph().setResourceAccessRights(new AccessRightSet("a", "b", "c"));
+        String pml4 = """
+                const d = 'd'
+                const e = 'e'
+                const f = 'f'
+                
+                set resource access rights [d, e, f]
+                
+                create pc 'pc1'
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
+                create oa 'oa1' in ['pc1']
+                
+                associate 'ua1' and 'oa1' with [d, e, f]
+                """;
+        pap.executePML(new UserContext("u1"), pml4);
+
+        String pml5 = """                
+                associate 'ua1' and 'oa1' with [a, b, c]
+                """;
+        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext("u1"), pml5));
     }
 }

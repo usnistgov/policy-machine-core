@@ -36,7 +36,7 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public void beginTx() {
         if (tx == null) {
             tx = new MemoryTx<>(false, 0, new TxUserDefinedPML(new TxPolicyEventTracker(), this));
         }
@@ -44,12 +44,12 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
     }
 
     @Override
-    public void commit() throws PMException {
+    public void commit() {
         tx.commit();
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         tx.getStore().rollback();
 
         tx.rollback();

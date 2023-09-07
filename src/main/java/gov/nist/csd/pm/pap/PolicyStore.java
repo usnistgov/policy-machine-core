@@ -65,7 +65,12 @@ public abstract class PolicyStore implements Policy, Transactional {
         beginTx();
         reset();
 
-        policyDeserializer.deserialize(this, author, input);
+        try {
+            policyDeserializer.deserialize(this, author, input);
+        } catch (PMException e) {
+            rollback();
+            throw e;
+        }
 
         commit();
     }

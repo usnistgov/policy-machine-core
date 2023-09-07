@@ -198,7 +198,7 @@ public class Scope implements Serializable {
     }
 
     private boolean isBuiltinFunction(String name) {
-        return PMLBuiltinFunctions.builtinFunctions().containsKey(name);
+        return PMLBuiltinFunctions.isBuiltinFunction(name);
     }
 
     public enum Mode {

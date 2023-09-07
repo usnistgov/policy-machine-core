@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
+import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
+import gov.nist.csd.pm.util.PolicyEquals;
 import gov.nist.csd.pm.util.SamplePolicy;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
@@ -88,9 +92,12 @@ public abstract class PAPTest {
             assertFalse(pap.graph().nodeExists("ua1"));
         }
 
-    }
-
-    private static final String input = """
+        private static final String input = """
+            const testConst = "hello world"
+            function testFunc() void {
+                create pc "pc1"
+            }
+            
             create policy class 'super_policy'
             create user attribute 'super_ua' in ['super_policy']
             associate 'super_ua' and ADMIN_POLICY_TARGET with ['*']
@@ -123,17 +130,15 @@ public abstract class PAPTest {
                     }
                 }
             }
-            const testConst = "hello world"
-            function testFunc() void {
-                create pc "pc1"
-            }
             """;
-    private static final String expected = """
+        private static final String expected = """
             # constants
             const testConst = 'hello world'
                         
             # functions
-            function testFunc() void {create policy class 'pc1'}
+            function testFunc() void {
+                create policy class 'pc1'
+            }
                         
             # graph
             set resource access rights ['read', 'write', 'execute']
@@ -166,24 +171,71 @@ public abstract class PAPTest {
             # objects
                         
             # prohibitions
-            create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1']
+            create prohibition 'p1'
+            deny user attribute 'ua1'
+            access rights ['read']
+            on union of [!'oa1']
                         
             # obligations
-            create obligation 'obl1' {create rule 'rule1' when any user performs ['event1', 'event2'] on any policy element do (evtCtx) {let event = evtCtx['event']if equals(event, 'event1') {create policy class 'e1'} else if equals(event, 'event2') {create policy class 'e2'} }}
+            create obligation 'obl1' {
+                create rule 'rule1'
+                when any user
+                performs ['event1', 'event2']
+                on any policy element
+                do (evtCtx) {
+                    let event = evtCtx['event']
+                    if equals(event, 'event1') {
+                        create policy class 'e1'
+                    } else if equals(event, 'event2') {
+                        create policy class 'e2'
+                    }
+                }
+            }
             """.trim();
-    @Test
-    void testSerialize() throws PMException {
-        UserContext userContext = new UserContext(SUPER_USER);
-        pap.deserialize(userContext, input, new PMLDeserializer());
-        String actual = pap.serialize(new PMLSerializer(false));
-        assertEquals(new ArrayList<>(), check(expected, actual));
+        @Test
+        void testSuccess() throws PMException {
+            UserContext userContext = new UserContext(SUPER_USER);
+            pap.deserialize(userContext, input, new PMLDeserializer());
+            String actual = pap.serialize(new PMLSerializer());
+            assertEquals(new ArrayList<>(), check(expected, actual));
 
-        assertThrows(PMException.class, () -> {
-            pap.deserialize(new UserContext("unknown user"), input, new PMLDeserializer());
-        });
+            assertThrows(PMException.class, () -> {
+                pap.deserialize(new UserContext("unknown user"), input, new PMLDeserializer());
+            });
+        }
+        @Test
+        void testJSONAndPMLCreateEqualPolicy() throws PMException {
+            UserContext userContext = new UserContext(SUPER_USER);
+            pap.deserialize(userContext, input, new PMLDeserializer());
+            String pml = pap.serialize(new PMLSerializer());
+            String json = pap.serialize(new JSONSerializer());
+
+            pap.policyStore.reset();
+            PAP pap1 = new PAP(pap.policyStore);
+            pap1.deserialize(userContext, pml, new PMLDeserializer());
+
+            pap.policyStore.reset();
+            PAP pap2 = new PAP(pap.policyStore);
+            pap2.deserialize(userContext, json, new JSONDeserializer());
+
+            PolicyEquals.check(pap1, pap2);
+        }
+
+        @Test
+        void testAssignPolicyClassTargetToAnotherPolicyClass() throws PMException {
+            UserContext userContext = new UserContext(SUPER_USER);
+            pap.deserialize(userContext, input, new PMLDeserializer());
+
+            pap.graph().createObjectAttribute("test-oa", "pc1");
+            pap.graph().assign(AdminPolicy.policyClassTargetName("pc1"), "test-oa");
+            String pml = pap.serialize(new PMLSerializer());
+
+            PAP pap1 = new PAP(new MemoryPolicyStore());
+            pap1.deserialize(userContext, pml, new PMLDeserializer());
+
+            PolicyEquals.check(pap, pap1);
+        }
     }
-
-
 
     @Test
     void testExecutePML() throws PMException {
@@ -2055,6 +2107,227 @@ public abstract class PAPTest {
                 assertTrue(constants.containsKey("const2"));
                 actual = constants.get("const2");
                 assertEquals(const2, actual);
+            }
+        }
+
+        @Nested
+        class TxTests {
+
+            @Test
+            void testSimple() throws PMException {
+                pap.beginTx();
+                pap.graph().createPolicyClass("pc1");
+                pap.rollback();
+                assertFalse(pap.graph().nodeExists("pc1"));
+
+                pap.beginTx();
+                pap.graph().createPolicyClass("pc1");
+                pap.commit();
+                assertTrue(pap.graph().nodeExists("pc1"));
+            }
+
+            @Test
+            void testSuccess() throws PMException {
+                pap.runTx((tx) -> {
+                    pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+                    pap.graph().createPolicyClass("pc1");
+                    pap.graph().createObjectAttribute("oa1", "pc1");
+                    pap.graph().createUserAttribute("ua1", "pc1");
+                    pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
+                    pap.graph().createUser("u1", "ua1");
+
+                    pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                              new AccessRightSet("read"), true,
+                                              new ContainerCondition("oa1", false)
+                    );
+
+                    pap.obligations().create(new UserContext("u1"), "obl1");
+
+                    pap.userDefinedPML().createConstant("const1", new Value("value"));
+                });
+
+                assertEquals(new AccessRightSet("read"), pap.graph().getResourceAccessRights());
+                assertTrue(pap.graph().nodeExists("pc1"));
+                assertTrue(pap.graph().nodeExists("ua1"));
+                assertTrue(pap.graph().nodeExists("oa1"));
+                assertTrue(pap.graph().nodeExists("u1"));
+                assertEquals(new Association("ua1", "oa1"), pap.graph().getAssociationsWithSource("ua1").get(0));
+                assertTrue(pap.prohibitions().exists("deny-ua1"));
+                assertTrue(pap.obligations().exists("obl1"));
+                assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
+            }
+
+            @Test
+            void testRollbackGraph() throws PMException {
+                assertThrows(PMException.class, () -> {
+                    pap.runTx((tx) -> {
+                        pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+                        pap.graph().createPolicyClass("pc1");
+                        pap.graph().createObjectAttribute("oa1", "pc1");
+                        pap.graph().createUserAttribute("ua1", "pc1");
+                        pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
+                        pap.graph().createUser("u1", "ua1");
+
+                        pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                                  new AccessRightSet("read"), true,
+                                                  new ContainerCondition("oa1", false)
+                        );
+
+                        pap.obligations().create(new UserContext("u1"), "obl1");
+
+                        pap.userDefinedPML().createConstant("const1", new Value("value"));
+
+                        pap.graph().createPolicyClass("pc1");
+                    });
+                });
+
+                assertEquals(new AccessRightSet(), pap.graph().getResourceAccessRights());
+                assertFalse(pap.graph().nodeExists("pc1"));
+                assertFalse(pap.graph().nodeExists("ua1"));
+                assertFalse(pap.graph().nodeExists("oa1"));
+                assertFalse(pap.graph().nodeExists("u1"));
+                assertFalse(pap.prohibitions().exists("deny-ua1"));
+                assertFalse(pap.obligations().exists("obl1"));
+                assertFalse(pap.userDefinedPML().getConstants().containsKey("const1"));
+            }
+
+            @Test
+            void testRollbackProhibitions() throws PMException {
+                pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("ua2", "pc1");
+                pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
+                pap.graph().createUser("u1", "ua1");
+
+                pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                          new AccessRightSet("read"), true,
+                                          new ContainerCondition("oa1", false)
+                );
+
+                pap.userDefinedPML().createConstant("const1", new Value("value"));
+
+                assertThrows(PMException.class, () -> {
+                    pap.runTx((tx) -> {
+                        pap.graph().createPolicyClass("pc2");
+                        pap.prohibitions().delete("deny-ua1");
+                        pap.obligations().create(new UserContext("u1"), "obl1");
+                        pap.userDefinedPML().createConstant("const2", new Value("value"));
+                        pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua2", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                                  new AccessRightSet("read"), true,
+                                                  new ContainerCondition("oa1", false)
+                        );
+                        pap.prohibitions().create("deny-ua2", new ProhibitionSubject("ua2", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                                  new AccessRightSet("read"), true,
+                                                  new ContainerCondition("oa1", false)
+                        );
+
+                        pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua2", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                                  new AccessRightSet("read"), true,
+                                                  new ContainerCondition("oa1", false)
+                        );
+                    });
+                });
+
+                assertEquals(new AccessRightSet("read"), pap.graph().getResourceAccessRights());
+                assertTrue(pap.graph().nodeExists("pc1"));
+                assertTrue(pap.graph().nodeExists("ua1"));
+                assertTrue(pap.graph().nodeExists("oa1"));
+                assertTrue(pap.graph().nodeExists("u1"));
+                assertTrue(pap.prohibitions().exists("deny-ua1"));
+                assertFalse(pap.prohibitions().exists("deny-ua2"));
+                assertEquals("ua1", pap.prohibitions().get("deny-ua1").getSubject().getName());
+                assertFalse(pap.obligations().exists("obl1"));
+                assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
+                assertFalse(pap.userDefinedPML().getConstants().containsKey("const2"));
+            }
+
+            @Test
+            void testRollbackObligations() throws PMException {
+                pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("ua2", "pc1");
+                pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
+                pap.graph().createUser("u1", "ua1");
+                pap.graph().createUser("u2", "ua1");
+
+                pap.obligations().create(new UserContext("u1"), "obl1");
+
+                pap.userDefinedPML().createConstant("const1", new Value("value"));
+
+                assertThrows(PMException.class, () -> {
+                    pap.runTx((tx) -> {
+                        pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                                  new AccessRightSet("read"), true,
+                                                  new ContainerCondition("oa1", false)
+                        );
+                        pap.graph().createUser("u3", "ua1");
+                        pap.obligations().delete("obl1");
+                        pap.obligations().create(new UserContext("u2"), "obl1");
+                        pap.obligations().create(new UserContext("u1"), "obl2");
+
+                        pap.obligations().create(new UserContext("u1"), "obl1");
+                    });
+                });
+
+                assertEquals(new AccessRightSet("read"), pap.graph().getResourceAccessRights());
+                assertTrue(pap.graph().nodeExists("pc1"));
+                assertTrue(pap.graph().nodeExists("ua1"));
+                assertTrue(pap.graph().nodeExists("oa1"));
+                assertTrue(pap.graph().nodeExists("u1"));
+                assertFalse(pap.graph().nodeExists("u3"));
+                assertFalse(pap.prohibitions().exists("deny-ua1"));
+                assertTrue(pap.obligations().exists("obl1"));
+                assertFalse(pap.obligations().exists("obl2"));
+                assertEquals("u1", pap.obligations().get("obl1").getAuthor().getUser());
+                assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
+            }
+
+            @Test
+            void testRollbackUserDefinedPML() throws PMException {
+                pap.graph().setResourceAccessRights(new AccessRightSet("read"));
+                pap.graph().createPolicyClass("pc1");
+                pap.graph().createObjectAttribute("oa1", "pc1");
+                pap.graph().createUserAttribute("ua1", "pc1");
+                pap.graph().createUserAttribute("ua2", "pc1");
+                pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
+                pap.graph().createUser("u1", "ua1");
+                pap.graph().createUser("u2", "ua1");
+
+                pap.obligations().create(new UserContext("u1"), "obl1");
+
+                pap.userDefinedPML().createConstant("const1", new Value("value"));
+
+                assertThrows(PMException.class, () -> {
+                    pap.runTx((tx) -> {
+                        pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                                                  new AccessRightSet("read"), true,
+                                                  new ContainerCondition("oa1", false)
+                        );
+                        pap.graph().createUser("u3", "ua1");
+                        pap.obligations().delete("obl1");
+                        pap.obligations().create(new UserContext("u2"), "obl1");
+
+                        pap.userDefinedPML().createConstant("const2", new Value("value"));
+                        pap.userDefinedPML().createConstant("const1", new Value("value"));
+                    });
+                });
+
+                assertEquals(new AccessRightSet("read"), pap.graph().getResourceAccessRights());
+                assertTrue(pap.graph().nodeExists("pc1"));
+                assertTrue(pap.graph().nodeExists("ua1"));
+                assertTrue(pap.graph().nodeExists("oa1"));
+                assertTrue(pap.graph().nodeExists("u1"));
+                assertFalse(pap.graph().nodeExists("u3"));
+                assertFalse(pap.prohibitions().exists("deny-ua1"));
+                assertTrue(pap.obligations().exists("obl1"));
+                assertFalse(pap.obligations().exists("obl2"));
+                assertEquals("u1", pap.obligations().get("obl1").getAuthor().getUser());
+                assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
+                assertFalse(pap.userDefinedPML().getConstants().containsKey("const2"));
             }
         }
 

@@ -235,5 +235,4 @@ public class JSONTest {
         PAP pap2 = new PAP(new MemoryPolicyStore());
         pap2.deserialize(new UserContext(SUPER_USER), serialize, new JSONDeserializer());
     }
-
 }

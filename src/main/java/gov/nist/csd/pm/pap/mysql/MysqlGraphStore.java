@@ -516,10 +516,19 @@ class MysqlGraphStore implements GraphStore {
 
         createNodeInternal(name, PC, properties);
 
-        // create rep OA
+        // create pc rep oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
         String pcTarget = AdminPolicy.policyClassTargetName(name);
-        createNodeInternal(pcTarget, OA, properties);
-        assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
+        if (!nodeExists(pcTarget)) {
+            createNodeInternal(pcTarget, OA, properties);
+        }
+
+        try {
+            if (!getParents(pcTarget).contains(POLICY_CLASSES_OA.nodeName())) {
+                assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
+            }
+        } catch (NodeDoesNotExistException e) {
+            throw new PMBackendException("error creating target attribute for policy class " + name, e);
+        }
 
         connection.commit();
 

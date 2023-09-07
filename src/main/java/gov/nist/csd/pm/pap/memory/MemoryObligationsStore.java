@@ -38,7 +38,7 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public void beginTx() {
         if (tx == null) {
             tx = new MemoryTx<>(false, 0, new TxObligations(new TxPolicyEventTracker(), this));
         }
@@ -47,12 +47,12 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
     }
 
     @Override
-    public void commit() throws PMException {
+    public void commit() {
         tx.commit();
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         tx.getStore().rollback();
 
         tx.rollback();

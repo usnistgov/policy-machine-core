@@ -56,19 +56,19 @@ public class MemoryTx<T extends BaseMemoryTx> implements Transactional {
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public void beginTx() {
         active = true;
         counter++;
     }
 
     @Override
-    public void commit() throws PMException {
+    public void commit() {
         counter--;
         active = counter != 0;
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         counter--;
         active = counter != 0;
     }

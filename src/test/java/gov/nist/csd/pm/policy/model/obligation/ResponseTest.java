@@ -23,6 +23,10 @@ class ResponseTest {
         String pml = """
                 create pc 'pc1'
                 create oa 'oa1' in ['pc1']
+                create ua 'ua1' in ['pc1']
+                create u 'u1' in ['ua1']
+                
+                associate 'ua1' and POLICY_CLASSES_OA with [create_policy_class]
                 const x = "hello world"
                 function createX() {
                     create policy class x
@@ -40,13 +44,11 @@ class ResponseTest {
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.bootstrap(new SuperUserBootstrapper());
-        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         MemoryPDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.getEventProcessor().processEvent(new EventContext(new UserContext("u1"), "oa1", new AssignToEvent("o1", "oa1")));
         assertTrue(pap.graph().nodeExists("hello world"));
-
-        System.out.print(new Gson().toJson(pap.obligations().get("obl1")));
     }
 
 }

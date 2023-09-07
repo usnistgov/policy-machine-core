@@ -19,8 +19,7 @@ class PDPTest {
         PAP pap = new PAP(new MemoryPolicyStore());
         PDP pdp = new MemoryPDP(pap);
 
-        UserContext superUser = new UserContext(SUPER_USER);
-        pdp.runTx(superUser, (policy) -> {
+        pap.runTx((policy) -> {
             policy.graph().createPolicyClass("pc1");
             policy.graph().createUserAttribute("ua1", "pc1");
             policy.graph().createObjectAttribute("oa1", "pc1");

@@ -58,7 +58,7 @@ public class PAP implements Transactional, PMLExecutable, Policy {
     }
 
     public interface TxRunner {
-        void runTx(PAP pap);
+        void runTx(PAP pap) throws PMException;
     }
 
     @Override

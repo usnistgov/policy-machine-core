@@ -1,11 +1,8 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-
-import java.util.List;
 
 class TxPolicyStore implements Policy, BaseMemoryTx {
 
@@ -25,14 +22,6 @@ class TxPolicyStore implements Policy, BaseMemoryTx {
         txProhibitions = new TxProhibitions(txPolicyEventTracker, (MemoryProhibitionsStore) txStore.prohibitions());
         txObligations = new TxObligations(txPolicyEventTracker, (MemoryObligationsStore) txStore.obligations());
         txUserDefinedPML = new TxUserDefinedPML(txPolicyEventTracker, (MemoryUserDefinedPMLStore) txStore.userDefinedPML());
-    }
-
-    public List<PolicyEvent> getTxEvents() {
-        return txPolicyEventTracker.getEvents();
-    }
-
-    protected TxPolicyEventTracker getTxPolicyEventListener() {
-        return txPolicyEventTracker;
     }
 
     public void clearEvents() {
@@ -78,6 +67,7 @@ class TxPolicyStore implements Policy, BaseMemoryTx {
 
     @Override
     public void rollback() throws PMException {
-        List<PolicyEvent> events = txPolicyEventTracker.getEvents();
+        clearEvents();
     }
+
 }

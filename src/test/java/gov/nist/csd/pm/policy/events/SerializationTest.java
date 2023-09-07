@@ -93,7 +93,7 @@ public class SerializationTest {
 
         createFunctionEvent.apply(memoryPolicyStore);
 
-        assertThrows(SerializationException.class, () -> memoryPolicyStore.serialize(new PMLSerializer()));
+        assertThrows(RuntimeException.class, () -> memoryPolicyStore.serialize(new PMLSerializer()));
     }
 
 }

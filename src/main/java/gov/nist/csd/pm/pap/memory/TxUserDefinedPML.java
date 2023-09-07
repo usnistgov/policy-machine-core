@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
@@ -22,11 +23,16 @@ public class TxUserDefinedPML implements UserDefinedPML, BaseMemoryTx {
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryUserDefinedPMLStore> txCmd = (TxCmd<MemoryUserDefinedPMLStore>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryUserDefinedPMLStore);
+            try {
+                TxCmd<MemoryUserDefinedPMLStore> txCmd = (TxCmd<MemoryUserDefinedPMLStore>) TxCmd.eventToCmd(event);
+                txCmd.rollback(memoryUserDefinedPMLStore);
+            } catch (PMException e) {
+                // throw runtime exception because there is noway back if the rollback fails
+                throw new PMRuntimeException("", e);
+            }
         }
     }
 

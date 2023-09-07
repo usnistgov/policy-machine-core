@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -175,9 +176,32 @@ abstract class TxCmd<T extends MemoryStore<?>> {
                     e.getOldPro()
             );
 
+        } else if (event instanceof TxEvents.MemorySetResourceAccessRightsEvent e) {
+            return new TxCmd.SetResourceAccessRightsTxCmd(
+                    e.getOldAccessRights(),
+                    e.getNewAccessRights()
+            );
         }
 
        throw new UnsupportedPolicyEvent(event);
+    }
+
+    static class SetResourceAccessRightsTxCmd extends TxCmd<MemoryGraphStore> {
+
+        private AccessRightSet oldAccessRights;
+        private AccessRightSet newAccessRights;
+
+        public SetResourceAccessRightsTxCmd(AccessRightSet oldAccessRights, AccessRightSet newAccessRights) {
+            super(Type.GRAPH);
+
+            this.oldAccessRights = oldAccessRights;
+            this.newAccessRights = newAccessRights;
+        }
+
+        @Override
+        public void rollback(MemoryGraphStore store) throws PMException {
+            store.setResourceAccessRights(oldAccessRights);
+        }
     }
 
     static class CreatePolicyClassTxCmd extends TxCmd<MemoryGraphStore> {

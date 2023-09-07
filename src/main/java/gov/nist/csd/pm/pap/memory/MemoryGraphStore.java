@@ -52,7 +52,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     }
 
     @Override
-    public void beginTx() throws PMException {
+    public void beginTx() {
         if (tx == null) {
             tx = new MemoryTx<>(false, 0, new TxGraph(new TxPolicyEventTracker(), this));
         }
@@ -60,12 +60,12 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     }
 
     @Override
-    public void commit() throws PMException {
+    public void commit() {
         tx.commit();
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         tx.getStore().rollback();
 
         tx.rollback();
@@ -94,7 +94,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     throws AdminAccessRightExistsException, PMBackendException {
         checkSetResourceAccessRightsInput(accessRightSet);
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.setResourceAccessRights(accessRightSet));
 
         resourceAccessRights.clear();
@@ -111,20 +110,20 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     throws NodeNameExistsException, PMBackendException {
         checkCreatePolicyClassInput(name);
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.createPolicyClass(name, properties));
 
         runInternalTx(() -> {
             // create pc node
             createNodeInternal(name, PC, properties);
 
-            // create pc rep oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
+            // create pc target oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
             String pcTarget = AdminPolicy.policyClassTargetName(name);
             if (!nodeExists(pcTarget)) {
                 createNodeInternal(pcTarget, OA, properties);
             }
 
-            if (!getParents(pcTarget).contains(POLICY_CLASSES_OA.nodeName())) {
+            List<String> parents = getParentsInternal(pcTarget);
+            if (!parents.contains(POLICY_CLASSES_OA.nodeName())) {
                 assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
             }
         });
@@ -141,9 +140,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public String createUserAttribute(String name, Map<String, String> properties, String parent, String... parents)
     throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
            AssignmentCausesLoopException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.createUserAttribute(name, properties, parent, parents));
-
         return createNode(name, UA, properties, parent, parents);
     }
 
@@ -158,9 +154,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public String createObjectAttribute(String name, Map<String, String> properties, String parent, String... parents)
     throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
            AssignmentCausesLoopException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.createObjectAttribute(name, properties, parent, parents));
-
         return createNode(name, OA, properties, parent, parents);
     }
 
@@ -175,9 +168,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public String createObject(String name, Map<String, String> properties, String parent, String... parents)
     throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
            AssignmentCausesLoopException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.createObject(name, properties, parent, parents));
-
         return createNode(name, O, properties, parent, parents);
     }
 
@@ -192,9 +182,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public String createUser(String name, Map<String, String> properties, String parent, String... parents)
     throws NodeDoesNotExistException, NodeNameExistsException, PMBackendException, InvalidAssignmentException,
            AssignmentCausesLoopException {
-        // log the command if in a tx
-        handleTxIfActive(tx -> tx.createUser(name, properties, parent, parents));
-
         return createNode(name, U, properties, parent, parents);
     }
 
@@ -210,7 +197,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     throws NodeDoesNotExistException, PMBackendException {
         checkSetNodePropertiesInput(name);
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.setNodeProperties(name, properties));
 
         graph.get(name).setProperties(properties);
@@ -247,7 +233,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
             return;
         }
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.deleteNode(name));
 
         NodeType type = graph.get(name).getNode().getType();
@@ -269,7 +254,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
             return;
         }
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.assign(child, parent));
 
         assignInternal(child, parent);
@@ -282,7 +266,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
             return;
         }
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.deassign(child, parent));
 
         deassignInternal(child, parent);
@@ -292,9 +275,8 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public List<String> getParents(String node) throws NodeDoesNotExistException, PMBackendException {
         checkGetParentsInput(node);
 
-        return new ArrayList<>(graph.get(node).getParents());
+        return getParentsInternal(node);
     }
-
 
     @Override
     public List<String> getChildren(String node) throws NodeDoesNotExistException, PMBackendException {
@@ -309,7 +291,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     throws InvalidAssociationException, UnknownAccessRightException, NodeDoesNotExistException, PMBackendException {
         checkAssociateInput(ua, target, accessRights);
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.associate(ua, target, accessRights));
 
         if (containsEdge(ua, target)) {
@@ -326,7 +307,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
             return;
         }
 
-        // log the command if in a tx
         handleTxIfActive(tx -> tx.dissociate(ua, target));
 
         dissociateInternal(ua, target);
@@ -384,6 +364,13 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
            AssignmentCausesLoopException {
         checkCreateNodeInput(name, type, parent, additionalParents);
 
+        switch (type) {
+            case OA -> handleTxIfActive(tx -> tx.createObjectAttribute(name, properties, parent, additionalParents));
+            case UA -> handleTxIfActive(tx -> tx.createUserAttribute(name, properties, parent, additionalParents));
+            case O -> handleTxIfActive(tx -> tx.createObject(name, properties, parent, additionalParents));
+            default -> handleTxIfActive(tx -> tx.createUser(name, properties, parent, additionalParents));
+        }
+
         createNodeInternal(name, type, properties);
 
         runInternalTx(() -> {
@@ -395,6 +382,10 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         });
 
         return name;
+    }
+
+    private List<String> getParentsInternal(String node) {
+        return new ArrayList<>(graph.get(node).getParents());
     }
 
     protected void createNodeInternal(String name, NodeType type, Map<String, String> properties) {

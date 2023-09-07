@@ -18,7 +18,14 @@ public class PMLEquals {
         List<String> lines = new ArrayList<>();
         Scanner sc = new Scanner(pml);
         while (sc.hasNextLine()) {
-            lines.add(sc.nextLine());
+            String line = sc.nextLine();
+
+            // ignore comment lines
+            if (line.startsWith("#")) {
+                continue;
+            }
+
+            lines.add(line);
         }
 
         Collections.sort(lines);

@@ -54,4 +54,39 @@ class PMLFormatterTest {
         assertEquals(expected, format);
     }
 
+    @Test
+    void testFormatWithProhibition() {
+        String pml = """
+               create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1']
+               """;
+        String format = PMLFormatter.format(pml);
+
+        String expected = """
+                create prohibition 'p1'
+                deny user attribute 'ua1'
+                access rights ['read']
+                on union of [!'oa1']
+                """;
+
+        assertEquals(expected, format);
+
+        pml = """
+               if equals('a', 'a') {
+                   create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1']
+               }
+               """;
+        format = PMLFormatter.format(pml);
+
+        expected = """
+                if equals('a', 'a') {
+                    create prohibition 'p1'
+                    deny user attribute 'ua1'
+                    access rights ['read']
+                    on union of [!'oa1']
+                }
+                """;
+
+        assertEquals(expected, format);
+    }
+
 }

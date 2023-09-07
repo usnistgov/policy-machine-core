@@ -97,6 +97,10 @@ public class FunctionDefinitionStatement extends PMLStatement {
 
     @Override
     public String toString() {
+        if (isFuncExec) {
+            throw new RuntimeException("PML Function " + functionName + " cannot be serialized as it is a Java function");
+        }
+
         String argsStr = serializeFormalArgs();
 
         return String.format(

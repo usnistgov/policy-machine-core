@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.CreateProhibitionEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
@@ -23,11 +24,16 @@ public class TxProhibitions implements Prohibitions, BaseMemoryTx {
     }
 
     @Override
-    public void rollback() throws PMException {
+    public void rollback() {
         List<PolicyEvent> events = txPolicyEventTracker.getEvents();
         for (PolicyEvent event : events) {
-            TxCmd<MemoryProhibitionsStore> txCmd = (TxCmd<MemoryProhibitionsStore>) TxCmd.eventToCmd(event);
-            txCmd.rollback(memoryProhibitionsStore);
+            try {
+                TxCmd<MemoryProhibitionsStore> txCmd = (TxCmd<MemoryProhibitionsStore>) TxCmd.eventToCmd(event);
+                txCmd.rollback(memoryProhibitionsStore);
+            } catch (PMException e) {
+                // throw runtime exception because there is noway back if the rollback fails
+                throw new PMRuntimeException("", e);
+            }
         }
     }
 
