@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -43,7 +44,7 @@ public class AdjudicatorObligations implements Obligations {
             accessRightChecker.check(userCtx, target.policyElement(), accessRight);
 
         } else if (target.getType() == Target.Type.ANY_POLICY_ELEMENT) {
-            accessRightChecker.check(userCtx, AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), accessRight);
+            accessRightChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
 
         } else if (target.getType() == Target.Type.ANY_CONTAINED_IN) {
             accessRightChecker.check(userCtx, target.anyContainedIn(), accessRight);
@@ -58,14 +59,14 @@ public class AdjudicatorObligations implements Obligations {
 
     private void checkSubject(EventSubject subject, String accessRight) throws PMException {
         if (subject.getType() == EventSubject.Type.ANY_USER) {
-            accessRightChecker.check(userCtx, AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), accessRight);
+            accessRightChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
 
         } else if (subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE) {
             accessRightChecker.check(userCtx, subject.anyUserWithAttribute(), accessRight);
 
         } else if (subject.getType() == EventSubject.Type.PROCESS) {
             // need permissions on super object create a process obligation
-            accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), accessRight);
+            accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), accessRight);
 
         } else if (subject.getType() == EventSubject.Type.USERS) {
             for (String user : subject.users()) {

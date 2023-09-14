@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp;
 
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.policy.Graph;
@@ -35,7 +36,7 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), SET_RESOURCE_ACCESS_RIGHTS);
+        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), SET_RESOURCE_ACCESS_RIGHTS);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.POLICY_CLASSES_OA.nodeName(), CREATE_POLICY_CLASS);
+        accessRightChecker.check(userCtx, AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), CREATE_POLICY_CLASS);
 
         return null;
     }

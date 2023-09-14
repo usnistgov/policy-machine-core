@@ -314,45 +314,45 @@ public abstract class PAPTest {
     }
 
     void testAdminPolicy(PAP pap, int numExpectedPolicyClasses) throws PMException {
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.ADMIN_POLICY.nodeName()));
-        List<String> children = pap.graph().getChildren(AdminPolicy.Node.ADMIN_POLICY.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.ADMIN_POLICY.nodeName()));
+        List<String> children = pap.graph().getChildren(AdminPolicyNode.ADMIN_POLICY.nodeName());
         assertEquals(5, children.size());
-        assertTrue(children.containsAll(List.of(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName(), AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(),
-                                                AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), AdminPolicy.Node.PROHIBITIONS_TARGET.nodeName(), AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName())));
+        assertTrue(children.containsAll(List.of(AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(),
+                                                AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), AdminPolicyNode.PROHIBITIONS_TARGET.nodeName(), AdminPolicyNode.OBLIGATIONS_TARGET.nodeName())));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName()));
-        List<String> parents = pap.graph().getParents(AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName()));
+        List<String> parents = pap.graph().getParents(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName()));
-        children = pap.graph().getChildren(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()));
+        children = pap.graph().getChildren(AdminPolicyNode.POLICY_CLASSES_OA.nodeName());
         assertEquals(numExpectedPolicyClasses, children.size());
-        assertTrue(children.contains(AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName()));
+        assertTrue(children.contains(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName()));
 
-        parents = pap.graph().getParents(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName());
+        parents = pap.graph().getParents(AdminPolicyNode.POLICY_CLASSES_OA.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicy.Node.ADMIN_POLICY.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName()));
-        parents = pap.graph().getParents(AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName()));
+        parents = pap.graph().getParents(AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicy.Node.ADMIN_POLICY.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName()));
-        parents = pap.graph().getParents(AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName()));
+        parents = pap.graph().getParents(AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicy.Node.ADMIN_POLICY.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.PROHIBITIONS_TARGET.nodeName()));
-        parents = pap.graph().getParents(AdminPolicy.Node.PROHIBITIONS_TARGET.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.PROHIBITIONS_TARGET.nodeName()));
+        parents = pap.graph().getParents(AdminPolicyNode.PROHIBITIONS_TARGET.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicy.Node.ADMIN_POLICY.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName()));
-        parents = pap.graph().getParents(AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.OBLIGATIONS_TARGET.nodeName()));
+        parents = pap.graph().getParents(AdminPolicyNode.OBLIGATIONS_TARGET.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicy.Node.ADMIN_POLICY.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
     }
 
 
@@ -402,8 +402,8 @@ public abstract class PAPTest {
                 String rep = AdminPolicy.policyClassTargetName("pc1");
                 assertTrue(pap.graph().nodeExists("pc1"));
                 assertTrue(pap.graph().nodeExists(rep));
-                assertTrue(pap.graph().getParents(rep).contains(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName()));
-                assertTrue(pap.graph().getChildren(AdminPolicy.Node.POLICY_CLASSES_OA.nodeName()).contains(rep));
+                assertTrue(pap.graph().getParents(rep).contains(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()));
+                assertTrue(pap.graph().getChildren(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()).contains(rep));
             }
         }
 

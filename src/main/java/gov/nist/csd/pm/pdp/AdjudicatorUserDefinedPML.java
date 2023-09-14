@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -25,12 +26,12 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(), CREATE_FUNCTION);
+        accessRightChecker.check(userCtx, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), CREATE_FUNCTION);
     }
 
     @Override
     public void deleteFunction(String functionName) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(), DELETE_FUNCTION);
+        accessRightChecker.check(userCtx, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), DELETE_FUNCTION);
     }
 
     @Override
@@ -47,12 +48,12 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public void createConstant(String constantName, Value constantValue) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), CREATE_CONSTANT);
+        accessRightChecker.check(userCtx, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), CREATE_CONSTANT);
     }
 
     @Override
     public void deleteConstant(String constName) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), DELETE_CONSTANT);
+        accessRightChecker.check(userCtx, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), DELETE_CONSTANT);
     }
 
     @Override

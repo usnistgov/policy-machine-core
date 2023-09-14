@@ -14,7 +14,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.AdminPolicy.Node.POLICY_CLASSES_OA;
+import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASSES_OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;

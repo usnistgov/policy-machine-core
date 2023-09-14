@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.serialization.pml;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.serialization.json.*;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicySerializer;
@@ -238,7 +239,7 @@ public class PMLSerializer implements PolicySerializer {
     private Expression buildNameExpression(String name) {
         if (AdminPolicy.isAdminPolicyNodeName(name)) {
             return new Expression(new VariableReference(
-                    AdminPolicy.Node.fromNodeName(name).constantName(),
+                    AdminPolicyNode.fromNodeName(name).constantName(),
                     Type.string()
             ));
         }

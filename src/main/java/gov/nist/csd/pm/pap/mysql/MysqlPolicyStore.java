@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PolicyStore;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.PolicySerializer;
@@ -135,13 +136,13 @@ public class MysqlPolicyStore extends PolicyStore implements Verifier {
 
     @Override
     public void verifyAdminPolicyClassNode() throws PMException {
-        if (!graph.nodeExists(Node.ADMIN_POLICY_TARGET.nodeName())) {
-            graph.createNodeInternal(Node.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
+        if (!graph.nodeExists(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName())) {
+            graph.createNodeInternal(AdminPolicyNode.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
         }
     }
 
     @Override
-    public void verifyAdminPolicyAttribute(Node node, Node parent) throws PMException {
+    public void verifyAdminPolicyAttribute(AdminPolicyNode node, AdminPolicyNode parent) throws PMException {
         if (!graph.nodeExists(node.nodeName())) {
             graph.createNodeInternal(node.nodeName(), OA, new HashMap<>());
         }
@@ -152,7 +153,7 @@ public class MysqlPolicyStore extends PolicyStore implements Verifier {
     }
 
     @Override
-    public void verifyAdminPolicyConstant(Node constant) throws PMException {
+    public void verifyAdminPolicyConstant(AdminPolicyNode constant) throws PMException {
         try {
             userDefinedPML.createConstant(constant.constantName(), new Value(constant.nodeName()));
         } catch (PMLConstantAlreadyDefinedException e) {

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
@@ -54,7 +55,7 @@ class Adjudicator implements Policy {
 
     @Override
     public String serialize(PolicySerializer serializer) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), SERIALIZE_POLICY);
+        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), SERIALIZE_POLICY);
 
         return null;
     }
@@ -62,11 +63,11 @@ class Adjudicator implements Policy {
     @Override
     public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
             throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), DESERIALIZE_POLICY);
+        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), DESERIALIZE_POLICY);
     }
 
     @Override
     public void reset() throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), RESET);
+        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), RESET);
     }
 }

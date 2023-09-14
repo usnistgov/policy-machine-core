@@ -165,11 +165,11 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
 
     @Override
     public void verifyAdminPolicyClassNode() {
-        graph.createNodeInternal(Node.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
+        graph.createNodeInternal(AdminPolicyNode.ADMIN_POLICY.nodeName(), PC, new HashMap<>());
     }
 
     @Override
-    public void verifyAdminPolicyAttribute(Node node, Node parent) throws PMException {
+    public void verifyAdminPolicyAttribute(AdminPolicyNode node, AdminPolicyNode parent) throws PMException {
         if (!graph.nodeExists(node.nodeName())) {
             graph.createNodeInternal(node.nodeName(), OA, new HashMap<>());
         }
@@ -180,7 +180,7 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
     }
 
     @Override
-    public void verifyAdminPolicyConstant(Node constant) throws PMException {
+    public void verifyAdminPolicyConstant(AdminPolicyNode constant) throws PMException {
         try {
             userDefinedPML.createConstant(constant.constantName(), new Value(constant.nodeName()));
         } catch (PMLConstantAlreadyDefinedException e) {

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminPolicy.Node.POLICY_CLASSES_OA;
+import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASSES_OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.U;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;

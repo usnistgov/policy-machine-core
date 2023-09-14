@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.epp;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
@@ -134,14 +135,14 @@ class EPPTest {
             policy.graph().createPolicyClass("pc1");
             policy.graph().createUserAttribute("ua1", "pc1");
             policy.graph().associate("super_ua", "ua1", new AccessRightSet("*"));
-            policy.graph().associate("super_ua", AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), new AccessRightSet("*"));
+            policy.graph().associate("super_ua", AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), new AccessRightSet("*"));
             policy.graph().createObjectAttribute("oa1", "pc1");
             policy.graph().createUser("u1", "ua1");
             policy.graph().createObject("o1", "oa1");
-            policy.graph().associate("ua1", AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(),
+            policy.graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(),
                                      new AccessRightSet(CREATE_OBLIGATION));
             policy.graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
-            policy.graph().associate("ua1", AdminPolicy.Node.OBLIGATIONS_TARGET.nodeName(), new AccessRightSet("*"));
+            policy.graph().associate("ua1", AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext("u1"), (policy) -> {

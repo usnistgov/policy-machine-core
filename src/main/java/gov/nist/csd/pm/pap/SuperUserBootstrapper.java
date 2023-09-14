@@ -33,10 +33,10 @@ public class SuperUserBootstrapper implements PolicyBootstrapper {
             // if the association already exists this will do nothing
             pap.graph().associate(SUPER_UA1, SUPER_UA, allAccessRights());
 
-            pap.graph().associate(SUPER_UA, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), allAccessRights());
-            pap.graph().associate(SUPER_UA, AdminPolicy.Node.POLICY_CLASSES_OA.nodeName(), allAccessRights());
-            pap.graph().associate(SUPER_UA, AdminPolicy.Node.PML_FUNCTIONS_TARGET.nodeName(), allAccessRights());
-            pap.graph().associate(SUPER_UA, AdminPolicy.Node.PML_CONSTANTS_TARGET.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), allAccessRights());
+            pap.graph().associate(SUPER_UA, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), allAccessRights());
         });
     }
 

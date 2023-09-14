@@ -7,78 +7,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static gov.nist.csd.pm.pap.AdminPolicyNode.*;
+
 public class AdminPolicy {
 
-    public enum Node {
-        ADMIN_POLICY("pm_admin:policy"),
-        ADMIN_POLICY_TARGET("pm_admin:policy:target"),
-        POLICY_CLASSES_OA("pm_admin:POLICY_CLASSES"),
-        PML_FUNCTIONS_TARGET("pm_admin:FUNCTIONS"),
-        PML_CONSTANTS_TARGET("pm_admin:CONSTANTS"),
-        OBLIGATIONS_TARGET("pm_admin:OBLIGATIONS"),
-        PROHIBITIONS_TARGET("pm_admin:PROHIBITIONS");
-
-        private final String value;
-
-        Node(String value) {
-            this.value = value;
-        }
-
-        public static Node fromNodeName(String child) {
-            switch (child) {
-                case "pm_admin:policy" -> {
-                    return ADMIN_POLICY;
-                }
-                case "pm_admin:policy:target" -> {
-                    return ADMIN_POLICY_TARGET;
-                }
-                case "pm_admin:POLICY_CLASSES" -> {
-                    return POLICY_CLASSES_OA;
-                }
-                case "pm_admin:FUNCTIONS" -> {
-                    return PML_FUNCTIONS_TARGET;
-                }
-                case "pm_admin:CONSTANTS" -> {
-                    return PML_CONSTANTS_TARGET;
-                }
-                case "pm_admin:OBLIGATIONS" -> {
-                    return OBLIGATIONS_TARGET;
-                }
-                case "pm_admin:PROHIBITIONS" -> {
-                    return PROHIBITIONS_TARGET;
-                }
-            }
-
-            throw new IllegalArgumentException("unknown admin policy node " + child);
-        }
-
-        public String constantName() {
-            return name();
-        }
-
-        public String nodeName() {
-            return value;
-        }
-    }
-
     public static final Set<String> ALL_NODE_NAMES = new HashSet<>(List.of(
-            Node.ADMIN_POLICY.value,
-            Node.ADMIN_POLICY_TARGET.value,
-            Node.POLICY_CLASSES_OA.value,
-            Node.PML_FUNCTIONS_TARGET.value,
-            Node.PML_CONSTANTS_TARGET.value,
-            Node.OBLIGATIONS_TARGET.value,
-            Node.PROHIBITIONS_TARGET.value
+            ADMIN_POLICY.nodeName(),
+            ADMIN_POLICY_TARGET.nodeName(),
+            POLICY_CLASSES_OA.nodeName(),
+            PML_FUNCTIONS_TARGET.nodeName(),
+            PML_CONSTANTS_TARGET.nodeName(),
+            OBLIGATIONS_TARGET.nodeName(),
+            PROHIBITIONS_TARGET.nodeName()
     ));
 
     public static final Set<String> AL_NODE_CONSTANT_NAMES = new HashSet<>(List.of(
-            Node.ADMIN_POLICY.constantName(),
-            Node.ADMIN_POLICY_TARGET.constantName(),
-            Node.POLICY_CLASSES_OA.constantName(),
-            Node.PML_FUNCTIONS_TARGET.constantName(),
-            Node.PML_CONSTANTS_TARGET.constantName(),
-            Node.OBLIGATIONS_TARGET.constantName(),
-            Node.PROHIBITIONS_TARGET.constantName()
+            ADMIN_POLICY.constantName(),
+            ADMIN_POLICY_TARGET.constantName(),
+            POLICY_CLASSES_OA.constantName(),
+            PML_FUNCTIONS_TARGET.constantName(),
+            PML_CONSTANTS_TARGET.constantName(),
+            OBLIGATIONS_TARGET.constantName(),
+            PROHIBITIONS_TARGET.constantName()
     ));
 
     public static boolean isAdminPolicyNodeConstantName(String name) {
@@ -95,14 +45,14 @@ public class AdminPolicy {
 
 
     /**
-     * Create {@link AdminPolicy.Node#ADMIN_POLICY}
-     * Create the {@link AdminPolicy.Node#ADMIN_POLICY} policy class.<p>
-     * Create the {@link AdminPolicy.Node#POLICY_CLASSES_OA} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy.Node#ADMIN_POLICY_TARGET} in the POLICY_CLASSES_OA object attribute.<p>
-     * Create the {@link AdminPolicy.Node#PML_CONSTANTS_TARGET} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy.Node#PML_FUNCTIONS_TARGET} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy.Node#PROHIBITIONS_TARGET} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicy.Node#OBLIGATIONS_TARGET} in the ADMIN_POLICY policy class.<p>
+     * Create {@link AdminPolicyNode#ADMIN_POLICY}
+     * Create the {@link AdminPolicyNode#ADMIN_POLICY} policy class.<p>
+     * Create the {@link AdminPolicyNode#POLICY_CLASSES_OA} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicyNode#ADMIN_POLICY_TARGET} in the POLICY_CLASSES_OA object attribute.<p>
+     * Create the {@link AdminPolicyNode#PML_CONSTANTS_TARGET} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicyNode#PML_FUNCTIONS_TARGET} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicyNode#PROHIBITIONS_TARGET} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicyNode#OBLIGATIONS_TARGET} in the ADMIN_POLICY policy class.<p>
      *
      * Verify that all AdminPolicy constants are defined as PML constants in the policy. <p>
      *
@@ -128,7 +78,7 @@ public class AdminPolicy {
                 continue;
             }
 
-            graphStore.createObjectAttribute(repOA, Node.POLICY_CLASSES_OA.value);
+            graphStore.createObjectAttribute(repOA, POLICY_CLASSES_OA.nodeName());
         }
     }
 
@@ -136,20 +86,20 @@ public class AdminPolicy {
         try {
             verifier.verifyAdminPolicyClassNode();
 
-            verifier.verifyAdminPolicyAttribute(Node.POLICY_CLASSES_OA, Node.ADMIN_POLICY);
-            verifier.verifyAdminPolicyAttribute(Node.ADMIN_POLICY_TARGET, Node.POLICY_CLASSES_OA);
-            verifier.verifyAdminPolicyAttribute(Node.PML_FUNCTIONS_TARGET, Node.ADMIN_POLICY);
-            verifier.verifyAdminPolicyAttribute(Node.PML_CONSTANTS_TARGET, Node.ADMIN_POLICY);
-            verifier.verifyAdminPolicyAttribute(Node.OBLIGATIONS_TARGET, Node.ADMIN_POLICY);
-            verifier.verifyAdminPolicyAttribute(Node.PROHIBITIONS_TARGET, Node.ADMIN_POLICY);
+            verifier.verifyAdminPolicyAttribute(POLICY_CLASSES_OA, ADMIN_POLICY);
+            verifier.verifyAdminPolicyAttribute(ADMIN_POLICY_TARGET, POLICY_CLASSES_OA);
+            verifier.verifyAdminPolicyAttribute(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
+            verifier.verifyAdminPolicyAttribute(PML_CONSTANTS_TARGET, ADMIN_POLICY);
+            verifier.verifyAdminPolicyAttribute(OBLIGATIONS_TARGET, ADMIN_POLICY);
+            verifier.verifyAdminPolicyAttribute(PROHIBITIONS_TARGET, ADMIN_POLICY);
 
-            verifier.verifyAdminPolicyConstant(Node.ADMIN_POLICY);
-            verifier.verifyAdminPolicyConstant(Node.POLICY_CLASSES_OA);
-            verifier.verifyAdminPolicyConstant(Node.ADMIN_POLICY_TARGET);
-            verifier.verifyAdminPolicyConstant(Node.PML_FUNCTIONS_TARGET);
-            verifier.verifyAdminPolicyConstant(Node.PML_CONSTANTS_TARGET);
-            verifier.verifyAdminPolicyConstant(Node.PROHIBITIONS_TARGET);
-            verifier.verifyAdminPolicyConstant(Node.OBLIGATIONS_TARGET);
+            verifier.verifyAdminPolicyConstant(ADMIN_POLICY);
+            verifier.verifyAdminPolicyConstant(POLICY_CLASSES_OA);
+            verifier.verifyAdminPolicyConstant(ADMIN_POLICY_TARGET);
+            verifier.verifyAdminPolicyConstant(PML_FUNCTIONS_TARGET);
+            verifier.verifyAdminPolicyConstant(PML_CONSTANTS_TARGET);
+            verifier.verifyAdminPolicyConstant(PROHIBITIONS_TARGET);
+            verifier.verifyAdminPolicyConstant(OBLIGATIONS_TARGET);
         } catch (PMException e) {
             throw new AdminPolicyVerificationException(e);
         }
@@ -158,9 +108,9 @@ public class AdminPolicy {
     public interface Verifier {
         void verifyAdminPolicyClassNode() throws PMException;
 
-        void verifyAdminPolicyAttribute(Node node, Node parent) throws PMException;
+        void verifyAdminPolicyAttribute(AdminPolicyNode node, AdminPolicyNode parent) throws PMException;
 
-        void verifyAdminPolicyConstant(Node constant) throws PMException;
+        void verifyAdminPolicyConstant(AdminPolicyNode constant) throws PMException;
     }
 
 

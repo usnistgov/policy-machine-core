@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -32,7 +33,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
     @Override
     public void create(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) throws PMException {
         if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
-            accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), CREATE_PROCESS_PROHIBITION);
+            accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), CREATE_PROCESS_PROHIBITION);
         } else {
             accessRightChecker.check(userCtx, subject.getName(), CREATE_PROHIBITION);
         }
@@ -44,7 +45,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
             // there is another access right needed if the condition is a complement
             if (contCond.isComplement()) {
-                accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION);
+                accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION);
             }
         }
     }
@@ -60,7 +61,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
         // check that the user can create a prohibition for the subject
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-            accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), DELETE_PROCESS_PROHIBITION);
+            accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), DELETE_PROCESS_PROHIBITION);
         } else {
             accessRightChecker.check(userCtx, prohibition.getSubject().getName(), DELETE_PROHIBITION);
         }
@@ -71,7 +72,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
             // there is another access right needed if the condition is a complement
             if (contCond.isComplement()) {
-                accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), DELETE_CONTAINER_COMPLEMENT_FROM_PROHIBITION);
+                accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), DELETE_CONTAINER_COMPLEMENT_FROM_PROHIBITION);
             }
         }
     }
@@ -116,7 +117,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
 
         // check user has access to subject prohibitions
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-            accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(), GET_PROCESS_PROHIBITIONS);
+            accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), GET_PROCESS_PROHIBITIONS);
         } else {
             accessRightChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
         }
@@ -134,7 +135,7 @@ public class AdjudicatorProhibitions implements Prohibitions {
             try {
                 // check user has access to subject prohibitions
                 if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-                    accessRightChecker.check(userCtx, AdminPolicy.Node.ADMIN_POLICY_TARGET.nodeName(),
+                    accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(),
                                              GET_PROCESS_PROHIBITIONS);
                 } else {
                     accessRightChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
