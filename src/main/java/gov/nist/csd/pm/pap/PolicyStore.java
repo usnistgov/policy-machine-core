@@ -10,7 +10,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 /**
  * PolicyStore is an abstract class that outlines the expected behavior of a backend implementation. It is expected that
- * any subclass calls {@link AdminPolicy#verify(AdminPolicy.Verifier, GraphStore)} in the constructor to verify the setup
+ * any subclass calls {@link AdminPolicyNode#verify(AdminPolicy.Verifier, GraphStore)} in the constructor to verify the setup
  * of the admin policy.
  */
 public abstract class PolicyStore implements Policy, Transactional {
@@ -28,7 +28,7 @@ public abstract class PolicyStore implements Policy, Transactional {
     public abstract UserDefinedPMLStore userDefinedPML();
 
     /**
-     * Reset the underlying policy. This method should call {@link AdminPolicy#verify(AdminPolicy.Verifier, GraphStore)}
+     * Reset the underlying policy. This method should call {@link AdminPolicyNode#verify(AdminPolicy.Verifier, GraphStore)}
      * to initialize the admin policy elements after reset.
      *
      * @throws PMException If there is an error during the reset or admin initialization process
