@@ -1,13 +1,15 @@
 package gov.nist.csd.pm.pap;
 
+import static gov.nist.csd.pm.pap.AdminPolicy.policyClassTargetName;
+
 public enum AdminPolicyNode {
-    ADMIN_POLICY("pm_admin:policy"),
-    ADMIN_POLICY_TARGET("pm_admin:policy:target"),
-    POLICY_CLASSES_OA("pm_admin:POLICY_CLASSES"),
-    PML_FUNCTIONS_TARGET("pm_admin:FUNCTIONS"),
-    PML_CONSTANTS_TARGET("pm_admin:CONSTANTS"),
-    OBLIGATIONS_TARGET("pm_admin:OBLIGATIONS"),
-    PROHIBITIONS_TARGET("pm_admin:PROHIBITIONS");
+    ADMIN_POLICY("PM_ADMIN"),
+    ADMIN_POLICY_TARGET(policyClassTargetName(ADMIN_POLICY.value)),
+    POLICY_CLASSES_OA("PM_ADMIN:POLICY_CLASSES"),
+    PML_FUNCTIONS_TARGET("PM_ADMIN:FUNCTIONS"),
+    PML_CONSTANTS_TARGET("PM_ADMIN:CONSTANTS"),
+    OBLIGATIONS_TARGET("PM_ADMIN:OBLIGATIONS"),
+    PROHIBITIONS_TARGET("PM_ADMIN:PROHIBITIONS");
 
     private final String value;
 
@@ -17,10 +19,10 @@ public enum AdminPolicyNode {
 
     public static AdminPolicyNode fromNodeName(String child) {
         switch (child) {
-            case "pm_admin:policy" -> {
+            case "pm_admin" -> {
                 return ADMIN_POLICY;
             }
-            case "pm_admin:policy:target" -> {
+            case "pm_admin:target" -> {
                 return ADMIN_POLICY_TARGET;
             }
             case "pm_admin:POLICY_CLASSES" -> {
