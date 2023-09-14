@@ -31,12 +31,8 @@ public class AccessRightChecker {
         }
 
         AccessRightSet accessRights = policyReviewer.getPrivileges(userCtx, target);
-        if(accessRights.isEmpty()) {
+        if (!accessRights.containsAll(Arrays.asList(toCheck))) {
             throw new UnauthorizedException(userCtx, target, toCheck);
-        } else {
-            if (!accessRights.containsAll(Arrays.asList(toCheck))) {
-                throw new UnauthorizedException(userCtx, target, toCheck);
-            }
         }
     }
 
