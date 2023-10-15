@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.util.PMLEquals;
 import gov.nist.csd.pm.util.PolicyEquals;
 import org.junit.jupiter.api.Test;
 
