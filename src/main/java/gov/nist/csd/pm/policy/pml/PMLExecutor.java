@@ -3,12 +3,12 @@ package gov.nist.csd.pm.policy.pml;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.*;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.util.*;
 
@@ -23,18 +23,13 @@ public class PMLExecutor {
         ExecutionContext ctx = new ExecutionContext(author);
         ctx.scope().loadFromPMLContext(PMLContext.fromPolicy(policy));
 
-        ExecutionContext predefined;
-        try {
-            // add custom builtin functions to scope
-            for (FunctionDefinitionStatement func : customFunctions) {
-                ctx.scope().addFunction(func);
-            }
-
-            // store the predefined ctx to avoid adding again at the end of execution
-            predefined = ctx.copy();
-        } catch (PMLScopeException e) {
-            throw new PMLExecutionException(e.getMessage());
+        // add custom builtin functions to scope
+        for (FunctionDefinitionStatement func : customFunctions) {
+            ctx.scope().addFunction(func);
         }
+
+        // store the predefined ctx to avoid adding again at the end of execution
+        ExecutionContext predefined = ctx.copy();
 
         // execute each statement
         for (PMLStatement stmt : compiledStatements) {
@@ -77,11 +72,11 @@ public class PMLExecutor {
     public static Value executeStatementBlock(ExecutionContext executionCtx, Policy policyAuthor, List<PMLStatement> statements) throws PMException {
         for (PMLStatement statement : statements) {
             Value value = statement.execute(executionCtx, policyAuthor);
-            if (value.isReturn() || value.isBreak() || value.isContinue()) {
+            if (value instanceof ReturnValue || value instanceof BreakValue || value instanceof ContinueValue) {
                 return value;
             }
         }
 
-        return new Value();
+        return new VoidValue();
     }
 }

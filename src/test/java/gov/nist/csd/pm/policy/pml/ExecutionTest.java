@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.pml;
 
-import gov.nist.csd.pm.pap.SuperUserBootstrapper;
+import gov.nist.csd.pm.pdp.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
+import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExecutionTest {
@@ -23,34 +23,33 @@ public class ExecutionTest {
     @Test
     void testGraphPML() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
 
         String input =
                 """
-                set resource access rights ['read', 'write']
+                set resource access rights ["read", "write"]
                 
-                create policy class 'pc1'
+                create policy class "pc1"
                 
-                set properties of 'pc1' to {'k': 'v'}
+                set properties of "pc1" to {"k": "v"}
                 
-                create object attribute 'oa1' in ['pc1']
-                create object attribute 'oa2' in ['pc1']
-                create object attribute 'oa3' in ['pc1']
+                create object attribute "oa1" assign to ["pc1"]
+                create object attribute "oa2" assign to ["pc1"]
+                create object attribute "oa3" assign to ["pc1"]
                 
-                let parents = ['oa1', 'oa2', 'oa3']
-                create object 'o1' in parents
+                var parents = ["oa1", "oa2", "oa3"]
+                create object "o1" assign to parents
                 
-                create user attribute 'ua1' in ['pc1']
-                create user attribute 'ua2' in ['pc1']
-                create user attribute 'ua3' in ['pc1']
+                create user attribute "ua1" assign to ["pc1"]
+                create user attribute "ua2" assign to ["pc1"]
+                create user attribute "ua3" assign to ["pc1"]
                 
-                let username = 'u1'
-                create user username in ['ua1']
-                assign username to ['ua2', 'ua3']
+                var username = "u1"
+                create user username assign to ["ua1"]
+                assign username to ["ua2", "ua3"]
                 
-                associate 'ua1' and 'oa1' with ['read', 'write']
-                associate 'ua2' and 'oa2' with ['read', 'write']
-                associate 'ua3' and 'oa3' with ['read', 'write']
+                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua2" and "oa2" with ["read", "write"]
+                associate "ua3" and "oa3" with ["read", "write"]
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
@@ -88,14 +87,14 @@ public class ExecutionTest {
                 pap.graph().getAssociationsWithSource("ua3").get(0));
 
         input = """
-                dissociate 'ua1' and 'oa1'
+                dissociate "ua1" and ["oa1"]
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "oa1")));
 
         input =
                 """
-                deassign 'u1' from ['ua1', 'ua2']
+                deassign "u1" from ["ua1", "ua2"]
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().getParents("u1").containsAll(Arrays.asList("ua1", "ua2")));
@@ -104,14 +103,14 @@ public class ExecutionTest {
 
         input =
                 """
-                delete user 'u1'
+                delete user "u1"
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().nodeExists("u1"));
 
         input =
                 """
-                deassign 'o1' from ['oa1']
+                deassign "o1" from ["oa1"]
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().getParents("oa1").contains("oa1"));
@@ -119,16 +118,16 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object 'o1'
+                delete object "o1"
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().nodeExists("o1"));
 
         input =
                 """
-                delete user attribute 'ua1'
-                delete user attribute 'ua2'
-                delete user attribute 'ua3'
+                delete user attribute "ua1"
+                delete user attribute "ua2"
+                delete user attribute "ua3"
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().nodeExists("ua1"));
@@ -138,9 +137,9 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object attribute 'oa1'
-                delete object attribute 'oa2'
-                delete object attribute 'oa3'
+                delete object attribute "oa1"
+                delete object attribute "oa2"
+                delete object attribute "oa3"
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().nodeExists("oa1"));
@@ -149,7 +148,7 @@ public class ExecutionTest {
 
         input =
                 """
-                delete policy class 'pc1'
+                delete policy class "pc1"
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertFalse(pap.graph().nodeExists("pc1"));
@@ -158,48 +157,46 @@ public class ExecutionTest {
     @Test
     void testIf() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
         String input = """
-                let x = 'test'
-                let y = 'test'
+                var x = "test"
+                var y = "test"
                 if equals(x, y) {
-                    create policy class 'pc1'
+                    create policy class "pc1"
                 }
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertTrue(pap.graph().nodeExists("pc1"));
 
         input = """
-                let x = 'test'
-                let y = 'test'
-                let z = 'test1'
+                var x = "test"
+                var y = "test"
+                var z = "test1"
                 if equals(x, z) {
-                    create policy class 'pc1'
+                    create policy class "pc1"
                 } else if equals(x, y) {
-                    create policy class 'pc2'
+                    create policy class "pc2"
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertFalse(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
 
         input = """
-                let x = 'test'
-                let y = 'test1'
-                let z = 'test2'
+                var x = "test"
+                var y = "test1"
+                var z = "test2"
                 if equals(x, z) {
-                    create policy class 'pc1'
+                    create policy class "pc1"
                 } else if equals(x, y) {
-                    create policy class 'pc2'
+                    create policy class "pc2"
                 } else {
-                    create policy class 'pc3'
+                    create policy class "pc3"
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertFalse(pap.graph().nodeExists("pc1"));
@@ -207,34 +204,34 @@ public class ExecutionTest {
         assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
-                let x = 'test'
-                let y = 'test1'
-                let z = 'test2'
+                var x = "test"
+                var y = "test1"
+                var z = "test2"
                 if equals(x, y) {
-                    create policy class 'pc1'
+                    create policy class "pc1"
                 } else {
-                    create policy class 'pc2'
+                    create policy class "pc2"
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertFalse(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
 
         input = """
-                let x = 'test'
-                let y = 'test1'
-                let z = 'test2'
+                var x = "test"
+                var y = "test1"
+                var z = "test2"
                 if !equals(x, y) {
-                    create policy class 'pc1'
+                    create policy class "pc1"
                 } else {
-                    create policy class 'pc2'
+                    create policy class "pc2"
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertTrue(pap.graph().nodeExists("pc1"));
@@ -244,9 +241,9 @@ public class ExecutionTest {
     @Test
     void testForeach() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         String input = """
-                foreach x in ['pc1', 'pc2', 'pc3'] {
+                foreach x in ["pc1", "pc2", "pc3"] {
                     create policy class x
                 }
                 """;
@@ -257,13 +254,13 @@ public class ExecutionTest {
         assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
-                let m = {'k1': 'pc1', 'k2': 'pc2', 'k3': 'pc3'}
-                foreach x in m {
-                    create policy class m[x]
+                var m = {"k1": "pc1", "k2": "pc2", "k3": "pc3"}
+                foreach x, y in m {
+                    create policy class y
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertTrue(pap.graph().nodeExists("pc1"));
@@ -271,14 +268,14 @@ public class ExecutionTest {
         assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
-                foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
+                foreach x, y in {"k1": ["pc1", "pc2"], "k2": ["pc3"]} {
                     foreach z in y {
                         create policy class z
                     }
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertTrue(pap.graph().nodeExists("pc1"));
@@ -286,7 +283,7 @@ public class ExecutionTest {
         assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
-                foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
+                foreach x, y in {"k1": ["pc1", "pc2"], "k2": ["pc3"]} {
                     foreach z in y {
                         create policy class z
                         break
@@ -294,7 +291,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertTrue(pap.graph().nodeExists("pc1"));
@@ -302,7 +299,7 @@ public class ExecutionTest {
         assertTrue(pap.graph().nodeExists("pc3"));
 
         input = """
-                foreach x, y in {'k1': ['pc1', 'pc2'], 'k2': ['pc3']} {
+                foreach x, y in {"k1": ["pc1", "pc2"], "k2": ["pc3"]} {
                     foreach z in y {
                         continue
                         create policy class z
@@ -310,7 +307,7 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertFalse(pap.graph().nodeExists("pc1"));
@@ -318,11 +315,11 @@ public class ExecutionTest {
         assertFalse(pap.graph().nodeExists("pc3"));
 
         input = """
-                let a = 'test'
-                let b = 'test'
-                foreach x in ['pc1', 'pc2', 'pc3'] {
+                var a = "test"
+                var b = "test"
+                foreach x in ["pc1", "pc2", "pc3"] {
                     if equals(a, b) {
-                        a = 'test2'
+                        a = "test2"
                         continue
                     }
                     
@@ -330,27 +327,12 @@ public class ExecutionTest {
                 }
                 """;
         pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertFalse(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("pc2"));
         assertTrue(pap.graph().nodeExists("pc3"));
-    }
-
-    @Test
-    void testForRange() throws PMException {
-        String input = """
-                for i in range [1, 5] {
-                    create policy class numToStr(i)
-                }
-                """;
-        PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
-        PMLExecutor.compileAndExecutePML(pap, superUser, input);
-
-        assertEquals(7, pap.graph().getPolicyClasses().size());
-        assertTrue(pap.graph().getPolicyClasses().containsAll(List.of("1", "2", "3", "4", "5")));
     }
 
     @Test
@@ -360,10 +342,10 @@ public class ExecutionTest {
                     create policy class x
                 }
                 
-                testFunc('pc1')
+                testFunc("pc1")
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
 
         assertTrue(pap.graph().nodeExists("pc1"));
@@ -373,16 +355,15 @@ public class ExecutionTest {
                     create policy class x
                 }
                 
-                testFunc(['pc1'])
+                testFunc(["pc1"])
                 """;
         PAP pap1 = new PAP(new MemoryPolicyStore());
-        pap1.bootstrap(new SuperUserBootstrapper());
-        assertThrows(IllegalStateException.class, () -> PMLExecutor.compileAndExecutePML(pap1, superUser, input1));
+        assertThrows(ClassCastException.class, () -> PMLExecutor.compileAndExecutePML(pap1, superUser, input1));
 
         input = """
-                let x = 'hello'
+                var x = "hello"
                 function testFunc() {
-                    x = concat([x, ' world'])
+                    x = concat([x, " world"])
                     create policy class x
                 }
                 
@@ -395,21 +376,20 @@ public class ExecutionTest {
     @Test
     void testChangeVariableValue() throws PMException {
         String input = """
-                let a = 'hello world'
+                var a = "hello world"
                 const b = a
                 create policy class b
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertTrue(pap.graph().nodeExists("hello world"));
 
         PAP pap1 = new PAP(new MemoryPolicyStore());
-        pap1.bootstrap(new SuperUserBootstrapper());
         String input1 = """
-                let a = 'hello world'
+                var a = "hello world"
                 const b = a
-                a = 'test'
+                a = "test"
                 create policy class b
                 """;
         PMLExecutor.compileAndExecutePML(pap1, superUser, input1);
@@ -419,12 +399,12 @@ public class ExecutionTest {
     @Test
     void testMaps() throws PMException {
         String input = """
-                let m = {'k1': {'k1-1': {'k1-1-1': 'v1'}}}
-                let x = m['k1']['k1-1']['k1-1-1']
+                var m = {"k1": {"k1-1": {"k1-1-1": "v1"}}}
+                var x = m["k1"]["k1-1"]["k1-1-1"]
                 create policy class x
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertTrue(pap.graph().getPolicyClasses().contains("v1"));
     }
@@ -435,7 +415,7 @@ public class ExecutionTest {
                 set resource access rights ["read", "write"]
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
         assertTrue(pap.graph().getResourceAccessRights().contains("read"));
 
@@ -448,24 +428,24 @@ public class ExecutionTest {
     @Test
     void testDeleteNonExistentNode() throws PMException {
         String input = """
-                delete pc 'pc1'
+                delete pc "pc1"
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         assertDoesNotThrow(() -> PMLExecutor.compileAndExecutePML(pap, superUser, input));
     }
 
     @Test
     void testDeleteProhibition() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
+        
         pap.graph().setResourceAccessRights(new AccessRightSet("read"));
         pap.graph().createPolicyClass("pc1");
         pap.graph().createUserAttribute("ua1", "pc1");
         pap.graph().createObjectAttribute("oa1", "pc1");
 
         String input = """
-                create prohibition 'p1'
+                create prohibition "p1"
                 deny user attribute "ua1"
                 access rights ["read"]
                 on union of ["oa1"]
@@ -473,26 +453,10 @@ public class ExecutionTest {
         pap.executePML(superUser, input);
 
         input = """
-                delete prohibition 'p1'
+                delete prohibition "p1"
                 """;
         pap.executePML(superUser, input);
         assertFalse(pap.prohibitions().getAll().containsKey("p1"));
-    }
-
-    @Test
-    void testArrayGetByIndex() throws PMException {
-        String s = """
-                let x = ["1", "2", "3"]
-                create pc x[1]
-                
-                let y = [["1", "2", "3"]]
-                create pc y[0][0]
-                """;
-        PAP pap = new PAP(new MemoryPolicyStore());
-        pap.bootstrap(new SuperUserBootstrapper());
-        pap.executePML(new UserContext(SUPER_USER), s);
-        assertTrue(pap.graph().nodeExists("2"));
-        assertTrue(pap.graph().nodeExists("1"));
     }
 
     @Test
@@ -502,7 +466,7 @@ public class ExecutionTest {
                     return s
                 }
                 
-                create policy class testFunc('test')
+                create policy class testFunc("test")
                 """;
 
         PAP pap = new PAP(new MemoryPolicyStore());
@@ -515,11 +479,11 @@ public class ExecutionTest {
     void testOverwriteFunctionArg() throws PMException {
         String pml = """
                 function testFunc(string s) string {
-                    s = 'test2'
+                    s = "test2"
                     return s
                 }
                 
-                create policy class testFunc('test')
+                create policy class testFunc("test")
                 """;
 
         PAP pap = new PAP(new MemoryPolicyStore());

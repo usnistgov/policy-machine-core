@@ -5,9 +5,14 @@ import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.model.obligation.event.*;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.Subject;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.UserAttributesSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.UsersSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInIntersectionTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInUnionTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.OnTargets;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +39,7 @@ public interface ObligationsStore extends Obligations {
      */
     @Override
     void create(UserContext author, String name, Rule... rules)
-    throws ObligationNameExistsException, NodeDoesNotExistException, PMBackendException;
+            throws ObligationNameExistsException, NodeDoesNotExistException, PMBackendException;
 
     /**
      * Update the author and rules of the obligation with the given name. This will overwrite any existing rules to the rules
@@ -49,7 +54,7 @@ public interface ObligationsStore extends Obligations {
      */
     @Override
     void update(UserContext author, String name, Rule... rules)
-    throws ObligationDoesNotExistException, ObligationRuleNameExistsException, NodeDoesNotExistException, PMBackendException;
+            throws ObligationDoesNotExistException, ObligationRuleNameExistsException, NodeDoesNotExistException, PMBackendException;
 
     /**
      * Delete the obligation with the given name. If the obligation does not exist, no exception is thrown as this is
@@ -100,7 +105,7 @@ public interface ObligationsStore extends Obligations {
      * exist.
      */
     default void checkCreateInput(GraphStore graphStore, UserContext author, String name, Rule... rules)
-    throws PMBackendException, ObligationNameExistsException, NodeDoesNotExistException {
+            throws PMBackendException, ObligationNameExistsException, NodeDoesNotExistException {
         if (exists(name)) {
             throw new ObligationNameExistsException(name);
         }
@@ -122,7 +127,7 @@ public interface ObligationsStore extends Obligations {
      * don't exist.
      */
     default void checkUpdateInput(GraphStore graphStore, UserContext author, String name, Rule... rules)
-    throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException, ObligationRuleNameExistsException {
+            throws PMBackendException, ObligationDoesNotExistException, NodeDoesNotExistException, ObligationRuleNameExistsException {
         if (!exists(name)) {
             throw new ObligationDoesNotExistException(name);
         }
@@ -170,52 +175,36 @@ public interface ObligationsStore extends Obligations {
     }
 
     private void checkAuthorExists(GraphStore graph, UserContext author)
-    throws NodeDoesNotExistException, PMBackendException {
+            throws NodeDoesNotExistException, PMBackendException {
         if (!graph.nodeExists(author.getUser())) {
             throw new NodeDoesNotExistException(author.getUser());
         }
     }
 
     private void checkEventPatternAttributesExist(GraphStore graph, Rule... rules)
-    throws NodeDoesNotExistException, PMBackendException {
+            throws NodeDoesNotExistException, PMBackendException {
         for (Rule rule : rules) {
             EventPattern event = rule.getEventPattern();
 
             // check subject
-            EventSubject subject = event.getSubject();
-            switch (subject.getType()) {
-                case USERS -> {
-                    for (String user : subject.users()) {
-                        if (!graph.nodeExists(user)) {
-                            throw new NodeDoesNotExistException(user);
-                        }
-                    }
-                }
-                case ANY_USER_WITH_ATTRIBUTE -> {
-                    if (!graph.nodeExists(subject.anyUserWithAttribute())) {
-                        throw new NodeDoesNotExistException(subject.anyUserWithAttribute());
+            Subject subject = event.getSubject();
+            if (subject instanceof UsersSubject ||
+                    subject instanceof UserAttributesSubject) {
+                for (String sub : subject.getSubjects()) {
+                    if (!graph.nodeExists(sub)) {
+                        throw new NodeDoesNotExistException(sub);
                     }
                 }
             }
 
             // check target
             Target target = event.getTarget();
-            switch (target.getType()) {
-                case ANY_OF_SET -> {
-                    for (String pe : target.anyOfSet()) {
-                        if (!graph.nodeExists(pe)) {
-                            throw new NodeDoesNotExistException(pe);
-                        }
-                    }
-                }
-                case POLICY_ELEMENT -> {
-                    if (!graph.nodeExists(target.policyElement())) {
-                        throw new NodeDoesNotExistException(target.policyElement());
-                    }
-                }
-                case ANY_CONTAINED_IN -> {
-                    if (!graph.nodeExists(target.anyContainedIn())) {
-                        throw new NodeDoesNotExistException(target.anyContainedIn());
+            if (target instanceof AnyInUnionTarget ||
+                    target instanceof AnyInIntersectionTarget ||
+                    target instanceof OnTargets) {
+                for (String tar : target.getTargets()) {
+                    if (!graph.nodeExists(tar)) {
+                        throw new NodeDoesNotExistException(tar);
                     }
                 }
             }

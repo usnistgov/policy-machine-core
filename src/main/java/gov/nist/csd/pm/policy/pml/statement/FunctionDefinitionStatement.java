@@ -3,38 +3,28 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.pml.model.function.FunctionExecutor;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.policy.pml.PMLFormatter;
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+
 public class FunctionDefinitionStatement extends PMLStatement {
 
-    public static String name(String name) {
-        return name;
-    }
-
-    public static Type returns(Type type) {
-        return type;
-    }
-
-    public static List<FormalArgument> args(FormalArgument ... formalArguments) {
-        return Arrays.stream(formalArguments).toList();
-    }
-
-    private final String functionName;
-    private final Type returnType;
-    private final List<FormalArgument> args;
+    private String functionName;
+    private Type returnType;
+    private List<FormalArgument> args;
     private List<PMLStatement> statements;
     private FunctionExecutor functionExecutor;
     private boolean isFuncExec;
+
+    private FunctionDefinitionStatement() {}
 
     public FunctionDefinitionStatement(FunctionDefinitionStatement functionDefinitionStatement) {
         this.functionName = functionDefinitionStatement.functionName;
@@ -44,14 +34,14 @@ public class FunctionDefinitionStatement extends PMLStatement {
         this.functionExecutor = functionDefinitionStatement.functionExecutor;
         this.isFuncExec = functionDefinitionStatement.isFuncExec;
     }
-    public FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PMLStatement> stmts) {
+    private FunctionDefinitionStatement(String functionName, Type returnType, List<FormalArgument> args, List<PMLStatement> stmts) {
         this.functionName = functionName;
         this.returnType = returnType;
         this.args = args;
         this.statements = stmts;
     }
 
-    public FunctionDefinitionStatement(String functionName, Type returnType,
+    private FunctionDefinitionStatement(String functionName, Type returnType,
                                        List<FormalArgument> args, FunctionExecutor executor) {
         this.functionName = functionName;
         this.returnType = returnType;
@@ -92,23 +82,25 @@ public class FunctionDefinitionStatement extends PMLStatement {
             throw new PMLExecutionException(e.getMessage());
         }
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
+    public String toFormattedString(int indentLevel) {
         if (isFuncExec) {
             throw new RuntimeException("PML Function " + functionName + " cannot be serialized as it is a Java function");
         }
 
         String argsStr = serializeFormalArgs();
 
+        String indent = indent(indentLevel);
         return String.format(
-                "function %s(%s) %s {%s}",
+                "%sfunction %s(%s) %s%s",
+                indent,
                 functionName,
                 argsStr,
-                returnType.toString(),
-                PMLFormatter.statementsToString(statements)
+                returnType.isVoid() ? "" : returnType.toString() + " ",
+                new PMLStatementBlock(statements).toFormattedString(indentLevel)
         );
     }
 
@@ -150,15 +142,23 @@ public class FunctionDefinitionStatement extends PMLStatement {
 
         public Builder(String name) {
             this.name = name;
+            this.returnType = Type.voidType();
+            this.args = new ArrayList<>();
+            this.body = new ArrayList<>();
         }
 
-        public Builder returns(Type type) {
-            this.returnType = type;
+        public Builder returns(Type returnType) {
+            this.returnType = returnType;
             return this;
         }
 
         public Builder args(FormalArgument ... args) {
             this.args = new ArrayList<>(List.of(args));
+            return this;
+        }
+
+        public Builder args(List<FormalArgument> args) {
+            this.args = args;
             return this;
         }
 
@@ -169,6 +169,11 @@ public class FunctionDefinitionStatement extends PMLStatement {
 
         public Builder body(PMLStatement ... body) {
             this.body = new ArrayList<>(List.of(body));
+            return this;
+        }
+
+        public Builder body(List<PMLStatement> body) {
+            this.body = body;
             return this;
         }
 

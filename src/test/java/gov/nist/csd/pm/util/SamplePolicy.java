@@ -9,7 +9,7 @@ import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
+import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 
 public class SamplePolicy {
 

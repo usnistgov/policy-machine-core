@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.PolicyStore;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
@@ -175,7 +175,7 @@ class MemoryPolicyStoreTest {
                 new Rule(
                         "rule1",
                         new EventPattern(
-                                EventSubject.anyUser(),
+                                new AnyUserSubject(),
                                 Performs.events("test_event")
                         ),
                         new Response(
@@ -193,7 +193,7 @@ class MemoryPolicyStoreTest {
         Rule rule1 = new Rule(
                 "rule1",
                 new EventPattern(
-                        EventSubject.anyUser(),
+                        new AnyUserSubject(),
                         Performs.events("test_event")
                 ),
                 new Response(

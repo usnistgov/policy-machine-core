@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -519,7 +520,7 @@ class MysqlGraphStore implements GraphStore {
         // create pc rep oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
         String pcTarget = AdminPolicy.policyClassTargetName(name);
         if (!nodeExists(pcTarget)) {
-            createNodeInternal(pcTarget, OA, properties);
+            createNodeInternal(pcTarget, OA, new HashMap<>());
         }
 
         try {

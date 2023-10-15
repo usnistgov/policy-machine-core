@@ -10,10 +10,8 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.model.expression.Literal;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.pml.statement.VarStatement;
+import gov.nist.csd.pm.policy.pml.statement.VariableDeclarationStatement;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,10 +37,10 @@ public class JSONDeserializer implements PolicyDeserializer {
         try {
             JSONPolicy jsonPolicy = objectMapper.readValue(input, JSONPolicy.class);
 
+            createUserDefinedPML(policy, author, customPMLFunctions, jsonPolicy.getUserDefinedPML());
             createGraph(policy, jsonPolicy.getGraph());
             createProhibitions(policy, jsonPolicy.getProhibitions());
             createObligations(policy, author, customPMLFunctions, jsonPolicy.getObligations());
-            createUserDefinedPML(policy, author, customPMLFunctions, jsonPolicy.getUserDefinedPML());
         } catch (JsonProcessingException e) {
             throw new PMException(e);
         }
@@ -53,10 +51,9 @@ public class JSONDeserializer implements PolicyDeserializer {
             throws PMException {
         Map<String, String> constants = userDefinedPML.getConstants();
         for (Map.Entry<String, String> e : constants.entrySet()) {
-            VarStatement varStatement = new VarStatement(e.getKey(), new Expression(new Literal(e.getValue())), true);
-
+            String constPML = "const " + e.getKey() + " = " + e.getValue();
             PMLDeserializer pmlDeserializer = new PMLDeserializer(customPMLFunctions);
-            pmlDeserializer.deserialize(policy, author, varStatement.toString());
+            pmlDeserializer.deserialize(policy, author, constPML);
         }
 
         Map<String, String> functions = userDefinedPML.getFunctions();
@@ -94,10 +91,18 @@ public class JSONDeserializer implements PolicyDeserializer {
             policy.graph().setResourceAccessRights(graph.resourceAccessRights);
         }
 
-        if (graph.policyClasses != null) {
-            for (JSONPolicyClass policyClass : graph.policyClasses) {
-                createPolicyClass(policy, policyClass);
-            }
+        if (graph.policyClasses == null) {
+            return;
+        }
+
+        // create all policy class nodes first
+        for (JSONPolicyClass policyClass : graph.policyClasses) {
+            policy.graph().createPolicyClass(policyClass.getName(), policyClass.getProperties());
+        }
+
+        // create policy class attribute hierarchies
+        for (JSONPolicyClass policyClass : graph.policyClasses) {
+            createPolicyClass(policy, policyClass);
         }
 
         createUserOrObjects(policy, graph.users, U);
@@ -140,6 +145,13 @@ public class JSONDeserializer implements PolicyDeserializer {
 
         createAttributes(policy, UA, name, userAttributes);
         createAttributes(policy, OA, name, objectAttributes);
+
+        Map<String, List<JSONAssociation>> associations = policyClass.getAssociations();
+        for (Map.Entry<String, List<JSONAssociation>> e : associations.entrySet()) {
+            for (JSONAssociation jsonAssociation : e.getValue()) {
+                policy.graph().associate(e.getKey(), jsonAssociation.getTarget(), jsonAssociation.getArset());
+            }
+        }
     }
 
     private void createAttributes(Policy policy, NodeType type, String parent, List<JSONNode> attrs)

@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.pdp.memory;
 
+import com.google.protobuf.Any;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -25,7 +27,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Relationship;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
@@ -191,26 +193,6 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
             List<Association> nodeAssociations = policy.graph().getAssociationsWithSource(node);
             collectAssociations(nodeAssociations, borderTargets);
-
-            /*//get the parents of the subject to start bfs on user side
-            List<String> parents = policyReader.graph().getParents(node);
-            while (!parents.isEmpty()) {
-                String parent = parents.iterator().next();
-                Node parentNode = policyReader.graph().getNode(parent);
-                if (parentNode.getType() == UA) {
-                    //get the associations the current parent node is the source of
-                    List<Association> nodeAssociations = policyReader.graph().getAssociationsWithSource(parent);
-
-                    //collect the target and operation information for each association
-                    collectAssociations(nodeAssociations, borderTargets);
-                }
-
-                //add all of the current parent node's parents to the queue
-                parents.addAll(policyReader.graph().getParents(parent));
-
-                //remove the current parent from the queue
-                parents.remove(parent);
-            }*/
         };
 
         // start the bfs
@@ -859,18 +841,11 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
             List<Rule> rules = obligation.getRules();
             for (Rule rule : rules) {
                 Target target = rule.getEventPattern().getTarget();
-                if (target.getType() == Target.Type.POLICY_ELEMENT) {
-                    if (target.policyElement().equals(attribute)) {
-                        obls.add(obligation);
-                    }
-                } else if (target.getType() == Target.Type.ANY_POLICY_ELEMENT) {
+
+                if (target instanceof AnyTarget) {
                     obls.add(obligation);
-                } else if (target.getType() == Target.Type.ANY_CONTAINED_IN) {
-                    if (getAttributeContainers(attribute).contains(target.anyContainedIn())) {
-                        obls.add(obligation);
-                    }
-                } else if (target.getType() == Target.Type.ANY_OF_SET) {
-                    if (target.anyOfSet().contains(attribute)) {
+                } else {
+                    if (target.getTargets().contains(attribute)) {
                         obls.add(obligation);
                     }
                 }

@@ -1,16 +1,16 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.PMLFormatter;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+
 
 public class IfStatement extends PMLStatement {
 
@@ -32,15 +32,15 @@ public class IfStatement extends PMLStatement {
         return ifElseBlocks;
     }
 
-    public List<PMLStatement> getElseBlockStatements() {
+    public List<PMLStatement> getElseBlock() {
         return elseBlockStatements;
     }
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        boolean not = ifBlock.not;
         boolean condition = ifBlock.condition.execute(ctx, policy).getBooleanValue();
-        if ((condition && !not) || (!condition && not)) {
+
+        if (condition) {
             return executeBlock(ctx, policy, ifBlock.block);
         }
 
@@ -56,42 +56,39 @@ public class IfStatement extends PMLStatement {
     }
 
     @Override
-    public String toString() {
+    public String toFormattedString(int indentLevel) {
         return String.format(
                 "%s%s%s",
-                ifBlockToString(),
-                elseIfBlockToString(),
-                elseBlockToString()
+                ifBlockToString(indentLevel),
+                elseIfBlockToString(indentLevel),
+                elseBlockToString(indentLevel)
         );
     }
 
-    private String elseBlockToString() {
+    private String elseBlockToString(int indentLevel) {
         if (elseBlockStatements.isEmpty()) {
             return "";
         }
-        return String.format("else {%s}", PMLFormatter.statementsToString(elseBlockStatements));
+
+        return String.format(" else %s", new PMLStatementBlock(elseBlockStatements).toFormattedString(indentLevel));
     }
 
-    private String elseIfBlockToString() {
+    private String elseIfBlockToString(int indentLevel) {
         StringBuilder s = new StringBuilder();
         for (ConditionalBlock b : ifElseBlocks) {
-            s.append(String.format(" else if %s {%s} ", b.condition, PMLFormatter.statementsToString(b.block)));
+            s.append(String.format(" else if %s %s", b.condition, new PMLStatementBlock(b.block).toFormattedString(indentLevel)));
         }
 
         return s.toString();
     }
 
-    private String ifBlockToString() {
-        return String.format("if %s {%s}", ifBlock.condition, PMLFormatter.statementsToString(ifBlock.block));
+    private String ifBlockToString(int indentLevel) {
+        return String.format("%sif %s %s", indent(indentLevel), ifBlock.condition, new PMLStatementBlock(ifBlock.block).toFormattedString(indentLevel));
     }
 
     private Value executeBlock(ExecutionContext ctx, Policy policy, List<PMLStatement> block) throws PMException {
-        ExecutionContext copy = null;
-        try {
-            copy = ctx.copy();
-        } catch (PMLScopeException e) {
-            throw new PMException(e.getMessage());
-        }
+        ExecutionContext copy = ctx.copy();
+
         Value value = PMLExecutor.executeStatementBlock(copy, policy, block);
 
         ctx.scope().overwriteValues(copy.scope());
@@ -112,5 +109,5 @@ public class IfStatement extends PMLStatement {
         return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(boolean not, Expression condition, List<PMLStatement> block) implements Serializable { }
+    public record ConditionalBlock(Expression condition, List<PMLStatement> block) implements Serializable { }
 }

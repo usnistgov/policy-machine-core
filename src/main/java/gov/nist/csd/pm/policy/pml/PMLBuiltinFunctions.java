@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.pml;
 
-import gov.nist.csd.pm.policy.pml.functions.*;
+import gov.nist.csd.pm.policy.pml.function.builtin.*;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.util.HashMap;
@@ -13,7 +13,6 @@ public class PMLBuiltinFunctions {
     private static final FunctionDefinitionStatement equals = new Equals();
     private static final FunctionDefinitionStatement contains = new Contains();
     private static final FunctionDefinitionStatement containsKey = new ContainsKey();
-    private static final FunctionDefinitionStatement numToStr = new NumToStr();
 
     // policy functions
     private static final FunctionDefinitionStatement getAssociationsWithSource = new GetAssociationsWithSource();
@@ -30,8 +29,6 @@ public class PMLBuiltinFunctions {
     private static final FunctionDefinitionStatement search = new Search();
     private static final FunctionDefinitionStatement append = new Append();
     private static final FunctionDefinitionStatement appendAll = new AppendAll();
-    private static final FunctionDefinitionStatement length = new Length();
-
 
     private static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
 
@@ -40,7 +37,6 @@ public class PMLBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(equals.getFunctionName(), equals);
         BUILTIN_FUNCTIONS.put(contains.getFunctionName(), contains);
         BUILTIN_FUNCTIONS.put(containsKey.getFunctionName(), containsKey);
-        BUILTIN_FUNCTIONS.put(numToStr.getFunctionName(), numToStr);
 
         BUILTIN_FUNCTIONS.put(getAssociationsWithSource.getFunctionName(), getAssociationsWithSource);
         BUILTIN_FUNCTIONS.put(getAssociationsWithTarget.getFunctionName(), getAssociationsWithTarget);
@@ -56,7 +52,6 @@ public class PMLBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(search.getFunctionName(), search);
         BUILTIN_FUNCTIONS.put(append.getFunctionName(), append);
         BUILTIN_FUNCTIONS.put(appendAll.getFunctionName(), appendAll);
-        BUILTIN_FUNCTIONS.put(length.getFunctionName(), length);
     }
 
     public static Map<String, FunctionDefinitionStatement> builtinFunctions() {

@@ -1,11 +1,15 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.Objects;
+
 
 public class DeleteStatement extends PMLStatement {
 
@@ -36,23 +40,23 @@ public class DeleteStatement extends PMLStatement {
             policy.graph().deleteNode(name);
         }
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
+    public String toFormattedString(int indentLevel) {
         String typeStr = "";
         switch (type) {
             case PROHIBITION -> typeStr = "prohibition";
             case OBLIGATION -> typeStr = "obligation";
-            case POLICY_CLASS -> typeStr = "policy class";
-            case OBJECT_ATTRIBUTE -> typeStr = "object attribute";
-            case USER_ATTRIBUTE -> typeStr = "user attribute";
-            case OBJECT -> typeStr = "object";
-            case USER -> typeStr = "user";
+            case POLICY_CLASS -> typeStr = "PC";
+            case OBJECT_ATTRIBUTE -> typeStr = "OA";
+            case USER_ATTRIBUTE -> typeStr = "UA";
+            case OBJECT -> typeStr = "O";
+            case USER -> typeStr = "U";
         }
 
-        return String.format("delete %s %s", typeStr, expression);
+        return indent(indentLevel) + String.format("delete %s %s", typeStr, expression);
     }
 
     @Override

@@ -1,13 +1,22 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStmt;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
+import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
+
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStmt> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class FunctionReturnStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -16,31 +25,33 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStmt
     }
 
     @Override
-    public FunctionReturnStmt visitFunctionReturnStatement(PMLParser.FunctionReturnStatementContext ctx) {
+    public PMLStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
         // check that the return statement is inside a function
-        if (!inFunction(ctx)) {
+        if (!inFunctionOrResponse(ctx)) {
             visitorCtx.errorLog().addError(
                     ctx,
-                    "return statement not in function definition"
+                    "return statement not in function definition or obligation response"
             );
+
+            return new ErrorStatement(ctx);
         }
 
         if (ctx.expression() == null) {
-            return new FunctionReturnStmt();
-        } else {
-            Expression expr = Expression.compile(visitorCtx, ctx.expression());
-
-            return new FunctionReturnStmt(expr);
+            return new FunctionReturnStatement();
         }
+
+        Expression e = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+
+        return new FunctionReturnStatement(e);
     }
 
-    private boolean inFunction(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.FunctionDefinitionStatementContext) {
+    private boolean inFunctionOrResponse(ParserRuleContext ctx) {
+        if (ctx instanceof PMLParser.FunctionDefinitionStatementContext || ctx instanceof PMLParser.ResponseContext) {
             return true;
         } else if (ctx == null) {
             return false;
         }
 
-        return inFunction(ctx.getParent());
+        return inFunctionOrResponse(ctx.getParent());
     }
 }

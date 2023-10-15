@@ -1,12 +1,15 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.List;
 import java.util.Objects;
+
 
 public class AssignStatement extends PMLStatement {
 
@@ -33,23 +36,13 @@ public class AssignStatement extends PMLStatement {
 
         String childStringValue = childValue.getStringValue();
 
-        if (assignToValue.isString()) {
-            String parent = assignToValue.getStringValue();
+        List<Value> valueArr = assignToValue.getArrayValue();
+        for (Value value : valueArr) {
+            String parent = value.getStringValue();
             policy.graph().assign(childStringValue, parent);
-        } else if (assignToValue.isArray()) {
-            List<Value> valueArr = assignToValue.getArrayValue();
-            for (Value value : valueArr) {
-                String parent = value.getStringValue();
-                policy.graph().assign(childStringValue, parent);
-            }
         }
 
-        return new Value();
-    }
-
-    @Override
-    public String toString() {
-        return String.format("assign %s to %s", child, assignTo);
+        return new VoidValue();
     }
 
     @Override
@@ -63,5 +56,10 @@ public class AssignStatement extends PMLStatement {
     @Override
     public int hashCode() {
         return Objects.hash(child, assignTo);
+    }
+
+    @Override
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("assign %s to %s", child, assignTo);
     }
 }

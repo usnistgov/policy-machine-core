@@ -1,12 +1,15 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.Objects;
+
 
 public class AssociateStatement extends PMLStatement {
 
@@ -49,12 +52,12 @@ public class AssociateStatement extends PMLStatement {
                 accessRightSet
         );
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        return String.format("associate %s and %s with %s",
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("associate %s and %s with %s",
                 ua, target, accessRights);
     }
 

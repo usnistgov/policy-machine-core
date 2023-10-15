@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.policy.model.access;
 
+import java.util.Arrays;
+
 public class AdminAccessRights {
 
     public static final String CREATE_POLICY_CLASS = "create_policy_class";
@@ -7,32 +9,26 @@ public class AdminAccessRights {
     public static final String CREATE_OBJECT_ATTRIBUTE = "create_object_attribute";
     public static final String CREATE_USER_ATTRIBUTE = "create_user_attribute";
     public static final String CREATE_USER = "create_user";
+
     public static final String SET_NODE_PROPERTIES = "set_node_properties";
+
     public static final String DELETE_POLICY_CLASS = "delete_policy_class";
     public static final String DELETE_OBJECT = "delete_object";
     public static final String DELETE_OBJECT_ATTRIBUTE = "delete_object_attribute";
     public static final String DELETE_USER_ATTRIBUTE = "delete_user_attribute";
     public static final String DELETE_USER = "delete_user";
-    public static final String ASSIGN_OBJECT_ATTRIBUTE = "assign_object_attribute";
-    public static final String ASSIGN_TO_OBJECT_ATTRIBUTE = "assign_to_object_attribute";
-    public static final String ASSIGN_OBJECT = "assign_object";
-    public static final String ASSIGN_USER_ATTRIBUTE = "assign_user_attribute";
-    public static final String ASSIGN_TO_USER_ATTRIBUTE = "assign_to_user_attribute";
-    public static final String ASSIGN_TO_POLICY_CLASS = "assign_to_policy_class";
-    public static final String ASSIGN_USER = "assign_user";
 
-    public static final String DEASSIGN_USER_ATTRIBUTE = "deassign_user_attribute";
-    public static final String DEASSIGN_OBJECT_ATTRIBUTE = "deassign_object_attribute";
-    public static final String DEASSIGN_USER = "deassign_user";
-    public static final String DEASSIGN_OBJECT = "deassign_object";
-    public static final String DEASSIGN_FROM_USER_ATTRIBUTE = "deassign_from_user_attribute";
-    public static final String DEASSIGN_FROM_OBJECT_ATTRIBUTE = "deassign_from_object_attribute";
-    public static final String DEASSIGN_FROM_POLICY_CLASS = "deassign_from_policy_class";
+    public static final String ASSIGN = "assign";
+    public static final String ASSIGN_TO = "assign_to";
+    public static final String DEASSIGN = "deassign";
+    public static final String DEASSIGN_FROM = "deassign_from";
 
-    public static final String ASSOCIATE_USER_ATTRIBUTE = "associate_user_attribute";
-    public static final String ASSOCIATE_OBJECT_ATTRIBUTE = "associate_object_attribute";
-    public static final String DISSOCIATE_USER_ATTRIBUTE = "associate_user_attribute";
-    public static final String DISSOCIATE_OBJECT_ATTRIBUTE = "associate_object_attribute";
+    public static final String ASSOCIATE = "associate";
+    public static final String ASSOCIATE_TO = "associate_to";
+
+    public static final String DISSOCIATE = "dissociate";
+    public static final String DISSOCIATE_FROM = "dissociate_from";
+
     public static final String GET_ASSOCIATIONS = "get_associations";
     public static final String GET_PROHIBITIONS = "get_prohibitions";
     public static final String GET_ACCESS_RIGHTS = "get_access_rights";
@@ -74,35 +70,27 @@ public class AdminAccessRights {
     private static final AccessRightSet ALL_ADMIN_ACCESS_RIGHTS_SET = new AccessRightSet(
             CREATE_POLICY_CLASS,
             CREATE_OBJECT,
-            CREATE_OBJECT_ATTRIBUTE,
+            CREATE_OBJECT_ATTRIBUTE ,
             CREATE_USER_ATTRIBUTE,
             CREATE_USER,
+
             SET_NODE_PROPERTIES,
+
             DELETE_POLICY_CLASS,
             DELETE_OBJECT,
             DELETE_OBJECT_ATTRIBUTE,
             DELETE_USER_ATTRIBUTE,
             DELETE_USER,
-            ASSIGN_OBJECT_ATTRIBUTE,
-            ASSIGN_TO_OBJECT_ATTRIBUTE,
-            ASSIGN_OBJECT,
-            ASSIGN_USER_ATTRIBUTE,
-            ASSIGN_TO_USER_ATTRIBUTE,
-            ASSIGN_USER,
-            ASSIGN_TO_POLICY_CLASS,
 
-            DEASSIGN_USER_ATTRIBUTE,
-            DEASSIGN_OBJECT_ATTRIBUTE,
-            DEASSIGN_USER,
-            DEASSIGN_OBJECT,
-            DEASSIGN_FROM_USER_ATTRIBUTE,
-            DEASSIGN_FROM_OBJECT_ATTRIBUTE,
-            DEASSIGN_FROM_POLICY_CLASS,
+            ASSIGN,
+            ASSIGN_TO,
+            DEASSIGN,
+            DEASSIGN_FROM,
+            ASSOCIATE,
+            ASSOCIATE_TO,
+            DISSOCIATE,
+            DISSOCIATE_FROM,
 
-            ASSOCIATE_USER_ATTRIBUTE,
-            ASSOCIATE_OBJECT_ATTRIBUTE,
-            DISSOCIATE_USER_ATTRIBUTE,
-            DISSOCIATE_OBJECT_ATTRIBUTE,
             GET_ASSOCIATIONS,
             GET_PROHIBITIONS,
             GET_ACCESS_RIGHTS,
@@ -134,10 +122,8 @@ public class AdminAccessRights {
             DELETE_CONSTANT,
             GET_CONSTANTS,
             GET_CONTEXT,
-
             SERIALIZE_POLICY,
             DESERIALIZE_POLICY,
-
             RESET
     );
 
@@ -170,5 +156,4 @@ public class AdminAccessRights {
     public static boolean isWildcardAccessRight(String ar) {
         return WILDCARD_ACCESS_RIGHTS_SET.contains(ar);
     }
-
 }

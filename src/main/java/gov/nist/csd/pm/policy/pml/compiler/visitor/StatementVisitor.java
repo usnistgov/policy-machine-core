@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import org.antlr.v4.runtime.CommonTokenStream;
 
-public class StatementVisitor extends PMLBaseVisitor<PMLStatement> {
+public class StatementVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -14,76 +15,117 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement> {
     }
 
     @Override
-    public PMLStatement visitStatement(PMLParser.StatementContext ctx) {
-        PMLStatement statement = null;
-        if (ctx.variableDeclarationStatement() != null) {
-            statement = new VarStmtVisitor(visitorCtx)
-                    .visitVariableDeclarationStatement(ctx.variableDeclarationStatement());
-        } else if (ctx.functionDefinitionStatement() != null) {
-            statement = new FunctionDefinitionVisitor(visitorCtx)
-                    .visitFunctionDefinitionStatement(ctx.functionDefinitionStatement());
-        } else if (ctx.foreachStatement() != null) {
-            statement = new ForeachStmtVisitor(visitorCtx)
-                    .visitForeachStatement(ctx.foreachStatement());
-        } else if (ctx.forRangeStatement() != null) {
-            statement = new ForRangeStmtVisitor(visitorCtx)
-                    .visitForRangeStatement(ctx.forRangeStatement());
-        } else if (ctx.functionInvokeStatement() != null) {
-            statement = new FunctionInvokeVisitor(visitorCtx)
-                    .visitFunctionInvokeStatement(ctx.functionInvokeStatement());
-        } else if (ctx.ifStatement() != null) {
-            statement = new IfStmtVisitor(visitorCtx)
-                    .visitIfStatement(ctx.ifStatement());
-        } else if (ctx.createAttributeStatement() != null) {
-            statement = new CreateAttrStmtVisitor(visitorCtx)
-                    .visitCreateAttributeStatement(ctx.createAttributeStatement());
-        } else if (ctx.createPolicyStatement() != null) {
-            statement = new CreatePolicyStmtVisitor(visitorCtx)
-                    .visitCreatePolicyStatement(ctx.createPolicyStatement());
-        } else if (ctx.createUserOrObjectStatement() != null) {
-            statement = new CreateUserOrObjectStmtVisitor(visitorCtx)
-                    .visitCreateUserOrObjectStatement(ctx.createUserOrObjectStatement());
-        } else if (ctx.createProhibitionStatement() != null) {
-            statement = new CreateProhibitionStmtVisitor(visitorCtx)
-                    .visitCreateProhibitionStatement(ctx.createProhibitionStatement());
-        } else if (ctx.createObligationStatement() != null) {
-            statement = new CreateObligationStmtVisitor(visitorCtx)
-                    .visitCreateObligationStatement(ctx.createObligationStatement());
-        } else if (ctx.setNodePropertiesStatement() != null) {
-            statement = new SetNodePropertiesStmtVisitor(visitorCtx)
-                    .visitSetNodePropertiesStatement(ctx.setNodePropertiesStatement());
-        } else if (ctx.assignStatement() != null) {
-            statement = new AssignStmtVisitor(visitorCtx)
-                    .visitAssignStatement(ctx.assignStatement());
-        } else if (ctx.deassignStatement() != null) {
-            statement = new DeassignStmtVisitor(visitorCtx)
-                    .visitDeassignStatement(ctx.deassignStatement());
-        } else if (ctx.deleteStatement() != null) {
-            statement = new DeleteStmtVisitor(visitorCtx)
-                    .visitDeleteStatement(ctx.deleteStatement());
-        } else if (ctx.associateStatement() != null) {
-            statement = new AssociateStmtVisitor(visitorCtx)
-                    .visitAssociateStatement(ctx.associateStatement());
-        } else if (ctx.dissociateStatement() != null) {
-            statement = new DissociateStmtVisitor(visitorCtx)
-                    .visitDissociateStatement(ctx.dissociateStatement());
-        } else if (ctx.functionReturnStatement() != null) {
-            statement = new FunctionReturnStmtVisitor(visitorCtx)
-                    .visitFunctionReturnStatement(ctx.functionReturnStatement());
-        } else if (ctx.breakStatement() != null) {
-            statement = new BreakStmtVisitor(visitorCtx)
-                    .visitBreakStatement(ctx.breakStatement());
-        } else if (ctx.continueStatement() != null) {
-            statement = new ContinueStmtVisitor(visitorCtx)
-                    .visitContinueStatement(ctx.continueStatement());
-        } else if (ctx.setResourceAccessRightsStatement() != null) {
-            statement = new SetResourceAccessRightsStmtVisitor(visitorCtx)
-                    .visitSetResourceAccessRightsStatement(ctx.setResourceAccessRightsStatement());
-        } else if (ctx.deleteRuleStatement() != null) {
-            statement = new DeleteRuleStmtVisitor(visitorCtx)
-                    .visitDeleteRuleStatement(ctx.deleteRuleStatement());
-        }
+    public PMLStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
+        return  new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
+    }
 
-        return statement;
+    @Override
+    public PMLStatement visitCreateNonPCStatement(PMLParser.CreateNonPCStatementContext ctx) {
+        return new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitCreateObligationStatement(PMLParser.CreateObligationStatementContext ctx) {
+        return new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
+        return new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitSetNodePropertiesStatement(PMLParser.SetNodePropertiesStatementContext ctx) {
+        return new SetNodePropertiesStmtVisitor(visitorCtx).visitSetNodePropertiesStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitAssignStatement(PMLParser.AssignStatementContext ctx) {
+        return new AssignStmtVisitor(visitorCtx).visitAssignStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitDeassignStatement(PMLParser.DeassignStatementContext ctx) {
+        return new DeassignStmtVisitor(visitorCtx).visitDeassignStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitAssociateStatement(PMLParser.AssociateStatementContext ctx) {
+        return new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitDissociateStatement(PMLParser.DissociateStatementContext ctx) {
+        return new DissociateStmtVisitor(visitorCtx).visitDissociateStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
+        return new SetResourceAccessRightsStmtVisitor(visitorCtx).visitSetResourceAccessRightsStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
+        return new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
+        return new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitVariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
+        return new VarStmtVisitor(visitorCtx).visitVariableAssignmentStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitConstDeclaration(PMLParser.ConstDeclarationContext ctx) {
+        return new VarStmtVisitor(visitorCtx).visitConstDeclaration(ctx);
+    }
+
+    @Override
+    public PMLStatement visitVarDeclaration(PMLParser.VarDeclarationContext ctx) {
+        return new VarStmtVisitor(visitorCtx).visitVarDeclaration(ctx);
+    }
+
+    @Override
+    public PMLStatement visitShortDeclaration(PMLParser.ShortDeclarationContext ctx) {
+        return new VarStmtVisitor(visitorCtx).visitShortDeclaration(ctx);
+    }
+
+    @Override
+    public PMLStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+        return new FunctionDefinitionVisitor(visitorCtx).visitFunctionDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
+        return new FunctionReturnStmtVisitor(visitorCtx).visitReturnStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
+        return new FunctionInvokeStmtVisitor(visitorCtx).visitFunctionInvokeStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
+        return new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitBreakStatement(PMLParser.BreakStatementContext ctx) {
+        return new BreakStmtVisitor(visitorCtx).visitBreakStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitContinueStatement(PMLParser.ContinueStatementContext ctx) {
+        return new ContinueStmtVisitor(visitorCtx).visitContinueStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitIfStatement(PMLParser.IfStatementContext ctx) {
+        return new IfStmtVisitor(visitorCtx).visitIfStatement(ctx);
     }
 }

@@ -3,7 +3,12 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
+
+import java.util.Objects;
+
 
 public class SingleLineCommentStatement extends PMLStatement{
 
@@ -18,11 +23,28 @@ public class SingleLineCommentStatement extends PMLStatement{
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        return "# " + comment;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SingleLineCommentStatement that = (SingleLineCommentStatement) o;
+        return Objects.equals(comment, that.comment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(comment);
+    }
+
+    @Override
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + "// " + comment;
     }
 }

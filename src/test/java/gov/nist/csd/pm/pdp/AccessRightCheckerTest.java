@@ -29,7 +29,7 @@ class AccessRightCheckerTest {
         memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
 
         memoryPolicyStore.graph().associate("ua1", "oa1", new AccessRightSet("read"));
-        memoryPolicyStore.graph().associate("ua1", AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), new AccessRightSet(AdminAccessRights.ASSIGN_TO_POLICY_CLASS));
+        memoryPolicyStore.graph().associate("ua1", AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), new AccessRightSet(AdminAccessRights.ASSIGN_TO));
 
         memoryPolicyStore.graph().createUser("u1", "ua1");
         memoryPolicyStore.graph().createObject("o1", "oa1");
@@ -39,7 +39,7 @@ class AccessRightCheckerTest {
     void testAccessRightChecker() throws PMException {
         AccessRightChecker accessRightChecker = new AccessRightChecker(new PAP(memoryPolicyStore), new MemoryPolicyReviewer(memoryPolicyStore));
         accessRightChecker.check(new UserContext("u1"), "o1", "read");
-        accessRightChecker.check(new UserContext("u1"), "pc1", AdminAccessRights.ASSIGN_TO_POLICY_CLASS);
+        accessRightChecker.check(new UserContext("u1"), "pc1", AdminAccessRights.ASSIGN_TO);
         assertThrows(UnauthorizedException.class, () -> accessRightChecker.check(new UserContext("u1"), "pc1", AdminAccessRights.DELETE_POLICY_CLASS));
     }
 

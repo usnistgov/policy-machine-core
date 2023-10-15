@@ -1,16 +1,21 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.value.ArrayValue;
+import gov.nist.csd.pm.policy.pml.value.MapValue;
+
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.policy.pml.PMLExecutor.executeStatementBlock;
-import static gov.nist.csd.pm.policy.pml.PMLFormatter.statementsToString;
 
 public class ForeachStatement extends PMLStatement {
 
@@ -29,33 +34,28 @@ public class ForeachStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         if (statements.isEmpty()) {
-            return new Value();
+            return new VoidValue();
         }
 
         Value iterValue = iter.execute(ctx, policy);
-        if (iterValue.isArray()) {
-            for (Value v : iterValue.getArrayValue()) {
-                ExecutionContext localExecutionCtx;
-                try {
-                    localExecutionCtx = ctx.copy();
-                } catch (PMLScopeException e) {
-                    throw new RuntimeException(e);
-                }
+        if (iterValue instanceof ArrayValue arrayValue) {
+            for (Value v : arrayValue.getValue()) {
+                ExecutionContext localExecutionCtx = ctx.copy();
 
-                localExecutionCtx.scope().putValue(varName, v);
+                localExecutionCtx.scope().addValue(varName, v);
 
                 Value value = executeStatementBlock(localExecutionCtx, policy, statements);
 
-                if (value.isBreak()) {
+                if (value instanceof BreakValue) {
                     break;
-                } else if (value.isReturn()) {
+                } else if (value instanceof ReturnValue) {
                     return value;
                 }
 
                 ctx.scope().overwriteValues(localExecutionCtx.scope());
             }
-        } else if (iterValue.isMap()) {
-            for (Value key : iterValue.getMapValue().keySet()) {
+        } else if (iterValue instanceof MapValue mapValue) {
+            for (Map.Entry<Value, Value> entry : mapValue.getValue().entrySet()) {
                 ExecutionContext localExecutionCtx;
                 try {
                     localExecutionCtx = ctx.copy();
@@ -63,18 +63,16 @@ public class ForeachStatement extends PMLStatement {
                     throw new RuntimeException(e);
                 }
 
-                Value mapValue = iterValue.getMapValue().get(key);
-
-                localExecutionCtx.scope().putValue(varName, key);
+                localExecutionCtx.scope().addValue(varName, entry.getKey());
                 if (valueVarName != null) {
-                    localExecutionCtx.scope().putValue(valueVarName, mapValue);
+                    localExecutionCtx.scope().addValue(valueVarName, entry.getValue());
                 }
 
                 Value value = executeStatementBlock(localExecutionCtx, policy, statements);
 
-                if (value.isBreak()) {
+                if (value instanceof BreakValue) {
                     break;
-                } else if (value.isReturn()) {
+                } else if (value instanceof ReturnValue) {
                     return value;
                 }
 
@@ -82,15 +80,15 @@ public class ForeachStatement extends PMLStatement {
             }
         }
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        return String.format("foreach %s in %s {%s}",
-                (valueVarName != null ? String.format("%s, %s", varName, valueVarName) : varName),
-                iter,
-                statementsToString(statements)
+    public String toFormattedString(int indentLevel) {
+        return String.format("%sforeach %s in %s %s",
+                             indent(indentLevel), (valueVarName != null ? String.format("%s, %s", varName, valueVarName) : varName),
+                             iter,
+                             new PMLStatementBlock(statements).toFormattedString(indentLevel)
         );
     }
 

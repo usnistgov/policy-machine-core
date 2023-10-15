@@ -5,15 +5,22 @@ import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.exceptions.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLExecutable;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static gov.nist.csd.pm.pap.AdminPolicy.ALL_NODE_NAMES;
+import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.ANY;
+import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
 public abstract class PDP implements EventEmitter {
 
@@ -28,6 +35,25 @@ public abstract class PDP implements EventEmitter {
     public abstract PolicyReviewer reviewer() throws PMException;
 
     public abstract void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException;
+
+    public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
+        if(!isPolicyEmpty()) {
+            throw new BootstrapExistingPolicyException();
+        }
+
+        bootstrapper.bootstrap(pap);
+    }
+
+    private boolean isPolicyEmpty() throws PMException {
+        Set<String> nodes = new HashSet<>(pap.graph().search(ANY, NO_PROPERTIES));
+
+        boolean prohibitionsEmpty = pap.prohibitions().getAll().isEmpty();
+        boolean obligationsEmpty = pap.obligations().getAll().isEmpty();
+
+        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODE_NAMES))) &&
+                prohibitionsEmpty &&
+                obligationsEmpty;
+    }
 
     @Override
     public void addEventListener(EventProcessor listener) {
@@ -61,7 +87,7 @@ public abstract class PDP implements EventEmitter {
         private final PDPObligations pdpObligations;
         private final PDPUserDefinedPML pdpUserDefinedPML;
 
-        public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<EventProcessor> epps) throws PMException {
+        public PDPTx(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer, List<EventProcessor> epps) {
             this.adjudicator = new Adjudicator(userCtx, pap, policyReviewer);
             this.pap = pap;
             this.epps = epps;

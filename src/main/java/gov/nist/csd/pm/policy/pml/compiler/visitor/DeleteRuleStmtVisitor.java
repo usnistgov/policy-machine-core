@@ -1,13 +1,15 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.DeleteRuleStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
 
-public class DeleteRuleStmtVisitor extends PMLBaseVisitor<DeleteRuleStatement> {
+
+public class DeleteRuleStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -16,7 +18,7 @@ public class DeleteRuleStmtVisitor extends PMLBaseVisitor<DeleteRuleStatement> {
     }
 
     @Override
-    public DeleteRuleStatement visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
+    public PMLStatement visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
         Expression ruleNameExpr = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
         Expression oblNameExpr = Expression.compile(visitorCtx, ctx.obligationName, Type.string());
         return new DeleteRuleStatement(ruleNameExpr, oblNameExpr);

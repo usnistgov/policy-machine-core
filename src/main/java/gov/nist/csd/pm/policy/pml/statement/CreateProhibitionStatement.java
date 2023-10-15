@@ -3,11 +3,19 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.policy.pml.expression.*;
+import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
+import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
-import gov.nist.csd.pm.policy.pml.model.expression.*;
+import gov.nist.csd.pm.policy.pml.type.Type;
+
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.ComplementedValue;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,10 +31,10 @@ public class CreateProhibitionStatement extends PMLStatement {
     private final ProhibitionSubject.Type subjectType;
     private final Expression accessRights;
     private final boolean isIntersection;
-    private final List<Container> containers;
+    private final Expression containers;
 
     public CreateProhibitionStatement(Expression name, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
-                                      boolean isIntersection, List<Container> containers) {
+                                      boolean isIntersection, Expression containers) {
         this.name = name;
         this.subject = subject;
         this.subjectType = subjectType;
@@ -55,7 +63,7 @@ public class CreateProhibitionStatement extends PMLStatement {
         return isIntersection;
     }
 
-    public List<Container> getContainers() {
+    public Expression getContainers() {
         return containers;
     }
 
@@ -72,10 +80,11 @@ public class CreateProhibitionStatement extends PMLStatement {
         }
 
         List<ContainerCondition> containerConditions = new ArrayList<>();
-        for (Container container : containers) {
-            boolean isComplement = container.isComplement;
-            Value containerValue = container.name.execute(ctx, policy);
-            containerConditions.add(new ContainerCondition(containerValue.getStringValue(), isComplement));
+        for (Value container : containers.execute(ctx, policy).getArrayValue()) {
+            boolean isComplement = container instanceof ComplementedValue;
+            String containerName = container.getStringValue();
+
+            containerConditions.add(new ContainerCondition(containerName, isComplement));
         }
 
 
@@ -87,29 +96,21 @@ public class CreateProhibitionStatement extends PMLStatement {
                 containerConditions.toArray(new ContainerCondition[]{})
         );
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        String subjectStr = "";
-        switch (subjectType) {
-            case USER_ATTRIBUTE -> subjectStr = "user attribute";
-            case USER -> subjectStr = "user";
-            case PROCESS -> subjectStr = "process";
-        }
-
-        StringBuilder containerStr = new StringBuilder((isIntersection ? "intersection" : "union") + " of [");
-        int length = containerStr.length();
-        for (Container c : containers) {
-            if (containerStr.length() != length) {
-                containerStr.append(", ");
-            }
-            containerStr.append(c);
-        }
-        containerStr.append("]");
-
-        return String.format("create prohibition %s deny %s %s access rights %s on %s", name, subjectStr, subject, accessRights, containerStr);
+    public String toFormattedString(int indentLevel) {
+        String subjectStr = getSubjectStr();
+        String indent = indent(indentLevel);
+        return String.format(
+                """
+                %screate prohibition %s
+                %s  deny %s %s
+                %s  access rights %s
+                %s  on %s of %s""",
+                indent, name, indent, subjectStr, subject, indent, accessRights, indent, (isIntersection ? "intersection" : "union"), containers
+        );
     }
 
     @Override
@@ -123,6 +124,17 @@ public class CreateProhibitionStatement extends PMLStatement {
     @Override
     public int hashCode() {
         return Objects.hash(name, subject, accessRights, isIntersection, containers);
+    }
+
+    private String getSubjectStr() {
+        String subjectStr = "";
+        switch (subjectType) {
+            case USER_ATTRIBUTE -> subjectStr = "UA";
+            case USER -> subjectStr = "U";
+            case PROCESS -> subjectStr = "process";
+        }
+
+        return subjectStr;
     }
 
     public static class Container implements Serializable {
@@ -161,22 +173,27 @@ public class CreateProhibitionStatement extends PMLStatement {
         ArrayLiteral arrayLiteral = new ArrayLiteral(Type.string());
         for (String ar : prohibition.getAccessRightSet()) {
             if (isAdminAccessRight(ar)) {
-                arrayLiteral.add(new Expression(new VariableReference(ar, Type.string())));
+                arrayLiteral.add(new ReferenceByID(ar));
             } else {
-                arrayLiteral.add(new Expression(new Literal(ar)));
+                arrayLiteral.add(new StringLiteral(ar));
             }
         }
 
-        List<Container> containers = new ArrayList<>();
+        ArrayLiteral containers = new ArrayLiteral(Type.string());
         for (ContainerCondition cc : prohibition.getContainers()) {
-            containers.add(new Container(cc.isComplement(), new Expression(new Literal(cc.getName()))));
+            StringLiteral s = new StringLiteral(cc.getName());
+            if (cc.isComplement()) {
+                containers.add(s);
+            } else {
+                containers.add(new NegatedExpression(s));
+            }
         }
 
         return new CreateProhibitionStatement(
-                new Expression(new Literal(prohibition.getName())),
-                new Expression(new Literal(prohibition.getSubject().getName())),
+                new StringLiteral(prohibition.getName()),
+                new StringLiteral(prohibition.getSubject().getName()),
                 prohibition.getSubject().getType(),
-                new Expression(new Literal(arrayLiteral)),
+                arrayLiteral,
                 prohibition.isIntersection(),
                 containers
         );

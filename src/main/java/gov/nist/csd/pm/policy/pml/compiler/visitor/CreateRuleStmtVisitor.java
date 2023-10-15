@@ -1,18 +1,20 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.CreateRuleStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
+
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
+public class CreateRuleStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -21,17 +23,19 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     @Override
-    public CreateRuleStatement visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
+    public PMLStatement visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
 
         CreateRuleStatement.SubjectClause subjectClause = getSubjectClause(ctx.subjectClause());
         CreateRuleStatement.PerformsClause performsClause = getPerformsClause(ctx.performsClause);
         CreateRuleStatement.OnClause onClause = getOnClause(ctx.onClause());
-        CreateRuleStatement.ResponseBlock responseBlock = new CreateRuleStatement.ResponseBlock();
+        CreateRuleStatement.ResponseBlock responseBlock;
         try {
             responseBlock = getResponse(ctx.response());
         } catch (VariableAlreadyDefinedInScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+            return new ErrorStatement(ctx);
         }
 
         return new CreateRuleStatement(name, subjectClause, performsClause, onClause, responseBlock);
@@ -48,19 +52,20 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
         PMLParser.ResponseBlockContext responseBlockCtx = ctx.responseBlock();
         List<PMLParser.ResponseStatementContext> responseStmtsCtx = responseBlockCtx.responseStatement();
 
+        StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
+        CreateRuleStmtVisitor createRuleStmtVisitor = new CreateRuleStmtVisitor(localVisitorCtx);
+        DeleteRuleStmtVisitor deleteRuleStmtVisitor = new DeleteRuleStmtVisitor(localVisitorCtx);
+
         List<PMLStatement> stmts = new ArrayList<>();
         for (PMLParser.ResponseStatementContext responseStmtCtx : responseStmtsCtx) {
             PMLStatement stmt = null;
 
             if (responseStmtCtx.statement() != null) {
-                stmt = new StatementVisitor(localVisitorCtx)
-                        .visitStatement(responseStmtCtx.statement());
+                stmt = statementVisitor.visitStatement(responseStmtCtx.statement());
             } else if (responseStmtCtx.createRuleStatement() != null) {
-                stmt = new CreateRuleStmtVisitor(localVisitorCtx)
-                        .visitCreateRuleStatement(responseStmtCtx.createRuleStatement());
+                stmt = createRuleStmtVisitor.visitCreateRuleStatement(responseStmtCtx.createRuleStatement());
             } else if (responseStmtCtx.deleteRuleStatement() != null) {
-                stmt = new DeleteRuleStmtVisitor(localVisitorCtx)
-                        .visitDeleteRuleStatement(responseStmtCtx.deleteRuleStatement());
+                stmt = deleteRuleStmtVisitor.visitDeleteRuleStatement(responseStmtCtx.deleteRuleStatement());
             }
 
             stmts.add(stmt);
@@ -70,24 +75,23 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     private CreateRuleStatement.OnClause getOnClause(PMLParser.OnClauseContext onClauseCtx) {
-        Expression name = null;
-        CreateRuleStatement.TargetType onClauseType = null;
-        if (onClauseCtx instanceof PMLParser.PolicyElementContext policyElementContext) {
-            name = Expression.compile(visitorCtx, policyElementContext.expression(), Type.string());
-            onClauseType = CreateRuleStatement.TargetType.POLICY_ELEMENT;
-        } else if (onClauseCtx instanceof PMLParser.AnyPolicyElementContext) {
-            onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
-        } else if (onClauseCtx instanceof PMLParser.AnyContainedInContext anyContainedInContext) {
-            name = Expression.compile(visitorCtx, anyContainedInContext.expression(), Type.string());
-            onClauseType = CreateRuleStatement.TargetType.ANY_CONTAINED_IN;
-        } else if (onClauseCtx instanceof PMLParser.AnyOfSetContext anyOfSetContext) {
-            name = Expression.compile(visitorCtx, anyOfSetContext.expression(), Type.array(Type.string()));
-            onClauseType = CreateRuleStatement.TargetType.ANY_OF_SET;
-        } else {
-            onClauseType = CreateRuleStatement.TargetType.ANY_POLICY_ELEMENT;
+        Expression targets = null;
+        CreateRuleStatement.TargetType onClauseType = CreateRuleStatement.TargetType.ANY_TARGET;
+        if (onClauseCtx instanceof PMLParser.AnyInUnionTargetContext anyInUnionTargetContext) {
+            targets = Expression.compile(visitorCtx, anyInUnionTargetContext.expression(), Type.array(Type.string()));
+            onClauseType = CreateRuleStatement.TargetType.ANY_IN_UNION;
+
+        } else if (onClauseCtx instanceof PMLParser.AnyInIntersectionTargetContext anyInIntersectionTargetContext) {
+            targets = Expression.compile(visitorCtx, anyInIntersectionTargetContext.expression(), Type.array(Type.string()));
+            onClauseType = CreateRuleStatement.TargetType.ANY_IN_INTERSECTION;
+
+        } else if (onClauseCtx instanceof PMLParser.OnTargetsContext onTargetsContext) {
+            targets = Expression.compile(visitorCtx, onTargetsContext.expression(), Type.array(Type.string()));
+            onClauseType = CreateRuleStatement.TargetType.ON_TARGETS;
+
         }
 
-        return new CreateRuleStatement.OnClause(name, onClauseType);
+        return new CreateRuleStatement.OnClause(targets, onClauseType);
     }
 
     private CreateRuleStatement.PerformsClause getPerformsClause(PMLParser.ExpressionContext performsClause) {
@@ -96,27 +100,25 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     private CreateRuleStatement.SubjectClause getSubjectClause(PMLParser.SubjectClauseContext ctx) {
-        CreateRuleStatement.SubjectType type;
-        Expression expr;
+        CreateRuleStatement.SubjectType type = CreateRuleStatement.SubjectType.ANY_USER;
+        Expression expr = null;
 
-        if (ctx instanceof PMLParser.AnyUserSubjectContext) {
-            type = CreateRuleStatement.SubjectType.ANY_USER;
-            return new CreateRuleStatement.SubjectClause(type);
-        } else if (ctx instanceof PMLParser.UserSubjectContext userSubjectCtx) {
-            type = CreateRuleStatement.SubjectType.USER;
-            expr = Expression.compile(visitorCtx, userSubjectCtx.user, Type.string());
-
-        } else if (ctx instanceof PMLParser.UsersListSubjectContext usersListSubjectCtx) {
+        if (ctx instanceof PMLParser.UsersSubjectContext usersSubjectContext) {
             type = CreateRuleStatement.SubjectType.USERS;
-            expr = Expression.compile(visitorCtx, usersListSubjectCtx.users, Type.array(Type.string()));
+            expr = Expression.compile(visitorCtx, usersSubjectContext.expression(), Type.array(Type.string()));
 
-        } else if (ctx instanceof PMLParser.UserAttrSubjectContext userAttrSubjectCtx) {
-            type = CreateRuleStatement.SubjectType.USER;
-            expr = Expression.compile(visitorCtx, userAttrSubjectCtx.attribute, Type.string());
+        } else if (ctx instanceof PMLParser.UsersInUnionSubjectContext usersInUnionSubjectContext){
+            type = CreateRuleStatement.SubjectType.USERS_IN_UNION;
+            expr = Expression.compile(visitorCtx, usersInUnionSubjectContext.expression(), Type.array(Type.string()));
 
-        } else {
-            type = CreateRuleStatement.SubjectType.USER;
-            expr = Expression.compile(visitorCtx, ((PMLParser.ProcessSubjectContext)ctx).process, Type.string());
+        } else if (ctx instanceof PMLParser.UsersInIntersectionSubjectContext usersInIntersectionSubjectContext) {
+            type = CreateRuleStatement.SubjectType.USERS_IN_INTERSECTION;
+            expr = Expression.compile(visitorCtx, usersInIntersectionSubjectContext.expression(), Type.array(Type.string()));
+
+        } else if (ctx instanceof PMLParser.ProcessesSubjectContext processesSubjectContext) {
+            type = CreateRuleStatement.SubjectType.PROCESSES;
+            expr = Expression.compile(visitorCtx, processesSubjectContext.expression(), Type.array(Type.string()));
+
         }
 
         return new CreateRuleStatement.SubjectClause(type, expr);

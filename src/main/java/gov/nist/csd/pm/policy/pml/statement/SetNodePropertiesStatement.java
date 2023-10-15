@@ -1,13 +1,16 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 
 public class SetNodePropertiesStatement extends PMLStatement {
 
@@ -38,12 +41,12 @@ public class SetNodePropertiesStatement extends PMLStatement {
 
         policy.graph().setNodeProperties(name, properties);
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        return String.format("set properties of %s to %s", nameExpr, propertiesExpr);
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("set properties of %s to %s", nameExpr, propertiesExpr);
     }
 
     @Override

@@ -1,12 +1,16 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.List;
 import java.util.Objects;
+
 
 public class DeassignStatement extends PMLStatement {
 
@@ -33,26 +37,18 @@ public class DeassignStatement extends PMLStatement {
 
         String childStringValue = childValue.getStringValue();
 
-        if (deassignFromValue.isString()) {
-            String parent = deassignFromValue.getStringValue();
+        List<Value> valueArr = deassignFromValue.getArrayValue();
+        for (Value value : valueArr) {
+            String parent = value.getStringValue();
             policy.graph().deassign(childStringValue, parent);
-        } else {
-            List<Value> valueArr = deassignFromValue.getArrayValue();
-            for (Value value : valueArr) {
-                String parent = value.getStringValue();
-                policy.graph().deassign(childStringValue, parent);
-            }
         }
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        return String.format("deassign %s from %s",
-                child,
-                deassignFrom
-        );
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("deassign %s from %s", child, deassignFrom);
     }
 
     @Override

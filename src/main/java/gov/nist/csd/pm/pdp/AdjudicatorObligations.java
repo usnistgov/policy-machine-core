@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Obligations;
@@ -9,8 +8,10 @@ import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.*;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInUnionTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class AdjudicatorObligations implements Obligations {
     @Override
     public void create(UserContext author, String name, Rule... rules) throws PMException {
         for (Rule rule : rules) {
-            EventSubject subject = rule.getEventPattern().getSubject();
+            Subject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, CREATE_OBLIGATION);
 
             Target target = rule.getEventPattern().getTarget();
@@ -40,39 +41,24 @@ public class AdjudicatorObligations implements Obligations {
     }
 
     private void checkTarget(Target target, String accessRight) throws PMException {
-        if (target.getType() == Target.Type.POLICY_ELEMENT) {
-            accessRightChecker.check(userCtx, target.policyElement(), accessRight);
-
-        } else if (target.getType() == Target.Type.ANY_POLICY_ELEMENT) {
+        if (target instanceof AnyTarget) {
             accessRightChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
+        }
 
-        } else if (target.getType() == Target.Type.ANY_CONTAINED_IN) {
-            accessRightChecker.check(userCtx, target.anyContainedIn(), accessRight);
-
-        } else if (target.getType() == Target.Type.ANY_OF_SET) {
-            for (String policyElement : target.anyOfSet()) {
-                accessRightChecker.check(userCtx, policyElement, accessRight);
-            }
-
+        for (String tar : target.getTargets()) {
+            accessRightChecker.check(userCtx, tar, accessRight);
         }
     }
 
-    private void checkSubject(EventSubject subject, String accessRight) throws PMException {
-        if (subject.getType() == EventSubject.Type.ANY_USER) {
+    private void checkSubject(Subject subject, String accessRight) throws PMException {
+        if (subject instanceof AnyUserSubject ||
+                subject instanceof ProcessesSubject) {
             accessRightChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
 
-        } else if (subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE) {
-            accessRightChecker.check(userCtx, subject.anyUserWithAttribute(), accessRight);
+        }
 
-        } else if (subject.getType() == EventSubject.Type.PROCESS) {
-            // need permissions on super object create a process obligation
-            accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), accessRight);
-
-        } else if (subject.getType() == EventSubject.Type.USERS) {
-            for (String user : subject.users()) {
-                accessRightChecker.check(userCtx, user, accessRight);
-            }
-
+        for (String user : subject.getSubjects()) {
+            accessRightChecker.check(userCtx, user, accessRight);
         }
     }
 
@@ -85,7 +71,7 @@ public class AdjudicatorObligations implements Obligations {
     public void delete(String name) throws PMException {
         Obligation obligation = pap.obligations().get(name);
         for (Rule rule : obligation.getRules()) {
-            EventSubject subject = rule.getEventPattern().getSubject();
+            Subject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, DELETE_OBLIGATION);
 
             Target target = rule.getEventPattern().getTarget();
@@ -99,7 +85,7 @@ public class AdjudicatorObligations implements Obligations {
         obligations.removeIf(obligation -> {
             try {
                 for (Rule rule : obligation.getRules()) {
-                    EventSubject subject = rule.getEventPattern().getSubject();
+                    Subject subject = rule.getEventPattern().getSubject();
                     checkSubject(subject, GET_OBLIGATION);
 
                     Target target = rule.getEventPattern().getTarget();
@@ -134,7 +120,7 @@ public class AdjudicatorObligations implements Obligations {
     public Obligation get(String name) throws PMException {
         Obligation obligation = pap.obligations().get(name);
         for (Rule rule : obligation.getRules()) {
-            EventSubject subject = rule.getEventPattern().getSubject();
+            Subject subject = rule.getEventPattern().getSubject();
             checkSubject(subject, GET_OBLIGATION);
 
             Target target = rule.getEventPattern().getTarget();

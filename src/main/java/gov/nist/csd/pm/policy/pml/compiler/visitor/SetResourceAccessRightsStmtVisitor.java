@@ -1,13 +1,16 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
+
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.SetResourceAccessRightsStatement;
 
-public class SetResourceAccessRightsStmtVisitor extends PMLBaseVisitor<SetResourceAccessRightsStatement> {
+public class SetResourceAccessRightsStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -16,10 +19,10 @@ public class SetResourceAccessRightsStmtVisitor extends PMLBaseVisitor<SetResour
     }
 
     @Override
-    public SetResourceAccessRightsStatement visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
+    public PMLStatement visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
         if (visitorCtx.scope().isResourceAccessRightsExpressionSet()) {
             visitorCtx.errorLog().addError(ctx, "set resource access rights has already been called");
-            return new SetResourceAccessRightsStatement(visitorCtx.scope().getResourceAccessRightsExpression());
+            return new ErrorStatement(ctx);
         }
 
         Expression exprList = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));

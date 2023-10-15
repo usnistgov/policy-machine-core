@@ -10,7 +10,7 @@ import gov.nist.csd.pm.policy.events.prohibitions.DeleteProhibitionEvent;
 import gov.nist.csd.pm.policy.events.prohibitions.UpdateProhibitionEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteConstantEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.DeleteFunctionEvent;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;

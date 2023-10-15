@@ -1,8 +1,5 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-
 import java.util.Map;
 
 public class JSONUserDefinedPML {

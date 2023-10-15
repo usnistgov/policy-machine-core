@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
+import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -9,7 +10,7 @@ import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
 import java.util.*;
@@ -19,6 +20,13 @@ import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
 public class JSONSerializer implements PolicySerializer {
 
+    private Map<Association, List<String>> delayedAssociations;
+    private Set<String> createdPCs;
+    private Set<String> createdAttrs;
+    private Policy policy;
+
+    public JSONSerializer() {}
+
     @Override
     public String serialize(Policy policy) throws PMException {
         return buildJSONPolicy(policy)
@@ -26,12 +34,21 @@ public class JSONSerializer implements PolicySerializer {
     }
 
     public JSONPolicy buildJSONPolicy(Policy policy) throws PMException {
+        resetBuild(policy);
+
         return new JSONPolicy(
                 buildGraphJSON(policy),
                 buildProhibitionsJSON(policy),
                 buildObligationsJSON(policy),
                 buildUserDefinedPML(policy)
         );
+    }
+
+    private void resetBuild(Policy policy) throws PMException {
+        this.delayedAssociations = new HashMap<>();
+        this.createdPCs = new HashSet<>();
+        this.createdAttrs = new HashSet<>();
+        this.policy = policy;
     }
 
 
@@ -49,8 +66,7 @@ public class JSONSerializer implements PolicySerializer {
                 continue;
             }
 
-            String str = e.getValue().toString();
-            jsonConstants.put(e.getKey(), str.substring(1, str.length()-1));
+            jsonConstants.put(e.getKey(), e.getValue().toString());
         }
 
         return new JSONUserDefinedPML(jsonFunctions, jsonConstants);
@@ -111,28 +127,36 @@ public class JSONSerializer implements PolicySerializer {
         List<JSONPolicyClass> policyClassesList = new ArrayList<>();
 
         List<String> policyClasses = policy.graph().getPolicyClasses();
-        Set<String> attrs = new HashSet<>();
-        Map<Association, List<String>> delayedAssociations = new HashMap<>();
         for (String pc : policyClasses) {
-            JSONPolicyClass jsonPolicyClass = buildJSONPolicyCLass(policy, attrs, delayedAssociations, pc);
+            JSONPolicyClass jsonPolicyClass = buildJSONPolicyCLass(pc);
+
+            createdPCs.add(pc);
+
+            // ignore the creation of the admin policy class - it is done automatically
+            if (jsonPolicyClass.getName().equals(AdminPolicyNode.ADMIN_POLICY.nodeName())) {
+                continue;
+            }
+
             policyClassesList.add(jsonPolicyClass);
         }
 
         return policyClassesList;
     }
 
-    private JSONPolicyClass buildJSONPolicyCLass(Policy policy, Set<String> existingAttrs,
-                                                        Map<Association, List<String>> delayedAssociations, String pc)
-            throws PMException {
+    private JSONPolicyClass buildJSONPolicyCLass(String pc) throws PMException {
         List<Association> associations = new ArrayList<>();
-        List<JSONNode> userAttributes = getAttributes(policy, associations, delayedAssociations, existingAttrs, pc, UA);
-        List<JSONNode> objectAttributes = getAttributes(policy, associations, delayedAssociations, existingAttrs, pc, OA);
 
-        // process associations
+        // uas
+        List<JSONNode> userAttributes = getAttributes(pc, UA, associations);
+
+        // oas
+        List<JSONNode> objectAttributes = getAttributes(pc, OA, associations);
+
+        // associations
         Map<String, List<JSONAssociation>> jsonAssociations = new HashMap<>();
         for (Association association : associations) {
             List<String> waitingFor = delayedAssociations.getOrDefault(association, new ArrayList<>());
-            waitingFor.removeAll(existingAttrs);
+            waitingFor.removeAll(createdAttrs);
 
             if (waitingFor.isEmpty()) {
                 List<JSONAssociation> nodeAssociations = jsonAssociations.getOrDefault(association.getSource(), new ArrayList<>());
@@ -146,12 +170,13 @@ public class JSONSerializer implements PolicySerializer {
             }
         }
 
+        // check delayed associations
         Iterator<Map.Entry<Association, List<String>>> iterator = delayedAssociations.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Association, List<String>> next = iterator.next();
             Association association = next.getKey();
             List<String> waitingFor = next.getValue();
-            waitingFor.removeAll(existingAttrs);
+            waitingFor.removeAll(createdAttrs);
 
             if (waitingFor.isEmpty()) {
                 List<JSONAssociation> nodeAssociations = jsonAssociations.getOrDefault(association.getSource(), new ArrayList<>());
@@ -163,16 +188,17 @@ public class JSONSerializer implements PolicySerializer {
         }
 
         Node node = policy.graph().getNode(pc);
+        boolean isAdminNode = AdminPolicy.isAdminPolicyNodeName(pc);
 
         JSONPolicyClass jsonPolicyClass = new JSONPolicyClass();
         jsonPolicyClass.setName(pc);
-        if (!node.getProperties().isEmpty()) {
+        if (!isAdminNode && !node.getProperties().isEmpty()) {
             jsonPolicyClass.setProperties(node.getProperties());
         }
-        if (!userAttributes.isEmpty()) {
+        if (!isAdminNode && !userAttributes.isEmpty()) {
             jsonPolicyClass.setUserAttributes(userAttributes);
         }
-        if (!objectAttributes.isEmpty()) {
+        if (!isAdminNode && !objectAttributes.isEmpty()) {
             jsonPolicyClass.setObjectAttributes(objectAttributes);
         }
         if (!jsonAssociations.isEmpty()) {
@@ -182,16 +208,11 @@ public class JSONSerializer implements PolicySerializer {
         return jsonPolicyClass;
     }
 
-    private List<JSONNode> getAttributes(Policy policy,
-                                         List<Association> associations,
-                                         Map<Association, List<String>> delayedAssociations,
-                                         Set<String> existingAttrs,
-                                         String start, NodeType type) throws PMException {
+    private List<JSONNode> getAttributes(String start, NodeType type, List<Association> associations) throws PMException {
         List<JSONNode> jsonNodes = new ArrayList<>();
         List<String> children = policy.graph().getChildren(start);
         for(String child : children) {
             Node node = policy.graph().getNode(child);
-
             if (node.getType() != type) {
                 continue;
             }
@@ -211,13 +232,13 @@ public class JSONSerializer implements PolicySerializer {
             JSONNode jsonNode = new JSONNode();
             jsonNode.setName(child);
 
-            if (!node.getProperties().isEmpty() && !existingAttrs.contains(child)) {
+            if (!node.getProperties().isEmpty() && !createdAttrs.contains(child)) {
                 jsonNode.setProperties(node.getProperties());
             }
 
-            existingAttrs.add(child);
+            createdAttrs.add(child);
 
-            List<JSONNode> childAttrs = getAttributes(policy, associations, delayedAssociations, existingAttrs, child, type);
+            List<JSONNode> childAttrs = getAttributes(child, type, associations);
             if (!childAttrs.isEmpty()) {
                 jsonNode.setChildren(childAttrs);
             }

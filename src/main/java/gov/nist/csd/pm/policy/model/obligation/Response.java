@@ -2,11 +2,13 @@ package gov.nist.csd.pm.policy.model.obligation;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.ReturnValue;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.epp.EventContext;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.io.Serializable;
 import java.util.List;
@@ -61,13 +63,16 @@ public class Response implements Serializable {
     }
 
     public Value execute(Policy policyAuthor, EventContext eventCtx) throws PMException {
-        executionCtx.scope().putValue(eventCtxVariable, Value.objectToValue(eventCtx));
+        executionCtx.scope().addValue(eventCtxVariable, Value.fromObject(eventCtx));
 
         for (PMLStatement stmt : stmts) {
-            stmt.execute(executionCtx, policyAuthor);
+            Value result = stmt.execute(executionCtx, policyAuthor);
+            if (result instanceof ReturnValue) {
+                break;
+            }
         }
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override

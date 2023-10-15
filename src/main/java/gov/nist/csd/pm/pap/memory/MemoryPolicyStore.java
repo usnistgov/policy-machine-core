@@ -4,7 +4,7 @@ import gov.nist.csd.pm.pap.*;
 import gov.nist.csd.pm.policy.*;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.exceptions.*;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -182,7 +182,7 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
     @Override
     public void verifyAdminPolicyConstant(AdminPolicyNode constant) throws PMException {
         try {
-            userDefinedPML.createConstant(constant.constantName(), new Value(constant.nodeName()));
+            userDefinedPML.createConstant(constant.constantName(), new StringValue(constant.nodeName()));
         } catch (PMLConstantAlreadyDefinedException e) {
             // ignore this exception as the admin policy constant already existing is not an error
         }

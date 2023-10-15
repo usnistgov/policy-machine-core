@@ -1,11 +1,16 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
+
+import java.util.List;
 import java.util.Objects;
+
 
 public class DissociateStatement extends PMLStatement {
 
@@ -28,16 +33,18 @@ public class DissociateStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         String ua = uaExpr.execute(ctx, policy).getStringValue();
-        String target = targetExpr.execute(ctx, policy).getStringValue();
+        List<Value> targets = targetExpr.execute(ctx, policy).getArrayValue();
 
-        policy.graph().dissociate(ua, target);
+        for (Value target : targets) {
+            policy.graph().dissociate(ua, target.getStringValue());
+        }
 
-        return new Value();
+        return new VoidValue();
     }
 
     @Override
-    public String toString() {
-        return String.format("dissociate %s and %s", uaExpr, targetExpr);
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("dissociate %s and %s", uaExpr, targetExpr);
     }
 
     @Override

@@ -11,26 +11,24 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.model.expression.VariableReference;
-import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import org.apache.commons.lang3.SerializationException;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
+import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SerializationTest {
@@ -66,12 +64,12 @@ public class SerializationTest {
                         new Rule(
                                 "rule1",
                                 new EventPattern(
-                                        EventSubject.anyUser(),
+                                        new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
                                 new Response(
                                         new UserContext(SUPER_USER),
-                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new StringLiteral("test_pc"))
                                 )
                         )
                 )
@@ -84,12 +82,13 @@ public class SerializationTest {
     @Test
     void testFuncExecDoestNotSerialize() throws PMException {
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        CreateFunctionEvent createFunctionEvent = new CreateFunctionEvent(new FunctionDefinitionStatement(
-                "test_func",
-                Type.string(),
-                List.of(new FormalArgument("arg1", Type.string())),
-                (ctx, policy) -> new Value("hello world")
-        ));
+        CreateFunctionEvent createFunctionEvent = new CreateFunctionEvent(new FunctionDefinitionStatement.Builder("test_func")
+                                                                                  .returns(Type.string())
+                                                                                  .args(
+                                                                                          new FormalArgument("arg1", Type.string())
+                                                                                  )
+                                                                                  .executor((ctx, policy) -> new StringValue("hello world"))
+                                                                                  .build());
 
         createFunctionEvent.apply(memoryPolicyStore);
 

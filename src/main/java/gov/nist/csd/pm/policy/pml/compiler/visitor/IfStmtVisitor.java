@@ -1,17 +1,18 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.IfStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
+
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
+public class IfStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -20,10 +21,9 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
     }
 
     @Override
-    public IfStatement visitIfStatement(PMLParser.IfStatementContext ctx) {
+    public PMLStatement visitIfStatement(PMLParser.IfStatementContext ctx) {
         // if block
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        boolean isComp = ctx.IS_COMPLEMENT() != null;
         Expression condition = Expression.compile(localVisitorCtx, ctx.condition, Type.bool());
 
         List<PMLStatement> block = new ArrayList<>();
@@ -36,21 +36,20 @@ public class IfStmtVisitor extends PMLBaseVisitor<IfStatement> {
         // update outer scoped variables
         visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
 
-        IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(isComp, condition, block);
+        IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(condition, block);
 
         // else ifs
         localVisitorCtx = visitorCtx.copy();
         statementVisitor = new StatementVisitor(localVisitorCtx);
         List<IfStatement.ConditionalBlock> elseIfs = new ArrayList<>();
         for (PMLParser.ElseIfStatementContext elseIfStmtCtx : ctx.elseIfStatement()) {
-            isComp = elseIfStmtCtx.IS_COMPLEMENT() != null;
             condition = Expression.compile(visitorCtx, elseIfStmtCtx.condition, Type.bool());
             block = new ArrayList<>();
             for (PMLParser.StatementContext stmtCtx : elseIfStmtCtx.statementBlock().statement()) {
                 PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
                 block.add(statement);
             }
-            elseIfs.add(new IfStatement.ConditionalBlock(isComp, condition, block));
+            elseIfs.add(new IfStatement.ConditionalBlock(condition, block));
 
             // update outer scoped variables
             visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());

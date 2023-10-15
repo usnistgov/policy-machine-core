@@ -1,17 +1,18 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.pml.statement.CreateProhibitionStatement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibitionStatement> {
+public class CreateProhibitionStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -20,7 +21,7 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
     }
 
     @Override
-    public CreateProhibitionStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
+    public PMLStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
         ProhibitionSubject.Type type;
@@ -36,14 +37,8 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
 
         boolean isIntersection = ctx.INTERSECTION() != null;
 
-        List<CreateProhibitionStatement.Container> containers = new ArrayList<>();
-        for (PMLParser.ProhibitionContainerExpressionContext contExprCtx : ctx.containers.prohibitionContainerExpression()) {
-            boolean isComplement =
-                    contExprCtx.IS_COMPLEMENT() != null && contExprCtx.IS_COMPLEMENT().getText().equals("!");
-            Expression ccName = Expression.compile(visitorCtx, contExprCtx.container, Type.string());
-            containers.add(new CreateProhibitionStatement.Container(isComplement, ccName));
-        }
+        Expression cc = Expression.compile(visitorCtx, ctx.containers, Type.array(Type.string()));
 
-        return new CreateProhibitionStatement(name, subject, type, accessRights, isIntersection, containers);
+        return new CreateProhibitionStatement(name, subject, type, accessRights, isIntersection, cc);
     }
 }

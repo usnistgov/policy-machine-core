@@ -13,9 +13,11 @@ import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentExcepti
 import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.model.obligation.event.*;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.Subject;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.UserAttributesSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.UsersSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
@@ -711,16 +713,15 @@ public interface GraphStore extends Graph {
 
     private static boolean nodeInEvent(String name, EventPattern event) {
         // check subject
-        EventSubject subject = event.getSubject();
-        if ((subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE && subject.anyUserWithAttribute().equals(name))
-                || (subject.getType() == EventSubject.Type.USERS && subject.users().contains(name))) {
-            return true;
+        Subject subject = event.getSubject();
+        if (subject instanceof UserAttributesSubject userAttributesEventSubject) {
+            return userAttributesEventSubject.getSubjects().contains(name);
+        } else if (subject instanceof UsersSubject usersEventSubject) {
+            return usersEventSubject.getSubjects().contains(name);
         }
 
         // check the target
         Target target = event.getTarget();
-        return (target.getType() == Target.Type.ANY_CONTAINED_IN && target.anyContainedIn().equals(name))
-                || (target.getType() == Target.Type.ANY_OF_SET && target.anyOfSet().contains(name))
-                || (target.getType() == Target.Type.POLICY_ELEMENT && target.policyElement().equals(name));
+        return target.getTargets().contains(name);
     }
 }

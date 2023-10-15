@@ -19,25 +19,25 @@ public enum AdminPolicyNode {
 
     public static AdminPolicyNode fromNodeName(String child) {
         switch (child) {
-            case "pm_admin" -> {
+            case "PM_ADMIN" -> {
                 return ADMIN_POLICY;
             }
-            case "pm_admin:target" -> {
+            case "PM_ADMIN:target" -> {
                 return ADMIN_POLICY_TARGET;
             }
-            case "pm_admin:POLICY_CLASSES" -> {
+            case "PM_ADMIN:POLICY_CLASSES" -> {
                 return POLICY_CLASSES_OA;
             }
-            case "pm_admin:FUNCTIONS" -> {
+            case "PM_ADMIN:FUNCTIONS" -> {
                 return PML_FUNCTIONS_TARGET;
             }
-            case "pm_admin:CONSTANTS" -> {
+            case "PM_ADMIN:CONSTANTS" -> {
                 return PML_CONSTANTS_TARGET;
             }
-            case "pm_admin:OBLIGATIONS" -> {
+            case "PM_ADMIN:OBLIGATIONS" -> {
                 return OBLIGATIONS_TARGET;
             }
-            case "pm_admin:PROHIBITIONS" -> {
+            case "PM_ADMIN:PROHIBITIONS" -> {
                 return PROHIBITIONS_TARGET;
             }
         }

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.mysql;
 
 import gov.nist.csd.pm.pap.UserDefinedPMLStore;
 import gov.nist.csd.pm.policy.exceptions.*;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.apache.commons.lang3.SerializationUtils;
 

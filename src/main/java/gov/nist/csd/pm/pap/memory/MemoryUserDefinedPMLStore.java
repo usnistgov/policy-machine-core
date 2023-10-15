@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.memory;
 import gov.nist.csd.pm.pap.UserDefinedPMLStore;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.*;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
@@ -62,7 +62,7 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
         // log the command if in a tx
         handleTxIfActive(tx -> tx.createFunction(functionDefinitionStatement));
 
-        functions.put(functionDefinitionStatement.getFunctionName(), functionDefinitionStatement);
+        functions.put(functionDefinitionStatement.getFunctionName(), new FunctionDefinitionStatement(functionDefinitionStatement));
     }
 
     @Override
@@ -79,14 +79,19 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
 
     @Override
     public Map<String, FunctionDefinitionStatement> getFunctions() {
-        return new HashMap<>(functions);
+        HashMap<String, FunctionDefinitionStatement> map = new HashMap<>();
+        for (Map.Entry<String, FunctionDefinitionStatement> e : functions.entrySet()) {
+            map.put(e.getKey(), new FunctionDefinitionStatement(e.getValue()));
+        }
+
+        return map;
     }
 
     @Override
     public FunctionDefinitionStatement getFunction(String name) throws PMLFunctionNotDefinedException {
         checkGetFunctionInput(name);
 
-        return functions.get(name);
+        return new FunctionDefinitionStatement(functions.get(name));
     }
 
     @Override

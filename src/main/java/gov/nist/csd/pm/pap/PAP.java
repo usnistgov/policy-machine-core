@@ -1,21 +1,13 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.exceptions.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLExecutable;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.tx.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static gov.nist.csd.pm.pap.AdminPolicy.ALL_NODE_NAMES;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.ANY;
-import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
 public class PAP implements Transactional, PMLExecutable, Policy {
 
@@ -23,25 +15,6 @@ public class PAP implements Transactional, PMLExecutable, Policy {
 
     public PAP(PolicyStore policyStore) throws PMException {
         this.policyStore = policyStore;
-    }
-
-    public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
-        if(!isPolicyEmpty()) {
-            throw new BootstrapExistingPolicyException();
-        }
-
-        bootstrapper.bootstrap(this);
-    }
-
-    private boolean isPolicyEmpty() throws PMException {
-        Set<String> nodes = new HashSet<>(policyStore.graph().search(ANY, NO_PROPERTIES));
-
-        boolean prohibitionsEmpty = policyStore.prohibitions().getAll().isEmpty();
-        boolean obligationsEmpty = policyStore.obligations().getAll().isEmpty();
-
-        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODE_NAMES))) &&
-                prohibitionsEmpty &&
-                obligationsEmpty;
     }
 
     public void runTx(TxRunner txRunner) throws PMException {

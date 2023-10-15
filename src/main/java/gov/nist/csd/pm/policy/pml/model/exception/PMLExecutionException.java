@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.pml.model.exception;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 public class PMLExecutionException extends PMException {
@@ -10,5 +11,9 @@ public class PMLExecutionException extends PMException {
 
     public PMLExecutionException(String msg) {
         super(msg);
+    }
+
+    public PMLExecutionException(Exception e) {
+        super(e);
     }
 }

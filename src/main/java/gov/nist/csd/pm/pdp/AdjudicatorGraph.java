@@ -8,6 +8,7 @@ import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.model.access.AdminAccessRights;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
@@ -213,26 +214,11 @@ public class AdjudicatorGraph implements Graph {
         Node childNode = pap.graph().getNode(child);
         Node parentNode = pap.graph().getNode(parent);
 
-        String childAR = switch (childNode.getType()) {
-            case OA -> ASSIGN_OBJECT_ATTRIBUTE;
-            case UA -> ASSIGN_USER_ATTRIBUTE;
-            case O -> ASSIGN_OBJECT;
-            case U -> ASSIGN_USER;
-            default -> throw new IllegalArgumentException("cannot assign node of type " + childNode.getType());
-        };
-
-        String parentAR = switch (parentNode.getType()) {
-            case OA -> ASSIGN_TO_OBJECT_ATTRIBUTE;
-            case UA -> ASSIGN_TO_USER_ATTRIBUTE;
-            case PC -> ASSIGN_TO_POLICY_CLASS;
-            default -> throw new IllegalArgumentException("cannot assign to a node of type " + parentNode.getType());
-        };
-
         //check the user can assign the child
-        accessRightChecker.check(userCtx, child, childAR);
+        accessRightChecker.check(userCtx, child, ASSIGN);
 
         // check that the user can assign to the parent node
-        accessRightChecker.check(userCtx, parent, parentAR);
+        accessRightChecker.check(userCtx, parent, ASSIGN_TO);
     }
 
     @Override
@@ -240,26 +226,11 @@ public class AdjudicatorGraph implements Graph {
         Node childNode = pap.graph().getNode(child);
         Node parentNode = pap.graph().getNode(parent);
 
-        String childAR = switch (childNode.getType()) {
-            case OA -> DEASSIGN_OBJECT_ATTRIBUTE;
-            case UA -> DEASSIGN_USER_ATTRIBUTE;
-            case O -> DEASSIGN_OBJECT;
-            case U -> DEASSIGN_USER;
-            default -> throw new InvalidAssignmentException("cannot deassign node of type " + childNode.getType());
-        };
-
-        String parentAR = switch (parentNode.getType()) {
-            case OA -> DEASSIGN_FROM_OBJECT_ATTRIBUTE;
-            case UA -> DEASSIGN_FROM_USER_ATTRIBUTE;
-            case PC -> DEASSIGN_FROM_POLICY_CLASS;
-            default -> throw new InvalidAssignmentException("cannot deassign from a node of type " + parentNode.getType());
-        };
-
         //check the user can deassign the child
-        accessRightChecker.check(userCtx, child, childAR);
+        accessRightChecker.check(userCtx, child, DEASSIGN);
 
         // check that the user can deassign from the parent node
-        accessRightChecker.check(userCtx, parent, parentAR);
+        accessRightChecker.check(userCtx, parent, DEASSIGN_FROM);
     }
 
     @Override
@@ -294,32 +265,14 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
-        Node targetNode = pap.graph().getNode(target);
-
-        String targetAR = switch (targetNode.getType()) {
-            case OA -> DISSOCIATE_OBJECT_ATTRIBUTE;
-            case UA -> DISSOCIATE_USER_ATTRIBUTE;
-            default -> throw new InvalidAssociationException("cannot associate a target node of type " + targetNode.getType());
-        };
-
-        //check the user can associate the source and target nodes
-        accessRightChecker.check(userCtx, ua, ASSOCIATE_USER_ATTRIBUTE);
-        accessRightChecker.check(userCtx, target, targetAR);
+        accessRightChecker.check(userCtx, ua, ASSOCIATE);
+        accessRightChecker.check(userCtx, target, ASSOCIATE_TO);
     }
 
     @Override
     public void dissociate(String ua, String target) throws PMException {
-        Node targetNode = pap.graph().getNode(target);
-
-        String targetAR = switch (targetNode.getType()) {
-            case OA -> DISSOCIATE_OBJECT_ATTRIBUTE;
-            case UA -> DISSOCIATE_USER_ATTRIBUTE;
-            default -> throw new InvalidAssociationException("cannot dissociate a target node of type " + targetNode.getType());
-        };
-
-        //check the user can dissociate the source and target nodes
-        accessRightChecker.check(userCtx, ua, DISSOCIATE_USER_ATTRIBUTE);
-        accessRightChecker.check(userCtx, target, targetAR);
+        accessRightChecker.check(userCtx, ua, DISSOCIATE);
+        accessRightChecker.check(userCtx, target, DISSOCIATE_FROM);
     }
 
     @Override

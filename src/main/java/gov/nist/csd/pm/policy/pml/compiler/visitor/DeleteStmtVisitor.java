@@ -1,13 +1,15 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.DeleteStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
 
-public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
+
+public class DeleteStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -16,7 +18,7 @@ public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
     }
 
     @Override
-    public DeleteStatement visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
+    public PMLStatement visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
         Expression nameExpr = Expression.compile(visitorCtx, ctx.expression(), Type.string());
 
         PMLParser.DeleteTypeContext deleteTypeCtx = ctx.deleteType();

@@ -2,8 +2,8 @@ package gov.nist.csd.pm.policy.model.obligation;
 
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.Subject;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -23,13 +23,13 @@ public class Rule implements Serializable {
         this.response = response;
     }
 
-    public Rule(String name, EventSubject subject, Performs performs, Target target, Response response) {
+    public Rule(String name, Subject subject, Performs performs, Target target, Response response) {
         this.name = name;
         this.eventPattern = new EventPattern(subject, performs, target);
         this.response = response;
     }
 
-    public Rule(String name, EventSubject subject, Performs performs, Response response) {
+    public Rule(String name, Subject subject, Performs performs, Response response) {
         this.name = name;
         this.eventPattern = new EventPattern(subject, performs);
         this.response = response;

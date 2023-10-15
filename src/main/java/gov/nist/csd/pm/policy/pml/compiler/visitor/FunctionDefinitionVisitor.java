@@ -1,15 +1,13 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
-import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
-import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStmt;
+import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 
@@ -18,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitionStatement> {
+public class FunctionDefinitionVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -27,98 +25,64 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     }
 
     @Override
-    public FunctionDefinitionStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+    public PMLStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
         String funcName = ctx.ID().getText();
         List<FormalArgument> args = parseFormalArgs(ctx.formalArgList());
-        Type returnType = parseReturnType(ctx.funcReturnType());
-        List<PMLStatement> body = parseBody(ctx, args);
-
-        FunctionDefinitionStatement functionDefinition = new FunctionDefinitionStatement(funcName, returnType, args, body);
-
-        // add args as variables in scope
-        Scope localScope = visitorCtx.scope().copy();
-        for (FormalArgument arg : args) {
-            try {
-                localScope.addVariable(arg.name(), arg.type(), false);
-            } catch (VariableAlreadyDefinedInScopeException e) {
-                visitorCtx.errorLog().addError(ctx, e.getMessage());
-            }
+        if (args == null) {
+            return new ErrorStatement(ctx);
         }
 
-        // check that the body has a return statement IF the return type is NOT VOID
-        PMLStatement lastStmt = null;
-        if (body.size() > 0) {
-            lastStmt = body.get(body.size()-1);
+        Type returnType = parseReturnType(ctx.returnType);
+
+        List<PMLStatement> body = parseBody(ctx, args, returnType);
+        if (body == null) {
+            return new ErrorStatement(ctx);
         }
 
-        if (returnType.isVoid()) {
-            if (lastStmt instanceof FunctionReturnStmt returnStmt) {
-                if (!returnStmt.isVoid()) {
-                    visitorCtx.errorLog().addError(
-                            ctx,
-                            "return statement should be empty for functions that return VOID"
-                    );
-                }
-            }
-        } else {
-            if (lastStmt instanceof FunctionReturnStmt returnStmt) {
-                Type retExprType = Type.any();
-                try {
-                    retExprType = returnStmt.getExpr().getType(localScope);
-                } catch (PMLScopeException e) {
-                    visitorCtx.errorLog().addError(ctx, e.getMessage());
-                }
-                if (returnStmt.isVoid()) {
-                    visitorCtx.errorLog().addError(
-                            ctx,
-                            "return statement missing expression"
-                    );
-                } else if (!retExprType.equals(returnType)) {
-                    visitorCtx.errorLog().addError(
-                            ctx,
-                            "function expected to return type " + returnType + " not " + retExprType
-                    );
-                }
-            } else {
-                visitorCtx.errorLog().addError(
-                        ctx,
-                        "function missing return statement at end of function body"
-                );
-            }
-        }
+        FunctionDefinitionStatement functionDefinition = new FunctionDefinitionStatement.Builder(funcName)
+                .returns(returnType)
+                .args(args)
+                .body(body)
+                .build();
 
         // add function to scope
         try {
             visitorCtx.scope().addFunction(functionDefinition);
         } catch (FunctionAlreadyDefinedInScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+            return new ErrorStatement(ctx);
         }
 
         return functionDefinition;
     }
 
-    private List<PMLStatement> parseBody(PMLParser.FunctionDefinitionStatementContext ctx, List<FormalArgument> args) {
-        PMLParser.FuncBodyContext funcBodyCtx = ctx.funcBody();
-
+    private List<PMLStatement> parseBody(PMLParser.FunctionDefinitionStatementContext ctx,
+                                         List<FormalArgument> args,
+                                         Type returnType) {
         // create a new scope for the function body
         VisitorContext localVisitorCtx = visitorCtx.copy();
         // add the args to the local scope
         for (FormalArgument formalArgument : args) {
-            // string literal as a placeholder since the actual value is not determined yet
             try {
                 localVisitorCtx.scope().addVariable(formalArgument.name(), formalArgument.type(), false);
             } catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+                return null;
             }
         }
 
-        StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
-        List<PMLStatement> stmts = new ArrayList<>();
-        for (PMLParser.StatementContext stmtCtx : funcBodyCtx.statement()) {
-            stmts.add(statementVisitor.visitStatement(stmtCtx));
+        StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
+        StatementBlockVisitor.Result result = statementBlockVisitor.visitStatementBlock(ctx.statementBlock());
+
+        if (!result.allPathsReturned() && !returnType.isVoid()) {
+            visitorCtx.errorLog().addError(ctx, "not all conditional paths return");
+
+            return null;
         }
 
-        return stmts;
+        return result.stmts();
     }
 
     private List<FormalArgument> parseFormalArgs(PMLParser.FormalArgListContext formalArgListCtx) {
@@ -126,7 +90,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         Set<String> argNames = new HashSet<>();
         for (PMLParser.FormalArgContext formalArgCtx : formalArgListCtx.formalArg()) {
             String name = formalArgCtx.ID().getText();
-            PMLParser.VariableTypeContext varTypeContext = formalArgCtx.formalArgType().variableType();
+            PMLParser.VariableTypeContext varTypeContext = formalArgCtx.variableType();
 
             // check that a formalArg does not clash with an already defined variable
             if (visitorCtx.scope().variableExists(name) || argNames.contains(name)) {
@@ -134,6 +98,8 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
                         formalArgCtx,
                         String.format("formal arg '%s' already defined in scope", name)
                 );
+
+                return null;
             }
 
             Type type = Type.toType(varTypeContext);
@@ -145,18 +111,11 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         return formalArguments;
     }
 
-    private Type parseReturnType(PMLParser.FuncReturnTypeContext funcReturnTypeCtx) {
-        if (funcReturnTypeCtx == null) {
+    private Type parseReturnType(PMLParser.VariableTypeContext variableTypeContext) {
+        if (variableTypeContext == null) {
             return Type.voidType();
         }
 
-        if (funcReturnTypeCtx instanceof PMLParser.VariableReturnTypeContext varReturnTypeCtx) {
-            PMLParser.VariableTypeContext varTypeCtx = varReturnTypeCtx.variableType();
-            return Type.toType(varTypeCtx);
-        } else if (funcReturnTypeCtx instanceof PMLParser.VoidReturnTypeContext) {
-            return Type.voidType();
-        }
-
-        return Type.any();
+        return Type.toType(variableTypeContext);
     }
 }

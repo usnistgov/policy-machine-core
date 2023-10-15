@@ -119,7 +119,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
             // create pc target oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
             String pcTarget = AdminPolicy.policyClassTargetName(name);
             if (!nodeExists(pcTarget)) {
-                createNodeInternal(pcTarget, OA, properties);
+                createNodeInternal(pcTarget, OA, new HashMap<>());
             }
 
             List<String> parents = getParentsInternal(pcTarget);

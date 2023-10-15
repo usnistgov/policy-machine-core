@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.policy.pml.compiler;
 
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.io.Serializable;
 import java.util.Objects;

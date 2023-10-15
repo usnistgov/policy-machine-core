@@ -1,13 +1,19 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.ErrorExpression;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.statement.VarStatement;
 
-public class VarStmtVisitor extends PMLBaseVisitor<VarStatement> {
+import gov.nist.csd.pm.policy.pml.statement.*;
+import gov.nist.csd.pm.policy.pml.type.Type;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -16,29 +22,102 @@ public class VarStmtVisitor extends PMLBaseVisitor<VarStatement> {
     }
 
     @Override
-    public VarStatement visitVariableDeclarationStatement(PMLParser.VariableDeclarationStatementContext ctx) {
-        String varName = ctx.ID().getText();
-        PMLParser.ExpressionContext expressionCtx = ctx.expression();
-        Expression expr = Expression.compile(visitorCtx, expressionCtx);
-        boolean isConst = ctx.CONST() != null;
+    public PMLStatement visitConstDeclaration(PMLParser.ConstDeclarationContext ctx) {
+        List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
+        for (PMLParser.ConstSpecContext constSpecContext : ctx.constSpec()) {
+            String varName = constSpecContext.ID().getText();
+            Expression expr = Expression.compile(visitorCtx, constSpecContext.expression(), Type.any());
 
-        VarStatement varStatement = new VarStatement(varName, expr, isConst);
+            try {
+                if (visitorCtx.scope().variableExists(varName) && visitorCtx.scope().getVariable(varName).isConst()) {
+                    visitorCtx.errorLog().addError(ctx, "cannot reassign const variable");
 
-        try {
-            if (ctx.CONST() == null && ctx.LET() == null
-                    && (visitorCtx.scope().variableExists(varName) && visitorCtx.scope().getVariable(varName).isConst())) {
-                    visitorCtx.errorLog().addError(
-                            ctx,
-                            "cannot reassign const variable"
-                    );
-                    return varStatement;
+                    return new ErrorStatement(ctx);
+                }
+
+                visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), true);
+            } catch (PMLScopeException e) {
+                visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+                return new ErrorStatement(ctx);
             }
 
-            visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), isConst);
-        } catch (PMLScopeException e) {
-            visitorCtx.errorLog().addError(ctx, e.getMessage());
+            decls.add(new VariableDeclarationStatement.Declaration(varName, expr));
         }
 
-        return varStatement;
+        return new VariableDeclarationStatement(true, decls);
+    }
+
+    @Override
+    public PMLStatement visitVarDeclaration(PMLParser.VarDeclarationContext ctx) {
+        List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
+        for (PMLParser.VarSpecContext varSpecContext : ctx.varSpec()) {
+            String varName = varSpecContext.ID().getText();
+            Expression expr = Expression.compile(visitorCtx, varSpecContext.expression(), Type.any());
+
+            try {
+                visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), false);
+            } catch (PMLScopeException e) {
+                visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+                return new ErrorStatement(ctx);
+            }
+
+            decls.add(new VariableDeclarationStatement.Declaration(varName, expr));
+        }
+
+        return new VariableDeclarationStatement(false, decls);
+    }
+
+    @Override
+    public PMLStatement visitShortDeclaration(PMLParser.ShortDeclarationContext ctx) {
+        String varName = ctx.ID().getText();
+        Expression expr = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+
+        ShortDeclarationStatement stmt = new ShortDeclarationStatement(varName, expr);
+
+        try {
+            if (visitorCtx.scope().variableExists(varName)) {
+                visitorCtx.errorLog().addError(ctx, "variable " + varName + " already exists");
+
+                return new ErrorStatement(ctx);
+            }
+
+            visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), false);
+        } catch (PMLScopeException e) {
+            visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+            return new ErrorStatement(ctx);
+        }
+
+        return stmt;
+    }
+
+    @Override
+    public PMLStatement visitVariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
+        String varName = ctx.ID().getText();
+        Expression expr = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+
+        VariableAssignmentStatement stmt = new VariableAssignmentStatement(
+                varName,
+                ctx.PLUS() != null,
+                expr
+        );
+
+        try {
+           if (visitorCtx.scope().getVariable(varName).isConst()) {
+                visitorCtx.errorLog().addError(ctx, "cannot reassign const variable");
+
+                return new ErrorStatement(ctx);
+            }
+
+            // don't need to update variable since the name and type are the only thing that matter during compilation
+        } catch (PMLScopeException e) {
+            visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+            return new ErrorStatement(ctx);
+        }
+
+        return stmt;
     }
 }

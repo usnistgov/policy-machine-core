@@ -1,13 +1,12 @@
 package gov.nist.csd.pm.epp;
 
 import gov.nist.csd.pm.pdp.PolicyReviewer;
-import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.events.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.Subject;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 
 public class EventContext {
 
@@ -54,7 +53,7 @@ public class EventContext {
             return false;
         }
 
-        EventSubject patternSubject = pattern.getSubject();
+        Subject patternSubject = pattern.getSubject();
         Target patternTarget = pattern.getTarget();
 
         return patternSubject.matches(userCtx, policyReviewer) &&

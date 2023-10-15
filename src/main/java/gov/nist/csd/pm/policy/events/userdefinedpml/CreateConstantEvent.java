@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.events.userdefinedpml;
 
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.util.Objects;
 

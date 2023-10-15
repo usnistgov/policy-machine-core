@@ -1,10 +1,11 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLBaseVisitor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
+import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.ForeachStatement;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
@@ -12,7 +13,7 @@ import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
+public class ForeachStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     private final VisitorContext visitorCtx;
 
@@ -21,52 +22,55 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
     }
 
     @Override
-    public ForeachStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
-        Type anyArrayType = Type.array(Type.any());
-        Type anyMapType = Type.map(Type.any(), Type.any());
+    public PMLStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
+        boolean isMapFor = ctx.value != null;
 
-        Expression iter = Expression.compile(visitorCtx, ctx.expression(), anyArrayType, anyMapType);
-        Type iterType = Type.any();
+        Expression iter;
+        if (isMapFor) {
+            iter = Expression.compile(visitorCtx, ctx.expression(), Type.map(Type.any(), Type.any()));
+        } else {
+            iter = Expression.compile(visitorCtx, ctx.expression(), Type.array(Type.any()));
+        }
+
+        Type iterType;
         try {
             iterType = iter.getType(visitorCtx.scope());
         } catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+            return new ErrorStatement(ctx);
         }
 
         String varName = ctx.key.getText();
         String mapValueVarName = null;
-        if (ctx.mapValue != null) {
-            if (!iterType.equals(Type.map(Type.any(), Type.any()))) {
-                visitorCtx.errorLog().addError(
-                        ctx,
-                        "use of key, value in foreach only available for maps"
-                );
-            } else {
-                mapValueVarName = ctx.mapValue.getText();
-            }
+        if (isMapFor) {
+            mapValueVarName = ctx.value.getText();
         }
 
         List<PMLStatement> block = new ArrayList<>();
         Type keyType;
         Type valueType = null;
-        if (iterType.equals(anyArrayType)) {
-            keyType = iterType.getArrayType();
-        } else {
+        if (isMapFor) {
             keyType = iterType.getMapKeyType();
             valueType = iterType.getMapValueType();
+        } else {
+            keyType = iterType.getArrayElementType();
         }
 
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
-            try {
-                localVisitorCtx.scope().addVariable(varName, keyType, false);
-                if (valueType != null) {
-                    localVisitorCtx.scope().addVariable(mapValueVarName, valueType, false);
-                }
-            }catch (PMLScopeException e) {
-                visitorCtx.errorLog().addError(ctx, e.getMessage());
-            }
 
+        try {
+            localVisitorCtx.scope().addVariable(varName, keyType, false);
+            if (valueType != null) {
+                localVisitorCtx.scope().addVariable(mapValueVarName, valueType, false);
+            }
+        }catch (PMLScopeException e) {
+            visitorCtx.errorLog().addError(ctx, e.getMessage());
+
+            return new ErrorStatement(ctx);
+        }
+
+        for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
             PMLStatement statement = new StatementVisitor(localVisitorCtx)
                     .visitStatement(stmtCtx);
             block.add(statement);

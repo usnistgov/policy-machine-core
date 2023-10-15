@@ -3,17 +3,14 @@ package gov.nist.csd.pm.pap.mysql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PolicyStore;
-import gov.nist.csd.pm.policy.PolicyDeserializer;
-import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMLConstantAlreadyDefinedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -155,7 +152,7 @@ public class MysqlPolicyStore extends PolicyStore implements Verifier {
     @Override
     public void verifyAdminPolicyConstant(AdminPolicyNode constant) throws PMException {
         try {
-            userDefinedPML.createConstant(constant.constantName(), new Value(constant.nodeName()));
+            userDefinedPML.createConstant(constant.constantName(), new StringValue(constant.nodeName()));
         } catch (PMLConstantAlreadyDefinedException e) {
             // ignore this exception as the admin policy constant already existing is not an error
         }

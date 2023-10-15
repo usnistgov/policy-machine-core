@@ -4,7 +4,8 @@ import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AdminAccessRights;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,11 +17,11 @@ public class PMLContext {
         Map<String, Value> constants = policy.userDefinedPML().getConstants();
 
         for (String ar : AdminAccessRights.allAdminAccessRights()) {
-            constants.put(ar, new Value(ar));
+            constants.put(ar, new StringValue(ar));
         }
 
         for (String ar : AdminAccessRights.wildcardAccessRights()) {
-            constants.put(ar, new Value(ar));
+            constants.put(ar, new StringValue(ar));
         }
 
         return new PMLContext(functions, constants);

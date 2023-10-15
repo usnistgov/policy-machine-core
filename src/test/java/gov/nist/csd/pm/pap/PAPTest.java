@@ -3,6 +3,21 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
+import gov.nist.csd.pm.policy.model.obligation.event.*;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.UserAttributesSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.UsersSubject;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInUnionTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.OnTargets;
+import gov.nist.csd.pm.policy.pml.expression.*;
+import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
+import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.policy.pml.statement.CreateNonPCStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
+import gov.nist.csd.pm.policy.pml.value.VoidValue;
 import gov.nist.csd.pm.util.PolicyEquals;
 import gov.nist.csd.pm.util.SamplePolicy;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
@@ -18,18 +33,11 @@ import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationExcept
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
-import gov.nist.csd.pm.policy.model.obligation.event.EventSubject;
-import gov.nist.csd.pm.policy.model.obligation.event.Performs;
-import gov.nist.csd.pm.policy.model.obligation.event.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.pml.model.expression.*;
-import gov.nist.csd.pm.policy.pml.model.function.FormalArgument;
-import gov.nist.csd.pm.policy.pml.statement.CreateAttrStatement;
+import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -38,12 +46,11 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.SuperUserBootstrapper.SUPER_USER;
+import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
-import static gov.nist.csd.pm.util.PMLEquals.check;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest {
@@ -83,8 +90,8 @@ public abstract class PAPTest {
         @Test
         void testErrorDuringDeserializationCausesRollback() throws PMException {
             String pml = """
-                    create pc 'pc1'
-                    create ua 'ua1' in ['pc2']
+                    create pc "pc1"
+                    create ua "ua1" assign to ["pc2"]
                     """;
 
             assertThrows(PMException.class, () -> pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer()));
@@ -94,110 +101,119 @@ public abstract class PAPTest {
 
         private static final String input = """
             const testConst = "hello world"
-            function testFunc() void {
+            function testFunc() {
                 create pc "pc1"
             }
             
-            create policy class 'super_policy'
-            create user attribute 'super_ua' in ['super_policy']
-            associate 'super_ua' and ADMIN_POLICY_TARGET with ['*']
-            associate 'super_ua' and POLICY_CLASSES_OA with ['*']
-            associate 'super_ua' and PML_FUNCTIONS_TARGET with ['*']
-            associate 'super_ua' and PML_CONSTANTS_TARGET with ['*']
-            create user attribute 'super_ua1' in ['super_policy']
-            associate 'super_ua' and 'super_ua1' with ['*']
-            create user 'super' in ['super_ua']
-            assign 'super' to ['super_ua1']
+            create policy class "super_policy"
+            create user attribute "super_ua" assign to ["super_policy"]
+            associate "super_ua" and ADMIN_POLICY_TARGET with ["*"]
+            associate "super_ua" and POLICY_CLASSES_OA with ["*"]
+            associate "super_ua" and PML_FUNCTIONS_TARGET with ["*"]
+            associate "super_ua" and PML_CONSTANTS_TARGET with ["*"]
+            create user attribute "super_ua1" assign to ["super_policy"]
+            associate "super_ua" and "super_ua1" with ["*"]
+            create user "super" assign to ["super_ua"]
+            assign "super" to ["super_ua1"]
             
-            set resource access rights ['read', 'write', 'execute']
-            create policy class 'pc1'
-            set properties of 'pc1' to {'k':'v'}
-            create oa 'oa1' in ['pc1']
-            set properties of 'oa1' to {'k1':'v1', 'k2':'v2'}
-            create ua 'ua1' in ['pc1']
-            associate 'ua1' and 'oa1' with ['read', 'write']
-            create prohibition 'p1' deny user attribute 'ua1' access rights ['read'] on union of [!'oa1']
-            create obligation 'obl1' {
-                create rule 'rule1'
+            set resource access rights ["read", "write", "execute"]
+            create policy class "pc1"
+            set properties of "pc1" to {"k":"v"}
+            create oa "oa1" assign to ["pc1"]
+            set properties of "oa1" to {"k1":"v1", "k2":"v2"}
+            create ua "ua1" assign to ["pc1"]
+            associate "ua1" and "oa1" with ["read", "write"]
+            create prohibition "p1" deny user attribute "ua1" access rights ["read"] on union of [!"oa1"]
+            create obligation "obl1" {
+                create rule "rule1"
                 when any user
-                performs ['event1', 'event2']
+                performs ["event1", "event2"]
                 do(evtCtx) {
-                    let event = evtCtx['event']
-                    if equals(event, 'event1') {
-                        create policy class 'e1'
-                    } else if equals(event, 'event2') {
-                        create policy class 'e2'
+                    event := evtCtx["event"]
+                    if equals(event, "event1") {
+                        create policy class "e1"
+                    } else if equals(event, "event2") {
+                        create policy class "e2"
                     }
                 }
             }
             """;
-        private static final String expected = """
-            # constants
-            const testConst = 'hello world'
-                        
-            # functions
-            function testFunc() void {
-                create policy class 'pc1'
-            }
-                        
-            # graph
-            set resource access rights ['read', 'write', 'execute']
-                        
-            # policy class: pm_admin:policy
-            create object attribute 'pc1:target' in [POLICY_CLASSES_OA]
-            create object attribute 'super_policy:target' in [POLICY_CLASSES_OA]
-                        
-            # policy class: super_policy
-            create policy class 'super_policy'
-            create user attribute 'super_ua' in ['super_policy']
-            create user attribute 'super_ua1' in ['super_policy']
-            associate 'super_ua' and 'super_ua1' with ['*']
-            associate 'super_ua' and PML_FUNCTIONS_TARGET with ['*']
-            associate 'super_ua' and POLICY_CLASSES_OA with ['*']
-            associate 'super_ua' and ADMIN_POLICY_TARGET with ['*']
-            associate 'super_ua' and PML_CONSTANTS_TARGET with ['*']
-                        
-            # policy class: pc1
-            create policy class 'pc1'
-            set properties of 'pc1' to {'k': 'v'}
-            create user attribute 'ua1' in ['pc1']
-            create object attribute 'oa1' in ['pc1']
-            set properties of 'oa1' to {'k1': 'v1', 'k2': 'v2'}
-            associate 'ua1' and 'oa1' with ['read', 'write']
-                        
-            # users
-            create user 'super' in ['super_ua', 'super_ua1']
-                        
-            # objects
-                        
-            # prohibitions
-            create prohibition 'p1'
-            deny user attribute 'ua1'
-            access rights ['read']
-            on union of [!'oa1']
-                        
-            # obligations
-            create obligation 'obl1' {
-                create rule 'rule1'
-                when any user
-                performs ['event1', 'event2']
-                on any policy element
-                do (evtCtx) {
-                    let event = evtCtx['event']
-                    if equals(event, 'event1') {
-                        create policy class 'e1'
-                    } else if equals(event, 'event2') {
-                        create policy class 'e2'
-                    }
-                }
-            }
-            """.trim();
+        private static final String expected =
+                 """
+                 // user defined pml functions and constants
+                 const testConst = "hello world"
+                                
+                 function testFunc() {
+                     create PC "pc1"
+                 }
+                                
+                                
+                 // GRAPH
+                 set resource access rights ["read", "write", "execute"]
+                                
+                 // super_policy
+                 create PC "super_policy" {
+                     user attributes {
+                         "super_ua"
+                         "super_ua1"
+                     }
+                     associations {
+                         "super_ua" and "super_ua1" with ["*"]
+                         "super_ua" and ADMIN_POLICY_TARGET with ["*"]
+                         "super_ua" and PML_FUNCTIONS_TARGET with ["*"]
+                         "super_ua" and POLICY_CLASSES_OA with ["*"]
+                         "super_ua" and PML_CONSTANTS_TARGET with ["*"]
+                     }
+                 }
+                                
+                 // pc1
+                 create PC "pc1" with properties {"k": "v"} {
+                     user attributes {
+                         "ua1"
+                     }
+                     object attributes {
+                         "oa1" {"k1": "v1", "k2": "v2"}
+                     }
+                     associations {
+                         "ua1" and "oa1" with ["read", "write"]
+                     }
+                 }
+                                
+                 // users
+                 create U "super" assign to ["super_ua", "super_ua1"]
+                                
+                 // objects
+                                
+                                
+                                
+                 // PROHIBITIONS
+                 create prohibition "p1"
+                   deny UA "ua1"
+                   access rights ["read"]
+                   on union of ["oa1"]
+                                
+                                
+                 // OBLIGATIONS
+                 create obligation "obl1" {
+                     create rule "rule1"
+                     when any user
+                     performs ["event1", "event2"]
+                     on any
+                     do (evtCtx) {
+                         event := evtCtx["event"]
+                         if equals(event, "event1") {
+                             create PC "e1"
+                         } else if equals(event, "event2") {
+                             create PC "e2"
+                         }
+                     }
+                 }\n""";
         @Test
         void testSuccess() throws PMException {
             UserContext userContext = new UserContext(SUPER_USER);
             pap.deserialize(userContext, input, new PMLDeserializer());
             String actual = pap.serialize(new PMLSerializer());
-            assertEquals(new ArrayList<>(), check(expected, actual));
+            assertEquals(expected, actual);
 
             assertThrows(PMException.class, () -> {
                 pap.deserialize(new UserContext("unknown user"), input, new PMLDeserializer());
@@ -218,7 +234,7 @@ public abstract class PAPTest {
             PAP pap2 = new PAP(pap.policyStore);
             pap2.deserialize(userContext, json, new JSONDeserializer());
 
-            PolicyEquals.check(pap1, pap2);
+            PolicyEquals.assertPolicyEquals(pap1, pap2);
         }
 
         @Test
@@ -233,7 +249,7 @@ public abstract class PAPTest {
             PAP pap1 = new PAP(new MemoryPolicyStore());
             pap1.deserialize(userContext, pml, new PMLDeserializer());
 
-            PolicyEquals.check(pap, pap1);
+            PolicyEquals.assertPolicyEquals(pap, pap1);
         }
     }
 
@@ -242,17 +258,16 @@ public abstract class PAPTest {
         try {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            FunctionDefinitionStatement functionDefinitionStatement = new FunctionDefinitionStatement(
-                    "testfunc",
-                    Type.voidType(),
-                    List.of(),
-                    (ctx, policy) -> {
+            FunctionDefinitionStatement functionDefinitionStatement = new FunctionDefinitionStatement.Builder("testfunc")
+                    .returns(Type.voidType())
+                    .args()
+                    .executor((ctx, policy) -> {
                         policy.graph().createPolicyClass("pc3");
-                        return new Value();
-                    }
-            );
+                        return new VoidValue();
+                    })
+                    .build();
 
-            pap.executePML(new UserContext(SUPER_USER), "create ua 'ua3' in ['pc2']\ntestfunc()", functionDefinitionStatement);
+            pap.executePML(new UserContext(SUPER_USER), "create ua \"ua3\" assign to [\"pc2\"]\ntestfunc()", functionDefinitionStatement);
             assertTrue(pap.graph().nodeExists("ua3"));
             assertTrue(pap.graph().nodeExists("pc3"));
         } catch (IOException e) {
@@ -272,48 +287,7 @@ public abstract class PAPTest {
         testAdminPolicy(pap, 1);
     }
 
-    @Test
-    void testBootstrapWithAdminPolicyOnly() throws PMException {
-        pap.bootstrap(p -> {
-            p.graph().createPolicyClass("pc1");
-        });
-
-        testAdminPolicy(pap, 2);
-        assertTrue(pap.graph().nodeExists("pc1"));
-        assertTrue(pap.graph().nodeExists(AdminPolicy.policyClassTargetName("pc1")));
-    }
-
-    @Test
-    void testBootstrapWithExistingPolicyThrowsException() throws PMException {
-        pap.graph().createPolicyClass("pc1");
-        assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pap.bootstrap(new SuperUserBootstrapper());
-        });
-
-        pap.reset();
-
-        pap.graph().setResourceAccessRights(new AccessRightSet("read"));
-        pap.graph().createPolicyClass("pc1");
-        pap.graph().createUserAttribute("ua1", "pc1");
-        pap.graph().createUser("u1", "ua1");
-        pap.graph().createObjectAttribute("oa1", "pc1");
-        pap.graph().createObject("o1", "oa1");
-
-        pap.prohibitions().create("pro1", new ProhibitionSubject("u1", ProhibitionSubject.Type.USER),
-                                  new AccessRightSet("read"), true, new ContainerCondition("oa1", false));
-
-        assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pap.bootstrap(new SuperUserBootstrapper());
-        });
-
-        pap.obligations().create(new UserContext("u1"), "obl1");
-
-        assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pap.bootstrap(new SuperUserBootstrapper());
-        });
-    }
-
-    void testAdminPolicy(PAP pap, int numExpectedPolicyClasses) throws PMException {
+    public static void testAdminPolicy(PAP pap, int numExpectedPolicyClasses) throws PMException {
         assertTrue(pap.graph().nodeExists(AdminPolicyNode.ADMIN_POLICY.nodeName()));
         List<String> children = pap.graph().getChildren(AdminPolicyNode.ADMIN_POLICY.nodeName());
         assertEquals(5, children.size());
@@ -811,7 +785,7 @@ public abstract class PAPTest {
                                          new Rule(
                                                  "rule1",
                                                  new EventPattern(
-                                                         EventSubject.anyUserWithAttribute("ua1"),
+                                                         new UserAttributesSubject("ua1"),
                                                          new Performs("event1")
                                                  ),
                                                  new Response(new UserContext(""))
@@ -819,7 +793,7 @@ public abstract class PAPTest {
                                          new Rule(
                                                  "rule1",
                                                  new EventPattern(
-                                                         EventSubject.users("ua1"),
+                                                         new UsersSubject("ua1"),
                                                          new Performs("event1")
                                                  ),
                                                  new Response(new UserContext(""))
@@ -1541,12 +1515,12 @@ public abstract class PAPTest {
                         new Rule(
                                 "rule1",
                                 new EventPattern(
-                                        EventSubject.anyUser(),
+                                        new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
                                 new Response(
                                         new UserContext("u1"),
-                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new StringLiteral("test_pc"))
                                 )
                         )
                 )
@@ -1559,24 +1533,24 @@ public abstract class PAPTest {
                         new Rule(
                                 "rule1",
                                 new EventPattern(
-                                        EventSubject.anyUser(),
+                                        new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
                                 new Response(
                                         new UserContext("u1"),
-                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new StringLiteral("test_pc"))
                                 )
                         )
                 ).addRule(
                         new Rule(
                                 "rule2",
                                 new EventPattern(
-                                        EventSubject.anyUser(),
+                                        new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
                                 new Response(
                                         new UserContext("u1"),
-                                        new CreatePolicyStatement(new Expression(new VariableReference("test_pc", Type.string())))
+                                        new CreatePolicyStatement(new StringLiteral("test_pc"))
                                 )
                         )
                 );
@@ -1616,9 +1590,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("ua2"),
+                                                     new UsersSubject("ua2"),
                                                      Performs.events("test_event"),
-                                                     Target.anyPolicyElement()
+                                                     new AnyTarget()
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1630,9 +1604,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.anyUserWithAttribute("ua3"),
+                                                     new UserAttributesSubject("ua3"),
                                                      Performs.events("test_event"),
-                                                     Target.anyPolicyElement()
+                                                     new AnyTarget()
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1652,9 +1626,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("u1"),
+                                                     new UsersSubject("u1"),
                                                      Performs.events("test_event"),
-                                                     Target.anyOfSet("oa1")
+                                                     new OnTargets("oa1")
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1666,9 +1640,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("u1"),
+                                                     new UsersSubject("u1"),
                                                      Performs.events("test_event"),
-                                                     Target.policyElement("oa1")
+                                                     new OnTargets("oa1")
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1680,9 +1654,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("u1"),
+                                                     new UsersSubject("u1"),
                                                      Performs.events("test_event"),
-                                                     Target.anyContainedIn("oa1")
+                                                     new AnyInUnionTarget("oa1")
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1741,9 +1715,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("ua2"),
+                                                     new UsersSubject("ua2"),
                                                      Performs.events("test_event"),
-                                                     Target.anyPolicyElement()
+                                                     new AnyTarget()
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1755,9 +1729,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.anyUserWithAttribute("ua2"),
+                                                     new UserAttributesSubject("ua2"),
                                                      Performs.events("test_event"),
-                                                     Target.anyPolicyElement()
+                                                     new AnyTarget()
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1779,9 +1753,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("u1"),
+                                                     new UsersSubject("u1"),
                                                      Performs.events("test_event"),
-                                                     Target.anyOfSet("oa1")
+                                                     new OnTargets("oa1")
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1793,9 +1767,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("u1"),
+                                                     new UsersSubject("u1"),
                                                      Performs.events("test_event"),
-                                                     Target.policyElement("oa1")
+                                                     new OnTargets("oa1")
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1807,9 +1781,9 @@ public abstract class PAPTest {
                                      new Rule(
                                              "rule1",
                                              new EventPattern(
-                                                     EventSubject.users("u1"),
+                                                     new UsersSubject("u1"),
                                                      Performs.events("test_event"),
-                                                     Target.anyContainedIn("oa1")
+                                                     new AnyInUnionTarget("oa1")
                                              ),
                                              new Response(new UserContext("u1"))
                                      )
@@ -1918,27 +1892,26 @@ public abstract class PAPTest {
         @Nested
         class CreateFunction {
 
-            FunctionDefinitionStatement testFunc = new FunctionDefinitionStatement(
-                    "testFunc",
-                    Type.string(),
-                    Arrays.asList(
+            FunctionDefinitionStatement testFunc = new FunctionDefinitionStatement.Builder("testFunc")
+                    .returns(Type.string())
+                    .args(
                             new FormalArgument("arg1", Type.string()),
                             new FormalArgument("arg2", Type.array(Type.string()))
-                    ),
-                    Arrays.asList(
-                            new CreatePolicyStatement(new Expression(new VariableReference("pc1", Type.string()))),
-                            new CreateAttrStatement(
-                                    new Expression(new VariableReference("ua1", Type.string())),
+                    )
+                    .body(
+                            new CreatePolicyStatement(new StringLiteral("pc1")),
+                            new CreateNonPCStatement(
+                                    new StringLiteral("ua1"),
                                     UA,
-                                    new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("pc1", Type.string()))}, Type.string())))
+                                    new ArrayLiteral(new Expression[]{new StringLiteral("pc1")}, Type.string())
                             ),
-                            new CreateAttrStatement(
-                                    new Expression(new VariableReference("oa1", Type.string())),
+                            new CreateNonPCStatement(
+                                    new StringLiteral("oa1"),
                                     OA,
-                                    new Expression(new Literal(new ArrayLiteral(new Expression[]{new Expression(new VariableReference("pc1", Type.string()))}, Type.string())))
+                                    new ArrayLiteral(new Expression[]{new StringLiteral("pc1")}, Type.string())
                             )
                     )
-            );
+                    .build();
 
             @Test
             void testPMLFunctionAlreadyDefinedException() throws PMException {
@@ -1965,7 +1938,7 @@ public abstract class PAPTest {
 
             @Test
             void testSuccess() throws PMException {
-                pap.userDefinedPML().createFunction(new FunctionDefinitionStatement("testFunc", Type.voidType(), List.of(), List.of()));
+                pap.userDefinedPML().createFunction(new FunctionDefinitionStatement.Builder("testFunc").returns(Type.voidType()).build());
                 assertTrue(pap.userDefinedPML().getFunctions().containsKey("testFunc"));
                 pap.userDefinedPML().deleteFunction("testFunc");
                 assertFalse(pap.userDefinedPML().getFunctions().containsKey("testFunc"));
@@ -1977,8 +1950,8 @@ public abstract class PAPTest {
 
             @Test
             void testSuccess() throws PMException {
-                FunctionDefinitionStatement testFunc1 = new FunctionDefinitionStatement("testFunc1", Type.voidType(), List.of(), List.of());
-                FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement("testFunc2", Type.voidType(), List.of(), List.of());
+                FunctionDefinitionStatement testFunc1 = new FunctionDefinitionStatement.Builder("testFunc1").returns(Type.voidType()).build();
+                FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement.Builder("testFunc2").returns(Type.voidType()).build();
 
                 pap.userDefinedPML().createFunction(testFunc1);
                 pap.userDefinedPML().createFunction(testFunc2);
@@ -2005,8 +1978,8 @@ public abstract class PAPTest {
 
             @Test
             void testSuccess() throws PMException {
-                FunctionDefinitionStatement testFunc1 = new FunctionDefinitionStatement("testFunc1", Type.voidType(), List.of(), List.of());
-                FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement("testFunc2", Type.voidType(), List.of(), List.of());
+                FunctionDefinitionStatement testFunc1 = new FunctionDefinitionStatement.Builder("testFunc1").returns(Type.voidType()).build();
+                FunctionDefinitionStatement testFunc2 = new FunctionDefinitionStatement.Builder("testFunc2").returns(Type.voidType()).build();
 
                 pap.userDefinedPML().createFunction(testFunc1);
                 pap.userDefinedPML().createFunction(testFunc2);
@@ -2028,13 +2001,14 @@ public abstract class PAPTest {
 
             @Test
             void testPMLConstantAlreadyDefinedException() throws PMException {
-                pap.userDefinedPML().createConstant("const1", new Value("test"));
-                assertThrows(PMLConstantAlreadyDefinedException.class, () -> pap.userDefinedPML().createConstant("const1", new Value("test")));
+                pap.userDefinedPML().createConstant("const1", new StringValue("test"));
+                assertThrows(PMLConstantAlreadyDefinedException.class,
+                             () -> pap.userDefinedPML().createConstant("const1", new StringValue("test")));
             }
 
             @Test
             void testSuccess() throws PMException {
-                Value expected = new Value("test");
+                StringValue expected = new StringValue("test");
 
                 pap.userDefinedPML().createConstant("const1", expected);
                 assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
@@ -2053,7 +2027,7 @@ public abstract class PAPTest {
 
             @Test
             void testSuccess() throws PMException {
-                pap.userDefinedPML().createConstant("const1", new Value("test"));
+                pap.userDefinedPML().createConstant("const1", new StringValue("test"));
                 assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
                 pap.userDefinedPML().deleteConstant("const1");
                 assertFalse(pap.userDefinedPML().getConstants().containsKey("const1"));
@@ -2065,8 +2039,8 @@ public abstract class PAPTest {
 
             @Test
             void success() throws PMException {
-                Value const1 = new Value("test1");
-                Value const2 = new Value("test2");
+                StringValue const1 = new StringValue("test1");
+                StringValue const2 = new StringValue("test2");
 
                 pap.userDefinedPML().createConstant("const1", const1);
                 pap.userDefinedPML().createConstant("const2", const2);
@@ -2093,8 +2067,8 @@ public abstract class PAPTest {
 
             @Test
             void success() throws PMException {
-                Value const1 = new Value("test1");
-                Value const2 = new Value("test2");
+                StringValue const1 = new StringValue("test1");
+                StringValue const2 = new StringValue("test2");
 
                 pap.userDefinedPML().createConstant("const1", const1);
                 pap.userDefinedPML().createConstant("const2", const2);
@@ -2143,7 +2117,7 @@ public abstract class PAPTest {
 
                     pap.obligations().create(new UserContext("u1"), "obl1");
 
-                    pap.userDefinedPML().createConstant("const1", new Value("value"));
+                    pap.userDefinedPML().createConstant("const1", new StringValue("value"));
                 });
 
                 assertEquals(new AccessRightSet("read"), pap.graph().getResourceAccessRights());
@@ -2175,7 +2149,7 @@ public abstract class PAPTest {
 
                         pap.obligations().create(new UserContext("u1"), "obl1");
 
-                        pap.userDefinedPML().createConstant("const1", new Value("value"));
+                        pap.userDefinedPML().createConstant("const1", new StringValue("value"));
 
                         pap.graph().createPolicyClass("pc1");
                     });
@@ -2206,14 +2180,14 @@ public abstract class PAPTest {
                                           new ContainerCondition("oa1", false)
                 );
 
-                pap.userDefinedPML().createConstant("const1", new Value("value"));
+                pap.userDefinedPML().createConstant("const1", new StringValue("value"));
 
                 assertThrows(PMException.class, () -> {
                     pap.runTx((tx) -> {
                         pap.graph().createPolicyClass("pc2");
                         pap.prohibitions().delete("deny-ua1");
                         pap.obligations().create(new UserContext("u1"), "obl1");
-                        pap.userDefinedPML().createConstant("const2", new Value("value"));
+                        pap.userDefinedPML().createConstant("const2", new StringValue("value"));
                         pap.prohibitions().create("deny-ua1", new ProhibitionSubject("ua2", ProhibitionSubject.Type.USER_ATTRIBUTE),
                                                   new AccessRightSet("read"), true,
                                                   new ContainerCondition("oa1", false)
@@ -2256,7 +2230,7 @@ public abstract class PAPTest {
 
                 pap.obligations().create(new UserContext("u1"), "obl1");
 
-                pap.userDefinedPML().createConstant("const1", new Value("value"));
+                pap.userDefinedPML().createConstant("const1", new StringValue("value"));
 
                 assertThrows(PMException.class, () -> {
                     pap.runTx((tx) -> {
@@ -2299,7 +2273,7 @@ public abstract class PAPTest {
 
                 pap.obligations().create(new UserContext("u1"), "obl1");
 
-                pap.userDefinedPML().createConstant("const1", new Value("value"));
+                pap.userDefinedPML().createConstant("const1", new StringValue("value"));
 
                 assertThrows(PMException.class, () -> {
                     pap.runTx((tx) -> {
@@ -2311,8 +2285,8 @@ public abstract class PAPTest {
                         pap.obligations().delete("obl1");
                         pap.obligations().create(new UserContext("u2"), "obl1");
 
-                        pap.userDefinedPML().createConstant("const2", new Value("value"));
-                        pap.userDefinedPML().createConstant("const1", new Value("value"));
+                        pap.userDefinedPML().createConstant("const2", new StringValue("value"));
+                        pap.userDefinedPML().createConstant("const1", new StringValue("value"));
                     });
                 });
 

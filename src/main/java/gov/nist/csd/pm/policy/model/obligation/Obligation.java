@@ -2,10 +2,7 @@ package gov.nist.csd.pm.policy.model.obligation;
 
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.pml.model.expression.Literal;
 import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
-import gov.nist.csd.pm.policy.pml.statement.CreateRuleStatement;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
 
 import java.io.Serializable;
 import java.util.ArrayList;

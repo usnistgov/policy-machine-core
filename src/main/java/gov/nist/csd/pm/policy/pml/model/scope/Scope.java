@@ -3,9 +3,10 @@ package gov.nist.csd.pm.policy.pml.model.scope;
 import gov.nist.csd.pm.policy.pml.PMLBuiltinFunctions;
 import gov.nist.csd.pm.policy.pml.PMLContext;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
-import gov.nist.csd.pm.policy.pml.model.expression.Type;
-import gov.nist.csd.pm.policy.pml.model.expression.Value;
-import gov.nist.csd.pm.policy.pml.statement.Expression;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
@@ -117,7 +118,10 @@ public class Scope implements Serializable {
         if (mode == Mode.COMPILE) {
             Map<String, Value> constants = pmlCtx.getConstants();
             for (Map.Entry<String, Value> constant : constants.entrySet()) {
-                variables.put(constant.getKey(), new Variable(constant.getKey(), Type.string(), true));
+                String id = constant.getKey();
+                Type type = constant.getValue().getType();
+
+                variables.put(id, new Variable(id, type, true));
             }
         }
     }
@@ -149,12 +153,21 @@ public class Scope implements Serializable {
         throw new UnknownFunctionInScopeException(name);
     }
 
+    public boolean functionExists(String name) {
+        try {
+            getFunction(name);
+            return true;
+        } catch (UnknownFunctionInScopeException e) {
+            return false;
+        }
+    }
+
     public void removeFunction(String name) {
         functions.remove(name);
     }
 
     public void addVariable(String name, Type type, boolean isConst) throws VariableAlreadyDefinedInScopeException {
-        if (constantExists(name)) {
+        if (variableExists(name)) {
             throw new VariableAlreadyDefinedInScopeException(name);
         }
 
@@ -183,15 +196,31 @@ public class Scope implements Serializable {
         return true;
     }
 
-    public void putValue(String name, Value value) {
+    public void addValue(String name, Value value) throws VariableAlreadyDefinedInScopeException {
+        if (this.values.containsKey(name)) {
+            throw new VariableAlreadyDefinedInScopeException(name);
+        }
+
         this.values.put(name, value);
+    }
+
+    public void updateValue(String name, Value value) throws UnknownVariableInScopeException {
+        if (!this.values.containsKey(name)) {
+            throw new UnknownVariableInScopeException(name);
+        }
+
+        this.values.put(name, value);
+    }
+
+    public boolean valueExists(String id) {
+        return values.containsKey(id);
     }
 
     public Value getValue(String name) throws UnknownVariableInScopeException {
         if (values.containsKey(name)) {
-            return values.get(name);
+           return values.get(name);
         }else if (resourceAccessRights.contains(name)) {
-            return new Value(name);
+            return new StringValue(name);
         }
 
         throw new UnknownVariableInScopeException(name);
