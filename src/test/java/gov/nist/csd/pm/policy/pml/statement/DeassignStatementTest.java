@@ -46,15 +46,12 @@ class DeassignStatementTest {
         );
 
         assertEquals(
-                """
-                        deassign "ua3" from ["ua1", "ua2"]""",
+                "deassign \"ua3\" from [\"ua1\", \"ua2\"]",
                 stmt.toFormattedString(0)
         );
         assertEquals(
-                """
-                            deassign "ua3" from ["ua1", "ua2"]
-                        """,
-                stmt.toFormattedString(1) + "\n"
+                "    deassign \"ua3\" from [\"ua1\", \"ua2\"]",
+                stmt.toFormattedString(1)
         );
     }
 

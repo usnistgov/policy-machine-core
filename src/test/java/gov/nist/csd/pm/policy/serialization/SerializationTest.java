@@ -63,17 +63,16 @@ public class SerializationTest {
 
     @Test
     void testJSONAndPMLWithFunctionsAndConstants() throws PMException {
-        String pml = """
-                function f1() {
-                    f2()
-                }
-                
-                function f2() {
-                    create pc a
-                }
-                
-                const a = "a"
-                """;
+        String pml =
+                "function f1() {\n" +
+                "    f2()\n" +
+                "}\n" +
+                "\n" +
+                "function f2() {\n" +
+                "    create pc a\n" +
+                "}\n" +
+                "\n" +
+                "const a = \"a\"";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext("u1"), pml);
 

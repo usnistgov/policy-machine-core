@@ -44,9 +44,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testVoidReturnType() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                voidFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "voidFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
                                                                       .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc.getSignature())));
 
@@ -81,9 +79,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testFunctionNotInScope() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                voidFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "voidFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
@@ -96,9 +92,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testWrongNumberOfArgs() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                voidFunc("a")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "voidFunc(\"a\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
                                                                       .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc.getSignature())));
         FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
@@ -112,9 +106,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testWrongArgType() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                voidFunc("a", ["b", "c"])
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "voidFunc(\"a\", [\"b\", \"c\"])", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
                                                                       .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc.getSignature())));
 
@@ -141,9 +133,7 @@ class FunctionInvokeExpressionTest {
                 .build();
 
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                stringFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "stringFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
                                                                       .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc.getSignature())));
 
@@ -168,9 +158,7 @@ class FunctionInvokeExpressionTest {
                 })
                 .build();
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                stringFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "stringFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
                            .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc.getSignature()))
@@ -198,25 +186,24 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testChainMethodCall() throws PMException {
-        String pml = """
-                a("123")
-                
-                function c(string x) string {
-                    return "c" + x
-                }
-                                
-                function b(string x, string y) {
-                    create policy class c(x)
-                    create policy class c(y)
-                }
-                                
-                function a(string x) {
-                    x = "x"
-                    y := "y"
-                                
-                    b(x, y)
-                }
-                """;
+        String pml =
+                "a(\"123\")\n" +
+                "                \n" +
+                "                function c(string x) string {\n" +
+                "                    return \"c\" + x\n" +
+                "                }\n" +
+                "                                \n" +
+                "                function b(string x, string y) {\n" +
+                "                    create policy class c(x)\n" +
+                "                    create policy class c(y)\n" +
+                "                }\n" +
+                "                                \n" +
+                "                function a(string x) {\n" +
+                "                    x = \"x\"\n" +
+                "                    y := \"y\"\n" +
+                "                                \n" +
+                "                    b(x, y)\n" +
+                "                }";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
         assertTrue(store.graph().nodeExists("cx"));
@@ -225,15 +212,14 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testReassignArgValueInFunctionDoesNotUpdateVariableOutsideOfScope() throws PMException {
-        String pml = """
-                x := "test"
-                a(x)
-                create pc x
-                                 
-                function a(string x) {
-                    x = "x"                               
-                }
-                """;
+        String pml =
+                "x := \"test\"\n" +
+                "a(x)\n" +
+                "create pc x\n" +
+                "                 \n" +
+                "function a(string x) {\n" +
+                "    x = \"x\"                               \n" +
+                "}";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
         assertFalse(store.graph().nodeExists("x"));
@@ -242,17 +228,16 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testReturnInIf() throws PMException {
-        String pml = """            
-                function a() {
-                    if true {
-                        return
-                    }
-                    
-                    create pc "pc1"                               
-                }
-                
-                a()
-                """;
+        String pml =
+                "function a() {\n" +
+                "    if true {\n" +
+                "        return\n" +
+                "    }\n" +
+                "    \n" +
+                "    create pc \"pc1\"\n" +
+                "}\n" +
+                "\n" +
+                "a()";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
         assertFalse(store.graph().nodeExists("pc1"));

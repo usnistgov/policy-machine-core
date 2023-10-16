@@ -37,11 +37,9 @@ class FunctionDefinitionVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    return "test"
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    return \"test\"\n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of(testSignature.getFunctionName(), testSignature))
@@ -65,11 +63,9 @@ class FunctionDefinitionVisitorTest {
 
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a) { 
-                    
-                }
-                """,
+                "function func1(string a) { \n" +
+                        "                    \n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of("func1", new FunctionSignature("func1", Type.voidType(), List.of(new FormalArgument("a", Type.string())))))
@@ -92,15 +88,13 @@ class FunctionDefinitionVisitorTest {
     @Test
     void testNotAllPathsReturn() throws PMException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    if true {
-                        return "test"
-                    } else {
-                    
-                    }
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    if true {\n" +
+                        "                        return \"test\"\n" +
+                        "                    } else {\n" +
+                        "                    \n" +
+                        "                    }\n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of(testSignature.getFunctionName(), testSignature))
@@ -114,13 +108,11 @@ class FunctionDefinitionVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    foreach x in c {
-                        return
-                    }
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    foreach x in c {\n" +
+                        "                        return\n" +
+                        "                    }\n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of(testSignature.getFunctionName(), testSignature))
@@ -134,11 +126,9 @@ class FunctionDefinitionVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    \n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of(testSignature.getFunctionName(), testSignature))
@@ -155,11 +145,9 @@ class FunctionDefinitionVisitorTest {
     @Test
     void testReturnVoidWhenReturnValueIsString() throws PMException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    return
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    return\n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of(testSignature.getFunctionName(), testSignature))
@@ -176,11 +164,9 @@ class FunctionDefinitionVisitorTest {
     @Test
     void testWrongTypeOfReturnValue() throws PMException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    return false
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    return false\n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()).withPersistedFunctions(Map.of(testSignature.getFunctionName(), testSignature))
@@ -199,11 +185,9 @@ class FunctionDefinitionVisitorTest {
 
         @Test
         void testDuplicateFormalArgNames() throws PMException {
-            String pml = """
-                    function func1(string a, bool a) string {
-                        return ""
-                    }
-                    """;
+            String pml = "function func1(string a, bool a) string {\n" +
+                    "                        return \"\"\n" +
+                    "                    }";
             PMLCompilationException e =
                     assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
             assertEquals(1, e.getErrors().size());

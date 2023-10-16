@@ -3,6 +3,7 @@ package gov.nist.csd.pm.policy.model.graph.nodes;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Stores information needed for a node.
@@ -71,26 +72,22 @@ public class Node implements Serializable {
         this.properties = properties;
     }
 
-    /**
-     * Two nodes are equal if their IDs are the same.
-     *
-     * @param o The object to check for equality.
-     * @return true if the two objects are the same, false otherwise.
-     */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Node n)) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        return this.name.equals(n.name)
-                && this.type.equals(n.type)
-                && this.properties.equals(n.properties);
+        Node node = (Node) o;
+        return Objects.equals(name, node.name) && type == node.type && Objects.equals(
+                properties, node.properties);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, type, properties);
     }
 
     @Override

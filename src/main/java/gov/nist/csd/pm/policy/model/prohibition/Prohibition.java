@@ -99,8 +99,9 @@ public class Prohibition implements Serializable {
                 accessRightSet, that.accessRightSet);
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, subject, containers, accessRightSet, intersection);
     }
 
     @Override

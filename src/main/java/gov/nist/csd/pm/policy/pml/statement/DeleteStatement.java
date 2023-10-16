@@ -51,15 +51,15 @@ public class DeleteStatement extends PMLStatement {
     public String toFormattedString(int indentLevel) {
         String typeStr = "";
         switch (type) {
-            case PROHIBITION -> typeStr = "prohibition";
-            case OBLIGATION -> typeStr = "obligation";
-            case POLICY_CLASS -> typeStr = "PC";
-            case OBJECT_ATTRIBUTE -> typeStr = "OA";
-            case USER_ATTRIBUTE -> typeStr = "UA";
-            case OBJECT -> typeStr = "O";
-            case USER -> typeStr = "U";
-            case FUNCTION -> typeStr = "function";
-            case CONST -> typeStr = "const";
+            case PROHIBITION: typeStr = "prohibition"; break;
+            case OBLIGATION: typeStr = "obligation"; break;
+            case POLICY_CLASS: typeStr = "PC"; break;
+            case OBJECT_ATTRIBUTE: typeStr = "OA"; break;
+            case USER_ATTRIBUTE: typeStr = "UA"; break;
+            case OBJECT: typeStr = "O"; break;
+            case USER: typeStr = "U"; break;
+            case FUNCTION: typeStr = "function"; break;
+            case CONST: typeStr = "const"; break;
         }
 
         return indent(indentLevel) + String.format("delete %s %s", typeStr, expression);

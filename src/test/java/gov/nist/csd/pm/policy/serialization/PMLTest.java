@@ -39,9 +39,7 @@ class PMLTest {
 
     @Test
     void testDeserializationWithCustomFunctions() throws IOException, PMException {
-        String pml = """
-               testFunc("hello world")
-               """;
+        String pml = "testFunc(\"hello world\")";
 
         PMLDeserializer pmlDeserializer = new PMLDeserializer();
 

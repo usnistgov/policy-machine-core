@@ -47,16 +47,12 @@ class DeleteRuleStatementTest {
                 new StringLiteral("rule1"), new StringLiteral("obl1"));
 
         assertEquals(
-                """
-                        delete rule "rule1" from obligation "obl1"
-                        """,
-                stmt.toFormattedString(0) + "\n"
+                "delete rule \"rule1\" from obligation \"obl1\"",
+                stmt.toFormattedString(0)
         );
         assertEquals(
-                """
-                            delete rule "rule1" from obligation "obl1"
-                        """,
-                stmt.toFormattedString(1) + "\n"
+                "    delete rule \"rule1\" from obligation \"obl1\"",
+                stmt.toFormattedString(1)
         );
     }
 

@@ -52,7 +52,8 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         }
 
         PMLStatement lastStmt = statements.get(statements.size() - 1);
-        if (lastStmt instanceof FunctionReturnStatement functionReturnStatement) {
+        if (lastStmt instanceof FunctionReturnStatement) {
+            FunctionReturnStatement functionReturnStatement = (FunctionReturnStatement) lastStmt;
             if (!functionReturnStatement.matchesReturnType(returnType, visitorCtx.scope())) {
                 throw new PMException("return statement \"" + functionReturnStatement + "\" does not match return type " + returnType);
             }
@@ -66,7 +67,9 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         for (int i = 0; i < statements.size(); i++) {
             pmlStatement = statements.get(i);
 
-            if (pmlStatement instanceof FunctionReturnStatement functionReturnStatement) {
+            if (pmlStatement instanceof FunctionReturnStatement) {
+                FunctionReturnStatement functionReturnStatement = (FunctionReturnStatement) pmlStatement;
+
                 if (i < statements.size() - 1) {
                     throw new PMException("function return should be last statement in block");
                 }
@@ -76,7 +79,9 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
                 }
 
                 return true;
-            } else if (pmlStatement instanceof IfStatement ifStatement) {
+            } else if (pmlStatement instanceof IfStatement) {
+                IfStatement ifStatement = (IfStatement) pmlStatement;
+
                 if (!allIfStatementPathsReturned(ifStatement, returnType)) {
                     return false;
                 } else {
@@ -112,7 +117,22 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         return true;
     }
 
-    record Result(boolean allPathsReturned, List<PMLStatement> stmts) {
+    class Result {
 
+        private final boolean allPathsReturned;
+        private final List<PMLStatement> stmts;
+
+        public Result(boolean allPathsReturned, List<PMLStatement> stmts) {
+            this.allPathsReturned = allPathsReturned;
+            this.stmts = stmts;
+        }
+
+        public boolean allPathsReturned() {
+            return allPathsReturned;
+        }
+
+        public List<PMLStatement> stmts() {
+            return stmts;
+        }
     }
 }

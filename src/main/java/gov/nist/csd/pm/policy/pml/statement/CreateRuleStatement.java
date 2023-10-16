@@ -86,21 +86,16 @@ public class CreateRuleStatement extends PMLStatement {
 
     private Subject executeEventSubject(ExecutionContext ctx, Policy policy) throws PMException {
         switch (subjectClause.type) {
-            case ANY_USER -> {
+            case ANY_USER:
                 return new AnyUserSubject();
-            }
-            case USERS -> {
+            case USERS:
                 return new UsersSubject(getListFromExpression(ctx, policy, subjectClause.expr));
-            }
-            case USERS_IN_UNION -> {
+            case USERS_IN_UNION:
                 return new UsersInUnionSubject(getListFromExpression(ctx, policy, subjectClause.expr));
-            }
-            case USERS_IN_INTERSECTION -> {
+            case USERS_IN_INTERSECTION:
                 return new UsersInIntersectionSubject(getListFromExpression(ctx, policy, subjectClause.expr));
-            }
-            default  -> {
+            default:
                 return new ProcessesSubject(getListFromExpression(ctx, policy, subjectClause.expr));
-            }
         }
     }
 
@@ -138,18 +133,14 @@ public class CreateRuleStatement extends PMLStatement {
         }
 
         switch (onClause.onClauseType) {
-            case ANY_TARGET -> {
+            case ANY_TARGET:
                 return new AnyTarget();
-            }
-            case ANY_IN_UNION -> {
+            case ANY_IN_UNION:
                 return new AnyInUnionTarget(targetStrs);
-            }
-            case ANY_IN_INTERSECTION -> {
+            case ANY_IN_INTERSECTION:
                 return new AnyInIntersectionTarget(targetStrs);
-            }
-            case ON_TARGETS -> {
+            case ON_TARGETS:
                 return new OnTargets(targetStrs);
-            }
         }
 
         return new AnyTarget();
@@ -162,12 +153,11 @@ public class CreateRuleStatement extends PMLStatement {
         String indent = indent(indentLevel);
 
         return String.format(
-                """
-                %screate rule %s
-                %s%s
-                %s%s
-                %s
-                %sdo (%s) %s""",
+                "%screate rule %s\n" +
+                        "%s%s\n" +
+                        "%s%s\n" +
+                        "%s\n" +
+                        "%sdo (%s) %s",
                 indent, name,
                 indent, subjectClause,
                 indent, performsClause,
@@ -238,11 +228,11 @@ public class CreateRuleStatement extends PMLStatement {
         public String toString() {
             String s = "when ";
             switch (type) {
-                case ANY_USER -> s += "any user";
-                case USERS -> s += "users " + expr;
-                case USERS_IN_INTERSECTION -> s += "users in intersection of " + expr;
-                case USERS_IN_UNION -> s += "users in union of " + expr;
-                case PROCESSES -> s += "processes " + expr;
+                case ANY_USER: return s + "any user";
+                case USERS: return s + "users " + expr;
+                case USERS_IN_INTERSECTION: return s + "users in intersection of " + expr;
+                case USERS_IN_UNION: return s + "users in union of " + expr;
+                case PROCESSES: return s + "processes " + expr;
             }
 
             return s;
@@ -280,13 +270,6 @@ public class CreateRuleStatement extends PMLStatement {
         @Override
         public String toString() {
             return "performs " + events.toString();
-        }
-
-        public record Event(String eventName, String alias) {
-            @Override
-            public String toString() {
-                return String.format("%s%s", eventName, alias == null || alias.isEmpty() ? "" : "as " + alias);
-            }
         }
     }
 
@@ -333,10 +316,10 @@ public class CreateRuleStatement extends PMLStatement {
 
             String s = "on ";
             switch (onClauseType) {
-                case ON_TARGETS -> s += targets;
-                case ANY_TARGET -> s += "any";
-                case ANY_IN_UNION -> s += "union of " + targets;
-                case ANY_IN_INTERSECTION -> s += "intersection of " + targets;
+                case ON_TARGETS: return s + targets;
+                case ANY_TARGET: return s + "any";
+                case ANY_IN_UNION: return s + "union of " + targets;
+                case ANY_IN_INTERSECTION: return s + "intersection of " + targets;
             }
 
             return s;

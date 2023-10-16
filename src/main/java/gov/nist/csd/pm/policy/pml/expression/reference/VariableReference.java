@@ -12,9 +12,12 @@ public abstract class VariableReference extends Expression {
 
     public static Expression compileVariableReference(VisitorContext visitorCtx, PMLParser.VariableReferenceContext ctx) {
         Expression e = null;
-        if (ctx instanceof PMLParser.ReferenceByIDContext referenceByIDContext) {
+        if (ctx instanceof PMLParser.ReferenceByIDContext) {
+            PMLParser.ReferenceByIDContext referenceByIDContext = (PMLParser.ReferenceByIDContext) ctx;
             e = visitReferenceByID(visitorCtx, referenceByIDContext);
-        } else if (ctx instanceof PMLParser.ReferenceByIndexContext referenceByIndexContext) {
+
+        } else if (ctx instanceof PMLParser.ReferenceByIndexContext) {
+            PMLParser.ReferenceByIndexContext referenceByIndexContext = (PMLParser.ReferenceByIndexContext) ctx;
             e = visitReferenceByIndex(visitorCtx, referenceByIndexContext);
         } else {
             visitorCtx.errorLog().addError(ctx, "invalid variable reference");
@@ -73,13 +76,17 @@ public abstract class VariableReference extends Expression {
 
     private static ReferenceByIndex visitIndex(VisitorContext visitorCtx, PMLParser.IndexContext indexCtx,
                                                VariableReference varRef, Type allowedKeyType) {
-        if (indexCtx instanceof PMLParser.BracketIndexContext bracketIndexContext) {
+        if (indexCtx instanceof PMLParser.BracketIndexContext) {
+            PMLParser.BracketIndexContext bracketIndexContext = (PMLParser.BracketIndexContext) indexCtx;
+
             return new ReferenceByBracketIndex(
                     varRef,
                     Expression.compile(visitorCtx, bracketIndexContext.expression(), allowedKeyType)
             );
 
-        } else if (indexCtx instanceof PMLParser.DotIndexContext dotIndexContext) {
+        } else if (indexCtx instanceof PMLParser.DotIndexContext) {
+            PMLParser.DotIndexContext dotIndexContext = (PMLParser.DotIndexContext) indexCtx;
+
             String id = dotIndexContext.key.ID().getText();
             return new ReferenceByDotIndex(varRef, id);
 

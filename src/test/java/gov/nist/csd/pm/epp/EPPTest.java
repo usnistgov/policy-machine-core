@@ -43,23 +43,23 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """
-                create pc "pc1"
-                create oa "oa1" assign to ["pc1"]
-                create ua "ua1" assign to ["pc1"]
-                create u "u1" assign to ["ua1"]
-                associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and POLICY_CLASS_TARGETS with ["*"]
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs ["create_object_attribute"]
-                    on ["oa1"]
-                    do(evtCtx) {
-                        create policy class "pc2"
-                    }
-                }
-                """;
+        String pml =
+                "create pc \"pc1\"\n" +
+                "create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "associate \"ua1\" and \"oa1\" with [\"*\"]\n" +
+                "associate \"ua1\" and POLICY_CLASS_TARGETS with [\"*\"]\n" +
+                "create obligation \"test\" {\n" +
+                "    create rule \"rule1\"\n" +
+                "    when any user\n" +
+                "    performs [\"create_object_attribute\"]\n" +
+                "    on [\"oa1\"]\n" +
+                "    do(evtCtx) {\n" +
+                "        create policy class \"pc2\"\n" +
+                "    }\n" +
+                "}\n" +
+                "";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         assertTrue(pap.graph().nodeExists("pc1"));
@@ -78,32 +78,27 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" assign to ["pc1"]
-                create u "u1" assign to ["ua1"]
-                create oa "oa1" assign to ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
-                
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs ["create_object_attribute"]
-                    on ["oa1"]
-                    do(evtCtx) {
-                        create policy class evtCtx["eventName"]
-                        target := evtCtx["target"]
-                        
-                        create policy class evtCtx["event"]["name"] + "_test"
-                        set properties of evtCtx["event"]["name"] to {"key": target}
-                        
-                        userCtx := evtCtx["userCtx"]
-                        create policy class userCtx["user"] + "_test"
-                    }
-                }
-                """;
+        String pml =
+                "create pc \"pc1\"\n" +
+                "create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "associate \"ua1\" and POLICY_CLASS_TARGETS with [create_policy_class]\n" +
+                "create obligation \"test\" {\n" +
+                "    create rule \"rule1\"\n" +
+                "        when any user\n" +
+                "        performs [\"create_object_attribute\"]\n" +
+                "        on [\"oa1\"]\n" +
+                "        do(evtCtx) {\n" +
+                "            create policy class evtCtx[\"eventName\"]\n" +
+                "            target := evtCtx[\"target\"]\n" +
+                "            create policy class evtCtx[\"event\"][\"name\"] + \"_test\"\n" +
+                "            set properties of evtCtx[\"event\"][\"name\"] to {\"key\": target}\n" +
+                "            userCtx := evtCtx[\"userCtx\"]\n" +
+                "            create policy class userCtx[\"user\"] + \"_test\"\n" +
+                "        }\n" +
+                "}";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
@@ -174,25 +169,24 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap, testFunc);
 
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" assign to ["pc1"]
-                create u "u1" assign to ["ua1"]
-                create oa "oa1" assign to ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
-                
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs ["create_object_attribute"]
-                    on ["oa1"]
-                    do(evtCtx) {
-                        testFunc()
-                    }
-                }
-                """;
+        String pml =
+                "create pc \"pc1\"\n" +
+                "create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "\n" +
+                "associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "associate \"ua1\" and POLICY_CLASS_TARGETS with [create_policy_class]\n" +
+                "\n" +
+                "create obligation \"test\" {\n" +
+                "    create rule \"rule1\"\n" +
+                "    when any user\n" +
+                "    performs [\"create_object_attribute\"]\n" +
+                "    on [\"oa1\"]\n" +
+                "    do(evtCtx) {\n" +
+                "        testFunc()\n" +
+                "    }\n" +
+                "}";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer(testFunc));
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
@@ -206,29 +200,28 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" assign to ["pc1"]
-                create u "u1" assign to ["ua1"]
-                create oa "oa1" assign to ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
-                
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs ["create_object_attribute"]
-                    on ["oa1"]
-                    do(evtCtx) {
-                        if true {
-                            return
-                        }
-                        
-                        create policy class "test"
-                    }
-                }
-                """;
+        String pml =
+                "create pc \"pc1\"\n" +
+                "create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "\n" +
+                "associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "associate \"ua1\" and POLICY_CLASS_TARGETS with [create_policy_class]\n" +
+                "\n" +
+                "create obligation \"test\" {\n" +
+                "    create rule \"rule1\"\n" +
+                "    when any user\n" +
+                "    performs [\"create_object_attribute\"]\n" +
+                "    on [\"oa1\"]\n" +
+                "    do(evtCtx) {\n" +
+                "        if true {\n" +
+                "            return\n" +
+                "        }\n" +
+                "        \n" +
+                "        create policy class \"test\"\n" +
+                "    }\n" +
+                "}";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));

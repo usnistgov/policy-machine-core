@@ -19,9 +19,7 @@ class DeassignStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.DeassignStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                deassign "a" from ["b", "c"]
-                """,
+                "deassign \"a\" from [\"b\", \"c\"]",
                 PMLParser.DeassignStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeassignStmtVisitor(visitorCtx).visitDeassignStatement(ctx);
@@ -35,9 +33,7 @@ class DeassignStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.DeassignStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                deassign "a" from "c"
-                """,
+                "deassign \"a\" from \"c\"",
                 PMLParser.DeassignStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DeassignStmtVisitor(visitorCtx).visitDeassignStatement(ctx);
@@ -47,9 +43,7 @@ class DeassignStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                deassign ["a"] from ["b", "c"]
-                """,
+                "deassign [\"a\"] from [\"b\", \"c\"]",
                 PMLParser.DeassignStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DeassignStmtVisitor(visitorCtx).visitDeassignStatement(ctx);

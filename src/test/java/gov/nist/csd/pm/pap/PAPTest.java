@@ -91,45 +91,43 @@ public abstract class PAPTest {
 
         @Test
         void testErrorDuringDeserializationCausesRollback() throws PMException {
-            String pml = """
-                    create pc "pc1"
-                    create ua "ua1" assign to ["pc2"]
-                    """;
+            String pml = "create pc \"pc1\"\n" +
+                    "                    create ua \"ua1\" assign to [\"pc2\"]";
 
             assertThrows(PMException.class, () -> pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer()));
             assertFalse(pap.graph().nodeExists("pc1"));
             assertFalse(pap.graph().nodeExists("ua1"));
         }
 
-        private static final String input = """
-            const testConst = "hello world"
-            function testFunc() {
-                create pc "pc1"
-            }
-            
-            set resource access rights ["read", "write", "execute"]
-            create policy class "pc1"
-            set properties of "pc1" to {"k":"v"}
-            create oa "oa1" assign to ["pc1"]
-            set properties of "oa1" to {"k1":"v1", "k2":"v2"}
-            create ua "ua1" assign to ["pc1"]
-            create u "u1" assign to ["ua1"]
-            associate "ua1" and "oa1" with ["read", "write"]
-            create prohibition "p1" deny user attribute "ua1" access rights ["read"] on union of ["oa1"]
-            create obligation "obl1" {
-                create rule "rule1"
-                when any user
-                performs ["event1", "event2"]
-                do(evtCtx) {
-                    event := evtCtx["event"]
-                    if equals(event, "event1") {
-                        create policy class "e1"
-                    } else if equals(event, "event2") {
-                        create policy class "e2"
-                    }
-                }
-            }
-            """;
+        private static final String input =
+                "            const testConst = \"hello world\"\n" +
+                "            function testFunc() {\n" +
+                "                create pc \"pc1\"\n" +
+                "            }\n" +
+                "            \n" +
+                "            set resource access rights [\"read\", \"write\", \"execute\"]\n" +
+                "            create policy class \"pc1\"\n" +
+                "            set properties of \"pc1\" to {\"k\":\"v\"}\n" +
+                "            create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "            set properties of \"oa1\" to {\"k1\":\"v1\", \"k2\":\"v2\"}\n" +
+                "            create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "            create u \"u1\" assign to [\"ua1\"]\n" +
+                "            associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "            create prohibition \"p1\" deny user attribute \"ua1\" access rights [\"read\"] on union " +
+                "of [\"oa1\"]\n" +
+                "            create obligation \"obl1\" {\n" +
+                "                create rule \"rule1\"\n" +
+                "                when any user\n" +
+                "                performs [\"event1\", \"event2\"]\n" +
+                "                do(evtCtx) {\n" +
+                "                    event := evtCtx[\"event\"]\n" +
+                "                    if equals(event, \"event1\") {\n" +
+                "                        create policy class \"e1\"\n" +
+                "                    } else if equals(event, \"event2\") {\n" +
+                "                        create policy class \"e2\"\n" +
+                "                    }\n" +
+                "                }\n" +
+                "            }";
 
         @Test
         void testSuccess() throws PMException {
@@ -166,7 +164,7 @@ public abstract class PAPTest {
             PAP pap2 = new PAP(pap.policyStore);
             pap2.deserialize(userContext, json, new JSONDeserializer());
 
-            PolicyEquals.assertPolicyEquals(pap1, pap2);
+            assertPolicyEquals(pap1, pap2);
         }
 
         @Test
@@ -181,7 +179,7 @@ public abstract class PAPTest {
             PAP pap1 = new PAP(new MemoryPolicyStore());
             pap1.deserialize(userContext, pml, new PMLDeserializer());
 
-            PolicyEquals.assertPolicyEquals(pap, pap1);
+            assertPolicyEquals(pap, pap1);
         }
     }
 

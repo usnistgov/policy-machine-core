@@ -100,7 +100,23 @@ public class VariableDeclarationStatement extends PMLStatement{
         return sb.toString();
     }
 
-    public record Declaration(String id, Expression expression) {
+    public static class Declaration {
+
+        private final String id;
+        private final Expression expression;
+
+        public Declaration(String id, Expression expression) {
+            this.id = id;
+            this.expression = expression;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public Expression expression() {
+            return expression;
+        }
 
         @Override
         public boolean equals(Object o) {

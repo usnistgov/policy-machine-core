@@ -24,28 +24,26 @@ class ResponseTest {
 
     @Test
     void testResponseExecutionWithUserDefinedAndBuiltinPML() throws PMException {
-        String pml = """
-                create pc "pc1"
-                create oa "oa1" assign to ["pc1"]
-                create ua "ua1" assign to ["pc1"]
-                create u "u1" assign to ["ua1"]
-                
-                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
-                const x = "hello world"
-                function createX() {
-                    create policy class x
-                }
-                
-                create obligation "obl1" {
-                    create rule "rule1"
-                    when any user
-                    performs ["assign_to"]
-                    on ["oa1"]
-                    do(ctx) {
-                        createX()
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "                create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "                create u \"u1\" assign to [\"ua1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and POLICY_CLASS_TARGETS with [create_policy_class]\n" +
+                "                const x = \"hello world\"\n" +
+                "                function createX() {\n" +
+                "                    create policy class x\n" +
+                "                }\n" +
+                "                \n" +
+                "                create obligation \"obl1\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs [\"assign_to\"]\n" +
+                "                    on [\"oa1\"]\n" +
+                "                    do(ctx) {\n" +
+                "                        createX()\n" +
+                "                    }\n" +
+                "                }";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         PDP pdp = new PDP(pap);
@@ -56,24 +54,23 @@ class ResponseTest {
 
     @Test
     void testResponseWithExistingFunction() throws PMException {
-        String pml = """
-                create pc "pc1"
-                create oa "oa1" assign to ["pc1"]
-                create ua "ua1" assign to ["pc1"]
-                create u "u1" assign to ["ua1"]
-                
-                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
-                
-                create obligation "obl1" {
-                    create rule "rule1"
-                    when any user
-                    performs ["assign_to"]
-                    on ["oa1"]
-                    do(ctx) {
-                        createX()
-                    }
-                }
-                """;
+        String pml =
+                "create pc \"pc1\"\n" +
+                "create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "\n" +
+                "associate \"ua1\" and POLICY_CLASS_TARGETS with [create_policy_class]\n" +
+                "\n" +
+                "create obligation \"obl1\" {\n" +
+                "    create rule \"rule1\"\n" +
+                "    when any user\n" +
+                "    performs [\"assign_to\"]\n" +
+                "    on [\"oa1\"]\n" +
+                "    do(ctx) {\n" +
+                "        createX()\n" +
+                "    }\n" +
+                "}";
 
         PAP pap = new PAP(new MemoryPolicyStore());
 

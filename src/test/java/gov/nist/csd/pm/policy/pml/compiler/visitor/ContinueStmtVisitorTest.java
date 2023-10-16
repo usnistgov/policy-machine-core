@@ -21,11 +21,9 @@ class ContinueStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a"] {
-                    continue
-                }
-                """,
+                "foreach x in [\"a\"] {\n" +
+                        "                    continue\n" +
+                        "                }",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -41,9 +39,7 @@ class ContinueStmtVisitorTest {
     @Test
     void testNotInForLoop() throws PMException {
         PMLParser.ContinueStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                continue
-                """,
+                "continue",
                 PMLParser.ContinueStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new ContinueStmtVisitor(visitorCtx).visitContinueStatement(ctx);

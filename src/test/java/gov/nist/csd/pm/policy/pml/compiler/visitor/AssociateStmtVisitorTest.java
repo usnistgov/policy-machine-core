@@ -19,9 +19,7 @@ class AssociateStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.AssociateStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                associate "a" and "b" with ["c", "d"]
-                """,
+                "associate \"a\" and \"b\" with [\"c\", \"d\"]",
                 PMLParser.AssociateStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);
@@ -35,9 +33,7 @@ class AssociateStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.AssociateStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                associate ["a"] and "b" with ["c", "d"]
-                """,
+                "associate [\"a\"] and \"b\" with [\"c\", \"d\"]",
                 PMLParser.AssociateStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);
@@ -48,9 +44,7 @@ class AssociateStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                associate "a" and ["b"] with ["c", "d"]
-                """,
+                "associate \"a\" and [\"b\"] with [\"c\", \"d\"]",
                 PMLParser.AssociateStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);
@@ -61,9 +55,7 @@ class AssociateStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                associate "a" and "b" with "c"
-                """,
+                "associate \"a\" and \"b\" with \"c\"",
                 PMLParser.AssociateStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);

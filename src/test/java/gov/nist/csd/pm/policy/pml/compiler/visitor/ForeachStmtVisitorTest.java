@@ -36,9 +36,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testSuccess() {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a", "b"] {}
-                """,
+                "foreach x in [\"a\", \"b\"] {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -49,9 +47,7 @@ class ForeachStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x, y in {"a": "b"} {}
-                """,
+                "foreach x, y in {\"a\": \"b\"} {}",
                 PMLParser.ForeachStatementContext.class);
         visitorCtx = new VisitorContext(testGlobalScope);
         stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -65,9 +61,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testInvalidExpressions() {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in "a" {}
-                """,
+                "foreach x in \"a\" {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -78,9 +72,7 @@ class ForeachStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in {"a": "b"} {}
-                """,
+                "foreach x in {\"a\": \"b\"} {}",
                 PMLParser.ForeachStatementContext.class);
         visitorCtx = new VisitorContext(testGlobalScope);
         new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -94,9 +86,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testKeyValueOnArray() {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x, y in ["a"] {}
-                """,
+                "foreach x, y in [\"a\"] {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -110,9 +100,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testIterVarDoesNotExists() throws VariableAlreadyDefinedInScopeException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in arr {}
-                """,
+                "foreach x in arr {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -126,9 +114,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testKeyValueVarsAlreadyExist() throws VariableAlreadyDefinedInScopeException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a"] {}
-                """,
+                "foreach x in [\"a\"] {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
@@ -140,9 +126,7 @@ class ForeachStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x, y in {"a": "b"} {}
-                """,
+                "foreach x, y in {\"a\": \"b\"} {}",
                 PMLParser.ForeachStatementContext.class);
         visitorCtx = new VisitorContext(testGlobalScope);
         visitorCtx.scope().addVariable("y", new Variable("y", Type.string(), false));
@@ -157,9 +141,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testKeyOnlyOnMapReturnsError() throws VariableAlreadyDefinedInScopeException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in {"a": "b"} {}
-                """,
+                "foreach x in {\"a\": \"b\"} {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -173,9 +155,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testKeyValueOnArrayReturnsError() throws VariableAlreadyDefinedInScopeException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x, y in ["a": "b"] {}
-                """,
+                "foreach x, y in [\"a\": \"b\"] {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);

@@ -21,28 +21,26 @@ class PrivilegeCheckerTest {
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(
                 new UserContext("u1"),
-                        """
-                        set resource access rights ["read", "write"]
-                        
-                        create policy class "pc1" {
-                            uas {
-                                "ua1"
-                                "ua2"                                
-                            }
-                            oas {
-                                "oa1"
-                            }
-                            associations {
-                                "ua1" and "oa1" with ["read", "write"]
-                                "ua1" and POLICY_CLASS_TARGETS with ["read"]
-                            }
-                        }
-                        
-                        create user "u1" assign to ["ua1"]
-                        create user "u2" assign to ["ua2"]
-                        
-                        create object "o1" assign to ["oa1"]
-                        """,
+                        "                        set resource access rights [\"read\", \"write\"]\n" +
+                                "                        \n" +
+                                "                        create policy class \"pc1\" {\n" +
+                                "                            uas {\n" +
+                                "                                \"ua1\"\n" +
+                                "                                \"ua2\"                                \n" +
+                                "                            }\n" +
+                                "                            oas {\n" +
+                                "                                \"oa1\"\n" +
+                                "                            }\n" +
+                                "                            associations {\n" +
+                                "                                \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                                "                                \"ua1\" and POLICY_CLASS_TARGETS with [\"read\"]\n" +
+                                "                            }\n" +
+                                "                        }\n" +
+                                "                        \n" +
+                                "                        create user \"u1\" assign to [\"ua1\"]\n" +
+                                "                        create user \"u2\" assign to [\"ua2\"]\n" +
+                                "                        \n" +
+                                "                        create object \"o1\" assign to [\"oa1\"]",
                         new PMLDeserializer()
         );
         privilegeChecker = new PrivilegeChecker(pap, new PolicyReviewer(pap));

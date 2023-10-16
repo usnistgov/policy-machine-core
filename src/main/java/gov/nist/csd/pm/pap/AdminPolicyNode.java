@@ -19,27 +19,20 @@ public enum AdminPolicyNode {
 
     public static AdminPolicyNode fromNodeName(String child) {
         switch (child) {
-            case "PM_ADMIN" -> {
+            case "PM_ADMIN":
                 return ADMIN_POLICY;
-            }
-            case "PM_ADMIN:target" -> {
+            case "PM_ADMIN:target":
                 return ADMIN_POLICY_TARGET;
-            }
-            case "PM_ADMIN:POLICY_CLASS_TARGETS" -> {
+            case "PM_ADMIN:POLICY_CLASS_TARGETS":
                 return POLICY_CLASS_TARGETS;
-            }
-            case "PM_ADMIN:FUNCTIONS" -> {
+            case "PM_ADMIN:FUNCTIONS":
                 return PML_FUNCTIONS_TARGET;
-            }
-            case "PM_ADMIN:CONSTANTS" -> {
+            case "PM_ADMIN:CONSTANTS":
                 return PML_CONSTANTS_TARGET;
-            }
-            case "PM_ADMIN:OBLIGATIONS" -> {
+            case "PM_ADMIN:OBLIGATIONS":
                 return OBLIGATIONS_TARGET;
-            }
-            case "PM_ADMIN:PROHIBITIONS" -> {
+            case "PM_ADMIN:PROHIBITIONS":
                 return PROHIBITIONS_TARGET;
-            }
         }
 
         throw new IllegalArgumentException("unknown admin policy node " + child);

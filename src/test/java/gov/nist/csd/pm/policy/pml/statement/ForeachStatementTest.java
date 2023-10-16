@@ -99,18 +99,16 @@ class ForeachStatementTest {
                                                      )
         );
 
-        assertEquals("""
-                             foreach x in ["a", "b", "c"] {
-                                 create PC x
-                             }""",
+        assertEquals("foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                             "    create PC x\n" +
+                             "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 foreach x in ["a", "b", "c"] {
-                                     create PC x
-                                 }
-                             """,
-                     stmt.toFormattedString(1) + "\n");
+        assertEquals(
+                "    foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                        "        create PC x\n" +
+                        "    }",
+                stmt.toFormattedString(1));
     }
 
     @Test
@@ -121,54 +119,49 @@ class ForeachStatementTest {
                                                      )
         );
 
-        assertEquals("""
-                             foreach x, y in {"a": "b", "c": "d"} {
-                                 create PC x
-                             }""",
+        assertEquals("foreach x, y in {\"a\": \"b\", \"c\": \"d\"} {\n" +
+                             "    create PC x\n" +
+                             "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 foreach x, y in {"a": "b", "c": "d"} {
-                                     create PC x
-                                 }
-                             """,
-                     stmt.toFormattedString(1) + "\n");
+        assertEquals("    foreach x, y in {\"a\": \"b\", \"c\": \"d\"} {\n" +
+                             "        create PC x\n" +
+                             "    }",
+                     stmt.toFormattedString(1));
     }
 
     @Test
     void testReturnEndsExecution() throws PMException {
-        String pml = """
-                f1()
-                
-                function f1() {
-                    foreach x in ["1", "2", "3"] {
-                        if x == "2" {
-                            return
-                        }
-                        
-                        create PC x
-                    }
-                }
-                """;
+        String pml =
+                "f1()\n" +
+                "\n" +
+                "function f1() {\n" +
+                "    foreach x in [\"1\", \"2\", \"3\"] {\n" +
+                "        if x == \"2\" {\n" +
+                "            return\n" +
+                "        }\n" +
+                "        \n" +
+                "        create PC x\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
 
         assertTrue(store.graph().nodeExists("1"));
         assertFalse(store.graph().nodeExists("2"));
 
-        pml = """
-                f1()
-                
-                function f1() {
-                    foreach x, y in {"1": "1", "2": "2"} {
-                        if x == "2" {
-                            return
-                        }
-                        
-                        create PC x
-                    }
-                }
-                """;
+        pml =
+                "f1()\n" +
+                "\n" +
+                "function f1() {\n" +
+                "    foreach x, y in {\"1\": \"1\", \"2\": \"2\"} {\n" +
+                "        if x == \"2\" {\n" +
+                "            return\n" +
+                "        }\n" +
+                "        \n" +
+                "        create PC x\n" +
+                "    }\n" +
+                "}";
         store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
 

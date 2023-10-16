@@ -27,62 +27,60 @@ class ObligationsReviewerTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        String pml = """
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                            "oa1-1"
-                            "oa1-2"
-                        "oa2"
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create u "u2" assign to ["ua1"]
-                
-                create obligation "o1" {
-                    create rule "r1"
-                    when users ["u1"]
-                    performs ["assign_to"]
-                    do(ctx){
-                        create policy class "test"
-                    }
-                }
-                
-                create obligation "o2" {
-                    create rule "r2"
-                    when any user
-                    performs ["assign_to"]
-                    do(ctx){
-                        create policy class "test"
-                    }
-                }
-                """;
+        String pml =
+                "                create pc \"pc1\" {\n" +
+                "                    uas {\n" +
+                "                        \"ua1\"\n" +
+                "                    }\n" +
+                "                    oas {\n" +
+                "                        \"oa1\"\n" +
+                "                            \"oa1-1\"\n" +
+                "                            \"oa1-2\"\n" +
+                "                        \"oa2\"\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create u \"u1\" assign to [\"ua1\"]\n" +
+                "                create u \"u2\" assign to [\"ua1\"]\n" +
+                "                \n" +
+                "                create obligation \"o1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when users [\"u1\"]\n" +
+                "                    performs [\"assign_to\"]\n" +
+                "                    do(ctx){\n" +
+                "                        create policy class \"test\"\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create obligation \"o2\" {\n" +
+                "                    create rule \"r2\"\n" +
+                "                    when any user\n" +
+                "                    performs [\"assign_to\"]\n" +
+                "                    do(ctx){\n" +
+                "                        create policy class \"test\"\n" +
+                "                    }\n" +
+                "                }";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        pml = """
-              create obligation "o3" {
-                    create rule "r3"
-                    when any user
-                    performs ["assign_to"]
-                    on ["oa2"]
-                    do(ctx) {
-                        create policy class "test"
-                    }
-              }
-              
-              create obligation "o4" {
-                    create rule "r4"
-                    when users ["u2"]
-                    performs ["assign"]
-                    on ["oa1"]
-                    do(ctx) {}
-              }
-              """;
+        pml =
+                "              create obligation \"o3\" {\n" +
+                "                    create rule \"r3\"\n" +
+                "                    when any user\n" +
+                "                    performs [\"assign_to\"]\n" +
+                "                    on [\"oa2\"]\n" +
+                "                    do(ctx) {\n" +
+                "                        create policy class \"test\"\n" +
+                "                    }\n" +
+                "              }\n" +
+                "              \n" +
+                "              create obligation \"o4\" {\n" +
+                "                    create rule \"r4\"\n" +
+                "                    when users [\"u2\"]\n" +
+                "                    performs [\"assign\"]\n" +
+                "                    on [\"oa1\"]\n" +
+                "                    do(ctx) {}\n" +
+                "              }";
         pap.executePML(new UserContext("u2"), pml);
 
         obligationReviewer = new ObligationsReviewer(pap, new GraphReviewer(pap));

@@ -29,18 +29,15 @@ class FunctionDefinitionStatementTest {
                 )
                 .build();
 
-        assertEquals("""
-                             function func1(string a, bool b, []string c) string {
-                                 return "test"
-                             }""",
+        assertEquals("function func1(string a, bool b, []string c) string {\n" +
+                             "    return \"test\"\n" +
+                             "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 function func1(string a, bool b, []string c) string {
-                                     return "test"
-                                 }
-                             """,
-                     stmt.toFormattedString(1) + "\n");
+        assertEquals("    function func1(string a, bool b, []string c) string {\n" +
+                             "        return \"test\"\n" +
+                             "    }",
+                     stmt.toFormattedString(1));
     }
 
     @Test
@@ -57,33 +54,28 @@ class FunctionDefinitionStatementTest {
                 )
                 .build();
 
-        assertEquals("""
-                             function func1(string a, bool b, []string c) {
-                                 return
-                             }""",
+        assertEquals("function func1(string a, bool b, []string c) {\n" +
+                             "    return\n" +
+                             "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 function func1(string a, bool b, []string c) {
-                                     return
-                                 }
-                             """,
-                     stmt.toFormattedString(1) + "\n");
+        assertEquals("    function func1(string a, bool b, []string c) {\n" +
+                             "        return\n" +
+                             "    }",
+                     stmt.toFormattedString(1));
     }
 
     @Test
     void testFormalArgOverwritesVariable()
             throws PMException {
-        String pml = """
-                var a = "test"
-                var b = "test2"
-                func1(a, b)
-                
-                function func1(string a, string b) {
-                    create policy class a
-                    create policy class b
-                }
-                """;
+        String pml = "var a = \"test\"\n" +
+                "                var b = \"test2\"\n" +
+                "                func1(a, b)\n" +
+                "                \n" +
+                "                function func1(string a, string b) {\n" +
+                "                    create policy class a\n" +
+                "                    create policy class b\n" +
+                "                }";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext(""), pml);
 
@@ -93,18 +85,16 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testInvokeFromDefinition() throws PMException {
-        String pml = """
-                function f1(string a) {
-                    create policy class a
-                }
-                
-                function f2() {
-                    a := "test"
-                    f1(a)
-                }
-                
-                f2()
-                """;
+        String pml = "function f1(string a) {\n" +
+                "                    create policy class a\n" +
+                "                }\n" +
+                "                \n" +
+                "                function f2() {\n" +
+                "                    a := \"test\"\n" +
+                "                    f1(a)\n" +
+                "                }\n" +
+                "                \n" +
+                "                f2()";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext(""), pml);
 
@@ -113,19 +103,18 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testInvokeFromFunctionUsingConstant() throws PMException {
-        String pml = """
-                const x = "x"
-                
-                func1()
-                
-                function func1() {
-                    func2()
-                }
-                
-                function func2() {
-                    create policy class x
-                }
-                """;
+        String pml =
+                "const x = \"x\"\n" +
+                "\n" +
+                "func1()\n" +
+                "\n" +
+                "function func1() {\n" +
+                "    func2()\n" +
+                "}\n" +
+                "\n" +
+                "function func2() {\n" +
+                "    create policy class x\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext(""), pml);
         assertTrue(memoryPolicyStore.graph().nodeExists("x"));

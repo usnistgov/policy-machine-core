@@ -19,9 +19,7 @@ class DissociateStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.DissociateStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                dissociate "a" and ["b"]
-                """,
+                "dissociate \"a\" and [\"b\"]",
                 PMLParser.DissociateStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DissociateStmtVisitor(visitorCtx).visitDissociateStatement(ctx);
@@ -35,9 +33,7 @@ class DissociateStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.DissociateStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                dissociate ["a"] and "b"
-                """,
+                "dissociate [\"a\"] and \"b\"",
                 PMLParser.DissociateStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DissociateStmtVisitor(visitorCtx).visitDissociateStatement(ctx);
@@ -52,9 +48,7 @@ class DissociateStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                dissociate "a" and "b"
-                """,
+                "dissociate \"a\" and \"b\"",
                 PMLParser.DissociateStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DissociateStmtVisitor(visitorCtx).visitDissociateStatement(ctx);

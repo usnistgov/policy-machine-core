@@ -715,9 +715,13 @@ public interface GraphStore extends Graph {
     private static boolean nodeInEvent(String name, EventPattern event) {
         // check subject
         Subject subject = event.getSubject();
-        if (subject instanceof UserAttributesSubject userAttributesEventSubject) {
+        if (subject instanceof UserAttributesSubject) {
+            UserAttributesSubject userAttributesEventSubject = (UserAttributesSubject) subject;
             return userAttributesEventSubject.getSubjects().contains(name);
-        } else if (subject instanceof UsersSubject usersEventSubject) {
+
+        } else if (subject instanceof UsersSubject) {
+            UsersSubject usersEventSubject = (UsersSubject) subject;
+
             return usersEventSubject.getSubjects().contains(name);
         }
 

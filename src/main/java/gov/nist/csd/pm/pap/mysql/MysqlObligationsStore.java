@@ -29,9 +29,7 @@ class MysqlObligationsStore implements ObligationsStore {
     throws PMBackendException, ObligationNameExistsException, NodeDoesNotExistException {
         checkCreateInput(new MysqlGraphStore(connection), author, name, rules);
 
-        String sql = """
-                insert into obligation (name, author, rules) values (?, ?, ?)
-                """;
+        String sql = "insert into obligation (name, author, rules) values (?, ?, ?)";
 
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
@@ -69,9 +67,7 @@ class MysqlObligationsStore implements ObligationsStore {
 
     @Override
     public void delete(String name) throws MysqlPolicyException {
-        String sql = """
-                delete from obligation where name = ?
-                """;
+        String sql = "delete from obligation where name = ?";
 
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
@@ -85,9 +81,7 @@ class MysqlObligationsStore implements ObligationsStore {
     public List<Obligation> getAll() throws MysqlPolicyException {
         List<Obligation> obligations = new ArrayList<>();
 
-        String sql = """
-                select name, author, rules from obligation;
-                """;
+        String sql = "select name, author, rules from obligation;";
 
         try(Statement stmt = connection.getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
@@ -117,9 +111,7 @@ class MysqlObligationsStore implements ObligationsStore {
 
     @Override
     public Obligation get(String name) throws ObligationDoesNotExistException, MysqlPolicyException {
-        String sql = """
-                select author, rules from obligation where name = ?
-                """;
+        String sql = "select author, rules from obligation where name = ?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);

@@ -58,16 +58,13 @@ public class ProhibitionSubject implements Serializable {
 
     private Type typeFromString(String s) throws InvalidProhibitionSubjectException {
         switch (s) {
-            case "USER_ATTRIBUTE" -> {
+            case "USER_ATTRIBUTE":
                 return Type.USER_ATTRIBUTE;
-            }
-            case "USER" -> {
+            case "USER":
                 return Type.USER;
-            }
-            case "PROCESS" -> {
+            case "PROCESS":
                 return Type.PROCESS;
-            }
-            default -> throw new InvalidProhibitionSubjectException(s);
+            default: throw new InvalidProhibitionSubjectException(s);
         }
     }
 

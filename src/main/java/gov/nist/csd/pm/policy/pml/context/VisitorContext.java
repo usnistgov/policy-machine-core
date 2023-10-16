@@ -11,7 +11,17 @@ import org.antlr.v4.runtime.ListTokenSource;
 import java.util.List;
 import java.util.Objects;
 
-public record VisitorContext(CommonTokenStream tokens, Scope<Variable, FunctionSignature> scope, ErrorLog errorLog) {
+public class VisitorContext {
+
+    private CommonTokenStream tokens;
+    private Scope<Variable, FunctionSignature> scope;
+    private ErrorLog errorLog;
+
+    public VisitorContext(CommonTokenStream tokens, Scope<Variable, FunctionSignature> scope, ErrorLog errorLog) {
+        this.tokens = tokens;
+        this.scope = scope;
+        this.errorLog = errorLog;
+    }
 
     public VisitorContext(Scope<Variable, FunctionSignature> scope) {
         this(new CommonTokenStream(new ListTokenSource(List.of())), scope, new ErrorLog());
@@ -19,6 +29,18 @@ public record VisitorContext(CommonTokenStream tokens, Scope<Variable, FunctionS
 
     public VisitorContext(GlobalScope<Variable, FunctionSignature> globalScope) {
         this(new CommonTokenStream(new ListTokenSource(List.of())), new Scope<>(globalScope), new ErrorLog());
+    }
+
+    public CommonTokenStream tokens() {
+        return tokens;
+    }
+
+    public Scope<Variable, FunctionSignature> scope() {
+        return scope;
+    }
+
+    public ErrorLog errorLog() {
+        return errorLog;
     }
 
     public VisitorContext copy() {

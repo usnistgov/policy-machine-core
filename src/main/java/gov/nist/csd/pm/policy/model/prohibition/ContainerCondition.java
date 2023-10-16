@@ -44,8 +44,9 @@ public final class ContainerCondition implements Serializable {
         return complement == that.complement && Objects.equals(name, that.name);
     }
 
+    @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, complement);
     }
 
     @Override

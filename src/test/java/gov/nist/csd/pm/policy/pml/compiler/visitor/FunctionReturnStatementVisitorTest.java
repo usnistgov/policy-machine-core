@@ -27,11 +27,9 @@ class FunctionReturnStatementVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.FunctionDefinitionStatementContext ctx1 = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    return "test"
-                }
-                """,
+                "function func1(string a, bool b, []string c) string {\n" +
+                        "                    return \"test\"\n" +
+                        "                }",
                 PMLParser.FunctionDefinitionStatementContext.class);
 
         VisitorContext visitorCtx = new VisitorContext(
@@ -58,16 +56,14 @@ class FunctionReturnStatementVisitorTest {
         );
 
         PMLParser.CreateObligationStatementContext ctx2 = PMLContextVisitor.toCtx(
-                """
-                        create obligation "test" {
-                            create rule "test"
-                            when users ["u1"]
-                            performs ["e1"]
-                            do(ctx) {
-                                return
-                            }
-                        }
-                        """,
+                "create obligation \"test\" {\n" +
+                        "                            create rule \"test\"\n" +
+                        "                            when users [\"u1\"]\n" +
+                        "                            performs [\"e1\"]\n" +
+                        "                            do(ctx) {\n" +
+                        "                                return\n" +
+                        "                            }\n" +
+                        "                        }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -83,9 +79,7 @@ class FunctionReturnStatementVisitorTest {
     @Test
     void testReturnStatementNotInFunctionOrResponse() throws PMException {
         PMLParser.ReturnStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                        return
-                        """,
+                "return",
                 PMLParser.ReturnStatementContext.class
         );
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -101,16 +95,14 @@ class FunctionReturnStatementVisitorTest {
     @Test
     void testReturnStatementWithValueInResponse() throws PMException {
         PMLParser.CreateObligationStatementContext ctx2 = PMLContextVisitor.toCtx(
-                """
-                        create obligation "test" {
-                            create rule "test"
-                            when users ["u1"]
-                            performs ["e1"]
-                            do(ctx) {
-                                return "test"
-                            }
-                        }
-                        """,
+                "create obligation \"test\" {\n" +
+                        "    create rule \"test\"\n" +
+                        "    when users [\"u1\"]\n" +
+                        "    performs [\"e1\"]\n" +
+                        "    do(ctx) {\n" +
+                        "        return \"test\"\n" +
+                        "    }\n" +
+                        "}",
                 PMLParser.CreateObligationStatementContext.class
         );
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));

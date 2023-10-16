@@ -48,15 +48,22 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatement> {
 
     private Expression compileConstLiteral(PMLParser.LiteralContext literalContext) {
         LiteralVisitor literalVisitor = new LiteralVisitor(visitorCtx);
-        if (literalContext instanceof PMLParser.StringLiteralContext stringLiteralContext) {
+        if (literalContext instanceof PMLParser.StringLiteralContext) {
+            PMLParser.StringLiteralContext stringLiteralContext = (PMLParser.StringLiteralContext) literalContext;
             return literalVisitor.visitStringLiteral(stringLiteralContext);
-        } else if (literalContext instanceof PMLParser.BoolLiteralContext boolLiteralContext) {
+
+        } else if (literalContext instanceof PMLParser.BoolLiteralContext) {
+            PMLParser.BoolLiteralContext boolLiteralContext = (PMLParser.BoolLiteralContext) literalContext;
             return literalVisitor.visitBoolLiteral(boolLiteralContext);
-        } else if (literalContext instanceof PMLParser.ArrayLiteralContext arrayLiteralContext) {
+
+        } else if (literalContext instanceof PMLParser.ArrayLiteralContext) {
+            PMLParser.ArrayLiteralContext arrayLiteralContext = (PMLParser.ArrayLiteralContext) literalContext;
             return literalVisitor.visitArrayLiteral(arrayLiteralContext);
+
         } else {
             PMLParser.MapLiteralContext mapLiteralContext = (PMLParser.MapLiteralContext) literalContext;
             return literalVisitor.visitMapLiteral(mapLiteralContext);
+
         }
     }
 

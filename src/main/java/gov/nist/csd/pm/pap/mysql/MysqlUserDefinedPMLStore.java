@@ -26,9 +26,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
     throws PMBackendException, PMLFunctionAlreadyDefinedException {
         checkCreateFunctionInput(functionDefinitionStatement.getSignature().getFunctionName());
 
-        String sql = """
-                insert into pml_function (name, bytes) values (?,?)
-                """;
+        String sql = "insert into pml_function (name, bytes) values (?,?)";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, functionDefinitionStatement.getSignature().getFunctionName());
             ps.setBytes(2, SerializationUtils.serialize(functionDefinitionStatement));
@@ -44,9 +42,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
             return;
         }
 
-        String sql = """
-                delete from pml_function where name=?
-                """;
+        String sql = "delete from pml_function where name=?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, functionName);
             ps.executeUpdate();
@@ -57,9 +53,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
 
     @Override
     public Map<String, FunctionDefinitionStatement> getFunctions() throws MysqlPolicyException {
-        String sql = """
-                select bytes from pml_function
-                """;
+        String sql = "select bytes from pml_function";
 
         Map<String, FunctionDefinitionStatement> functionDefinitionStatements = new HashMap<>();
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql);
@@ -80,9 +74,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
     throws PMLFunctionNotDefinedException, PMBackendException {
         checkGetFunctionInput(name);
 
-        String sql = """
-                select bytes from pml_function where name = ?
-                """;
+        String sql = "select bytes from pml_function where name = ?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
@@ -106,9 +98,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
     throws PMBackendException, PMLConstantAlreadyDefinedException {
         checkCreateConstantInput(constantName);
 
-        String sql = """
-                insert into pml_constant (name, value) values (?,?)
-                """;
+        String sql = "insert into pml_constant (name, value) values (?,?)";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, constantName);
             ps.setBytes(2, SerializationUtils.serialize(constantValue));
@@ -124,9 +114,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
             return;
         }
 
-        String sql = """
-                delete from pml_constant where name=?
-                """;
+        String sql = "delete from pml_constant where name=?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, constName);
             ps.executeUpdate();
@@ -137,9 +125,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
 
     @Override
     public Map<String, Value> getConstants() throws MysqlPolicyException {
-        String sql = """
-                select name, value from pml_constant
-                """;
+        String sql = "select name, value from pml_constant";
 
         Map<String, Value> constants = new HashMap<>();
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql);
@@ -160,9 +146,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
     public Value getConstant(String name) throws PMBackendException, PMLConstantNotDefinedException {
         checkGetConstantInput(name);
 
-        String sql = """
-                select value from pml_constant where name=?
-                """;
+        String sql = "select value from pml_constant where name=?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);

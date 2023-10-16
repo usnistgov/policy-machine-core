@@ -19,32 +19,31 @@ class ProhibitionsReviewerTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        String pml = """
-                set resource access rights ["read"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                            "ua2"
-                                "ua3"
-                    }
-                    oas {
-                        "oa1"
-                        "oa2"
-                    }
-                }
-                
-                create u "u1" assign to ["ua3"]
-                
-                create prohibition "p1"
-                deny UA "ua1"
-                access rights ["read"]
-                on intersection of ["oa1", "oa2"]
-                
-                create prohibition "p2"
-                deny U "u1"
-                access rights ["read"]
-                on intersection of [!"oa1", "oa2"]
-                """;
+        String pml =
+                "set resource access rights [\"read\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "            \"ua2\"\n" +
+                "                \"ua3\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "        \"oa2\"\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua3\"]\n" +
+                "\n" +
+                "create prohibition \"p1\"\n" +
+                "deny UA \"ua1\"\n" +
+                "access rights [\"read\"]\n" +
+                "on intersection of [\"oa1\", \"oa2\"]\n" +
+                "\n" +
+                "create prohibition \"p2\"\n" +
+                "deny U \"u1\"\n" +
+                "access rights [\"read\"]\n" +
+                "on intersection of [!\"oa1\", \"oa2\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 

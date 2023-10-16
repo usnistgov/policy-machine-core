@@ -23,12 +23,10 @@ class CreateProhibitionStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.CreateProhibitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create prohibition "test"
-                deny user "u1"
-                ["read"]
-                on union of [!"oa1"]
-                """,
+                "                create prohibition \"test\"\n" +
+                        "                deny user \"u1\"\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of [!\"oa1\"]",
                 PMLParser.CreateProhibitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
@@ -49,12 +47,10 @@ class CreateProhibitionStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.CreateProhibitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create prohibition ["test"]
-                deny user "u1"
-                ["read"]
-                on union of [!"oa1"]
-                """,
+                "create prohibition [\"test\"]\n" +
+                        "                deny user \"u1\"\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of [!\"oa1\"]",
                 PMLParser.CreateProhibitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
@@ -65,12 +61,10 @@ class CreateProhibitionStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create prohibition "test"
-                deny user ["u1"]
-                ["read"]
-                on union of [!"oa1"]
-                """,
+                "create prohibition \"test\"\n" +
+                        "                deny user [\"u1\"]\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of [!\"oa1\"]",
                 PMLParser.CreateProhibitionStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
@@ -81,12 +75,10 @@ class CreateProhibitionStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create prohibition "test"
-                deny user "u1"
-                "read"
-                on union of [!"oa1"]
-                """,
+                "create prohibition \"test\"\n" +
+                        "                deny user \"u1\"\n" +
+                        "                \"read\"\n" +
+                        "                on union of [!\"oa1\"]",
                 PMLParser.CreateProhibitionStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
@@ -97,12 +89,10 @@ class CreateProhibitionStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create prohibition "test"
-                deny user "u1"
-                ["read"]
-                on union of !"oa1"
-                """,
+                "create prohibition \"test\"\n" +
+                        "                deny user \"u1\"\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of !\"oa1\"",
                 PMLParser.CreateProhibitionStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);

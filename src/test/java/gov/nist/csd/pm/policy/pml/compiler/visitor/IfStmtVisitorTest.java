@@ -24,15 +24,13 @@ class IfStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.IfStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                if true {
-                    x := "a"
-                } else if false {
-                    x := "b"
-                } else {
-                    x := "c"
-                }
-                """,
+                "if true {\n" +
+                        "                    x := \"a\"\n" +
+                        "                } else if false {\n" +
+                        "                    x := \"b\"\n" +
+                        "                } else {\n" +
+                        "                    x := \"c\"\n" +
+                        "                }",
                 PMLParser.IfStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new IfStmtVisitor(visitorCtx)
@@ -40,8 +38,14 @@ class IfStmtVisitorTest {
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new IfStatement(
-                        new IfStatement.ConditionalBlock(new BoolLiteral(true), List.of(new ShortDeclarationStatement("x", new StringLiteral("a")))),
-                        List.of(new IfStatement.ConditionalBlock(new BoolLiteral(false), List.of(new ShortDeclarationStatement("x", new StringLiteral("b"))))),
+                        new IfStatement.ConditionalBlock(
+                                new BoolLiteral(true), List.of(new ShortDeclarationStatement("x",
+                                                                                             new StringLiteral("a")
+                        ))),
+                        List.of(new IfStatement.ConditionalBlock(
+                                new BoolLiteral(false), List.of(new ShortDeclarationStatement("x",
+                                                                                              new StringLiteral("b")
+                        )))),
                         List.of(new ShortDeclarationStatement("x", new StringLiteral("c")))
                 ),
                 stmt
@@ -51,15 +55,14 @@ class IfStmtVisitorTest {
     @Test
     void testConditionExpressionsNotBool() throws PMException {
         PMLParser.IfStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                if "a" {
-                    x := "a"
-                } else if "b" {
-                    x := "b"
-                } else {
-                    x := "c"
-                }
-                """,
+                "" +
+                        "if \"a\" {\n" +
+                        "                    x := \"a\"\n" +
+                        "                } else if \"b\" {\n" +
+                        "                    x := \"b\"\n" +
+                        "                } else {\n" +
+                        "                    x := \"c\"\n" +
+                        "                }",
                 PMLParser.IfStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new IfStmtVisitor(visitorCtx)
@@ -77,17 +80,16 @@ class IfStmtVisitorTest {
 
     @Test
     void testReturnVoidInIf() throws PMException {
-        String pml = """
-                function f1() {
-                    if true {
-                        return
-                    }
-                    
-                    create policy class "pc1"
-                }
-                
-                f1()
-                """;
+        String pml =
+                "function f1() {\n" +
+                "    if true {\n" +
+                "        return\n" +
+                "    }\n" +
+                "    \n" +
+                "    create policy class \"pc1\"\n" +
+                "}\n" +
+                "\n" +
+                "f1()";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
         assertFalse(store.graph().nodeExists("pc1"));

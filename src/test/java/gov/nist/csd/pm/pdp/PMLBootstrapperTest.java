@@ -15,19 +15,18 @@ class PMLBootstrapperTest {
         PAP pap = new PAP(new MemoryPolicyStore());
         PDP pdp = new PDP(pap);
 
-        String input = """
-                const read = "read"
-                const write = "write"
-                set resource access rights [read, write]
-                
-                create pc "pc1"
-                create ua "ua1" assign to ["pc1"]
-                create oa "oa1" assign to ["pc1"]
-                
-                associate "ua1" and "oa1" with [read]
-                
-                create user "u1" assign to ["ua1"]
-                """;
+        String input =
+                "const read = \"read\"\n" +
+                "const write = \"write\"\n" +
+                "set resource access rights [read, write]\n" +
+                "\n" +
+                "create pc \"pc1\"\n" +
+                "create ua \"ua1\" assign to [\"pc1\"]\n" +
+                "create oa \"oa1\" assign to [\"pc1\"]\n" +
+                "\n" +
+                "associate \"ua1\" and \"oa1\" with [read]\n" +
+                "\n" +
+                "create user \"u1\" assign to [\"ua1\"]";
 
         pdp.bootstrap(new PMLBootstrapper(new UserContext("u1"), input));
 

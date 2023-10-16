@@ -89,43 +89,41 @@ class CreateObligationStatementTest {
 
         );
         assertEquals(
-                """
-                        create obligation "obl1" {
-                            create rule "rule1"
-                            when any user
-                            performs ["e1", "e2"]
-                            on union of ["oa1", "oa2"]
-                            do (evtCtx) {        
-                                create PC "pc2"
-                            }
-                            create rule "rule2"
-                            when users ["u1"]
-                            performs ["e3"]
-                            on union of ["oa1", "oa2"]
-                            do (evtCtx) {        
-                                create PC "pc3"
-                            }
-                        }""",
+                "create obligation \"obl1\" {\n" +
+                        "    create rule \"rule1\"\n" +
+                        "    when any user\n" +
+                        "    performs [\"e1\", \"e2\"]\n" +
+                        "    on union of [\"oa1\", \"oa2\"]\n" +
+                        "    do (evtCtx) {\n" +
+                        "        create PC \"pc2\"\n" +
+                        "    }\n" +
+                        "    create rule \"rule2\"\n" +
+                        "    when users [\"u1\"]\n" +
+                        "    performs [\"e3\"]\n" +
+                        "    on union of [\"oa1\", \"oa2\"]\n" +
+                        "    do (evtCtx) {\n" +
+                        "        create PC \"pc3\"\n" +
+                        "    }\n" +
+                        "}",
                 stmt.toFormattedString(0)
         );
         assertEquals(
-                """
-                            create obligation "obl1" {
-                                create rule "rule1"
-                                when any user
-                                performs ["e1", "e2"]
-                                on union of ["oa1", "oa2"]
-                                do (evtCtx) {        
-                                    create PC "pc2"
-                                }
-                                create rule "rule2"
-                                when users ["u1"]
-                                performs ["e3"]
-                                on union of ["oa1", "oa2"]
-                                do (evtCtx) {        
-                                    create PC "pc3"
-                                }
-                            }""",
+                "create obligation \"obl1\" {\n" +
+                        "    create rule \"rule1\"\n" +
+                        "    when any user\n" +
+                        "    performs [\"e1\", \"e2\"]\n" +
+                        "    on union of [\"oa1\", \"oa2\"]\n" +
+                        "    do (evtCtx) {\n" +
+                        "        create PC \"pc2\"\n" +
+                        "    }\n" +
+                        "    create rule \"rule2\"\n" +
+                        "    when users [\"u1\"]\n" +
+                        "    performs [\"e3\"]\n" +
+                        "    on union of [\"oa1\", \"oa2\"]\n" +
+                        "    do (evtCtx) {\n" +
+                        "        create PC \"pc3\"\n" +
+                        "    }\n" +
+                        "}",
                 stmt.toFormattedString(0)
         );
     }

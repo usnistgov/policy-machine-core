@@ -32,22 +32,20 @@ class StatementBlockVisitorTest {
     @Test
     void testAllPathsReturned() throws PMException {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else if equals(a, "c") {
-                        return "c"
-                    } else if equals(a, "d") {
-                        return "d"
-                    } else {
-                        return "e"
-                    }
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                        return \"c\"\n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                        return \"d\"\n" +
+                        "                    } else {\n" +
+                        "                        return \"e\"\n" +
+                        "                    }\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
@@ -57,26 +55,24 @@ class StatementBlockVisitorTest {
         assertTrue(result.allPathsReturned());
 
         ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        if true {
-                            return "a"
-                        } else {
-                            return "b"
-                        }
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else if equals(a, "c") {
-                        return "c"
-                    } else if equals(a, "d") {
-                        return "d"
-                    } else {
-                        return "e"
-                    }
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        if true {\n" +
+                        "                            return \"a\"\n" +
+                        "                        } else {\n" +
+                        "                            return \"b\"\n" +
+                        "                        }\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                        return \"c\"\n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                        return \"d\"\n" +
+                        "                    } else {\n" +
+                        "                        return \"e\"\n" +
+                        "                    }\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         visitorContext = new VisitorContext(testGlobalScope);
@@ -86,21 +82,19 @@ class StatementBlockVisitorTest {
         assertTrue(result.allPathsReturned());
 
         ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else if equals(a, "c") {
-                    } else if equals(a, "d") {
-                    } else {
-                    }
-                    
-                    return "e"
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                    } else {\n" +
+                        "                    }\n" +
+                        "                    \n" +
+                        "                    return \"e\"\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         visitorContext = new VisitorContext(testGlobalScope);
@@ -110,25 +104,23 @@ class StatementBlockVisitorTest {
         assertTrue(result.allPathsReturned());
 
         ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        if true {
-                            return "a"
-                        }
-                        
-                        return "a"
-                    } else if equals(a, "c") {
-                    } else if equals(a, "d") {
-                    } else {
-                    }
-                    
-                    return "e"
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        if true {\n" +
+                        "                            return \"a\"\n" +
+                        "                        }\n" +
+                        "                        \n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                    } else {\n" +
+                        "                    }\n" +
+                        "                    \n" +
+                        "                    return \"e\"\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         visitorContext = new VisitorContext(testGlobalScope);
@@ -141,21 +133,19 @@ class StatementBlockVisitorTest {
     @Test
     void testReturnNotLastStatementInBlockThrowsException() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    return "a"
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else if equals(a, "c") {
-                        return "c"
-                    } else if equals(a, "d") {
-                        return "d"
-                    }
-                }
-                """
+                "{\n" +
+                        "                    return \"a\"\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                        return \"c\"\n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                        return \"d\"\n" +
+                        "                    }\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
@@ -168,25 +158,23 @@ class StatementBlockVisitorTest {
         );
 
         ctx = toStatementBlockCtx(
-                """
-                {
-                    return "a"
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                        
-                        if true {
-                            return "a"
-                        }
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else if equals(a, "c") {
-                        return "c"
-                    } else {
-                        return "d"
-                    }
-                }
-                """
+                "{\n" +
+                        "                    return \"a\"\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                        \n" +
+                        "                        if true {\n" +
+                        "                            return \"a\"\n" +
+                        "                        }\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                        return \"c\"\n" +
+                        "                    } else {\n" +
+                        "                        return \"d\"\n" +
+                        "                    }\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         visitorContext = new VisitorContext(testGlobalScope);
@@ -202,11 +190,9 @@ class StatementBlockVisitorTest {
     @Test
     void testReturnTypeDoesNotMatchThrowsException() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    return true
-                }
-                """
+                "{\n" +
+                        "                    return true\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
@@ -222,20 +208,18 @@ class StatementBlockVisitorTest {
     @Test
     void testIfStatementNotAllPathsReturned() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else if equals(a, "c") {
-                        
-                    } else if equals(a, "d") {
-                        
-                    }
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else if equals(a, \"c\") {\n" +
+                        "                        \n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                        \n" +
+                        "                    }\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
@@ -248,24 +232,22 @@ class StatementBlockVisitorTest {
     @Test
     void testMultipleIfStatementsNotAllPathsReturned() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else {
-                        return "c"
-                    }
-                     
-                    if equals(a, "c") {
-                        
-                    } else if equals(a, "d") {
-                        
-                    }
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else {\n" +
+                        "                        return \"c\"\n" +
+                        "                    }\n" +
+                        "                     \n" +
+                        "                    if equals(a, \"c\") {\n" +
+                        "                        \n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                        \n" +
+                        "                    }\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
@@ -278,26 +260,24 @@ class StatementBlockVisitorTest {
     @Test
     void testMultipleIfStatementsAllPathsReturned() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    var a = "a"
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else {
-                        return "c"
-                    }
-                     
-                    if equals(a, "c") {
-                        return "a"
-                    } else if equals(a, "d") {
-                        return "a"
-                    }
-                    
-                    return "b"
-                }
-                """
+                "{\n" +
+                        "                    var a = \"a\"\n" +
+                        "                    if equals(a, \"a\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"b\") {\n" +
+                        "                        return \"b\"\n" +
+                        "                    } else {\n" +
+                        "                        return \"c\"\n" +
+                        "                    }\n" +
+                        "                     \n" +
+                        "                    if equals(a, \"c\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    } else if equals(a, \"d\") {\n" +
+                        "                        return \"a\"\n" +
+                        "                    }\n" +
+                        "                    \n" +
+                        "                    return \"b\"\n" +
+                        "                }"
         );
         ctx.parent = toCtx("function f1() {}", PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
@@ -310,11 +290,9 @@ class StatementBlockVisitorTest {
     @Test
     void testFunctionInBlock() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    function f1() {}
-                }
-                """
+                "{\n" +
+                        "    function f1() {}\n" +
+                        "}"
         );
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
         StatementBlockVisitor.Result result = new StatementBlockVisitor(visitorContext, Type.string())

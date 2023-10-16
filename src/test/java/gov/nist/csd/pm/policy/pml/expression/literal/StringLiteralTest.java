@@ -21,9 +21,7 @@ class StringLiteralTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                "test"
-                """,
+                "\"test\"",
                 PMLParser.LiteralExpressionContext.class);
 
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));

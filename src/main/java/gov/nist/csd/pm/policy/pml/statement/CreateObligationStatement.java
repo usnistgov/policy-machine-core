@@ -68,9 +68,8 @@ public class CreateObligationStatement extends PMLStatement {
 
         String indent = indent(indentLevel);
         return String.format(
-                """
-                %screate obligation %s {
-                %s%s}""", indent, name, sb, indent);
+                "%screate obligation %s {\n" +
+                        "%s%s}", indent, name, sb, indent);
     }
 
     @Override

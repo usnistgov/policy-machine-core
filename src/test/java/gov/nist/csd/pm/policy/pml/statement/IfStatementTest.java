@@ -16,28 +16,26 @@ class IfStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        String pml = """
-                function func1(string s) {
-                    if s == "a" {
-                        create policy class s
-
-                    } else if s == "b" {
-                        create policy class s
-                    
-                    } else if s == "c" {
-                        create policy class s
-                    
-                    } else {
-                        create policy class s
-                    
-                    }
-                }
-                
-                func1("a")
-                func1("b")
-                func1("c")
-                func1("d")
-                """;
+        String pml = "function func1(string s) {\n" +
+                "                    if s == \"a\" {\n" +
+                "                        create policy class s\n" +
+                "\n" +
+                "                    } else if s == \"b\" {\n" +
+                "                        create policy class s\n" +
+                "                    \n" +
+                "                    } else if s == \"c\" {\n" +
+                "                        create policy class s\n" +
+                "                    \n" +
+                "                    } else {\n" +
+                "                        create policy class s\n" +
+                "                    \n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                func1(\"a\")\n" +
+                "                func1(\"b\")\n" +
+                "                func1(\"c\")\n" +
+                "                func1(\"d\")";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext("u1"), pml);
 
@@ -75,29 +73,26 @@ class IfStatementTest {
                 )
         );
 
-        assertEquals("""
-                             if true {
-                                 create PC "a"
-                             } else if true {
-                                 create PC "b"                          
-                             } else if true {
-                                 create PC "c"
-                             } else {
-                                 create PC "d"                             
-                             }""",
+        assertEquals("if true {\n" +
+                             "    create PC \"a\"\n" +
+                             "} else if true {\n" +
+                             "    create PC \"b\"\n" +
+                             "} else if true {\n" +
+                             "    create PC \"c\"\n" +
+                             "} else {\n" +
+                             "    create PC \"d\"\n" +
+                             "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 if true {
-                                     create PC "a"
-                                 } else if true {
-                                     create PC "b"                          
-                                 } else if true {
-                                     create PC "c"
-                                 } else {
-                                     create PC "d"                             
-                                 }
-                             """,
-                     stmt.toFormattedString(1) + "\n");
+        assertEquals("    if true {\n" +
+                             "        create PC \"a\"\n" +
+                             "    } else if true {\n" +
+                             "        create PC \"b\"\n" +
+                             "    } else if true {\n" +
+                             "        create PC \"c\"\n" +
+                             "    } else {\n" +
+                             "        create PC \"d\"\n" +
+                             "    }",
+                     stmt.toFormattedString(1));
     }
 }

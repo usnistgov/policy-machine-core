@@ -214,5 +214,21 @@ public class CreatePolicyStmtVisitor extends PMLBaseVisitor<CreatePolicyStatemen
         return lines;
     }
 
-    record HierarchyLine(int indent, String stmt) { }
+    static class HierarchyLine {
+        private final int indent;
+        private final String stmt;
+
+        public HierarchyLine(int indent, String stmt) {
+            this.indent = indent;
+            this.stmt = stmt;
+        }
+
+        public int indent() {
+            return indent;
+        }
+
+        public String stmt() {
+            return stmt;
+        }
+    }
 }

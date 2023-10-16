@@ -39,9 +39,7 @@ class MysqlGraphStore implements GraphStore {
         checkSetResourceAccessRightsInput(accessRightSet);
 
         try {
-            String sql = """
-                insert into resource_access_rights (id, access_rights) values (1, ?) ON DUPLICATE KEY UPDATE access_rights = (?);
-                """;
+            String sql = "insert into resource_access_rights (id, access_rights) values (1, ?) ON DUPLICATE KEY UPDATE access_rights = (?);";
             try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
                 String arJson = MysqlPolicyStore.arsetToJson(accessRightSet);
                 ps.setString(1, arJson);
@@ -56,9 +54,7 @@ class MysqlGraphStore implements GraphStore {
     @Override
     public AccessRightSet getResourceAccessRights() throws MysqlPolicyException {
         AccessRightSet arset = new AccessRightSet();
-        String sql = """
-                    select access_rights from resource_access_rights;
-                    """;
+        String sql = "select access_rights from resource_access_rights;";
 
         try(Statement stmt = connection.getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
@@ -136,9 +132,7 @@ class MysqlGraphStore implements GraphStore {
     throws PMBackendException, NodeDoesNotExistException {
         checkSetNodePropertiesInput(name);
 
-        String sql = """
-                    UPDATE node SET properties=? WHERE NAME=?
-                    """;
+        String sql = "UPDATE node SET properties=? WHERE NAME=?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, MysqlPolicyStore.toJSON(properties));
             ps.setString(2, name);
@@ -150,9 +144,7 @@ class MysqlGraphStore implements GraphStore {
 
     @Override
     public boolean nodeExists(String name) throws MysqlPolicyException {
-        String sql = """
-                    SELECT count(*) FROM node WHERE name = ?
-                    """;
+        String sql = "SELECT count(*) FROM node WHERE name = ?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
@@ -175,9 +167,7 @@ class MysqlGraphStore implements GraphStore {
     public Node getNode(String name) throws NodeDoesNotExistException, PMBackendException {
         checkGetNodeInput(name);
 
-        String sql = """
-                    SELECT name, node_type_id, properties FROM node WHERE name = ?
-                    """;
+        String sql = "SELECT name, node_type_id, properties FROM node WHERE name = ?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
@@ -230,7 +220,7 @@ class MysqlGraphStore implements GraphStore {
             }
         }
 
-        if (!where.isEmpty()) {
+        if (where.length() != 0) {
             sql = sql + " where " + where;
         }
 
@@ -250,9 +240,7 @@ class MysqlGraphStore implements GraphStore {
     @Override
     public List<String> getPolicyClasses() throws MysqlPolicyException {
         List<String> policyClasses = new ArrayList<>();
-        String sql = """
-                    SELECT name FROM node WHERE node_type_id = ?
-                    """;
+        String sql = "SELECT name FROM node WHERE node_type_id = ?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setInt(1, MysqlPolicyStore.getNodeTypeId(PC));
             ResultSet rs = ps.executeQuery();
@@ -283,9 +271,7 @@ class MysqlGraphStore implements GraphStore {
             return;
         }
 
-        String sql = """
-                    DELETE FROM node WHERE NAME=?
-                    """;
+        String sql = "DELETE FROM node WHERE NAME=?";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
             ps.execute();
@@ -312,11 +298,9 @@ class MysqlGraphStore implements GraphStore {
             return;
         }
 
-        String sql = """
-            INSERT INTO assignment (start_node_id, end_node_id) VALUES (
-              (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)
-            ) ON DUPLICATE KEY UPDATE start_node_id=start_node_id
-            """;
+        String sql = "INSERT INTO assignment (start_node_id, end_node_id) VALUES (\n" +
+                "              (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)\n" +
+                "            ) ON DUPLICATE KEY UPDATE start_node_id=start_node_id";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, child);
@@ -334,11 +318,9 @@ class MysqlGraphStore implements GraphStore {
             return;
         }
 
-        String sql = """
-            DELETE FROM assignment
-            WHERE start_node_id = (SELECT id FROM node WHERE name=?)
-            AND end_node_id = (SELECT id FROM node WHERE name=?)
-            """;
+        String sql = "DELETE FROM assignment\n" +
+                "            WHERE start_node_id = (SELECT id FROM node WHERE name=?)\n" +
+                "            AND end_node_id = (SELECT id FROM node WHERE name=?)";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, child);
@@ -355,12 +337,10 @@ class MysqlGraphStore implements GraphStore {
 
         List<String> parents = new ArrayList<>();
 
-        String sql = """
-                    select parents.name from node
-                    join assignment on node.id=assignment.start_node_id
-                    join node as parents on parents.id=assignment.end_node_id
-                    where node.name = ?;
-                    """;
+        String sql = "select parents.name from node\n" +
+                "                    join assignment on node.id=assignment.start_node_id\n" +
+                "                    join node as parents on parents.id=assignment.end_node_id\n" +
+                "                    where node.name = ?;";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, node);
@@ -384,12 +364,10 @@ class MysqlGraphStore implements GraphStore {
 
         List<String> children = new ArrayList<>();
 
-        String sql = """
-                    select children.name from node
-                    join assignment on node.id=assignment.end_node_id
-                    join node as children on children.id=assignment.start_node_id
-                    where node.name = ?;
-                    """;
+        String sql = "select children.name from node\n" +
+                "                    join assignment on node.id=assignment.end_node_id\n" +
+                "                    join node as children on children.id=assignment.start_node_id\n" +
+                "                    where node.name = ?;";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, node);
@@ -411,11 +389,9 @@ class MysqlGraphStore implements GraphStore {
     throws PMBackendException, UnknownAccessRightException, NodeDoesNotExistException, InvalidAssociationException {
         checkAssociateInput(ua, target, accessRights);
 
-        String sql = """
-            INSERT INTO association (start_node_id, end_node_id, operation_set) VALUES (
-              (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?), ?
-            ) ON DUPLICATE KEY UPDATE operation_set=?
-            """;
+        String sql = "INSERT INTO association (start_node_id, end_node_id, operation_set) VALUES (\n" +
+                "              (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?), ?\n" +
+                "            ) ON DUPLICATE KEY UPDATE operation_set=?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, ua);
@@ -436,11 +412,9 @@ class MysqlGraphStore implements GraphStore {
             return;
         }
 
-        String sql = """
-            DELETE FROM association
-            WHERE start_node_id = (SELECT id FROM node WHERE name=?)
-            AND end_node_id = (SELECT id FROM node WHERE name=?)
-            """;
+        String sql = "DELETE FROM association\n" +
+                "            WHERE start_node_id = (SELECT id FROM node WHERE name=?)\n" +
+                "            AND end_node_id = (SELECT id FROM node WHERE name=?)";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, ua);
@@ -457,12 +431,10 @@ class MysqlGraphStore implements GraphStore {
 
         List<Association> associations = new ArrayList<>();
 
-        String sql = """
-                    select targets.name, association.operation_set from node
-                    join association on node.id=association.start_node_id
-                    join node as targets on targets.id=association.end_node_id
-                    where node.name = ?;
-                    """;
+        String sql = "select targets.name, association.operation_set from node\n" +
+                "                    join association on node.id=association.start_node_id\n" +
+                "                    join node as targets on targets.id=association.end_node_id\n" +
+                "                    where node.name = ?;";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, ua);
             ResultSet rs = ps.executeQuery();
@@ -487,12 +459,10 @@ class MysqlGraphStore implements GraphStore {
 
         List<Association> associations = new ArrayList<>();
 
-        String sql = """
-                    select sources.name, association.operation_set from node
-                    join association on node.id=association.end_node_id
-                    join node as sources on sources.id=association.start_node_id
-                    where node.name = ?;
-                    """;
+        String sql = "select sources.name, association.operation_set from node\n" +
+                "                    join association on node.id=association.end_node_id\n" +
+                "                    join node as sources on sources.id=association.start_node_id\n" +
+                "                    where node.name = ?;";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, target);
             ResultSet rs = ps.executeQuery();
@@ -568,9 +538,7 @@ class MysqlGraphStore implements GraphStore {
     }
 
     protected void createNodeInternal(String name, NodeType type, Map<String, String> properties) throws MysqlPolicyException {
-        String sql = """
-                    INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)
-                    """;
+        String sql = "INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)";
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setInt(1, MysqlPolicyStore.getNodeTypeId(type));
             ps.setString(2, name);
@@ -582,11 +550,9 @@ class MysqlGraphStore implements GraphStore {
     }
 
     protected void assignInternal(String child, String parent) throws MysqlPolicyException {
-        String sql = """
-            INSERT INTO assignment (start_node_id, end_node_id) VALUES (
-              (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)
-            ) ON DUPLICATE KEY UPDATE start_node_id=start_node_id
-            """;
+        String sql = "INSERT INTO assignment (start_node_id, end_node_id) VALUES (\n" +
+                "              (SELECT id FROM node WHERE name=?), (SELECT id FROM node WHERE name=?)\n" +
+                "            ) ON DUPLICATE KEY UPDATE start_node_id=start_node_id";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, child);

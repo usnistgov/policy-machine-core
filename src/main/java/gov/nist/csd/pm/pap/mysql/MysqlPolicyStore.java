@@ -104,24 +104,24 @@ public class MysqlPolicyStore extends PolicyStore implements Verifier {
 
     static int getNodeTypeId(NodeType nodeType) {
         // values are mapped to values in node_type table
-        return switch (nodeType) {
-            case PC -> 5;
-            case OA -> 1;
-            case UA -> 2;
-            case O -> 4;
-            default -> 3; // U
-        };
+        switch (nodeType) {
+            case PC: return 5;
+            case OA: return 1;
+            case UA: return 2;
+            case O: return 4;
+            default: return 3; // U
+        }
     }
 
     static NodeType getNodeTypeFromId(int id) {
         // values are mapped to values in node_type table
-        return switch (id) {
-            case 1 -> OA;
-            case 2 -> UA;
-            case 3 -> U;
-            case 4 -> O;
-            default -> PC;
-        };
+        switch (id) {
+            case 1: return OA;
+            case 2: return UA;
+            case 3: return U;
+            case 4: return O;
+            default: return PC;
+        }
     }
 
     public static String toJSON(Map<String, String> map) throws JsonProcessingException {

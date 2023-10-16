@@ -58,6 +58,7 @@ public class Rule implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rule rule = (Rule) o;
+
         return name.equals(rule.name) && eventPattern.equals(rule.eventPattern) && response.equals(rule.response);
     }
 

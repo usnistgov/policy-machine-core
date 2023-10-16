@@ -19,9 +19,7 @@ class AssignStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.AssignStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                assign "a" to ["b", "c"]
-                """,
+                "assign \"a\" to [\"b\", \"c\"]",
                 PMLParser.AssignStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new AssignStmtVisitor(visitorCtx).visitAssignStatement(ctx);
@@ -35,9 +33,7 @@ class AssignStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.AssignStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                assign "a" to "b"
-                """,
+                "assign \"a\" to \"b\"",
                 PMLParser.AssignStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new AssignStmtVisitor(visitorCtx).visitAssignStatement(ctx);
@@ -47,9 +43,7 @@ class AssignStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                assign ["a"] to "b"
-                """,
+                "assign [\"a\"] to \"b\"",
                 PMLParser.AssignStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new AssignStmtVisitor(visitorCtx).visitAssignStatement(ctx);

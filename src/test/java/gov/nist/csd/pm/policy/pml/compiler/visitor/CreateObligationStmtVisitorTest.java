@@ -20,9 +20,7 @@ class CreateObligationStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {}
-                """,
+                "create obligation \"test\" {}",
                 PMLParser.CreateObligationStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
@@ -36,9 +34,7 @@ class CreateObligationStmtVisitorTest {
     @Test
     void testInvalidNameExpression() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation ["test"] {}
-                """,
+                "create obligation [\"test\"] {}",
                 PMLParser.CreateObligationStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);

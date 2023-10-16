@@ -47,35 +47,46 @@ abstract class TxCmd<T extends MemoryStore<?>> {
 
 
     static TxCmd<?> eventToCmd(PolicyEvent event) throws UnsupportedPolicyEvent {
-        if (event instanceof CreateConstantEvent e) {
+        if (event instanceof CreateConstantEvent) {
+            CreateConstantEvent e = (CreateConstantEvent) event;
             return new TxCmd.AddConstantTxCmd(
                     e.getName(),
                     e.getValue()
             );
 
-        } else if (event instanceof CreateFunctionEvent e) {
+        } else if (event instanceof CreateFunctionEvent) {
+            CreateFunctionEvent e = (CreateFunctionEvent) event;
+
             return new TxCmd.AddFunctionTxCmd(
                     e.getFunctionDefinitionStatement()
             );
 
-        } else if (event instanceof AssignEvent e) {
+        } else if (event instanceof AssignEvent) {
+            AssignEvent e = (AssignEvent) event;
+
             return new TxCmd.AssignTxCmd(
                     e.getChild(),
                     e.getParent()
             );
 
-        } else if (event instanceof AssignToEvent e) {
+        } else if (event instanceof AssignToEvent) {
+            AssignToEvent e = (AssignToEvent) event;
+
             return new TxCmd.AssignTxCmd(
                     e.getChild(),
                     e.getParent()
             );
 
-        } else if (event instanceof AssociateEvent e) {
+        } else if (event instanceof AssociateEvent) {
+            AssociateEvent e = (AssociateEvent) event;
+
             return new TxCmd.AssociateTxCmd(
                     new Association(e.getUa(), e.getTarget(), e.getAccessRightSet())
             );
 
-        } else if (event instanceof CreateObjectAttributeEvent e) {
+        } else if (event instanceof CreateObjectAttributeEvent) {
+            CreateObjectAttributeEvent e = (CreateObjectAttributeEvent) event;
+
             return new TxCmd.CreateObjectAttributeTxCmd(
                     e.getName(),
                     e.getProperties(),
@@ -83,7 +94,9 @@ abstract class TxCmd<T extends MemoryStore<?>> {
                     e.getAdditionalParents()
             );
 
-        } else if (event instanceof CreateObjectEvent e) {
+        } else if (event instanceof CreateObjectEvent) {
+            CreateObjectEvent e = (CreateObjectEvent) event;
+
             return new TxCmd.CreateObjectTxCmd(
                     e.getName(),
                     e.getProperties(),
@@ -91,23 +104,31 @@ abstract class TxCmd<T extends MemoryStore<?>> {
                     e.getAdditionalParents()
             );
 
-        } else if (event instanceof CreateObligationEvent e) {
+        } else if (event instanceof CreateObligationEvent) {
+            CreateObligationEvent e = (CreateObligationEvent) event;
+
             return new TxCmd.CreateObligationTxCmd(
                     new Obligation(e.getAuthor(), e.getName(), e.getRules())
             );
 
-        } else if (event instanceof CreatePolicyClassEvent e) {
+        } else if (event instanceof CreatePolicyClassEvent) {
+            CreatePolicyClassEvent e = (CreatePolicyClassEvent) event;
+
             return new TxCmd.CreatePolicyClassTxCmd(
                     e.getName(),
                     e.getProperties()
             );
 
-        } else if (event instanceof CreateProhibitionEvent e) {
+        } else if (event instanceof CreateProhibitionEvent) {
+            CreateProhibitionEvent e = (CreateProhibitionEvent) event;
+
             return new TxCmd.CreateProhibitionTxCmd(
                     new Prohibition(e.getName(), e.getSubject(), e.getAccessRightSet(), e.isIntersection(), e.getContainers())
             );
 
-        } else if (event instanceof CreateUserAttributeEvent e) {
+        } else if (event instanceof CreateUserAttributeEvent) {
+            CreateUserAttributeEvent e = (CreateUserAttributeEvent) event;
+
             return new TxCmd.CreateUserAttributeTxCmd(
                     e.getName(),
                     e.getProperties(),
@@ -115,7 +136,9 @@ abstract class TxCmd<T extends MemoryStore<?>> {
                     e.getAdditionalParents()
             );
 
-        } else if (event instanceof CreateUserEvent e) {
+        } else if (event instanceof CreateUserEvent) {
+            CreateUserEvent e = (CreateUserEvent) event;
+
             return new TxCmd.CreateUserTxCmd(
                     e.getName(),
                     e.getProperties(),
@@ -123,62 +146,84 @@ abstract class TxCmd<T extends MemoryStore<?>> {
                     e.getAdditionalParents()
             );
 
-        } else if (event instanceof DeassignEvent e) {
+        } else if (event instanceof DeassignEvent) {
+            DeassignEvent e = (DeassignEvent) event;
+
             return new TxCmd.DeassignTxCmd(
                     e.getChild(),
                     e.getParent()
             );
 
-        } else if (event instanceof TxEvents.MemoryDeleteNodeEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteNodeEvent) {
+            TxEvents.MemoryDeleteNodeEvent e = (TxEvents.MemoryDeleteNodeEvent) event;
+
             return new TxCmd.DeleteNodeTxCmd(
                     e.getName(),
                     e.getNode(),
                     e.getParents()
             );
 
-        } else if (event instanceof TxEvents.MemoryDeleteObligationEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteObligationEvent) {
+            TxEvents.MemoryDeleteObligationEvent e = (TxEvents.MemoryDeleteObligationEvent) event;
+
             return new TxCmd.DeleteObligationTxCmd(
                     e.getObligationToDelete()
             );
 
-        } else if (event instanceof TxEvents.MemoryDeleteProhibitionEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteProhibitionEvent) {
+            TxEvents.MemoryDeleteProhibitionEvent e = (TxEvents.MemoryDeleteProhibitionEvent) event;
+
             return new TxCmd.DeleteProhibitionTxCmd(
                     e.getProhibitionToDelete()
             );
 
-        } else if (event instanceof TxEvents.MemoryDissociateEvent e) {
+        } else if (event instanceof TxEvents.MemoryDissociateEvent) {
+            TxEvents.MemoryDissociateEvent e = (TxEvents.MemoryDissociateEvent) event;
+
             return new TxCmd.DissociateTxCmd(
                     new Association(e.getUa(), e.getTarget(), e.getAccessRightSet())
             );
 
-        } else if (event instanceof TxEvents.MemoryDeleteConstantEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteConstantEvent) {
+            TxEvents.MemoryDeleteConstantEvent e = (TxEvents.MemoryDeleteConstantEvent) event;
+
             return new TxCmd.RemoveConstantTxCmd(
                     e.getName(),
                     e.getValue()
             );
 
-        } else if (event instanceof TxEvents.MemoryDeleteFunctionEvent e) {
+        } else if (event instanceof TxEvents.MemoryDeleteFunctionEvent) {
+            TxEvents.MemoryDeleteFunctionEvent e = (TxEvents.MemoryDeleteFunctionEvent) event;
+
             return new TxCmd.RemoveFunctionTxCmd(e.getFunctionDefinitionStatement());
 
-        } else if (event instanceof TxEvents.MemorySetNodePropertiesEvent e) {
+        } else if (event instanceof TxEvents.MemorySetNodePropertiesEvent) {
+            TxEvents.MemorySetNodePropertiesEvent e = (TxEvents.MemorySetNodePropertiesEvent) event;
+
             return new TxCmd.SetNodePropertiesTxCmd(
                     e.getName(),
                     e.getOldProps(),
                     e.getProperties()
             );
 
-        } else if (event instanceof TxEvents.MemoryUpdateObligationEvent e) {
+        } else if (event instanceof TxEvents.MemoryUpdateObligationEvent) {
+            TxEvents.MemoryUpdateObligationEvent e = (TxEvents.MemoryUpdateObligationEvent) event;
+
             return new TxCmd.UpdateObligationTxCmd(
                     new Obligation(e.getAuthor(), e.getName(), e.getRules()), e.getOldObl()
             );
 
-        } else if (event instanceof TxEvents.MemoryUpdateProhibitionEvent e) {
+        } else if (event instanceof TxEvents.MemoryUpdateProhibitionEvent) {
+            TxEvents.MemoryUpdateProhibitionEvent e = (TxEvents.MemoryUpdateProhibitionEvent) event;
+
             return new TxCmd.UpdateProhibitionTxCmd(
                     new Prohibition(e.getName(), e.getSubject(), e.getAccessRightSet(), e.isIntersection(), e.getContainers()),
                     e.getOldPro()
             );
 
-        } else if (event instanceof TxEvents.MemorySetResourceAccessRightsEvent e) {
+        } else if (event instanceof TxEvents.MemorySetResourceAccessRightsEvent) {
+            TxEvents.MemorySetResourceAccessRightsEvent e = (TxEvents.MemorySetResourceAccessRightsEvent) event;
+
             return new TxCmd.SetResourceAccessRightsTxCmd(
                     e.getOldAccessRights(),
                     e.getNewAccessRights()
@@ -348,11 +393,21 @@ abstract class TxCmd<T extends MemoryStore<?>> {
             }
 
             switch (type) {
-                case PC -> store.createPolicyClass(name, properties);
-                case OA -> store.createObjectAttribute(name, properties, initialParent, parentsArr);
-                case UA -> store.createUserAttribute(name, properties, initialParent, parentsArr);
-                case O -> store.createObject(name, properties, initialParent, parentsArr);
-                case U -> store.createUser(name, properties, initialParent, parentsArr);
+                case PC:
+                    store.createPolicyClass(name, properties);
+                    break;
+                case OA:
+                    store.createObjectAttribute(name, properties, initialParent, parentsArr);
+                    break;
+                case UA:
+                    store.createUserAttribute(name, properties, initialParent, parentsArr);
+                    break;
+                case O:
+                    store.createObject(name, properties, initialParent, parentsArr);
+                    break;
+                case U:
+                    store.createUser(name, properties, initialParent, parentsArr);
+                    break;
             }
         }
     }

@@ -18,28 +18,27 @@ class GraphReviewerTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    oas {
-                        "oa1"
-                            "oa2"
-                                "oa3"
-                        "oa4"                                  
-                    }
-                }
-                
-                create pc "pc2" {
-                    oas {
-                        "oa5"
-                            "oa6"
-                    }
-                }
-                
-                create pc "pc3"
-                
-                create o "o1" assign to ["oa3", "oa6"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa2\"\n" +
+                "                \"oa3\"\n" +
+                "        \"oa4\"\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create pc \"pc2\" {\n" +
+                "    oas {\n" +
+                "        \"oa5\"\n" +
+                "            \"oa6\"\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create pc \"pc3\"\n" +
+                "\n" +
+                "create o \"o1\" assign to [\"oa3\", \"oa6\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 

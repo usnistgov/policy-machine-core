@@ -19,9 +19,7 @@ class SetNodePropertiesStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.SetNodePropertiesStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                set properties of "o1" to {"a": "b"}
-                """,
+                "set properties of \"o1\" to {\"a\": \"b\"}",
                 PMLParser.SetNodePropertiesStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new SetNodePropertiesStmtVisitor(visitorCtx)
@@ -36,9 +34,7 @@ class SetNodePropertiesStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.SetNodePropertiesStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                set properties of ["o1"] to {"a": "b"}
-                """,
+                "set properties of [\"o1\"] to {\"a\": \"b\"}",
                 PMLParser.SetNodePropertiesStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new SetNodePropertiesStmtVisitor(visitorCtx)
@@ -50,9 +46,7 @@ class SetNodePropertiesStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                set properties of "o1" to ["a", "b"]
-                """,
+                "set properties of \"o1\" to [\"a\", \"b\"]",
                 PMLParser.SetNodePropertiesStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new SetNodePropertiesStmtVisitor(visitorCtx)

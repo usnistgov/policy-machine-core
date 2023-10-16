@@ -67,30 +67,30 @@ public class CreateNonPCStatement extends PMLStatement{
         String[] parentsArr = parents.toArray(new String[]{});
 
         switch (type) {
-            case UA -> policy.graph().createUserAttribute(
+            case UA: policy.graph().createUserAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
-            );
-            case OA -> policy.graph().createObjectAttribute(
+            ); break;
+            case OA: policy.graph().createObjectAttribute(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
-            );
-            case U -> policy.graph().createUser(
+            ); break;
+            case U: policy.graph().createUser(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
-            );
-            case O -> policy.graph().createObject(
+            ); break;
+            case O: policy.graph().createObject(
                     nameValue.getStringValue(),
                     new HashMap<>(),
                     initialParent,
                     parentsArr
-            );
+            ); break;
         }
 
         if (withProperties != null) {

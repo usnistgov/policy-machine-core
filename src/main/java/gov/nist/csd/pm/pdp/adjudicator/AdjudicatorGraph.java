@@ -180,12 +180,13 @@ public class AdjudicatorGraph implements Graph {
             return;
         }
 
-        String op = switch (nodeType) {
-            case OA -> DELETE_OBJECT_ATTRIBUTE;
-            case UA -> DELETE_USER_ATTRIBUTE;
-            case O -> DELETE_OBJECT;
-            case U -> DELETE_USER;
-            default -> DELETE_POLICY_CLASS;
+        String op = "";
+        switch (nodeType) {
+            case OA: op = DELETE_OBJECT_ATTRIBUTE; break;
+            case UA: op = DELETE_USER_ATTRIBUTE; break;
+            case O: op = DELETE_OBJECT; break;
+            case U: op = DELETE_USER; break;
+            default: op = DELETE_POLICY_CLASS; break;
         };
 
         // check the user can delete the node

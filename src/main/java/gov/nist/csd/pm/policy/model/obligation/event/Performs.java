@@ -2,7 +2,17 @@ package gov.nist.csd.pm.policy.model.obligation.event;
 
 import java.util.Arrays;
 
-public record Performs (String ... events) {
+public class Performs {
+
+    private final String[] events;
+
+    public Performs(String... events) {
+        this.events = events;
+    }
+
+    public String[] events() {
+        return events;
+    }
 
     public static Performs events(String ... events) {
         return new Performs(events);

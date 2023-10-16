@@ -330,10 +330,10 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         checkCreateNodeInput(name, type, parent, additionalParents);
 
         switch (type) {
-            case OA -> handleTxIfActive(tx -> tx.createObjectAttribute(name, properties, parent, additionalParents));
-            case UA -> handleTxIfActive(tx -> tx.createUserAttribute(name, properties, parent, additionalParents));
-            case O -> handleTxIfActive(tx -> tx.createObject(name, properties, parent, additionalParents));
-            default -> handleTxIfActive(tx -> tx.createUser(name, properties, parent, additionalParents));
+            case OA: handleTxIfActive(tx -> tx.createObjectAttribute(name, properties, parent, additionalParents)); break;
+            case UA: handleTxIfActive(tx -> tx.createUserAttribute(name, properties, parent, additionalParents)); break;
+            case O:  handleTxIfActive(tx -> tx.createObject(name, properties, parent, additionalParents)); break;
+            default: handleTxIfActive(tx -> tx.createUser(name, properties, parent, additionalParents)); break;
         }
 
         createNodeInternal(name, type, properties);
@@ -435,21 +435,11 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
 
     private Vertex buildVertex(String name, NodeType type, Map<String, String> properties) {
         switch (type) {
-            case PC -> {
-                return new VertexPolicyClass(name, properties);
-            }
-            case OA -> {
-                return new VertexAttribute(name, OA, properties);
-            }
-            case UA -> {
-                return new VertexAttribute(name, UA, properties);
-            }
-            case O -> {
-                return new VertexLeaf(name, O, properties);
-            }
-            default -> {
-                return new VertexLeaf(name, U, properties);
-            }
+            case PC: return new VertexPolicyClass(name, properties);
+            case OA: return new VertexAttribute(name, properties);
+            case UA: return new VertexAttribute(name, properties);
+            case O: return new VertexLeaf(name, properties);
+            default: return new VertexLeaf(name, properties);
         }
     }
 

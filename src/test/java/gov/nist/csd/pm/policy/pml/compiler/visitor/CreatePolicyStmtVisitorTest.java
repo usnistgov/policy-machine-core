@@ -32,9 +32,7 @@ class CreatePolicyStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create policy class "test"
-                """,
+                "create policy class \"test\"",
                 PMLParser.CreatePolicyStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
@@ -49,9 +47,7 @@ class CreatePolicyStmtVisitorTest {
     @Test
     void testSuccessWithProperties() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create policy class "test" with properties {"a": "b"}
-                """,
+                "create policy class \"test\" with properties {\"a\": \"b\"}",
                 PMLParser.CreatePolicyStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
@@ -65,9 +61,7 @@ class CreatePolicyStmtVisitorTest {
     @Test
     void testInvalidNameExpression() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create policy class ["test"]
-                """,
+                "create policy class [\"test\"]",
                 PMLParser.CreatePolicyStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
@@ -80,19 +74,18 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testHierarchyUserAttributesOnly() throws PMException {
-        String pml = """
-                create policy class "test" {
-                    user attributes {
-                        "a"
-                            "a1"
-                            "a2"
-                                "a21"
-                            "a3"
-                        "b"
-                            "b1"
-                    }
-                }
-                """;
+        String pml = "" +
+                "create policy class \"test\" {\n" +
+                "    user attributes {\n" +
+                "        \"a\"\n" +
+                "            \"a1\"\n" +
+                "            \"a2\"\n" +
+                "                \"a21\"\n" +
+                "            \"a3\"\n" +
+                "        \"b\"\n" +
+                "            \"b1\"\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(1, compiledPML.stmts().size());
@@ -119,19 +112,18 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testHierarchyObjectAttributesOnly() throws PMException {
-        String pml = """
-                create policy class "test" {
-                    object attributes {
-                        "a"
-                            "a1"
-                            "a2"
-                                "a21"
-                            "a3"
-                        "b"
-                            "b1"
-                    }
-                }
-                """;
+        String pml =
+                "create policy class \"test\" {\n" +
+                "    object attributes {\n" +
+                "        \"a\"\n" +
+                "            \"a1\"\n" +
+                "            \"a2\"\n" +
+                "                \"a21\"\n" +
+                "            \"a3\"\n" +
+                "        \"b\"\n" +
+                "            \"b1\"\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(1, compiledPML.stmts().size());
@@ -158,21 +150,20 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testHierarchyUsingReferenceByID() throws PMException {
-        String pml = """
-                const a = "a"
-                const b = "b"
-                create policy class "test" {
-                    object attributes {
-                        a
-                            "a1"
-                            "a2"
-                                "a21"
-                            "a3"
-                        b
-                            "a21"
-                    }
-                }
-                """;
+        String pml =
+                "const a = \"a\"\n" +
+                "const b = \"b\"\n" +
+                "create policy class \"test\" {\n" +
+                "    object attributes {\n" +
+                "        a\n" +
+                "            \"a1\"\n" +
+                "            \"a2\"\n" +
+                "                \"a21\"\n" +
+                "            \"a3\"\n" +
+                "        b\n" +
+                "            \"a21\"\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(1, compiledPML.stmts().size());
@@ -201,16 +192,14 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testAssociationsOnly() throws PMException {
-        String pml = """
-                const a = "a"
-                create policy class "test" {
-                    associations {
-                        a and "b" with ["read", "write"]
-                        a and "c" with ["read"]
-                        a and "d" with ["read"]
-                    }
-                }
-                """;
+        String pml = "const a = \"a\"\n" +
+                "                create policy class \"test\" {\n" +
+                "                    associations {\n" +
+                "                        a and \"b\" with [\"read\", \"write\"]\n" +
+                "                        a and \"c\" with [\"read\"]\n" +
+                "                        a and \"d\" with [\"read\"]\n" +
+                "                    }\n" +
+                "                }";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(1, compiledPML.stmts().size());
@@ -234,32 +223,31 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testUserAndObjectAttributeWithAssociationsAndPropertiesHierarchy() throws PMException {
-        String pml = """
-                create policy class "test" with properties {"a": "b"} {
-                    user attributes {
-                        "ua1"
-                            "ua1-1"
-                            "ua1-2"
-                                "ua1-2-1"
-                            "ua1-3"
-                        "ua2"
-                            "ua2-1"
-                    }
-                    object attributes {
-                        "oa1"
-                            "oa1-1"
-                            "oa1-2"
-                                "oa1-2-1"
-                            "oa1-3"
-                        "oa2"
-                            "oa2-1"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                        "ua1" and "oa1" with [create_policy_class]
-                    }
-                }
-                """;
+        String pml =
+                "create policy class \"test\" with properties {\"a\": \"b\"} {\n" +
+                "    user attributes {\n" +
+                "        \"ua1\"\n" +
+                "            \"ua1-1\"\n" +
+                "            \"ua1-2\"\n" +
+                "                \"ua1-2-1\"\n" +
+                "            \"ua1-3\"\n" +
+                "        \"ua2\"\n" +
+                "            \"ua2-1\"\n" +
+                "    }\n" +
+                "    object attributes {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa1-1\"\n" +
+                "            \"oa1-2\"\n" +
+                "                \"oa1-2-1\"\n" +
+                "            \"oa1-3\"\n" +
+                "        \"oa2\"\n" +
+                "            \"oa2-1\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "        \"ua1\" and \"oa1\" with [create_policy_class]\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(1, compiledPML.stmts().size());
@@ -298,41 +286,40 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testAttributeInMultipleAttributesAndPolicyClasses() throws PMException {
-        String pml = """
-                create policy class "test" with properties {"a": "b"} {
-                    user attributes {
-                        "ua1"
-                            "ua3"
-                        "ua2"
-                            "ua3"
-                    }
-                    
-                    object attributes {
-                        "oa1"
-                    }
-                    
-                    
-                    
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                
-                create policy class "test2" with properties {"a": "b"} {
-                    user attributes {
-                        "ua1"
-                            "ua3"
-                        "ua2"
-                            "ua3"
-                    }
-                    object attributes {
-                        "oa1"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                """;
+        String pml =
+                "create policy class \"test\" with properties {\"a\": \"b\"} {\n" +
+                "    user attributes {\n" +
+                "        \"ua1\"\n" +
+                "            \"ua3\"\n" +
+                "        \"ua2\"\n" +
+                "            \"ua3\"\n" +
+                "    }\n" +
+                "\n" +
+                "    object attributes {\n" +
+                "        \"oa1\"\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create policy class \"test2\" with properties {\"a\": \"b\"} {\n" +
+                "    user attributes {\n" +
+                "        \"ua1\"\n" +
+                "            \"ua3\"\n" +
+                "        \"ua2\"\n" +
+                "            \"ua3\"\n" +
+                "    }\n" +
+                "    object attributes {\n" +
+                "        \"oa1\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(2, compiledPML.stmts().size());
@@ -381,28 +368,27 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testAttributePropertiesInHierarchy() throws PMException {
-        String pml = """
-                create policy class "test" with properties {"a": "b"} {
-                    user attributes {
-                        "ua1" {"k": "v"}
-                            "ua1-1" {"k1": "v1", "k2": "v2"}
-                            "ua1-2"
-                                "ua1-2-1"
-                            "ua1-3"
-                        "ua2"
-                            "ua2-1"
-                    }
-                    object attributes {
-                        "oa1"
-                            "oa1-1"
-                            "oa1-2"
-                                "oa1-2-1" {"k1": "v1", "k2": "v2"}
-                            "oa1-3"
-                        "oa2" {"k1": "v1", "k2": "v2"}
-                            "oa2-1" {"k1": "v1", "k2": "v2"}
-                    }
-                }
-                """;
+        String pml =
+                "create policy class \"test\" with properties {\"a\": \"b\"} {\n" +
+                "    user attributes {\n" +
+                "        \"ua1\" {\"k\": \"v\"}\n" +
+                "            \"ua1-1\" {\"k1\": \"v1\", \"k2\": \"v2\"}\n" +
+                "            \"ua1-2\"\n" +
+                "                \"ua1-2-1\"\n" +
+                "            \"ua1-3\"\n" +
+                "        \"ua2\"\n" +
+                "            \"ua2-1\"\n" +
+                "    }\n" +
+                "    object attributes {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa1-1\"\n" +
+                "            \"oa1-2\"\n" +
+                "                \"oa1-2-1\" {\"k1\": \"v1\", \"k2\": \"v2\"}\n" +
+                "            \"oa1-3\"\n" +
+                "        \"oa2\" {\"k1\": \"v1\", \"k2\": \"v2\"}\n" +
+                "            \"oa2-1\" {\"k1\": \"v1\", \"k2\": \"v2\"}\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
         assertEquals(1, compiledPML.stmts().size());
@@ -437,13 +423,12 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testMalformedProperty() throws PMException {
-        String pml = """
-                create policy class "test" {
-                    user attributes {
-                        "a" {"a"}
-                    }
-                }
-                """;
+        String pml =
+                "create policy class \"test\" {\n" +
+                "    user attributes {\n" +
+                "        \"a\" {\"a\"}\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class, () -> PMLCompiler.compilePML(memoryPolicyStore, pml));
@@ -458,14 +443,13 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testHierarchyWithInvalidIndentation() throws PMException {
-        String pml = """
-                create policy class "test" {
-                    user attributes {
-                    "a"
-                    "b"
-                    }
-                }
-                """;
+        String pml =
+                "create policy class \"test\" {\n" +
+                "    user attributes {\n" +
+                "    \"a\"\n" +
+                "    \"b\"\n" +
+                "    }\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class, () -> PMLCompiler.compilePML(memoryPolicyStore, pml));
@@ -477,15 +461,14 @@ class CreatePolicyStmtVisitorTest {
         );
 
 
-        String pml2 = """
-                create policy class "test" {
-                    user attributes {
-                        "a"
-                    "b"
-                        "c"
-                    }
-                }
-                """;
+        String pml2 =
+                "create policy class \"test\" {\n" +
+                "    user attributes {\n" +
+                "        \"a\"\n" +
+                "    \"b\"\n" +
+                "        \"c\"\n" +
+                "    }\n" +
+                "}";
         e = assertThrows(
                 PMLCompilationException.class, () -> PMLCompiler.compilePML(memoryPolicyStore, pml2));
 
@@ -496,15 +479,14 @@ class CreatePolicyStmtVisitorTest {
         );
 
 
-        String pml3 = """
-                create policy class "test" {
-                    user attributes {
-                        "a"
-                        "b"
-                         "c"
-                    }
-                }
-                """;
+        String pml3 =
+                "create policy class \"test\" {\n" +
+                "    user attributes {\n" +
+                "        \"a\"\n" +
+                "        \"b\"\n" +
+                "         \"c\"\n" +
+                "    }\n" +
+                "}";
         e = assertThrows(
                 PMLCompilationException.class, () -> PMLCompiler.compilePML(memoryPolicyStore, pml3));
 

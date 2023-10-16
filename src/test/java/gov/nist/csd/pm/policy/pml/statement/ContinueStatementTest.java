@@ -14,15 +14,13 @@ class ContinueStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        String pml = """
-                foreach x in ["a", "b", "c"] {
-                    if x == "b" {
-                        continue
-                    }         
-                    
-                    create policy class x         
-                }
-                """;
+        String pml = "foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                "                    if x == \"b\" {\n" +
+                "                        continue\n" +
+                "                    }         \n" +
+                "                    \n" +
+                "                    create policy class x         \n" +
+                "                }";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(""), pml);
 
@@ -33,17 +31,15 @@ class ContinueStatementTest {
 
     @Test
     void testMultipleLevels() throws PMException {
-        String pml = """
-                foreach x in ["a", "b", "c"] {
-                    if x == "b" {
-                        if x == "b" {
-                            continue
-                        }   
-                    }         
-                    
-                    create policy class x         
-                }
-                """;
+        String pml = "foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                "                    if x == \"b\" {\n" +
+                "                        if x == \"b\" {\n" +
+                "                            continue\n" +
+                "                        }   \n" +
+                "                    }         \n" +
+                "                    \n" +
+                "                    create policy class x         \n" +
+                "                }";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(""), pml);
 

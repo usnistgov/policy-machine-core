@@ -12,17 +12,16 @@ class FunctionReturnStatementTest {
 
     @Test
     void testReturnValueIsUnwrapped() throws PMException {
-        String pml = """
-                function f1() string {
-                    return f2()
-                }
-                
-                function f2() string {
-                    return "test"
-                }
-                
-                create policy class f1()
-                """;
+        String pml =
+                "function f1() string {\n" +
+                "    return f2()\n" +
+                "}\n" +
+                "\n" +
+                "function f2() string {\n" +
+                "    return \"test\"\n" +
+                "}\n" +
+                "\n" +
+                "create policy class f1()";
         MemoryPolicyStore store = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
 

@@ -21,9 +21,7 @@ class BoolLiteralTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true
-                """,
+                "true",
                 PMLParser.LiteralExpressionContext.class);
 
         GlobalScope<Variable, FunctionSignature> globalScope = GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore());

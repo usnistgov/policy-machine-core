@@ -35,9 +35,7 @@ class CreateNonPCStmtVisitorTest {
     @Test
     void testSuccess() {
         PMLParser.CreateNonPCStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create user attribute "ua1" with properties {"k": "v"} assign to ["a"]
-                """,
+                "create user attribute \"ua1\" with properties {\"k\": \"v\"} assign to [\"a\"]",
                 PMLParser.CreateNonPCStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
@@ -51,9 +49,7 @@ class CreateNonPCStmtVisitorTest {
     @Test
     void testInvalidExpressions() {
         PMLParser.CreateNonPCStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create user attribute ["ua1"] with properties {"k": "v"} assign to ["a"]
-                """,
+                "create user attribute [\"ua1\"] with properties {\"k\": \"v\"} assign to [\"a\"]",
                 PMLParser.CreateNonPCStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
@@ -64,9 +60,7 @@ class CreateNonPCStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create user attribute "ua1" with properties ["k", "v"] assign to ["a"]
-                """,
+                "create user attribute \"ua1\" with properties [\"k\", \"v\"] assign to [\"a\"]",
                 PMLParser.CreateNonPCStatementContext.class);
         visitorCtx = new VisitorContext(testGlobalScope);
         new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
@@ -77,9 +71,7 @@ class CreateNonPCStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create user attribute "ua1" with properties {"k": "v"} assign to "a"
-                """,
+                "create user attribute \"ua1\" with properties {\"k\": \"v\"} assign to \"a\"",
                 PMLParser.CreateNonPCStatementContext.class);
         visitorCtx = new VisitorContext(testGlobalScope);
         new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);

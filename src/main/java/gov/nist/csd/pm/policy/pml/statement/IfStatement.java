@@ -98,10 +98,15 @@ public class IfStatement extends PMLStatement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        IfStatement ifStmt = (IfStatement) o;
-        return Objects.equals(ifBlock, ifStmt.ifBlock) && Objects.equals(ifElseBlocks, ifStmt.ifElseBlocks) && Objects.equals(elseBlockStatements, ifStmt.elseBlockStatements);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        IfStatement that = (IfStatement) o;
+        return Objects.equals(ifBlock, that.ifBlock) && Objects.equals(
+                ifElseBlocks, that.ifElseBlocks) && Objects.equals(elseBlockStatements, that.elseBlockStatements);
     }
 
     @Override
@@ -109,5 +114,38 @@ public class IfStatement extends PMLStatement {
         return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(Expression condition, List<PMLStatement> block) implements Serializable { }
+    public static class ConditionalBlock implements Serializable {
+        private final Expression condition;
+        private final List<PMLStatement> block;
+
+        public ConditionalBlock(Expression condition, List<PMLStatement> block) {
+            this.condition = condition;
+            this.block = block;
+        }
+
+        public Expression condition() {
+            return condition;
+        }
+
+        public List<PMLStatement> block() {
+            return block;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ConditionalBlock that = (ConditionalBlock) o;
+            return Objects.equals(condition, that.condition) && Objects.equals(block, that.block);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(condition, block);
+        }
+    }
 }

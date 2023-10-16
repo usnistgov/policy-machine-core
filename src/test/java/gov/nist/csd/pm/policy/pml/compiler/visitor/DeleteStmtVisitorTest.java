@@ -19,9 +19,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteNode() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete object attribute "oa1"
-                """,
+                "delete object attribute \"oa1\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -35,9 +33,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete object attribute ["oa1"]
-                """,
+                "delete object attribute [\"oa1\"]",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -51,9 +47,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteObligation() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete obligation "test"
-                """,
+                "delete obligation \"test\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -67,9 +61,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteProhibition() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete prohibition "test"
-                """,
+                "delete prohibition \"test\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -83,9 +75,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteFunction() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete function "test"
-                """,
+                "delete function \"test\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -99,9 +89,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteConstant() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete const "test"
-                """,
+                "delete const \"test\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);

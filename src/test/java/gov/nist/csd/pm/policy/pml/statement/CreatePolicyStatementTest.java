@@ -141,60 +141,59 @@ class CreatePolicyStatementTest {
     @Test
     void testFormattedString() {
         String s = stmt.toFormattedString(0);
-        assertEquals("""
-                             create PC "test" with properties {"a": "b"} {
-                                 user attributes {
-                                     ua1 {"k": "v"}
-                                         "ua1-1"
-                                         "ua1-2"
-                                             "ua1-2-1" {"k": "v"}
-                                         "ua1-3"
-                                     "ua2" {"k": "v"}
-                                         "ua1-2-1"
-                                 }
-                                 object attributes {
-                                     "oa1" {"k": "v"}
-                                         "oa1-1"
-                                         "oa1-2"
-                                             "oa1-2-1" {"k": "v"}
-                                         "oa1-3"
-                                     "oa2" {"k": "v"}
-                                         "oa1-2-1"
-                                 }
-                                 associations {
-                                     "ua1" and "oa1" with ["read", "write"]
-                                 }
-                             }""", s);
+        assertEquals(
+                "create PC \"test\" with properties {\"a\": \"b\"} {\n" +
+                         "    user attributes {\n" +
+                         "        ua1 {\"k\": \"v\"}\n" +
+                         "            \"ua1-1\"\n" +
+                         "            \"ua1-2\"\n" +
+                         "                \"ua1-2-1\" {\"k\": \"v\"}\n" +
+                         "            \"ua1-3\"\n" +
+                         "        \"ua2\" {\"k\": \"v\"}\n" +
+                         "            \"ua1-2-1\"\n" +
+                         "    }\n" +
+                         "    object attributes {\n" +
+                         "        \"oa1\" {\"k\": \"v\"}\n" +
+                         "            \"oa1-1\"\n" +
+                         "            \"oa1-2\"\n" +
+                         "                \"oa1-2-1\" {\"k\": \"v\"}\n" +
+                         "            \"oa1-3\"\n" +
+                         "        \"oa2\" {\"k\": \"v\"}\n" +
+                         "            \"oa1-2-1\"\n" +
+                         "    }\n" +
+                         "    associations {\n" +
+                         "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                         "    }\n" +
+                         "}", s);
     }
 
     @Test
     void testFormattedStringWithIndent() {
         String s = stmt.toFormattedString(2);
-        assertEquals("""
-                             create PC "test" with properties {"a": "b"} {
-                                 user attributes {
-                                     ua1 {"k": "v"}
-                                         "ua1-1"
-                                         "ua1-2"
-                                             "ua1-2-1" {"k": "v"}
-                                         "ua1-3"
-                                     "ua2" {"k": "v"}
-                                         "ua1-2-1"
-                                 }
-                                 object attributes {
-                                     "oa1" {"k": "v"}
-                                         "oa1-1"
-                                         "oa1-2"
-                                             "oa1-2-1" {"k": "v"}
-                                         "oa1-3"
-                                     "oa2" {"k": "v"}
-                                         "oa1-2-1"
-                                 }
-                                 associations {
-                                     "ua1" and "oa1" with ["read", "write"]
-                                 }
-                             }
-                     """.stripTrailing(), s);
+        assertEquals(
+                "        create PC \"test\" with properties {\"a\": \"b\"} {\n" +
+                         "            user attributes {\n" +
+                         "                ua1 {\"k\": \"v\"}\n" +
+                         "                    \"ua1-1\"\n" +
+                         "                    \"ua1-2\"\n" +
+                         "                        \"ua1-2-1\" {\"k\": \"v\"}\n" +
+                         "                    \"ua1-3\"\n" +
+                         "                \"ua2\" {\"k\": \"v\"}\n" +
+                         "                    \"ua1-2-1\"\n" +
+                         "            }\n" +
+                         "            object attributes {\n" +
+                         "                \"oa1\" {\"k\": \"v\"}\n" +
+                         "                    \"oa1-1\"\n" +
+                         "                    \"oa1-2\"\n" +
+                         "                        \"oa1-2-1\" {\"k\": \"v\"}\n" +
+                         "                    \"oa1-3\"\n" +
+                         "                \"oa2\" {\"k\": \"v\"}\n" +
+                         "                    \"oa1-2-1\"\n" +
+                         "            }\n" +
+                         "            associations {\n" +
+                         "                \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                         "            }\n" +
+                         "        }".stripTrailing(), s);
     }
 
     @Test

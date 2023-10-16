@@ -27,9 +27,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1("a", "b", ["c", "d"])
-                """,
+                "func1(\"a\", \"b\", [\"c\", \"d\"])",
                 PMLParser.FunctionInvokeStatementContext.class);
 
         VisitorContext visitorCtx = new VisitorContext(
@@ -68,9 +66,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testFunctionDoesNotExist() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1("a", "b", ["c", "d"])
-                """,
+                "func1(\"a\", \"b\", [\"c\", \"d\"])",
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new FunctionInvokeStmtVisitor(visitorCtx)
@@ -85,9 +81,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testWrongNumberOfArgs() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1("a", "b")
-                """,
+                "func1(\"a\", \"b\")",
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
@@ -118,9 +112,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testWrongArgType() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1("a", "b")
-                """,
+                "func1(\"a\", \"b\")",
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
@@ -150,9 +142,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testNoArgs() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1()
-                """,
+                "func1()",
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(
                 GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())

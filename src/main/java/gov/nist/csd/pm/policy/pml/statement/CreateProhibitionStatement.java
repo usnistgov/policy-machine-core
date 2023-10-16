@@ -104,11 +104,10 @@ public class CreateProhibitionStatement extends PMLStatement {
         String subjectStr = getSubjectStr();
         String indent = indent(indentLevel);
         return String.format(
-                """
-                %screate prohibition %s
-                %s  deny %s %s
-                %s  access rights %s
-                %s  on %s of %s""",
+                "%screate prohibition %s\n" +
+                        "%s  deny %s %s\n" +
+                        "%s  access rights %s\n" +
+                        "%s  on %s of %s",
                 indent, name, indent, subjectStr, subject, indent, accessRights, indent, (isIntersection ? "intersection" : "union"), containers
         );
     }
@@ -129,9 +128,9 @@ public class CreateProhibitionStatement extends PMLStatement {
     private String getSubjectStr() {
         String subjectStr = "";
         switch (subjectType) {
-            case USER_ATTRIBUTE -> subjectStr = "UA";
-            case USER -> subjectStr = "U";
-            case PROCESS -> subjectStr = "process";
+            case USER_ATTRIBUTE: return "UA";
+            case USER: return "U";
+            case PROCESS: return "process";
         }
 
         return subjectStr;

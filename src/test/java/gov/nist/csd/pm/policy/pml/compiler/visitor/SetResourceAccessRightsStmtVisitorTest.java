@@ -18,9 +18,7 @@ class SetResourceAccessRightsStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.SetResourceAccessRightsStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                set resource access rights ["a", "b"]
-                """,
+                "set resource access rights [\"a\", \"b\"]",
                 PMLParser.SetResourceAccessRightsStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new SetResourceAccessRightsStmtVisitor(visitorCtx)
@@ -35,9 +33,7 @@ class SetResourceAccessRightsStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.SetResourceAccessRightsStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                set resource access rights "a"
-                """,
+                "set resource access rights \"a\"",
                 PMLParser.SetResourceAccessRightsStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new SetResourceAccessRightsStmtVisitor(visitorCtx)

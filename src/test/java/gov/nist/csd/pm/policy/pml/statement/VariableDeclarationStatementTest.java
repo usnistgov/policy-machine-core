@@ -54,20 +54,19 @@ class VariableDeclarationStatementTest {
                 )
         );
 
-        String expected = """
-                const (
-                    a = "a"
-                    b = "b"
-                )""";
+        String expected =
+                "const (\n" +
+                "    a = \"a\"\n" +
+                "    b = \"b\"\n" +
+                ")";
         assertEquals(expected, stmt.toFormattedString(0));
 
-        expected = """
-                    const (
-                        a = "a"
-                        b = "b"
-                    )
-                """;
-        assertEquals(expected, stmt.toFormattedString(1) + "\n");
+        expected =
+                "    const (\n" +
+                "        a = \"a\"\n" +
+                "        b = \"b\"\n" +
+                "    )";
+        assertEquals(expected, stmt.toFormattedString(1));
 
         stmt = new VariableDeclarationStatement(
                 false,
@@ -77,21 +76,19 @@ class VariableDeclarationStatementTest {
                 )
         );
 
-        expected = """
-                var (
-                    c = "c"
-                    d = "d"
-                )
-                """;
-        assertEquals(expected, stmt.toFormattedString(0) + "\n");
+        expected =
+                "var (\n" +
+                "    c = \"c\"\n" +
+                "    d = \"d\"\n" +
+                ")";
+        assertEquals(expected, stmt.toFormattedString(0));
 
-        expected = """
-                    var (
-                        c = "c"
-                        d = "d"
-                    )
-                """;
-        assertEquals(expected, stmt.toFormattedString(1) + "\n");
+        expected =
+                "    var (\n" +
+                "        c = \"c\"\n" +
+                "        d = \"d\"\n" +
+                "    )";
+        assertEquals(expected, stmt.toFormattedString(1));
     }
 
 }

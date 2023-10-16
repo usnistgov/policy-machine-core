@@ -36,15 +36,10 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
         String sql;
         if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
-            sql =
-                    """
-                    insert into prohibition (name, process_id, subject_type, access_rights, is_intersection) values (?,?,?,?,?)
-                    """;
+            sql = "insert into prohibition (name, process_id, subject_type, access_rights, is_intersection) values (?,?,?,?,?)";
         } else {
-            sql =
-                    """
-                    insert into prohibition (name, node_id, subject_type, access_rights, is_intersection) values (?,(select id from node where name = ?),?,?,?)
-                    """;
+            sql = "                    insert into prohibition (name, node_id, subject_type, access_rights, " +
+                    "is_intersection) values (?,(select id from node where name = ?),?,?,?)";
         }
 
         int prohibitionID;
@@ -68,9 +63,7 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
             throw new MysqlPolicyException(e.getMessage());
         }
 
-        sql = """
-        insert into prohibition_container (prohibition_id, container_id, is_complement) values (?, (select id from node where name = ?), ?)
-        """;
+        sql = "insert into prohibition_container (prohibition_id, container_id, is_complement) values (?, (select id from node where name = ?), ?)";
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             for (ContainerCondition containerCondition : containerConditions) {
                 ps.setInt(1, prohibitionID);
@@ -119,9 +112,7 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
             return;
         }
 
-        String sql = """
-                delete from prohibition where name = ?
-                """;
+        String sql = "delete from prohibition where name = ?";
 
         try (PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
@@ -133,10 +124,9 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     @Override
     public Map<String, List<Prohibition>> getAll() throws MysqlPolicyException {
-        String sql = """
-                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, 
-                subject_type, access_rights, is_intersection from prohibition
-                """;
+        String sql = "select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id," +
+                " \n" +
+                "                subject_type, access_rights, is_intersection from prohibition";
 
         try(Statement stmt = connection.getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
@@ -170,11 +160,10 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     private List<ContainerCondition> getContainerConditions(int id) throws SQLException {
         List<ContainerCondition> containers = new ArrayList<>();
-        String containerSql = """
-                        select (select name from node where node.id = prohibition_container.container_id) as container, is_complement 
-                        from prohibition_container 
-                        where prohibition_id=?
-                        """;
+        String containerSql = "select (select name from node where node.id = prohibition_container.container_id) as " +
+                "container, is_complement \n" +
+                "                        from prohibition_container \n" +
+                "                        where prohibition_id=?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(containerSql)) {
             ps.setInt(1, id);
@@ -193,11 +182,10 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     @Override
     public List<Prohibition> getWithSubject(String subject) throws MysqlPolicyException {
-        String sql = """
-                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, subject_type, access_rights, is_intersection 
-                from prohibition 
-                where node_id = (select id from node where name = ?) || process_id = ?
-                """;
+        String sql = "select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id," +
+                " subject_type, access_rights, is_intersection \n" +
+                "                from prohibition \n" +
+                "                where node_id = (select id from node where name = ?) || process_id = ?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, subject);
@@ -216,11 +204,10 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     @Override
     public Prohibition get(String name) throws MysqlPolicyException, ProhibitionDoesNotExistException {
-        String sql = """
-                select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id, 
-                       subject_type, access_rights, is_intersection 
-                from prohibition where name = ?
-                """;
+        String sql = "select id, name, (select name from node where node.id=prohibition.node_id) as node, process_id," +
+                " \n" +
+                "                       subject_type, access_rights, is_intersection \n" +
+                "                from prohibition where name = ?";
 
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
@@ -241,15 +228,12 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     private int getProhibitionSubjectTypeId(ProhibitionSubject.Type type) {
         switch (type) {
-            case USER -> {
+            case USER:
                 return 1;
-            }
-            case USER_ATTRIBUTE -> {
+            case USER_ATTRIBUTE:
                 return 2;
-            }
-            case PROCESS -> {
+            case PROCESS:
                 return 3;
-            }
         }
 
         return 0;
@@ -257,15 +241,12 @@ class MysqlProhibitionsStore implements ProhibitionsStore {
 
     private ProhibitionSubject.Type getProhibitionSubjectTypeFromId(int id) {
         switch (id) {
-            case 1 -> {
+            case 1:
                 return USER;
-            }
-            case 2 -> {
+            case 2:
                 return USER_ATTRIBUTE;
-            }
-            case 3 -> {
+            case 3:
                 return PROCESS;
-            }
         }
 
         return USER;

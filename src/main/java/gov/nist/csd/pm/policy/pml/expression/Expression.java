@@ -47,28 +47,52 @@ public abstract class Expression extends PMLStatement {
                                      Type expectedType) {
         Expression expression = null;
 
-        if (expressionCtx instanceof PMLParser.VariableReferenceExpressionContext variableReferenceExpressionContext) {
+        if (expressionCtx instanceof PMLParser.VariableReferenceExpressionContext) {
+            PMLParser.VariableReferenceExpressionContext variableReferenceExpressionContext
+                    = (PMLParser.VariableReferenceExpressionContext) expressionCtx;
+
             expression = VariableReference.compileVariableReference(visitorCtx, variableReferenceExpressionContext.variableReference());
 
-        } else if (expressionCtx instanceof PMLParser.FunctionInvokeExpressionContext functionInvokeExpressionContext) {
+        } else if (expressionCtx instanceof PMLParser.FunctionInvokeExpressionContext) {
+            PMLParser.FunctionInvokeExpressionContext functionInvokeExpressionContext
+                    = (PMLParser.FunctionInvokeExpressionContext) expressionCtx;
+
             expression = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorCtx, functionInvokeExpressionContext);
 
-        } else if (expressionCtx instanceof PMLParser.LiteralExpressionContext literalExpressionContext) {
+        } else if (expressionCtx instanceof PMLParser.LiteralExpressionContext) {
+            PMLParser.LiteralExpressionContext literalExpressionContext
+                    = (PMLParser.LiteralExpressionContext) expressionCtx;
+
             expression = Literal.compileLiteral(visitorCtx, literalExpressionContext);
 
-        } else if (expressionCtx instanceof PMLParser.NegateExpressionContext negatedExprContext) {
+        } else if (expressionCtx instanceof PMLParser.NegateExpressionContext) {
+            PMLParser.NegateExpressionContext negatedExprContext
+                    = (PMLParser.NegateExpressionContext) expressionCtx;
+
             expression = NegatedExpression.compileNegatedExpression(visitorCtx, negatedExprContext);
 
-        } else if (expressionCtx instanceof PMLParser.PlusExpressionContext plusExpressionsContext) {
+        } else if (expressionCtx instanceof PMLParser.PlusExpressionContext) {
+            PMLParser.PlusExpressionContext plusExpressionsContext
+                    = (PMLParser.PlusExpressionContext) expressionCtx;
+
             expression = PlusExpression.compilePlusExpression(visitorCtx, plusExpressionsContext);
 
-        } else if (expressionCtx instanceof PMLParser.EqualsExpressionContext equalsExpressionContext) {
+        } else if (expressionCtx instanceof PMLParser.EqualsExpressionContext) {
+            PMLParser.EqualsExpressionContext equalsExpressionContext
+                    = (PMLParser.EqualsExpressionContext) expressionCtx;
+
             expression = EqualsExpression.compileEqualsExpression(visitorCtx, equalsExpressionContext);
 
-        } else if (expressionCtx instanceof PMLParser.LogicalExpressionContext logicalExpressionsContext) {
+        } else if (expressionCtx instanceof PMLParser.LogicalExpressionContext) {
+            PMLParser.LogicalExpressionContext logicalExpressionsContext
+                    = (PMLParser.LogicalExpressionContext) expressionCtx;
+
             expression = LogicalExpression.compileLogicalExpression(visitorCtx, logicalExpressionsContext);
 
-        } else if (expressionCtx instanceof PMLParser.ParenExpressionContext parenExpressionContext) {
+        } else if (expressionCtx instanceof PMLParser.ParenExpressionContext) {
+            PMLParser.ParenExpressionContext parenExpressionContext
+                    = (PMLParser.ParenExpressionContext) expressionCtx;
+
             expression = ParenExpression.compileParenExpression(visitorCtx, parenExpressionContext.expression());
 
         }

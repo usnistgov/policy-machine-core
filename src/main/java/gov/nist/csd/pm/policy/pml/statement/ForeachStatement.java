@@ -39,7 +39,9 @@ public class ForeachStatement extends PMLStatement {
         }
 
         Value iterValue = iter.execute(ctx, policy);
-        if (iterValue instanceof ArrayValue arrayValue) {
+        if (iterValue instanceof ArrayValue) {
+            ArrayValue arrayValue = (ArrayValue) iterValue;
+
             for (Value v : arrayValue.getValue()) {
                 ExecutionContext localExecutionCtx = ctx.copy();
 
@@ -55,7 +57,9 @@ public class ForeachStatement extends PMLStatement {
 
                 ctx.scope().local().overwriteFromLocalScope(localExecutionCtx.scope().local());
             }
-        } else if (iterValue instanceof MapValue mapValue) {
+        } else if (iterValue instanceof MapValue) {
+            MapValue mapValue = (MapValue) iterValue;
+
             for (Map.Entry<Value, Value> entry : mapValue.getValue().entrySet()) {
                 ExecutionContext localExecutionCtx;
                 try {

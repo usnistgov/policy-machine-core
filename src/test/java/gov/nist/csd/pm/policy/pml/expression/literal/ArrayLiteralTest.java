@@ -18,9 +18,7 @@ class ArrayLiteralTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ["a", "b", "c"]
-                """,
+                "[\"a\", \"b\", \"c\"]",
                 PMLParser.LiteralExpressionContext.class);
 
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));

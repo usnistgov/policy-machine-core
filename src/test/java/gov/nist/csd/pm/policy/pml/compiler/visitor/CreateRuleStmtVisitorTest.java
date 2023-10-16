@@ -30,14 +30,12 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testInvalidExpressionTypes() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule ["test"]
-                    when any user
-                    performs ["e1"]
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule [\"test\"]\n" +
+                        "                    when any user\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -49,14 +47,12 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when users "u1"
-                    performs ["e1"]
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when users \"u1\"\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -68,14 +64,12 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when users in union of "u1"
-                    performs ["e1"]
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when users in union of \"u1\"\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -87,14 +81,12 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when users in intersection of "u1"
-                    performs ["e1"]
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when users in intersection of \"u1\"\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -106,14 +98,12 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when processes "u1"
-                    performs ["e1"]
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when processes \"u1\"\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -125,15 +115,13 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when any user
-                    performs ["e1"]
-                    on union of "oa1"
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when any user\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    on union of \"oa1\"\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -145,15 +133,13 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when any user
-                    performs ["e1"]
-                    on intersection of "oa1"
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when any user\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    on intersection of \"oa1\"\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -165,15 +151,13 @@ class CreateRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {
-                    create rule "test"
-                    when any user
-                    performs ["e1"]
-                    on "oa1"
-                    do(ctx) {}
-                }
-                """,
+                "create obligation \"test\" {\n" +
+                        "                    create rule \"test\"\n" +
+                        "                    when any user\n" +
+                        "                    performs [\"e1\"]\n" +
+                        "                    on \"oa1\"\n" +
+                        "                    do(ctx) {}\n" +
+                        "                }",
                 PMLParser.CreateObligationStatementContext.class
         );
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
@@ -189,41 +173,42 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testSubjectClause() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "any user"
-                        when any user
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {}
-                        
-                        create rule "users"
-                        when users ["u1"]
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {}
-                        
-                        create rule "users union"
-                        when users in union of ["ua1", "ua2"]
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {}
-                        
-                        create rule "users intersection"
-                        when users in intersection of ["ua1", "ua2"]
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {}
-                        
-                        create rule "processes"
-                        when processes ["123"]
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {}
-                    }
-                    """;
+        String pml =
+                "create obligation \"obligation1\" {\n" +
+                "                        create rule \"any user\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on any\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"users\"\n" +
+                "                        when users [\"u1\"]\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on any\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"users union\"\n" +
+                "                        when users in union of [\"ua1\", \"ua2\"]\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on any\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"users intersection\"\n" +
+                "                        when users in intersection of [\"ua1\", \"ua2\"]\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on any\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"processes\"\n" +
+                "                        when processes [\"123\"]\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on any\n" +
+                "                        do(ctx) {}\n" +
+                "                    }";
+
         CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
         assertEquals(1, compiledPML.stmts().size());
+
 
         CreateObligationStatement stmt = (CreateObligationStatement)compiledPML.stmts().get(0);
         assertEquals(
@@ -278,38 +263,36 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testOnClause() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "any target"
-                        when any user
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {}
-                        
-                        create rule "no target is any"
-                        when any user
-                        performs ["test_event"]
-                        do(ctx) {}
-                        
-                        create rule "any in union"
-                        when any user
-                        performs ["test_event"]
-                        on union of ["oa1", "oa2"]
-                        do(ctx) {}
-                        
-                        create rule "any in intersection"
-                        when any user
-                        performs ["test_event"]
-                        on intersection of ["oa1", "oa2"]
-                        do(ctx) {}
-                        
-                        create rule "on targets"
-                        when any user
-                        performs ["test_event"]
-                        on ["oa1", "oa2"]
-                        do(ctx) {}
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"any target\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on any\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"no target is any\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"any in union\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on union of [\"oa1\", \"oa2\"]\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"any in intersection\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on intersection of [\"oa1\", \"oa2\"]\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"on targets\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"test_event\"]\n" +
+                "                        on [\"oa1\", \"oa2\"]\n" +
+                "                        do(ctx) {}\n" +
+                "                    }";
         CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
         assertEquals(1, compiledPML.stmts().size());
 
@@ -365,21 +348,19 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testPerformsClause() throws PMException {
-        String pml = """
-                    e2 := "e2"
-                    events := ["e1", "e2"]
-                    create obligation "obligation1" {
-                        create rule "e1 and e2"
-                        when any user
-                        performs ["e1", e2]
-                        do(ctx) {}
-                        
-                        create rule "var events"
-                        when any user
-                        performs events
-                        do(ctx) {}
-                    }
-                    """;
+        String pml = "e2 := \"e2\"\n" +
+                "                    events := [\"e1\", \"e2\"]\n" +
+                "                    create obligation \"obligation1\" {\n" +
+                "                        create rule \"e1 and e2\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"e1\", e2]\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"var events\"\n" +
+                "                        when any user\n" +
+                "                        performs events\n" +
+                "                        do(ctx) {}\n" +
+                "                    }";
         CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
         assertEquals(3, compiledPML.stmts().size());
 
@@ -409,17 +390,15 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testResponse() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "e1 and e2"
-                        when any user
-                        performs ["e1"]
-                        do(ctx) {
-                            create policy class "pc1"
-                            create policy class "pc2"
-                        }
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"e1 and e2\"\n" +
+                "                        when any user\n" +
+                "                        performs [\"e1\"]\n" +
+                "                        do(ctx) {\n" +
+                "                            create policy class \"pc1\"\n" +
+                "                            create policy class \"pc2\"\n" +
+                "                        }\n" +
+                "                    }";
         CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
         assertEquals(1, compiledPML.stmts().size());
 
@@ -443,16 +422,15 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testFunctionInResponseReturnsError() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "e1 and e2"
-                        when any user
-                        performs ["e1"]
-                        do(ctx) {
-                            function f1() {}
-                        }
-                    }
-                    """;
+        String pml =
+                "create obligation \"obligation1\" {\n" +
+                "    create rule \"e1 and e2\"\n" +
+                "    when any user\n" +
+                "    performs [\"e1\"]\n" +
+                "    do(ctx) {\n" +
+                "        function f1() {}\n" +
+                "    }\n" +
+                "}";
         PMLCompilationException e =
                 assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
         assertEquals("functions are not allowed inside response blocks", e.getErrors().get(0).errorMessage());
@@ -460,17 +438,16 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testReturnValueInResponseThrowsException() {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "any user"
-                        when any user
-                        performs ["test_event"]
-                        on any
-                        do(ctx) {
-                            return "test"
-                        }                        
-                    }
-                    """;
+        String pml =
+                "create obligation \"obligation1\" {\n" +
+                "    create rule \"any user\"\n" +
+                "    when any user\n" +
+                "    performs [\"test_event\"]\n" +
+                "    on any\n" +
+                "    do(ctx) {\n" +
+                "        return \"test\"\n" +
+                "    }                        \n" +
+                "}";
         assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
     }
 

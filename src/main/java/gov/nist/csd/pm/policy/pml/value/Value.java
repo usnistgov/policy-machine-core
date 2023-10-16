@@ -27,7 +27,8 @@ public abstract class Value implements Serializable {
     }
 
     protected Value unwrap() {
-        if (this instanceof ReturnValue rv) {
+        if (this instanceof ReturnValue) {
+            ReturnValue rv = (ReturnValue)this;
             return rv.unwrap();
         }
 
@@ -68,14 +69,14 @@ public abstract class Value implements Serializable {
     public abstract String toString();
 
     public static Value fromObject(Object o) {
-        if (o instanceof String s) {
-            return new StringValue(s);
-        } if (o instanceof List list) {
-            return toListValue(list);
-        } else if (o instanceof Boolean b) {
-            return new BoolValue(b);
-        } else if (o instanceof Map m) {
-            return toMapValue(m);
+        if (o instanceof String) {
+            return new StringValue((String)o);
+        } if (o instanceof List) {
+            return toListValue((List)o);
+        } else if (o instanceof Boolean) {
+            return new BoolValue((Boolean)o);
+        } else if (o instanceof Map) {
+            return toMapValue((Map)o);
         } else {
             return objToValue(o);
         }

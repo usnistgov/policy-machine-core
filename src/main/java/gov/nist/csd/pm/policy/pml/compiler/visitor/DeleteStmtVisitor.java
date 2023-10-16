@@ -19,7 +19,9 @@ public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
 
         PMLParser.DeleteTypeContext deleteTypeCtx = ctx.deleteType();
         DeleteStatement.Type deleteType = null;
-        if (deleteTypeCtx instanceof PMLParser.DeleteNodeContext deleteNodeCtx) {
+        if (deleteTypeCtx instanceof PMLParser.DeleteNodeContext) {
+            PMLParser.DeleteNodeContext deleteNodeCtx = (PMLParser.DeleteNodeContext) deleteTypeCtx;
+
             PMLParser.NodeTypeContext nodeTypeCtx = deleteNodeCtx.nodeType();
             if (nodeTypeCtx.POLICY_CLASS() != null) {
                 deleteType = DeleteStatement.Type.POLICY_CLASS;

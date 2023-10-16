@@ -24,25 +24,22 @@ class PMLVisitorTest {
 
     @Test
     void testConstantAndFunctionSignatureCompilationHappensBeforeOtherStatements() throws PMException {
-        String pml = """
-                test2()
-                
-                const b = "b"
-
-                function test2() {
-                    create pc b
-                    create pc c
-                    
-                    test1()
-                }               
-                
-                const c = "c"
-                
-                function test1() {
-                    create pc "a"
-                }
-                
-                """;
+        String pml = "test2()\n" +
+                "\n" +
+                "const b = \"b\"\n" +
+                "\n" +
+                "function test2() {\n" +
+                "    create pc b\n" +
+                "    create pc c\n" +
+                "    \n" +
+                "    test1()\n" +
+                "}               \n" +
+                "\n" +
+                "const c = \"c\"\n" +
+                "\n" +
+                "function test1() {\n" +
+                "    create pc \"a\"\n" +
+                "}\n";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext("u1"), pml);
 
@@ -53,15 +50,13 @@ class PMLVisitorTest {
 
     @Test
     void testDuplicateFunctionNames() throws PMException {
-        String pml = """
-                function test1() {
-                
-                }              
-                                
-                function test1() {
-                }
-                
-                """;
+        String pml = "function test1() {\n" +
+                "                \n" +
+                "                }              \n" +
+                "                                \n" +
+                "                function test1() {\n" +
+                "                }\n" +
+                "                ";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class, () -> PMLExecutor.compileAndExecutePML(memoryPolicyStore,
@@ -73,11 +68,10 @@ class PMLVisitorTest {
 
     @Test
     void testFunctionReferencesUnknownConst() throws PMException {
-        String pml = """
-                function test1() {
-                    create policy class a
-                }
-                """;
+        String pml =
+                "function test1() {\n" +
+                "    create policy class a\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class, () -> PMLExecutor.compileAndExecutePML(memoryPolicyStore,
@@ -89,11 +83,10 @@ class PMLVisitorTest {
 
     @Test
     void testDuplicateConstantNames() throws PMException {
-        String pml = """
-                const a = "a"
-                const a = "a"
-                
-                """;
+        String pml =
+                "                const a = \"a\"\n" +
+                "                const a = \"a\"\n" +
+                "                ";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class, () -> PMLExecutor.compileAndExecutePML(memoryPolicyStore,
@@ -105,12 +98,10 @@ class PMLVisitorTest {
 
     @Test
     void testConstClashesWithFunctionArgThrowsException() throws PMException {
-        String pml = """
-                const a = "a"
-                
-                function f1(string a) {}
-                
-                """;
+        String pml =
+                "const a = \"a\"\n" +
+                "\n" +
+                "function f1(string a) {}\n";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class,
@@ -122,11 +113,10 @@ class PMLVisitorTest {
 
     @Test
     void testDuplicateFunctionNameReturnsError() throws PMException {
-        String pml = """
-                function f1(string a, string b) string {
-                    return ""
-                }
-                """;
+        String pml =
+                "function f1(string a, string b) string {\n" +
+                "    return \"\"\n" +
+                "}";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         memoryPolicyStore.userDefinedPML().createFunction(new FunctionDefinitionStatement.Builder("f1")
                                                                   .returns(Type.voidType())
@@ -142,9 +132,7 @@ class PMLVisitorTest {
 
     @Test
     void testConstantOverwritesExistingUserDefinedConstant() throws PMException {
-        String pml = """
-                const x = ["x"]
-                """;
+        String pml = "const x = [\"x\"]";
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
         ArrayValue expected = new ArrayValue(List.of(new StringValue("x2")), Type.string());
         memoryPolicyStore.userDefinedPML().createConstant("x", expected);

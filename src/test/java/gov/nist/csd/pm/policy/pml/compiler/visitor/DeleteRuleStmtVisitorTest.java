@@ -18,9 +18,7 @@ class DeleteRuleStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.DeleteRuleStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete rule "rule1" from obligation "obl1"
-                """,
+                "delete rule \"rule1\" from obligation \"obl1\"",
                 PMLParser.DeleteRuleStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
@@ -34,9 +32,7 @@ class DeleteRuleStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         PMLParser.DeleteRuleStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete rule ["rule1"] from obligation "obl1"
-                """,
+                "delete rule [\"rule1\"] from obligation \"obl1\"",
                 PMLParser.DeleteRuleStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
@@ -47,9 +43,7 @@ class DeleteRuleStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                delete rule "rule1" from obligation ["obl1"]
-                """,
+                "delete rule \"rule1\" from obligation [\"obl1\"]",
                 PMLParser.DeleteRuleStatementContext.class);
         visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);

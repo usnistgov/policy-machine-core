@@ -31,25 +31,24 @@ class AccessReviewerTest {
 
     @Test
     void testComputeAccessibleChildren() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                            "oa2"                           
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create o "o1" assign to ["oa1"]
-                create o "o2" assign to ["oa1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa2\"                           \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create o \"o1\" assign to [\"oa1\"]\n" +
+                "create o \"o2\" assign to [\"oa1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -63,26 +62,25 @@ class AccessReviewerTest {
 
     @Test
     void testComputeAccessibleParents() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                        "oa2"
-                        "oa3"                           
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                        "ua1" and "oa2" with ["read", "write"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create o "o1" assign to ["oa1", "oa2"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "        \"oa2\"\n" +
+                "        \"oa3\"                           \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "        \"ua1\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create o \"o1\" assign to [\"oa1\", \"oa2\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -96,43 +94,42 @@ class AccessReviewerTest {
 
     @Test
     void testBuildPOS() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"                        
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                create pc "pc2" {
-                    uas {
-                        "ua2"
-                    }
-                    oas {
-                        "oa2"
-                            "oa3"
-                        "oa4"                           
-                    }
-                    associations {
-                        "ua2" and "oa2" with ["read", "write"]
-                        "ua2" and "oa4" with ["read"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1", "ua2"]
-                create o "o1" assign to ["oa1", "oa3"]
-                create o "o2" assign to ["oa4"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"                        \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "create pc \"pc2\" {\n" +
+                "    uas {\n" +
+                "        \"ua2\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa2\"\n" +
+                "            \"oa3\"\n" +
+                "        \"oa4\"                           \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua2\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "        \"ua2\" and \"oa4\" with [\"read\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\", \"ua2\"]\n" +
+                "create o \"o1\" assign to [\"oa1\", \"oa3\"]\n" +
+                "create o \"o2\" assign to [\"oa4\"]\n" +
+                "\n" +
+                "create prohibition \"p1\"\n" +
+                "deny user \"u1\" \n" +
+                "access rights [\"write\"]\n" +
+                "on union of [\"oa1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -146,45 +143,44 @@ class AccessReviewerTest {
 
     @Test
     void testExplain() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"                        
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                create pc "pc2" {
-                    uas {
-                        "ua2"
-                    }
-                    oas {
-                        "oa2"
-                            "oa3"                           
-                    }
-                    associations {
-                        "ua2" and "oa2" with ["read", "write"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1", "ua2"]
-                create o "o1" assign to ["oa1", "oa3"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                
-                create prohibition "p2"
-                deny user "u1" 
-                access rights ["write"]
-                on union of [!"oa1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"                        \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "create pc \"pc2\" {\n" +
+                "    uas {\n" +
+                "        \"ua2\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa2\"\n" +
+                "            \"oa3\"                           \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua2\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\", \"ua2\"]\n" +
+                "create o \"o1\" assign to [\"oa1\", \"oa3\"]\n" +
+                "\n" +
+                "create prohibition \"p1\"\n" +
+                "deny user \"u1\" \n" +
+                "access rights [\"write\"]\n" +
+                "on union of [\"oa1\"]\n" +
+                "\n" +
+                "create prohibition \"p2\"\n" +
+                "deny user \"u1\" \n" +
+                "access rights [\"write\"]\n" +
+                "on union of [!\"oa1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -219,26 +215,23 @@ class AccessReviewerTest {
     @Test
 
     void testExplainOnObjAttrWithAssociation() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    user attributes {
-                        "ua1"
-                    }
-                    
-                    object attributes {
-                        "oa1"
-                            "oa2"
-                    }
-                    
-                    associations {
-                        "ua1" and "oa1" with ["write"]
-                        "ua1" and "oa2" with ["read"]
-                    }
-                }
-                
-                create user "u1" assign to ["ua1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    user attributes {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    object attributes {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa2\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"write\"]\n" +
+                "        \"ua1\" and \"oa2\" with [\"read\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create user \"u1\" assign to [\"ua1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -273,24 +266,23 @@ class AccessReviewerTest {
 
     @Test
     void testComputeSubgraphPrivileges() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                            "oa2"                           
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create o "o1" assign to ["oa2"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa2\"                           \n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create o \"o1\" assign to [\"oa2\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -308,25 +300,24 @@ class AccessReviewerTest {
 
     @Test
     void testFindBorderAttributes() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                        "ua2"
-                    }
-                    oas {
-                        "oa1"
-                            "oa2"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                        "ua2" and "oa2" with ["read"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1", "ua2"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "        \"ua2\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "            \"oa2\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "        \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\", \"ua2\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -343,26 +334,25 @@ class AccessReviewerTest {
 
     @Test
     void testBuildACL() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                        "ua2"
-                    }
-                    oas {
-                        "oa1"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                        "ua2" and "oa1" with ["read"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create u "u2" assign to ["ua2"]
-                create o "o1" assign to ["oa1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "        \"ua2\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "        \"ua2\" and \"oa1\" with [\"read\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create u \"u2\" assign to [\"ua2\"]\n" +
+                "create o \"o1\" assign to [\"oa1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -379,31 +369,30 @@ class AccessReviewerTest {
 
     @Test
     void testBuildCapabilityList() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                        "oa2"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                        "ua1" and "oa2" with ["read"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create o "o1" assign to ["oa1"]
-                create o "o2" assign to ["oa2"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "        \"oa2\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "        \"ua1\" and \"oa2\" with [\"read\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create o \"o1\" assign to [\"oa1\"]\n" +
+                "create o \"o2\" assign to [\"oa2\"]\n" +
+                "\n" +
+                "create prohibition \"p1\"\n" +
+                "deny user \"u1\" \n" +
+                "access rights [\"write\"]\n" +
+                "on union of [\"oa1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -422,28 +411,27 @@ class AccessReviewerTest {
 
     @Test
     void testComputeDeniedPrivileges() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1"]
-                create o "o1" assign to ["oa1"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                """;
+        String pml =
+                "set resource access rights [\"read\", \"write\"]\n" +
+                "create pc \"pc1\" {\n" +
+                "    uas {\n" +
+                "        \"ua1\"\n" +
+                "    }\n" +
+                "    oas {\n" +
+                "        \"oa1\"\n" +
+                "    }\n" +
+                "    associations {\n" +
+                "        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "create u \"u1\" assign to [\"ua1\"]\n" +
+                "create o \"o1\" assign to [\"oa1\"]\n" +
+                "\n" +
+                "create prohibition \"p1\"\n" +
+                "deny user \"u1\" \n" +
+                "access rights [\"write\"]\n" +
+                "on union of [\"oa1\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
@@ -454,34 +442,33 @@ class AccessReviewerTest {
 
     @Test
     void testComputePolicyClassAccessRights() throws PMException {
-        String pml = """
-                set resource access rights ["read", "write"]
-                create pc "pc1" {
-                    uas {
-                        "ua1"
-                    }
-                    oas {
-                        "oa1"
-                    }
-                    associations {
-                        "ua1" and "oa1" with ["read", "write"]
-                    }
-                }
-                create pc "pc2" {
-                    uas {
-                        "ua2"
-                    }
-                    oas {
-                        "oa2"
-                    }
-                    associations {
-                        "ua2" and "oa2" with ["read"]
-                    }
-                }
-                
-                create u "u1" assign to ["ua1", "ua2"]
-                create o "o1" assign to ["oa1", "oa2"]
-                """;
+        String pml =
+                "                set resource access rights [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\" {\n" +
+                "                    uas {\n" +
+                "                        \"ua1\"\n" +
+                "                    }\n" +
+                "                    oas {\n" +
+                "                        \"oa1\"\n" +
+                "                    }\n" +
+                "                    associations {\n" +
+                "                        \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                create pc \"pc2\" {\n" +
+                "                    uas {\n" +
+                "                        \"ua2\"\n" +
+                "                    }\n" +
+                "                    oas {\n" +
+                "                        \"oa2\"\n" +
+                "                    }\n" +
+                "                    associations {\n" +
+                "                        \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create u \"u1\" assign to [\"ua1\", \"ua2\"]\n" +
+                "                create o \"o1\" assign to [\"oa1\", \"oa2\"]";
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 

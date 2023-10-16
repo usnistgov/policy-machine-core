@@ -21,11 +21,9 @@ class BreakStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a"] {
-                    break
-                }
-                """,
+                "foreach x in [\"a\"] {\n" +
+                        "                    break\n" +
+                        "                }",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -41,9 +39,7 @@ class BreakStmtVisitorTest {
     @Test
     void testNotInForLoop() throws PMException {
         PMLParser.BreakStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                break
-                """,
+                "break",
                 PMLParser.BreakStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new BreakStmtVisitor(visitorCtx).visitBreakStatement(ctx);
