@@ -51,6 +51,7 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.toProperties;
+import static gov.nist.csd.pm.util.PolicyEquals.assertPolicyEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest {
@@ -212,8 +213,17 @@ public abstract class PAPTest {
         void testSuccess() throws PMException {
             UserContext userContext = new UserContext(SUPER_USER);
             pap.deserialize(userContext, input, new PMLDeserializer());
-            String actual = pap.serialize(new PMLSerializer());
-            assertEquals(expected, actual);
+
+            String pml = pap.serialize(new PMLSerializer());
+            PAP pmlPAP = new PAP(new MemoryPolicyStore());
+            pmlPAP.deserialize(userContext, pml, new PMLDeserializer());
+
+            String json = pap.serialize(new JSONSerializer());
+            PAP jsonPAP = new PAP(new MemoryPolicyStore());
+            jsonPAP.deserialize(userContext, json, new JSONDeserializer());
+
+            assertPolicyEquals(pap, pmlPAP);
+            assertPolicyEquals(pap, jsonPAP);
 
             assertThrows(PMException.class, () -> {
                 pap.deserialize(new UserContext("unknown user"), input, new PMLDeserializer());

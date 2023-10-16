@@ -440,11 +440,21 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         }
 
         for (Association association : incomingAssociations) {
-            graph.get(association.getSource()).deleteAssociation(association.getSource(), association.getTarget());
+            Vertex v = graph.get(association.getSource());
+            if(v == null) {
+                continue;
+            }
+
+            v.deleteAssociation(association.getSource(), association.getTarget());
         }
 
         for (Association association : outgoingAssociations) {
-            graph.get(association.getTarget()).deleteAssociation(association.getSource(), association.getTarget());
+            Vertex v = graph.get(association.getTarget());
+            if(v == null) {
+                continue;
+            }
+
+            v.deleteAssociation(association.getSource(), association.getTarget());
         }
 
         graph.remove(name);
