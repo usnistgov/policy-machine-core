@@ -68,15 +68,19 @@ public class Relationship implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Relationship ge)) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        return this.source.equals(ge.source) && this.target.equals(ge.target);
+        Relationship that = (Relationship) o;
+        return Objects.equals(source, that.source) && Objects.equals(
+                target, that.target) && Objects.equals(accessRightSet, that.accessRightSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source, target);
+        return Objects.hash(source, target, accessRightSet);
     }
 }

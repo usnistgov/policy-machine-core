@@ -98,9 +98,9 @@ class VertexUserAttribute implements Vertex {
     @Override
     public void deleteAssociation(String ua, String target) {
         if (ua.equals(node.getName())) {
-            outgoingAssociations.remove(new Association(ua, target));
+            outgoingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
         } else {
-            incomingAssociations.remove(new Association(ua, target));
+            incomingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
         }
     }
 }

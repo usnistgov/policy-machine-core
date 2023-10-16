@@ -23,10 +23,6 @@ public class Association extends Relationship implements Serializable {
         super(source, target, ars);
     }
 
-    public Association(String ua, String target) {
-        super(ua, target, new AccessRightSet());
-    }
-
     private static final Map<NodeType, NodeType[]> validAssociations = new EnumMap<>(NodeType.class);
     static {
         validAssociations.put(PC, new NodeType[]{});

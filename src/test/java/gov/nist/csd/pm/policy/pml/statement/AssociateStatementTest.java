@@ -31,8 +31,8 @@ class AssociateStatementTest {
         ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"));
         stmt.execute(execCtx, store);
 
-        assertTrue(store.graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "oa1")));
-        assertTrue(store.graph().getAssociationsWithTarget("oa1").contains(new Association("ua1", "oa1")));
+        assertTrue(store.graph().getAssociationsWithSource("ua1").get(0).equals(new Association("ua1", "oa1", new AccessRightSet("read"))));
+        assertTrue(store.graph().getAssociationsWithTarget("oa1").get(0).equals(new Association("ua1", "oa1", new AccessRightSet("read"))));
     }
 
     @Test

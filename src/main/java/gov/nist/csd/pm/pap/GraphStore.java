@@ -635,19 +635,21 @@ public interface GraphStore extends Graph {
      * @throws NodeDoesNotExistException If either the user attribute or target does not exist.
      * @throws PMBackendException        If there is an error in the backend implementation.
      */
-    default boolean checkDissociateInput(String ua, String target)
-    throws PMBackendException, NodeDoesNotExistException {
+    default boolean checkDissociateInput(String ua, String target) throws PMBackendException, NodeDoesNotExistException {
         if (!nodeExists(ua)) {
             throw new NodeDoesNotExistException(ua);
         } else if (!nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }
 
-        if (!getAssociationsWithSource(ua).contains(new Association(ua, target))) {
-            return false;
+        List<Association> associations = getAssociationsWithSource(ua);
+        for (Association a : associations) {
+            if (a.getSource().equals(ua) && a.getTarget().equals(target)) {
+                return true;
+            }
         }
 
-        return true;
+        return false;
     }
 
     /**

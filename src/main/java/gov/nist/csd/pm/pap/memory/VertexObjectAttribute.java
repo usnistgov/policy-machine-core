@@ -91,6 +91,6 @@ class VertexObjectAttribute implements Vertex {
 
     @Override
     public void deleteAssociation(String ua, String target) {
-        associations.remove(new Association(ua, target));
+        associations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
     }
 }

@@ -90,7 +90,7 @@ public class ExecutionTest {
                 dissociate "ua1" and ["oa1"]
                 """;
         PMLExecutor.compileAndExecutePML(pap, superUser, input);
-        assertFalse(pap.graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "oa1")));
+        assertTrue(pap.graph().getAssociationsWithSource("ua1").isEmpty());
 
         input =
                 """

@@ -77,7 +77,7 @@ public abstract class PAPTest {
         assertTrue(pap.graph().nodeExists("pc1"));
         assertTrue(pap.graph().nodeExists("oa1"));
         assertTrue(pap.graph().nodeExists("ua1"));
-        assertTrue(pap.graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "oa1")));
+        assertTrue(pap.graph().getAssociationsWithSource("ua1").get(0).equals(new Association("ua1", "oa1", new AccessRightSet())));
 
         pap.beginTx();
         pap.graph().deleteNode("ua1");
@@ -1051,12 +1051,12 @@ public abstract class PAPTest {
                 pap.graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
                 assertTrue(
-                        pap.graph().getAssociationsWithSource("ua1")
-                           .contains(new Association("ua1", "oa1"))
+                        pap.graph().getAssociationsWithSource("ua1").get(0)
+                           .equals(new Association("ua1", "oa1", new AccessRightSet("read")))
                 );
                 assertTrue(
-                        pap.graph().getAssociationsWithTarget("oa1")
-                           .contains(new Association("ua1", "oa1"))
+                        pap.graph().getAssociationsWithTarget("oa1").get(0)
+                           .equals(new Association("ua1", "oa1", new AccessRightSet("read")))
                 );
             }
 
@@ -1120,10 +1120,8 @@ public abstract class PAPTest {
 
                 pap.graph().dissociate("ua1", "oa1");
 
-                assertFalse(pap.graph().getAssociationsWithSource("ua1")
-                               .contains(new Association("ua1", "oa1")));
-                assertFalse(pap.graph().getAssociationsWithTarget("oa1")
-                               .contains(new Association("ua1", "oa1")));
+                assertTrue(pap.graph().getAssociationsWithSource("ua1").isEmpty());
+                assertTrue(pap.graph().getAssociationsWithTarget("oa1").isEmpty());
             }
         }
 
@@ -2135,7 +2133,10 @@ public abstract class PAPTest {
                 assertTrue(pap.graph().nodeExists("ua1"));
                 assertTrue(pap.graph().nodeExists("oa1"));
                 assertTrue(pap.graph().nodeExists("u1"));
-                assertEquals(new Association("ua1", "oa1"), pap.graph().getAssociationsWithSource("ua1").get(0));
+                assertEquals(
+                        new Association("ua1", "oa1", new AccessRightSet("read")),
+                        pap.graph().getAssociationsWithSource("ua1").get(0)
+                );
                 assertTrue(pap.prohibitions().exists("deny-ua1"));
                 assertTrue(pap.obligations().exists("obl1"));
                 assertTrue(pap.userDefinedPML().getConstants().containsKey("const1"));
