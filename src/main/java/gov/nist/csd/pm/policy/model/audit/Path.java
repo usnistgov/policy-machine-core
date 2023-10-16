@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Path {
     private List<String> userDagPath;
@@ -47,18 +48,29 @@ public class Path {
     }
 
     @Override
-    public int hashCode() {
-        return this.toString().hashCode();
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Path path = (Path) o;
+        return Objects.equals(userDagPath, path.userDagPath) && Objects.equals(
+                targetDagPath, path.targetDagPath) && Objects.equals(association, path.association);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Path)) {
-            return false;
-        }
+    public int hashCode() {
+        return Objects.hash(userDagPath, targetDagPath, association);
+    }
 
-        Path p = (Path)o;
-        return this.userDagPath.equals(p.userDagPath) && this.targetDagPath.equals(p.targetDagPath)
-                && this.association.equals(p.association);
+    @Override
+    public String toString() {
+        return "Path{" +
+                "userDagPath=" + userDagPath +
+                ", targetDagPath=" + targetDagPath +
+                ", association=" + association +
+                '}';
     }
 }

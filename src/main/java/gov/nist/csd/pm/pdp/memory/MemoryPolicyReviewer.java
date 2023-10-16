@@ -44,7 +44,7 @@ public class MemoryPolicyReviewer extends PolicyReviewer {
 
     final Policy policy;
 
-    public MemoryPolicyReviewer(Policy policy) throws PMException {
+    public MemoryPolicyReviewer(Policy policy) {
         this.policy = policy;
     }
 

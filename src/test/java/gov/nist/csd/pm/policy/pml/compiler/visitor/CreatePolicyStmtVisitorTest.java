@@ -305,9 +305,13 @@ class CreatePolicyStmtVisitorTest {
                         "ua2"
                             "ua3"
                     }
+                    
                     object attributes {
                         "oa1"
                     }
+                    
+                    
+                    
                     associations {
                         "ua1" and "oa1" with ["read", "write"]
                     }
