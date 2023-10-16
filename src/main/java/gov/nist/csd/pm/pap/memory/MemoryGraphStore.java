@@ -561,8 +561,18 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     }
 
     private boolean containsEdge(String source, String target) {
-        return graph.get(source).getParents().contains(target)
-                || graph.get(source).getOutgoingAssociations().contains(new Association(source, target));
+        return graph.get(source).getParents().contains(target) || associationExists(source, target);
+    }
+
+    private boolean associationExists(String source, String target) {
+        List<Association> outgoingAssociations = graph.get(source).getOutgoingAssociations();
+        for (Association a : outgoingAssociations) {
+            if (a.getTarget().equals(target)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private List<Node> getNodes() {
