@@ -32,52 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CreateRuleStmtVisitorTest {
 
     @Test
-    void test() {
-        String input = """
-                create policy class "test" {
-                    user attributes {
-                        "A"
-                            "B"
-                                "C"
-                        "B"
-                    }
-                }
-                """;
-        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
-
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(pmlErrorHandler);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        /*PMLParser parser = new PMLParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(pmlErrorHandler);*/
-
-        PMLParser parser = new PMLParser(tokens);
-        TokenStream tokenStream = parser.getTokenStream();
-        while (tokenStream.LA(1) != EOF) {
-            Token lt = tokenStream.LT(1);
-            // System.out.println(lt);
-            tokenStream.consume();
-        }
-        List<Token> list = tokens.getTokens(5, 22);
-        for (Token t : list) {
-            System.out.println(t);
-            /*TokenSource tokenSource = t.getTokenSource();
-            CommonTokenStream commonTokenStream = new CommonTokenStream(tokenSource, HIDDEN);
-            PMLParser p = new PMLParser(commonTokenStream);
-
-            int startIndex = p.pml().start.getStartIndex();
-            int stopIndex = p.pml().stop.getStopIndex();
-            Interval interval = new Interval(startIndex, stopIndex);
-            String text = p.pml().start.getInputStream().getText(interval);*/
-        }
-
-        // PMLVisitor PMLVisitor = new PMLVisitor(new VisitorContext(new Scope(Scope.Mode.COMPILE), new ErrorLog()));
-    }
-
-    @Test
     void testInvalidExpressionTypes() {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
                 """

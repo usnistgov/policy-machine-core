@@ -32,8 +32,6 @@ public class SerializationTest {
         PAP jsonPAP = new PAP(new MemoryPolicyStore());
         jsonPAP.deserialize(new UserContext("super"), json, new JSONDeserializer());
 
-        System.out.println(pml);
-
         PAP pmlPAP = new PAP(new MemoryPolicyStore());
         pmlPAP.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
 

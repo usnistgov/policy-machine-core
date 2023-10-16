@@ -18,12 +18,6 @@ import java.util.*;
 
 public class CreatePolicyStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
-
-    public static void main(String[] args) {
-        String s = "        123";
-        System.out.println(s.length() - s.stripIndent().length());
-    }
-
     private final VisitorContext visitorCtx;
 
     public CreatePolicyStmtVisitor(VisitorContext visitorCtx) {

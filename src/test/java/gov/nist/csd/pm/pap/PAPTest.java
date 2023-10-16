@@ -123,7 +123,7 @@ public abstract class PAPTest {
             set properties of "oa1" to {"k1":"v1", "k2":"v2"}
             create ua "ua1" assign to ["pc1"]
             associate "ua1" and "oa1" with ["read", "write"]
-            create prohibition "p1" deny user attribute "ua1" access rights ["read"] on union of [!"oa1"]
+            create prohibition "p1" deny user attribute "ua1" access rights ["read"] on union of ["oa1"]
             create obligation "obl1" {
                 create rule "rule1"
                 when any user

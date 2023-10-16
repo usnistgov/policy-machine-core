@@ -183,9 +183,9 @@ public class CreateProhibitionStatement extends PMLStatement {
         for (ContainerCondition cc : prohibition.getContainers()) {
             StringLiteral s = new StringLiteral(cc.getName());
             if (cc.isComplement()) {
-                containers.add(s);
-            } else {
                 containers.add(new NegatedExpression(s));
+            } else {
+                containers.add(s);
             }
         }
 

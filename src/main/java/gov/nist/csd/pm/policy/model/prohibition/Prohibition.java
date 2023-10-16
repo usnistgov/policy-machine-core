@@ -91,12 +91,18 @@ public class Prohibition implements Serializable {
         this.intersection = intersection;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Prohibition p)) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        return this.getName().equals(p.getName());
+        Prohibition that = (Prohibition) o;
+        return intersection == that.intersection && Objects.equals(name, that.name) && Objects.equals(
+                subject, that.subject) && Objects.equals(containers, that.containers) && Objects.equals(
+                accessRightSet, that.accessRightSet);
     }
 
     public int hashCode() {

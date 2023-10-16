@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.model.prohibition;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public final class ContainerCondition implements Serializable {
 
@@ -31,12 +32,16 @@ public final class ContainerCondition implements Serializable {
         this.complement = complement;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ContainerCondition cc)) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        return this.name.equals(cc.name) && this.complement == cc.complement;
+        ContainerCondition that = (ContainerCondition) o;
+        return complement == that.complement && Objects.equals(name, that.name);
     }
 
     public int hashCode() {
