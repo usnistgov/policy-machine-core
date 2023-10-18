@@ -64,9 +64,6 @@ class ReferenceByBracketIndexTest {
                 create policy class a["b"]["c"]["d"]
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        memoryPolicyStore.graph().createPolicyClass("pc1");
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createUserAttribute("u1", "ua1");
         PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext("u1"), pml);
 
         assertTrue(memoryPolicyStore.graph().nodeExists("e"));
@@ -95,7 +92,7 @@ class ReferenceByBracketIndexTest {
     }
 
     @Test
-    void testKeyDoesNotExist() throws PMException {
+    void testKeyDoesNotExist() {
         String pml = """
                 a := {
                     "b": {
@@ -107,12 +104,23 @@ class ReferenceByBracketIndexTest {
                 
                 create policy class a["z"]["c"]["d"]
                 """;
-        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        memoryPolicyStore.graph().createPolicyClass("pc1");
-        memoryPolicyStore.graph().createUserAttribute("ua1", "pc1");
-        memoryPolicyStore.graph().createUserAttribute("u1", "ua1");
         assertThrows(NullPointerException.class,
-                     () -> PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext("u1"), pml));
+                     () -> PMLExecutor.compileAndExecutePML(new MemoryPolicyStore(), new UserContext("u1"), pml));
+    }
+
+    @Test
+    void testArrayKey() throws PMException {
+        String pml = """
+                a := {
+                    ["a"]: "test"
+                }
+                
+                create policy class a[["a"]]
+                """;
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext("u1"), pml);
+
+        assertTrue(memoryPolicyStore.graph().nodeExists("test"));
     }
 
 }
