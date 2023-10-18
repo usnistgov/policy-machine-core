@@ -35,8 +35,6 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public Map<String, FunctionDefinitionStatement> getFunctions() throws PMException {
-        // accessRightChecker.check(userCtx, SUPER_PC_REP, GET_FUNCTIONS);
-
         return null;
     }
 
@@ -57,13 +55,11 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public Map<String, Value> getConstants() throws PMException {
-        // accessRightChecker.check(userCtx, SUPER_PC_REP, GET_CONSTANTS);
-
         return null;
     }
 
     @Override
-    public Value getConstant(String name) throws PMException {
+    public Value getConstant(String name) {
         return null;
     }
 }
