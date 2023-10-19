@@ -80,7 +80,7 @@ responseStatement:
 createProhibitionStatement:
     CREATE PROHIBITION name=expression
     DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
-    ACCESS_RIGHTS? accessRights=expression
+    ACCESS_RIGHTS accessRights=expression
     ON (INTERSECTION|UNION) OF containers=expression ;
 
 setNodePropertiesStatement:
