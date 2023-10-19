@@ -93,13 +93,6 @@ public class LiteralVisitor extends PMLParserBaseVisitor<Expression> {
             if (keyType == null) {
                 keyType = keyExprType;
             } else if (!keyExprType.equals(keyType)) {
-                /*visitorCtx.errorLog().addError(
-                        ctx,
-                        "expected map keys to be of the same type but found: "
-                                + keyExprType + " and " + keyType
-                );
-
-                return new ErrorExpression(ctx);*/
                 keyType = Type.any();
             }
 

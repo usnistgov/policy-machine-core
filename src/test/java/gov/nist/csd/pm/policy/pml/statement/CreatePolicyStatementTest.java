@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.PMLCompiler;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
@@ -124,6 +125,15 @@ class CreatePolicyStatementTest {
         expected.graph().assign("oa1-2-1", "oa2");
 
         expected.graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
+
+        PolicyEquals.assertPolicyEquals(expected, memoryPolicyStore);
+
+        String s = stmt.toString();
+        memoryPolicyStore = new MemoryPolicyStore();
+        memoryPolicyStore.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
+        memoryPolicyStore.userDefinedPML().createConstant("ua1", new StringValue("ua1"));
+        PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext("u2"), s);
+        memoryPolicyStore.userDefinedPML().deleteConstant("ua1");
 
         PolicyEquals.assertPolicyEquals(expected, memoryPolicyStore);
     }
