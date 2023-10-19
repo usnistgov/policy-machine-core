@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DeleteStmtVisitorTest {
 
     @Test
-    void testSuccess() {
+    void testDeleteNode() {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 delete object attribute "oa1"
@@ -43,6 +43,38 @@ class DeleteStmtVisitorTest {
         assertEquals(
                 "expected expression type string, got []string",
                 visitorCtx.errorLog().getErrors().get(0).errorMessage()
+        );
+    }
+
+    @Test
+    void testDeleteObligation() {
+        PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
+                """
+                delete obligation "test"
+                """,
+                PMLParser.DeleteStatementContext.class);
+        VisitorContext visitorCtx = new VisitorContext();
+        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+                new DeleteStatement(DeleteStatement.Type.OBLIGATION, new StringLiteral("test")),
+                stmt
+        );
+    }
+
+    @Test
+    void testDeleteProhibition() {
+        PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
+                """
+                delete prohibition "test"
+                """,
+                PMLParser.DeleteStatementContext.class);
+        VisitorContext visitorCtx = new VisitorContext();
+        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+                new DeleteStatement(DeleteStatement.Type.PROHIBITION, new StringLiteral("test")),
+                stmt
         );
     }
 }
