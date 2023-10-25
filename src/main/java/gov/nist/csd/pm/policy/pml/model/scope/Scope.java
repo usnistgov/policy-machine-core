@@ -1,17 +1,19 @@
 package gov.nist.csd.pm.policy.pml.model.scope;
 
+import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.pml.PMLBuiltinFunctions;
 import gov.nist.csd.pm.policy.pml.PMLContext;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class Scope implements Serializable {
 

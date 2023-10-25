@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.policy.pml.model.exception;
 
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.policy.pml.compiler.error.ErrorLog;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PMLCompilationException extends PMException {
 

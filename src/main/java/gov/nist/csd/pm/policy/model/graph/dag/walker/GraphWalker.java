@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.policy.model.graph.dag.walker;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.graph.dag.ShortCircuit;
 
 public interface GraphWalker {
 

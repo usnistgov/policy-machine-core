@@ -11,7 +11,7 @@ import gov.nist.csd.pm.policy.model.graph.dag.visitor.Visitor;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.Direction;
 import gov.nist.csd.pm.policy.model.graph.dag.walker.GraphWalker;
 
-import java.util.*;
+import java.util.List;
 
 public class BreadthFirstGraphWalker implements GraphWalker {
 

@@ -1,8 +1,5 @@
 package gov.nist.csd.pm.pap.mysql;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.serialization.pml;
 
-import gov.nist.csd.pm.pap.PolicyStore;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;

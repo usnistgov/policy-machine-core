@@ -1,17 +1,19 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class CreatePolicyStatement extends PMLStatement {
 

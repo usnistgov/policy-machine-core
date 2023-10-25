@@ -1,13 +1,10 @@
 package gov.nist.csd.pm.pdp.memory;
 
-import com.google.protobuf.Any;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.memory.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -27,9 +24,11 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Relationship;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Response;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
 import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -7,14 +7,10 @@ import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
-
 import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.policy.pml.value.ArrayValue;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
 
-import java.lang.reflect.Array;
-import java.util.List;
 import java.util.Objects;
 
 public class PlusExpression extends Expression{

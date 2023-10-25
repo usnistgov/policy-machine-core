@@ -4,7 +4,9 @@ import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class Target implements Serializable {
 

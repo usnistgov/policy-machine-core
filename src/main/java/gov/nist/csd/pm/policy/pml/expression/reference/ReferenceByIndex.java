@@ -1,15 +1,10 @@
 package gov.nist.csd.pm.policy.pml.expression.reference;
 
-import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.policy.pml.value.Value;
 
-import java.util.Map;
 import java.util.Objects;
 
 public abstract class ReferenceByIndex extends VariableReference{

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;

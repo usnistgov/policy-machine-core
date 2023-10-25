@@ -1,14 +1,15 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.model.obligation.event.*;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.obligation.Response;
+import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
+import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.*;
 import gov.nist.csd.pm.policy.model.obligation.event.target.*;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.obligation.Response;
-import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.pml.value.ArrayValue;
 import gov.nist.csd.pm.policy.pml.value.RuleValue;
 import gov.nist.csd.pm.policy.pml.value.StringValue;

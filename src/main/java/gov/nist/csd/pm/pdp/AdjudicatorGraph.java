@@ -1,20 +1,17 @@
 package gov.nist.csd.pm.pdp;
 
+import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.UnauthorizedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
-import gov.nist.csd.pm.policy.model.access.AdminAccessRights;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
-import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentException;
-import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 
 import java.util.List;
 import java.util.Map;

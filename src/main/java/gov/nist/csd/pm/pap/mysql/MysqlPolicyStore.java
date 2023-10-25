@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminPolicy.*;
+import static gov.nist.csd.pm.pap.AdminPolicy.Verifier;
+import static gov.nist.csd.pm.pap.AdminPolicy.verify;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
 public class MysqlPolicyStore extends PolicyStore implements Verifier {

@@ -2,7 +2,6 @@ package gov.nist.csd.pm.policy.pml.expression.reference;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 import gov.nist.csd.pm.policy.pml.value.Value;

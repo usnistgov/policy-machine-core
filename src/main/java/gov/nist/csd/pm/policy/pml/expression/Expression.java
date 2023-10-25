@@ -1,20 +1,15 @@
 package gov.nist.csd.pm.policy.pml.expression;
 
-import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.PMLErrorHandler;
 import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.Literal;
 import gov.nist.csd.pm.policy.pml.expression.reference.VariableReference;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.policy.pml.value.Value;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 

@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.Value;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.util.List;

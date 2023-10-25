@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Policy;

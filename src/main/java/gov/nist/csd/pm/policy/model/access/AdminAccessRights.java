@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.policy.model.access;
 
-import java.util.Arrays;
-
 public class AdminAccessRights {
 
     public static final String CREATE_POLICY_CLASS = "create_policy_class";

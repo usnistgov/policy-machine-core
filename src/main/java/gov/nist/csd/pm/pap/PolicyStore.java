@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.PolicySerializer;
-import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.tx.Transactional;

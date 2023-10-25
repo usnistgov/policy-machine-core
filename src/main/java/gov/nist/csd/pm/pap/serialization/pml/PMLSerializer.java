@@ -8,7 +8,7 @@ import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.expression.*;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.MapLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
@@ -16,7 +16,6 @@ import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.statement.*;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.policy.pml.value.StringValue;
 
 import java.util.*;
 

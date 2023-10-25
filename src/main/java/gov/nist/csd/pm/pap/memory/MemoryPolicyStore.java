@@ -1,15 +1,20 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.*;
-import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.Graph;
+import gov.nist.csd.pm.policy.Obligations;
+import gov.nist.csd.pm.policy.Prohibitions;
+import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
-import gov.nist.csd.pm.policy.exceptions.*;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMLConstantAlreadyDefinedException;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.AdminPolicy.*;
+import static gov.nist.csd.pm.pap.AdminPolicy.Verifier;
+import static gov.nist.csd.pm.pap.AdminPolicy.verify;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.PC;
 

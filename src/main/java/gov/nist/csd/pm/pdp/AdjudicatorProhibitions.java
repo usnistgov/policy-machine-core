@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Prohibitions;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ADD_CONTAINER_COMPLEMENT_TO_PROHIBITION;
 
 public class AdjudicatorProhibitions implements Prohibitions {
     private final UserContext userCtx;

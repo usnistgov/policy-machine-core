@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.policy.events.graph;
 
-import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 
 import java.util.Arrays;

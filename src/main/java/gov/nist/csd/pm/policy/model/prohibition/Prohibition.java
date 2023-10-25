@@ -3,7 +3,9 @@ package gov.nist.csd.pm.policy.model.prohibition;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Object representing a Prohibition.

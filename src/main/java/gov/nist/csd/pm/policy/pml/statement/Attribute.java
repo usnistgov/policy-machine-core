@@ -7,9 +7,7 @@ import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class Attribute extends PMLStatement {

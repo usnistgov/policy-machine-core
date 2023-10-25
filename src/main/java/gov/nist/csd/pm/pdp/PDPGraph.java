@@ -5,7 +5,7 @@ import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.policy.Graph;
-import gov.nist.csd.pm.policy.events.*;
+import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.graph.*;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;

@@ -1,19 +1,21 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.model.obligation.event.*;
-import gov.nist.csd.pm.policy.model.obligation.event.subject.*;
-import gov.nist.csd.pm.policy.model.obligation.event.target.*;
-import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
+import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
+import gov.nist.csd.pm.policy.model.obligation.event.subject.*;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInIntersectionTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInUnionTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
+import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
+import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.type.Type;
-
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 

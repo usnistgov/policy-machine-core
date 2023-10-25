@@ -6,8 +6,8 @@ import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.exceptions.PMRuntimeException;
-import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.util.List;
 import java.util.Map;

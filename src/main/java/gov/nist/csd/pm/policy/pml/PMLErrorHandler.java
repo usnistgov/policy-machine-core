@@ -2,7 +2,9 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.policy.pml.compiler.Position;
 import gov.nist.csd.pm.policy.pml.compiler.error.CompileError;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 
 import java.util.ArrayList;
 import java.util.List;

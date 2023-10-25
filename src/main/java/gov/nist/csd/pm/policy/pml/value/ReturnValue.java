@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.policy.pml.value;
 
-import gov.nist.csd.pm.policy.pml.type.Type;
-
 import java.util.Objects;
 
 public class ReturnValue extends Value{

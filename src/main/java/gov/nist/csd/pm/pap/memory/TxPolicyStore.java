@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pap.memory;
 
-import gov.nist.csd.pm.policy.*;
+import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.PolicyDeserializer;
+import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 

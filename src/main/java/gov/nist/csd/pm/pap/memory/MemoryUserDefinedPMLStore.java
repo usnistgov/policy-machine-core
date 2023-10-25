@@ -3,8 +3,8 @@ package gov.nist.csd.pm.pap.memory;
 import gov.nist.csd.pm.pap.UserDefinedPMLStore;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.exceptions.*;
-import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.HashMap;

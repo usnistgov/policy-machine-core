@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.model.obligation;
 
-import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
 
 import java.io.Serializable;

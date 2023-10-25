@@ -2,8 +2,6 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import gov.nist.csd.pm.policy.Obligations;
-import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
 import java.util.ArrayList;

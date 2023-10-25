@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.*;
-import static gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject.Type.USER;
 
 class MysqlProhibitionsStore implements ProhibitionsStore {
 

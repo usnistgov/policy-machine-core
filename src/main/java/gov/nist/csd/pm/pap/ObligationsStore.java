@@ -5,7 +5,7 @@ import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.*;
+import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.Subject;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.UserAttributesSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.UsersSubject;

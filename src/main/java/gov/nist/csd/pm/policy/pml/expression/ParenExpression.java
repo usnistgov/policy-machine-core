@@ -7,7 +7,6 @@ import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
-
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.Value;
 

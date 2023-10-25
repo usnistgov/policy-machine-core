@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.policy.model.graph.nodes;
 
-import com.google.gson.Gson;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

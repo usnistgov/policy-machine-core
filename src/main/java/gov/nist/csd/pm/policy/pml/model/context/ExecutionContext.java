@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.pml.model.context;
 
-import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.model.scope.*;
 
 import java.io.Serializable;

@@ -1,15 +1,11 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.value.*;
-import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.value.ArrayValue;
-import gov.nist.csd.pm.policy.pml.value.MapValue;
-
-import gov.nist.csd.pm.policy.pml.value.Value;
+import gov.nist.csd.pm.policy.pml.value.*;
 
 import java.util.List;
 import java.util.Map;

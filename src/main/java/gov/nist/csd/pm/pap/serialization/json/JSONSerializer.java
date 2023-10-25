@@ -10,8 +10,8 @@ import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.util.*;
 

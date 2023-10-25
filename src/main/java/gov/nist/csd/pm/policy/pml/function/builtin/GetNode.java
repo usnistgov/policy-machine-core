@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.policy.pml.function.builtin;
 
 
-import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-
-import gov.nist.csd.pm.policy.pml.value.Value;
-import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
+import gov.nist.csd.pm.policy.pml.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.Value;
 
 
 public class GetNode extends FunctionDefinitionStatement {

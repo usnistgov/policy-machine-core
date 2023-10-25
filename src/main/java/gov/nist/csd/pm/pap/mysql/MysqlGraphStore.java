@@ -8,7 +8,9 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.nodes.Node;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.graph.nodes.Properties;
-import gov.nist.csd.pm.policy.model.graph.relationships.*;
+import gov.nist.csd.pm.policy.model.graph.relationships.Association;
+import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentException;
+import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +23,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASSES_OA;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.U;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
 class MysqlGraphStore implements GraphStore {

@@ -3,18 +3,24 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.PMLErrorHandler;
 import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
-import gov.nist.csd.pm.policy.pml.statement.*;
+import gov.nist.csd.pm.policy.pml.statement.AssociateStatement;
+import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
+import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CreatePolicyStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 

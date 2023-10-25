@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
-import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.statement.ForeachStatement;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;

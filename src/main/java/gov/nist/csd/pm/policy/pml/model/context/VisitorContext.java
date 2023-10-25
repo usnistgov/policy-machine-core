@@ -4,7 +4,6 @@ import gov.nist.csd.pm.policy.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ListTokenSource;
-import org.antlr.v4.runtime.TokenStream;
 
 import java.util.List;
 import java.util.Objects;

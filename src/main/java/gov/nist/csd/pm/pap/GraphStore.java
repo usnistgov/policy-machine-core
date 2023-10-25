@@ -13,7 +13,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssignmentExcepti
 import gov.nist.csd.pm.policy.model.graph.relationships.InvalidAssociationException;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
-import gov.nist.csd.pm.policy.model.obligation.event.*;
+import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.Subject;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.UserAttributesSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.UsersSubject;
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
-import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.wildcardAccessRights;
 
 /**
  * GraphStore extends the {@link Graph} interface and outlines how a concrete implementation of the interface

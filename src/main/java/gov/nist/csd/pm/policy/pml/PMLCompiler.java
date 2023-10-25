@@ -1,26 +1,22 @@
 package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.policy.pml.compiler.visitor.PMLVisitor;
-import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.Scope;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
-import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.type.Type;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.antlr.v4.runtime.Lexer.HIDDEN;
 
 public class PMLCompiler {
 
