@@ -128,76 +128,7 @@ public abstract class PAPTest {
                 }
             }
             """;
-        private static final String expected =
-                 """
-                 // user defined pml functions and constants
-                 const testConst = "hello world"
-                                
-                 function testFunc() {
-                     create PC "pc1"
-                 }
-                                
-                                
-                 // GRAPH
-                 set resource access rights ["read", "write", "execute"]
-                                
-                 // super_policy
-                 create PC "super_policy" {
-                     user attributes {
-                         "super_ua"
-                         "super_ua1"
-                     }
-                     associations {
-                         "super_ua" and "super_ua1" with ["*"]
-                         "super_ua" and ADMIN_POLICY_TARGET with ["*"]
-                         "super_ua" and PML_FUNCTIONS_TARGET with ["*"]
-                         "super_ua" and POLICY_CLASSES_OA with ["*"]
-                         "super_ua" and PML_CONSTANTS_TARGET with ["*"]
-                     }
-                 }
-                                
-                 // pc1
-                 create PC "pc1" with properties {"k": "v"} {
-                     user attributes {
-                         "ua1"
-                     }
-                     object attributes {
-                         "oa1" {"k1": "v1", "k2": "v2"}
-                     }
-                     associations {
-                         "ua1" and "oa1" with ["read", "write"]
-                     }
-                 }
-                                
-                 // users
-                 create U "super" assign to ["super_ua", "super_ua1"]
-                                
-                 // objects
-                                
-                                
-                                
-                 // PROHIBITIONS
-                 create prohibition "p1"
-                   deny UA "ua1"
-                   access rights ["read"]
-                   on union of ["oa1"]
-                                
-                                
-                 // OBLIGATIONS
-                 create obligation "obl1" {
-                     create rule "rule1"
-                     when any user
-                     performs ["event1", "event2"]
-                     on any
-                     do (evtCtx) {
-                         event := evtCtx["event"]
-                         if equals(event, "event1") {
-                             create PC "e1"
-                         } else if equals(event, "event2") {
-                             create PC "e2"
-                         }
-                     }
-                 }\n""";
+
         @Test
         void testSuccess() throws PMException {
             UserContext userContext = new UserContext("u1");
