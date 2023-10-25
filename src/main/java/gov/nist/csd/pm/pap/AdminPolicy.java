@@ -14,7 +14,7 @@ public class AdminPolicy {
     public static final Set<String> ALL_NODE_NAMES = new HashSet<>(List.of(
             ADMIN_POLICY.nodeName(),
             ADMIN_POLICY_TARGET.nodeName(),
-            POLICY_CLASSES_OA.nodeName(),
+            POLICY_CLASS_TARGETS.nodeName(),
             PML_FUNCTIONS_TARGET.nodeName(),
             PML_CONSTANTS_TARGET.nodeName(),
             OBLIGATIONS_TARGET.nodeName(),
@@ -24,7 +24,7 @@ public class AdminPolicy {
     public static final Set<String> AL_NODE_CONSTANT_NAMES = new HashSet<>(List.of(
             ADMIN_POLICY.constantName(),
             ADMIN_POLICY_TARGET.constantName(),
-            POLICY_CLASSES_OA.constantName(),
+            POLICY_CLASS_TARGETS.constantName(),
             PML_FUNCTIONS_TARGET.constantName(),
             PML_CONSTANTS_TARGET.constantName(),
             OBLIGATIONS_TARGET.constantName(),
@@ -47,8 +47,8 @@ public class AdminPolicy {
     /**
      * Create {@link AdminPolicyNode#ADMIN_POLICY}
      * Create the {@link AdminPolicyNode#ADMIN_POLICY} policy class.<p>
-     * Create the {@link AdminPolicyNode#POLICY_CLASSES_OA} in the ADMIN_POLICY policy class.<p>
-     * Create the {@link AdminPolicyNode#ADMIN_POLICY_TARGET} in the POLICY_CLASSES_OA object attribute.<p>
+     * Create the {@link AdminPolicyNode#POLICY_CLASS_TARGETS} in the ADMIN_POLICY policy class.<p>
+     * Create the {@link AdminPolicyNode#ADMIN_POLICY_TARGET} in the POLICY_CLASS_TARGETS object attribute.<p>
      * Create the {@link AdminPolicyNode#PML_CONSTANTS_TARGET} in the ADMIN_POLICY policy class.<p>
      * Create the {@link AdminPolicyNode#PML_FUNCTIONS_TARGET} in the ADMIN_POLICY policy class.<p>
      * Create the {@link AdminPolicyNode#PROHIBITIONS_TARGET} in the ADMIN_POLICY policy class.<p>
@@ -78,7 +78,7 @@ public class AdminPolicy {
                 continue;
             }
 
-            graphStore.createObjectAttribute(repOA, POLICY_CLASSES_OA.nodeName());
+            graphStore.createObjectAttribute(repOA, POLICY_CLASS_TARGETS.nodeName());
         }
     }
 
@@ -86,15 +86,15 @@ public class AdminPolicy {
         try {
             verifier.verifyAdminPolicyClassNode();
 
-            verifier.verifyAdminPolicyAttribute(POLICY_CLASSES_OA, ADMIN_POLICY);
-            verifier.verifyAdminPolicyAttribute(ADMIN_POLICY_TARGET, POLICY_CLASSES_OA);
+            verifier.verifyAdminPolicyAttribute(POLICY_CLASS_TARGETS, ADMIN_POLICY);
+            verifier.verifyAdminPolicyAttribute(ADMIN_POLICY_TARGET, POLICY_CLASS_TARGETS);
             verifier.verifyAdminPolicyAttribute(PML_FUNCTIONS_TARGET, ADMIN_POLICY);
             verifier.verifyAdminPolicyAttribute(PML_CONSTANTS_TARGET, ADMIN_POLICY);
             verifier.verifyAdminPolicyAttribute(OBLIGATIONS_TARGET, ADMIN_POLICY);
             verifier.verifyAdminPolicyAttribute(PROHIBITIONS_TARGET, ADMIN_POLICY);
 
             verifier.verifyAdminPolicyConstant(ADMIN_POLICY);
-            verifier.verifyAdminPolicyConstant(POLICY_CLASSES_OA);
+            verifier.verifyAdminPolicyConstant(POLICY_CLASS_TARGETS);
             verifier.verifyAdminPolicyConstant(ADMIN_POLICY_TARGET);
             verifier.verifyAdminPolicyConstant(PML_FUNCTIONS_TARGET);
             verifier.verifyAdminPolicyConstant(PML_CONSTANTS_TARGET);

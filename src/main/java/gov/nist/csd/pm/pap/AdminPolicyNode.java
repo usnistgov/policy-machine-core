@@ -5,7 +5,7 @@ import static gov.nist.csd.pm.pap.AdminPolicy.policyClassTargetName;
 public enum AdminPolicyNode {
     ADMIN_POLICY("PM_ADMIN"),
     ADMIN_POLICY_TARGET(policyClassTargetName(ADMIN_POLICY.value)),
-    POLICY_CLASSES_OA("PM_ADMIN:POLICY_CLASSES"),
+    POLICY_CLASS_TARGETS("PM_ADMIN:POLICY_CLASS_TARGETS"),
     PML_FUNCTIONS_TARGET("PM_ADMIN:FUNCTIONS"),
     PML_CONSTANTS_TARGET("PM_ADMIN:CONSTANTS"),
     OBLIGATIONS_TARGET("PM_ADMIN:OBLIGATIONS"),
@@ -25,8 +25,8 @@ public enum AdminPolicyNode {
             case "PM_ADMIN:target" -> {
                 return ADMIN_POLICY_TARGET;
             }
-            case "PM_ADMIN:POLICY_CLASSES" -> {
-                return POLICY_CLASSES_OA;
+            case "PM_ADMIN:POLICY_CLASS_TARGETS" -> {
+                return POLICY_CLASS_TARGETS;
             }
             case "PM_ADMIN:FUNCTIONS" -> {
                 return PML_FUNCTIONS_TARGET;

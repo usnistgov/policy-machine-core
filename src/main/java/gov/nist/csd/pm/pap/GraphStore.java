@@ -55,10 +55,10 @@ public interface GraphStore extends Graph {
 
     /**
      * Create a policy class in the graph. This method should also create an object attribute that represents the
-     * policy class in {@link AdminPolicyNode#POLICY_CLASSES_OA}. This object attribute can be used in
+     * policy class in {@link AdminPolicyNode#POLICY_CLASS_TARGETS}. This object attribute can be used in
      * the future to create associations with the policy class itself which is not a supported relation in NGAC.
      * If the provided name equals {@link AdminPolicyNode#ADMIN_POLICY} then this method should also create the
-     * {@link AdminPolicyNode#POLICY_CLASSES_OA} node and assign it to ADMIN_POLICY before creating
+     * {@link AdminPolicyNode#POLICY_CLASS_TARGETS} node and assign it to ADMIN_POLICY before creating
      * {@link AdminPolicyNode#ADMIN_POLICY_TARGET} <p>
      *
      * See {@link Graph#createPolicyClass(String)} <p>

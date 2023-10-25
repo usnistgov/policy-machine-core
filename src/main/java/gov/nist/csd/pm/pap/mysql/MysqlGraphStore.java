@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASSES_OA;
+import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASS_TARGETS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 
@@ -518,15 +518,15 @@ class MysqlGraphStore implements GraphStore {
 
         createNodeInternal(name, PC, properties);
 
-        // create pc rep oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
+        // create pc rep oa or verify that its assigned to the POLICY_CLASS_TARGETS node if already created
         String pcTarget = AdminPolicy.policyClassTargetName(name);
         if (!nodeExists(pcTarget)) {
             createNodeInternal(pcTarget, OA, new HashMap<>());
         }
 
         try {
-            if (!getParents(pcTarget).contains(POLICY_CLASSES_OA.nodeName())) {
-                assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
+            if (!getParents(pcTarget).contains(POLICY_CLASS_TARGETS.nodeName())) {
+                assignInternal(pcTarget, POLICY_CLASS_TARGETS.nodeName());
             }
         } catch (NodeDoesNotExistException e) {
             throw new PMBackendException("error creating target attribute for policy class " + name, e);

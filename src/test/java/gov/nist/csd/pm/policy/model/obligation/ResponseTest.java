@@ -23,7 +23,7 @@ class ResponseTest {
                 create ua "ua1" assign to ["pc1"]
                 create u "u1" assign to ["ua1"]
                 
-                associate "ua1" and POLICY_CLASSES_OA with [create_policy_class]
+                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
                 const x = "hello world"
                 function createX() {
                     create policy class x

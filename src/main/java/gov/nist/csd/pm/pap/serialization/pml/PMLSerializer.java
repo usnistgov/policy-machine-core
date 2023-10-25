@@ -84,7 +84,7 @@ public class PMLSerializer implements PolicySerializer {
             pml.append(new CreateNonPCStatement(
                     buildNameExpression(AdminPolicy.policyClassTargetName(policyClass.getName())),
                     OA,
-                    new ArrayLiteral(Type.string(), buildNameExpression(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()))
+                    new ArrayLiteral(Type.string(), buildNameExpression(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName()))
             )).append("\n");
         }
 

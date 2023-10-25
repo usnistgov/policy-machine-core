@@ -29,7 +29,7 @@ class MemoryPDPTest {
         pap.graph().createObjectAttribute("oa1", "pc1");
         pap.graph().createUserAttribute("ua1", "pc1");
         pap.graph().createUser("u1", "ua1");
-        pap.graph().associate("ua1", AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), new AccessRightSet("*"));
+        pap.graph().associate("ua1", AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName(), new AccessRightSet("*"));
 
         PDP pdp = new MemoryPDP(pap);
         assertThrows(NodeNameExistsException.class, () -> {

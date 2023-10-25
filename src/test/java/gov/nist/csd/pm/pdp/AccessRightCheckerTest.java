@@ -29,7 +29,7 @@ class AccessRightCheckerTest {
         memoryPolicyStore.graph().createObjectAttribute("oa1", "pc1");
 
         memoryPolicyStore.graph().associate("ua1", "oa1", new AccessRightSet("read"));
-        memoryPolicyStore.graph().associate("ua1", AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), new AccessRightSet(AdminAccessRights.ASSIGN_TO));
+        memoryPolicyStore.graph().associate("ua1", AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName(), new AccessRightSet(AdminAccessRights.ASSIGN_TO));
 
         memoryPolicyStore.graph().createUser("u1", "ua1");
         memoryPolicyStore.graph().createObject("o1", "oa1");

@@ -221,20 +221,20 @@ public abstract class PAPTest {
         assertTrue(pap.graph().nodeExists(AdminPolicyNode.ADMIN_POLICY.nodeName()));
         List<String> children = pap.graph().getChildren(AdminPolicyNode.ADMIN_POLICY.nodeName());
         assertEquals(5, children.size());
-        assertTrue(children.containsAll(List.of(AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(),
+        assertTrue(children.containsAll(List.of(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName(), AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(),
                                                 AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), AdminPolicyNode.PROHIBITIONS_TARGET.nodeName(), AdminPolicyNode.OBLIGATIONS_TARGET.nodeName())));
 
         assertTrue(pap.graph().nodeExists(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName()));
         List<String> parents = pap.graph().getParents(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName());
         assertEquals(1, parents.size());
-        assertTrue(parents.contains(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()));
+        assertTrue(parents.contains(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName()));
 
-        assertTrue(pap.graph().nodeExists(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()));
-        children = pap.graph().getChildren(AdminPolicyNode.POLICY_CLASSES_OA.nodeName());
+        assertTrue(pap.graph().nodeExists(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName()));
+        children = pap.graph().getChildren(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName());
         assertEquals(numExpectedPolicyClasses, children.size());
         assertTrue(children.contains(AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName()));
 
-        parents = pap.graph().getParents(AdminPolicyNode.POLICY_CLASSES_OA.nodeName());
+        parents = pap.graph().getParents(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName());
         assertEquals(1, parents.size());
         assertTrue(parents.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
 
@@ -306,8 +306,8 @@ public abstract class PAPTest {
                 String rep = AdminPolicy.policyClassTargetName("pc1");
                 assertTrue(pap.graph().nodeExists("pc1"));
                 assertTrue(pap.graph().nodeExists(rep));
-                assertTrue(pap.graph().getParents(rep).contains(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()));
-                assertTrue(pap.graph().getChildren(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()).contains(rep));
+                assertTrue(pap.graph().getParents(rep).contains(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName()));
+                assertTrue(pap.graph().getChildren(AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName()).contains(rep));
             }
         }
 

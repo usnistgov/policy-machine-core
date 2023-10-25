@@ -45,7 +45,7 @@ class EPPTest {
                 create ua "ua1" assign to ["pc1"]
                 create u "u1" assign to ["ua1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and POLICY_CLASSES_OA with ["*"]
+                associate "ua1" and POLICY_CLASS_TARGETS with ["*"]
                 create obligation "test" {
                     create rule "rule1"
                     when any user
@@ -81,7 +81,7 @@ class EPPTest {
                 create oa "oa1" assign to ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and POLICY_CLASSES_OA with [create_policy_class]
+                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
                 
                 create obligation "test" {
                     create rule "rule1"

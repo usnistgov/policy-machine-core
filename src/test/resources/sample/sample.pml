@@ -19,8 +19,8 @@ function f2(string s) string {
 set resource access rights ["read", "write"]
 
 // policy class: pm_admin:policy
-create object attribute "pc1:target" assign to [POLICY_CLASSES_OA]
-create object attribute "pc2:target" assign to [POLICY_CLASSES_OA]
+create object attribute "pc1:target" assign to [POLICY_CLASS_TARGETS]
+create object attribute "pc2:target" assign to [POLICY_CLASS_TARGETS]
 
 // policy class: pc1
 create policy class "pc1"

@@ -44,7 +44,7 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.POLICY_CLASSES_OA.nodeName(), CREATE_POLICY_CLASS);
+        accessRightChecker.check(userCtx, AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName(), CREATE_POLICY_CLASS);
 
         return null;
     }

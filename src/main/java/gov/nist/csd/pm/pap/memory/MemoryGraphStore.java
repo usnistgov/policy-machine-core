@@ -14,7 +14,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASSES_OA;
+import static gov.nist.csd.pm.pap.AdminPolicyNode.POLICY_CLASS_TARGETS;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.WILDCARD;
@@ -116,15 +116,15 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
             // create pc node
             createNodeInternal(name, PC, properties);
 
-            // create pc target oa or verify that its assigned to the POLICY_CLASSES_OA node if already created
+            // create pc target oa or verify that its assigned to the POLICY_CLASS_TARGETS node if already created
             String pcTarget = AdminPolicy.policyClassTargetName(name);
             if (!nodeExists(pcTarget)) {
                 createNodeInternal(pcTarget, OA, new HashMap<>());
             }
 
             List<String> parents = getParentsInternal(pcTarget);
-            if (!parents.contains(POLICY_CLASSES_OA.nodeName())) {
-                assignInternal(pcTarget, POLICY_CLASSES_OA.nodeName());
+            if (!parents.contains(POLICY_CLASS_TARGETS.nodeName())) {
+                assignInternal(pcTarget, POLICY_CLASS_TARGETS.nodeName());
             }
         });
 
