@@ -6,6 +6,7 @@ import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JSONPolicy {
@@ -16,6 +17,10 @@ public class JSONPolicy {
     private JSONUserDefinedPML userDefinedPML;
 
     public JSONPolicy() {
+        graph = new JSONGraph();
+        prohibitions = new ArrayList<>();
+        obligations = new ArrayList<>();
+        userDefinedPML = new JSONUserDefinedPML();
     }
 
     public JSONPolicy(JSONGraph graph, List<Prohibition> prohibitions, List<String> obligations,

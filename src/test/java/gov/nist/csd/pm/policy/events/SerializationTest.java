@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SerializationTest {
@@ -68,7 +67,7 @@ public class SerializationTest {
                                         new Performs("test_event")
                                 ),
                                 new Response(
-                                        new UserContext(SUPER_USER),
+                                        new UserContext("u1"),
                                         new CreatePolicyStatement(new StringLiteral("test_pc"))
                                 )
                         )

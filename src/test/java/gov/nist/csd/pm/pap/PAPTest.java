@@ -46,7 +46,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 import static gov.nist.csd.pm.policy.model.graph.nodes.Properties.NO_PROPERTIES;
@@ -106,23 +105,13 @@ public abstract class PAPTest {
                 create pc "pc1"
             }
             
-            create policy class "super_policy"
-            create user attribute "super_ua" assign to ["super_policy"]
-            associate "super_ua" and ADMIN_POLICY_TARGET with ["*"]
-            associate "super_ua" and POLICY_CLASSES_OA with ["*"]
-            associate "super_ua" and PML_FUNCTIONS_TARGET with ["*"]
-            associate "super_ua" and PML_CONSTANTS_TARGET with ["*"]
-            create user attribute "super_ua1" assign to ["super_policy"]
-            associate "super_ua" and "super_ua1" with ["*"]
-            create user "super" assign to ["super_ua"]
-            assign "super" to ["super_ua1"]
-            
             set resource access rights ["read", "write", "execute"]
             create policy class "pc1"
             set properties of "pc1" to {"k":"v"}
             create oa "oa1" assign to ["pc1"]
             set properties of "oa1" to {"k1":"v1", "k2":"v2"}
             create ua "ua1" assign to ["pc1"]
+            create u "u1" assign to ["ua1"]
             associate "ua1" and "oa1" with ["read", "write"]
             create prohibition "p1" deny user attribute "ua1" access rights ["read"] on union of ["oa1"]
             create obligation "obl1" {
@@ -211,7 +200,7 @@ public abstract class PAPTest {
                  }\n""";
         @Test
         void testSuccess() throws PMException {
-            UserContext userContext = new UserContext(SUPER_USER);
+            UserContext userContext = new UserContext("u1");
             pap.deserialize(userContext, input, new PMLDeserializer());
 
             String pml = pap.serialize(new PMLSerializer());
@@ -231,7 +220,7 @@ public abstract class PAPTest {
         }
         @Test
         void testJSONAndPMLCreateEqualPolicy() throws PMException {
-            UserContext userContext = new UserContext(SUPER_USER);
+            UserContext userContext = new UserContext("u1");
             pap.deserialize(userContext, input, new PMLDeserializer());
             String pml = pap.serialize(new PMLSerializer());
             String json = pap.serialize(new JSONSerializer());
@@ -249,7 +238,7 @@ public abstract class PAPTest {
 
         @Test
         void testAssignPolicyClassTargetToAnotherPolicyClass() throws PMException {
-            UserContext userContext = new UserContext(SUPER_USER);
+            UserContext userContext = new UserContext("u1");
             pap.deserialize(userContext, input, new PMLDeserializer());
 
             pap.graph().createObjectAttribute("test-oa", "pc1");
@@ -277,7 +266,7 @@ public abstract class PAPTest {
                     })
                     .build();
 
-            pap.executePML(new UserContext(SUPER_USER), "create ua \"ua3\" assign to [\"pc2\"]\ntestfunc()", functionDefinitionStatement);
+            pap.executePML(new UserContext("u1"), "create ua \"ua3\" assign to [\"pc2\"]\ntestfunc()", functionDefinitionStatement);
             assertTrue(pap.graph().nodeExists("ua3"));
             assertTrue(pap.graph().nodeExists("pc3"));
         } catch (IOException e) {

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JSONGraph {
@@ -12,6 +13,10 @@ public class JSONGraph {
     List<JSONUserOrObject> objects;
 
     public JSONGraph() {
+        resourceAccessRights = new AccessRightSet();
+        policyClasses = new ArrayList<>();
+        users = new ArrayList<>();
+        objects = new ArrayList<>();
     }
 
     public JSONGraph(AccessRightSet resourceAccessRights, List<JSONPolicyClass> policyClasses,

@@ -61,7 +61,7 @@ class PDPTest {
         PDP pdp = new MemoryPDP(pap);
         pap.graph().createPolicyClass("pc1");
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap(new SuperUserBootstrapper());
+            pdp.bootstrap((policy) -> {});
         });
 
         pap.reset();
@@ -77,13 +77,13 @@ class PDPTest {
                                   new AccessRightSet("read"), true, new ContainerCondition("oa1", false));
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap(new SuperUserBootstrapper());
+            pdp.bootstrap((policy) -> {});
         });
 
         pap.obligations().create(new UserContext("u1"), "obl1");
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap(new SuperUserBootstrapper());
+            pdp.bootstrap((policy) -> {});
         });
     }
 }

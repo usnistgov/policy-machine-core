@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ public class JSONPolicyClass {
     private Map<String, List<JSONAssociation>> associations;
 
     public JSONPolicyClass() {
+
     }
 
     public JSONPolicyClass(String name, Map<String, String> properties, List<JSONNode> userAttributes,

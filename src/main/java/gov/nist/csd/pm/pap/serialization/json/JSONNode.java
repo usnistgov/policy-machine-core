@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class JSONNode {
 

@@ -130,7 +130,6 @@ public class JSONDeserializer implements PolicyDeserializer {
         }
     }
 
-
     private void createPolicyClass(Policy policy, JSONPolicyClass policyClass)
             throws PMException {
         String name = policyClass.getName();
@@ -143,13 +142,20 @@ public class JSONDeserializer implements PolicyDeserializer {
             policy.graph().createPolicyClass(name, properties == null ? new HashMap<>() : properties);
         }
 
-        createAttributes(policy, UA, name, userAttributes);
-        createAttributes(policy, OA, name, objectAttributes);
+        if (userAttributes != null) {
+            createAttributes(policy, UA, name, userAttributes);
+        }
+
+        if (objectAttributes != null) {
+            createAttributes(policy, OA, name, objectAttributes);
+        }
 
         Map<String, List<JSONAssociation>> associations = policyClass.getAssociations();
-        for (Map.Entry<String, List<JSONAssociation>> e : associations.entrySet()) {
-            for (JSONAssociation jsonAssociation : e.getValue()) {
-                policy.graph().associate(e.getKey(), jsonAssociation.getTarget(), jsonAssociation.getArset());
+        if (associations != null) {
+            for (Map.Entry<String, List<JSONAssociation>> e : associations.entrySet()) {
+                for (JSONAssociation jsonAssociation : e.getValue()) {
+                    policy.graph().associate(e.getKey(), jsonAssociation.getTarget(), jsonAssociation.getArset());
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.policy.pml;
 
-import gov.nist.csd.pm.pdp.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
@@ -13,12 +12,11 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExecutionTest {
 
-    static UserContext superUser = new UserContext(SUPER_USER);
+    static UserContext superUser = new UserContext("u1");
 
     @Test
     void testGraphPML() throws PMException {

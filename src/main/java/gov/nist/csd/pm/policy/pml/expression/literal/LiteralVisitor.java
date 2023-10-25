@@ -35,8 +35,15 @@ public class LiteralVisitor extends PMLParserBaseVisitor<Expression> {
     public Expression visitArrayLiteral(PMLParser.ArrayLiteralContext ctx) {
         PMLParser.ArrayLitContext arrayCtx = ctx.arrayLit();
 
+        PMLParser.ExpressionListContext expressionListContext = arrayCtx.expressionList();
+        if (expressionListContext == null) {
+            return new ArrayLiteral(new ArrayList<>(), Type.any());
+        }
+
+        // set the element type to any if the list is empty
+        // element type being null is used in the following for loop to determine type dynamically
         Type elementType = null;
-        if (arrayCtx.expressionList().isEmpty()) {
+        if (expressionListContext.isEmpty()) {
             elementType = Type.any();
         }
 
@@ -44,7 +51,7 @@ public class LiteralVisitor extends PMLParserBaseVisitor<Expression> {
         // if all the elements are of the same type then that is the element type
         // if the elements are of different types then the type is ANY
         List<Expression> exprs = new ArrayList<>();
-        for (PMLParser.ExpressionContext expressionCtx : arrayCtx.expressionList().expression()) {
+        for (PMLParser.ExpressionContext expressionCtx : expressionListContext.expression()) {
             Expression expr = Expression.compile(visitorCtx, expressionCtx, Type.any());
             Type type;
             try {

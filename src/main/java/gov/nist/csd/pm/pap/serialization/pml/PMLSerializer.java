@@ -16,12 +16,14 @@ import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.statement.*;
 import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
 
 import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.*;
 
 public class PMLSerializer implements PolicySerializer {
+
     @Override
     public String serialize(Policy policy) throws PMException {
         JSONSerializer json = new JSONSerializer();
@@ -77,6 +79,18 @@ public class PMLSerializer implements PolicySerializer {
         pml.append(new SetResourceAccessRightsStatement(arrayLiteral)).append("\n\n");
 
         List<JSONPolicyClass> policyClasses = jsonGraph.getPolicyClasses();
+
+        // add create target statements
+        for (JSONPolicyClass policyClass : policyClasses) {
+            pml.append(new CreateNonPCStatement(
+                    buildNameExpression(AdminPolicy.policyClassTargetName(policyClass.getName())),
+                    OA,
+                    new ArrayLiteral(Type.string(), buildNameExpression(AdminPolicyNode.POLICY_CLASSES_OA.nodeName()))
+            )).append("\n");
+        }
+
+        pml.append("\n");
+
         for (JSONPolicyClass policyClass : policyClasses) {
             pml.append(buildCreatePCStatement(policyClass)).append("\n");
         }
@@ -140,20 +154,6 @@ public class PMLSerializer implements PolicySerializer {
 
         return sb.toString();
 
-    }
-
-    private String buildPCStatements(JSONPolicyClass policyClass, Set<String> createdNodes) {
-        StringBuilder pml = new StringBuilder();
-
-        pml.append(buildCreatePCStatement(policyClass)).append("\n");
-        /*pml.append("// ").append(policyClass.getName()).append(" user attributes").append("\n");
-        pml.append(buildAttributesStatements(policyClass.getName(), NodeType.UA, policyClass.getUserAttributes(), createdNodes)).append("\n");
-        pml.append("// ").append(policyClass.getName()).append(" object attributes").append("\n");
-        pml.append(buildAttributesStatements(policyClass.getName(), NodeType.OA, policyClass.getObjectAttributes(), createdNodes)).append("\n");
-        pml.append("// ").append(policyClass.getName()).append(" associations").append("\n");
-        pml.append(buildAssociationStatements(policyClass.getAssociations())).append("\n\n");*/
-
-        return pml.toString();
     }
 
     private String buildCreatePCStatement(JSONPolicyClass policyClass) {

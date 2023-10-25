@@ -3,7 +3,6 @@ package gov.nist.csd.pm.policy.model.obligation;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.SuperUserBootstrapper;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.memory.MemoryPDP;

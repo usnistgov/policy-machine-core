@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,11 +28,11 @@ class PMLTest {
         PMLDeserializer pmlDeserializer = new PMLDeserializer();
 
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.deserialize(new UserContext(SUPER_USER), pml, pmlDeserializer);
+        pap.deserialize(new UserContext("u1"), pml, pmlDeserializer);
 
         String serialize = pap.serialize(new PMLSerializer());
         PAP pap2 = new PAP(new MemoryPolicyStore());
-        pap2.deserialize(new UserContext(SUPER_USER), serialize, pmlDeserializer);
+        pap2.deserialize(new UserContext("u1"), serialize, pmlDeserializer);
 
         PolicyEquals.assertPolicyEquals(pap, pap2);
     }
@@ -47,7 +46,7 @@ class PMLTest {
         PMLDeserializer pmlDeserializer = new PMLDeserializer();
 
         PAP pap = new PAP(new MemoryPolicyStore());
-        assertThrows(PMException.class, () -> pap.deserialize(new UserContext(SUPER_USER), pml, pmlDeserializer));
+        assertThrows(PMException.class, () -> pap.deserialize(new UserContext("u1"), pml, pmlDeserializer));
 
         FunctionDefinitionStatement testFunc = new FunctionDefinitionStatement.Builder("testFunc")
                 .returns(Type.voidType())
@@ -62,7 +61,7 @@ class PMLTest {
                 .build();
 
         PMLDeserializer pmlDeserializer2 = new PMLDeserializer(testFunc);
-        pap.deserialize(new UserContext(SUPER_USER), pml, pmlDeserializer2);
+        pap.deserialize(new UserContext("u1"), pml, pmlDeserializer2);
         assertTrue(pap.graph().nodeExists("hello world"));
     }
 

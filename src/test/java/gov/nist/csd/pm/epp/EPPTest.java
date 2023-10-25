@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.*;
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 import static gov.nist.csd.pm.policy.model.obligation.event.Performs.events;
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,24 +74,14 @@ class EPPTest {
         PDP pdp = new MemoryPDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """
-                create policy class "super_policy"
-                create user attribute "super_ua" assign to ["super_policy"]
-                associate "super_ua" and ADMIN_POLICY_TARGET with ["*"]
-                associate "super_ua" and POLICY_CLASSES_OA with ["*"]
-                associate "super_ua" and PML_FUNCTIONS_TARGET with ["*"]
-                associate "super_ua" and PML_CONSTANTS_TARGET with ["*"]
-                create user attribute "super_ua1" assign to ["super_policy"]
-                associate "super_ua" and "super_ua1" with ["*"]
-                create user "super" assign to ["super_ua"]
-                assign "super" to ["super_ua1"]
-                
+        String pml = """                
                 create pc "pc1"
                 create ua "ua1" assign to ["pc1"]
-                assign "super" to ["ua1"]
+                create u "u1" assign to ["ua1"]
                 create oa "oa1" assign to ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
+                associate "ua1" and POLICY_CLASSES_OA with [create_policy_class]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -111,11 +100,11 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new UserContext(SUPER_USER), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        pdp.runTx(new UserContext(SUPER_USER), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
+        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
         assertTrue(pap.graph().getPolicyClasses().containsAll(Arrays.asList(
-                SUPER_PC, "pc1", "create_object_attribute", "oa2_test", "super_test"
+                "pc1", "create_object_attribute", "oa2_test", "u1_test"
         )));
     }
 
@@ -156,7 +145,7 @@ class EPPTest {
             );
         });
 
-        EventContext eventCtx = new EventContext(new UserContext(SUPER_USER), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"));
+        EventContext eventCtx = new EventContext(new UserContext("u1"), new CreateObjectAttributeEvent("oa2", new HashMap<>(), "pc1"));
         assertThrows(PMException.class, () -> {
             epp.getEventProcessor().processEvent(eventCtx);
         });

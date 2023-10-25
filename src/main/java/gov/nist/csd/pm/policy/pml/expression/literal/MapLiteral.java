@@ -24,9 +24,9 @@ public class MapLiteral extends Literal {
         this.type = Type.map(keyType, valueType);
     }
 
-    public MapLiteral(Type type) {
+    public MapLiteral(Type keyType, Type valueType) {
         this.map = new HashMap<>();
-        this.type = type;
+        this.type = Type.map(keyType, valueType);
     }
 
     @Override

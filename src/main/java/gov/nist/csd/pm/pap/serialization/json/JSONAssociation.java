@@ -8,6 +8,7 @@ public class JSONAssociation {
     private AccessRightSet arset;
 
     public JSONAssociation() {
+        arset = new AccessRightSet();
     }
 
     public JSONAssociation(String target, AccessRightSet arset) {

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class JSONUserDefinedPML {
@@ -7,6 +8,8 @@ public class JSONUserDefinedPML {
     Map<String, String> constants;
 
     public JSONUserDefinedPML() {
+        functions = new HashMap<>();
+        constants = new HashMap<>();
     }
 
     public JSONUserDefinedPML(Map<String, String> functions, Map<String, String> constants) {

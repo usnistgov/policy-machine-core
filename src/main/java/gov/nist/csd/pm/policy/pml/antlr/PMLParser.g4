@@ -162,7 +162,6 @@ expression:
     | left=expression (EQUALS | NOT_EQUALS) right=expression #EqualsExpression
     | left=expression (LOGICAL_AND | LOGICAL_OR) right=expression #LogicalExpression;
 expressionList: expression (COMMA expression)*;
-identifierList: ID (COMMA ID)*;
 
 literal:
     stringLit #StringLiteral

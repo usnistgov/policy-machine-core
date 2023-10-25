@@ -13,7 +13,6 @@ import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JSONTest {
@@ -23,14 +22,14 @@ public class JSONTest {
         String json = IOUtils.resourceToString("json/JSONTest.json", StandardCharsets.UTF_8, JSONTest.class.getClassLoader());
 
         PAP pap = new PAP(new MemoryPolicyStore());
-        pap.deserialize(new UserContext(SUPER_USER), json, new JSONDeserializer());
+        pap.deserialize(new UserContext("u1"), json, new JSONDeserializer());
 
         String serialize = pap.serialize(new JSONSerializer());
 
         assertEquals(json, serialize);
 
         PAP pap2 = new PAP(new MemoryPolicyStore());
-        pap2.deserialize(new UserContext(SUPER_USER), serialize, new JSONDeserializer());
+        pap2.deserialize(new UserContext("u1"), serialize, new JSONDeserializer());
 
         PolicyEquals.assertPolicyEquals(pap, pap2);
     }

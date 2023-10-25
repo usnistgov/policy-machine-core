@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static gov.nist.csd.pm.pdp.SuperUserBootstrapper.SUPER_USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryPDPTest {
@@ -63,9 +62,9 @@ class MemoryPDPTest {
                     .build();
 
             MemoryPDP memoryPDP = new MemoryPDP(pap);
-            memoryPDP.runTx(new UserContext(SUPER_USER), policy -> {
+            memoryPDP.runTx(new UserContext("u1"), policy -> {
                 policy.userDefinedPML().createFunction(functionDefinitionStatement);
-                policy.executePML(new UserContext(SUPER_USER), "create ua \"ua3\" assign to [\"pc2\"]");
+                policy.executePML(new UserContext("u1"), "create ua \"ua3\" assign to [\"pc2\"]");
             });
 
             assertTrue(pap.graph().nodeExists("ua3"));

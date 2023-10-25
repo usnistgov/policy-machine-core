@@ -483,12 +483,6 @@ public interface PMLParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpressionList(PMLParser.ExpressionListContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PMLParser#identifierList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIdentifierList(PMLParser.IdentifierListContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link PMLParser#literal}.
 	 * @param ctx the parse tree

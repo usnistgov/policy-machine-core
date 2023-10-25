@@ -8,6 +8,7 @@ import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -210,6 +211,45 @@ class LiteralVisitorTest {
         assertEquals(
                 Type.map(Type.any(), Type.string()),
                 literal.getType(visitorContext.scope())
+        );
+    }
+
+    @Test
+    void testEmptyLiterals() {
+        PMLParser.StringLiteralContext stringCtx = PMLContextVisitor.toLiteralCtx(
+                "\"\"",
+                PMLParser.StringLiteralContext.class);
+        VisitorContext visitorContext = new VisitorContext();
+        StringLiteral literal = new LiteralVisitor(visitorContext)
+                .visitStringLiteral(stringCtx);
+        assertEquals(0, visitorContext.errorLog().getErrors().size());
+        assertEquals(
+                new StringLiteral(""),
+                literal
+        );
+
+        PMLParser.ArrayLiteralContext arrayCtx = PMLContextVisitor.toLiteralCtx(
+                "[]",
+                PMLParser.ArrayLiteralContext.class);
+        visitorContext = new VisitorContext();
+        Expression arrayLiteral = new LiteralVisitor(visitorContext)
+                .visitArrayLiteral(arrayCtx);
+        assertEquals(0, visitorContext.errorLog().getErrors().size());
+        assertEquals(
+                new ArrayLiteral(Type.any()),
+                arrayLiteral
+        );
+
+        PMLParser.MapLiteralContext mapCtx = PMLContextVisitor.toLiteralCtx(
+                "{}",
+                PMLParser.MapLiteralContext.class);
+        visitorContext = new VisitorContext();
+        Expression mapLiteral = new LiteralVisitor(visitorContext)
+                .visitMapLiteral(mapCtx);
+        assertEquals(0, visitorContext.errorLog().getErrors().size());
+        assertEquals(
+                new MapLiteral(Type.any(), Type.any()),
+                mapLiteral
         );
     }
 }
