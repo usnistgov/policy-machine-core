@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface ProhibitionsReview {
 
-    // TODO add function for getting prohibitions with given container
     List<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException;
     List<Prohibition> getProhibitionsWithContainer(String container) throws PMException;
 
