@@ -67,9 +67,9 @@ public class Path {
 
     @Override
     public String toString() {
-        return "Path{" +
-                "userDagPath=" + userDagPath +
-                ", targetDagPath=" + targetDagPath +
+        return "{" +
+                "userPath=" + userDagPath +
+                ", targetPath=" + targetDagPath +
                 ", association=" + association +
                 '}';
     }

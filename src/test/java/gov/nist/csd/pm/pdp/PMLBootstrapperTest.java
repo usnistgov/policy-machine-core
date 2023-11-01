@@ -2,8 +2,6 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pdp.PMLBootstrapper;
-import gov.nist.csd.pm.pdp.memory.MemoryPDP;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,7 @@ class PMLBootstrapperTest {
     @Test
     void test() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        PDP pdp = new MemoryPDP(pap);
+        PDP pdp = new PDP(pap);
 
         String input = """
                 const read = "read"

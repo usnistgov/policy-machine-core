@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.adjudicator.AdjudicatorObligations;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.events.PolicyEvent;
 import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;

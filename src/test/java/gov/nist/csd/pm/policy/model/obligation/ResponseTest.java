@@ -5,7 +5,7 @@ import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pdp.memory.MemoryPDP;
+import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.policy.events.graph.AssignToEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -41,7 +41,7 @@ class ResponseTest {
                 """;
         PAP pap = new PAP(new MemoryPolicyStore());
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        MemoryPDP pdp = new MemoryPDP(pap);
+        PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.getEventProcessor().processEvent(new EventContext(new UserContext("u1"), "oa1", new AssignToEvent("o1", "oa1")));
         assertTrue(pap.graph().nodeExists("hello world"));

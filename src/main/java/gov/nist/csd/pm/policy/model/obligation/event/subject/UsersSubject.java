@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.model.obligation.event.subject;
 
-import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.review.GraphReview;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class UsersSubject extends Subject {
     }
 
     @Override
-    public boolean matches(UserContext userCtx, PolicyReviewer policyReviewer) {
+    public boolean matches(UserContext userCtx, GraphReview graphReview) {
         return subjects.contains(userCtx.getUser());
     }
 }

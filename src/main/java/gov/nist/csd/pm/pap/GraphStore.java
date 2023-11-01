@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.memory.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.policy.model.graph.dag.walker.dfs.DepthFirstGraphWalker;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
@@ -21,12 +21,12 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 public class AdjudicatorObligations implements Obligations {
     private final UserContext userCtx;
     private final PAP pap;
-    private final AccessRightChecker accessRightChecker;
+    private final PrivilegeChecker privilegeChecker;
 
-    public AdjudicatorObligations(UserContext userCtx, PAP pap, AccessRightChecker accessRightChecker) {
+    public AdjudicatorObligations(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         this.userCtx = userCtx;
         this.pap = pap;
-        this.accessRightChecker = accessRightChecker;
+        this.privilegeChecker = privilegeChecker;
     }
 
     @Override
@@ -42,23 +42,23 @@ public class AdjudicatorObligations implements Obligations {
 
     private void checkTarget(Target target, String accessRight) throws PMException {
         if (target instanceof AnyTarget) {
-            accessRightChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
+            privilegeChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
         }
 
         for (String tar : target.getTargets()) {
-            accessRightChecker.check(userCtx, tar, accessRight);
+            privilegeChecker.check(userCtx, tar, accessRight);
         }
     }
 
     private void checkSubject(Subject subject, String accessRight) throws PMException {
         if (subject instanceof AnyUserSubject ||
                 subject instanceof ProcessesSubject) {
-            accessRightChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
+            privilegeChecker.check(userCtx, AdminPolicyNode.OBLIGATIONS_TARGET.nodeName(), accessRight);
 
         }
 
         for (String user : subject.getSubjects()) {
-            accessRightChecker.check(userCtx, user, accessRight);
+            privilegeChecker.check(userCtx, user, accessRight);
         }
     }
 

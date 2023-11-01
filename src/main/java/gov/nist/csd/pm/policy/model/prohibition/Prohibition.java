@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.policy.model.prohibition;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
+import gov.nist.csd.pm.policy.pml.compiler.visitor.CreateProhibitionStmtVisitor;
+import gov.nist.csd.pm.policy.pml.statement.CreateProhibitionStatement;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,18 +32,8 @@ public class Prohibition implements Serializable {
         this.name = name;
         this.subject = subject;
 
-        if (containers == null) {
-            this.containers = new ArrayList<>();
-        } else {
-            this.containers = containers;
-        }
-
-        if (accessRightSet == null) {
-            this.accessRightSet = new AccessRightSet();
-        } else {
-            this.accessRightSet = accessRightSet;
-        }
-
+        this.containers = Objects.requireNonNullElseGet(containers, ArrayList::new);
+        this.accessRightSet = Objects.requireNonNullElseGet(accessRightSet, AccessRightSet::new);
         this.intersection = intersection;
     }
 
@@ -109,5 +101,10 @@ public class Prohibition implements Serializable {
 
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    @Override
+    public String toString() {
+        return CreateProhibitionStatement.fromProhibition(this).toString();
     }
 }

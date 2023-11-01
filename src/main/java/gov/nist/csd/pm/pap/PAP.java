@@ -35,22 +35,22 @@ public class PAP implements Transactional, PMLExecutable, Policy {
     }
 
     @Override
-    public Graph graph() {
+    public GraphStore graph() {
         return policyStore.graph();
     }
 
     @Override
-    public Prohibitions prohibitions() {
+    public ProhibitionsStore prohibitions() {
         return policyStore.prohibitions();
     }
 
     @Override
-    public Obligations obligations() {
+    public ObligationsStore obligations() {
         return policyStore.obligations();
     }
 
     @Override
-    public UserDefinedPML userDefinedPML() {
+    public UserDefinedPMLStore userDefinedPML() {
         return policyStore.userDefinedPML();
     }
 

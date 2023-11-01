@@ -65,6 +65,9 @@ public class AdminAccessRights {
     public static final String ALL_ADMIN_ACCESS_RIGHTS = "*a";
     public static final String ALL_RESOURCE_ACCESS_RIGHTS = "*r";
 
+    // policy review
+    public static final String REVIEW_POLICY = "review_policy";
+
     private static final AccessRightSet ALL_ADMIN_ACCESS_RIGHTS_SET = new AccessRightSet(
             CREATE_POLICY_CLASS,
             CREATE_OBJECT,
@@ -122,7 +125,10 @@ public class AdminAccessRights {
             GET_CONTEXT,
             SERIALIZE_POLICY,
             DESERIALIZE_POLICY,
-            RESET
+            RESET,
+
+            // review
+            REVIEW_POLICY
     );
 
     private static final AccessRightSet WILDCARD_ACCESS_RIGHTS_SET = new AccessRightSet(

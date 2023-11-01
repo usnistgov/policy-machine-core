@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.policy.model.obligation.event.subject;
 
-import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.review.GraphReview;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ public class AnyUserSubject extends Subject {
     }
 
     @Override
-    public boolean matches(UserContext userCtx, PolicyReviewer policyReviewer) throws PMException {
+    public boolean matches(UserContext userCtx, GraphReview graphReview) throws PMException {
         return true;
     }
 }

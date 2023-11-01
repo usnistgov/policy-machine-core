@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
@@ -7,29 +7,32 @@ import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.PolicySerializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.review.PolicyReview;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 
-class Adjudicator implements Policy {
+public class Adjudicator implements Policy {
 
     private final UserContext userCtx;
-    private final PAP pap;
-    private final AccessRightChecker accessRightChecker;
+    private final PrivilegeChecker privilegeChecker;
 
     private final AdjudicatorGraph adjudicatorGraph;
     private final AdjudicatorProhibitions adjudicatorProhibitions;
     private final AdjudicatorObligations adjudicatorObligations;
     private final AdjudicatorUserDefinedPML adjudicatorUserDefinedPML;
 
-    public Adjudicator(UserContext userCtx, PAP pap, PolicyReviewer policyReviewer) {
+    public Adjudicator(UserContext userCtx, PAP pap, PolicyReview policyReview) {
         this.userCtx = userCtx;
-        this.pap = pap;
-        this.accessRightChecker = new AccessRightChecker(pap, policyReviewer);
+        this.privilegeChecker = new PrivilegeChecker(pap, policyReview);
 
-        adjudicatorGraph = new AdjudicatorGraph(userCtx, pap, accessRightChecker);
-        adjudicatorProhibitions = new AdjudicatorProhibitions(userCtx, pap, accessRightChecker);
-        adjudicatorObligations = new AdjudicatorObligations(userCtx, pap, accessRightChecker);
-        adjudicatorUserDefinedPML = new AdjudicatorUserDefinedPML(userCtx, pap, accessRightChecker);
+        adjudicatorGraph = new AdjudicatorGraph(userCtx, pap, privilegeChecker);
+        adjudicatorProhibitions = new AdjudicatorProhibitions(userCtx, pap, privilegeChecker);
+        adjudicatorObligations = new AdjudicatorObligations(userCtx, pap, privilegeChecker);
+        adjudicatorUserDefinedPML = new AdjudicatorUserDefinedPML(userCtx, pap, privilegeChecker);
+    }
+
+    public PrivilegeChecker getAccessRightChecker() {
+        return privilegeChecker;
     }
 
     @Override
@@ -54,7 +57,7 @@ class Adjudicator implements Policy {
 
     @Override
     public String serialize(PolicySerializer serializer) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), SERIALIZE_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), SERIALIZE_POLICY);
 
         return null;
     }
@@ -62,11 +65,11 @@ class Adjudicator implements Policy {
     @Override
     public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
             throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), DESERIALIZE_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), DESERIALIZE_POLICY);
     }
 
     @Override
     public void reset() throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), RESET);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), RESET);
     }
 }

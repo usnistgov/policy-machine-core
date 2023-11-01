@@ -1,46 +1,69 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.reviewer;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.policy.model.graph.dag.UserDagResult;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
-import gov.nist.csd.pm.policy.review.PolicyReview;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
+import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.ALL_RESOURCE_ACCESS_RIGHTS;
 
-public abstract class PolicyReviewer implements PolicyReview {
+public class AccessRightResolver {
 
-    public AccessRightSet resolvePermissions(UserDagResult userContext, TargetDagResult targetCtx, String target, AccessRightSet resourceOps) {
-        AccessRightSet allowed = resolveAllowedPermissions(targetCtx.pcSet(), resourceOps);
-
-        // remove any prohibited operations
-        Set<String> denied = resolveProhibitions(userContext, targetCtx, target);
-        allowed.removeAll(denied);
-
-        return allowed;
-    }
-
-    public AccessRightSet resolveAllowedPermissions(Map<String, AccessRightSet> pcMap, AccessRightSet resourceOps) {
+    public AccessRightSet resolvePrivileges(UserDagResult userContext, TargetDagResult targetCtx, String target, AccessRightSet resourceOps) {
         Map<String, AccessRightSet> resolvedPcMap = new HashMap<>();
-        for (Map.Entry<String, AccessRightSet> pc : pcMap.entrySet()) {
+        for (Map.Entry<String, AccessRightSet> pc : targetCtx.pcSet().entrySet()) {
             AccessRightSet pcOps = pc.getValue();
 
-            // replace instances of *, *a or *r with the literal operations
-            resolveSpecialPermissions(pcOps, resourceOps);
+            // replace instances of *, *a or *r with the literal access rights
+            resolveWildcardAccessRights(pcOps, resourceOps);
 
             resolvedPcMap.put(pc.getKey(), pcOps);
         }
 
-        return resolvePolicyClassOperationSets(resolvedPcMap);
+        AccessRightSet result = resolvePolicyClassAccessRightSets(resolvedPcMap);
+
+        // remove any prohibited access rights
+        AccessRightSet denied = resolveDeniedAccessRights(userContext, targetCtx, target);
+        result.removeAll(denied);
+
+        return result;
     }
 
-    public AccessRightSet resolvePolicyClassOperationSets(Map<String, AccessRightSet> pcMap) {
+    public AccessRightSet resolveDeniedAccessRights(UserDagResult userCtx, TargetDagResult targetCtx, String target) {
+        AccessRightSet denied = new AccessRightSet();
+        Set<Prohibition> prohibitions = userCtx.prohibitions();
+        Set<String> reachedTargets = targetCtx.reachedTargets();
+
+        for(Prohibition p : prohibitions) {
+            if (isProhibitionSatisfied(p, reachedTargets, target)) {
+                denied.addAll(p.getAccessRightSet());
+            }
+        }
+
+        return denied;
+    }
+
+    public List<Prohibition> computeSatisfiedProhibitions(UserDagResult userDagResult, TargetDagResult targetDagResult,
+                                                          String target) {
+        List<Prohibition> satisfied = new ArrayList<>();
+
+        Set<Prohibition> prohibitions = userDagResult.prohibitions();
+        Set<String> reachedTargets = targetDagResult.reachedTargets();
+
+        for(Prohibition p : prohibitions) {
+            if (isProhibitionSatisfied(p, reachedTargets, target)) {
+                satisfied.add(p);
+            }
+        }
+
+        return satisfied;
+    }
+
+    private AccessRightSet resolvePolicyClassAccessRightSets(Map<String, AccessRightSet> pcMap) {
         // retain only the ops that the decider knows about
         AccessRightSet allowed = new AccessRightSet();
         boolean first = true;
@@ -62,36 +85,23 @@ public abstract class PolicyReviewer implements PolicyReview {
         return allowed;
     }
 
-    public void resolveSpecialPermissions(AccessRightSet permissions, AccessRightSet resourceOps) {
+    private void resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
         // if the permission set includes *, remove the * and add all resource operations
-        if (permissions.contains(ALL_ACCESS_RIGHTS)) {
-            permissions.remove(ALL_ACCESS_RIGHTS);
-            permissions.addAll(allAdminAccessRights());
-            permissions.addAll(resourceOps);
+        if (accessRightSet.contains(ALL_ACCESS_RIGHTS)) {
+            accessRightSet.remove(ALL_ACCESS_RIGHTS);
+            accessRightSet.addAll(allAdminAccessRights());
+            accessRightSet.addAll(resourceOps);
         } else {
             // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
-            if (permissions.contains(ALL_ADMIN_ACCESS_RIGHTS)) {
-                permissions.remove(ALL_ADMIN_ACCESS_RIGHTS);
-                permissions.addAll(allAdminAccessRights());
+            if (accessRightSet.contains(ALL_ADMIN_ACCESS_RIGHTS)) {
+                accessRightSet.remove(ALL_ADMIN_ACCESS_RIGHTS);
+                accessRightSet.addAll(allAdminAccessRights());
             }
-            if (permissions.contains(ALL_RESOURCE_ACCESS_RIGHTS)) {
-                permissions.remove(ALL_RESOURCE_ACCESS_RIGHTS);
-                permissions.addAll(resourceOps);
-            }
-        }
-    }
-
-    public AccessRightSet resolveProhibitions(UserDagResult userCtx, TargetDagResult targetCtx, String target) {
-        AccessRightSet denied = new AccessRightSet();
-        Set<Prohibition> prohibitions = userCtx.prohibitions();
-        Set<String> reachedTargets = targetCtx.reachedTargets();
-
-        for(Prohibition p : prohibitions) {
-            if (isProhibitionSatisfied(p, reachedTargets, target)) {
-                denied.addAll(p.getAccessRightSet());
+            if (accessRightSet.contains(ALL_RESOURCE_ACCESS_RIGHTS)) {
+                accessRightSet.remove(ALL_RESOURCE_ACCESS_RIGHTS);
+                accessRightSet.addAll(resourceOps);
             }
         }
-        return denied;
     }
 
     private boolean isProhibitionSatisfied(Prohibition prohibition, Set<String> reachedTargets, String target) {
@@ -136,4 +146,5 @@ public abstract class PolicyReviewer implements PolicyReview {
 
         return addOps;
     }
+
 }

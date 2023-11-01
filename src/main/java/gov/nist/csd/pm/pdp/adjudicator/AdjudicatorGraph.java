@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
@@ -24,17 +24,17 @@ public class AdjudicatorGraph implements Graph {
 
     private final UserContext userCtx;
     private final PAP pap;
-    private final AccessRightChecker accessRightChecker;
+    private final PrivilegeChecker privilegeChecker;
 
-    public AdjudicatorGraph(UserContext userCtx, PAP pap, AccessRightChecker accessRightChecker) {
+    public AdjudicatorGraph(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         this.userCtx = userCtx;
         this.pap = pap;
-        this.accessRightChecker = accessRightChecker;
+        this.privilegeChecker = privilegeChecker;
     }
 
     @Override
     public void setResourceAccessRights(AccessRightSet accessRightSet) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), SET_RESOURCE_ACCESS_RIGHTS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_TARGET.nodeName(), SET_RESOURCE_ACCESS_RIGHTS);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public String createPolicyClass(String name, Map<String, String> properties) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName(), CREATE_POLICY_CLASS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.POLICY_CLASS_TARGETS.nodeName(), CREATE_POLICY_CLASS);
 
         return null;
     }
@@ -108,13 +108,13 @@ public class AdjudicatorGraph implements Graph {
 
     private void checkParents(String accessRight, String ... parents) throws PMException {
         for (String parent : parents) {
-            accessRightChecker.check(userCtx, parent, accessRight);
+            privilegeChecker.check(userCtx, parent, accessRight);
         }
     }
 
     @Override
     public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
-        accessRightChecker.check(userCtx, name, SET_NODE_PROPERTIES);
+        privilegeChecker.check(userCtx, name, SET_NODE_PROPERTIES);
     }
 
     @Override
@@ -124,12 +124,10 @@ public class AdjudicatorGraph implements Graph {
             return false;
         }
 
-        try {
-            accessRightChecker.check(userCtx, name);
-            return true;
-        } catch (UnauthorizedException e) {
-            return false;
-        }
+        // check user has permissions on the node
+        privilegeChecker.check(userCtx, name);
+
+        return true;
     }
 
     @Override
@@ -138,12 +136,7 @@ public class AdjudicatorGraph implements Graph {
         Node node = pap.graph().getNode(name);
 
         // check user has permissions on the node
-        try {
-            accessRightChecker.check(userCtx, name);
-        } catch (UnauthorizedException e) {
-            // if no permissions, the user shouldn't know it exists
-            throw new NodeDoesNotExistException(name);
-        }
+        privilegeChecker.check(userCtx, name);
 
         return node;
     }
@@ -153,7 +146,7 @@ public class AdjudicatorGraph implements Graph {
         List<String> search = pap.graph().search(type, properties);
         search.removeIf(node -> {
             try {
-                accessRightChecker.check(userCtx, node);
+                privilegeChecker.check(userCtx, node);
                 return false;
             } catch (PMException e) {
                 return true;
@@ -168,7 +161,7 @@ public class AdjudicatorGraph implements Graph {
         List<String> policyClasses = pap.graph().getPolicyClasses();
         policyClasses.removeIf(pc -> {
             try {
-                accessRightChecker.check(userCtx, AdminPolicy.policyClassTargetName(pc));
+                privilegeChecker.check(userCtx, AdminPolicy.policyClassTargetName(pc));
                 return false;
             } catch (PMException e) {
                 return true;
@@ -183,7 +176,7 @@ public class AdjudicatorGraph implements Graph {
         NodeType nodeType = pap.graph().getNode(name).getType();
 
         if (nodeType == PC) {
-            accessRightChecker.check(userCtx, AdminPolicy.policyClassTargetName(name), DELETE_POLICY_CLASS);
+            privilegeChecker.check(userCtx, AdminPolicy.policyClassTargetName(name), DELETE_POLICY_CLASS);
             return;
         }
 
@@ -196,13 +189,13 @@ public class AdjudicatorGraph implements Graph {
         };
 
         // check the user can delete the node
-        accessRightChecker.check(userCtx, name, op);
+        privilegeChecker.check(userCtx, name, op);
 
         // check that the user can delete the node from the node's parents
         List<String> parents = pap.graph().getParents(name);
 
         for(String parent : parents) {
-            accessRightChecker.check(userCtx, parent, op);
+            privilegeChecker.check(userCtx, parent, op);
         }
     }
 
@@ -212,10 +205,10 @@ public class AdjudicatorGraph implements Graph {
         Node parentNode = pap.graph().getNode(parent);
 
         //check the user can assign the child
-        accessRightChecker.check(userCtx, child, ASSIGN);
+        privilegeChecker.check(userCtx, child, ASSIGN);
 
         // check that the user can assign to the parent node
-        accessRightChecker.check(userCtx, parent, ASSIGN_TO);
+        privilegeChecker.check(userCtx, parent, ASSIGN_TO);
     }
 
     @Override
@@ -224,10 +217,10 @@ public class AdjudicatorGraph implements Graph {
         Node parentNode = pap.graph().getNode(parent);
 
         //check the user can deassign the child
-        accessRightChecker.check(userCtx, child, DEASSIGN);
+        privilegeChecker.check(userCtx, child, DEASSIGN);
 
         // check that the user can deassign from the parent node
-        accessRightChecker.check(userCtx, parent, DEASSIGN_FROM);
+        privilegeChecker.check(userCtx, parent, DEASSIGN_FROM);
     }
 
     @Override
@@ -235,7 +228,7 @@ public class AdjudicatorGraph implements Graph {
         List<String> parents = pap.graph().getParents(node);
         parents.removeIf(parent -> {
             try {
-                accessRightChecker.check(userCtx, parent);
+                privilegeChecker.check(userCtx, parent);
                 return false;
             } catch (PMException e) {
                 return true;
@@ -250,7 +243,7 @@ public class AdjudicatorGraph implements Graph {
         List<String> children = pap.graph().getChildren(node);
         children.removeIf(child -> {
             try {
-                accessRightChecker.check(userCtx, child);
+                privilegeChecker.check(userCtx, child);
                 return false;
             } catch (PMException e) {
                 return true;
@@ -262,14 +255,14 @@ public class AdjudicatorGraph implements Graph {
 
     @Override
     public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
-        accessRightChecker.check(userCtx, ua, ASSOCIATE);
-        accessRightChecker.check(userCtx, target, ASSOCIATE_TO);
+        privilegeChecker.check(userCtx, ua, ASSOCIATE);
+        privilegeChecker.check(userCtx, target, ASSOCIATE_TO);
     }
 
     @Override
     public void dissociate(String ua, String target) throws PMException {
-        accessRightChecker.check(userCtx, ua, DISSOCIATE);
-        accessRightChecker.check(userCtx, target, DISSOCIATE_FROM);
+        privilegeChecker.check(userCtx, ua, DISSOCIATE);
+        privilegeChecker.check(userCtx, target, DISSOCIATE_FROM);
     }
 
     @Override
@@ -285,8 +278,8 @@ public class AdjudicatorGraph implements Graph {
     private List<Association> getAssociations(List<Association> associations) {
         associations.removeIf(association -> {
             try {
-                accessRightChecker.check(userCtx, association.getSource(), GET_ASSOCIATIONS);
-                accessRightChecker.check(userCtx, association.getTarget(), GET_ASSOCIATIONS);
+                privilegeChecker.check(userCtx, association.getSource(), GET_ASSOCIATIONS);
+                privilegeChecker.check(userCtx, association.getTarget(), GET_ASSOCIATIONS);
                 return false;
             } catch (PMException e) {
                 return true;

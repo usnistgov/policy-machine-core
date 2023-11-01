@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.model.obligation.event.target;
 
-import gov.nist.csd.pm.pdp.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.review.GraphReview;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public abstract class Target implements Serializable {
         this.targets = new ArrayList<>(List.of(targets));
     }
 
-    public abstract boolean matches(String target, PolicyReviewer policyReviewer) throws PMException;
+    public abstract boolean matches(String target, GraphReview graphReview) throws PMException;
 
     public List<String> getTargets() {
         return targets;

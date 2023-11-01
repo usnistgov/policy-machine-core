@@ -11,17 +11,17 @@ import java.util.Set;
 
 public interface AccessReview {
 
-    AccessRightSet getPrivileges(UserContext userCtx, String target) throws PMException;
-    AccessRightSet getDeniedPrivileges(UserContext userCtx, String target) throws PMException;
-    Map<String, AccessRightSet> getPolicyClassAccessRights(UserContext userContext, String target) throws PMException;
+    AccessRightSet computePrivileges(UserContext userCtx, String target) throws PMException;
+    AccessRightSet computeDeniedPrivileges(UserContext userCtx, String target) throws PMException;
+    Map<String, AccessRightSet> computePolicyClassAccessRights(UserContext userContext, String target) throws PMException;
     Map<String, AccessRightSet> buildCapabilityList(UserContext userCtx) throws PMException;
     Map<String, AccessRightSet> buildACL(String target) throws PMException;
-    Map<String, AccessRightSet> getBorderAttributes(String user) throws PMException;
+    Map<String, AccessRightSet> findBorderAttributes(String user) throws PMException;
     // does not include the root in results
-    Map<String, AccessRightSet> getSubgraphPrivileges(UserContext userCtx, String root) throws PMException;
+    Map<String, AccessRightSet> computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException;
     Explain explain(UserContext userCtx, String target) throws PMException;
     Set<String> buildPOS(UserContext userCtx) throws PMException;
-    List<String> getAccessibleChildren(UserContext userCtx, String root) throws PMException;
-    List<String> getAccessibleParents(UserContext userCtx, String root) throws PMException;
+    List<String> computeAccessibleChildren(UserContext userCtx, String root) throws PMException;
+    List<String> computeAccessibleParents(UserContext userCtx, String root) throws PMException;
 
 }

@@ -4,7 +4,6 @@ import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pdp.memory.MemoryPDP;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
@@ -36,7 +35,7 @@ class EPPTest {
     void test() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
 
-        PDP pdp = new MemoryPDP(pap);
+        PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         String pml = """
@@ -71,7 +70,7 @@ class EPPTest {
     void testAccessingEventContextInResponse() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
 
-        PDP pdp = new MemoryPDP(pap);
+        PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         String pml = """                
@@ -111,7 +110,7 @@ class EPPTest {
     @Test
     void testErrorInEPPResponse() throws PMException {
         PAP pap = new PAP(new MemoryPolicyStore());
-        PDP pdp = new MemoryPDP(pap);
+        PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
         pap.runTx((policy) -> {

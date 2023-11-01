@@ -4,6 +4,7 @@ import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pdp.adjudicator.AdjudicatorUserDefinedPML;
 import gov.nist.csd.pm.policy.UserDefinedPML;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateConstantEvent;
 import gov.nist.csd.pm.policy.events.userdefinedpml.CreateFunctionEvent;

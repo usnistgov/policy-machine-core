@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
@@ -15,22 +15,22 @@ import static gov.nist.csd.pm.policy.model.access.AdminAccessRights.*;
 public class AdjudicatorUserDefinedPML implements UserDefinedPML {
     private final UserContext userCtx;
     private final PAP pap;
-    private final AccessRightChecker accessRightChecker;
+    private final PrivilegeChecker privilegeChecker;
 
-    public AdjudicatorUserDefinedPML(UserContext userCtx, PAP pap, AccessRightChecker accessRightChecker) {
+    public AdjudicatorUserDefinedPML(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         this.userCtx = userCtx;
         this.pap = pap;
-        this.accessRightChecker = accessRightChecker;
+        this.privilegeChecker = privilegeChecker;
     }
 
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), CREATE_FUNCTION);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), CREATE_FUNCTION);
     }
 
     @Override
     public void deleteFunction(String functionName) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), DELETE_FUNCTION);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PML_FUNCTIONS_TARGET.nodeName(), DELETE_FUNCTION);
     }
 
     @Override
@@ -45,12 +45,12 @@ public class AdjudicatorUserDefinedPML implements UserDefinedPML {
 
     @Override
     public void createConstant(String constantName, Value constantValue) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), CREATE_CONSTANT);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), CREATE_CONSTANT);
     }
 
     @Override
     public void deleteConstant(String constName) throws PMException {
-        accessRightChecker.check(userCtx, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), DELETE_CONSTANT);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PML_CONSTANTS_TARGET.nodeName(), DELETE_CONSTANT);
     }
 
     @Override
