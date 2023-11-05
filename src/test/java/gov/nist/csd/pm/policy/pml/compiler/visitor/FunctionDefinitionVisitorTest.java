@@ -2,6 +2,7 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.pml.PMLCompiler;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
@@ -147,7 +148,7 @@ class FunctionDefinitionVisitorTest {
     }
 
     @Test
-    void testFunctionInScope() throws FunctionAlreadyDefinedInScopeException {
+    void testFunctionInScope() throws FunctionAlreadyDefinedInScopeException, PMLFunctionNotDefinedException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 function func1(string a, bool b, []string c) string {

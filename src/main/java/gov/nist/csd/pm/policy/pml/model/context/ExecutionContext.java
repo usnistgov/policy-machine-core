@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.pml.model.context;
 
+import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.model.scope.*;
@@ -26,12 +27,13 @@ public class ExecutionContext implements Serializable {
     }
 
     public ExecutionContext copy() throws UnknownFunctionInScopeException, FunctionAlreadyDefinedInScopeException,
-            UnknownVariableInScopeException, VariableAlreadyDefinedInScopeException {
+                                          UnknownVariableInScopeException, VariableAlreadyDefinedInScopeException,
+                                          PMLFunctionNotDefinedException {
         ExecutionContext copy = new ExecutionContext(this.author);
 
         for (String funcName : this.scope.functions().keySet()) {
-            copy.scope.addFunction(this.scope.getFunction(funcName));
             copy.scope.addFunctionSignature(this.scope.getFunctionSignature(funcName));
+            copy.scope.addFunction(this.scope.getFunction(funcName));
         }
 
         for (String varName : this.scope.variables().keySet()) {

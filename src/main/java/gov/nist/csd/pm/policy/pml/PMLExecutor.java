@@ -17,7 +17,7 @@ public class PMLExecutor {
     public static void compileAndExecutePML(Policy policy, UserContext author, String input,
                                             FunctionDefinitionStatement ... customFunctions) throws PMException {
         // compile the PML into statements
-        List<PMLStatement> compiledStatements = PMLCompiler.compilePML(policy, input, customFunctions);
+        List<PMLStatement> stmts = PMLCompiler.compilePML(policy, input, customFunctions);
 
         // initialize the execution context
         ExecutionContext ctx = new ExecutionContext(author);
@@ -25,6 +25,7 @@ public class PMLExecutor {
 
         // add custom builtin functions to scope
         for (FunctionDefinitionStatement func : customFunctions) {
+            ctx.scope().addFunctionSignature(func.signature());
             ctx.scope().addFunction(func);
         }
 
@@ -32,7 +33,7 @@ public class PMLExecutor {
         ExecutionContext predefined = ctx.copy();
 
         // execute each statement
-        for (PMLStatement stmt : compiledStatements) {
+        for (PMLStatement stmt : stmts) {
             try {
                 stmt.execute(ctx, policy);
             } catch (PMException e) {

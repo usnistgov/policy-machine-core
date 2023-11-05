@@ -48,7 +48,7 @@ public class Scope implements Serializable {
      */
     private AccessRightSet resourceAccessRights;
 
-    private final Mode mode;
+    private Mode mode;
 
     public Scope(Mode mode) {
         this.mode = mode;
@@ -58,6 +58,10 @@ public class Scope implements Serializable {
         this.values = new HashMap<>();
         this.resourceAccessRightsExpression = null;
         this.resourceAccessRights = new AccessRightSet();
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
     }
 
     public Map<String, FunctionDefinitionStatement> functions() {
@@ -169,10 +173,13 @@ public class Scope implements Serializable {
         functionSignatures.remove(name);
     }
 
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws FunctionAlreadyDefinedInScopeException {
+    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement)
+            throws FunctionAlreadyDefinedInScopeException, PMLFunctionNotDefinedException {
         if (functions.containsKey(functionDefinitionStatement.signature().getFunctionName())
                 || isBuiltinFunction(functionDefinitionStatement.signature().getFunctionName())) {
             throw new FunctionAlreadyDefinedInScopeException(functionDefinitionStatement.signature().getFunctionName());
+        } else if (!functionSignatures.containsKey(functionDefinitionStatement.signature().getFunctionName())) {
+            throw new PMLFunctionNotDefinedException(functionDefinitionStatement.signature().getFunctionName());
         }
 
         this.functions.put(functionDefinitionStatement.signature().getFunctionName(), functionDefinitionStatement);

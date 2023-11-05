@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
+import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
@@ -56,7 +57,7 @@ public class FunctionDefinitionVisitor extends PMLParserBaseVisitor<PMLStatement
         // add function to scope
         try {
             visitorCtx.scope().addFunction(functionDefinition);
-        } catch (FunctionAlreadyDefinedInScopeException e) {
+        } catch (FunctionAlreadyDefinedInScopeException | PMLFunctionNotDefinedException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
 
             return new ErrorStatement(ctx);

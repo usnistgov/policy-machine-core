@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
+import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
@@ -60,8 +61,9 @@ public class FunctionDefinitionStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMLExecutionException {
         try {
+            ctx.scope().addFunctionSignature(this.signature);
             ctx.scope().addFunction(this);
-        } catch (FunctionAlreadyDefinedInScopeException e) {
+        } catch (FunctionAlreadyDefinedInScopeException | PMLFunctionNotDefinedException e) {
             throw new PMLExecutionException(e.getMessage());
         }
 
