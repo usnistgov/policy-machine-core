@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -465,5 +466,43 @@ public class ExecutionTest {
 
         assertFalse(pap.graph().nodeExists("test"));
         assertTrue(pap.graph().nodeExists("test2"));
+    }
+
+    @Test
+    void testLocalConst() throws PMException {
+        String pml = """
+                function testFunc() {
+                    const x = "x"
+                    create policy class x
+                }
+                
+                testFunc()
+                """;
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(memoryPolicyStore, superUser, pml);
+
+        assertTrue(memoryPolicyStore.graph().nodeExists("x"));
+    }
+
+    @Test
+    void testLocalConstOverwritesGlobal() throws PMException {
+        String pml = """
+                const x = "x"
+                function testFunc() {
+                    const x = "not x"
+                    var x = "not x"
+                    create policy class x
+                }
+                
+                testFunc()
+                """;
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        PMLCompilationException e =
+                assertThrows(PMLCompilationException.class,
+                             () -> PMLExecutor.compileAndExecutePML(memoryPolicyStore, superUser, pml)
+                );
+        assertEquals(2, e.getErrors().size());
+        assertEquals("cannot reassign const variable", e.getErrors().get(0).errorMessage());
+        assertEquals("variable 'x' already defined in scope", e.getErrors().get(1).errorMessage());
     }
 }

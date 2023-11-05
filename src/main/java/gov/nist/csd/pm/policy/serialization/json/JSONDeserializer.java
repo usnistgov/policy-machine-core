@@ -2,6 +2,12 @@ package gov.nist.csd.pm.policy.serialization.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.statement.VariableDeclarationStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
@@ -12,6 +18,7 @@ import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,20 +53,29 @@ public class JSONDeserializer implements PolicyDeserializer {
     }
 
     private void createUserDefinedPML(Policy policy, UserContext author,
-                                      FunctionDefinitionStatement[] customPMLFunctions, JSONUserDefinedPML userDefinedPML)
+                                      FunctionDefinitionStatement[] customPMLFunctions,
+                                      JSONUserDefinedPML userDefinedPML)
             throws PMException {
+        // to apply the constants and functions to the policy, create a PML string and execute it on the policy
+        // this will allow all function signatures to be compiled before the function bodies in the case of functions
+        // calling other functions
+        StringBuilder pml = new StringBuilder();
+
         Map<String, String> constants = userDefinedPML.getConstants();
+        List<VariableDeclarationStatement.Declaration> constDecs = new ArrayList<>();
         for (Map.Entry<String, String> e : constants.entrySet()) {
-            String constPML = "const " + e.getKey() + " = " + e.getValue();
-            PMLDeserializer pmlDeserializer = new PMLDeserializer(customPMLFunctions);
-            pmlDeserializer.deserialize(policy, author, constPML);
+            Expression expression = Expression.fromString(new VisitorContext(), e.getValue(), Type.any());
+            constDecs.add(new VariableDeclarationStatement.Declaration(e.getKey(), expression));
         }
+        pml.append(new VariableDeclarationStatement(true, constDecs)).append("\n");
 
         Map<String, String> functions = userDefinedPML.getFunctions();
         for (Map.Entry<String, String> e : functions.entrySet()) {
-            PMLDeserializer pmlDeserializer = new PMLDeserializer(customPMLFunctions);
-            pmlDeserializer.deserialize(policy, author, e.getValue());
+            pml.append(e.getValue()).append("\n");
         }
+
+        PMLDeserializer pmlDeserializer = new PMLDeserializer(customPMLFunctions);
+        pmlDeserializer.deserialize(policy, author, pml.toString());
     }
 
     private void createObligations(Policy policy, UserContext author,
