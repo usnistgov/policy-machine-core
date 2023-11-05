@@ -3,11 +3,19 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.compiler.visitor.FunctionDefinitionVisitor;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
@@ -123,5 +131,46 @@ class FunctionDefinitionStatementTest {
                                  }
                              """,
                      stmt.toFormattedString(1) + "\n");
+    }
+
+    @Test
+    void testFormalArgOverwritesVariable()
+            throws PMException {
+        String pml = """
+                x := "x"
+                const y = "y"
+                
+                func1("test", "test2")
+                
+                function func1(string x, string y) {
+                    create policy class x
+                    create policy class y
+                }
+                """;
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext(""), pml);
+
+        assertTrue(memoryPolicyStore.graph().nodeExists("test"));
+        assertTrue(memoryPolicyStore.graph().nodeExists("test2"));
+    }
+
+    @Test
+    void testInvokeFromFunctionUsingConstant() throws PMException {
+        String pml = """
+                const x = "x"
+                
+                func1()
+                
+                function func1() {
+                    func2()
+                }
+                
+                function func2() {
+                    create policy class x
+                }
+                """;
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext(""), pml);
+        assertTrue(memoryPolicyStore.graph().nodeExists("x"));
     }
 }

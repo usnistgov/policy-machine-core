@@ -314,6 +314,12 @@ public interface PMLParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PMLParser#functionSignature}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionSignature(PMLParser.FunctionSignatureContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PMLParser#formalArgList}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

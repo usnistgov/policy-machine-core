@@ -31,6 +31,7 @@ public class ExecutionContext implements Serializable {
 
         for (String funcName : this.scope.functions().keySet()) {
             copy.scope.addFunction(this.scope.getFunction(funcName));
+            copy.scope.addFunctionSignature(this.scope.getFunctionSignature(funcName));
         }
 
         for (String varName : this.scope.variables().keySet()) {

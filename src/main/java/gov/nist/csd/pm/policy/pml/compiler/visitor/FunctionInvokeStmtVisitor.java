@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
@@ -51,9 +52,9 @@ public class FunctionInvokeStmtVisitor extends PMLParserBaseVisitor<PMLStatement
         }
 
         // check the function is in scope and the args are correct
-        FunctionDefinitionStatement functionDefinitionStmt;
+        FunctionSignature functionSignature;
         try {
-            functionDefinitionStmt = visitorCtx.scope().getFunction(funcName);
+            functionSignature = visitorCtx.scope().getFunctionSignature(funcName);
         } catch (UnknownFunctionInScopeException e) {
             visitorCtx.errorLog().addError(funcCallCtx, e.getMessage());
 
@@ -61,7 +62,7 @@ public class FunctionInvokeStmtVisitor extends PMLParserBaseVisitor<PMLStatement
         }
 
         // check that the actual args are correct type
-        List<FormalArgument> formalArgs = functionDefinitionStmt.getArgs();
+        List<FormalArgument> formalArgs = functionSignature.getArgs();
 
         if (formalArgs.size() != actualArgs.size()) {
             visitorCtx.errorLog().addError(

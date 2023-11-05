@@ -3,10 +3,14 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.policy.pml.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FunctionReturnStatementVisitorTest {
 
     @Test
-    void testSuccess() {
+    void testSuccess() throws FunctionAlreadyDefinedInScopeException {
         PMLParser.FunctionDefinitionStatementContext ctx1 = PMLContextVisitor.toCtx(
                 """
                 function func1(string a, bool b, []string c) string {
@@ -25,6 +29,9 @@ class FunctionReturnStatementVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(new FunctionSignature("func1", Type.string(), List.of(
+                new FormalArgument("a", Type.string()), new FormalArgument("b", Type.bool()), new FormalArgument("c", Type.array(Type.string()))
+        )));
         FunctionDefinitionStatement functionDefinitionStatement = (FunctionDefinitionStatement) new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx1);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());

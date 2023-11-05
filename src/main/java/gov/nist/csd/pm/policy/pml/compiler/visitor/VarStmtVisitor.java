@@ -3,6 +3,8 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.expression.literal.Literal;
+import gov.nist.csd.pm.policy.pml.expression.literal.LiteralVisitor;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.*;
@@ -24,7 +26,7 @@ public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
         for (PMLParser.ConstSpecContext constSpecContext : ctx.constSpec()) {
             String varName = constSpecContext.ID().getText();
-            Expression expr = Expression.compile(visitorCtx, constSpecContext.expression(), Type.any());
+            Expression expr = compileConstLiteral(constSpecContext.literal());
 
             try {
                 if (visitorCtx.scope().variableExists(varName) && visitorCtx.scope().getVariable(varName).isConst()) {
@@ -44,6 +46,20 @@ public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         }
 
         return new VariableDeclarationStatement(true, decls);
+    }
+
+    private Expression compileConstLiteral(PMLParser.LiteralContext literalContext) {
+        LiteralVisitor literalVisitor = new LiteralVisitor(visitorCtx);
+        if (literalContext instanceof PMLParser.StringLiteralContext stringLiteralContext) {
+            return literalVisitor.visitStringLiteral(stringLiteralContext);
+        } else if (literalContext instanceof PMLParser.BoolLiteralContext boolLiteralContext) {
+            return literalVisitor.visitBoolLiteral(boolLiteralContext);
+        } else if (literalContext instanceof PMLParser.ArrayLiteralContext arrayLiteralContext) {
+            return literalVisitor.visitArrayLiteral(arrayLiteralContext);
+        } else {
+            PMLParser.MapLiteralContext mapLiteralContext = (PMLParser.MapLiteralContext) literalContext;
+            return literalVisitor.visitMapLiteral(mapLiteralContext);
+        }
     }
 
     @Override

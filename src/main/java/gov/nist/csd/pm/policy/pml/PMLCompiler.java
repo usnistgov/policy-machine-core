@@ -24,10 +24,11 @@ public class PMLCompiler {
         ErrorLog errorLog = new ErrorLog();
         Scope scope = new Scope(Scope.Mode.COMPILE);
         scope.loadFromPMLContext(PMLContext.fromPolicy(policy));
-
+        
         // add custom builtin functions to scope
         for (FunctionDefinitionStatement func : customBuiltinFunctions) {
             try {
+                scope.addFunctionSignature(func.signature());
                 scope.addFunction(func);
             } catch (FunctionAlreadyDefinedInScopeException e) {
                 errorLog.addError(0, 0, 0, e.getMessage());

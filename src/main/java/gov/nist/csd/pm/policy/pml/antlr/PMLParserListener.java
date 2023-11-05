@@ -518,6 +518,16 @@ public interface PMLParserListener extends ParseTreeListener {
 	 */
 	void exitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PMLParser#functionSignature}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionSignature(PMLParser.FunctionSignatureContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PMLParser#functionSignature}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionSignature(PMLParser.FunctionSignatureContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PMLParser#formalArgList}.
 	 * @param ctx the parse tree
 	 */

@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
@@ -28,16 +29,16 @@ public class FunctionInvokeExpression extends Expression {
         PMLParser.FunctionInvokeContext functionInvokeContext = functionInvokeExpressionContext.functionInvoke();
         String funcName = functionInvokeContext.ID().getText();
 
-        FunctionDefinitionStatement functionDefinitionStmt;
+        FunctionSignature functionSignature;
         try {
-            functionDefinitionStmt = visitorCtx.scope().getFunction(funcName);
+            functionSignature = visitorCtx.scope().getFunctionSignature(funcName);
         } catch (UnknownFunctionInScopeException e) {
             visitorCtx.errorLog().addError(functionInvokeContext, e.getMessage());
 
             return new ErrorExpression(functionInvokeExpressionContext);
         }
 
-        List<FormalArgument> formalArgs = functionDefinitionStmt.getArgs();
+        List<FormalArgument> formalArgs = functionSignature.getArgs();
         PMLParser.FunctionInvokeArgsContext funcCallArgsCtx = functionInvokeContext.functionInvokeArgs();
         List<PMLParser.ExpressionContext> argExpressions =  new ArrayList<>();
         PMLParser.ExpressionListContext expressionListContext = funcCallArgsCtx.expressionList();
@@ -69,7 +70,7 @@ public class FunctionInvokeExpression extends Expression {
         }
 
         // get result types
-        Type returnType = functionDefinitionStmt.getReturnType();
+        Type returnType = functionSignature.getReturnType();
 
         return new FunctionInvokeExpression(funcName, returnType, actualArgs);
     }
@@ -107,7 +108,7 @@ public class FunctionInvokeExpression extends Expression {
         FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionName);
         ExecutionContext localCtx = ctx.copy();
 
-        List<FormalArgument> formalArgs = functionDef.getArgs();
+        List<FormalArgument> formalArgs = functionDef.signature().getArgs();
 
         for (int i = 0; i < actualArgs.size(); i++) {
             Expression argExpr = actualArgs.get(i);

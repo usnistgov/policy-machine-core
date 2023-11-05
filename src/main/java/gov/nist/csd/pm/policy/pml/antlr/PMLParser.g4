@@ -117,12 +117,13 @@ variableDeclarationStatement:
     CONST (constSpec | OPEN_PAREN (constSpec)* CLOSE_PAREN) #ConstDeclaration
     | VAR (varSpec | OPEN_PAREN (varSpec)* CLOSE_PAREN) #VarDeclaration
     | ID DECLARE_ASSIGN expression #ShortDeclaration;
-constSpec: ID ASSIGN_EQUALS expression;
+constSpec: ID ASSIGN_EQUALS literal ;
 varSpec: ID ASSIGN_EQUALS expression;
 
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
-functionDefinitionStatement: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? statementBlock ;
+functionDefinitionStatement: functionSignature statementBlock ;
+functionSignature: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
 formalArgList: (formalArg (COMMA formalArg)*)? ;
 formalArg: variableType ID ;
 returnStatement: RETURN expression?;

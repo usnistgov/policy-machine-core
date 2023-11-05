@@ -1,16 +1,23 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.PMLCompiler;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,8 +27,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionVisitorTest {
 
+    FunctionSignature testSignature = new FunctionSignature("func1", Type.string(), List.of(
+            new FormalArgument("a", Type.string()),
+            new FormalArgument("b", Type.bool()),
+            new FormalArgument("c", Type.array(Type.string()))
+    ));
+
     @Test
-    void testSuccess() {
+    void testSuccess() throws FunctionAlreadyDefinedInScopeException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 function func1(string a, bool b, []string c) string {
@@ -30,6 +43,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         PMLStatement stmt = new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -56,6 +70,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(new FunctionSignature("func1", Type.voidType(), List.of(new FormalArgument("a", Type.string()))));
         stmt = new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size(), visitorCtx.errorLog().getErrors().toString());
@@ -72,7 +87,7 @@ class FunctionDefinitionVisitorTest {
     }
 
     @Test
-    void testNotAllPathsReturn() {
+    void testNotAllPathsReturn() throws FunctionAlreadyDefinedInScopeException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 function func1(string a, bool b, []string c) string {
@@ -85,6 +100,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
@@ -103,6 +119,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
@@ -119,31 +136,12 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 "not all conditional paths return",
-                visitorCtx.errorLog().getErrors().get(0).errorMessage()
-        );
-    }
-
-    @Test
-    void testFormalArgClashesWithVariable() throws VariableAlreadyDefinedInScopeException {
-        PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                function func1(string a, bool b, []string c) string {
-                    
-                }
-                """,
-                PMLParser.FunctionDefinitionStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
-        visitorCtx.scope().addVariable("a", Type.string(), false);
-        new FunctionDefinitionVisitor(visitorCtx)
-                .visitFunctionDefinitionStatement(ctx);
-        assertEquals(1, visitorCtx.errorLog().getErrors().size());
-        assertEquals(
-                "formal arg 'a' already defined in scope",
                 visitorCtx.errorLog().getErrors().get(0).errorMessage()
         );
     }
@@ -158,6 +156,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         visitorCtx.scope().addFunction(new FunctionDefinitionStatement.Builder("func1").build());
         new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
@@ -169,7 +168,7 @@ class FunctionDefinitionVisitorTest {
     }
 
     @Test
-    void testReturnVoidWhenReturnValueIsString() {
+    void testReturnVoidWhenReturnValueIsString() throws FunctionAlreadyDefinedInScopeException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 function func1(string a, bool b, []string c) string {
@@ -178,6 +177,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
@@ -188,7 +188,7 @@ class FunctionDefinitionVisitorTest {
     }
 
     @Test
-    void testWrongTypeOfReturnValue() {
+    void testWrongTypeOfReturnValue() throws FunctionAlreadyDefinedInScopeException {
         PMLParser.FunctionDefinitionStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 function func1(string a, bool b, []string c) string {
@@ -197,6 +197,7 @@ class FunctionDefinitionVisitorTest {
                 """,
                 PMLParser.FunctionDefinitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
+        visitorCtx.scope().addFunctionSignature(testSignature);
         new FunctionDefinitionVisitor(visitorCtx)
                 .visitFunctionDefinitionStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
@@ -204,5 +205,23 @@ class FunctionDefinitionVisitorTest {
                 "return statement \"return false\" does not match return type string",
                 visitorCtx.errorLog().getErrors().get(0).errorMessage()
         );
+    }
+
+    @Nested
+    class FunctionSignatureVisitorTest {
+
+        @Test
+        void testDuplicateFormalArgNames() throws PMException {
+            String pml = """
+                    function func1(string a, bool a) string {
+                        return ""
+                    }
+                    """;
+            PMLCompilationException e =
+                    assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
+            assertEquals(2, e.getErrors().size());
+            assertEquals("formal arg 'a' already defined in signature", e.getErrors().get(0).errorMessage());
+        }
+
     }
 }

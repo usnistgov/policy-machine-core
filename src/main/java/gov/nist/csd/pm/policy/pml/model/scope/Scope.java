@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.policy.pml.model.scope;
 
+import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.pml.PMLBuiltinFunctions;
 import gov.nist.csd.pm.policy.pml.PMLContext;
 import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
@@ -22,6 +24,7 @@ public class Scope implements Serializable {
      * These will include any builtin functions such as concat().
      */
     private Map<String, FunctionDefinitionStatement> functions;
+    private Map<String, FunctionSignature> functionSignatures;
 
     /**
      * The variables accessible in the scope.
@@ -50,6 +53,7 @@ public class Scope implements Serializable {
     public Scope(Mode mode) {
         this.mode = mode;
         this.functions = new HashMap<>();
+        this.functionSignatures = new HashMap<>();
         this.variables = new HashMap<>();
         this.values = new HashMap<>();
         this.resourceAccessRightsExpression = null;
@@ -80,6 +84,7 @@ public class Scope implements Serializable {
         Scope copy = new Scope(this.mode);
 
         copy.functions = new HashMap<>(this.functions);
+        copy.functionSignatures = new HashMap<>(this.functionSignatures);
         copy.variables = new HashMap<>(this.variables);
 
         if (isResourceAccessRightsExpressionSet()) {
@@ -113,6 +118,11 @@ public class Scope implements Serializable {
 
     public void loadFromPMLContext(PMLContext pmlCtx) {
         functions.putAll(pmlCtx.getFunctions());
+
+        for (FunctionDefinitionStatement func : pmlCtx.getFunctions().values()) {
+            functionSignatures.put(func.signature().getFunctionName(), func.signature());
+        }
+
         values.putAll(pmlCtx.getConstants());
 
         // if the mode is COMPILE add the constants as variables which will be used during the compilation of
@@ -136,13 +146,36 @@ public class Scope implements Serializable {
         this.resourceAccessRights = accessRightSet;
     }
 
-    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws FunctionAlreadyDefinedInScopeException {
-        if (functions.containsKey(functionDefinitionStatement.getFunctionName())
-                || isBuiltinFunction(functionDefinitionStatement.getFunctionName())) {
-            throw new FunctionAlreadyDefinedInScopeException(functionDefinitionStatement.getFunctionName());
+    public void addFunctionSignature(FunctionSignature functionSignature) throws FunctionAlreadyDefinedInScopeException {
+        if (functionSignatures.containsKey(functionSignature.getFunctionName())
+                || isBuiltinFunction(functionSignature.getFunctionName())) {
+            throw new FunctionAlreadyDefinedInScopeException(functionSignature.getFunctionName());
         }
 
-        this.functions.put(functionDefinitionStatement.getFunctionName(), functionDefinitionStatement);
+        this.functionSignatures.put(functionSignature.getFunctionName(), functionSignature);
+    }
+
+    public FunctionSignature getFunctionSignature(String name) throws UnknownFunctionInScopeException {
+        if (functionSignatures.containsKey(name)) {
+            return functionSignatures.get(name);
+        } else if (isBuiltinFunction(name)) {
+            return PMLBuiltinFunctions.builtinFunctions().get(name).signature();
+        }
+
+        throw new UnknownFunctionInScopeException(name);
+    }
+
+    public void removeFunctionSignature(String name) {
+        functionSignatures.remove(name);
+    }
+
+    public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) throws FunctionAlreadyDefinedInScopeException {
+        if (functions.containsKey(functionDefinitionStatement.signature().getFunctionName())
+                || isBuiltinFunction(functionDefinitionStatement.signature().getFunctionName())) {
+            throw new FunctionAlreadyDefinedInScopeException(functionDefinitionStatement.signature().getFunctionName());
+        }
+
+        this.functions.put(functionDefinitionStatement.signature().getFunctionName(), functionDefinitionStatement);
     }
 
     public FunctionDefinitionStatement getFunction(String name) throws UnknownFunctionInScopeException {
@@ -176,6 +209,10 @@ public class Scope implements Serializable {
         this.variables.put(name, new Variable(name, type, isConst));
     }
 
+    public void addOrOverwriteVariable(String name, Type type) {
+        this.variables.put(name, new Variable(name, type, false));
+    }
+
     private boolean constantExists(String name) {
         return variables.containsKey(name) && variables.get(name).isConst();
     }
@@ -203,6 +240,10 @@ public class Scope implements Serializable {
             throw new VariableAlreadyDefinedInScopeException(name);
         }
 
+        this.values.put(name, value);
+    }
+
+    public void addOrOverwriteValue(String name, Value value) {
         this.values.put(name, value);
     }
 

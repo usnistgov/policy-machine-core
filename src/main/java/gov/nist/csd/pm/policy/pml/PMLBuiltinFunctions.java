@@ -33,25 +33,25 @@ public class PMLBuiltinFunctions {
     private static final Map<String, FunctionDefinitionStatement> BUILTIN_FUNCTIONS = new HashMap<>();
 
     static {
-        BUILTIN_FUNCTIONS.put(concat.getFunctionName(), concat);
-        BUILTIN_FUNCTIONS.put(equals.getFunctionName(), equals);
-        BUILTIN_FUNCTIONS.put(contains.getFunctionName(), contains);
-        BUILTIN_FUNCTIONS.put(containsKey.getFunctionName(), containsKey);
+        BUILTIN_FUNCTIONS.put(concat.signature().getFunctionName(), concat);
+        BUILTIN_FUNCTIONS.put(equals.signature().getFunctionName(), equals);
+        BUILTIN_FUNCTIONS.put(contains.signature().getFunctionName(), contains);
+        BUILTIN_FUNCTIONS.put(containsKey.signature().getFunctionName(), containsKey);
 
-        BUILTIN_FUNCTIONS.put(getAssociationsWithSource.getFunctionName(), getAssociationsWithSource);
-        BUILTIN_FUNCTIONS.put(getAssociationsWithTarget.getFunctionName(), getAssociationsWithTarget);
-        BUILTIN_FUNCTIONS.put(getChildren.getFunctionName(), getChildren);
-        BUILTIN_FUNCTIONS.put(getParents.getFunctionName(), getParents);
-        BUILTIN_FUNCTIONS.put(getNodeProperties.getFunctionName(), getNodeProperties);
-        BUILTIN_FUNCTIONS.put(getNodeType.getFunctionName(), getNodeType);
-        BUILTIN_FUNCTIONS.put(getProhibitionsFor.getFunctionName(), getProhibitionsFor);
-        BUILTIN_FUNCTIONS.put(hasPropertyKey.getFunctionName(), hasPropertyKey);
-        BUILTIN_FUNCTIONS.put(hasPropertyValue.getFunctionName(), hasPropertyValue);
-        BUILTIN_FUNCTIONS.put(nodeExists.getFunctionName(), nodeExists);
-        BUILTIN_FUNCTIONS.put(getNode.getFunctionName(), getNode);
-        BUILTIN_FUNCTIONS.put(search.getFunctionName(), search);
-        BUILTIN_FUNCTIONS.put(append.getFunctionName(), append);
-        BUILTIN_FUNCTIONS.put(appendAll.getFunctionName(), appendAll);
+        BUILTIN_FUNCTIONS.put(getAssociationsWithSource.signature().getFunctionName(), getAssociationsWithSource);
+        BUILTIN_FUNCTIONS.put(getAssociationsWithTarget.signature().getFunctionName(), getAssociationsWithTarget);
+        BUILTIN_FUNCTIONS.put(getChildren.signature().getFunctionName(), getChildren);
+        BUILTIN_FUNCTIONS.put(getParents.signature().getFunctionName(), getParents);
+        BUILTIN_FUNCTIONS.put(getNodeProperties.signature().getFunctionName(), getNodeProperties);
+        BUILTIN_FUNCTIONS.put(getNodeType.signature().getFunctionName(), getNodeType);
+        BUILTIN_FUNCTIONS.put(getProhibitionsFor.signature().getFunctionName(), getProhibitionsFor);
+        BUILTIN_FUNCTIONS.put(hasPropertyKey.signature().getFunctionName(), hasPropertyKey);
+        BUILTIN_FUNCTIONS.put(hasPropertyValue.signature().getFunctionName(), hasPropertyValue);
+        BUILTIN_FUNCTIONS.put(nodeExists.signature().getFunctionName(), nodeExists);
+        BUILTIN_FUNCTIONS.put(getNode.signature().getFunctionName(), getNode);
+        BUILTIN_FUNCTIONS.put(search.signature().getFunctionName(), search);
+        BUILTIN_FUNCTIONS.put(append.signature().getFunctionName(), append);
+        BUILTIN_FUNCTIONS.put(appendAll.signature().getFunctionName(), appendAll);
     }
 
     public static Map<String, FunctionDefinitionStatement> builtinFunctions() {

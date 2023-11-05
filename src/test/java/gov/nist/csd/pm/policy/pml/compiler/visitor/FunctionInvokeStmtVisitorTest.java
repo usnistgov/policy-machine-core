@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
@@ -28,13 +29,11 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
-        visitorCtx.scope().addFunction(new FunctionDefinitionStatement.Builder("func1")
-                                               .args(
-                                                       new FormalArgument("a", Type.string()),
-                                                       new FormalArgument("b", Type.string()),
-                                                       new FormalArgument("c", Type.array(Type.string()))
-                                               )
-                                               .build());
+        visitorCtx.scope().addFunctionSignature(new FunctionSignature("func1", Type.voidType(), List.of(
+                new FormalArgument("a", Type.string()),
+                new FormalArgument("b", Type.string()),
+                new FormalArgument("c", Type.array(Type.string()))
+        )));
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
                 .visitFunctionInvokeStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -75,13 +74,11 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
-        visitorCtx.scope().addFunction(new FunctionDefinitionStatement.Builder("func1")
-                                               .args(
-                                                       new FormalArgument("a", Type.string()),
-                                                       new FormalArgument("b", Type.string()),
-                                                       new FormalArgument("c", Type.array(Type.string()))
-                                               )
-                                               .build());
+        visitorCtx.scope().addFunctionSignature(new FunctionSignature("func1", Type.voidType(), List.of(
+                new FormalArgument("a", Type.string()),
+                new FormalArgument("b", Type.string()),
+                new FormalArgument("c", Type.array(Type.string()))
+        )));
 
         new FunctionInvokeStmtVisitor(visitorCtx)
                 .visitFunctionInvokeStatement(ctx);
@@ -101,12 +98,10 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
-        visitorCtx.scope().addFunction(new FunctionDefinitionStatement.Builder("func1")
-                                               .args(
-                                                       new FormalArgument("a", Type.string()),
-                                                       new FormalArgument("b", Type.bool())
-                                               )
-                                               .build());
+        visitorCtx.scope().addFunctionSignature(new FunctionSignature("func1", Type.voidType(), List.of(
+                new FormalArgument("a", Type.string()),
+                new FormalArgument("b", Type.bool())
+        )));
 
         new FunctionInvokeStmtVisitor(visitorCtx)
                 .visitFunctionInvokeStatement(ctx);
@@ -126,13 +121,7 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext();
-        visitorCtx.scope().addFunction(new FunctionDefinitionStatement.Builder("func1")
-                                               .args()
-                                               .returns(Type.string())
-                                               .executor((c, policy) -> {
-                                                   return new StringValue("test");
-                                               })
-                                               .build());
+        visitorCtx.scope().addFunctionSignature(new FunctionSignature("func1", Type.string(), List.of()));
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
                 .visitFunctionInvokeStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());

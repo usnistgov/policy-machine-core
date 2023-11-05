@@ -39,7 +39,7 @@ public class FunctionInvocationStatement extends PMLStatement {
         ExecutionContext localCtx = ctx.copy();
 
 
-        List<FormalArgument> formalArgs = functionDef.getArgs();
+        List<FormalArgument> formalArgs = functionDef.signature().getArgs();
 
         if (formalArgs.size() != actualArgs.size()) {
             throw new PMLExecutionException("expected " + formalArgs.size() + " args for function \""
@@ -56,7 +56,7 @@ public class FunctionInvocationStatement extends PMLStatement {
                                                         + functionName + "\", got " + argValue.getType());
             }
 
-            localCtx.scope().addValue(formalArg.name(), argValue);
+            localCtx.scope().addOrOverwriteValue(formalArg.name(), argValue);
         }
 
         Value value = new VoidValue();

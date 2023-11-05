@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
@@ -86,7 +87,7 @@ class ExpressionTest {
     void testCompileStringExpression_FuncInvoke() throws PMLCompilationException,
                                                          FunctionAlreadyDefinedInScopeException {
         VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunction(new FunctionDefinitionStatement.Builder("test").returns(Type.string()).build());
+        visitorContext.scope().addFunctionSignature(new FunctionSignature("test", Type.string(), List.of()));
         Expression expression = Expression.fromString(visitorContext, "test()", Type.string());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(new FunctionInvokeExpression("test", Type.string(), List.of()), expression);

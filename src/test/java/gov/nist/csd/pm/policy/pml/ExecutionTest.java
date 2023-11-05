@@ -359,39 +359,15 @@ public class ExecutionTest {
         assertThrows(ClassCastException.class, () -> PMLExecutor.compileAndExecutePML(pap1, superUser, input1));
 
         input = """
-                var x = "hello"
+                const x = "hello"
                 function testFunc() {
-                    x = concat([x, " world"])
-                    create policy class x
+                    create policy class x + " world"
                 }
                 
                 testFunc()
                 """;
         PMLExecutor.compileAndExecutePML(pap1, superUser, input);
         assertTrue(pap1.graph().nodeExists("hello world"));
-    }
-
-    @Test
-    void testChangeVariableValue() throws PMException {
-        String input = """
-                var a = "hello world"
-                const b = a
-                create policy class b
-                """;
-        PAP pap = new PAP(new MemoryPolicyStore());
-        
-        PMLExecutor.compileAndExecutePML(pap, superUser, input);
-        assertTrue(pap.graph().nodeExists("hello world"));
-
-        PAP pap1 = new PAP(new MemoryPolicyStore());
-        String input1 = """
-                var a = "hello world"
-                const b = a
-                a = "test"
-                create policy class b
-                """;
-        PMLExecutor.compileAndExecutePML(pap1, superUser, input1);
-        assertFalse(pap.graph().nodeExists("test"));
     }
 
     @Test

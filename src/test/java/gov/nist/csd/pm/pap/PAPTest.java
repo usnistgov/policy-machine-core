@@ -1850,8 +1850,8 @@ public abstract class PAPTest {
             @Test
             void testSuccess() throws PMException {
                 pap.userDefinedPML().createFunction(testFunc);
-                assertTrue(pap.userDefinedPML().getFunctions().containsKey(testFunc.getFunctionName()));
-                FunctionDefinitionStatement actual = pap.userDefinedPML().getFunctions().get(testFunc.getFunctionName());
+                assertTrue(pap.userDefinedPML().getFunctions().containsKey(testFunc.signature().getFunctionName()));
+                FunctionDefinitionStatement actual = pap.userDefinedPML().getFunctions().get(testFunc.signature().getFunctionName());
                 assertEquals(testFunc, actual);
             }
         }

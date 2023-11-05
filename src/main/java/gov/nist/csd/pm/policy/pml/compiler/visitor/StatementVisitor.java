@@ -15,7 +15,7 @@ public class StatementVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
     @Override
     public PMLStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
-        return  new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
+        return new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
     }
 
     @Override

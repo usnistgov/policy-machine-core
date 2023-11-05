@@ -46,7 +46,7 @@ class FunctionInvokeExpressionTest {
                 voidFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunction(voidFunc);
+        visitorContext.scope().addFunctionSignature(voidFunc.signature());
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -97,7 +97,7 @@ class FunctionInvokeExpressionTest {
                 voidFunc("a")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunction(voidFunc);
+        visitorContext.scope().addFunctionSignature(voidFunc.signature());
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -113,7 +113,7 @@ class FunctionInvokeExpressionTest {
                 voidFunc("a", ["b", "c"])
                 """, PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunction(voidFunc);
+        visitorContext.scope().addFunctionSignature(voidFunc.signature());
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -141,7 +141,7 @@ class FunctionInvokeExpressionTest {
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunction(stringFunc);
+        visitorContext.scope().addFunctionSignature(stringFunc.signature());
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -185,7 +185,7 @@ class FunctionInvokeExpressionTest {
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunction(stringFunc);
+        visitorContext.scope().addFunctionSignature(stringFunc.signature());
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 

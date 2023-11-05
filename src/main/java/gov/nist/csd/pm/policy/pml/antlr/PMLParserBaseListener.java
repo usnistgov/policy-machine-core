@@ -592,6 +592,18 @@ public class PMLParserBaseListener implements PMLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFunctionSignature(PMLParser.FunctionSignatureContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunctionSignature(PMLParser.FunctionSignatureContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFormalArgList(PMLParser.FormalArgListContext ctx) { }
 	/**
 	 * {@inheritDoc}

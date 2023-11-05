@@ -42,7 +42,7 @@ public class PMLContext {
     }
 
     public void addFunction(FunctionDefinitionStatement functionDefinitionStatement) {
-        this.functions.put(functionDefinitionStatement.getFunctionName(), functionDefinitionStatement);
+        this.functions.put(functionDefinitionStatement.signature().getFunctionName(), functionDefinitionStatement);
     }
 
     public void removeFunction(String functionName) {
