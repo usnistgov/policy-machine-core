@@ -62,6 +62,7 @@ class FunctionInvokeExpressionTest {
         );
 
         ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
+        executionContext.scope().addFunctionSignature(voidFunc.signature());
         executionContext.scope().addFunction(voidFunc);
         Value value = e.execute(executionContext, new MemoryPolicyStore());
         assertEquals(
@@ -151,6 +152,7 @@ class FunctionInvokeExpressionTest {
 
         MemoryPolicyStore store = new MemoryPolicyStore();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
+        executionContext.scope().addFunctionSignature(stringFunc.signature());
         executionContext.scope().addFunction(stringFunc);
         executionContext.scope().addValue("x", new StringValue("x"));
         Value value = e.execute(executionContext, store);
@@ -191,6 +193,7 @@ class FunctionInvokeExpressionTest {
 
         MemoryPolicyStore store = new MemoryPolicyStore();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
+        executionContext.scope().addFunctionSignature(stringFunc.signature());
         executionContext.scope().addFunction(stringFunc);
         Value value = e.execute(executionContext, store);
         assertEquals(
