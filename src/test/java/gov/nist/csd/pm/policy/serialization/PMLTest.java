@@ -1,7 +1,7 @@
-package gov.nist.csd.pm.pap.serialization;
+package gov.nist.csd.pm.policy.serialization;
 
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;

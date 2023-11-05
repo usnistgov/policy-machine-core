@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.serialization.json;
+package gov.nist.csd.pm.policy.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

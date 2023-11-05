@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.serialization.json;
+package gov.nist.csd.pm.policy.serialization.json;
 
 import java.util.HashMap;
 import java.util.Map;

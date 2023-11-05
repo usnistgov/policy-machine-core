@@ -1,10 +1,11 @@
-package gov.nist.csd.pm.pap.serialization.pml;
+package gov.nist.csd.pm.policy.serialization.pml;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.PolicyEquals;
 import org.junit.jupiter.api.Test;
 

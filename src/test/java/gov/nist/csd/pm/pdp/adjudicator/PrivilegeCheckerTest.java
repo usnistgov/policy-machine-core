@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp.adjudicator;
 
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.reviewer.PolicyReviewer;
 import gov.nist.csd.pm.policy.exceptions.NodeDoesNotExistException;
 import gov.nist.csd.pm.policy.exceptions.PMException;

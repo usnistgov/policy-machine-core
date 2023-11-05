@@ -3,8 +3,7 @@ package gov.nist.csd.pm.pdp.reviewer;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.policy.events.graph.AssignEvent;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.events.graph.AssignToEvent;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -16,7 +15,6 @@ import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

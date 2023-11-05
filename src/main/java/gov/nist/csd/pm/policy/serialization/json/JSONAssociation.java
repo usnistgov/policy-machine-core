@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.serialization.json;
+package gov.nist.csd.pm.policy.serialization.json;
 
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 

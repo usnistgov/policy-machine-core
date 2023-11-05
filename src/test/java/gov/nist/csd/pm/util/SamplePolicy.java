@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.util;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;

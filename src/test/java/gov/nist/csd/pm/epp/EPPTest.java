@@ -3,7 +3,7 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.pap.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;

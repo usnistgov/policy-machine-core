@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.serialization.pml;
+package gov.nist.csd.pm.policy.serialization.pml;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;

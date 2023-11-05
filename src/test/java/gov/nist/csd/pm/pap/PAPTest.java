@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
-import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
+import gov.nist.csd.pm.policy.serialization.json.JSONDeserializer;
+import gov.nist.csd.pm.policy.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.policy.model.obligation.event.*;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.UserAttributesSubject;
@@ -20,8 +20,8 @@ import gov.nist.csd.pm.policy.pml.value.StringValue;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 import gov.nist.csd.pm.util.PolicyEquals;
 import gov.nist.csd.pm.util.SamplePolicy;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;

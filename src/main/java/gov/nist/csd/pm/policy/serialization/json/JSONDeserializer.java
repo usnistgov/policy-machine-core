@@ -1,8 +1,8 @@
-package gov.nist.csd.pm.pap.serialization.json;
+package gov.nist.csd.pm.policy.serialization.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
