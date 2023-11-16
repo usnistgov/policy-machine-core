@@ -1,10 +1,13 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.BoolLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.statement.IfStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.statement.ShortDeclarationStatement;
@@ -17,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IfStmtVisitorTest {
 
     @Test
-    void testSuccess() {
+    void testSuccess() throws PMException {
         PMLParser.IfStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 if true {
@@ -29,7 +32,7 @@ class IfStmtVisitorTest {
                 }
                 """,
                 PMLParser.IfStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new IfStmtVisitor(visitorCtx)
                 .visitIfStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -44,7 +47,7 @@ class IfStmtVisitorTest {
     }
 
     @Test
-    void testConditionExpressionsNotBool() {
+    void testConditionExpressionsNotBool() throws PMException {
         PMLParser.IfStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 if "a" {
@@ -56,7 +59,7 @@ class IfStmtVisitorTest {
                 }
                 """,
                 PMLParser.IfStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new IfStmtVisitor(visitorCtx)
                 .visitIfStatement(ctx);
         assertEquals(2, visitorCtx.errorLog().getErrors().size());

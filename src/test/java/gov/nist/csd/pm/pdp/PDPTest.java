@@ -12,7 +12,7 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
+import gov.nist.csd.pm.policy.pml.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
@@ -142,12 +142,11 @@ class PDPTest {
 
             assertTrue(pap.graph().nodeExists("ua3"));
 
-            PMLExecutionException e = assertThrows(PMLExecutionException.class, () -> {
+            UnauthorizedException e = assertThrows(UnauthorizedException.class, () -> {
                 pdp.runTx(new UserContext("u1"), policy -> {
                     policy.executePML(new UserContext("u1"), "testfunc()");
                 });
             });
-            assertEquals(UnauthorizedException.class, e.getCause().getClass());
 
             assertFalse(pap.graph().nodeExists("pc3"));
         } catch (IOException e) {

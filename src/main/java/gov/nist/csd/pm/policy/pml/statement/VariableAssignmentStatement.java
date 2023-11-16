@@ -2,8 +2,9 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
@@ -21,6 +22,10 @@ public class VariableAssignmentStatement extends PMLStatement{
         this.id = id;
         this.isPlus = isPlus;
         this.expression = expression;
+    }
+
+    public VariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
+        super(ctx);
     }
 
     public String getId() {
@@ -53,13 +58,13 @@ public class VariableAssignmentStatement extends PMLStatement{
 
         // if statement uses '+=' add the existing value to the new value
         if (isPlus) {
-            String strValue = ctx.scope().getValue(id).getStringValue();
+            String strValue = ctx.scope().getVariable(id).getStringValue();
             String exprValue = expression.execute(ctx, policy).getStringValue();
 
             value = new StringValue(strValue + exprValue);
         }
 
-        ctx.scope().updateValue(id, value);
+        ctx.scope().local().addOrOverwriteVariable(id, value);
 
         return new VoidValue();
     }

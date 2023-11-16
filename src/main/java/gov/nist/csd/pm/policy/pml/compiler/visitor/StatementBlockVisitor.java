@@ -2,8 +2,8 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
 import gov.nist.csd.pm.policy.pml.statement.IfStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
@@ -12,14 +12,13 @@ import gov.nist.csd.pm.policy.pml.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StatementBlockVisitor extends PMLParserBaseVisitor<StatementBlockVisitor.Result> {
+public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
-    private VisitorContext visitorCtx;
     private Type returnType;
 
-    public StatementBlockVisitor(VisitorContext visitorCtx, Type returnType) {
-        this.visitorCtx = visitorCtx;
-        this.returnType = returnType;
+    public StatementBlockVisitor(VisitorContext visitorCtx, Type retyurnType) {
+        super(visitorCtx);
+        this.returnType = retyurnType;
     }
 
     @Override
@@ -28,11 +27,16 @@ public class StatementBlockVisitor extends PMLParserBaseVisitor<StatementBlockVi
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
         for (PMLParser.StatementContext statementContext : ctx.statement()) {
             PMLStatement pmlStatement = statementVisitor.visitStatement(statementContext);
+
+            if (pmlStatement instanceof FunctionDefinitionStatement) {
+                visitorCtx.errorLog().addError(statementContext, "functions are not allowed inside statement blocks");
+            }
+
             stmts.add(pmlStatement);
         }
 
         try {
-            boolean allPathsReturned = allPathsReturned(visitorCtx, stmts, returnType);
+            boolean allPathsReturned = allPathsReturned(stmts, returnType);
             return new Result(allPathsReturned, stmts);
         } catch (PMException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
@@ -41,7 +45,7 @@ public class StatementBlockVisitor extends PMLParserBaseVisitor<StatementBlockVi
             return new Result(true, stmts);
         }
     }
-    private boolean allPathsReturned(VisitorContext visitorCtx, List<PMLStatement> statements, Type returnType)
+    private boolean allPathsReturned(List<PMLStatement> statements, Type returnType)
             throws PMException {
         if (statements.isEmpty()) {
             return false;
@@ -73,7 +77,7 @@ public class StatementBlockVisitor extends PMLParserBaseVisitor<StatementBlockVi
 
                 return true;
             } else if (pmlStatement instanceof IfStatement ifStatement) {
-                if (!allIfStatementPathsReturned(visitorCtx, ifStatement, returnType)) {
+                if (!allIfStatementPathsReturned(ifStatement, returnType)) {
                     return false;
                 } else {
                     allPathsReturned = true;
@@ -84,23 +88,23 @@ public class StatementBlockVisitor extends PMLParserBaseVisitor<StatementBlockVi
         return allPathsReturned;
     }
 
-    private boolean allIfStatementPathsReturned(VisitorContext visitorCtx, IfStatement ifStatement, Type returnType)
+    private boolean allIfStatementPathsReturned(IfStatement ifStatement, Type returnType)
             throws PMException {
-        boolean check = allPathsReturned(visitorCtx, ifStatement.getIfBlock().block(), returnType);
+        boolean check = allPathsReturned(ifStatement.getIfBlock().block(), returnType);
         if (!check) {
             return false;
         }
 
         // check else ifs
         for (IfStatement.ConditionalBlock conditionalBlock : ifStatement.getIfElseBlocks()) {
-            check = allPathsReturned(visitorCtx, conditionalBlock.block(), returnType);
+            check = allPathsReturned(conditionalBlock.block(), returnType);
             if (!check) {
                 return false;
             }
         }
 
         // check else
-        check = allPathsReturned(visitorCtx, ifStatement.getElseBlock(), returnType);
+        check = allPathsReturned(ifStatement.getElseBlock(), returnType);
         if (!check) {
             return false;
         }

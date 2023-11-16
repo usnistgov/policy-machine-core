@@ -2,9 +2,10 @@ package gov.nist.csd.pm.policy.pml.expression;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.Value;
 
@@ -25,7 +26,7 @@ public class AnyExpression extends Expression {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        return e.execute(ctx, policy);
+        return PMLStatement.execute(ctx, policy, e);
     }
 
     @Override

@@ -8,8 +8,9 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.*;
 import gov.nist.csd.pm.policy.model.obligation.event.target.*;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.ArrayValue;
 import gov.nist.csd.pm.policy.pml.value.RuleValue;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
@@ -23,11 +24,11 @@ import java.util.Objects;
 
 public class CreateRuleStatement extends PMLStatement {
 
-    private final Expression name;
-    private final SubjectClause subjectClause;
-    private final PerformsClause performsClause;
-    private final OnClause onClause;
-    private final ResponseBlock responseBlock;
+    private Expression name;
+    private SubjectClause subjectClause;
+    private PerformsClause performsClause;
+    private OnClause onClause;
+    private ResponseBlock responseBlock;
 
     public CreateRuleStatement(Expression name, SubjectClause subjectClause,
                                PerformsClause performsClause, OnClause onClause, ResponseBlock responseBlock) {
@@ -36,6 +37,10 @@ public class CreateRuleStatement extends PMLStatement {
         this.performsClause = performsClause;
         this.onClause = onClause;
         this.responseBlock = responseBlock;
+    }
+
+    public CreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
+        super(ctx);
     }
 
     public Expression getName() {
@@ -66,8 +71,6 @@ public class CreateRuleStatement extends PMLStatement {
         Performs performs = executePerforms(ctx, policy);
         Target target = executeTarget(ctx, policy);
 
-        ExecutionContext ruleCtx = ctx.copy();
-
         Rule rule = new Rule(
                 nameValue.getValue(),
                 new EventPattern(
@@ -75,7 +78,7 @@ public class CreateRuleStatement extends PMLStatement {
                         performs,
                         target
                 ),
-                new Response(responseBlock.evtVar, ruleCtx, responseBlock.getStatements())
+                new Response(responseBlock.evtVar, responseBlock.getStatements())
         );
 
         return new RuleValue(rule);

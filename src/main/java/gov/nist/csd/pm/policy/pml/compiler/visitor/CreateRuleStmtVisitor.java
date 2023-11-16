@@ -1,28 +1,26 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.CreateRuleStatement;
-import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateRuleStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
     public CreateRuleStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
+    public CreateRuleStatement visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
 
         CreateRuleStatement.SubjectClause subjectClause = getSubjectClause(ctx.subjectClause());
@@ -34,7 +32,7 @@ public class CreateRuleStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         } catch (VariableAlreadyDefinedInScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-            return new ErrorStatement(ctx);
+            return new CreateRuleStatement(ctx);
         }
 
         return new CreateRuleStatement(name, subjectClause, performsClause, onClause, responseBlock);
@@ -46,7 +44,7 @@ public class CreateRuleStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         // create a new local parser scope for the response block
         // add the event name and event context map to the local parser scope
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        localVisitorCtx.scope().addVariable(evtVar, Type.map(Type.string(), Type.any()), true);
+        localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, Type.map(Type.string(), Type.any()), true));
 
         PMLParser.ResponseBlockContext responseBlockCtx = ctx.responseBlock();
         List<PMLParser.ResponseStatementContext> responseStmtsCtx = responseBlockCtx.responseStatement();
@@ -65,6 +63,10 @@ public class CreateRuleStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
                 stmt = createRuleStmtVisitor.visitCreateRuleStatement(responseStmtCtx.createRuleStatement());
             } else if (responseStmtCtx.deleteRuleStatement() != null) {
                 stmt = deleteRuleStmtVisitor.visitDeleteRuleStatement(responseStmtCtx.deleteRuleStatement());
+            }
+
+            if (stmt instanceof FunctionDefinitionStatement) {
+                visitorCtx.errorLog().addError(responseStmtCtx, "functions are not allowed inside response blocks");
             }
 
             stmts.add(stmt);

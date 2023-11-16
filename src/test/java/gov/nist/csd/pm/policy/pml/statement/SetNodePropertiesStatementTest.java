@@ -4,12 +4,12 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +28,7 @@ class SetNodePropertiesStatementTest {
         store.graph().createUser("u1", "ua1");
         UserContext userContext = new UserContext("u1");
 
-        stmt.execute(new ExecutionContext(userContext), store);
+        stmt.execute(new ExecutionContext(userContext, GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())), store);
 
         assertEquals(
                 Map.of("a", "b", "c", "d"),

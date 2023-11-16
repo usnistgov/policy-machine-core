@@ -19,7 +19,7 @@ public class GetNode extends FunctionDefinitionStatement {
                               new FormalArgument(NODE_ARG, Type.string())
                       )
                       .executor((ctx, author) -> {
-                          Node node = author.graph().getNode(ctx.scope().getValue(NODE_ARG).getStringValue());
+                          Node node = author.graph().getNode(ctx.scope().getVariable(NODE_ARG).getStringValue());
 
                           return Value.fromObject(node);
                       })

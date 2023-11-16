@@ -5,7 +5,8 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -27,7 +28,7 @@ class CreateNonPCStatementTest {
         store.graph().createPolicyClass("pc1");
         store.graph().createUserAttribute("ua2", "pc1");
         store.graph().createUser("u2", "ua2");
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore()));
 
         stmt1.execute(execCtx, store);
         stmt2.execute(execCtx, store);
@@ -54,7 +55,7 @@ class CreateNonPCStatementTest {
         store.graph().createPolicyClass("pc1");
         store.graph().createUserAttribute("ua2", "pc1");
         store.graph().createUser("u1", "ua2");
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore()));
 
         stmt1.execute(execCtx, store);
 

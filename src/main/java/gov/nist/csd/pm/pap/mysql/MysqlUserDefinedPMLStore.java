@@ -24,13 +24,13 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement)
     throws PMBackendException, PMLFunctionAlreadyDefinedException {
-        checkCreateFunctionInput(functionDefinitionStatement.signature().getFunctionName());
+        checkCreateFunctionInput(functionDefinitionStatement.getSignature().getFunctionName());
 
         String sql = """
                 insert into pml_function (name, bytes) values (?,?)
                 """;
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setString(1, functionDefinitionStatement.signature().getFunctionName());
+            ps.setString(1, functionDefinitionStatement.getSignature().getFunctionName());
             ps.setBytes(2, SerializationUtils.serialize(functionDefinitionStatement));
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -66,7 +66,7 @@ class MysqlUserDefinedPMLStore implements UserDefinedPMLStore {
             ResultSet resultSet = ps.executeQuery()) {
             while (resultSet.next()) {
                 FunctionDefinitionStatement funcDef = SerializationUtils.deserialize(resultSet.getBlob(1).getBinaryStream().readAllBytes());
-                functionDefinitionStatements.put(funcDef.signature().getFunctionName(), funcDef);
+                functionDefinitionStatements.put(funcDef.getSignature().getFunctionName(), funcDef);
             }
         } catch (SQLException | IOException e) {
             throw new MysqlPolicyException(e.getMessage());

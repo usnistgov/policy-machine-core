@@ -4,14 +4,11 @@ import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.PMLErrorHandler;
 import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.statement.AssociateStatement;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
-import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,16 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CreatePolicyStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class CreatePolicyStmtVisitor extends PMLBaseVisitor<CreatePolicyStatement> {
 
     public CreatePolicyStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
+    public CreatePolicyStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression withProperties = null;
         if (ctx.properties != null) {
@@ -55,7 +50,7 @@ public class CreatePolicyStmtVisitor extends PMLParserBaseVisitor<PMLStatement> 
                 oas = buildOAHierarchyStatement(name, hierarchyCtx.objectAttrsHierarchy());
             }
         } catch (PMLCompilationException e) {
-            return new ErrorStatement(ctx);
+            return new CreatePolicyStatement(ctx);
         }
 
         List<AssociateStatement> assocs = new ArrayList<>();

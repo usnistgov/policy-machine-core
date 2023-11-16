@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.policy.pml.expression.reference;
 
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.Objects;

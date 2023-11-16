@@ -6,24 +6,26 @@ import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.BoolLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.BoolValue;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.policy.pml.statement.PMLStatement.execute;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LogicalExpressionTest {
 
     @Test
-    void testCompile() {
+    void testCompile() throws PMException {
         PMLParser.LogicalExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                 """
                 true && false
                 """,
                 PMLParser.LogicalExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -41,13 +43,14 @@ class LogicalExpressionTest {
                 true && false
                 """,
                 PMLParser.LogicalExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
+        MemoryPolicyStore store = new MemoryPolicyStore();
+
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(store));
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        MemoryPolicyStore store = new MemoryPolicyStore();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
-        Value actual = expression.execute(executionContext, store);
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(store));
+        Value actual = execute(executionContext, store, expression);
         assertEquals(
                 new BoolValue(false),
                 actual
@@ -58,13 +61,13 @@ class LogicalExpressionTest {
                 false || true
                 """,
                 PMLParser.LogicalExpressionContext.class);
-        visitorContext = new VisitorContext();
+        visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(store));
         expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         store = new MemoryPolicyStore();
-        executionContext = new ExecutionContext(new UserContext(""));
-        actual = expression.execute(executionContext, store);
+        executionContext = new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(store));
+        actual = execute(executionContext, store, expression);
         assertEquals(
                 new BoolValue(true),
                 actual

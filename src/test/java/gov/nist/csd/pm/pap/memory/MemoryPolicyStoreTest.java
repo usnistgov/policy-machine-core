@@ -15,6 +15,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -178,9 +179,7 @@ class MemoryPolicyStoreTest {
                                 new AnyUserSubject(),
                                 Performs.events("test_event")
                         ),
-                        new Response(
-                                new UserContext("test")
-                        )
+                        new Response("evtCtx", List.of())
                 )
         );
         List<Obligation> obligations = policyStore.obligations().getAll();
@@ -196,9 +195,7 @@ class MemoryPolicyStoreTest {
                         new AnyUserSubject(),
                         Performs.events("test_event")
                 ),
-                new Response(
-                        new UserContext("test")
-                )
+                new Response("evtCtx", List.of())
         );
 
         policyStore.graph().createPolicyClass("pc1");

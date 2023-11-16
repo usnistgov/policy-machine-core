@@ -2,8 +2,9 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
@@ -12,8 +13,8 @@ import java.util.Objects;
 
 public class DeleteStatement extends PMLStatement {
 
-    private final Type type;
-    private final Expression expression;
+    private Type type;
+    private Expression expression;
 
     public DeleteStatement(Type type, Expression expression) {
         this.type = type;
@@ -35,6 +36,10 @@ public class DeleteStatement extends PMLStatement {
             policy.prohibitions().delete(name);
         } else if (type == Type.OBLIGATION) {
             policy.obligations().delete(name);
+        } else if (type == Type.FUNCTION) {
+            policy.userDefinedPML().deleteFunction(name);
+        } else if (type == Type.CONST) {
+            policy.userDefinedPML().deleteConstant(name);
         } else {
             policy.graph().deleteNode(name);
         }
@@ -53,6 +58,8 @@ public class DeleteStatement extends PMLStatement {
             case USER_ATTRIBUTE -> typeStr = "UA";
             case OBJECT -> typeStr = "O";
             case USER -> typeStr = "U";
+            case FUNCTION -> typeStr = "function";
+            case CONST -> typeStr = "const";
         }
 
         return indent(indentLevel) + String.format("delete %s %s", typeStr, expression);
@@ -78,6 +85,8 @@ public class DeleteStatement extends PMLStatement {
         OBJECT,
         USER,
         PROHIBITION,
-        OBLIGATION
+        OBLIGATION,
+        FUNCTION,
+        CONST
     }
 }

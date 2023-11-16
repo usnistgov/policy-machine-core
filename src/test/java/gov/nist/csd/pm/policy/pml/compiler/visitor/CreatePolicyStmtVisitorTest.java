@@ -2,22 +2,20 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.CompiledPML;
 import gov.nist.csd.pm.policy.pml.PMLCompiler;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.expression.ErrorExpression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.statement.AssociateStatement;
-import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement.CreateOrAssignAttributeStatement;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import org.apache.commons.compress.archivers.zip.UnixStat;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -32,13 +30,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class CreatePolicyStmtVisitorTest {
 
     @Test
-    void testSuccess() {
+    void testSuccess() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 create policy class "test"
                 """,
                 PMLParser.CreatePolicyStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -49,13 +47,13 @@ class CreatePolicyStmtVisitorTest {
 
 
     @Test
-    void testSuccessWithProperties() {
+    void testSuccessWithProperties() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 create policy class "test" with properties {"a": "b"}
                 """,
                 PMLParser.CreatePolicyStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -65,13 +63,13 @@ class CreatePolicyStmtVisitorTest {
     }
 
     @Test
-    void testInvalidNameExpression() {
+    void testInvalidNameExpression() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 create policy class ["test"]
                 """,
                 PMLParser.CreatePolicyStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -96,9 +94,9 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(1, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(0);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(1, compiledPML.stmts().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),
@@ -135,9 +133,9 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(1, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(0);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(1, compiledPML.stmts().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),
@@ -176,9 +174,11 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(3, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(2);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(1, compiledPML.stmts().size());
+        assertEquals(2, compiledPML.constants().size());
+        assertEquals(0, compiledPML.functions().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),
@@ -212,9 +212,10 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(2, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(1);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(1, compiledPML.stmts().size());
+        assertEquals(1, compiledPML.constants().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),
@@ -260,9 +261,9 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(1, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(0);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(1, compiledPML.stmts().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),
@@ -333,9 +334,9 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(2, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(0);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(2, compiledPML.stmts().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),
@@ -356,7 +357,7 @@ class CreatePolicyStmtVisitorTest {
                 stmt
         );
 
-        stmt = (CreatePolicyStatement) statements.get(1);
+        stmt = (CreatePolicyStatement) compiledPML.stmts().get(1);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test2"),
@@ -403,9 +404,9 @@ class CreatePolicyStmtVisitorTest {
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
-        List<PMLStatement> statements = PMLCompiler.compilePML(memoryPolicyStore, pml);
-        assertEquals(1, statements.size());
-        CreatePolicyStatement stmt = (CreatePolicyStatement) statements.get(0);
+        CompiledPML compiledPML = PMLCompiler.compilePML(memoryPolicyStore, pml);
+        assertEquals(1, compiledPML.stmts().size());
+        CreatePolicyStatement stmt = (CreatePolicyStatement) compiledPML.stmts().get(0);
         assertEquals(
                 new CreatePolicyStatement(
                         new StringLiteral("test"),

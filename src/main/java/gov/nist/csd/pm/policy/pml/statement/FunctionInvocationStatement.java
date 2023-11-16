@@ -2,12 +2,12 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.exception.PMLExecutionException;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.value.ReturnValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
@@ -17,12 +17,16 @@ import java.util.Objects;
 
 public class FunctionInvocationStatement extends PMLStatement {
 
-    private final String functionName;
-    private final List<Expression> actualArgs;
+    private String functionName;
+    private List<Expression> actualArgs;
 
     public FunctionInvocationStatement(String functionName, List<Expression> actualArgs) {
         this.functionName = functionName;
         this.actualArgs = actualArgs;
+    }
+
+    public FunctionInvocationStatement(PMLParser.FunctionInvokeContext funcCallCtx) {
+        super(funcCallCtx);
     }
 
     public String getFunctionName() {
@@ -36,48 +40,26 @@ public class FunctionInvocationStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionName);
-        ExecutionContext localCtx = ctx.copy();
-
-
-        List<FormalArgument> formalArgs = functionDef.signature().getArgs();
-
-        if (formalArgs.size() != actualArgs.size()) {
-            throw new PMLExecutionException("expected " + formalArgs.size() + " args for function \""
-                                                    + functionName + "\", got " + actualArgs.size());
-        }
-
-        for (int i = 0; i < actualArgs.size(); i++) {
-            Expression argExpr = actualArgs.get(i);
-            Value argValue = argExpr.execute(localCtx, policy);
-            FormalArgument formalArg = formalArgs.get(i);
-
-            if (!argValue.getType().equals(formalArg.type())) {
-                throw new PMLExecutionException("expected " + formalArg.type() + " for arg " + i + " for function \""
-                                                        + functionName + "\", got " + argValue.getType());
-            }
-
-            localCtx.scope().addOrOverwriteValue(formalArg.name(), argValue);
-        }
 
         Value value = new VoidValue();
         if (functionDef.isFunctionExecutor()) {
             FunctionExecutor functionExecutor = functionDef.getFunctionExecutor();
             try {
-                value = functionExecutor.exec(localCtx, policy);
+                value = functionExecutor.exec(ctx, policy);
             } catch (PMLScopeException e) {
                 throw new PMLExecutionException(e);
             }
         } else {
             List<PMLStatement> statements = functionDef.getBody();
             for (PMLStatement stmt : statements) {
-                value = stmt.execute(localCtx, policy);
+                value = stmt.execute(ctx, policy);
                 if (value instanceof ReturnValue) {
                     break;
                 }
             }
         }
 
-        ctx.scope().overwriteValues(localCtx.scope());
+        ctx.scope().local().overwriteFromLocalScope(ctx.scope().local());
 
         return value;
     }

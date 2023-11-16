@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.policy.pml.model.scope;
+package gov.nist.csd.pm.policy.pml.scope;
 
 import gov.nist.csd.pm.policy.exceptions.PMException;
 

@@ -2,38 +2,34 @@ package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.AdminAccessRights;
 import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.policy.pml.compiler.visitor.PMLVisitor;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
-import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
+import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import static gov.nist.csd.pm.pap.AdminPolicyNode.*;
 
 public class PMLCompiler {
 
-    public static List<PMLStatement> compilePML(Policy policy, String input, FunctionDefinitionStatement... customBuiltinFunctions) throws PMException {
+    public static CompiledPML compilePML(Policy policy, String input, FunctionDefinitionStatement... customBuiltinFunctions) throws PMException {
         ErrorLog errorLog = new ErrorLog();
-        Scope scope = new Scope(Scope.Mode.COMPILE);
-        scope.loadFromPMLContext(PMLContext.fromPolicy(policy));
-        
-        // add custom builtin functions to scope
-        for (FunctionDefinitionStatement func : customBuiltinFunctions) {
-            try {
-                scope.addFunctionSignature(func.signature());
-                scope.addFunction(func);
-            } catch (FunctionAlreadyDefinedInScopeException e) {
-                errorLog.addError(0, 0, 0, e.getMessage());
-            }
-        }
+
+        GlobalScope<Variable, FunctionSignature> globalScope = GlobalScope.withVariablesAndSignatures(policy, customBuiltinFunctions);
 
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 
@@ -46,10 +42,10 @@ public class PMLCompiler {
         parser.removeErrorListeners();
         parser.addErrorListener(pmlErrorHandler);
 
-        PMLVisitor pmlVisitor = new PMLVisitor(new VisitorContext(tokens, scope, errorLog));
-        List<PMLStatement> stmts = new ArrayList<>();
+        PMLVisitor pmlVisitor = new PMLVisitor(new VisitorContext(tokens, new Scope<>(globalScope), errorLog));
+        CompiledPML compiled = null;
         try {
-            stmts = pmlVisitor.visitPml(parser.pml());
+            compiled = pmlVisitor.visitPml(parser.pml());
         } catch (Exception e) {
             errorLog.addError(parser.pml(), e.getMessage());
         }
@@ -61,6 +57,6 @@ public class PMLCompiler {
             throw new PMLCompilationException(errorLog);
         }
 
-        return stmts;
+        return compiled;
     }
 }

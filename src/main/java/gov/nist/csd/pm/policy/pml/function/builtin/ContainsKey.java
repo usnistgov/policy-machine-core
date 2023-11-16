@@ -19,8 +19,8 @@ public class ContainsKey extends FunctionDefinitionStatement {
                               new FormalArgument("key", Type.any())
                       )
                       .executor((ctx, author) -> {
-                          Map<Value, Value> valueMap = ctx.scope().getValue("map").getMapValue();
-                          Value element = ctx.scope().getValue("key");
+                          Map<Value, Value> valueMap = ctx.scope().getVariable("map").getMapValue();
+                          Value element = ctx.scope().getVariable("key");
                           boolean contains = valueMap.containsKey(element);
                           return new BoolValue(contains);
                       })

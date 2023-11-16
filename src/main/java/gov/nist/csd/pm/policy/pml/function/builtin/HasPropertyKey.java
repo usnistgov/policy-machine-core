@@ -18,8 +18,8 @@ public class HasPropertyKey extends FunctionDefinitionStatement {
                               new FormalArgument("key", Type.string())
                       )
                       .executor((ctx, author) -> {
-                          String nodeName = ctx.scope().getValue("nodeName").getStringValue();
-                          String key = ctx.scope().getValue("key").getStringValue();
+                          String nodeName = ctx.scope().getVariable("nodeName").getStringValue();
+                          String key = ctx.scope().getVariable("key").getStringValue();
                           Node node = author.graph().getNode(nodeName);
                           boolean hasPropertyKey = node.getProperties().containsKey(key);
                           return new BoolValue(hasPropertyKey);

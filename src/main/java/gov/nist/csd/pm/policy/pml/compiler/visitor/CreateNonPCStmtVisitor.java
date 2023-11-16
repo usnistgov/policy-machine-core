@@ -2,22 +2,18 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.CreateNonPCStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
-public class CreateNonPCStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private VisitorContext visitorCtx;
+public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement> {
 
     public CreateNonPCStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitCreateNonPCStatement(PMLParser.CreateNonPCStatementContext ctx) {
+    public CreateNonPCStatement visitCreateNonPCStatement(PMLParser.CreateNonPCStatementContext ctx) {
         NodeType type = getNodeType(ctx.nonPCNodeType());
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression assignTo = Expression.compile(visitorCtx, ctx.assignTo, Type.array(Type.string()));

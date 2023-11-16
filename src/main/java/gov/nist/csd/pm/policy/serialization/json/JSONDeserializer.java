@@ -3,11 +3,11 @@ package gov.nist.csd.pm.policy.serialization.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.statement.VariableDeclarationStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.PolicyDeserializer;
@@ -60,11 +60,12 @@ public class JSONDeserializer implements PolicyDeserializer {
         // this will allow all function signatures to be compiled before the function bodies in the case of functions
         // calling other functions
         StringBuilder pml = new StringBuilder();
+        VisitorContext visitorCtx = new VisitorContext(new Scope<>(GlobalScope.withVariablesAndSignatures(policy, customPMLFunctions)));
 
         Map<String, String> constants = userDefinedPML.getConstants();
         List<VariableDeclarationStatement.Declaration> constDecs = new ArrayList<>();
         for (Map.Entry<String, String> e : constants.entrySet()) {
-            Expression expression = Expression.fromString(new VisitorContext(), e.getValue(), Type.any());
+            Expression expression = Expression.fromString(visitorCtx, e.getValue(), Type.any());
             constDecs.add(new VariableDeclarationStatement.Declaration(e.getKey(), expression));
         }
         pml.append(new VariableDeclarationStatement(true, constDecs)).append("\n");

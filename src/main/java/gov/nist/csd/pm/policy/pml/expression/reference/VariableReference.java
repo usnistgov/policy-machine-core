@@ -3,9 +3,9 @@ package gov.nist.csd.pm.policy.pml.expression.reference;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.ErrorExpression;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 public abstract class VariableReference extends Expression {

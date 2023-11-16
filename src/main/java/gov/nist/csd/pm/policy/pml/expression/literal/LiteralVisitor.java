@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.policy.pml.expression.literal;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
+import gov.nist.csd.pm.policy.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.ErrorExpression;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.ArrayList;
@@ -13,12 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LiteralVisitor extends PMLParserBaseVisitor<Expression> {
-
-    private final VisitorContext visitorCtx;
+public class LiteralVisitor extends PMLBaseVisitor<Expression> {
 
     public LiteralVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override

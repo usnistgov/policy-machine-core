@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.policy.pml;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLCompilationException;
+import gov.nist.csd.pm.policy.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -359,6 +359,7 @@ public class ExecutionTest {
         PAP pap1 = new PAP(new MemoryPolicyStore());
         assertThrows(ClassCastException.class, () -> PMLExecutor.compileAndExecutePML(pap1, superUser, input1));
 
+        PAP pap2 = new PAP(new MemoryPolicyStore());
         input = """
                 const x = "hello"
                 function testFunc() {
@@ -367,8 +368,8 @@ public class ExecutionTest {
                 
                 testFunc()
                 """;
-        PMLExecutor.compileAndExecutePML(pap1, superUser, input);
-        assertTrue(pap1.graph().nodeExists("hello world"));
+        PMLExecutor.compileAndExecutePML(pap2, superUser, input);
+        assertTrue(pap2.graph().nodeExists("hello world"));
     }
 
     @Test
@@ -502,7 +503,7 @@ public class ExecutionTest {
                              () -> PMLExecutor.compileAndExecutePML(memoryPolicyStore, superUser, pml)
                 );
         assertEquals(2, e.getErrors().size());
-        assertEquals("cannot reassign const variable", e.getErrors().get(0).errorMessage());
+        assertEquals("const 'x' already defined in scope", e.getErrors().get(0).errorMessage());
         assertEquals("variable 'x' already defined in scope", e.getErrors().get(1).errorMessage());
     }
 }

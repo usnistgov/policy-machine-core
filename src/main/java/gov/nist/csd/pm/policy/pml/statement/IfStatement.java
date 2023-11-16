@@ -4,7 +4,7 @@ import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.Value;
 
 import java.io.Serializable;
@@ -91,7 +91,7 @@ public class IfStatement extends PMLStatement {
 
         Value value = PMLExecutor.executeStatementBlock(copy, policy, block);
 
-        ctx.scope().overwriteValues(copy.scope());
+        ctx.scope().local().overwriteFromLocalScope(copy.scope().local());
 
         return value;
     }

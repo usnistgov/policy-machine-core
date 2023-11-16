@@ -1,25 +1,20 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class FunctionReturnStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStatement> {
 
     public FunctionReturnStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
+    public FunctionReturnStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
         // check that the return statement is inside a function
         if (!inFunctionOrResponse(ctx)) {
             visitorCtx.errorLog().addError(
@@ -27,7 +22,7 @@ public class FunctionReturnStmtVisitor extends PMLParserBaseVisitor<PMLStatement
                     "return statement not in function definition or obligation response"
             );
 
-            return new ErrorStatement(ctx);
+            return new FunctionReturnStatement(ctx);
         }
 
         if (ctx.expression() == null) {

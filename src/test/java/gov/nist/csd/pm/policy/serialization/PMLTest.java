@@ -54,7 +54,7 @@ class PMLTest {
                         new FormalArgument("name", Type.string())
                 )
                 .executor((ctx, policy) -> {
-                    policy.graph().createPolicyClass(ctx.scope().getValue("name").getStringValue());
+                    policy.graph().createPolicyClass(ctx.scope().getVariable("name").getStringValue());
 
                     return new VoidValue();
                 })

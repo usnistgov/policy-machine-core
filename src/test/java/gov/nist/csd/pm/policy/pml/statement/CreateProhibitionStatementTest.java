@@ -10,20 +10,14 @@ import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.pml.expression.NegatedExpression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import gov.nist.csd.pm.util.PolicyEquals;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.OA;
-import static gov.nist.csd.pm.policy.model.graph.nodes.NodeType.UA;
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreateProhibitionStatementTest {
@@ -48,7 +42,7 @@ class CreateProhibitionStatementTest {
         store.graph().createObjectAttribute("oa1", "pc2");
         store.graph().createObjectAttribute("oa2", "pc2");
 
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore()));
 
         stmt.execute(execCtx, store);
 

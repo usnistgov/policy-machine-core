@@ -19,9 +19,9 @@ public class HasPropertyValue extends FunctionDefinitionStatement {
                               new FormalArgument("value", Type.string())
                       )
                       .executor((ctx, author) -> {
-                          String nodeName = ctx.scope().getValue("nodeName").getStringValue();
-                          String key = ctx.scope().getValue("key").getStringValue();
-                          String value = ctx.scope().getValue("value").getStringValue();
+                          String nodeName = ctx.scope().getVariable("nodeName").getStringValue();
+                          String key = ctx.scope().getVariable("key").getStringValue();
+                          String value = ctx.scope().getVariable("value").getStringValue();
                           Node node = author.graph().getNode(nodeName);
                           boolean has = node.getProperties().containsKey(key);
                           if (!has) {

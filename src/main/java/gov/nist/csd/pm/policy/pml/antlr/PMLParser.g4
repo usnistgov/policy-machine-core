@@ -5,6 +5,7 @@ options {
 }
 
 pml: (statement)* EOF ;
+
 statement: (
     createPolicyStatement
     | createNonPCStatement
@@ -47,7 +48,6 @@ createNonPCStatement:
     ASSIGN_TO assignTo=expression;
 nonPCNodeType:
     (OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
-
 
 createObligationStatement:
     CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
@@ -106,7 +106,9 @@ deleteStatement:
 deleteType:
     nodeType #DeleteNode
     | OBLIGATION #DeleteObligation
-    | PROHIBITION #DeleteProhibition ;
+    | PROHIBITION #DeleteProhibition
+    | FUNCTION #DeleteFunction
+    | CONST #DeleteConst;
 nodeType:
     (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 

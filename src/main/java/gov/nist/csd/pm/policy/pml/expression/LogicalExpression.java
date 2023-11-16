@@ -3,10 +3,11 @@ package gov.nist.csd.pm.policy.pml.expression;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.BoolValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
@@ -52,8 +53,8 @@ public class LogicalExpression extends Expression {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        boolean leftValue = left.execute(ctx, policy).getBooleanValue();
-        boolean rightValue = right.execute(ctx, policy).getBooleanValue();
+        boolean leftValue = PMLStatement.execute(ctx, policy, left).getBooleanValue();
+        boolean rightValue = PMLStatement.execute(ctx, policy, right).getBooleanValue();
 
         return new BoolValue(isAnd ? leftValue && rightValue : leftValue || rightValue);
     }

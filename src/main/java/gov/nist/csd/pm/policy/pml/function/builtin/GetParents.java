@@ -22,7 +22,7 @@ public class GetParents extends FunctionDefinitionStatement {
                               new FormalArgument("nodeName", Type.string())
                       )
                       .executor((ctx, author) -> {
-                          List<String> parents = author.graph().getParents(ctx.scope().getValue("nodeName").getStringValue());
+                          List<String> parents = author.graph().getParents(ctx.scope().getVariable("nodeName").getStringValue());
                           List<Value> parentValues = new ArrayList<>(parents.size());
                           for (int i = 0; i < parents.size(); i++) {
                               parentValues.add(new StringValue(parents.get(i)));

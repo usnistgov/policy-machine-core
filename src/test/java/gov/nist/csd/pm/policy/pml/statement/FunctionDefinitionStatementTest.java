@@ -3,79 +3,17 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.compiler.visitor.FunctionDefinitionVisitor;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionStatementTest {
-
-    @Test
-    void testSuccess() throws PMException, UnknownFunctionInScopeException {
-        FunctionDefinitionStatement stmt = new FunctionDefinitionStatement.Builder("func1")
-                .returns(Type.voidType())
-                .args(
-                        new FormalArgument("a", Type.string()),
-                        new FormalArgument("b", Type.bool()),
-                        new FormalArgument("c", Type.array(Type.string()))
-                )
-                .body()
-                .build();
-
-        MemoryPolicyStore store = new MemoryPolicyStore();
-        store.graph().createPolicyClass("pc1");
-        store.graph().createUserAttribute("ua1", "pc1");
-        store.graph().createUserAttribute("ua2", "pc1");
-        store.graph().createUserAttribute("ua3", "pc1");
-        store.graph().createUser("u1", "ua1");
-
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"));
-        stmt.execute(execCtx, store);
-
-        assertTrue(execCtx.scope().functionExists("func1"));
-        assertEquals(
-                stmt,
-                execCtx.scope().getFunction("func1")
-        );
-
-        stmt = new FunctionDefinitionStatement.Builder("func1")
-                .returns(Type.string())
-                .args(
-                        new FormalArgument("a", Type.string()),
-                        new FormalArgument("b", Type.bool()),
-                        new FormalArgument("c", Type.array(Type.string()))
-                )
-                .body(
-                        new FunctionReturnStatement(new StringLiteral("test"))
-                )
-                .build();
-
-        execCtx = new ExecutionContext(new UserContext("u1"));
-        stmt.execute(execCtx, store);
-
-        assertTrue(execCtx.scope().functionExists("func1"));
-        assertEquals(
-                stmt,
-                execCtx.scope().getFunction("func1")
-        );
-    }
 
     @Test
     void testToFormattedString() {
@@ -137,14 +75,13 @@ class FunctionDefinitionStatementTest {
     void testFormalArgOverwritesVariable()
             throws PMException {
         String pml = """
-                x := "x"
-                const y = "y"
+                var a = "test"
+                var b = "test2"
+                func1(a, b)
                 
-                func1("test", "test2")
-                
-                function func1(string x, string y) {
-                    create policy class x
-                    create policy class y
+                function func1(string a, string b) {
+                    create policy class a
+                    create policy class b
                 }
                 """;
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
@@ -152,6 +89,26 @@ class FunctionDefinitionStatementTest {
 
         assertTrue(memoryPolicyStore.graph().nodeExists("test"));
         assertTrue(memoryPolicyStore.graph().nodeExists("test2"));
+    }
+
+    @Test
+    void testInvokeFromDefinition() throws PMException {
+        String pml = """
+                function f1(string a) {
+                    create policy class a
+                }
+                
+                function f2() {
+                    a := "test"
+                    f1(a)
+                }
+                
+                f2()
+                """;
+        MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(memoryPolicyStore, new UserContext(""), pml);
+
+        assertTrue(memoryPolicyStore.graph().nodeExists("test"));
     }
 
     @Test

@@ -10,7 +10,7 @@ import gov.nist.csd.pm.policy.pml.value.Value;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PMLContext {
+/*public class PMLContext {
 
     public static PMLContext fromPolicy(Policy policy) throws PMException {
         Map<String, FunctionDefinitionStatement> functions = policy.userDefinedPML().getFunctions();
@@ -69,4 +69,4 @@ public class PMLContext {
         return this;
     }
 
-}
+}*/

@@ -422,6 +422,30 @@ public interface PMLParserListener extends ParseTreeListener {
 	 */
 	void exitDeleteProhibition(PMLParser.DeleteProhibitionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code DeleteFunction}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 */
+	void enterDeleteFunction(PMLParser.DeleteFunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DeleteFunction}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 */
+	void exitDeleteFunction(PMLParser.DeleteFunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code DeleteConst}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 */
+	void enterDeleteConst(PMLParser.DeleteConstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DeleteConst}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 */
+	void exitDeleteConst(PMLParser.DeleteConstContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PMLParser#nodeType}.
 	 * @param ctx the parse tree
 	 */

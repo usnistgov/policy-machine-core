@@ -257,6 +257,20 @@ public interface PMLParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDeleteProhibition(PMLParser.DeleteProhibitionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code DeleteFunction}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteFunction(PMLParser.DeleteFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeleteConst}
+	 * labeled alternative in {@link PMLParser#deleteType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteConst(PMLParser.DeleteConstContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PMLParser#nodeType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

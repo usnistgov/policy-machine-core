@@ -2,23 +2,19 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.CreateProhibitionStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
-public class CreateProhibitionStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibitionStatement> {
 
     public CreateProhibitionStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
+    public CreateProhibitionStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
         ProhibitionSubject.Type type;

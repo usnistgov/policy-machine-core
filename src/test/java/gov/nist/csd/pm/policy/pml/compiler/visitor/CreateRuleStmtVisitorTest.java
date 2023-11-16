@@ -2,37 +2,33 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.CompiledPML;
 import gov.nist.csd.pm.policy.pml.PMLCompiler;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
-import gov.nist.csd.pm.policy.pml.PMLErrorHandler;
-import gov.nist.csd.pm.policy.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.compiler.error.ErrorLog;
+import gov.nist.csd.pm.policy.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.CreateRuleStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
-import org.antlr.v4.runtime.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
-import static org.antlr.v4.runtime.Token.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CreateRuleStmtVisitorTest {
 
     @Test
-    void testInvalidExpressionTypes() {
+    void testInvalidExpressionTypes() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 create obligation "test" {
@@ -44,7 +40,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -63,7 +59,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -82,7 +78,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -101,7 +97,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -120,7 +116,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -140,7 +136,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -160,7 +156,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -180,7 +176,7 @@ class CreateRuleStmtVisitorTest {
                 """,
                 PMLParser.CreateObligationStatementContext.class
         );
-        visitorCtx = new VisitorContext();
+        visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -226,10 +222,10 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
-        assertEquals(1, stmts.size());
+        CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
+        assertEquals(1, compiledPML.stmts().size());
 
-        CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
+        CreateObligationStatement stmt = (CreateObligationStatement)compiledPML.stmts().get(0);
         assertEquals(
                 new CreateObligationStatement(
                         new StringLiteral("obligation1"),
@@ -314,10 +310,10 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
-        assertEquals(1, stmts.size());
+        CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
+        assertEquals(1, compiledPML.stmts().size());
 
-        CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
+        CreateObligationStatement stmt = (CreateObligationStatement)compiledPML.stmts().get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
                 new StringLiteral("obligation1"),
                 List.of(
@@ -384,10 +380,10 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
-        assertEquals(3, stmts.size());
+        CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
+        assertEquals(3, compiledPML.stmts().size());
 
-        CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(2);
+        CreateObligationStatement stmt = (CreateObligationStatement)compiledPML.stmts().get(2);
         CreateObligationStatement expected = new CreateObligationStatement(
                 new StringLiteral("obligation1"),
                 List.of(
@@ -424,10 +420,10 @@ class CreateRuleStmtVisitorTest {
                         }
                     }
                     """;
-        List<PMLStatement> stmts = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
-        assertEquals(1, stmts.size());
+        CompiledPML compiledPML = PMLCompiler.compilePML(new MemoryPolicyStore(), pml);
+        assertEquals(1, compiledPML.stmts().size());
 
-        CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
+        CreateObligationStatement stmt = (CreateObligationStatement)compiledPML.stmts().get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
                 new StringLiteral("obligation1"),
                 List.of(
@@ -443,6 +439,23 @@ class CreateRuleStmtVisitorTest {
                         )
                 )
         );
+    }
+
+    @Test
+    void testFunctionInResponseReturnsError() throws PMException {
+        String pml = """
+                    create obligation "obligation1" {
+                        create rule "e1 and e2"
+                        when any user
+                        performs ["e1"]
+                        do(ctx) {
+                            function f1() {}
+                        }
+                    }
+                    """;
+        PMLCompilationException e =
+                assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
+        assertEquals("functions are not allowed inside response blocks", e.getErrors().get(0).errorMessage());
     }
 
 }

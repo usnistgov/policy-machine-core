@@ -9,10 +9,12 @@ import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
 import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteRuleStatementTest {
@@ -30,10 +32,10 @@ class DeleteRuleStatementTest {
         store.obligations().create(userContext, "obl1", new Rule(
                 "rule1",
                 new EventPattern(new AnyUserSubject(), new Performs("e1")),
-                new Response(userContext)
+                new Response("e",List.of())
         ));
 
-        ExecutionContext execCtx = new ExecutionContext(userContext);
+        ExecutionContext execCtx = new ExecutionContext(userContext, GlobalScope.withValuesAndDefinitions(store));
         stmt.execute(execCtx, store);
 
         assertTrue(store.obligations().get("obl1").getRules().isEmpty());

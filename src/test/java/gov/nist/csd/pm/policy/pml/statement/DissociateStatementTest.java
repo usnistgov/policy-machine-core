@@ -5,7 +5,8 @@ import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
@@ -26,7 +27,7 @@ class DissociateStatementTest {
         store.graph().associate("ua1", "oa1", new AccessRightSet("read"));
         UserContext userContext = new UserContext("u1");
 
-        stmt.execute(new ExecutionContext(userContext), store);
+        stmt.execute(new ExecutionContext(userContext, GlobalScope.withValuesAndDefinitions(store)), store);
 
         assertTrue(store.graph().getAssociationsWithSource("ua1").isEmpty());
         assertTrue(store.graph().getAssociationsWithTarget("oa1").isEmpty());

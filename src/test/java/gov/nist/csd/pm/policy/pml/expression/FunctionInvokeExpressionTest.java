@@ -8,9 +8,12 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
+import gov.nist.csd.pm.policy.pml.scope.FunctionAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
@@ -22,7 +25,9 @@ import gov.nist.csd.pm.policy.pml.value.VoidValue;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
+import static gov.nist.csd.pm.policy.pml.statement.PMLStatement.execute;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionInvokeExpressionTest {
@@ -45,8 +50,9 @@ class FunctionInvokeExpressionTest {
                 """
                 voidFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunctionSignature(voidFunc.signature());
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
+                                                                      .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc.getSignature())));
+
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -61,10 +67,9 @@ class FunctionInvokeExpressionTest {
                 e.getType(visitorContext.scope())
         );
 
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
-        executionContext.scope().addFunctionSignature(voidFunc.signature());
-        executionContext.scope().addFunction(voidFunc);
-        Value value = e.execute(executionContext, new MemoryPolicyStore());
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())
+                                                                                                 .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc)));
+        Value value = execute(executionContext, new MemoryPolicyStore(), e);
         assertEquals(
                 new VoidValue(),
                 value
@@ -77,13 +82,13 @@ class FunctionInvokeExpressionTest {
     }
 
     @Test
-    void testFunctionNotInScope() {
+    void testFunctionNotInScope() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                 """
                 voidFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
-        Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
+        FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
                 "unknown function 'voidFunc' in scope",
@@ -92,14 +97,14 @@ class FunctionInvokeExpressionTest {
     }
 
     @Test
-    void testWrongNumberOfArgs() throws FunctionAlreadyDefinedInScopeException {
+    void testWrongNumberOfArgs() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                 """
                 voidFunc("a")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunctionSignature(voidFunc.signature());
-        Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
+                                                                      .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc.getSignature())));
+        FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
                 "wrong number of args for function call voidFunc: expected 2, got 1",
@@ -108,13 +113,14 @@ class FunctionInvokeExpressionTest {
     }
 
     @Test
-    void testWrongArgType() throws FunctionAlreadyDefinedInScopeException {
+    void testWrongArgType() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                 """
                 voidFunc("a", ["b", "c"])
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunctionSignature(voidFunc.signature());
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
+                                                                      .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc.getSignature())));
+
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -141,8 +147,9 @@ class FunctionInvokeExpressionTest {
                 """
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunctionSignature(stringFunc.signature());
+        VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
+                                      .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc.getSignature())));
+
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
@@ -151,11 +158,14 @@ class FunctionInvokeExpressionTest {
         );
 
         MemoryPolicyStore store = new MemoryPolicyStore();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
-        executionContext.scope().addFunctionSignature(stringFunc.signature());
-        executionContext.scope().addFunction(stringFunc);
-        executionContext.scope().addValue("x", new StringValue("x"));
-        Value value = e.execute(executionContext, store);
+        ExecutionContext executionContext =
+                new ExecutionContext(
+                        new UserContext(""),
+                        GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())
+                                   .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc))
+                );
+        executionContext.scope().addVariable("x", new StringValue("x"));
+        Value value = execute(executionContext, store, e);
         assertEquals(
                 new StringValue("test_ret"),
                 value
@@ -166,7 +176,7 @@ class FunctionInvokeExpressionTest {
         );
         assertEquals(
                 new StringValue("test"),
-                executionContext.scope().getValue("x")
+                executionContext.scope().getVariable("x")
         );
     }
 
@@ -186,16 +196,21 @@ class FunctionInvokeExpressionTest {
                 """
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext();
-        visitorContext.scope().addFunctionSignature(stringFunc.signature());
+        VisitorContext visitorContext = new VisitorContext(
+                GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
+                           .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc.getSignature()))
+        );
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 
         MemoryPolicyStore store = new MemoryPolicyStore();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""));
-        executionContext.scope().addFunctionSignature(stringFunc.signature());
-        executionContext.scope().addFunction(stringFunc);
-        Value value = e.execute(executionContext, store);
+        ExecutionContext executionContext =
+                new ExecutionContext(
+                        new UserContext(""),
+                        GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())
+                                   .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc))
+                );
+        Value value = execute(executionContext, store, e);
         assertEquals(
                 new StringValue("test"),
                 value

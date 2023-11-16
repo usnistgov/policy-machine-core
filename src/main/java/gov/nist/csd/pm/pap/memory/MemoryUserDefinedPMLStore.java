@@ -57,12 +57,12 @@ class MemoryUserDefinedPMLStore extends MemoryStore<TxUserDefinedPML> implements
 
     @Override
     public void createFunction(FunctionDefinitionStatement functionDefinitionStatement) throws PMLFunctionAlreadyDefinedException, PMBackendException {
-        checkCreateFunctionInput(functionDefinitionStatement.signature().getFunctionName());
+        checkCreateFunctionInput(functionDefinitionStatement.getSignature().getFunctionName());
 
         // log the command if in a tx
         handleTxIfActive(tx -> tx.createFunction(functionDefinitionStatement));
 
-        functions.put(functionDefinitionStatement.signature().getFunctionName(), new FunctionDefinitionStatement(functionDefinitionStatement));
+        functions.put(functionDefinitionStatement.getSignature().getFunctionName(), new FunctionDefinitionStatement(functionDefinitionStatement));
     }
 
     @Override

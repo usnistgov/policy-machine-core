@@ -531,7 +531,7 @@ abstract class TxCmd<T extends MemoryStore<?>> {
 
         @Override
         public void rollback(MemoryUserDefinedPMLStore store) throws PMException {
-            store.deleteFunction(functionDefinitionStatement.signature().getFunctionName());
+            store.deleteFunction(functionDefinitionStatement.getSignature().getFunctionName());
         }
     }
 

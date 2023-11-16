@@ -1,9 +1,8 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.IfStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
@@ -11,12 +10,10 @@ import gov.nist.csd.pm.policy.pml.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
 
     public IfStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
@@ -33,7 +30,7 @@ public class IfStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         }
 
         // update outer scoped variables
-        visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
+        visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
 
         IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(condition, block);
 
@@ -51,7 +48,7 @@ public class IfStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
             elseIfs.add(new IfStatement.ConditionalBlock(condition, block));
 
             // update outer scoped variables
-            visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
+            visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
         }
 
         // else
@@ -65,7 +62,7 @@ public class IfStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
             }
 
             // update outer scoped variables
-            visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
+            visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
         }
 
         return new IfStatement(ifBlock, elseIfs, block);

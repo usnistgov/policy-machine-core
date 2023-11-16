@@ -2,9 +2,9 @@ package gov.nist.csd.pm.policy.pml.function;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
@@ -22,6 +22,10 @@ public class FunctionSignature extends PMLStatement {
         this.functionName = functionName;
         this.returnType = returnType;
         this.args = args;
+    }
+
+    public FunctionSignature(PMLParser.FunctionSignatureContext ctx) {
+        super(ctx);
     }
 
     public String getFunctionName() {
@@ -50,8 +54,6 @@ public class FunctionSignature extends PMLStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        ctx.scope().addFunctionSignature(this);
-
         return new VoidValue();
     }
 

@@ -1,12 +1,16 @@
 package gov.nist.csd.pm.policy.pml.expression.reference;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.expression.ErrorExpression;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
+import gov.nist.csd.pm.policy.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,13 +23,13 @@ class VariableReferenceTest {
     @Nested
     class ReferenceByIDTest {
         @Test
-        void testReferenceById() throws VariableAlreadyDefinedInScopeException {
+        void testReferenceById() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                     """
                     a
                     """, PMLParser.VariableReferenceExpressionContext.class);
-            VisitorContext visitorContext = new VisitorContext();
-            visitorContext.scope().addVariable("a", Type.string(), false);
+            VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
+            visitorContext.scope().addVariable("a", new Variable("a", Type.string(), false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
@@ -35,12 +39,12 @@ class VariableReferenceTest {
         }
 
         @Test
-        void testUnknownVariable() {
+        void testUnknownVariable() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                     """
                     a
                     """, PMLParser.VariableReferenceExpressionContext.class);
-            VisitorContext visitorContext = new VisitorContext();
+            VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
             Expression e = compileVariableReference(visitorContext, ctx.variableReference());
             assertTrue(e instanceof ErrorExpression);
             assertEquals(1, visitorContext.errorLog().getErrors().size());
@@ -54,13 +58,13 @@ class VariableReferenceTest {
     @Nested
     class ReferenceByIndexTest {
         @Test
-        void testSuccess() throws VariableAlreadyDefinedInScopeException {
+        void testSuccess() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                     """
                     a.b.c
                     """, PMLParser.VariableReferenceExpressionContext.class);
-            VisitorContext visitorContext = new VisitorContext();
-            visitorContext.scope().addVariable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false);
+            VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
+            visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
@@ -72,8 +76,8 @@ class VariableReferenceTest {
                     """
                     a["b"]["c"]
                     """, PMLParser.VariableReferenceExpressionContext.class);
-            visitorContext = new VisitorContext();
-            visitorContext.scope().addVariable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false);
+            visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
+            visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false));
             actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
@@ -83,12 +87,12 @@ class VariableReferenceTest {
         }
 
         @Test
-        void testUnknownVariable() {
+        void testUnknownVariable() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                     """
                     a.b.c
                     """, PMLParser.VariableReferenceExpressionContext.class);
-            VisitorContext visitorContext = new VisitorContext();
+            VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
             Expression e = compileVariableReference(visitorContext, ctx.variableReference());
             assertTrue(e instanceof ErrorExpression);
             assertEquals(1, visitorContext.errorLog().getErrors().size());
@@ -99,13 +103,13 @@ class VariableReferenceTest {
         }
 
         @Test
-        void testVarRefNotAMap() throws VariableAlreadyDefinedInScopeException {
+        void testVarRefNotAMap() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
                     """
                     a.b.c
                     """, PMLParser.VariableReferenceExpressionContext.class);
-            VisitorContext visitorContext = new VisitorContext();
-            visitorContext.scope().addVariable("a", Type.map(Type.string(), Type.string()), false);
+            VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
+            visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.string()), false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(1, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(

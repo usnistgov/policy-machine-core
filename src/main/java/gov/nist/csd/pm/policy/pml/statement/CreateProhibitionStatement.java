@@ -11,7 +11,7 @@ import gov.nist.csd.pm.policy.pml.expression.NegatedExpression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.ComplementedValue;
 import gov.nist.csd.pm.policy.pml.value.Value;

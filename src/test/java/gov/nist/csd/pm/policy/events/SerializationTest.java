@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.policy.events;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.policy.events.graph.CreatePolicyClassEvent;
 import gov.nist.csd.pm.policy.events.obligations.CreateObligationEvent;
@@ -66,10 +67,9 @@ public class SerializationTest {
                                         new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
-                                new Response(
-                                        new UserContext("u1"),
+                                new Response("evtCtx", List.of(
                                         new CreatePolicyStatement(new StringLiteral("test_pc"))
-                                )
+                                ))
                         )
                 )
         );

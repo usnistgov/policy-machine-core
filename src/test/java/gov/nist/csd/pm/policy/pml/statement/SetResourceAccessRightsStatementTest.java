@@ -4,14 +4,11 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SetResourceAccessRightsStatementTest {
@@ -24,7 +21,7 @@ class SetResourceAccessRightsStatementTest {
 
         MemoryPolicyStore store = new MemoryPolicyStore();
 
-        stmt.execute(new ExecutionContext(new UserContext("")), store);
+        stmt.execute(new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())), store);
 
         assertEquals(
                 new AccessRightSet("a", "b", "c", "d"),

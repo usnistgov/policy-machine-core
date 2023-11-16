@@ -4,8 +4,8 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownVariableInScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 import org.junit.jupiter.api.Test;
 
@@ -33,15 +33,15 @@ class VariableDeclarationStatementTest {
                 )
         );
 
-        ExecutionContext ctx = new ExecutionContext(new UserContext("u1"));
-        ctx.scope().addValue("c", new StringValue("123"));
+        ExecutionContext ctx = new ExecutionContext(new UserContext("u1"), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore()));
+        ctx.scope().addVariable("c", new StringValue("123"));
         stmt1.execute(ctx, new MemoryPolicyStore());
         stmt2.execute(ctx, new MemoryPolicyStore());
 
-        assertEquals(new StringValue("a"), ctx.scope().getValue("a"));
-        assertEquals(new StringValue("b"), ctx.scope().getValue("b"));
-        assertEquals(new StringValue("c"), ctx.scope().getValue("c"));
-        assertEquals(new StringValue("d"), ctx.scope().getValue("d"));
+        assertEquals(new StringValue("a"), ctx.scope().getVariable("a"));
+        assertEquals(new StringValue("b"), ctx.scope().getVariable("b"));
+        assertEquals(new StringValue("c"), ctx.scope().getVariable("c"));
+        assertEquals(new StringValue("d"), ctx.scope().getVariable("d"));
     }
 
     @Test

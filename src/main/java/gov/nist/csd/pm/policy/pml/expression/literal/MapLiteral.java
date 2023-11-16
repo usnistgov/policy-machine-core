@@ -3,9 +3,10 @@ package gov.nist.csd.pm.policy.pml.expression.literal;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.MapValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
@@ -69,8 +70,8 @@ public class MapLiteral extends Literal {
         for (Expression keyExpr : map.keySet()) {
             Expression valueExpr = map.get(keyExpr);
 
-            Value key = keyExpr.execute(ctx, policy);
-            Value value = valueExpr.execute(ctx, policy);
+            Value key = PMLStatement.execute(ctx, policy, keyExpr);
+            Value value = PMLStatement.execute(ctx, policy, valueExpr);
 
             if (keyType == null) {
                 keyType = key.getType();

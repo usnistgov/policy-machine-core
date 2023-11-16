@@ -6,7 +6,8 @@ import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
@@ -28,7 +29,7 @@ class AssociateStatementTest {
         store.graph().createUserAttribute("ua1", "pc1");
         store.graph().createUserAttribute("u1", "pc1");
         store.graph().createObjectAttribute("oa1", "pc1");
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"), GlobalScope.withValuesAndDefinitions(store));
         stmt.execute(execCtx, store);
 
         assertTrue(store.graph().getAssociationsWithSource("ua1").get(0).equals(new Association("ua1", "oa1", new AccessRightSet("read"))));

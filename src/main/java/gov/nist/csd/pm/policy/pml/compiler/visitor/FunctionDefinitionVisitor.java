@@ -1,15 +1,10 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
-import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
-import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
@@ -19,51 +14,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FunctionDefinitionVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitionStatement> {
 
     public FunctionDefinitionVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
-        String funcName = ctx.functionSignature().ID().getText();
-        FunctionSignature signature;
-        try {
-            signature = visitorCtx.scope().getFunctionSignature(funcName);
-        } catch (UnknownFunctionInScopeException e) {
-            // this error will occur only if the function signature wasn't added to the scope during compilation
-            // this happens before the function definition is visited, so if it's missing something went wrong
-            // during compilation.
-            visitorCtx.errorLog().addError(ctx, "signature for function " + funcName +
-                    " was not compiled, check for errors during compilation");
-
-            return new ErrorStatement(ctx);
-        }
+    public FunctionDefinitionStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+        FunctionSignature signature = new FunctionSignatureVisitor(visitorCtx).visitFunctionSignature(ctx.functionSignature());
 
         List<PMLStatement> body = parseBody(ctx, signature.getArgs(), signature.getReturnType());
         if (body == null) {
-            return new ErrorStatement(ctx);
+            return new FunctionDefinitionStatement(ctx);
         }
 
-        FunctionDefinitionStatement functionDefinition = new FunctionDefinitionStatement.Builder(signature.getFunctionName())
+
+        return new FunctionDefinitionStatement.Builder(signature.getFunctionName())
                 .returns(signature.getReturnType())
                 .args(signature.getArgs())
                 .body(body)
                 .build();
-
-        // add function to scope
-        try {
-            visitorCtx.scope().addFunction(functionDefinition);
-        } catch (FunctionAlreadyDefinedInScopeException | PMLFunctionNotDefinedException e) {
-            visitorCtx.errorLog().addError(ctx, e.getMessage());
-
-            return new ErrorStatement(ctx);
-        }
-
-        return functionDefinition;
     }
 
     private List<PMLStatement> parseBody(PMLParser.FunctionDefinitionStatementContext ctx,
@@ -74,7 +45,7 @@ public class FunctionDefinitionVisitor extends PMLParserBaseVisitor<PMLStatement
 
         // add the args to the local scope, overwriting any variables with the same ID as the formal args
         for (FormalArgument formalArgument : args) {
-            localVisitorCtx.scope().addOrOverwriteVariable(formalArgument.name(), formalArgument.type());
+            localVisitorCtx.scope().addOrOverwriteVariable(formalArgument.name(), new Variable(formalArgument.name(), formalArgument.type(), false));
         }
 
         StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
@@ -89,35 +60,23 @@ public class FunctionDefinitionVisitor extends PMLParserBaseVisitor<PMLStatement
         return result.stmts();
     }
 
-    public static class FunctionSignatureVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-        private VisitorContext visitorCtx;
+    public static class FunctionSignatureVisitor extends PMLBaseVisitor<PMLStatement> {
 
         public FunctionSignatureVisitor(VisitorContext visitorCtx) {
-            this.visitorCtx = visitorCtx;
+            super(visitorCtx);
         }
 
         @Override
-        public PMLStatement visitFunctionSignature(PMLParser.FunctionSignatureContext ctx) {
+        public FunctionSignature visitFunctionSignature(PMLParser.FunctionSignatureContext ctx) {
             String funcName = ctx.ID().getText();
             List<FormalArgument> args = parseFormalArgs(ctx.formalArgList());
             if (args == null) {
-                return new ErrorStatement(ctx);
+                return new FunctionSignature(ctx);
             }
 
             Type returnType = parseReturnType(ctx.returnType);
 
-            FunctionSignature signature = new FunctionSignature(funcName, returnType, args);
-
-            try {
-                visitorCtx.scope().addFunctionSignature(signature);
-            } catch (FunctionAlreadyDefinedInScopeException e) {
-                visitorCtx.errorLog().addError(ctx, e.getMessage());
-
-                return new ErrorStatement(ctx);
-            }
-
-            return signature;
+            return new FunctionSignature(funcName, returnType, args);
         }
 
         private List<FormalArgument> parseFormalArgs(PMLParser.FormalArgListContext formalArgListCtx) {
@@ -127,11 +86,18 @@ public class FunctionDefinitionVisitor extends PMLParserBaseVisitor<PMLStatement
                 String name = formalArgCtx.ID().getText();
                 PMLParser.VariableTypeContext varTypeContext = formalArgCtx.variableType();
 
-                // check that two formal args dont have the same name
+                // check that two formal args dont have the same name and that there are no constants with the same name
                 if (argNames.contains(name)) {
                     visitorCtx.errorLog().addError(
                             formalArgCtx,
                             String.format("formal arg '%s' already defined in signature", name)
+                    );
+
+                    return null;
+                } else if (visitorCtx.scope().variableExists(name)) {
+                    visitorCtx.errorLog().addError(
+                            formalArgCtx,
+                            String.format("formal arg '%s' already defined as a constant in scope", name)
                     );
 
                     return null;

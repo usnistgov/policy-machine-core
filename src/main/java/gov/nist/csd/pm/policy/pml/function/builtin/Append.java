@@ -18,8 +18,8 @@ public class Append extends FunctionDefinitionStatement {
                               new FormalArgument("src", Type.any())
                       )
                       .executor((ctx, author) -> {
-                          List<Value> valueArr = ctx.scope().getValue("dst").getArrayValue();
-                          Value srcValue = ctx.scope().getValue("src");
+                          List<Value> valueArr = ctx.scope().getVariable("dst").getArrayValue();
+                          Value srcValue = ctx.scope().getVariable("src");
 
                           valueArr.add(srcValue);
 

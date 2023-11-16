@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.ForeachStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
@@ -13,16 +12,14 @@ import gov.nist.csd.pm.policy.pml.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForeachStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
 
     public ForeachStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
+    public ForeachStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
         boolean isMapFor = ctx.value != null;
 
         Expression iter;
@@ -38,7 +35,7 @@ public class ForeachStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         } catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-            return new ErrorStatement(ctx);
+            return new ForeachStatement(ctx);
         }
 
         String varName = ctx.key.getText();
@@ -60,14 +57,14 @@ public class ForeachStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
         VisitorContext localVisitorCtx = visitorCtx.copy();
 
         try {
-            localVisitorCtx.scope().addVariable(varName, keyType, false);
+            localVisitorCtx.scope().addVariable(varName, new Variable(varName, keyType, false));
             if (valueType != null) {
-                localVisitorCtx.scope().addVariable(mapValueVarName, valueType, false);
+                localVisitorCtx.scope().addVariable(mapValueVarName, new Variable(mapValueVarName, valueType, false));
             }
         }catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-            return new ErrorStatement(ctx);
+            return new ForeachStatement(ctx);
         }
 
         for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
@@ -75,7 +72,7 @@ public class ForeachStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
                     .visitStatement(stmtCtx);
             block.add(statement);
 
-            visitorCtx.scope().overwriteVariables(localVisitorCtx.scope());
+            visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
         }
 
         return new ForeachStatement(varName, mapValueVarName, iter, block);

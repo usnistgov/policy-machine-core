@@ -3,7 +3,6 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
 import gov.nist.csd.pm.policy.model.obligation.Obligation;
 import gov.nist.csd.pm.policy.model.obligation.Rule;
 import gov.nist.csd.pm.policy.model.obligation.event.EventPattern;
@@ -11,13 +10,13 @@ import gov.nist.csd.pm.policy.model.obligation.event.Performs;
 import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.model.obligation.event.target.AnyInUnionTarget;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static gov.nist.csd.pm.policy.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.policy.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreateObligationStatementTest {
@@ -43,7 +42,7 @@ class CreateObligationStatementTest {
         store.graph().createUser("u2", "ua2");
         store.graph().createObjectAttribute("oa1", "pc1");
         store.graph().createObjectAttribute("oa2", "pc1");
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), GlobalScope.withValuesAndDefinitions(store));
 
         stmt.execute(execCtx, store);
 

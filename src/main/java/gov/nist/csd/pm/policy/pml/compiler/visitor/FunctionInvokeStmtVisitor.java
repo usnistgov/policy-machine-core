@@ -1,41 +1,35 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
-import gov.nist.csd.pm.policy.pml.statement.ErrorStatement;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionInvocationStatement;
-import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionInvokeStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
-
-    private final VisitorContext visitorCtx;
+public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvocationStatement> {
 
     public FunctionInvokeStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitFunctionInvoke(PMLParser.FunctionInvokeContext ctx) {
+    public FunctionInvocationStatement visitFunctionInvoke(PMLParser.FunctionInvokeContext ctx) {
         return parse(ctx);
     }
 
     @Override
-    public PMLStatement visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
+    public FunctionInvocationStatement visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
         return parse(ctx.functionInvoke());
     }
 
-    private PMLStatement parse(PMLParser.FunctionInvokeContext funcCallCtx) {
+    private FunctionInvocationStatement parse(PMLParser.FunctionInvokeContext funcCallCtx) {
         String funcName = funcCallCtx.ID().getText();
 
         // get actual arg expressions
@@ -54,11 +48,11 @@ public class FunctionInvokeStmtVisitor extends PMLParserBaseVisitor<PMLStatement
         // check the function is in scope and the args are correct
         FunctionSignature functionSignature;
         try {
-            functionSignature = visitorCtx.scope().getFunctionSignature(funcName);
+            functionSignature = visitorCtx.scope().getFunction(funcName);
         } catch (UnknownFunctionInScopeException e) {
             visitorCtx.errorLog().addError(funcCallCtx, e.getMessage());
 
-            return new ErrorStatement(funcCallCtx);
+            return new FunctionInvocationStatement(funcCallCtx);
         }
 
         // check that the actual args are correct type
@@ -71,7 +65,7 @@ public class FunctionInvokeStmtVisitor extends PMLParserBaseVisitor<PMLStatement
                             "expected " + formalArgs.size() + ", got " + actualArgs.size()
             );
 
-            return new ErrorStatement(funcCallCtx);
+            return new FunctionInvocationStatement(funcCallCtx);
         } else {
             for (int i = 0; i < actualArgs.size(); i++) {
                 try {
@@ -86,12 +80,12 @@ public class FunctionInvokeStmtVisitor extends PMLParserBaseVisitor<PMLStatement
                                         actualType + " at arg " + i
                         );
 
-                        return new ErrorStatement(funcCallCtx);
+                        return new FunctionInvocationStatement(funcCallCtx);
                     }
                 } catch (PMLScopeException e) {
                     visitorCtx.errorLog().addError(funcCallCtx, e.getMessage());
 
-                    return new ErrorStatement(funcCallCtx);
+                    return new FunctionInvocationStatement(funcCallCtx);
                 }
             }
         }

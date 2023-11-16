@@ -2,6 +2,8 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.exceptions.PMLConstantNotDefinedException;
+import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.model.obligation.Response;
@@ -12,7 +14,10 @@ import gov.nist.csd.pm.policy.model.obligation.event.subject.AnyUserSubject;
 import gov.nist.csd.pm.policy.model.prohibition.ContainerCondition;
 import gov.nist.csd.pm.policy.model.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
+import gov.nist.csd.pm.policy.pml.value.StringValue;
+import gov.nist.csd.pm.policy.pml.value.Value;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -26,6 +31,8 @@ class DeleteStatementTest {
         DeleteStatement stmt1 = new DeleteStatement(DeleteStatement.Type.OBJECT_ATTRIBUTE, new StringLiteral("oa1"));
         DeleteStatement stmt2 = new DeleteStatement(DeleteStatement.Type.PROHIBITION, new StringLiteral("p1"));
         DeleteStatement stmt3 = new DeleteStatement(DeleteStatement.Type.OBLIGATION, new StringLiteral("o1"));
+        DeleteStatement stmt4 = new DeleteStatement(DeleteStatement.Type.FUNCTION, new StringLiteral("testFunc"));
+        DeleteStatement stmt5 = new DeleteStatement(DeleteStatement.Type.CONST, new StringLiteral("testConst"));
 
         MemoryPolicyStore store = new MemoryPolicyStore();
         store.graph().setResourceAccessRights(new AccessRightSet("read"));
@@ -38,7 +45,7 @@ class DeleteStatementTest {
         store.obligations().create(userContext, "o1", new Rule(
                 "rule1",
                 new EventPattern(new AnyUserSubject(), new Performs("e1")),
-                new Response(userContext)
+                new Response("e", List.of())
         ));
         store.prohibitions().create("p1",
                                     new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
@@ -46,14 +53,22 @@ class DeleteStatementTest {
                                     true,
                                     new ContainerCondition("oa1", true)
         );
+        store.userDefinedPML().createFunction(new FunctionDefinitionStatement.Builder("testFunc").build());
+        store.userDefinedPML().createConstant("testConst", new StringValue("test"));
 
-        stmt2.execute(new ExecutionContext(userContext), store);
-        stmt3.execute(new ExecutionContext(userContext), store);
-        stmt1.execute(new ExecutionContext(userContext), store);
+        GlobalScope<Value, FunctionDefinitionStatement> globalScope = GlobalScope.withValuesAndDefinitions(store);
+
+        stmt2.execute(new ExecutionContext(userContext, globalScope), store);
+        stmt3.execute(new ExecutionContext(userContext, globalScope), store);
+        stmt1.execute(new ExecutionContext(userContext, globalScope), store);
+        stmt4.execute(new ExecutionContext(userContext, globalScope), store);
+        stmt5.execute(new ExecutionContext(userContext, globalScope), store);
 
         assertFalse(store.graph().nodeExists("oa1"));
         assertFalse(store.prohibitions().exists("p1"));
         assertFalse(store.obligations().exists("o1"));
+        assertThrows(PMLFunctionNotDefinedException.class, () -> store.userDefinedPML().getFunction("testFunc"));
+        assertThrows(PMLConstantNotDefinedException.class, () -> store.userDefinedPML().getConstant("testConst"));
     }
 
     @Test

@@ -3,9 +3,10 @@ package gov.nist.csd.pm.policy.pml.expression.literal;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
+import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.ArrayValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
@@ -79,7 +80,7 @@ public class ArrayLiteral extends Literal {
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         List<Value> values = new ArrayList<>();
         for (Expression expr : array) {
-            values.add(expr.execute(ctx, policy));
+            values.add(PMLStatement.execute(ctx, policy, expr));
         }
 
         return new ArrayValue(values, type.getArrayElementType());

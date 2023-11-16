@@ -4,12 +4,11 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
 import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
-import gov.nist.csd.pm.policy.pml.PMLCompiler;
 import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.value.StringValue;
 import gov.nist.csd.pm.util.PolicyEquals;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,7 @@ class CreatePolicyStatementTest {
         store.graph().createPolicyClass("pc2");
         store.graph().createUserAttribute("ua2", "pc2");
         store.graph().createUser("u2", "ua2");
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), GlobalScope.withValuesAndDefinitions(store));
 
         stmt.execute(execCtx, store);
 
@@ -98,10 +97,11 @@ class CreatePolicyStatementTest {
 
     @Test
     void testHierarchy() throws PMException {
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"));
-        execCtx.scope().addValue("ua1", new StringValue("ua1"));
-
         MemoryPolicyStore memoryPolicyStore = new MemoryPolicyStore();
+
+        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), GlobalScope.withValuesAndDefinitions(memoryPolicyStore));
+        execCtx.scope().addVariable("ua1", new StringValue("ua1"));
+
         memoryPolicyStore.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
         stmt.execute(execCtx, memoryPolicyStore);
 

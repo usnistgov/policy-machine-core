@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.policy.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.policy.model.obligation.event.*;
@@ -718,7 +720,7 @@ public abstract class PAPTest {
                                                          new UserAttributesSubject("ua1"),
                                                          new Performs("event1")
                                                  ),
-                                                 new Response(new UserContext(""))
+                                                 new Response("evtCtx", List.of())
                                          ),
                                          new Rule(
                                                  "rule1",
@@ -726,7 +728,7 @@ public abstract class PAPTest {
                                                          new UsersSubject("ua1"),
                                                          new Performs("event1")
                                                  ),
-                                                 new Response(new UserContext(""))
+                                                 new Response("evtCtx", List.of())
                                          )
                 );
 
@@ -1446,10 +1448,9 @@ public abstract class PAPTest {
                                         new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
-                                new Response(
-                                        new UserContext("u1"),
+                                new Response("evtCtx", List.of(
                                         new CreatePolicyStatement(new StringLiteral("test_pc"))
-                                )
+                                ))
                         )
                 )
         );
@@ -1464,10 +1465,9 @@ public abstract class PAPTest {
                                         new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
-                                new Response(
-                                        new UserContext("u1"),
+                                new Response("evtCtx", List.of(
                                         new CreatePolicyStatement(new StringLiteral("test_pc"))
-                                )
+                                ))
                         )
                 ).addRule(
                         new Rule(
@@ -1476,10 +1476,9 @@ public abstract class PAPTest {
                                         new AnyUserSubject(),
                                         new Performs("test_event")
                                 ),
-                                new Response(
-                                        new UserContext("u1"),
+                                new Response("evtCtx", List.of(
                                         new CreatePolicyStatement(new StringLiteral("test_pc"))
-                                )
+                                ))
                         )
                 );
 
@@ -1522,7 +1521,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new AnyTarget()
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
                 assertThrows(NodeDoesNotExistException.class,
@@ -1536,7 +1535,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new AnyTarget()
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
             }
@@ -1558,7 +1557,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new OnTargets("oa1")
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
                 assertThrows(NodeDoesNotExistException.class,
@@ -1572,7 +1571,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new OnTargets("oa1")
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
                 assertThrows(NodeDoesNotExistException.class,
@@ -1586,7 +1585,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new AnyInUnionTarget("oa1")
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
             }
@@ -1647,7 +1646,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new AnyTarget()
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
                 assertThrows(NodeDoesNotExistException.class,
@@ -1661,7 +1660,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new AnyTarget()
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
             }
@@ -1685,7 +1684,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new OnTargets("oa1")
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
                 assertThrows(NodeDoesNotExistException.class,
@@ -1699,7 +1698,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new OnTargets("oa1")
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
                 assertThrows(NodeDoesNotExistException.class,
@@ -1713,7 +1712,7 @@ public abstract class PAPTest {
                                                      Performs.events("test_event"),
                                                      new AnyInUnionTarget("oa1")
                                              ),
-                                             new Response(new UserContext("u1"))
+                                             new Response("evtCtx", List.of())
                                      )
                              ));
             }
@@ -1850,8 +1849,8 @@ public abstract class PAPTest {
             @Test
             void testSuccess() throws PMException {
                 pap.userDefinedPML().createFunction(testFunc);
-                assertTrue(pap.userDefinedPML().getFunctions().containsKey(testFunc.signature().getFunctionName()));
-                FunctionDefinitionStatement actual = pap.userDefinedPML().getFunctions().get(testFunc.signature().getFunctionName());
+                assertTrue(pap.userDefinedPML().getFunctions().containsKey(testFunc.getSignature().getFunctionName()));
+                FunctionDefinitionStatement actual = pap.userDefinedPML().getFunctions().get(testFunc.getSignature().getFunctionName());
                 assertEquals(testFunc, actual);
             }
         }

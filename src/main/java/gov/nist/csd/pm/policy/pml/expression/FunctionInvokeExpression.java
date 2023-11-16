@@ -6,11 +6,11 @@ import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
-import gov.nist.csd.pm.policy.pml.model.scope.Scope;
-import gov.nist.csd.pm.policy.pml.model.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.scope.Scope;
+import gov.nist.csd.pm.policy.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
@@ -31,7 +31,7 @@ public class FunctionInvokeExpression extends Expression {
 
         FunctionSignature functionSignature;
         try {
-            functionSignature = visitorCtx.scope().getFunctionSignature(funcName);
+            functionSignature = visitorCtx.scope().getFunction(funcName);
         } catch (UnknownFunctionInScopeException e) {
             visitorCtx.errorLog().addError(functionInvokeContext, e.getMessage());
 
@@ -108,41 +108,41 @@ public class FunctionInvokeExpression extends Expression {
         FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionName);
         ExecutionContext localCtx = ctx.copy();
 
-        List<FormalArgument> formalArgs = functionDef.signature().getArgs();
+        List<FormalArgument> formalArgs = functionDef.getSignature().getArgs();
 
         for (int i = 0; i < actualArgs.size(); i++) {
             Expression argExpr = actualArgs.get(i);
-            Value argValue = argExpr.execute(localCtx, policy);
+            Value argValue = PMLStatement.execute(localCtx, policy, argExpr);
             FormalArgument formalArg = formalArgs.get(i);
 
             if (!argValue.getType().equals(formalArg.type())) {
                 throw new PMException("actual arg value has type " + argValue.getType() + " expected " + formalArg.type());
             }
 
-            localCtx.scope().addValue(formalArg.name(), argValue);
+            localCtx.scope().addVariable(formalArg.name(), argValue);
         }
 
         if (functionDef.isFunctionExecutor()) {
             FunctionExecutor functionExecutor = functionDef.getFunctionExecutor();
             Value ret = functionExecutor.exec(localCtx, policy);
 
-            ctx.scope().overwriteValues(localCtx.scope());
+            ctx.scope().local().overwriteFromLocalScope(localCtx.scope().local());
 
             return ret;
         } else {
             List<PMLStatement> statements = functionDef.getBody();
             for (PMLStatement stmt : statements) {
-                Value value = stmt.execute(localCtx, policy);
+                Value value = PMLStatement.execute(localCtx, policy, stmt);
 
                 if (stmt instanceof FunctionReturnStatement) {
-                    ctx.scope().overwriteValues(localCtx.scope());
+                    ctx.scope().local().overwriteFromLocalScope(localCtx.scope().local());
 
                     return value;
                 }
             }
         }
 
-        ctx.scope().overwriteValues(localCtx.scope());
+        ctx.scope().local().overwriteFromLocalScope(localCtx.scope().local());
 
         // if execution gets here than the function did not have a return statement (void)
         return new VoidValue();

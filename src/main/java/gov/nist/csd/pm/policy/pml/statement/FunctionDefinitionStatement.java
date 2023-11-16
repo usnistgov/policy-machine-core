@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
-import gov.nist.csd.pm.policy.exceptions.PMLFunctionNotDefinedException;
+import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.exception.PMLExecutionException;
-import gov.nist.csd.pm.policy.pml.model.scope.FunctionAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class FunctionDefinitionStatement extends PMLStatement {
 
-    private final FunctionSignature signature;
+    private FunctionSignature signature;
     private List<PMLStatement> statements;
     private FunctionExecutor functionExecutor;
     private boolean isFuncExec;
@@ -42,6 +42,10 @@ public class FunctionDefinitionStatement extends PMLStatement {
         this.isFuncExec = true;
     }
 
+    public FunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+        super(ctx);
+    }
+
     public boolean isFunctionExecutor() {
         return isFuncExec;
     }
@@ -50,7 +54,7 @@ public class FunctionDefinitionStatement extends PMLStatement {
         return functionExecutor;
     }
 
-    public FunctionSignature signature() {
+    public FunctionSignature getSignature() {
         return signature;
     }
 
@@ -61,10 +65,9 @@ public class FunctionDefinitionStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMLExecutionException {
         try {
-            ctx.scope().addFunctionSignature(this.signature);
-            ctx.scope().addFunction(this);
-        } catch (FunctionAlreadyDefinedInScopeException | PMLFunctionNotDefinedException e) {
-            throw new PMLExecutionException(e.getMessage());
+            policy.userDefinedPML().createFunction(this);
+        } catch (PMException e) {
+            throw new PMLExecutionException(e);
         }
 
         return new VoidValue();

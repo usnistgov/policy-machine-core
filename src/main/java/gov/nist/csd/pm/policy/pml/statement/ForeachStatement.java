@@ -2,9 +2,10 @@ package gov.nist.csd.pm.policy.pml.statement;
 
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.value.*;
 
 import java.util.List;
@@ -15,16 +16,20 @@ import static gov.nist.csd.pm.policy.pml.PMLExecutor.executeStatementBlock;
 
 public class ForeachStatement extends PMLStatement {
 
-    private final String varName;
-    private final String valueVarName;
-    private final Expression iter;
-    private final List<PMLStatement> statements;
+    private String varName;
+    private String valueVarName;
+    private Expression iter;
+    private List<PMLStatement> statements;
 
     public ForeachStatement(String varName, String valueVarName, Expression iter, List<PMLStatement> statements) {
         this.varName = varName;
         this.valueVarName = valueVarName;
         this.iter = iter;
         this.statements = statements;
+    }
+
+    public ForeachStatement(PMLParser.ForeachStatementContext ctx) {
+        super(ctx);
     }
 
     @Override
@@ -38,7 +43,7 @@ public class ForeachStatement extends PMLStatement {
             for (Value v : arrayValue.getValue()) {
                 ExecutionContext localExecutionCtx = ctx.copy();
 
-                localExecutionCtx.scope().addValue(varName, v);
+                localExecutionCtx.scope().addVariable(varName, v);
 
                 Value value = executeStatementBlock(localExecutionCtx, policy, statements);
 
@@ -48,7 +53,7 @@ public class ForeachStatement extends PMLStatement {
                     return value;
                 }
 
-                ctx.scope().overwriteValues(localExecutionCtx.scope());
+                ctx.scope().local().overwriteFromLocalScope(localExecutionCtx.scope().local());
             }
         } else if (iterValue instanceof MapValue mapValue) {
             for (Map.Entry<Value, Value> entry : mapValue.getValue().entrySet()) {
@@ -59,9 +64,9 @@ public class ForeachStatement extends PMLStatement {
                     throw new RuntimeException(e);
                 }
 
-                localExecutionCtx.scope().addValue(varName, entry.getKey());
+                localExecutionCtx.scope().addVariable(varName, entry.getKey());
                 if (valueVarName != null) {
-                    localExecutionCtx.scope().addValue(valueVarName, entry.getValue());
+                    localExecutionCtx.scope().addVariable(valueVarName, entry.getValue());
                 }
 
                 Value value = executeStatementBlock(localExecutionCtx, policy, statements);
@@ -72,7 +77,7 @@ public class ForeachStatement extends PMLStatement {
                     return value;
                 }
 
-                ctx.scope().overwriteValues(localExecutionCtx.scope());
+                ctx.scope().local().overwriteFromLocalScope(localExecutionCtx.scope().local());
             }
         }
 

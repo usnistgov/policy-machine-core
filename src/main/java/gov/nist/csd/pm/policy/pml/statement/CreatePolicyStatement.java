@@ -3,9 +3,10 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.graph.nodes.NodeType;
+import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
 import gov.nist.csd.pm.policy.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
@@ -17,8 +18,8 @@ import java.util.Objects;
 
 public class CreatePolicyStatement extends PMLStatement {
 
-    private final Expression name;
-    private final Expression properties;
+    private Expression name;
+    private Expression properties;
     private List<CreateOrAssignAttributeStatement> uas;
     private List<CreateOrAssignAttributeStatement> oas;
     private List<AssociateStatement> assocs;
@@ -40,6 +41,10 @@ public class CreatePolicyStatement extends PMLStatement {
         this.uas = uas;
         this.oas = oas;
         this.assocs = assocs;
+    }
+
+    public CreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
+        super(ctx);
     }
 
     public Expression getName() {

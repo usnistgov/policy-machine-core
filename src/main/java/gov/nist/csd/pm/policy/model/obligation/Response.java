@@ -3,8 +3,7 @@ package gov.nist.csd.pm.policy.model.obligation;
 import gov.nist.csd.pm.epp.EventContext;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.value.ReturnValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
@@ -16,37 +15,16 @@ import java.util.Objects;
 
 public class Response implements Serializable {
 
-    private final ExecutionContext executionCtx;
     private final List<PMLStatement> stmts;
     private final String eventCtxVariable;
 
-    public Response(String eventCtxVariable, ExecutionContext executionCtx, List<PMLStatement> stmts) {
+    public Response(String eventCtxVariable, List<PMLStatement> stmts) {
         this.eventCtxVariable = eventCtxVariable;
-        this.executionCtx = executionCtx;
         this.stmts = stmts;
-    }
-
-    public Response(String eventCtxVariable, ExecutionContext executionCtx, PMLStatement... stmts) {
-        this.eventCtxVariable = eventCtxVariable;
-        this.executionCtx = executionCtx;
-        this.stmts = List.of(stmts);
-    }
-
-    public Response(UserContext author, PMLStatement... stmts) {
-        this.eventCtxVariable = "";
-        this.executionCtx = new ExecutionContext(author);
-        this.stmts = List.of(stmts);
-    }
-
-    public Response(UserContext author, String eventCtxVariable, PMLStatement... stmts) {
-        this.eventCtxVariable = eventCtxVariable;
-        this.executionCtx = new ExecutionContext(author);
-        this.stmts = List.of(stmts);
     }
 
     public Response(Response response) {
         this.eventCtxVariable = response.eventCtxVariable;
-        this.executionCtx = response.executionCtx;
         this.stmts = response.stmts;
     }
 
@@ -58,15 +36,11 @@ public class Response implements Serializable {
         return stmts;
     }
 
-    public ExecutionContext getExecutionCtx() {
-        return executionCtx;
-    }
-
-    public Value execute(Policy policyAuthor, EventContext eventCtx) throws PMException {
-        executionCtx.scope().addValue(eventCtxVariable, Value.fromObject(eventCtx));
+    public Value execute(ExecutionContext executionCtx, Policy policy, EventContext eventCtx) throws PMException {
+        executionCtx.scope().local().addVariable(eventCtxVariable, Value.fromObject(eventCtx));
 
         for (PMLStatement stmt : stmts) {
-            Value result = stmt.execute(executionCtx, policyAuthor);
+            Value result = PMLStatement.execute(executionCtx, policy, stmt);
             if (result instanceof ReturnValue) {
                 break;
             }
@@ -77,14 +51,19 @@ public class Response implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Response response = (Response) o;
-        return Objects.equals(executionCtx, response.executionCtx) && Objects.equals(stmts, response.stmts);
+        return Objects.equals(stmts, response.stmts) && Objects.equals(
+                eventCtxVariable, response.eventCtxVariable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(executionCtx, stmts);
+        return Objects.hash(stmts, eventCtxVariable);
     }
 }

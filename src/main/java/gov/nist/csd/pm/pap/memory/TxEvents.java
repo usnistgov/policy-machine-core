@@ -126,7 +126,7 @@ public class TxEvents {
         private FunctionDefinitionStatement functionDefinitionStatement;
 
         public MemoryDeleteFunctionEvent(FunctionDefinitionStatement functionDefinitionStatement) {
-            super(functionDefinitionStatement.signature().getFunctionName());
+            super(functionDefinitionStatement.getSignature().getFunctionName());
             this.functionDefinitionStatement = functionDefinitionStatement;
         }
 

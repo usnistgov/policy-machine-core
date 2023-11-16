@@ -1,28 +1,26 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
-import gov.nist.csd.pm.policy.pml.antlr.PMLParserBaseVisitor;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.expression.literal.Literal;
 import gov.nist.csd.pm.policy.pml.expression.literal.LiteralVisitor;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.model.scope.PMLScopeException;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.statement.*;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
+public class VarStmtVisitor extends PMLBaseVisitor<PMLStatement> {
 
-    private final VisitorContext visitorCtx;
 
     public VarStmtVisitor(VisitorContext visitorCtx) {
-        this.visitorCtx = visitorCtx;
+        super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitConstDeclaration(PMLParser.ConstDeclarationContext ctx) {
+    public VariableDeclarationStatement visitConstDeclaration(PMLParser.ConstDeclarationContext ctx) {
         List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
         for (PMLParser.ConstSpecContext constSpecContext : ctx.constSpec()) {
             String varName = constSpecContext.ID().getText();
@@ -30,16 +28,16 @@ public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
 
             try {
                 if (visitorCtx.scope().variableExists(varName) && visitorCtx.scope().getVariable(varName).isConst()) {
-                    visitorCtx.errorLog().addError(ctx, "cannot reassign const variable");
+                    visitorCtx.errorLog().addError(ctx, "const '" + varName + "' already defined in scope");
 
-                    return new ErrorStatement(ctx);
+                    return new VariableDeclarationStatement(ctx);
                 }
 
-                visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), true);
+                visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(visitorCtx.scope()), true));
             } catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-                return new ErrorStatement(ctx);
+                return new VariableDeclarationStatement(ctx);
             }
 
             decls.add(new VariableDeclarationStatement.Declaration(varName, expr));
@@ -70,11 +68,11 @@ public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
             Expression expr = Expression.compile(visitorCtx, varSpecContext.expression(), Type.any());
 
             try {
-                visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), false);
+                visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(visitorCtx.scope()), false));
             } catch (PMLScopeException e) {
                 visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-                return new ErrorStatement(ctx);
+                return new VariableDeclarationStatement(ctx);
             }
 
             decls.add(new VariableDeclarationStatement.Declaration(varName, expr));
@@ -94,14 +92,14 @@ public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
             if (visitorCtx.scope().variableExists(varName)) {
                 visitorCtx.errorLog().addError(ctx, "variable " + varName + " already exists");
 
-                return new ErrorStatement(ctx);
+                return new ShortDeclarationStatement(ctx);
             }
 
-            visitorCtx.scope().addVariable(varName, expr.getType(visitorCtx.scope()), false);
+            visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(visitorCtx.scope()), false));
         } catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-            return new ErrorStatement(ctx);
+            return new ShortDeclarationStatement(ctx);
         }
 
         return stmt;
@@ -122,14 +120,14 @@ public class VarStmtVisitor extends PMLParserBaseVisitor<PMLStatement> {
            if (visitorCtx.scope().getVariable(varName).isConst()) {
                 visitorCtx.errorLog().addError(ctx, "cannot reassign const variable");
 
-                return new ErrorStatement(ctx);
+                return new VariableAssignmentStatement(ctx);
             }
 
             // don't need to update variable since the name and type are the only thing that matter during compilation
         } catch (PMLScopeException e) {
             visitorCtx.errorLog().addError(ctx, e.getMessage());
 
-            return new ErrorStatement(ctx);
+            return new VariableAssignmentStatement(ctx);
         }
 
         return stmt;

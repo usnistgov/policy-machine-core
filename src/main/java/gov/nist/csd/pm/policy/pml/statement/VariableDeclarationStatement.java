@@ -3,9 +3,10 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
-import gov.nist.csd.pm.policy.pml.model.context.ExecutionContext;
+import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,10 @@ public class VariableDeclarationStatement extends PMLStatement{
     public VariableDeclarationStatement(boolean isConst, Declaration declarations) {
         this.isConst = isConst;
         this.declarations = new ArrayList<>(List.of(declarations));
+    }
+
+    public VariableDeclarationStatement(ParserRuleContext ctx) {
+        super(ctx);
     }
 
     public List<Declaration> getDeclarations() {
@@ -49,10 +54,10 @@ public class VariableDeclarationStatement extends PMLStatement{
         for (Declaration declaration : declarations) {
             Value value = declaration.expression.execute(ctx, policy);
 
-            if (isConst || !ctx.scope().valueExists(declaration.id)) {
-                ctx.scope().addValue(declaration.id, value);
-            } else {
-                ctx.scope().updateValue(declaration.id, value);
+            ctx.scope().local().addOrOverwriteVariable(declaration.id, value);
+
+            if (isConst) {
+                policy.userDefinedPML().createConstant(declaration.id, value);
             }
         }
 

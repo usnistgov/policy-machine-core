@@ -1,11 +1,13 @@
 package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
+import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
+import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.policy.pml.model.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.context.VisitorContext;
+import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
 import gov.nist.csd.pm.policy.pml.statement.CreateObligationStatement;
-import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import org.junit.jupiter.api.Test;
 
@@ -16,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class CreateObligationStmtVisitorTest {
 
     @Test
-    void testSuccess() {
+    void testSuccess() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 create obligation "test" {}
                 """,
                 PMLParser.CreateObligationStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         PMLStatement stmt = new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -32,13 +34,13 @@ class CreateObligationStmtVisitorTest {
     }
 
     @Test
-    void testInvalidNameExpression() {
+    void testInvalidNameExpression() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
                 """
                 create obligation ["test"] {}
                 """,
                 PMLParser.CreateObligationStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext();
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
         new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(1, visitorCtx.errorLog().getErrors().size());
         assertEquals(
