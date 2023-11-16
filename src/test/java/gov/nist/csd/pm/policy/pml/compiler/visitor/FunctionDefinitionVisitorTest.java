@@ -206,7 +206,6 @@ class FunctionDefinitionVisitorTest {
                     """;
             PMLCompilationException e =
                     assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
-            System.out.println(e.getErrors());
             assertEquals(1, e.getErrors().size());
             assertEquals("formal arg 'a' already defined in signature", e.getErrors().get(0).errorMessage());
         }
