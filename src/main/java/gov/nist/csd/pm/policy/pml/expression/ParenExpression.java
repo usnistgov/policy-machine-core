@@ -33,7 +33,7 @@ public class ParenExpression extends Expression{
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        return PMLStatement.execute(ctx, policy, expression);
+        return expression.execute(ctx, policy);
     }
 
     @Override

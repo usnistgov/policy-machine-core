@@ -104,13 +104,13 @@ public class CreatePolicyStatement extends PMLStatement {
     }
 
     private void createUas(ExecutionContext ctx, Policy policy) throws PMException {
-        for (PMLStatement stmt : uas) {
+        for (CreateOrAssignAttributeStatement stmt : uas) {
             stmt.execute(ctx, policy);
         }
     }
 
     private void createOas(ExecutionContext ctx, Policy policy) throws PMException {
-        for (PMLStatement stmt : oas) {
+        for (CreateOrAssignAttributeStatement stmt : oas) {
             stmt.execute(ctx, policy);
         }
     }

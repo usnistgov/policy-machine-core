@@ -13,7 +13,6 @@ import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.BoolValue;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.policy.pml.statement.PMLStatement.execute;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LogicalExpressionTest {
@@ -50,7 +49,7 @@ class LogicalExpressionTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         ExecutionContext executionContext = new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(store));
-        Value actual = execute(executionContext, store, expression);
+        Value actual = expression.execute(executionContext, store);
         assertEquals(
                 new BoolValue(false),
                 actual
@@ -67,7 +66,7 @@ class LogicalExpressionTest {
 
         store = new MemoryPolicyStore();
         executionContext = new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(store));
-        actual = execute(executionContext, store, expression);
+        actual = expression.execute(executionContext, store);
         assertEquals(
                 new BoolValue(true),
                 actual

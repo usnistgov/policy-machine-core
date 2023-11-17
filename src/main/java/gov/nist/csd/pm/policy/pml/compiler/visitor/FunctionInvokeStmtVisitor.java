@@ -2,34 +2,34 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.Expression;
+import gov.nist.csd.pm.policy.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
 import gov.nist.csd.pm.policy.pml.context.VisitorContext;
 import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.scope.UnknownFunctionInScopeException;
-import gov.nist.csd.pm.policy.pml.statement.FunctionInvocationStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvocationStatement> {
+public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpression> {
 
     public FunctionInvokeStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public FunctionInvocationStatement visitFunctionInvoke(PMLParser.FunctionInvokeContext ctx) {
+    public FunctionInvokeExpression visitFunctionInvoke(PMLParser.FunctionInvokeContext ctx) {
         return parse(ctx);
     }
 
     @Override
-    public FunctionInvocationStatement visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
+    public FunctionInvokeExpression visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
         return parse(ctx.functionInvoke());
     }
 
-    private FunctionInvocationStatement parse(PMLParser.FunctionInvokeContext funcCallCtx) {
+    private FunctionInvokeExpression parse(PMLParser.FunctionInvokeContext funcCallCtx) {
         String funcName = funcCallCtx.ID().getText();
 
         // get actual arg expressions
@@ -52,7 +52,7 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvocation
         } catch (UnknownFunctionInScopeException e) {
             visitorCtx.errorLog().addError(funcCallCtx, e.getMessage());
 
-            return new FunctionInvocationStatement(funcCallCtx);
+            return new FunctionInvokeExpression(funcCallCtx);
         }
 
         // check that the actual args are correct type
@@ -65,7 +65,7 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvocation
                             "expected " + formalArgs.size() + ", got " + actualArgs.size()
             );
 
-            return new FunctionInvocationStatement(funcCallCtx);
+            return new FunctionInvokeExpression(funcCallCtx);
         } else {
             for (int i = 0; i < actualArgs.size(); i++) {
                 try {
@@ -80,16 +80,16 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvocation
                                         actualType + " at arg " + i
                         );
 
-                        return new FunctionInvocationStatement(funcCallCtx);
+                        return new FunctionInvokeExpression(funcCallCtx);
                     }
                 } catch (PMLScopeException e) {
                     visitorCtx.errorLog().addError(funcCallCtx, e.getMessage());
 
-                    return new FunctionInvocationStatement(funcCallCtx);
+                    return new FunctionInvokeExpression(funcCallCtx);
                 }
             }
         }
 
-        return new FunctionInvocationStatement(funcName, actualArgs);
+        return new FunctionInvokeExpression(funcName, functionSignature.getReturnType(), actualArgs);
     }
 }

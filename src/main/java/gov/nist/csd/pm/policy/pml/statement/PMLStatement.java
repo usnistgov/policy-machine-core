@@ -30,7 +30,7 @@ public abstract class PMLStatement implements Serializable {
         return ctx != null;
     }
 
-    protected abstract Value execute(ExecutionContext ctx, Policy policy) throws PMException;
+    public abstract Value execute(ExecutionContext ctx, Policy policy) throws PMException;
 
     @Override
     public abstract boolean equals(Object o);
@@ -50,7 +50,7 @@ public abstract class PMLStatement implements Serializable {
         return INDENT.repeat(indentLevel);
     }
 
-    public static Value execute(ExecutionContext ctx, Policy policy, PMLStatement stmt) throws PMException {
+    /*public static Value executeStmt(ExecutionContext ctx, Policy policy, PMLStatement stmt) throws PMException {
         if (stmt instanceof FunctionInvocationStatement functionInvocationStatement) {
             FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionInvocationStatement.getFunctionName());
             return executeFunctionInvoke(ctx, policy, functionInvocationStatement, functionDef);
@@ -88,5 +88,5 @@ public abstract class PMLStatement implements Serializable {
         }
 
         return funcInvoke.execute(funcInvokeExecCtx, policy);
-    }
+    }*/
 }

@@ -54,7 +54,7 @@ public class EqualsExpression extends Expression {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         return new BoolValue(
-                isEquals == PMLStatement.execute(ctx, policy, left).equals(PMLStatement.execute(ctx, policy, right))
+                isEquals == left.execute(ctx, policy).equals(right.execute(ctx, policy))
         );
     }
 

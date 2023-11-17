@@ -80,7 +80,7 @@ public class ArrayLiteral extends Literal {
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         List<Value> values = new ArrayList<>();
         for (Expression expr : array) {
-            values.add(PMLStatement.execute(ctx, policy, expr));
+            values.add(expr.execute(ctx, policy));
         }
 
         return new ArrayValue(values, type.getArrayElementType());

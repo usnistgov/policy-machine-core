@@ -44,7 +44,7 @@ public class NegatedExpression extends Expression {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        Value value = PMLStatement.execute(ctx, policy, expression);
+        Value value = expression.execute(ctx, policy);
 
         return new ComplementedValue(value);
     }

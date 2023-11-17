@@ -4,16 +4,14 @@ import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.context.VisitorContext;
-import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
-import gov.nist.csd.pm.policy.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
-import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.statement.CreatePolicyStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
@@ -27,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.policy.pml.statement.PMLStatement.execute;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionInvokeExpressionTest {
@@ -69,7 +66,7 @@ class FunctionInvokeExpressionTest {
 
         ExecutionContext executionContext = new ExecutionContext(new UserContext(""), GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())
                                                                                                  .withPersistedFunctions(Map.of(voidFunc.getSignature().getFunctionName(), voidFunc)));
-        Value value = execute(executionContext, new MemoryPolicyStore(), e);
+        Value value = e.execute(executionContext, new MemoryPolicyStore());
         assertEquals(
                 new VoidValue(),
                 value
@@ -148,35 +145,13 @@ class FunctionInvokeExpressionTest {
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore())
-                                      .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc.getSignature())));
+                                                                      .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc.getSignature())));
 
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
                 Type.string(),
                 e.getType(visitorContext.scope())
-        );
-
-        MemoryPolicyStore store = new MemoryPolicyStore();
-        ExecutionContext executionContext =
-                new ExecutionContext(
-                        new UserContext(""),
-                        GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())
-                                   .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc))
-                );
-        executionContext.scope().addVariable("x", new StringValue("x"));
-        Value value = execute(executionContext, store, e);
-        assertEquals(
-                new StringValue("test_ret"),
-                value
-        );
-        assertEquals(
-                Type.string(),
-                value.getType()
-        );
-        assertEquals(
-                new StringValue("test"),
-                executionContext.scope().getVariable("x")
         );
     }
 
@@ -210,7 +185,7 @@ class FunctionInvokeExpressionTest {
                         GlobalScope.withValuesAndDefinitions(new MemoryPolicyStore())
                                    .withPersistedFunctions(Map.of(stringFunc.getSignature().getFunctionName(), stringFunc))
                 );
-        Value value = execute(executionContext, store, e);
+        Value value = e.execute(executionContext, store);
         assertEquals(
                 new StringValue("test"),
                 value
@@ -219,5 +194,32 @@ class FunctionInvokeExpressionTest {
                 Type.string(),
                 value.getType()
         );
+    }
+
+    @Test
+    void testChainMethodCall() throws PMException {
+        String pml = """
+                a("123")
+                
+                function c(string x) string {
+                    return "c" + x
+                }
+                                
+                function b(string x, string y) {
+                    create policy class c(x)
+                    create policy class c(y)
+                }
+                                
+                function a(string x) {
+                    x = "x"
+                    y := "y"
+                                
+                    b(x, y)
+                }
+                """;
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
+        assertTrue(store.graph().nodeExists("cx"));
+        assertTrue(store.graph().nodeExists("cy"));
     }
 }

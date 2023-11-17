@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.policy.pml.statement.PMLStatement.execute;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParenExpressionTest {
@@ -45,7 +44,7 @@ class ParenExpressionTest {
         VisitorContext visitorContext = new VisitorContext(compileGlobalScope);
         Expression e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        Value actual = execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore(), e);
+        Value actual = e.execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -58,7 +57,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore(), e);
+        actual = e.execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore());
         assertEquals(
                 new BoolValue(false),
                 actual
@@ -71,7 +70,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore(), e);
+        actual = e.execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -84,7 +83,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore(), e);
+        actual = e.execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -97,7 +96,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore(), e);
+        actual = e.execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -110,7 +109,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore(), e);
+        actual = e.execute(new ExecutionContext(new UserContext(""), executeGlobalScope), new MemoryPolicyStore());
         assertEquals(
                 new BoolValue(false),
                 actual
@@ -130,7 +129,7 @@ class ParenExpressionTest {
 
         MemoryPolicyStore store = new MemoryPolicyStore();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(""), executeGlobalScope);
-        Value actual = execute(executionContext, store, expression);
+        Value actual = expression.execute(executionContext, store);
         assertEquals(
                 new BoolValue(false),
                 actual

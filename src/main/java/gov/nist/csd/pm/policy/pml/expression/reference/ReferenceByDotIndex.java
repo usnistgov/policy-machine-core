@@ -20,7 +20,7 @@ public class ReferenceByDotIndex extends ReferenceByIndex{
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        Value value = PMLStatement.execute(ctx, policy, varRef);
+        Value value = varRef.execute(ctx, policy);
 
         if (!value.getType().isMap()) {
             return value;

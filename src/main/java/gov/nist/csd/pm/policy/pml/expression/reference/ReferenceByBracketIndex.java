@@ -16,13 +16,13 @@ public class ReferenceByBracketIndex extends ReferenceByIndex{
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        Value value = PMLStatement.execute(ctx, policy, varRef);
+        Value value = varRef.execute(ctx, policy);
         if (!value.getType().isMap()) {
             return value;
         }
 
         Map<Value, Value> mapValue = value.getMapValue();
-        Value indexValue = PMLStatement.execute(ctx, policy, index);
+        Value indexValue = index.execute(ctx, policy);
 
         return mapValue.get(indexValue);
     }

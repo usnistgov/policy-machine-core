@@ -40,7 +40,7 @@ public class Response implements Serializable {
         executionCtx.scope().local().addVariable(eventCtxVariable, Value.fromObject(eventCtx));
 
         for (PMLStatement stmt : stmts) {
-            Value result = PMLStatement.execute(executionCtx, policy, stmt);
+            Value result = stmt.execute(executionCtx, policy);
             if (result instanceof ReturnValue) {
                 break;
             }

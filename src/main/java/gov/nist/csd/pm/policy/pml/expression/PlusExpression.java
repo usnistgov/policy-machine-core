@@ -54,8 +54,8 @@ public class PlusExpression extends Expression{
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        String leftStr = PMLStatement.execute(ctx, policy, left).getStringValue();
-        String rightStr = PMLStatement.execute(ctx, policy, right).getStringValue();
+        String leftStr = left.execute(ctx, policy).getStringValue();
+        String rightStr = right.execute(ctx, policy).getStringValue();
 
         return new StringValue(leftStr + rightStr);
     }

@@ -3,6 +3,8 @@ package gov.nist.csd.pm.policy.pml.expression;
 import gov.nist.csd.pm.policy.Policy;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
+import gov.nist.csd.pm.policy.pml.compiler.Variable;
+import gov.nist.csd.pm.policy.pml.exception.PMLExecutionException;
 import gov.nist.csd.pm.policy.pml.function.FormalArgument;
 import gov.nist.csd.pm.policy.pml.function.FunctionExecutor;
 import gov.nist.csd.pm.policy.pml.function.FunctionSignature;
@@ -12,9 +14,9 @@ import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.pml.statement.FunctionReturnStatement;
 import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.ReturnValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
@@ -23,6 +25,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class FunctionInvokeExpression extends Expression {
+
+    public FunctionInvokeExpression(PMLParser.FunctionInvokeContext funcCallCtx) {
+        super(funcCallCtx);
+    }
 
     public static Expression compileFunctionInvokeExpression(VisitorContext visitorCtx,
                                                              PMLParser.FunctionInvokeExpressionContext functionInvokeExpressionContext) {
@@ -75,9 +81,9 @@ public class FunctionInvokeExpression extends Expression {
         return new FunctionInvokeExpression(funcName, returnType, actualArgs);
     }
 
-    private final String functionName;
+    private String functionName;
     private Type result;
-    private final List<Expression> actualArgs;
+    private List<Expression> actualArgs;
 
     public FunctionInvokeExpression(String functionName, Type result, List<Expression> actualArgs) {
         this.functionName = functionName;
@@ -99,54 +105,65 @@ public class FunctionInvokeExpression extends Expression {
 
 
     @Override
-    public Type getType(Scope scope) throws PMLScopeException {
+    public Type getType(Scope<Variable, FunctionSignature> scope) throws PMLScopeException {
         return result;
     }
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionName);
-        ExecutionContext localCtx = ctx.copy();
+        FunctionDefinitionStatement funcDef = ctx.scope().getFunction(functionName);
 
-        List<FormalArgument> formalArgs = functionDef.getSignature().getArgs();
+        ExecutionContext invokeCtx = prepareFunctionInvoke(ctx, policy, funcDef);
 
-        for (int i = 0; i < actualArgs.size(); i++) {
-            Expression argExpr = actualArgs.get(i);
-            Value argValue = PMLStatement.execute(localCtx, policy, argExpr);
-            FormalArgument formalArg = formalArgs.get(i);
-
-            if (!argValue.getType().equals(formalArg.type())) {
-                throw new PMException("actual arg value has type " + argValue.getType() + " expected " + formalArg.type());
+        Value value = new VoidValue();
+        if (funcDef.isFunctionExecutor()) {
+            FunctionExecutor functionExecutor = funcDef.getFunctionExecutor();
+            try {
+                value = functionExecutor.exec(invokeCtx, policy);
+            } catch (PMLScopeException e) {
+                throw new PMLExecutionException(e);
             }
-
-            localCtx.scope().addVariable(formalArg.name(), argValue);
-        }
-
-        if (functionDef.isFunctionExecutor()) {
-            FunctionExecutor functionExecutor = functionDef.getFunctionExecutor();
-            Value ret = functionExecutor.exec(localCtx, policy);
-
-            ctx.scope().local().overwriteFromLocalScope(localCtx.scope().local());
-
-            return ret;
         } else {
-            List<PMLStatement> statements = functionDef.getBody();
+            List<PMLStatement> statements = funcDef.getBody();
             for (PMLStatement stmt : statements) {
-                Value value = PMLStatement.execute(localCtx, policy, stmt);
-
-                if (stmt instanceof FunctionReturnStatement) {
-                    ctx.scope().local().overwriteFromLocalScope(localCtx.scope().local());
-
-                    return value;
+                value = stmt.execute(invokeCtx, policy);
+                if (value instanceof ReturnValue) {
+                    break;
                 }
             }
         }
 
-        ctx.scope().local().overwriteFromLocalScope(localCtx.scope().local());
+        ctx.scope().local().overwriteFromLocalScope(ctx.scope().local());
 
-        // if execution gets here than the function did not have a return statement (void)
-        return new VoidValue();
+        return value;
+    }
 
+    private ExecutionContext prepareFunctionInvoke(ExecutionContext ctx, Policy policy, FunctionDefinitionStatement funcDef)
+            throws PMException {
+        String funcName = funcDef.getSignature().getFunctionName();
+        List<FormalArgument> formalArgs = funcDef.getSignature().getArgs();
+
+        if (formalArgs.size() != actualArgs.size()) {
+            throw new PMLExecutionException("expected " + formalArgs.size() + " args for function \""
+                                                    + funcName + "\", got " + actualArgs.size());
+        }
+
+        ExecutionContext funcInvokeExecCtx = ctx.copy();
+
+        for (int i = 0; i < actualArgs.size(); i++) {
+            Expression argExpr = actualArgs.get(i);
+            Value argValue = argExpr.execute(funcInvokeExecCtx, policy);
+            FormalArgument formalArg = formalArgs.get(i);
+
+            if (!argValue.getType().equals(formalArg.type())) {
+                throw new PMLExecutionException("expected " + formalArg.type() + " for arg " + i + " for function \""
+                                                        + funcName + "\", got " + argValue.getType());
+            }
+
+            funcInvokeExecCtx.scope().local().addOrOverwriteVariable(formalArg.name(), argValue);
+        }
+
+        return funcInvokeExecCtx;
     }
 
     @Override

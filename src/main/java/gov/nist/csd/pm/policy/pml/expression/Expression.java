@@ -14,6 +14,7 @@ import gov.nist.csd.pm.policy.pml.statement.PMLStatement;
 import gov.nist.csd.pm.policy.pml.type.Type;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public abstract class Expression extends PMLStatement {
 
@@ -98,6 +99,14 @@ public abstract class Expression extends PMLStatement {
         }
 
         return expression;
+    }
+
+    public Expression() {
+
+    }
+
+    public Expression(ParserRuleContext ctx) {
+        super(ctx);
     }
 
     public abstract Type getType(Scope<Variable, FunctionSignature> scope) throws PMLScopeException;

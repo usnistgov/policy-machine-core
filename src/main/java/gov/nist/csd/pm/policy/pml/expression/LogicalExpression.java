@@ -53,8 +53,8 @@ public class LogicalExpression extends Expression {
 
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
-        boolean leftValue = PMLStatement.execute(ctx, policy, left).getBooleanValue();
-        boolean rightValue = PMLStatement.execute(ctx, policy, right).getBooleanValue();
+        boolean leftValue = left.execute(ctx, policy).getBooleanValue();
+        boolean rightValue = right.execute(ctx, policy).getBooleanValue();
 
         return new BoolValue(isAnd ? leftValue && rightValue : leftValue || rightValue);
     }

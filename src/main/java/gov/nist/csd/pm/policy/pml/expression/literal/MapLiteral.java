@@ -70,8 +70,8 @@ public class MapLiteral extends Literal {
         for (Expression keyExpr : map.keySet()) {
             Expression valueExpr = map.get(keyExpr);
 
-            Value key = PMLStatement.execute(ctx, policy, keyExpr);
-            Value value = PMLStatement.execute(ctx, policy, valueExpr);
+            Value key = keyExpr.execute(ctx, policy);
+            Value value = valueExpr.execute(ctx, policy);
 
             if (keyType == null) {
                 keyType = key.getType();
