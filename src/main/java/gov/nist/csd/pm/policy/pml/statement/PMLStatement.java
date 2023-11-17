@@ -49,44 +49,4 @@ public abstract class PMLStatement implements Serializable {
         String INDENT = "    ";
         return INDENT.repeat(indentLevel);
     }
-
-    /*public static Value executeStmt(ExecutionContext ctx, Policy policy, PMLStatement stmt) throws PMException {
-        if (stmt instanceof FunctionInvocationStatement functionInvocationStatement) {
-            FunctionDefinitionStatement functionDef = ctx.scope().getFunction(functionInvocationStatement.getFunctionName());
-            return executeFunctionInvoke(ctx, policy, functionInvocationStatement, functionDef);
-        }
-
-        return stmt.execute(ctx, policy);
-    }
-
-    private static Value executeFunctionInvoke(ExecutionContext ctx, Policy policy,
-                                               FunctionInvocationStatement funcInvoke,
-                                               FunctionDefinitionStatement funcDef) throws PMException {
-        String funcName = funcDef.getSignature().getFunctionName();
-        List<Expression> actualArgs = funcInvoke.getActualArgs();
-
-        List<FormalArgument> formalArgs = funcDef.getSignature().getArgs();
-
-        if (formalArgs.size() != actualArgs.size()) {
-            throw new PMLExecutionException("expected " + formalArgs.size() + " args for function \""
-                                                    + funcName + "\", got " + actualArgs.size());
-        }
-
-        ExecutionContext funcInvokeExecCtx = ctx.copy();
-
-        for (int i = 0; i < actualArgs.size(); i++) {
-            Expression argExpr = actualArgs.get(i);
-            Value argValue = argExpr.execute(funcInvokeExecCtx, policy);
-            FormalArgument formalArg = formalArgs.get(i);
-
-            if (!argValue.getType().equals(formalArg.type())) {
-                throw new PMLExecutionException("expected " + formalArg.type() + " for arg " + i + " for function \""
-                                                        + funcName + "\", got " + argValue.getType());
-            }
-
-            funcInvokeExecCtx.scope().local().addOrOverwriteVariable(formalArg.name(), argValue);
-        }
-
-        return funcInvoke.execute(funcInvokeExecCtx, policy);
-    }*/
 }

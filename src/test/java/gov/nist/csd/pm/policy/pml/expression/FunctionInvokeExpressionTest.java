@@ -222,4 +222,21 @@ class FunctionInvokeExpressionTest {
         assertTrue(store.graph().nodeExists("cx"));
         assertTrue(store.graph().nodeExists("cy"));
     }
+
+    @Test
+    void testReassignArgValueInFunctionDoesNotUpdateVariableOutsideOfScope() throws PMException {
+        String pml = """
+                x := "test"
+                a(x)
+                create pc x
+                                 
+                function a(string x) {
+                    x = "x"                               
+                }
+                """;
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
+        assertFalse(store.graph().nodeExists("x"));
+        assertTrue(store.graph().nodeExists("test"));
+    }
 }
