@@ -23,27 +23,35 @@ public abstract class Value implements Serializable {
     }
 
     public String getStringValue() {
-        return this.to(StringValue.class).getValue();
+        return this.unwrap().to(StringValue.class).getValue();
+    }
+
+    protected Value unwrap() {
+        if (this instanceof ReturnValue rv) {
+            return rv.unwrap();
+        }
+
+        return this;
     }
 
     public Boolean getBooleanValue() {
-        return this.to(BoolValue.class).getValue();
+        return this.unwrap().to(BoolValue.class).getValue();
     }
 
     public List<Value> getArrayValue() {
-        return this.to(ArrayValue.class).getValue();
+        return this.unwrap().to(ArrayValue.class).getValue();
     }
 
     public Map<Value, Value> getMapValue() {
-        return this.to(MapValue.class).getValue();
+        return this.unwrap().to(MapValue.class).getValue();
     }
 
     public Value getProhibitionValue() {
-        return this.to(ProhibitionValue.class).getValue();
+        return this.unwrap().to(ProhibitionValue.class).getValue();
     }
 
     public Rule getRuleValue() {
-        return this.to(RuleValue.class).getValue();
+        return this.unwrap().to(RuleValue.class).getValue();
     }
 
     public <T extends Value> T to(Class<T> c) {

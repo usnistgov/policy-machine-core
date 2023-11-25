@@ -239,4 +239,22 @@ class FunctionInvokeExpressionTest {
         assertFalse(store.graph().nodeExists("x"));
         assertTrue(store.graph().nodeExists("test"));
     }
+
+    @Test
+    void testReturnInIf() throws PMException {
+        String pml = """            
+                function a() {
+                    if true {
+                        return
+                    }
+                    
+                    create pc "pc1"                               
+                }
+                
+                a()
+                """;
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
+        assertFalse(store.graph().nodeExists("pc1"));
+    }
 }

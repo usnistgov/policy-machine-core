@@ -219,6 +219,61 @@ class AccessReviewerTest {
     }
 
     @Test
+
+    void testExplainOnObjAttrWithAssociation() throws PMException {
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1" {
+                    user attributes {
+                        "ua1"
+                    }
+                    
+                    object attributes {
+                        "oa1"
+                            "oa2"
+                    }
+                    
+                    associations {
+                        "ua1" and "oa1" with ["write"]
+                        "ua1" and "oa2" with ["read"]
+                    }
+                }
+                
+                create user "u1" assign to ["ua1"]
+                """;
+        PAP pap = new PAP(new MemoryPolicyStore());
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        AccessReviewer accessReviewer = new AccessReviewer(pap);
+        Explain actual = accessReviewer.explain(new UserContext("u1"), "oa2");
+        assertEquals(
+                new Explain(
+                        new AccessRightSet("read", "write"),
+                        Map.of(
+                                "pc1", new PolicyClass(
+                                        new AccessRightSet("read", "write"),
+                                        Set.of(
+                                                new Path(
+                                                        List.of("u1", "ua1", "oa1"),
+                                                        List.of("oa2", "oa1", "pc1"),
+                                                        new Association("ua1", "oa1", new AccessRightSet("write"))
+                                                ),
+                                                new Path(
+                                                        List.of("u1", "ua1", "oa2"),
+                                                        List.of("oa2", "oa1", "pc1"),
+                                                        new Association("ua1", "oa2", new AccessRightSet("read"))
+                                                )
+                                        )
+                                )
+                        ),
+                        new AccessRightSet(),
+                        List.of()
+                ),
+                actual
+        );
+    }
+
+    @Test
     void testComputeSubgraphPrivileges() throws PMException {
         String pml = """
                 set resource access rights ["read", "write"]

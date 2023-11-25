@@ -614,7 +614,7 @@ public class AccessReviewer implements AccessReview {
                 //     OR if the target of the last edge in a user path does not match the target of the explain
                 // continue to the next target edge
                 if((!lastUserEdgeTarget.equals(curEdgeTarget)) &&
-                        (!lastUserEdgeTarget.equals(curEdgeSource) || lastUserEdgeTarget.equals(target))) {
+                        (!lastUserEdgeTarget.equals(curEdgeSource) || !lastUserEdgeTarget.equals(target))) {
                     continue;
                 }
 

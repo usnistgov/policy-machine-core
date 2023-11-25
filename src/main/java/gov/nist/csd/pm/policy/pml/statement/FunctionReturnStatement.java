@@ -10,6 +10,7 @@ import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.policy.pml.scope.Scope;
 import gov.nist.csd.pm.policy.pml.type.Type;
+import gov.nist.csd.pm.policy.pml.value.ReturnValue;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
@@ -46,10 +47,10 @@ public class FunctionReturnStatement extends PMLStatement {
     @Override
     public Value execute(ExecutionContext ctx, Policy policy) throws PMException {
         if (expr == null) {
-            return new VoidValue();
+            return new ReturnValue(new VoidValue());
         }
 
-        return expr.execute(ctx, policy);
+        return new ReturnValue(expr.execute(ctx, policy));
     }
 
     @Override

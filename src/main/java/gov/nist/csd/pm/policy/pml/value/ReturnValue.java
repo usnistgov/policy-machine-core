@@ -17,6 +17,11 @@ public class ReturnValue extends Value{
     }
 
     @Override
+    protected Value unwrap() {
+        return value.unwrap();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

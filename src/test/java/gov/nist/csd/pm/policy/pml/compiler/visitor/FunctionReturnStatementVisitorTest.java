@@ -98,4 +98,29 @@ class FunctionReturnStatementVisitorTest {
         );
     }
 
+    @Test
+    void testReturnStatementWithValueInResponse() throws PMException {
+        PMLParser.CreateObligationStatementContext ctx2 = PMLContextVisitor.toCtx(
+                """
+                        create obligation "test" {
+                            create rule "test"
+                            when users ["u1"]
+                            performs ["e1"]
+                            do(ctx) {
+                                return "test"
+                            }
+                        }
+                        """,
+                PMLParser.CreateObligationStatementContext.class
+        );
+        VisitorContext visitorCtx = new VisitorContext(GlobalScope.withVariablesAndSignatures(new MemoryPolicyStore()));
+        new CreateObligationStmtVisitor(visitorCtx)
+                .visitCreateObligationStatement(ctx2);
+        assertEquals(1, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+                "return statement in response cannot return a value",
+                visitorCtx.errorLog().getErrors().get(0).errorMessage()
+        );
+    }
+
 }

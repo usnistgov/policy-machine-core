@@ -3,6 +3,7 @@ package gov.nist.csd.pm.policy.pml.statement;
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
 import gov.nist.csd.pm.policy.model.access.UserContext;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.scope.GlobalScope;
@@ -132,5 +133,46 @@ class ForeachStatementTest {
                                  }
                              """,
                      stmt.toFormattedString(1) + "\n");
+    }
+
+    @Test
+    void testReturnEndsExecution() throws PMException {
+        String pml = """
+                f1()
+                
+                function f1() {
+                    foreach x in ["1", "2", "3"] {
+                        if x == "2" {
+                            return
+                        }
+                        
+                        create PC x
+                    }
+                }
+                """;
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
+
+        assertTrue(store.graph().nodeExists("1"));
+        assertFalse(store.graph().nodeExists("2"));
+
+        pml = """
+                f1()
+                
+                function f1() {
+                    foreach x, y in {"1": "1", "2": "2"} {
+                        if x == "2" {
+                            return
+                        }
+                        
+                        create PC x
+                    }
+                }
+                """;
+        store = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
+
+        assertTrue(store.graph().nodeExists("1"));
+        assertFalse(store.graph().nodeExists("2"));
     }
 }

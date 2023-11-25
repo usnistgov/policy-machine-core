@@ -198,4 +198,40 @@ class EPPTest {
         pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
         assertTrue(pap.graph().nodeExists("test"));
     }
+
+    @Test
+    void testReturnInResponse() throws PMException {
+        PAP pap = new PAP(new MemoryPolicyStore());
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+
+        String pml = """                
+                create pc "pc1"
+                create ua "ua1" assign to ["pc1"]
+                create u "u1" assign to ["ua1"]
+                create oa "oa1" assign to ["pc1"]
+                
+                associate "ua1" and "oa1" with ["*a"]
+                associate "ua1" and POLICY_CLASS_TARGETS with [create_policy_class]
+                
+                create obligation "test" {
+                    create rule "rule1"
+                    when any user
+                    performs ["create_object_attribute"]
+                    on ["oa1"]
+                    do(evtCtx) {
+                        if true {
+                            return
+                        }
+                        
+                        create policy class "test"
+                    }
+                }
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.graph().createObjectAttribute("oa2", "oa1"));
+        assertFalse(pap.graph().nodeExists("test"));
+    }
 }

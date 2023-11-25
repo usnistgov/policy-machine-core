@@ -100,5 +100,4 @@ class IfStatementTest {
                              """,
                      stmt.toFormattedString(1) + "\n");
     }
-
 }

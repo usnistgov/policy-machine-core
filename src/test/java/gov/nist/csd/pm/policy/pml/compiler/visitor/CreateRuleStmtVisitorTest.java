@@ -458,4 +458,20 @@ class CreateRuleStmtVisitorTest {
         assertEquals("functions are not allowed inside response blocks", e.getErrors().get(0).errorMessage());
     }
 
+    @Test
+    void testReturnValueInResponseThrowsException() {
+        String pml = """
+                    create obligation "obligation1" {
+                        create rule "any user"
+                        when any user
+                        performs ["test_event"]
+                        on any
+                        do(ctx) {
+                            return "test"
+                        }                        
+                    }
+                    """;
+        assertThrows(PMLCompilationException.class, () -> PMLCompiler.compilePML(new MemoryPolicyStore(), pml));
+    }
+
 }

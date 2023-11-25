@@ -2,7 +2,9 @@ package gov.nist.csd.pm.policy.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.memory.MemoryPolicyStore;
 import gov.nist.csd.pm.policy.exceptions.PMException;
+import gov.nist.csd.pm.policy.model.access.UserContext;
 import gov.nist.csd.pm.policy.pml.PMLContextVisitor;
+import gov.nist.csd.pm.policy.pml.PMLExecutor;
 import gov.nist.csd.pm.policy.pml.antlr.PMLParser;
 import gov.nist.csd.pm.policy.pml.expression.literal.BoolLiteral;
 import gov.nist.csd.pm.policy.pml.expression.literal.StringLiteral;
@@ -71,6 +73,24 @@ class IfStmtVisitorTest {
                 "expected expression type bool, got string",
                 visitorCtx.errorLog().getErrors().get(1).errorMessage()
         );
+    }
+
+    @Test
+    void testReturnVoidInIf() throws PMException {
+        String pml = """
+                function f1() {
+                    if true {
+                        return
+                    }
+                    
+                    create policy class "pc1"
+                }
+                
+                f1()
+                """;
+        MemoryPolicyStore store = new MemoryPolicyStore();
+        PMLExecutor.compileAndExecutePML(store, new UserContext(), pml);
+        assertFalse(store.graph().nodeExists("pc1"));
     }
 
 }

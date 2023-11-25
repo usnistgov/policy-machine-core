@@ -15,8 +15,8 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStat
 
     @Override
     public FunctionReturnStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
-        // check that the return statement is inside a function
-        if (!inFunctionOrResponse(ctx)) {
+        ParserRuleContext enclosingCtx = getEnclosingContext(ctx);
+        if (enclosingCtx == null) {
             visitorCtx.errorLog().addError(
                     ctx,
                     "return statement not in function definition or obligation response"
@@ -27,6 +27,13 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStat
 
         if (ctx.expression() == null) {
             return new FunctionReturnStatement();
+        } else if (enclosingCtx instanceof PMLParser.ResponseContext) {
+            visitorCtx.errorLog().addError(
+                    ctx,
+                    "return statement in response cannot return a value"
+            );
+
+            return new FunctionReturnStatement(ctx);
         }
 
         Expression e = Expression.compile(visitorCtx, ctx.expression(), Type.any());
@@ -34,13 +41,13 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStat
         return new FunctionReturnStatement(e);
     }
 
-    private boolean inFunctionOrResponse(ParserRuleContext ctx) {
+    private ParserRuleContext getEnclosingContext(ParserRuleContext ctx) {
         if (ctx instanceof PMLParser.FunctionDefinitionStatementContext || ctx instanceof PMLParser.ResponseContext) {
-            return true;
+            return ctx;
         } else if (ctx == null) {
-            return false;
+            return null;
         }
 
-        return inFunctionOrResponse(ctx.getParent());
+        return getEnclosingContext(ctx.getParent());
     }
 }
