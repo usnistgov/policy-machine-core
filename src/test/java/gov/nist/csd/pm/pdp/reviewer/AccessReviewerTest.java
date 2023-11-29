@@ -190,32 +190,30 @@ class AccessReviewerTest {
 
         AccessReviewer accessReviewer = new AccessReviewer(pap);
         Explain explain = accessReviewer.explain(new UserContext("u1"), "o1");
-        assertEquals(
-                new Explain(
-                        new AccessRightSet("read"),
-                        Map.of(
-                                "pc1", new PolicyClass(
-                                        new AccessRightSet("read", "write"),
-                                        Set.of(new Path(
-                                                List.of("u1", "ua1", "oa1"),
-                                                List.of("o1", "oa1", "pc1"),
-                                                new Association("ua1", "oa1", new AccessRightSet("read", "write"))
-                                        ))),
-                                "pc2", new PolicyClass(
-                                        new AccessRightSet("read", "write"),
-                                        Set.of(new Path(
-                                                List.of("u1", "ua2", "oa2"),
-                                                List.of("o1", "oa3", "oa2", "pc2"),
-                                                new Association("ua2", "oa2", new AccessRightSet("read", "write"))
-                                        )))
-                        ),
-                        new AccessRightSet("write"),
-                        List.of(
-                                new Prohibition("p1", new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), new AccessRightSet("write"), false, List.of(new ContainerCondition("oa1", false)))
-                        )
+        Explain expected = new Explain(
+                new AccessRightSet("read"),
+                Map.of(
+                        "pc1", new PolicyClass(
+                                new AccessRightSet("read", "write"),
+                                Set.of(new Path(
+                                        List.of("u1", "ua1", "oa1"),
+                                        List.of("o1", "oa1", "pc1"),
+                                        new Association("ua1", "oa1", new AccessRightSet("read", "write"))
+                                ))),
+                        "pc2", new PolicyClass(
+                                new AccessRightSet("read", "write"),
+                                Set.of(new Path(
+                                        List.of("u1", "ua2", "oa2"),
+                                        List.of("o1", "oa3", "oa2", "pc2"),
+                                        new Association("ua2", "oa2", new AccessRightSet("read", "write"))
+                                )))
                 ),
-                explain
+                new AccessRightSet("write"),
+                List.of(
+                        new Prohibition("p1", new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), new AccessRightSet("write"), false, List.of(new ContainerCondition("oa1", false)))
+                )
         );
+        assertEquals(expected, explain);
     }
 
     @Test

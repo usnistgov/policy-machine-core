@@ -18,6 +18,7 @@ import gov.nist.csd.pm.policy.model.prohibition.Prohibition;
 import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.policy.pml.value.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -340,8 +341,10 @@ abstract class TxCmd<T extends MemoryStore<?>> {
             String[] parentsArr = new String[parents.size()];
             if (type != PC) {
                 initialParent = parents.get(0);
-                parents.remove(0);
-                parentsArr = parents.toArray(new String[]{});
+
+                List<String> additionalParents = new ArrayList<>(parents);
+                additionalParents.remove(0);
+                parentsArr = additionalParents.toArray(new String[]{});
             }
 
             switch (type) {

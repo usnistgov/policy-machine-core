@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.ObligationsStore;
+import gov.nist.csd.pm.pap.memory.unmodifiable.UnmodifiableObligation;
 import gov.nist.csd.pm.policy.Obligations;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.UserContext;
@@ -10,6 +11,7 @@ import gov.nist.csd.pm.policy.tx.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 class MemoryObligationsStore extends MemoryStore<TxObligations> implements ObligationsStore, Transactional, BaseMemoryTx {
@@ -18,15 +20,7 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
     private MemoryGraphStore graph;
 
     public MemoryObligationsStore() {
-        this.obligations = new ArrayList<>();
-    }
-
-    public MemoryObligationsStore(List<Obligation> obligations) {
-        this.obligations = obligations;
-    }
-
-    public MemoryObligationsStore(Obligations obligations) throws PMException {
-        this.obligations = obligations.getAll();
+        this.obligations = Collections.unmodifiableList(new ArrayList<>());
     }
 
     public void setMemoryGraph(MemoryGraphStore graph) {
@@ -34,7 +28,7 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
     }
 
     public void clear() {
-        this.obligations.clear();
+        this.obligations = Collections.unmodifiableList(new ArrayList<>());
     }
 
     @Override
@@ -65,7 +59,7 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
         // log the command if in a tx
         handleTxIfActive(tx -> tx.create(author, name, rules));
 
-        obligations.add(new Obligation(author, name, Arrays.asList(rules)));
+        createInternal(obligations.size()-1, author, name, rules);
     }
 
     @Override
@@ -76,11 +70,12 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
         // log the command if in a tx
         handleTxIfActive(tx -> tx.update(author, name, rules));
 
-        for (Obligation o : obligations) {
-            if (o.getName().equals(name)) {
-                o.setAuthor(author);
-                o.setName(name);
-                o.setRules(List.of(rules));
+        for (int i = 0; i < obligations.size(); i++) {
+            if (obligations.get(i).getName().equals(name)) {
+                deleteInternal(name);
+                createInternal(i, author, name, rules);
+
+                return;
             }
         }
     }
@@ -94,12 +89,12 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
         // log the command if in a tx
         handleTxIfActive(tx -> tx.delete(name));
 
-        this.obligations.removeIf(o -> o.getName().equals(name));
+        deleteInternal(name);
     }
 
     @Override
     public List<Obligation> getAll() {
-        return new ArrayList<>(obligations);
+        return obligations;
     }
 
     @Override
@@ -119,11 +114,23 @@ class MemoryObligationsStore extends MemoryStore<TxObligations> implements Oblig
 
         for (Obligation obligation : obligations) {
             if (obligation.getName().equals(name)) {
-                return obligation.clone();
+                return obligation;
             }
         }
 
         // this shouldn't be reached due to the checkGet call, but just to be safe
         throw new ObligationDoesNotExistException(name);
+    }
+
+    private void createInternal(int index, UserContext author, String name, Rule ... rules) {
+        ArrayList<Obligation> copy = new ArrayList<>(obligations);
+        copy.add(Math.max(index, 0), new UnmodifiableObligation(author, name, Arrays.asList(rules)));
+        this.obligations = Collections.unmodifiableList(copy);
+    }
+
+    private void deleteInternal(String name) {
+        ArrayList<Obligation> copy = new ArrayList<>(obligations);
+        copy.removeIf(o -> o.getName().equals(name));
+        this.obligations = Collections.unmodifiableList(copy);
     }
 }

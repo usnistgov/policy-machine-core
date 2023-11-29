@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Obligation implements Cloneable, Serializable {
+public class Obligation implements Serializable {
 
     private UserContext author;
     private String name;
@@ -27,10 +27,7 @@ public class Obligation implements Cloneable, Serializable {
     public Obligation(UserContext author, String name, List<Rule> rules) {
         this.author = author;
         this.name = name;
-        this.rules = new ArrayList<>();
-        for (Rule rule : rules) {
-            this.rules.add(new Rule(rule));
-        }
+        this.rules = rules;
     }
 
     public Obligation(Obligation obligation) {
@@ -40,20 +37,6 @@ public class Obligation implements Cloneable, Serializable {
             this.rules.add(new Rule(rule));
         }
         this.author = obligation.author;
-    }
-
-    @Override
-    public Obligation clone() {
-        Obligation o;
-        try {
-            o = (Obligation) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return new Obligation(this.author, this.name);
-        }
-
-        o.author = this.author;
-        o.name = this.name;
-        return o;
     }
 
     public Obligation addRule(String name, EventPattern eventPattern, Response response) {
@@ -107,7 +90,7 @@ public class Obligation implements Cloneable, Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Obligation)) return false;
         Obligation that = (Obligation) o;
         return Objects.equals(author, that.author) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
     }

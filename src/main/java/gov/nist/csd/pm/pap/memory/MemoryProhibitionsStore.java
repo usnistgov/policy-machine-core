@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.ProhibitionsStore;
+import gov.nist.csd.pm.pap.memory.unmodifiable.UnmodifiableProhibition;
 import gov.nist.csd.pm.policy.Prohibitions;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -18,15 +19,7 @@ class MemoryProhibitionsStore extends MemoryStore<TxProhibitions> implements Pro
     private MemoryGraphStore graph;
 
     public MemoryProhibitionsStore() {
-        this.prohibitions = new HashMap<>();
-    }
-
-    public MemoryProhibitionsStore(Map<String, List<Prohibition>> prohibitions) {
-        this.prohibitions = prohibitions;
-    }
-
-    public MemoryProhibitionsStore(Prohibitions prohibitions) throws PMException {
-        this.prohibitions = prohibitions.getAll();
+        this.prohibitions = Collections.unmodifiableMap(new HashMap<>());
     }
 
     public void setMemoryGraph(MemoryGraphStore graph) {
@@ -34,7 +27,7 @@ class MemoryProhibitionsStore extends MemoryStore<TxProhibitions> implements Pro
     }
 
     public void clear() {
-        this.prohibitions.clear();
+        this.prohibitions = Collections.unmodifiableMap(new HashMap<>());
     }
 
     @Override
@@ -122,7 +115,7 @@ class MemoryProhibitionsStore extends MemoryStore<TxProhibitions> implements Pro
             return new ArrayList<>();
         }
 
-        return new ArrayList<>(subjectPros);
+        return subjectPros;
     }
 
     @Override
@@ -142,21 +135,22 @@ class MemoryProhibitionsStore extends MemoryStore<TxProhibitions> implements Pro
     }
 
     private void createInternal(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, ContainerCondition... containerConditions) {
-        List<Prohibition> existingPros = prohibitions.getOrDefault(subject.getName(), new ArrayList<>());
-        existingPros.add(new Prohibition(name, subject, accessRightSet, intersection, Arrays.asList(containerConditions)));
-        prohibitions.put(subject.getName(), existingPros);
+        List<Prohibition> existingPros = new ArrayList<>(prohibitions.getOrDefault(subject.getName(), new ArrayList<>()));
+        existingPros.add(new UnmodifiableProhibition(name, subject, accessRightSet, intersection, Arrays.asList(containerConditions)));
+
+        HashMap<String, List<Prohibition>> m = new HashMap<>(this.prohibitions);
+        m.put(subject.getName(), Collections.unmodifiableList(existingPros));
+
+        this.prohibitions = Collections.unmodifiableMap(m);
     }
 
     private void deleteInternal(String name) {
         for(String subject : prohibitions.keySet()) {
-            List<Prohibition> ps = prohibitions.get(subject);
-            Iterator<Prohibition> iterator = ps.iterator();
-            while (iterator.hasNext()) {
-                Prohibition p = iterator.next();
-                if(p.getName().equals(name)) {
-                    iterator.remove();
-                    prohibitions.put(subject, ps);
-                }
+            List<Prohibition> ps = new ArrayList<>(prohibitions.get(subject));
+            if(ps.removeIf(p -> p.getName().equals(name))) {
+                HashMap<String, List<Prohibition>> m = new HashMap<>(this.prohibitions);
+                m.put(subject, Collections.unmodifiableList(ps));
+                this.prohibitions = Collections.unmodifiableMap(m);
             }
         }
     }

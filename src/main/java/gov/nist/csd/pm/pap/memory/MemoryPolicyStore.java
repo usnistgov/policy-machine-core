@@ -40,17 +40,6 @@ public class MemoryPolicyStore extends PolicyStore implements BaseMemoryTx, Veri
         verify(this, graph);
     }
 
-    public MemoryPolicyStore(Graph graph, Prohibitions prohibitions, Obligations obligations, UserDefinedPML userDefinedPML) throws PMException {
-        this.graph = new MemoryGraphStore(graph);
-        this.prohibitions = new MemoryProhibitionsStore(prohibitions);
-        this.obligations = new MemoryObligationsStore(obligations);
-        this.userDefinedPML = new MemoryUserDefinedPMLStore(userDefinedPML);
-
-        initStores();
-
-        verify(this, this.graph);
-    }
-
     private void initStores() {
         this.graph.setMemoryProhibitions(prohibitions);
         this.graph.setMemoryObligations(obligations);

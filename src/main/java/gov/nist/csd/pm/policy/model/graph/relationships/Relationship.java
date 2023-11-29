@@ -71,7 +71,7 @@ public class Relationship implements Serializable {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Relationship)) {
             return false;
         }
         Relationship that = (Relationship) o;

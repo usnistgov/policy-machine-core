@@ -45,24 +45,12 @@ public class Rule implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public EventPattern getEventPattern() {
         return eventPattern;
     }
 
-    public void setEventPattern(EventPattern eventPattern) {
-        this.eventPattern = eventPattern;
-    }
-
     public Response getResponse() {
         return response;
-    }
-
-    public void setResponse(Response response) {
-        this.response = response;
     }
 
     @Override

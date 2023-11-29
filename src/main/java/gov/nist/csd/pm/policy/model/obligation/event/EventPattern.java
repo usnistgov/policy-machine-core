@@ -6,10 +6,7 @@ import gov.nist.csd.pm.policy.model.obligation.event.target.AnyTarget;
 import gov.nist.csd.pm.policy.model.obligation.event.target.Target;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class EventPattern implements Serializable {
 
@@ -22,31 +19,19 @@ public class EventPattern implements Serializable {
 
     public EventPattern(Subject subject, Performs performs) {
         this.subject = subject;
-        this.operations = Arrays.asList(performs.events());
+        this.operations = Collections.unmodifiableList(Arrays.asList(performs.events()));
         this.target = new AnyTarget();
     }
     public EventPattern(Subject subject, Performs performs, Target target) {
         this.subject = subject;
-        this.operations = Arrays.asList(performs.events());
+        this.operations = Collections.unmodifiableList(Arrays.asList(performs.events()));
         this.target = target;
     }
 
     public EventPattern(EventPattern eventPattern) {
         this.subject = eventPattern.subject;
-        this.operations = new ArrayList<>(eventPattern.operations);
+        this.operations = eventPattern.operations;
         this.target = eventPattern.target;
-    }
-
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
-    public void setOperations(List<String> operations) {
-        this.operations = operations;
-    }
-
-    public void setTarget(Target target) {
-        this.target = target;
     }
 
     public Subject getSubject() {

@@ -9,6 +9,8 @@ import gov.nist.csd.pm.policy.pml.context.ExecutionContext;
 import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -36,12 +38,19 @@ public class DeleteRuleStatement extends PMLStatement {
         String oblName = oblExpr.execute(ctx, policy).getStringValue();
 
         Obligation obligation = policy.obligations().get(oblName);
-        obligation.deleteRule(ruleName);
+        List<Rule> rules = new ArrayList<>();
+        for (Rule rule : obligation.getRules()) {
+            if (rule.getName().equals(ruleName)) {
+                continue;
+            }
+
+            rules.add(rule);
+        }
 
         policy.obligations().update(
                 obligation.getAuthor(),
                 obligation.getName(),
-                obligation.getRules().toArray(new Rule[]{})
+                rules.toArray(new Rule[]{})
         );
 
         return new VoidValue();

@@ -2,6 +2,8 @@ package gov.nist.csd.pm.pap.memory;
 
 import gov.nist.csd.pm.pap.AdminPolicy;
 import gov.nist.csd.pm.pap.GraphStore;
+import gov.nist.csd.pm.pap.memory.unmodifiable.UnmodifiableAccessRightSet;
+import gov.nist.csd.pm.pap.memory.unmodifiable.UnmodifiableAssociation;
 import gov.nist.csd.pm.policy.Graph;
 import gov.nist.csd.pm.policy.exceptions.*;
 import gov.nist.csd.pm.policy.model.access.AccessRightSet;
@@ -36,11 +38,6 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         initGraph();
     }
 
-    public MemoryGraphStore(Graph graph) throws PMException {
-        initGraph();
-        buildFromGraph(graph);
-    }
-
     private void initGraph() {
         graph = new HashMap<>();
         pcs = new ArrayList<>();
@@ -48,7 +45,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         uas = new ArrayList<>();
         os = new ArrayList<>();
         us = new ArrayList<>();
-        resourceAccessRights = new AccessRightSet();
+        resourceAccessRights = new UnmodifiableAccessRightSet();
     }
 
     @Override
@@ -81,7 +78,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
 
     public void clear() {
         graph.clear();
-        resourceAccessRights.clear();
+        resourceAccessRights = new UnmodifiableAccessRightSet();
         pcs.clear();
         oas.clear();
         uas.clear();
@@ -96,13 +93,12 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
 
         handleTxIfActive(tx -> tx.setResourceAccessRights(accessRightSet));
 
-        resourceAccessRights.clear();
-        resourceAccessRights.addAll(accessRightSet);
+        resourceAccessRights = new UnmodifiableAccessRightSet(accessRightSet);
     }
 
     @Override
     public AccessRightSet getResourceAccessRights() {
-        return new AccessRightSet(resourceAccessRights);
+        return resourceAccessRights;
     }
 
     @Override
@@ -122,7 +118,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
                 createNodeInternal(pcTarget, OA, new HashMap<>());
             }
 
-            List<String> parents = getParentsInternal(pcTarget);
+            List<String> parents = graph.get(pcTarget).getParents();
             if (!parents.contains(POLICY_CLASS_TARGETS.nodeName())) {
                 assignInternal(pcTarget, POLICY_CLASS_TARGETS.nodeName());
             }
@@ -211,7 +207,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public Node getNode(String name) throws NodeDoesNotExistException, PMBackendException {
         checkGetNodeInput(name);
 
-        return new Node(graph.get(name).getNode());
+        return graph.get(name).getNode();
     }
 
     @Override
@@ -275,14 +271,14 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public List<String> getParents(String node) throws NodeDoesNotExistException, PMBackendException {
         checkGetParentsInput(node);
 
-        return getParentsInternal(node);
+        return graph.get(node).getParents();
     }
 
     @Override
     public List<String> getChildren(String node) throws NodeDoesNotExistException, PMBackendException {
         checkGetChildrenInput(node);
 
-        return new ArrayList<>(graph.get(node).getChildren());
+        return graph.get(node).getChildren();
     }
 
 
@@ -316,7 +312,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     public List<Association> getAssociationsWithSource(String ua) throws NodeDoesNotExistException, PMBackendException {
         checkGetAssociationsWithSourceInput(ua);
 
-        return new ArrayList<>(graph.get(ua).getOutgoingAssociations());
+        return graph.get(ua).getOutgoingAssociations();
     }
 
     @Override
@@ -324,38 +320,7 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
     throws NodeDoesNotExistException, PMBackendException {
         checkGetAssociationsWithTargetInput(target);
 
-        return new ArrayList<>(graph.get(target).getIncomingAssociations());
-    }
-
-    private void buildFromGraph(Graph graph) throws PMException {
-        List<String> nodes = graph.search(ANY, NO_PROPERTIES);
-
-        // add nodes to graph
-        List<String> uas = new ArrayList<>();
-        for (String n : nodes) {
-            Node node = graph.getNode(n);
-            createNodeInternal(n, node.getType(), node.getProperties());
-
-            if (node.getType() == UA) {
-                uas.add(n);
-            }
-        }
-
-        // add assignments to graph
-        for (String n : nodes) {
-            List<String> parents = graph.getParents(n);
-            for (String p : parents) {
-                assignInternal(n, p);
-            }
-        }
-
-        // add associations to graph
-        for (String ua : uas) {
-            List<Association> assocs = graph.getAssociationsWithSource(ua);
-            for (Association a : assocs) {
-                associate(ua, a.getTarget(), a.getAccessRightSet());
-            }
-        }
+        return graph.get(target).getIncomingAssociations();
     }
 
     private String createNode(String name, NodeType type, Map<String, String> properties, String parent,
@@ -384,13 +349,9 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         return name;
     }
 
-    private List<String> getParentsInternal(String node) {
-        return new ArrayList<>(graph.get(node).getParents());
-    }
-
     protected void createNodeInternal(String name, NodeType type, Map<String, String> properties) {
         // add node to graph
-        graph.put(name, getVertex(name, type, properties));
+        graph.put(name, buildVertex(name, type, properties));
         if (type == NodeType.PC) {
             pcs.add(name);
         } else if (type == OA) {
@@ -472,22 +433,22 @@ class MemoryGraphStore extends MemoryStore<TxGraph> implements GraphStore, Trans
         }
     }
 
-    private Vertex getVertex(String name, NodeType type, Map<String, String> properties) {
+    private Vertex buildVertex(String name, NodeType type, Map<String, String> properties) {
         switch (type) {
             case PC -> {
                 return new VertexPolicyClass(name, properties);
             }
             case OA -> {
-                return new VertexObjectAttribute(name, properties);
+                return new VertexAttribute(name, OA, properties);
             }
             case UA -> {
-                return new VertexUserAttribute(name, properties);
+                return new VertexAttribute(name, UA, properties);
             }
             case O -> {
-                return new VertexObject(name, properties);
+                return new VertexLeaf(name, O, properties);
             }
             default -> {
-                return new VertexUser(name, properties);
+                return new VertexLeaf(name, U, properties);
             }
         }
     }

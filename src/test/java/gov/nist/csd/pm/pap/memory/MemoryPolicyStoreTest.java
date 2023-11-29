@@ -37,7 +37,7 @@ class MemoryPolicyStoreTest {
     void getResourceAccessRights() throws PMException {
         policyStore.graph().setResourceAccessRights(new AccessRightSet("read", "write"));
         AccessRightSet resourceAccessRights = policyStore.graph().getResourceAccessRights();
-        resourceAccessRights.add("test");
+        assertThrows(UnsupportedOperationException.class, () -> resourceAccessRights.add("test"));
 
         assertFalse(policyStore.graph().getResourceAccessRights().contains("test"));
     }
@@ -46,9 +46,7 @@ class MemoryPolicyStoreTest {
     void getNode() throws PMException {
         policyStore.graph().createPolicyClass("pc1", NO_PROPERTIES);
         Node pc1 = policyStore.graph().getNode("pc1");
-        pc1.getProperties().put("test", "test");
-
-        assertFalse(policyStore.graph().getNode("pc1").getProperties().containsKey("test"));
+        assertThrows(UnsupportedOperationException.class, () -> pc1.getProperties().put("test", "test"));
     }
 
     @Test
@@ -67,7 +65,7 @@ class MemoryPolicyStoreTest {
         policyStore.graph().createObjectAttribute("oa2", "pc1");
         policyStore.graph().createObjectAttribute("oa3", "pc1");
         List<String> children = policyStore.graph().getChildren("pc1");
-        children.add("test");
+        assertThrows(UnsupportedOperationException.class, () -> children.add("test"));
         assertFalse(policyStore.graph().getChildren("pc1").contains("test"));
     }
 
@@ -79,7 +77,7 @@ class MemoryPolicyStoreTest {
         policyStore.graph().createObjectAttribute("oa3", "pc1");
         policyStore.graph().createObject("o1", "oa1", "oa2", "oa3");
         List<String> parents = policyStore.graph().getParents("o1");
-        parents.add("test");
+        assertThrows(UnsupportedOperationException.class, () -> parents.add("test"));
         assertFalse(policyStore.graph().getParents("o1").contains("test"));
     }
 
@@ -90,8 +88,9 @@ class MemoryPolicyStoreTest {
         policyStore.graph().createObjectAttribute("oa1", "pc1");
         policyStore.graph().associate("ua1", "oa1", new AccessRightSet());
         List<Association> assocs = policyStore.graph().getAssociationsWithSource("ua1");
-        assocs.clear();
-        assertFalse(policyStore.graph().getAssociationsWithSource("ua1").isEmpty());
+        assertThrows(UnsupportedOperationException.class, () -> assocs.clear());
+        assertThrows(UnsupportedOperationException.class, () -> assocs.get(0).getAccessRightSet().clear());
+        assertThrows(UnsupportedOperationException.class, () -> assocs.get(0).setAccessRightSet(new AccessRightSet()));
     }
 
     @Test
@@ -101,8 +100,7 @@ class MemoryPolicyStoreTest {
         policyStore.graph().createObjectAttribute("oa1", "pc1");
         policyStore.graph().associate("ua1", "oa1", new AccessRightSet());
         List<Association> assocs = policyStore.graph().getAssociationsWithTarget("oa1");
-        assocs.clear();
-        assertFalse(policyStore.graph().getAssociationsWithTarget("oa1").isEmpty());
+        assertThrows(UnsupportedOperationException.class, () -> assocs.clear());
     }
 
     @Test
@@ -134,10 +132,11 @@ class MemoryPolicyStoreTest {
         policyStore.graph().createObjectAttribute("oa1", "pc1");
         policyStore.prohibitions().create("pro1", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet(), true, new ContainerCondition("oa1", false));
         List<Prohibition> prohibitions = policyStore.prohibitions().getWithSubject("ua1");
-        prohibitions.clear();
+        assertThrows(UnsupportedOperationException.class, () -> prohibitions.clear());
         assertEquals(1, policyStore.prohibitions().getAll().size());
-        prohibitions = policyStore.prohibitions().getWithSubject("ua1");
-        Prohibition p = prohibitions.get(0);
+        List<Prohibition> prohibitions2 = policyStore.prohibitions().getWithSubject("ua1");
+        Prohibition p = prohibitions2.get(0);
+        assertThrows(UnsupportedOperationException.class, () -> p.getContainers().add(new ContainerCondition("test", false)));
         Prohibition actual = policyStore.prohibitions().getWithSubject("ua1").get(0);
         assertEquals("pro1", actual.getName());
         assertEquals("ua1", actual.getSubject().getName());
@@ -163,6 +162,8 @@ class MemoryPolicyStoreTest {
         assertTrue(actual.isIntersection());
         assertEquals(1, actual.getContainers().size());
         assertEquals(new ContainerCondition("oa1", false), actual.getContainers().get(0));
+        assertThrows(UnsupportedOperationException.class, () -> p.getContainers().add(new ContainerCondition("test", false)));
+        assertThrows(UnsupportedOperationException.class, () -> p.getAccessRightSet().add("test"));
     }
 
     @Test
@@ -183,7 +184,7 @@ class MemoryPolicyStoreTest {
                 )
         );
         List<Obligation> obligations = policyStore.obligations().getAll();
-        obligations.clear();
+        assertThrows(UnsupportedOperationException.class, () -> obligations.clear());
         assertEquals(1, policyStore.obligations().getAll().size());
     }
 
@@ -208,6 +209,8 @@ class MemoryPolicyStoreTest {
         );
 
         Obligation obligation = policyStore.obligations().get("obl1");
+        assertThrows(UnsupportedOperationException.class, () -> obligation.setRules(List.of()));
+        assertThrows(UnsupportedOperationException.class, () -> obligation.getRules().clear());
         assertEquals("obl1", obligation.getName());
         assertEquals(new UserContext("u1"), obligation.getAuthor());
         assertEquals(1, obligation.getRules().size());

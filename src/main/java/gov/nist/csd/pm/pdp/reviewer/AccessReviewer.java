@@ -213,7 +213,7 @@ public class AccessReviewer implements AccessReview {
 
     @Override
     public List<String> computeAccessibleChildren(UserContext userCtx, String root) throws PMException {
-        List<String> children = pap.graph().getChildren(root);
+        List<String> children = new ArrayList<>(pap.graph().getChildren(root));
         children.removeIf(child -> {
             try {
                 return computePrivileges(userCtx, child).isEmpty();
@@ -228,7 +228,7 @@ public class AccessReviewer implements AccessReview {
 
     @Override
     public List<String> computeAccessibleParents(UserContext userCtx, String root) throws PMException {
-        List<String> parents = pap.graph().getParents(root);
+        List<String> parents = new ArrayList<>(pap.graph().getParents(root));
         parents.removeIf(parent -> {
             try {
                 return computePrivileges(userCtx, parent).isEmpty();
@@ -359,15 +359,11 @@ public class AccessReviewer implements AccessReview {
     private void collectAssociationsFromBorderTargets(List<Association> assocs, Map<String, AccessRightSet> borderTargets) {
         for (Association association : assocs) {
             AccessRightSet ops = association.getAccessRightSet();
-            Set<String> exOps = borderTargets.get(association.getTarget());
+            AccessRightSet exOps = borderTargets.getOrDefault(association.getTarget(), new AccessRightSet());
             //if the target is not in the map already, put it
             //else add the found operations to the existing ones.
-            if (exOps == null) {
-                borderTargets.put(association.getTarget(), ops);
-            } else {
-                ops.addAll(exOps);
-                borderTargets.put(association.getTarget(), ops);
-            }
+            exOps.addAll(ops);
+            borderTargets.put(association.getTarget(), exOps);
         }
     }
 

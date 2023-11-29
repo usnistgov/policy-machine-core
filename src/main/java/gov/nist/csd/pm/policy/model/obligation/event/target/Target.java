@@ -5,6 +5,7 @@ import gov.nist.csd.pm.policy.review.GraphReview;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,11 +14,11 @@ public abstract class Target implements Serializable {
     protected List<String> targets;
 
     public Target(List<String> targets) {
-        this.targets = targets;
+        this.targets = Collections.unmodifiableList(targets);
     }
 
     public Target(String ... targets) {
-        this.targets = new ArrayList<>(List.of(targets));
+        this.targets = Collections.unmodifiableList(new ArrayList<>(List.of(targets)));
     }
 
     public abstract boolean matches(String target, GraphReview graphReview) throws PMException;

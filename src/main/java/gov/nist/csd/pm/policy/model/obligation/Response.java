@@ -10,6 +10,8 @@ import gov.nist.csd.pm.policy.pml.value.Value;
 import gov.nist.csd.pm.policy.pml.value.VoidValue;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +22,7 @@ public class Response implements Serializable {
 
     public Response(String eventCtxVariable, List<PMLStatement> stmts) {
         this.eventCtxVariable = eventCtxVariable;
-        this.stmts = stmts;
+        this.stmts = Collections.unmodifiableList(new ArrayList<>(stmts));
     }
 
     public Response(Response response) {

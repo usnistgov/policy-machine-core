@@ -16,4 +16,9 @@ public class AccessRightSet extends HashSet<String> {
     public AccessRightSet(Collection<String> ops) {
         this.addAll(ops);
     }
+
+    public AccessRightSet(AccessRightSet a, AccessRightSet b) {
+        this.addAll(a);
+        this.addAll(b);
+    }
 }

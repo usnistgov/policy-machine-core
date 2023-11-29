@@ -12,19 +12,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-class VertexPolicyClass extends Vertex {
+class VertexLeaf extends Vertex {
 
     private UnmodifiableNode node;
-    private List<String> children;
+    private List<String> parents;
 
-    public VertexPolicyClass(String name, Map<String, String> properties) {
-        this.node = new UnmodifiableNode(name, NodeType.PC, properties);
-        this.children = Collections.unmodifiableList(new ArrayList<>());
-    }
-
-    private VertexPolicyClass(Node node, List<String> children) {
-        this.node = new UnmodifiableNode(node);
-        this.children = Collections.unmodifiableList(children);
+    VertexLeaf(String name, NodeType type, Map<String, String> properties) {
+        this.node = new UnmodifiableNode(name, type, properties);
+        this.parents = Collections.unmodifiableList(new ArrayList<>());
     }
 
     @Override
@@ -33,42 +28,42 @@ class VertexPolicyClass extends Vertex {
     }
 
     @Override
-    public UnmodifiableNode getNode() {
+    protected UnmodifiableNode getNode() {
         return node;
     }
 
     @Override
-    public List<String> getParents() {
+    protected List<String> getParents() {
+        return parents;
+    }
+
+    @Override
+    protected List<String> getChildren() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<String> getChildren() {
-        return children;
-    }
-
-    @Override
-    public List<Association> getOutgoingAssociations() {
+    protected List<Association> getOutgoingAssociations() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Association> getIncomingAssociations() {
+    protected List<Association> getIncomingAssociations() {
         return Collections.emptyList();
     }
 
     @Override
     public void addAssignment(String child, String parent) {
-        List<String> l = new ArrayList<>(children);
-        l.add(child);
-        children = Collections.unmodifiableList(l);
+        List<String> l = new ArrayList<>(parents);
+        l.add(parent);
+        parents = Collections.unmodifiableList(l);
     }
 
     @Override
     public void deleteAssignment(String child, String parent) {
-        List<String> l = new ArrayList<>(children);
-        l.remove(child);
-        children = Collections.unmodifiableList(l);
+        List<String> l = new ArrayList<>(parents);
+        l.remove(parent);
+        parents = Collections.unmodifiableList(l);
     }
 
     @Override
