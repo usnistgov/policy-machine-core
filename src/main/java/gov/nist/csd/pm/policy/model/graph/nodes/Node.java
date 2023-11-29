@@ -77,7 +77,7 @@ public class Node implements Serializable {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Node)) {
             return false;
         }
         Node node = (Node) o;
