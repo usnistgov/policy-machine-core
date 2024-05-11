@@ -433,8 +433,12 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     public void dissociate(String ua, String target) throws PMException {
 
         boolean nodesNotExist = (!nodeExists(ua) || !nodeExists(target));
+        if (nodesNotExist) {
+            return;
+        }
+
         boolean pathNotExist = (!getAssociationsWithSource(ua).contains(new Association(ua, target)));
-        if (nodesNotExist || pathNotExist) {
+        if (pathNotExist) {
             return;
         }
 
