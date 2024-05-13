@@ -289,8 +289,10 @@ class PAPGraph implements Graph, PolicyEventEmitter {
     private boolean nodeInEvent(String name, EventPattern event) {
         // check subject
         EventSubject subject = event.getSubject();
-        if ((subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE && subject.anyUserWithAttribute().equals(name))
-                || (subject.getType() == EventSubject.Type.USERS && subject.users().contains(name))) {
+
+        boolean isAnyUserWithAttribute = (subject.getType() == EventSubject.Type.ANY_USER_WITH_ATTRIBUTE && subject.anyUserWithAttribute().equals(name));
+        boolean isUserWithAttribute = (subject.getType() == EventSubject.Type.USERS && subject.users().contains(name));
+        if (isAnyUserWithAttribute || isUserWithAttribute) {
             return true;
         }
 
@@ -429,8 +431,14 @@ class PAPGraph implements Graph, PolicyEventEmitter {
 
     @Override
     public void dissociate(String ua, String target) throws PMException {
-        if ((!nodeExists(ua) || !nodeExists(target))
-                || (!getAssociationsWithSource(ua).contains(new Association(ua, target)))) {
+
+        boolean nodesNotExist = (!nodeExists(ua) || !nodeExists(target));
+        if (nodesNotExist) {
+            return;
+        }
+
+        boolean pathNotExist = (!getAssociationsWithSource(ua).contains(new Association(ua, target)));
+        if (pathNotExist) {
             return;
         }
 

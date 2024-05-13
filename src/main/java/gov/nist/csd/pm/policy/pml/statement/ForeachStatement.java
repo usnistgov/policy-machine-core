@@ -34,57 +34,66 @@ public class ForeachStatement extends PMLStatement {
 
         Value iterValue = iter.execute(ctx, policy);
         if (iterValue.isArray()) {
-            for (Value v : iterValue.getArrayValue()) {
-                ExecutionContext localExecutionCtx;
-                try {
-                    localExecutionCtx = ctx.copy();
-                } catch (PMLScopeException e) {
-                    throw new RuntimeException(e);
-                }
-
-                localExecutionCtx.scope().putValue(varName, v);
-
-                Value value = executeStatementBlock(localExecutionCtx, policy, statements);
-
-                if (value.isBreak()) {
-                    break;
-                } else if (value.isReturn()) {
-                    return value;
-                }
-
-                ctx.scope().overwriteValues(localExecutionCtx.scope());
-            }
+            return executeArrayIterator(iterValue, ctx, policy);
         } else if (iterValue.isMap()) {
-            for (Value key : iterValue.getMapValue().keySet()) {
-                ExecutionContext localExecutionCtx;
-                try {
-                    localExecutionCtx = ctx.copy();
-                } catch (PMLScopeException e) {
-                    throw new RuntimeException(e);
-                }
-
-                Value mapValue = iterValue.getMapValue().get(key);
-
-                localExecutionCtx.scope().putValue(varName, key);
-                if (valueVarName != null) {
-                    localExecutionCtx.scope().putValue(valueVarName, mapValue);
-                }
-
-                Value value = executeStatementBlock(localExecutionCtx, policy, statements);
-
-                if (value.isBreak()) {
-                    break;
-                } else if (value.isReturn()) {
-                    return value;
-                }
-
-                ctx.scope().overwriteValues(localExecutionCtx.scope());
-            }
+            return executeMapIterator(iterValue,ctx,policy);
         }
 
         return new Value();
     }
 
+    private Value executeArrayIterator(Value iterValue,ExecutionContext ctx, Policy policy ) throws PMException{
+        for (Value v : iterValue.getArrayValue()) {
+            ExecutionContext localExecutionCtx;
+            try {
+                localExecutionCtx = ctx.copy();
+            } catch (PMLScopeException e) {
+                throw new RuntimeException(e);
+            }
+
+            localExecutionCtx.scope().putValue(varName, v);
+
+            Value value = executeStatementBlock(localExecutionCtx, policy, statements);
+
+            if (value.isBreak()) {
+                break;
+            } else if (value.isReturn()) {
+                return value;
+            }
+
+            ctx.scope().overwriteValues(localExecutionCtx.scope());
+        }
+        return new Value();
+    }
+
+    private Value executeMapIterator(Value iterValue, ExecutionContext ctx, Policy policy ) throws PMException{
+        for (Value key : iterValue.getMapValue().keySet()) {
+            ExecutionContext localExecutionCtx;
+            try {
+                localExecutionCtx = ctx.copy();
+            } catch (PMLScopeException e) {
+                throw new RuntimeException(e);
+            }
+
+            Value mapValue = iterValue.getMapValue().get(key);
+
+            localExecutionCtx.scope().putValue(varName, key);
+            if (valueVarName != null) {
+                localExecutionCtx.scope().putValue(valueVarName, mapValue);
+            }
+
+            Value value = executeStatementBlock(localExecutionCtx, policy, statements);
+
+            if (value.isBreak()) {
+                break;
+            } else if (value.isReturn()) {
+                return value;
+            }
+
+            ctx.scope().overwriteValues(localExecutionCtx.scope());
+        }
+        return new Value();
+    }
     @Override
     public String toString() {
         return String.format("foreach %s in %s {%s}",

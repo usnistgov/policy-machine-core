@@ -509,9 +509,12 @@ public class MysqlGraph implements Graph {
                     INSERT INTO node (node_type_id, name, properties) VALUES (?,?,?)
                     """;
         try(PreparedStatement ps = connection.getConnection().prepareStatement(sql)) {
-            ps.setInt(1, MysqlPolicyStore.getNodeTypeId(type));
-            ps.setString(2, name);
-            ps.setString(3, MysqlPolicyStore.toJSON(properties));
+            int nodeTypeIdIndex = 1;
+            int nameIndex = 2;
+            int propertiesIndex = 3;
+            ps.setInt(nodeTypeIdIndex, MysqlPolicyStore.getNodeTypeId(type));
+            ps.setString(nameIndex, name);
+            ps.setString(propertiesIndex, MysqlPolicyStore.toJSON(properties));
             ps.execute();
 
             assign(name, initialParent);
