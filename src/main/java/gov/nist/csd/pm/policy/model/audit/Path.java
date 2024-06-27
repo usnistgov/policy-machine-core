@@ -4,6 +4,7 @@ import gov.nist.csd.pm.policy.model.graph.relationships.Association;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Path {
     private List<String> userDagPath;
@@ -48,7 +49,7 @@ public class Path {
 
     @Override
     public int hashCode() {
-        return this.toString().hashCode();
+        return Objects.hash(userDagPath, targetDagPath, association);
     }
 
     @Override
