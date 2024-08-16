@@ -1,19 +1,19 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.dag.Direction;
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.graph.relationship.Assignment;
-import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.obligation.EventPattern;
-import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.dag.Direction;
+import gov.nist.csd.pm.pap.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.node.NodeType;
+import gov.nist.csd.pm.pap.graph.relationship.Assignment;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.obligation.EventPattern;
+import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.exception.*;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static gov.nist.csd.pm.common.graph.node.NodeType.*;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.wildcardAccessRights;
 

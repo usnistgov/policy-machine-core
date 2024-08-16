@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.pap.op;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.EventContext;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.UserContext;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 

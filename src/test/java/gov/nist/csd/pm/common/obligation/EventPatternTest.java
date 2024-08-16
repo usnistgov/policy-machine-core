@@ -1,7 +1,10 @@
 package gov.nist.csd.pm.common.obligation;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.obligation.EventContext;
+import gov.nist.csd.pm.pap.obligation.EventPattern;
+import gov.nist.csd.pm.pap.obligation.UnexpectedOperandTypeException;
 import gov.nist.csd.pm.pap.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;

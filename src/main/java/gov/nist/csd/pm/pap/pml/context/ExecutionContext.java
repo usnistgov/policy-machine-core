@@ -1,15 +1,8 @@
 package gov.nist.csd.pm.pap.pml.context;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteGlobalScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.*;
@@ -17,7 +10,6 @@ import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

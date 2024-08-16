@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.obligation.EventContext;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModifier;
 import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.query.UserContext;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 
 import java.util.Collection;
 import java.util.Map;

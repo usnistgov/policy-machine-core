@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.explain.Explain;
-import gov.nist.csd.pm.pap.explain.Path;
-import gov.nist.csd.pm.pap.explain.PolicyClassExplain;
-import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.query.explain.Explain;
+import gov.nist.csd.pm.pap.query.explain.Path;
+import gov.nist.csd.pm.pap.query.explain.PolicyClassExplain;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

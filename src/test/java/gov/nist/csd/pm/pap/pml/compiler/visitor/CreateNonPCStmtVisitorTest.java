@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.graph.node.NodeType;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

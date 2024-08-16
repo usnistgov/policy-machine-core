@@ -2,18 +2,18 @@ package gov.nist.csd.pm.pap.op;
 
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.query.UserContext;
-import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.node.Node;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 
 public class PrivilegeChecker {
 

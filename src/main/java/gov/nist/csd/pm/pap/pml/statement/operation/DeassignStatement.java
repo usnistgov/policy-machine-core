@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.graph.DeassignOp;
 import gov.nist.csd.pm.pap.op.graph.GraphOp;

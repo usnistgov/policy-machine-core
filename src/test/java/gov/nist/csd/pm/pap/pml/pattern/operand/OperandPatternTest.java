@@ -1,14 +1,10 @@
 package gov.nist.csd.pm.pap.pml.pattern.operand;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.epp.EPP;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import gov.nist.csd.pm.pap.query.UserContext;
-import gov.nist.csd.pm.pdp.PDP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

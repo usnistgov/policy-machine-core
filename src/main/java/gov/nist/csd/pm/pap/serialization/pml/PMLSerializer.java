@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.pap.serialization.pml;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteral;
@@ -18,8 +18,6 @@ import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.serialization.json.*;
 
 import java.util.*;
-
-import static gov.nist.csd.pm.common.graph.node.NodeType.*;
 
 public class PMLSerializer implements PolicySerializer {
 

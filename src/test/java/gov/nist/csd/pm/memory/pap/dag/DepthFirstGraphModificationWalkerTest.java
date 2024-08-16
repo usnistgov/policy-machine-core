@@ -2,14 +2,13 @@ package gov.nist.csd.pm.memory.pap.dag;
 
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.dag.Direction;
-import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.dag.Direction;
+import gov.nist.csd.pm.pap.graph.dag.DepthFirstGraphWalker;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

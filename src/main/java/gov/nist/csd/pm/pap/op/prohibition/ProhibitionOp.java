@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.op.prohibition;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.Operation;

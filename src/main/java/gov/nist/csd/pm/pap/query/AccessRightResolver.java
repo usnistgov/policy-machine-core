@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.common.graph.dag.UserDagResult;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.graph.dag.TargetDagResult;
+import gov.nist.csd.pm.pap.graph.dag.UserDagResult;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
 
 import java.util.*;
 

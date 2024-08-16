@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.pap.op.obligation;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.obligation.Rule;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

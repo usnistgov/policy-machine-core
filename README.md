@@ -25,7 +25,7 @@ Then, add the maven dependency
 <dependency>
     <groupId>com.github.PM-Master</groupId>
     <artifactId>policy-machine-core</artifactId>
-    <version>LATEST</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 ## Package Description

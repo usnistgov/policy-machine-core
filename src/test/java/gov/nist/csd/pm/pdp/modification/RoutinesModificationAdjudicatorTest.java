@@ -1,13 +1,10 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.EventContext;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.pap.op.operation.DeleteAdminOperationOp;
 import gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.pap.op.routine.DeleteAdminRoutineOp;
 import gov.nist.csd.pm.pap.query.UserContext;
@@ -21,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
 import static gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp.ROUTINE_OPERAND;
 import static org.junit.jupiter.api.Assertions.*;
 

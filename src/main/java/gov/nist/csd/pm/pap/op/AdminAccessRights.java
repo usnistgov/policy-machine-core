@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.op;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 
 public class AdminAccessRights {
 

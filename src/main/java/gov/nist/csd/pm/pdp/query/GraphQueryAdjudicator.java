@@ -1,13 +1,11 @@
 package gov.nist.csd.pm.pdp.query;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.admin.AdminPolicy;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.node.NodeType;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.GraphQuerier;
 import gov.nist.csd.pm.pap.query.UserContext;

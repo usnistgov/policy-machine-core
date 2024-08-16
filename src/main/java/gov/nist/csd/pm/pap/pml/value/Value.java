@@ -2,8 +2,8 @@ package gov.nist.csd.pm.pap.pml.value;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import gov.nist.csd.pm.common.exception.PMRuntimeException;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.exception.PMRuntimeException;
+import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.type.Type;
 

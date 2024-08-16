@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.pap.exception;
 
-import gov.nist.csd.pm.common.exception.PMException;
-
 /**
  * Wrapper for backend related exceptions independent of backend implementation.
  */

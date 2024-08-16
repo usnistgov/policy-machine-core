@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.impl.memory.pap;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.dag.*;
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.graph.relationship.Relationship;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.explain.EdgePath;
-import gov.nist.csd.pm.pap.explain.Explain;
-import gov.nist.csd.pm.pap.explain.Path;
-import gov.nist.csd.pm.pap.explain.PolicyClassExplain;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.dag.*;
+import gov.nist.csd.pm.pap.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.graph.relationship.Relationship;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.query.explain.EdgePath;
+import gov.nist.csd.pm.pap.query.explain.Explain;
+import gov.nist.csd.pm.pap.query.explain.Path;
+import gov.nist.csd.pm.pap.query.explain.PolicyClassExplain;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.query.AccessQuerier;
 import gov.nist.csd.pm.pap.query.GraphQuerier;
@@ -22,8 +22,8 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.common.graph.node.NodeType.U;
-import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.pap.graph.node.NodeType.U;
+import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.query.AccessRightResolver.*;
 
 public class MemoryAccessQuerier extends AccessQuerier {

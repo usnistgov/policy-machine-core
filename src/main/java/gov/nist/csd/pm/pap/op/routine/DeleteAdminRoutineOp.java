@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.op.routine;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.Operation;
@@ -10,7 +10,6 @@ import gov.nist.csd.pm.pap.query.UserContext;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_ADMIN_ROUTINE;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.DELETE_ADMIN_ROUTINE;
 
 public class DeleteAdminRoutineOp extends Operation<Void> {

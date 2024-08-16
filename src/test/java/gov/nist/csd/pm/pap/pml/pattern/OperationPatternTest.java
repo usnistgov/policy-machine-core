@@ -1,14 +1,9 @@
 package gov.nist.csd.pm.pap.pml.pattern;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.pml.PMLCompiler;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
 import static org.junit.jupiter.api.Assertions.*;

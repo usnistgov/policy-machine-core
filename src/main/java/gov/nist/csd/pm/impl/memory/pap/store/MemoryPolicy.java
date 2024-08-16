@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.routine.Routine;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

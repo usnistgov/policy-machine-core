@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
-import static gov.nist.csd.pm.common.graph.node.NodeType.OA;
-import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.pap.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 
 /**
  * PolicyStore is an abstract class that outlines the expected behavior of a backend implementation.

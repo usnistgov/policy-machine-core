@@ -1,23 +1,20 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.graph.node.Properties;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.PAPTest;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.node.Properties;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pap.PAP;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.common.graph.node.Properties.toProperties;
+import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.pap.graph.node.Properties.toProperties;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

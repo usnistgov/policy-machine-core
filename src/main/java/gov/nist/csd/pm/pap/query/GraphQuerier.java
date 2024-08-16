@@ -1,17 +1,14 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.graph.relationship.Association;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.node.NodeType;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-
-import static org.antlr.v4.runtime.tree.Trees.getDescendants;
 
 public class GraphQuerier extends Querier implements GraphQuery{
 

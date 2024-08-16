@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.store;
 
-import gov.nist.csd.pm.common.tx.Transactional;
+import gov.nist.csd.pm.pap.tx.Transactional;
 
 public interface PolicyStore extends Transactional {
 

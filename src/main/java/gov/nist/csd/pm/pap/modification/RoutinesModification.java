@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.routine.Routine;
 
 /**

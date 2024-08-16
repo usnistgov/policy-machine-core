@@ -1,29 +1,21 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.pap.executable.AdminExecutor;
 import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
-import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.graph.relationship.Association;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.*;
 
-import static gov.nist.csd.pm.util.PolicyEquals.assertPolicyEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest extends PAPTestInitializer {

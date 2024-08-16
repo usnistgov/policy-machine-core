@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
 
 import java.util.Collection;
 import java.util.Map;

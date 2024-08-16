@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.EventContext;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.RoutinesModifier;

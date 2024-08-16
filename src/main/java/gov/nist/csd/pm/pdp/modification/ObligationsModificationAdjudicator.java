@@ -1,17 +1,16 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.obligation.EventContext;
-import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.EventContext;
+import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.modification.ObligationsModifier;
 import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.query.UserContext;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.obligation.Rule;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

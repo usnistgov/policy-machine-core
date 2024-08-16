@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.pap.graph.node.Node;
 
 import java.util.Objects;
 

@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.explain.Explain;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.query.explain.Explain;
 
 import java.util.Collection;
 import java.util.Map;

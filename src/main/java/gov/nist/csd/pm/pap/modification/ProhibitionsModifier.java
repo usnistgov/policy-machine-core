@@ -1,13 +1,12 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.exception.ProhibitionContainerDoesNotExistException;
-import gov.nist.csd.pm.pap.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.pap.exception.ProhibitionExistsException;
 import gov.nist.csd.pm.pap.exception.ProhibitionSubjectDoesNotExistException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.op;
 
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.OperandsDoNotMatchException;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
@@ -8,7 +8,6 @@ import gov.nist.csd.pm.pap.query.UserContext;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Stream;
 
 public abstract class Operation<T> extends AdminExecutable<T> implements Serializable {
 

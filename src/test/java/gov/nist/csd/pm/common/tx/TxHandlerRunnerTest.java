@@ -2,12 +2,10 @@ package gov.nist.csd.pm.common.tx;
 
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.exception.NodeNameExistsException;
-import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.exception.PMException;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-
-import static gov.nist.csd.pm.common.tx.TxRunner.runTx;
+import static gov.nist.csd.pm.pap.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TxHandlerRunnerTest {

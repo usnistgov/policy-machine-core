@@ -1,18 +1,16 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.graph.relationship.InvalidAssignmentException;
-import gov.nist.csd.pm.common.graph.relationship.InvalidAssociationException;
-import gov.nist.csd.pm.common.obligation.EventPattern;
-import gov.nist.csd.pm.common.obligation.Response;
-import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.graph.relationship.InvalidAssignmentException;
+import gov.nist.csd.pm.pap.graph.relationship.InvalidAssociationException;
+import gov.nist.csd.pm.pap.obligation.EventPattern;
+import gov.nist.csd.pm.pap.obligation.Response;
+import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.admin.AdminPolicy;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.exception.*;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.InSubjectPattern;
@@ -22,8 +20,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.common.graph.node.Properties.toProperties;
+import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.pap.graph.node.Properties.toProperties;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static org.junit.jupiter.api.Assertions.*;
