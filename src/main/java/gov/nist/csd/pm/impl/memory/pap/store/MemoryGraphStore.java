@@ -12,7 +12,7 @@ import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.pap.graph.node.NodeType.*;
 import static gov.nist.csd.pm.pap.graph.node.Properties.WILDCARD;
 
 public class MemoryGraphStore extends MemoryStore implements GraphStore {

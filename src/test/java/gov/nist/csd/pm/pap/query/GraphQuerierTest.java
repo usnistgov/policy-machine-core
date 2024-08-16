@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.graph.node.NodeType.*;
 import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.graph.node.Properties.toProperties;
 import static org.junit.jupiter.api.Assertions.*;

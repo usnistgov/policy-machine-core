@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static gov.nist.csd.pm.pap.graph.node.NodeType.*;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.wildcardAccessRights;
 

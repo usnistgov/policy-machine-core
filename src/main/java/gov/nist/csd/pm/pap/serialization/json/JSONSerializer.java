@@ -17,6 +17,8 @@ import gov.nist.csd.pm.pap.query.PolicyQuery;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.graph.node.NodeType.*;
+
 public class JSONSerializer implements PolicySerializer {
 
     @Override

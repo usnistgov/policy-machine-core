@@ -30,7 +30,6 @@ Then, add the maven dependency
 ```
 ## Package Description
 
-- `policy` - Basic policy interfaces and model.
 - `pap` - In memory and MySQL policy stores, as well as a PAP object wrapper to provide transaction support to policy stores.
 - `pdp` - Implementation of an administrative Policy Decision Point (PDP). Functionality to bootstrap a policy when creating a new PDP instance.
 - `epp` - Implementation of the Event Processing Point (EPP). The epp attaches to a PDP to listen to administrative events while exposing an interface for a PEP to send events.

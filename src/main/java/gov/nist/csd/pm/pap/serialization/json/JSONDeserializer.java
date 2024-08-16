@@ -11,6 +11,8 @@ import gov.nist.csd.pm.pap.graph.node.NodeType;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.graph.node.NodeType.*;
+
 public class JSONDeserializer implements PolicyDeserializer {
 
     @Override
@@ -79,11 +81,12 @@ public class JSONDeserializer implements PolicyDeserializer {
         // create all policy class nodes first
         for (Map.Entry<String, JSONPolicyClass> policyClass : graph.pcs.entrySet()) {
             Map<String, String> properties = policyClass.getValue().getProperties();
-            if (properties == null) {
-                properties = new HashMap<>();
+            pap.modify().graph().createPolicyClass(policyClass.getKey());
+
+            if (properties != null) {
+                pap.modify().graph().setNodeProperties(policyClass.getKey(), properties);
             }
 
-            pap.modify().graph().createPolicyClass(policyClass.getKey());
         }
     }
 
