@@ -28,20 +28,6 @@ class PMLStmtsOperationSignatureTest {
                 "operation op1(nodeop []string a, string b, string c) string ",
                 pmlStmtsOperationSignature.toFormattedString(0)
         );
-
-
-        /*pmlStmtsOperationSignature = new PMLStmtsOperationSignature(
-                pmlStmtsOperationSignature.getFunctionName(),
-                pmlStmtsOperationSignature.getReturnType(),
-                pmlStmtsOperationSignature.getOperands(),
-                pmlStmtsOperationSignature.getNodeOperands(),
-                pmlStmtsOperationSignature.getOperandTypes(),
-                new PMLStatementBlock(
-                        new ForeachStatement("varname", "", List.of(
-                                new CheckStatement()
-                        ))
-                )
-        );*/
     }
 
 }
