@@ -25,7 +25,7 @@ First, add jitpack as a repository
 Then, add the maven dependency
 ```xml
 <dependency>
-    <groupId>com.github.PM-Master</groupId>
+    <groupId>com.github.usnistgov</groupId>
     <artifactId>policy-machine-core</artifactId>
     <version>3.0.0</version>
 </dependency>
@@ -73,8 +73,8 @@ create obligation "sample_obligation" {
 	when any user
 	performs "create_object_attribute"
 	on {
-        descendants: "oa1"
-    }
+        	descendants: "oa1"
+    	}
 	do(ctx) {
 		associate "ua1" and ctx.operands.name with ["read", "write"]
 	}
@@ -103,15 +103,15 @@ access rights ["write"]
 on union of ["oa1"]
 
 create obligation "sample_obligation" {
-    create rule "rule1"
-    when any user
-    performs "create_object_attribute"
-    on {
-        descendants: "oa1"
-    }
-    do(ctx) {
-        associate "ua1" and ctx.operands.name with ["read", "write"]
-    }
+	create rule "rule1"
+    	when any user
+    	performs "create_object_attribute"
+    	on {
+        	descendants: "oa1"
+    	}
+    	do(ctx) {
+        	associate "ua1" and ctx.operands.name with ["read", "write"]
+    	}
 }
 """;
 ```
