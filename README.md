@@ -1,7 +1,9 @@
 # Policy Machine Core
 
-The core components of the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard. For complete documentation and detailed examples visit the [Wiki](https://github.com/PM-Master/policy-machine-core/wiki).
-## Importing
+The core components of the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard. 
+For complete documentation and detailed examples visit the Wiki.
+
+## Installation
 
 ### Install using Maven
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import with maven.
@@ -30,91 +32,86 @@ Then, add the maven dependency
 ```
 ## Package Description
 
-- `pap` - In memory and MySQL policy stores, as well as a PAP object wrapper to provide transaction support to policy stores.
-- `pdp` - Implementation of an administrative Policy Decision Point (PDP). Functionality to bootstrap a policy when creating a new PDP instance.
-- `epp` - Implementation of the Event Processing Point (EPP). The epp attaches to a PDP to listen to administrative events while exposing an interface for a PEP to send events.
-## PAP Usage
-### Create a policy with `Policy` interface
+- `pap` - Policy Administration Point. Provides the Policy Machine implementation of the NGAC PAP interfaces for modifying and querying policy.
+- `pdp` - Policy Decision Point. Implementation of an administrative PDP that controls access to admin operations on the PAP.
+- `epp` - Event Processing Point. The epp attaches to a PDP to listen to administrative events while exposing an interface for a PEP to send events.
+- `impl` - Policy Machine supported implementations of the PAP interfaces.
+
+## Basic Usage
+The following examples use the provided in memory PAP.
+
+### PAP Usage
+
+#### Create a policy with the `PolicyModification` interface
 ```java
-PolicyStore policyStore = new MemoryPolicyStore();
-PAP pap = new PAP(policyStore);
+// create a new memory PAP
+PAP pap = new MemoryPAP();
 
-pap.setResourceAccessRights(new AccessRightSet("read", "write"))
+// set the resource operations that the policy will support
+pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-pap.graph().createPolicyClass("pc1");  
-pap.graph().createUserAttribute("ua1", "pc1");  
-pap.graph().createObjectAttribute("oa1", "pc1");  
-pap.graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
+// create a simple configuration with one of each node type, granting u1 read access to o1.
+pap.modify().graph().createPolicyClass("pc1");
+pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+pap.modify().graph().createUser("u1", List.of("ua1"));
+pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+pap.modify().graph().createObject("o1", List.of("oa1"));
 
-pap.prohibitions().create(
-	"sample_prohibition", 
-	new ProhibitionSubject("ua2", USER_ATTRIBUTE), 
-	new AccessRightSet("write"), 
-	false, 
-	new ContainerCondition("oa2", false)
+// create a prohibition
+pap.modify().prohibitions().createProhibition(
+        "deny u1 write on oa1", 
+        ProhibitionSubject.userAttribute("u1"), 
+        new AccessRightSet("write"), 
+        false,
+        List.of("oa1")
 );
 
-// The best way to create obligations is with PML because the responses 
-// must be serialized and stored for later execution.
+// create an obligation that associates ua1 with any OA
 String obligationPML = """
 create obligation "sample_obligation" {
 	create rule "rule1"
 	when any user
-	perfroms ["assign_to"]
-	on ["oa1"]
+	performs "create_object_attribute"
+	on {
+        descendants: "oa1"
+    }
 	do(ctx) {
-		assign ctx.event.child to ["oa2"]
+		associate "ua1" and ctx.operands.name with ["read", "write"]
 	}
 }
 """;
-pap.executePML(new UserContext("u1")), obligationPML);
+
+// when creating an obligation a user is required
+// this is the user the obligation response will be executed on behalf of
+pap.executePML(new UserContext("u1"), obligationPML);
 ```
 
-### Create a policy with `PML`
+#### Create a policy with `PML`
 ```java
 String pml = """
-set resource access rights ["read", "write"]
+set resource operations ["read", "write"]
 
-create policy class "pc1" {
-	user attributes {
-		"ua1"
-	}
-	object attributes {
-		"oa1"
-	}
-	associations {
-		"ua1" and "oa1" with ["read", "write"]
-	}
-}
+create pc "pc1"
+create oa "oa1" in ["pc1"]
+create ua "ua1" in ["pc1"]
+create u "u1" in ["ua1"]
+create o "o1" in ["oa1"]
 
-create policy class "pc2" {
-	user attributes {
-		"ua2"
-	}
-	object attributes {
-		"oa2"
-	}
-	associations {
-		"ua2" and "oa2" with ["read", "write"]
-	}
-}
-
-create user "u2" in ["ua1", "ua2"]
-create object "o1" in ["oa1", "oa2"]
-
-create prohibition "sample_prohibition" 
-deny user attribute "ua2" 
+create prohibition "deny u1 write on oa1" 
+deny user "u1" 
 access rights ["write"] 
-on union of ["oa2"]
+on union of ["oa1"]
 
 create obligation "sample_obligation" {
-	create rule "rule1"
-	when any user
-	perfroms ["assign_to"]
-	on ["oa1"]
-	do(ctx) {
-		assign ctx.event.child to ["oa2"]
-	}
+    create rule "rule1"
+    when any user
+    performs "create_object_attribute"
+    on {
+        descendants: "oa1"
+    }
+    do(ctx) {
+        associate "ua1" and ctx.operands.name with ["read", "write"]
+    }
 }
 """;
 ```
@@ -130,22 +127,25 @@ pap.executePML(new UserContext("u1")), pml);
 pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer())
 ```
 
-## PDP Usage
-### Initialization
+### PDP Usage
+#### Initialization
 ```java
 PDP pdp = new PDP(pap);
 ```
-### Run a transaction as a user
+#### Run a transaction as a user
 ```java
 pdp.runTx(new UserContext("u1"), (policy) -> {
-    policy.graph().createPolicyClass("pc3")
-    policy.graph().createObjectAttribute("oa3", "pc2");
-    policy.graph().assign("o1", "oa3");
+    policy.modify().graph().createPolicyClass("pc3")
+    policy.modify().graph().createObjectAttribute("oa3", "pc2");
+    policy.modify().graph().assign("o1", "oa3");
 });
 ```
 
-## EPP Usage
+### EPP Usage
 An EPP will listen to policy events from the provided PDP and process obligations in the PAP accordingly. The EPP and PDP uses an event listener pattern. The EPP listens to events from the PDP, attaching itself within the EPP constructor.
 ```java
 EPP epp = new EPP(pdp, pap);
+
+// will trigger above obligation response and associate ua1 with oa2
+pdp.modify().graph().createObjectAttribute("oa2", List.of("oa1"));
 ```
