@@ -1,126 +1,168 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.policy.*;
-import gov.nist.csd.pm.policy.events.*;
-import gov.nist.csd.pm.policy.exceptions.PMException;
-import gov.nist.csd.pm.policy.model.access.UserContext;
-import gov.nist.csd.pm.policy.pml.PMLExecutable;
-import gov.nist.csd.pm.policy.pml.PMLExecutor;
-import gov.nist.csd.pm.policy.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.policy.tx.Transactional;
+import gov.nist.csd.pm.pap.admin.AdminPolicy;
+import gov.nist.csd.pm.pap.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.executable.AdminExecutor;
+import gov.nist.csd.pm.pap.modification.PolicyModifier;
+import gov.nist.csd.pm.pap.pml.PMLCompiler;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.query.PolicyQuerier;
+import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
+import gov.nist.csd.pm.pap.serialization.PolicySerializer;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.store.PolicyStore;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class PAP implements PolicySync, PolicyEventListener, PolicyEventEmitter, Transactional, PMLExecutable, Policy {
+public abstract class PAP implements PolicyPoint, AdminExecutor {
 
-    protected PolicyStore policyStore;
+    protected final PolicyStore policyStore;
+    private final PolicyModifier modifier;
 
-    protected Set<PolicyEventListener> listeners;
-
-    private final PAPGraph papGraph;
-    private final PAPProhibitions papProhibitions;
-    private final PAPObligations papObligations;
-    private final PAPUserDefinedPML papUserDefinedPML;
+    private Map<String, PMLOperation> pmlOperations;
+    private Map<String, PMLRoutine> pmlRoutines;
+    private Map<String, Value> pmlConstants;
 
     public PAP(PolicyStore policyStore) throws PMException {
         this.policyStore = policyStore;
-        this.listeners = new HashSet<>();
+        this.modifier = new PolicyModifier(policyStore);
+        AdminPolicy.verify(modifier);
 
-        this.papGraph = new PAPGraph(policyStore, this);
-        this.papProhibitions = new PAPProhibitions(policyStore, this);
-        this.papObligations = new PAPObligations(policyStore, this);
-        this.papUserDefinedPML = new PAPUserDefinedPML(policyStore, this);
+        this.pmlOperations = new HashMap<>();
+        this.pmlRoutines = new HashMap<>();
+        this.pmlConstants = new HashMap<>();
+    }
 
-        SuperPolicy.verifySuperPolicy(this.policyStore);
+    public PAP(PAP pap) throws PMException {
+        this(pap.policyStore);
+    }
+
+    public abstract PolicyQuerier query();
+
+    public PolicyModifier modify() {
+        return modifier;
+    }
+
+    protected PolicyStore policyStore() {
+        return policyStore;
     }
 
     @Override
-    public Graph graph() {
-        return papGraph;
+    public void reset() throws PMException {
+        policyStore.reset();
+
+        AdminPolicy.verify(modifier);
     }
 
     @Override
-    public Prohibitions prohibitions() {
-        return papProhibitions;
+    public Object executeAdminExecutable(AdminExecutable<?> adminExecutable, Map<String, Object> operands) throws PMException {
+        return adminExecutable.execute(this, operands);
     }
 
-    @Override
-    public Obligations obligations() {
-        return papObligations;
+    /**
+     * Serialize the current policy state with the given PolicySerializer.
+     *
+     * @param serializer The PolicySerializer used to generate the output String.
+     * @return The string representation of the policy.
+     * @throws PMException If there is an error during the serialization process.
+     */
+    public String serialize(PolicySerializer serializer) throws PMException {
+        return serializer.serialize(query());
     }
 
-    @Override
-    public UserDefinedPML userDefinedPML() {
-        return papUserDefinedPML;
+    /**
+     * Deserialize the given input string into the current policy state. The user defined in the UserContext needs to exist
+     * in the graph created if any obligations are created. If the user does not exist before an obligation is created
+     * an exception will be thrown. This method also resets the policy before deserialization. However, the {@link AdminPolicy}
+     * nodes are assumed to be created and can be referenced in the input string without explicit creation. If any of the
+     * admin policy nodes are created in the input string an exception will be thrown.
+     *
+     * @param author The UserContext describing the author of the deserialized policy elements.
+     * @param input The string representation of the policy to deserialize.
+     * @param policyDeserializer The PolicyDeserializer to apply the input string to the policy.
+     * @throws PMException If there is an error deserializing the given inputs string.
+     */
+    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer) throws PMException {
+        beginTx();
+
+        try {
+            policyDeserializer.deserialize(this, author, input);
+        } catch (PMException e) {
+            rollback();
+            throw e;
+        }
+
+        commit();
     }
 
-    @Override
-    public PolicySerializer serialize() throws PMException {
-        return policyStore.serialize();
+    public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
+        this.pmlOperations = pmlOperations;
     }
 
-    @Override
-    public PolicyDeserializer deserialize() throws PMException {
-        return new PAPDeserializer(policyStore);
-    }
-
-    @Override
-    public void addEventListener(PolicyEventListener listener, boolean sync) throws PMException {
-        listeners.add(listener);
-
-        if (sync) {
-            listener.handlePolicyEvent(policyStore.policySync());
+    public void setPMLOperations(PMLOperation... operations) throws PMException {
+        for (PMLOperation operation : operations) {
+            this.pmlOperations.put(operation.getName(), operation);
         }
     }
 
-    @Override
-    public void removeEventListener(PolicyEventListener listener) {
-        listeners.remove(listener);
+    public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
+        this.pmlRoutines = pmlRoutines;
     }
 
-    @Override
-    public void emitEvent(PolicyEvent event) throws PMException {
-        for (PolicyEventListener listener : listeners) {
-            listener.handlePolicyEvent(event);
+    public void setPMLRoutines(PMLRoutine... routines) throws PMException {
+        for (PMLRoutine routine : routines) {
+            this.pmlRoutines.put(routine.getName(), routine);
         }
     }
 
-    @Override
-    public void handlePolicyEvent(PolicyEvent event) throws PMException {
-        for (PolicyEventListener listener : listeners) {
-            listener.handlePolicyEvent(event);
+    public Map<String, PMLOperation> getPMLOperations() throws PMException {
+        return pmlOperations;
+    }
+
+    public Map<String, PMLRoutine> getPMLRoutines() throws PMException {
+        return pmlRoutines;
+    }
+
+    public void setPMLConstants(Map<String, Value> pmlConstants) throws PMException {
+        this.pmlConstants = pmlConstants;
+    }
+
+    public Map<String, Value> getPMLConstants() throws PMException {
+        return pmlConstants;
+    }
+
+    public void executePML(UserContext author, String input) throws PMException {
+        PMLCompiler pmlCompiler = new PMLCompiler(this);
+
+        List<PMLStatement> compiledPML = pmlCompiler.compilePML(input);
+
+        // execute other statements
+        ExecutionContext ctx = new ExecutionContext(author, this);
+
+        ctx.executeStatements(compiledPML, Map.of());
+    }
+
+    public void runTx(TxRunner txRunner) throws PMException {
+        beginTx();
+
+        try {
+            txRunner.runTx(this);
+
+            commit();
+        } catch (PMException e) {
+            rollback();
+            throw e;
         }
     }
 
-    @Override
-    public PolicySynchronizationEvent policySync() throws PMException {
-        return this.policyStore.policySync();
-    }
-
-    @Override
-    public void beginTx() throws PMException {
-        policyStore.beginTx();
-
-        emitEvent(new BeginTxEvent());
-    }
-
-    @Override
-    public void commit() throws PMException {
-        policyStore.commit();
-
-        emitEvent(new CommitTxEvent());
-    }
-
-    @Override
-    public void rollback() throws PMException {
-        policyStore.rollback();
-
-        emitEvent(new RollbackTxEvent(this));
-    }
-
-    @Override
-    public void executePML(UserContext userContext, String input, FunctionDefinitionStatement... functionDefinitionStatements) throws PMException {
-        PMLExecutor.compileAndExecutePML(this, userContext, input, functionDefinitionStatements);
+    public interface TxRunner {
+        void runTx(PAP pap) throws PMException;
     }
 }

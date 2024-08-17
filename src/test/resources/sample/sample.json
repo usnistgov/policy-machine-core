@@ -1,0 +1,151 @@
+{
+    "resourceOperations": [
+        "read",
+        "delete_readme",
+        "delete_project",
+        "write"
+    ],
+    "graph": {
+        "pcs": {
+            "RBAC": {},
+            "Location": {}
+        },
+        "uas": {
+            "US user": {
+                "assignments": [
+                    "Location"
+                ],
+                "associations": {
+                    "US project": [
+                        "*"
+                    ]
+                }
+            },
+            "reader": {
+                "assignments": [
+                    "employee"
+                ],
+                "associations": {
+                    "project": [
+                        "read"
+                    ]
+                }
+            },
+            "EU user": {
+                "assignments": [
+                    "Location"
+                ],
+                "associations": {
+                    "EU project": [
+                        "*"
+                    ]
+                }
+            },
+            "writer": {
+                "assignments": [
+                    "reader"
+                ],
+                "associations": {
+                    "project": [
+                        "write"
+                    ]
+                }
+            },
+            "employee": {
+                "assignments": [
+                    "RBAC"
+                ]
+            },
+            "deleter": {
+                "assignments": [
+                    "employee"
+                ],
+                "associations": {
+                    "project": [
+                        "write"
+                    ]
+                }
+            }
+        },
+        "oas": {
+            "EU project": {
+                "assignments": [
+                    "Location"
+                ]
+            },
+            "us_project1": {
+                "assignments": [
+                    "US project",
+                    "project"
+                ]
+            },
+            "project": {
+                "assignments": [
+                    "RBAC"
+                ]
+            },
+            "eu_project1": {
+                "assignments": [
+                    "project",
+                    "EU project"
+                ]
+            },
+            "US project": {
+                "assignments": [
+                    "Location"
+                ]
+            }
+        },
+        "users": {
+            "eu_writer1": {
+                "assignments": [
+                    "EU user",
+                    "writer"
+                ]
+            },
+            "us_writer1": {
+                "assignments": [
+                    "US user",
+                    "writer"
+                ]
+            },
+            "eu_reader1": {
+                "assignments": [
+                    "EU user",
+                    "reader"
+                ]
+            },
+            "us_reader1": {
+                "assignments": [
+                    "US user",
+                    "reader"
+                ]
+            }
+        },
+        "objects": {
+            "eu_project1 README": {
+                "assignments": [
+                    "eu_project1"
+                ]
+            },
+            "us_project1 README": {
+                "assignments": [
+                    "us_project1"
+                ]
+            }
+        }
+    },
+    "prohibitions": [],
+    "obligations": [
+        "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.operands.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.operands.projectName)\n    }\n\n}"
+    ],
+    "operations": [
+        "operation deleteProject(nodeop string projectName) {\n    check \"delete_project\" on projectName\n} {\n    delete OA projectName\n}",
+        "operation createProject(string projectName, nodeop string locProjectAttr) {\n    check \"assign_to\" on \"project\"\n    check \"assign_to\" on locProjectAttr\n} {\n    create OA projectName in [\"project\", locProjectAttr]\n    create O projectName + \" README\" in [projectName]\n}",
+        "operation deleteReadme(nodeop string projectReadme) {\n    check \"delete_readme\" on projectReadme\n} {\n    delete O projectReadme\n}",
+        "operation createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName and projectName with [\"*\"]\n    create prohibition \"deny admin delete README\"\n      deny UA uaName\n      access rights [\"delete_readme\"]\n      on union of [projectName]\n}"
+    ],
+    "routines": [
+        "routine deleteAllProjects(string locProjectOA) {\n    foreach project in getAdjacentAscendants(locProjectOA) {\n        deleteReadme(project + \" README\")\n        deleteProject(project)\n    }\n}"
+    ]
+}
