@@ -25,9 +25,9 @@ First, add jitpack as a repository
 Then, add the maven dependency
 ```xml
 <dependency>
-    <groupId>com.github.PM-Master</groupId>
+    <groupId>com.github.usnistgov</groupId>
     <artifactId>policy-machine-core</artifactId>
-    <version>3.0.0</version>
+    <version>VERSION</version>
 </dependency>
 ```
 ## Package Description
