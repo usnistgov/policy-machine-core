@@ -116,7 +116,8 @@ create obligation "sample_obligation" {
 """;
 ```
 
-A user is required to execute PML. This user will be the defined author of any obligations created.
+A user is required to execute PML and will only be used to define author of any obligations created. This user is the user 
+the obligation response will be executed on behalf of.
 ```java
 // execute the pml and apply to existing policy
 pap.executePML(new UserContext("u1")), pml);
@@ -124,7 +125,13 @@ pap.executePML(new UserContext("u1")), pml);
 // or
 
 // reset the current policy befire applying the PML
-pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer())
+pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+```
+
+#### Query access
+
+```java
+AccessRightSet privileges = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
 ```
 
 ### PDP Usage
