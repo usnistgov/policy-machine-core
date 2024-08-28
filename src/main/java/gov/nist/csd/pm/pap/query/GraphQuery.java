@@ -8,6 +8,9 @@ import gov.nist.csd.pm.pap.graph.relationship.Association;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Interface to query the graph.
+ */
 public interface GraphQuery {
 
     /**

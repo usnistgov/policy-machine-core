@@ -6,6 +6,9 @@ import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Interface to query prohibitions.
+ */
 public interface ProhibitionsQuery {
 
     /**
@@ -33,7 +36,20 @@ public interface ProhibitionsQuery {
      */
     Prohibition getProhibition(String name) throws PMException;
 
+    /**
+     * Get the prohibitions the given subject inherits through assignments.
+     * @param subject The subject node.
+     * @return The prohibitions the given subject inherits.
+     * @throws PMException If any PM related exceptions occur in the implementing class.
+     */
     Collection<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException;
+
+    /**
+     * Get the prohibitions that define the given container as a container condition.
+     * @param container The container to search for.
+     * @return The prohibitions that define the given container as a container condition.
+     * @throws PMException If any PM related exceptions occur in the implementing class.
+     */
     Collection<Prohibition> getProhibitionsWithContainer(String container) throws PMException;
 
 }

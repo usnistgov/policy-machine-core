@@ -5,7 +5,24 @@ For complete documentation and detailed examples visit the Wiki.
 
 ## Installation
 
-### Install using Maven
+### Install to maven local
+```
+git clone https://github.com/usnistgov/policy-machine-core.git
+
+cd policy-machine-core
+
+mvn clean install
+```
+
+```
+<dependency>
+    <groupId>gov.nist.csd.pm</groupId>
+    <artifactId>policy-machine-core</artifactId>
+    <version>3.0.0</version>
+</dependency>
+```
+
+### Install using Jitpack
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import with maven.
 
 First, add jitpack as a repository
