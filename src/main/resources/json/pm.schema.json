@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://www.github.com/usnistgov/policy-machine-core/tree/master/src/main/resources/pm.schema.json",
+    "$id": "https://raw.githubusercontent.com/usnistgov/policy-machine-core/master/src/main/resources/json/pm.schema.json",
     "title": "Policy Machine JSON Schema",
     "type": "object",
     "properties": {
