@@ -5,6 +5,9 @@ import gov.nist.csd.pm.pap.obligation.Obligation;
 
 import java.util.Collection;
 
+/**
+ * Interface to query obligations.
+ */
 public interface ObligationsQuery {
 
     /**

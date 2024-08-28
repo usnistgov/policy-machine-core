@@ -98,10 +98,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        Set<String> u1 = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
+        Collection<String> u1 = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
         assertEquals(
                 Set.of("oa1", "oa2", "oa4"),
-                u1
+                new HashSet<>(u1)
         );
     }
 

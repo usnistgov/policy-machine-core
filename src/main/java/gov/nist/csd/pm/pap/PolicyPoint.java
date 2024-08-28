@@ -44,9 +44,7 @@ public interface PolicyPoint extends Transactional {
     /**
      * Deserialize the given input string into the current policy state. The user defined in the UserContext needs to exist
      * in the graph created if any obligations are created. If the user does not exist before an obligation is created
-     * an exception will be thrown. This method also resets the policy before deserialization. However, the {@link AdminPolicy}
-     * nodes are assumed to be created and can be referenced in the input string without explicit creation. If any of the
-     * admin policy nodes are created in the input string an exception will be thrown.
+     * an exception will be thrown.
      *
      * @param author The UserContext describing the author of the deserialized policy elements.
      * @param input The string representation of the policy to deserialize.

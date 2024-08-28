@@ -173,7 +173,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Set<String> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+    public Collection<String> computePersonalObjectSystem(UserContext userCtx) throws PMException {
         // Prepare the hashset to return.
         HashSet<String> hsOa = new HashSet<>();
 
