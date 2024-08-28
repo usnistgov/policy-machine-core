@@ -1,20 +1,22 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class JSONGraph {
 
-    Map<String, JSONPolicyClass> pcs;
-    Map<String, JSONNode> uas;
-    Map<String, JSONNode> oas;
-    Map<String, JSONNode> users;
-    Map<String, JSONNode> objects;
+    List<JSONNode> pcs;
+    List<JSONNode> uas;
+    List<JSONNode> oas;
+    List<JSONNode> users;
+    List<JSONNode> objects;
 
-    public JSONGraph(Map<String, JSONPolicyClass> pcs,
-                     Map<String, JSONNode> uas,
-                     Map<String, JSONNode> oas,
-                     Map<String, JSONNode> users,
-                     Map<String, JSONNode> objects) {
+    public JSONGraph(List<JSONNode> pcs,
+                     List<JSONNode> uas,
+                     List<JSONNode> oas,
+                     List<JSONNode> users,
+                     List<JSONNode> objects) {
         this.pcs = pcs;
         this.uas = uas;
         this.oas = oas;
@@ -22,43 +24,55 @@ public class JSONGraph {
         this.objects = objects;
     }
 
-    public Map<String, JSONPolicyClass> getPcs() {
+    public List<JSONNode> getPcs() {
         return pcs;
     }
 
-    public void setPcs(Map<String, JSONPolicyClass> pcs) {
+    public void setPcs(List<JSONNode> pcs) {
         this.pcs = pcs;
     }
 
-    public Map<String, JSONNode> getUas() {
+    public List<JSONNode> getUas() {
         return uas;
     }
 
-    public void setUas(Map<String, JSONNode> uas) {
+    public void setUas(List<JSONNode> uas) {
         this.uas = uas;
     }
 
-    public Map<String, JSONNode> getOas() {
+    public List<JSONNode> getOas() {
         return oas;
     }
 
-    public void setOas(Map<String, JSONNode> oas) {
+    public void setOas(List<JSONNode> oas) {
         this.oas = oas;
     }
 
-    public Map<String, JSONNode> getUsers() {
+    public List<JSONNode> getUsers() {
         return users;
     }
 
-    public void setUsers(Map<String, JSONNode> users) {
+    public void setUsers(List<JSONNode> users) {
         this.users = users;
     }
 
-    public Map<String, JSONNode> getObjects() {
+    public List<JSONNode> getObjects() {
         return objects;
     }
 
-    public void setObjects(Map<String, JSONNode> objects) {
+    public void setObjects(List<JSONNode> objects) {
         this.objects = objects;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JSONGraph jsonGraph)) return false;
+        return Objects.equals(pcs, jsonGraph.pcs) && Objects.equals(uas, jsonGraph.uas) && Objects.equals(oas, jsonGraph.oas) && Objects.equals(users, jsonGraph.users) && Objects.equals(objects, jsonGraph.objects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pcs, uas, oas, users, objects);
     }
 }

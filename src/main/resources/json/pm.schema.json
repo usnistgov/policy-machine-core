@@ -1,0 +1,147 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://www.github.com/usnistgov/policy-machine-core/tree/master/src/main/resources/pm.schema.json",
+    "title": "Policy Machine JSON Schema",
+    "type": "object",
+    "properties": {
+        "resourceOperations": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "graph": {
+            "type": "object",
+            "properties": {
+                "pcs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/pcNode"
+                    }
+                },
+                "uas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/uaNode"
+                    }
+                },
+                "oas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/otherNode"
+                    }
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/otherNode"
+                    }
+                },
+                "objects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/otherNode"
+                    }
+                }
+            },
+            "additionalProperties": "false"
+        },
+        "prohibitions": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "obligations": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "operations": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "routines": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "$defs": {
+        "property": {
+            "type": "object",
+            "properties": {
+                "key": {"type":  "string"},
+                "value": {"type":  "string"}
+            },
+            "additionalProperties": false
+        },
+        "pcNode": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/property"
+                    }
+                }
+            },
+            "requiredProperties": ["name"],
+            "additionalProperties": "false"
+        },
+        "uaNode": {
+            "type": "object",
+            "properties": {
+                "assignments": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "associations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "target": {"type":  "string"},
+                            "arset": {"type":  "array", "items": {"type":  "string"}}
+                        }
+                    }
+                },
+                "properties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/property"
+                    }
+                }
+            },
+            "requiredProperties": ["name", "assignments"],
+            "additionalProperties": "false"
+        },
+        "otherNode": {
+            "type": "object",
+            "properties": {
+                "assignments": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "properties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/property"
+                    }
+                }
+            },
+            "requiredProperties": ["name", "assignments"],
+            "additionalProperties": "false"
+        }
+    }
+}

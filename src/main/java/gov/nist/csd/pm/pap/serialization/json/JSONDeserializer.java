@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.PMException;
@@ -22,15 +21,31 @@ public class JSONDeserializer implements PolicyDeserializer {
 
         pap.modify().operations().setResourceOperations(jsonPolicy.getResourceOperations());
 
-        createGraph(pap, jsonPolicy.getGraph());
-        createRestOfPolicy(
-                pap,
-                author,
-                jsonPolicy.getProhibitions(),
-                jsonPolicy.getObligations(),
-                jsonPolicy.getOperations(),
-                jsonPolicy.getRoutines()
-        );
+        Map<String, JSONNode> uaMap = new HashMap<>();
+        Map<String, JSONNode> oaMap = new HashMap<>();
+        Map<String, JSONNode> uMap = new HashMap<>();
+        Map<String, JSONNode> oMap = new HashMap<>();
+
+        for (JSONNode jsonNode : jsonPolicy.getGraph().uas) {
+            uaMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : jsonPolicy.getGraph().oas) {
+            oaMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : jsonPolicy.getGraph().users) {
+            uMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : jsonPolicy.getGraph().objects) {
+            oMap.put(jsonNode.getName(), jsonNode);
+        }
+
+        List<String> prohibitions = jsonPolicy.getProhibitions();
+        List<String> obligations = jsonPolicy.getObligations();
+        List<String> operations = jsonPolicy.getOperations();
+        List<String> routines = jsonPolicy.getRoutines();
+
+        createGraph(pap, jsonPolicy.getGraph().pcs, uaMap, oaMap, uMap, oMap);
+        createRestOfPolicy(pap, author, prohibitions, obligations, operations, routines);
     }
 
     private void createRestOfPolicy(PAP pap,
@@ -59,48 +74,65 @@ public class JSONDeserializer implements PolicyDeserializer {
         pap.executePML(author, sb.toString());
     }
 
-    private void createGraph(PAP pap, JSONGraph graph)
+    private void createGraph(PAP pap,
+                             List<JSONNode> pcs,
+                             Map<String, JSONNode> uaMap,
+                             Map<String, JSONNode> oaMap,
+                             Map<String, JSONNode> uMap,
+                             Map<String, JSONNode> oMap)
             throws PMException {
-        createPCs(pap, graph);
+        createPCs(pap, pcs);
 
         // create uas
-        createNodes(pap, UA, graph.uas);
+        createNodes(pap, UA, uaMap);
 
         // create oas
-        createNodes(pap, OA, graph.oas);
+        createNodes(pap, OA, oaMap);
 
         // associate uas and uas/oas
-        createAssociations(pap, graph.uas);
+        createAssociations(pap, uaMap);
 
         // create u and o
-        createNodes(pap, U, graph.users);
-        createNodes(pap, O, graph.objects);
+        createNodes(pap, U, uMap);
+        createNodes(pap, O, oMap);
     }
 
-    private void createPCs(PAP pap, JSONGraph graph) throws PMException {
-        // create all policy class nodes first
-        for (Map.Entry<String, JSONPolicyClass> policyClass : graph.pcs.entrySet()) {
-            Map<String, String> properties = policyClass.getValue().getProperties();
-            pap.modify().graph().createPolicyClass(policyClass.getKey());
+    private void createPCs(PAP pap, List<JSONNode> nodes) throws PMException {
+        for (JSONNode policyClass :  nodes) {
+            // create node
+            pap.modify().graph().createPolicyClass(policyClass.getName());
 
-            if (properties != null) {
-                pap.modify().graph().setNodeProperties(policyClass.getKey(), properties);
+            // set properties if any
+            Map<String, String> properties = jsonPropertiesToMap(policyClass.getProperties());
+            if (!properties.isEmpty()) {
+                pap.modify().graph().setNodeProperties(policyClass.getName(), properties);
             }
-
         }
+    }
+
+    private Map<String, String> jsonPropertiesToMap(List<JSONProperty> jsonProperties) {
+        Map<String, String> properties = new HashMap<>();
+
+        if (jsonProperties == null) {
+            return properties;
+        }
+
+        for (JSONProperty jsonProperty : jsonProperties) {
+            properties.put(jsonProperty.getKey(), jsonProperty.getValue());
+        }
+        return properties;
     }
 
     private void createAssociations(PAP pap, Map<String, JSONNode> uas) throws PMException {
         for (Map.Entry<String, JSONNode> entry : uas.entrySet()) {
-            String ua = entry.getKey();
             JSONNode jsonNode = entry.getValue();
-            Map<String, AccessRightSet> associations = jsonNode.getAssociations();
+            List<JSONAssociation> associations = jsonNode.getAssociations();
             if (associations == null) {
                 continue;
             }
 
-            for (Map.Entry<String, AccessRightSet> association : associations.entrySet()) {
-                pap.modify().graph().associate(ua, association.getKey(), association.getValue());
+            for (JSONAssociation jsonAssociation : associations) {
+                pap.modify().graph().associate(jsonNode.getName(), jsonAssociation.getTarget(), jsonAssociation.getArset());
             }
         }
     }
@@ -108,38 +140,37 @@ public class JSONDeserializer implements PolicyDeserializer {
     private void createNodes(PAP pap, NodeType type, Map<String, JSONNode> nodes)
             throws PMException {
         Set<Map.Entry<String, JSONNode>> entries = nodes.entrySet();
+        Set<String> createdNodes = new HashSet<>();
         for (Map.Entry<String, JSONNode> entry : entries) {
-            String name = entry.getKey();
-            createNode(pap, name, type, nodes);
+            createNode(pap, entry.getValue(), type, nodes, createdNodes);
         }
     }
 
-    private void createNode(PAP pap, String name, NodeType type, Map<String, JSONNode> nodes) throws PMException {
-        if (pap.query().graph().nodeExists(name)) {
+    private void createNode(PAP pap, JSONNode jsonNode, NodeType type, Map<String, JSONNode> nodes, Set<String> createdNodes) throws PMException {
+        if (createdNodes.contains(jsonNode.getName())) {
             return;
         }
 
-        JSONNode jsonNode = nodes.get(name);
-
         Collection<String> assignments = jsonNode.getAssignments();
-        boolean created = false;
         for (String assignment : assignments) {
             if (!pap.query().graph().nodeExists(assignment)) {
-                createNode(pap, assignment, type, nodes);
+                createNode(pap, nodes.get(assignment), type, nodes, createdNodes);
             }
-            createOrAssign(pap, created, name, type, jsonNode, assignment);
-            created = true;
+
+            createOrAssign(pap, createdNodes, jsonNode.getName(), type, jsonNode, assignment);
+
+            createdNodes.add(jsonNode.getName());
         }
     }
 
-    private void createOrAssign(PAP pap, boolean create, String name, NodeType type, JSONNode node, String assignment) throws PMException {
-        if (!create) {
+    private void createOrAssign(PAP pap, Set<String> createdNodes, String name, NodeType type, JSONNode node, String assignment) throws PMException {
+        if (!createdNodes.contains(name)) {
             // create node
             createNode(pap, type, name, node, List.of(assignment));
 
             // set properties
             if (node.getProperties() != null) {
-                pap.modify().graph().setNodeProperties(name, node.getProperties());
+                pap.modify().graph().setNodeProperties(name, jsonPropertiesToMap(node.getProperties()));
             }
         } else {
             pap.modify().graph().assign(name, List.of(assignment));

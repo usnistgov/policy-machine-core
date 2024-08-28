@@ -3,37 +3,46 @@ package gov.nist.csd.pm.pap.serialization.json;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class JSONNode {
 
-    private Map<String, String> properties;
+    private String name;
+    private List<JSONProperty> properties;
     private Collection<String> assignments;
-    private Map<String, AccessRightSet> associations;
+    private List<JSONAssociation> associations;
 
-    public JSONNode(Map<String, String> properties, Collection<String> assignments) {
-        if (!properties.isEmpty()) {
+    public JSONNode(String name, List<JSONProperty> properties, Collection<String> assignments, List<JSONAssociation> associations) {
+        this.name = name;
+
+        if (properties != null && !properties.isEmpty()) {
             this.properties = properties;
         }
 
-        if (!assignments.isEmpty()) {
+        if (assignments != null && !assignments.isEmpty()) {
             this.assignments = assignments;
+        }
+
+        if (associations != null && !associations.isEmpty()) {
+            this.associations = associations;
         }
     }
 
-    public JSONNode(Map<String, String> properties,
-                    Collection<String> assignments,
-                    Map<String, AccessRightSet> associations) {
-        this(properties, assignments);
-        this.associations = associations;
+    public String getName() {
+        return name;
     }
 
-    public Map<String, String> getProperties() {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<JSONProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(List<JSONProperty> properties) {
         this.properties = properties;
     }
 
@@ -45,11 +54,11 @@ public class JSONNode {
         this.assignments = assignments;
     }
 
-    public Map<String, AccessRightSet> getAssociations() {
+    public List<JSONAssociation> getAssociations() {
         return associations;
     }
 
-    public void setAssociations(Map<String, AccessRightSet> associations) {
+    public void setAssociations(List<JSONAssociation> associations) {
         this.associations = associations;
     }
 
