@@ -34,23 +34,46 @@ public class PMLSerializer implements PolicySerializer {
     private String serialize(JSONPolicy jsonPolicy) {
         StringBuilder sb = new StringBuilder();
 
+        Map<String, JSONNode> uaMap = new HashMap<>();
+        Map<String, JSONNode> oaMap = new HashMap<>();
+        Map<String, JSONNode> uMap = new HashMap<>();
+        Map<String, JSONNode> oMap = new HashMap<>();
+
+        for (JSONNode jsonNode : jsonPolicy.getGraph().getUas()) {
+            uaMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : jsonPolicy.getGraph().getOas()) {
+            oaMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : jsonPolicy.getGraph().getUsers()) {
+            uMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : jsonPolicy.getGraph().getObjects()) {
+            oMap.put(jsonNode.getName(), jsonNode);
+        }
+
+        List<String> prohibitions = jsonPolicy.getProhibitions();
+        List<String> obligations = jsonPolicy.getObligations();
+        List<String> operations = jsonPolicy.getOperations();
+        List<String> routines = jsonPolicy.getRoutines();
+
         sb.append("// resource operations\n");
         sb.append(jsonResourceOperations(jsonPolicy.getResourceOperations()));
 
         sb.append("\n// GRAPH\n");
-        sb.append(jsonGraphToPML(jsonPolicy.getGraph()));
+        sb.append(jsonGraphToPML(jsonPolicy.getGraph().getPcs(), uaMap, oaMap, uMap, oMap));
 
         sb.append("\n// PROHIBITIONS\n");
-        sb.append(concatStrings(jsonPolicy.getProhibitions()));
+        sb.append(concatStrings(prohibitions));
 
         sb.append("\n// OBLIGATIONS\n");
-        sb.append(concatStrings(jsonPolicy.getObligations()));
+        sb.append(concatStrings(obligations));
 
         sb.append("\n// OPERATIONS\n");
-        sb.append(concatStrings(jsonPolicy.getOperations()));
+        sb.append(concatStrings(operations));
 
         sb.append("\n// ROUTINES\n");
-        sb.append(concatStrings(jsonPolicy.getRoutines()));
+        sb.append(concatStrings(routines));
 
         return sb.toString();
     }
@@ -66,14 +89,14 @@ public class PMLSerializer implements PolicySerializer {
         return new SetResourceOperationsStatement(arrayLiteral).toFormattedString(0) + "\n";
     }
 
-    private String jsonGraphToPML(JSONGraph jsonGraph) {
+    private String jsonGraphToPML(List<JSONNode> pcs, Map<String, JSONNode> uaMap, Map<String, JSONNode> oaMap, Map<String, JSONNode> uMap, Map<String, JSONNode> oMap) {
         StringBuilder pml = new StringBuilder();
 
-        pml.append(buildPolicyClassesPML(jsonGraph));
-        pml.append(buildAttributesPML(jsonGraph.getPcs().keySet(), jsonGraph.getUas(), UA));
-        pml.append(buildAttributesPML(jsonGraph.getPcs().keySet(), jsonGraph.getOas(), OA));
-        pml.append(buildAssociations(jsonGraph.getUas()));
-        pml.append(buildUsersAndObjectsPML(jsonGraph));
+        pml.append(buildPolicyClassesPML(pcs));
+        pml.append(buildAttributesPML(pcs, uaMap, UA));
+        pml.append(buildAttributesPML(pcs, oaMap, OA));
+        pml.append(buildAssociations(uaMap));
+        pml.append(buildUsersAndObjectsPML(uMap, oMap));
 
         return pml.toString();
     }
@@ -84,17 +107,17 @@ public class PMLSerializer implements PolicySerializer {
             String name = ua.getKey();
             JSONNode node = ua.getValue();
 
-            Map<String, AccessRightSet> associations = node.getAssociations();
+            List<JSONAssociation> associations = node.getAssociations();
             if (associations == null) {
                 continue;
             }
 
-            for (Map.Entry<String, AccessRightSet> assoc : associations.entrySet()) {
+            for (JSONAssociation jsonAssociation : associations) {
                 sb.append(
                         new AssociateStatement(
                                 buildNameExpression(name),
-                                buildNameExpression(assoc.getKey()),
-                                setToExpression(assoc.getValue())
+                                buildNameExpression(jsonAssociation.getTarget()),
+                                setToExpression(jsonAssociation.getArset())
                         )
                 ).append("\n");
             }
@@ -103,10 +126,13 @@ public class PMLSerializer implements PolicySerializer {
         return sb.toString();
     }
 
-    private String buildAttributesPML(Set<String> pcs, Map<String, JSONNode> attrs, NodeType type) {
+    private String buildAttributesPML(List<JSONNode> pcs, Map<String, JSONNode> attrs, NodeType type) {
         StringBuilder pml = new StringBuilder();
 
-        Set<String> createNodes = new HashSet<>(pcs);
+        Set<String> createNodes = new HashSet<>();
+        for (JSONNode node : pcs) {
+            createNodes.add(node.getName());
+        }
 
         Set<Map.Entry<String, JSONNode>> entries = attrs.entrySet();
         for (Map.Entry<String, JSONNode> entry : entries) {
@@ -130,7 +156,9 @@ public class PMLSerializer implements PolicySerializer {
             if (!createdNodes.contains(assignment)) {
                 createNode(sb, createdNodes, assignment, type, nodes);
             }
+
             createOrAssign(sb, createdNodes, created, name, type, jsonNode, assignment);
+
             created = true;
         }
     }
@@ -147,24 +175,23 @@ public class PMLSerializer implements PolicySerializer {
         }
     }
 
-    private String buildPolicyClassesPML(JSONGraph jsonGraph) {
+    private String buildPolicyClassesPML(List<JSONNode> pcs) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("// policy classes\n");
 
-        Map<String, JSONPolicyClass> pcs = jsonGraph.getPcs();
-        for (Map.Entry<String, JSONPolicyClass> e : pcs.entrySet()) {
+        for (JSONNode pc : pcs) {
             // do not serialize admin policy node
-            if (AdminPolicy.isAdminPolicyNodeName(e.getKey())) {
+            if (AdminPolicy.isAdminPolicyNodeName(pc.getName())) {
                 continue;
             }
 
             sb.append(new CreatePolicyStatement(
-                    buildNameExpression(e.getKey())
+                    buildNameExpression(pc.getName())
             )).append("\n");
 
             SetNodePropertiesStatement setNodePropertiesStatement =
-                    buildSetNodePropertiesStatement(e.getKey(), e.getValue().getProperties());
+                    buildSetNodePropertiesStatement(pc.getName(), pc.getProperties());
             if (setNodePropertiesStatement != null) {
                 sb.append(setNodePropertiesStatement).append("\n");
             }
@@ -173,16 +200,16 @@ public class PMLSerializer implements PolicySerializer {
         return sb.toString();
     }
 
-    private String buildUsersAndObjectsPML(JSONGraph jsonGraph) {
+    private String buildUsersAndObjectsPML(Map<String, JSONNode> uMap, Map<String, JSONNode> oMap) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n// users\n");
-        for (Map.Entry<String, JSONNode> e : jsonGraph.getUsers().entrySet()) {
+        for (Map.Entry<String, JSONNode> e : uMap.entrySet()) {
             sb.append(jsonNodeToPML(new HashSet<>(), e.getKey(), U, e.getValue(), e.getValue().getAssignments()));
         }
 
         sb.append("\n// objects\n");
-        for (Map.Entry<String, JSONNode> e : jsonGraph.getObjects().entrySet()) {
+        for (Map.Entry<String, JSONNode> e : oMap.entrySet()) {
             sb.append(jsonNodeToPML(new HashSet<>(), e.getKey(), O, e.getValue(), e.getValue().getAssignments()));
         }
 
@@ -250,8 +277,8 @@ public class PMLSerializer implements PolicySerializer {
         );
     }
 
-    private SetNodePropertiesStatement buildSetNodePropertiesStatement(String name, Map<String, String> properties) {
-        Expression propertiesExpression = propertiesMapToExpression(properties);
+    private SetNodePropertiesStatement buildSetNodePropertiesStatement(String name, List<JSONProperty> properties) {
+        Expression propertiesExpression = jsonPropertiesToExpression(properties);
         if (propertiesExpression == null) {
             return null;
         }
@@ -262,16 +289,16 @@ public class PMLSerializer implements PolicySerializer {
         );
     }
 
-    private Expression propertiesMapToExpression(Map<String, String> properties) {
+    private Expression jsonPropertiesToExpression(List<JSONProperty> properties) {
         if (properties == null || properties.isEmpty()) {
             return null;
         }
 
         Map<Expression, Expression> propertiesExpressions = new HashMap<>();
-        for (Map.Entry<String, String> property : properties.entrySet()) {
+        for (JSONProperty jsonProperty : properties) {
             propertiesExpressions.put(
-                    new StringLiteral(property.getKey()),
-                    new StringLiteral(property.getValue())
+                    new StringLiteral(jsonProperty.getKey()),
+                    new StringLiteral(jsonProperty.getValue())
             );
         }
 

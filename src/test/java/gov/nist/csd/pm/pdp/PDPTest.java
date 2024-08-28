@@ -22,6 +22,7 @@ import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
 import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pdp.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PDPTest {
@@ -136,7 +137,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         ResourceAdjudicationResponse resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "read");
         assertEquals(resp.getResource(), pap.query().graph().getNode("o1"));
-        assertEquals(resp.getDecision(), Decision.GRANT);
+        assertEquals(resp.getDecision(), GRANT);
 
         resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "write");
         assertNull(resp.getResource());
@@ -173,11 +174,11 @@ class PDPTest {
                 new UserContext("u1"),
                 List.of(new OperationRequest("assign", Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa2"))))
         );
-        assertEquals(Decision.GRANT, resp.getDecision());
+        assertEquals(GRANT, resp.getDecision());
 
         // custom operation
         resp = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1", Map.of())));
-        assertEquals(Decision.GRANT, resp.getDecision());
+        assertEquals(GRANT, resp.getDecision());
 
         // denied
         resp = pdp.adjudicateAdminOperations(new UserContext("u2"), List.of(new OperationRequest("op1", Map.of())));
@@ -228,8 +229,10 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of("a", "test")));
-        pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine2", Map.of()));
+        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of("a", "test")));
+        assertEquals(GRANT, response.getDecision());
+        response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine2", Map.of()));
+        assertEquals(GRANT, response.getDecision());
 
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));

@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.github.com/usnistgov/policy-machine-core/tree/master/src/main/resources/pm.schema.json",
     "resourceOperations": [
         "read",
         "delete_readme",
@@ -6,134 +7,95 @@
         "write"
     ],
     "graph": {
-        "pcs": {
-            "RBAC": {},
-            "Location": {}
-        },
-        "uas": {
-            "US user": {
+        "pcs": [
+            {"name": "RBAC"},
+            {"name":  "Location"}
+        ],
+        "uas": [
+            {
+                "name": "US user",
                 "assignments": [
                     "Location"
                 ],
-                "associations": {
-                    "US project": [
-                        "*"
-                    ]
-                }
+                "associations": [
+                    {
+                        "target": "US project",
+                        "arset": ["*"]
+                    }
+                ]
             },
-            "reader": {
+            {
+                "name": "reader",
                 "assignments": [
                     "employee"
                 ],
-                "associations": {
-                    "project": [
-                        "read"
-                    ]
-                }
+                "associations": [
+                    {
+                        "target": "project",
+                        "arset": ["read"]
+                    }
+                ]
             },
-            "EU user": {
+            {
+                "name": "EU user",
                 "assignments": [
                     "Location"
                 ],
-                "associations": {
-                    "EU project": [
-                        "*"
-                    ]
-                }
+                "associations": [
+                    {
+                        "target": "EU project",
+                        "arset": ["*"]
+                    }
+                ]
             },
-            "writer": {
+            {
+                "name": "writer",
                 "assignments": [
                     "reader"
                 ],
-                "associations": {
-                    "project": [
-                        "write"
-                    ]
-                }
+                "associations": [
+                    {
+                        "target": "project",
+                        "arset": ["write"]
+                    }
+                ]
             },
-            "employee": {
+            {
+                "name": "employee",
                 "assignments": [
                     "RBAC"
                 ]
             },
-            "deleter": {
+            {
+                "name": "deleter",
                 "assignments": [
                     "employee"
                 ],
-                "associations": {
-                    "project": [
-                        "write"
-                    ]
-                }
-            }
-        },
-        "oas": {
-            "EU project": {
-                "assignments": [
-                    "Location"
-                ]
-            },
-            "us_project1": {
-                "assignments": [
-                    "US project",
-                    "project"
-                ]
-            },
-            "project": {
-                "assignments": [
-                    "RBAC"
-                ]
-            },
-            "eu_project1": {
-                "assignments": [
-                    "project",
-                    "EU project"
-                ]
-            },
-            "US project": {
-                "assignments": [
-                    "Location"
+                "associations": [
+                    {
+                        "target": "project",
+                        "arset": ["write"]
+                    }
                 ]
             }
-        },
-        "users": {
-            "eu_writer1": {
-                "assignments": [
-                    "EU user",
-                    "writer"
-                ]
-            },
-            "us_writer1": {
-                "assignments": [
-                    "US user",
-                    "writer"
-                ]
-            },
-            "eu_reader1": {
-                "assignments": [
-                    "EU user",
-                    "reader"
-                ]
-            },
-            "us_reader1": {
-                "assignments": [
-                    "US user",
-                    "reader"
-                ]
-            }
-        },
-        "objects": {
-            "eu_project1 README": {
-                "assignments": [
-                    "eu_project1"
-                ]
-            },
-            "us_project1 README": {
-                "assignments": [
-                    "us_project1"
-                ]
-            }
-        }
+        ],
+        "oas": [
+            {"name": "EU project", "assignments": ["Location"]},
+            {"name": "us_project1", "assignments": ["US project", "project"]},
+            {"name": "project", "assignments": [ "RBAC"]},
+            {"name": "eu_project1", "assignments": ["project", "EU project"]},
+            {"name": "US project", "assignments": ["Location"]}
+        ],
+        "users": [
+            {"name": "eu_writer1", "assignments": ["EU user", "writer"]},
+            {"name": "us_writer1", "assignments": ["US user", "writer"]},
+            {"name": "eu_reader1", "assignments": ["EU user", "reader"]},
+            {"name": "us_reader1", "assignments": ["US user", "reader"]}
+        ],
+        "objects": [
+            {"name": "eu_project1 README", "assignments": ["eu_project1"]},
+            {"name":  "us_project1 README", "assignments": ["us_project1"]}
+        ]
     },
     "prohibitions": [],
     "obligations": [

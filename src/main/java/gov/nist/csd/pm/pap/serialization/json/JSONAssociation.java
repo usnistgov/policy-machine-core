@@ -2,6 +2,8 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 
+import java.util.Objects;
+
 public class JSONAssociation {
 
     private String target;
@@ -30,5 +32,17 @@ public class JSONAssociation {
 
     public void setArset(AccessRightSet arset) {
         this.arset = arset;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JSONAssociation that)) return false;
+        return Objects.equals(target, that.target) && Objects.equals(arset, that.arset);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(target, arset);
     }
 }

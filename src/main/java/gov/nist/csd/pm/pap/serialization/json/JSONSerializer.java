@@ -100,8 +100,8 @@ public class JSONSerializer implements PolicySerializer {
         );
     }
 
-    private Map<String, JSONNode> buildNonUANodes(PolicyQuery policyQuery, NodeType type) throws PMException {
-        Map<String, JSONNode> nodes = new HashMap<>();
+    private List<JSONNode> buildNonUANodes(PolicyQuery policyQuery, NodeType type) throws PMException {
+        List<JSONNode> nodes = new ArrayList<>();
 
         Collection<String> search = policyQuery.graph().search(type, new HashMap<>());
         for (String node : search) {
@@ -110,15 +110,28 @@ public class JSONSerializer implements PolicySerializer {
             }
 
             Node n = policyQuery.graph().getNode(node);
-
             String name = n.getName();
-            Map<String, String> properties = n.getProperties();
+            List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
             Collection<String> descs = new ArrayList<>(policyQuery.graph().getAdjacentDescendants(name));
 
-            nodes.put(name, new JSONNode(properties, descs));
+            nodes.add(new JSONNode(name, properties, descs, null));
         }
 
         return nodes;
+    }
+
+    private List<JSONProperty> mapToJsonProperties(Map<String, String> map) {
+        List<JSONProperty> jsonProperties = new ArrayList<>();
+
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            jsonProperties.add(new JSONProperty(entry.getKey(), entry.getValue()));
+        }
+
+        return jsonProperties;
     }
 
     private boolean isUnmodifiedAdminNodeOrTarget(PolicyQuery policyQuery, String node) throws PMException {
@@ -126,38 +139,37 @@ public class JSONSerializer implements PolicySerializer {
         return descendants.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()) && descendants.size() == 1;
     }
 
-    private Map<String, JSONNode> buildUserAttributes(PolicyQuery policyQuery) throws PMException {
-        Map<String, JSONNode> userAttributes = new HashMap<>();
+    private List<JSONNode> buildUserAttributes(PolicyQuery policyQuery) throws PMException {
+        List<JSONNode> userAttributes = new ArrayList<>();
 
         Collection<String> search = policyQuery.graph().search(UA, new HashMap<>());
         for (String node : search) {
             Node n = policyQuery.graph().getNode(node);
 
             String name = n.getName();
-            Map<String, String> properties = n.getProperties();
+            List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
             Collection<String> descendants = policyQuery.graph().getAdjacentDescendants(name);
             Collection<Association> assocList = policyQuery.graph().getAssociationsWithSource(name);
-            Map<String, AccessRightSet> assocMap = new HashMap<>();
-
+            List<JSONAssociation> jsonAssociations = new ArrayList<>();
             for (Association assoc : assocList) {
-                assocMap.put(assoc.getTarget(), assoc.getAccessRightSet());
+                jsonAssociations.add(new JSONAssociation(assoc.getTarget(), assoc.getAccessRightSet()));
             }
 
             JSONNode jsonNode;
-            if (assocMap.isEmpty()) {
-                jsonNode = new JSONNode(properties, descendants);
+            if (jsonAssociations.isEmpty()) {
+                jsonNode = new JSONNode(name, properties, descendants, null);
             } else {
-                jsonNode = new JSONNode(properties, descendants, assocMap);
+                jsonNode = new JSONNode(name, properties, descendants, jsonAssociations);
             }
 
-            userAttributes.put(name, jsonNode);
+            userAttributes.add(jsonNode);
         }
 
         return userAttributes;
     }
 
-    private Map<String, JSONPolicyClass> buildPolicyClasses(PolicyQuery policyQuery) throws PMException {
-        Map<String, JSONPolicyClass> policyClassesList = new HashMap<>();
+    private List<JSONNode> buildPolicyClasses(PolicyQuery policyQuery) throws PMException {
+        List<JSONNode> policyClassesList = new ArrayList<>();
 
         Collection<String> policyClasses = policyQuery.graph().getPolicyClasses();
         for (String pc : policyClasses) {
@@ -165,21 +177,14 @@ public class JSONSerializer implements PolicySerializer {
                 continue;
             }
 
-            JSONPolicyClass jsonPolicyClass = buildJSONPolicyCLass(pc, policyQuery);
+            Node n = policyQuery.graph().getNode(pc);
+            String name = n.getName();
+            List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
+            JSONNode jsonPolicyClass = new JSONNode(name, properties, null, null);
 
-            policyClassesList.put(pc, jsonPolicyClass);
+            policyClassesList.add(jsonPolicyClass);
         }
 
         return policyClassesList;
-    }
-
-    private JSONPolicyClass buildJSONPolicyCLass(String pc, PolicyQuery policyQuery) throws PMException {
-        Node node = policyQuery.graph().getNode(pc);
-        JSONPolicyClass jsonPolicyClass = new JSONPolicyClass();
-        if (!node.getProperties().isEmpty()) {
-            jsonPolicyClass.setProperties(node.getProperties());
-        }
-
-        return jsonPolicyClass;
     }
 }
