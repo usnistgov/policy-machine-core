@@ -5,13 +5,9 @@ import gov.nist.csd.pm.pap.graph.dag.*;
 import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
-import gov.nist.csd.pm.pap.graph.relationship.Relationship;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.query.explain.EdgePath;
-import gov.nist.csd.pm.pap.query.explain.Explain;
-import gov.nist.csd.pm.pap.query.explain.Path;
-import gov.nist.csd.pm.pap.query.explain.PolicyClassExplain;
+import gov.nist.csd.pm.pap.query.explain.*;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.query.AccessQuerier;
 import gov.nist.csd.pm.pap.query.GraphQuerier;
@@ -157,10 +153,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
         Node userNode = graphQuerier.getNode(userCtx.getUser());
         Node targetNode = graphQuerier.getNode(target);
 
-        List<EdgePath> userPaths = explainDfs(userNode.getName());
-        List<EdgePath> targetPaths = explainDfs(targetNode.getName());
-
-        Map<String, PolicyClassExplain> resolvedPaths = resolvePaths(graphQuerier, userPaths, targetPaths, target);
+        Map<String, Map<Path, List<Association>>> targetPaths = explainTarget(targetNode.getName());
+        Map<String, Set<Path>> userPaths = explainUser(userNode.getName(), targetPaths);
+        List<PolicyClassExplain> resolvedPaths = resolvePaths(targetPaths, userPaths);
 
         UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
         TargetDagResult targetDagResult = processTargetDAG(target, userDagResult);
@@ -352,6 +347,184 @@ public class MemoryAccessQuerier extends AccessQuerier {
         return new UserDagResult(borderTargets, reachedProhibitions, prohibitionTargets);
     }
 
+    private List<PolicyClassExplain> resolvePaths(Map<String, Map<Path, List<Association>>> targetPaths,
+                                                         Map<String, Set<Path>> userPaths) {
+        List<PolicyClassExplain> result = new ArrayList<>();
+
+        for (Map.Entry<String, Map<Path, List<Association>>> targetPathEntry : targetPaths.entrySet()) {
+            String pc = targetPathEntry.getKey();
+            Map<Path, List<Association>> targetPathAssociations = targetPathEntry.getValue();
+
+            AccessRightSet arset = getArsetFromPaths(targetPathAssociations);
+            List<List<ExplainNode>> paths = getExplainNodePaths(targetPathAssociations, userPaths);
+
+            result.add(new PolicyClassExplain(pc, arset, paths));
+        }
+
+        return result;
+    }
+
+    private List<List<ExplainNode>> getExplainNodePaths(Map<Path, List<Association>> targetPathAssociations,
+                                                        Map<String, Set<Path>> userPaths) {
+        List<List<ExplainNode>> paths = new ArrayList<>();
+
+        for (Map.Entry<Path, List<Association>> targetPathEntry : targetPathAssociations.entrySet()) {
+            Path path = targetPathEntry.getKey();
+            List<Association> pathAssocs = targetPathEntry.getValue();
+
+            List<ExplainNode> explainNodes = new ArrayList<>();
+            for (String node : path) {
+                List<ExplainAssociation> explainAssocs = new ArrayList<>();
+
+                for (Association pathAssoc : pathAssocs) {
+                    String ua = pathAssoc.getSource();
+                    String target = pathAssoc.getTarget();
+                    if (!target.equals(node)) {
+                        continue;
+                    }
+
+                    Set<Path> userPathsToAssoc = userPaths.get(ua);
+                    if (userPathsToAssoc == null || userPathsToAssoc.isEmpty()) {
+                        continue;
+                    }
+
+                    explainAssocs.add(new ExplainAssociation(
+                            ua,
+                            pathAssoc.getTarget(),
+                            pathAssoc.getAccessRightSet(),
+                            new ArrayList<>(userPathsToAssoc)
+                    ));
+                }
+
+                explainNodes.add(new ExplainNode(node, explainAssocs));
+            }
+
+            paths.add(explainNodes);
+        }
+
+        return paths;
+    }
+
+    private AccessRightSet getArsetFromPaths(Map<Path, List<Association>> targetPathAssociations) {
+        AccessRightSet accessRightSet = new AccessRightSet();
+        for (List<Association> associations : targetPathAssociations.values()) {
+            for (Association association : associations) {
+                accessRightSet.addAll(association.getAccessRightSet());
+            }
+        }
+
+        return accessRightSet;
+    }
+
+    private Map<String, Map<Path, List<Association>>> explainTarget(String target) throws PMException {
+        Collection<String> policyClasses = graphQuerier.getPolicyClasses();
+
+        // initialize map with policy classes
+        Map<String, Map<List<String>, List<Association>>> pcPathAssociations = new HashMap<>();
+        for (String pc : policyClasses) {
+            pcPathAssociations.put(pc, new HashMap<>(Map.of(new ArrayList<>(List.of(pc)), new ArrayList<>())));
+        }
+
+        Propagator propagator = (src, dst) -> {
+            Map<List<String>, List<Association>> srcPathAssocs = pcPathAssociations.get(src);
+            Map<List<String>, List<Association>> dstPathAssocs = pcPathAssociations.getOrDefault(dst, new HashMap<>());
+
+            for (Map.Entry<List<String>, List<Association>> entry : srcPathAssocs.entrySet()) {
+                // add DST to the path from SRC
+                List<String> targetPath = new ArrayList<>(entry.getKey());
+                List<Association> associations = new ArrayList<>(entry.getValue());
+                targetPath.addFirst(dst);
+
+                // collect any associations for the DST node
+                Collection<Association> associationsWithTarget = graphQuerier.getAssociationsWithTarget(dst);
+                associations.addAll(associationsWithTarget);
+                dstPathAssocs.put(targetPath, associations);
+            }
+
+            // update dst entry
+            pcPathAssociations.put(dst, dstPathAssocs);
+        };
+
+        // DFS from target node
+        new DepthFirstGraphWalker(graphQuerier)
+                .withPropagator(propagator)
+                .walk(target);
+
+        // convert the map created above into a map where the policy classes are the keys
+        Map<List<String>, List<Association>> targetPathAssocs = pcPathAssociations.get(target);
+        Map<String, Map<Path, List<Association>>> pcMap = new HashMap<>();
+        for (Map.Entry<List<String>, List<Association>> entry : targetPathAssocs.entrySet()) {
+            Path targetPath = new Path(entry.getKey());
+            List<Association> associations = new ArrayList<>(entry.getValue());
+
+            String pc = targetPath.getLast();
+
+            Map<Path, List<Association>> pcPathAssocs = pcMap.getOrDefault(pc, new HashMap<>());
+            pcPathAssocs.put(targetPath, associations);
+            pcMap.put(pc, pcPathAssocs);
+        }
+
+        return pcMap;
+    }
+
+    private Map<String, Set<Path>> explainUser(String user, Map<String, Map<Path, List<Association>>> targetPaths) throws PMException {
+        // initialize map with the UAs of the target path associations
+        Set<String> uasFromTargetPathAssociations = new HashSet<>(getUAsFromTargetPathAssociations(targetPaths));
+        Map<String, Set<Path>> pathsToUAs = new HashMap<>();
+        for (String ua : uasFromTargetPathAssociations) {
+            pathsToUAs.put(ua, new HashSet<>(Set.of(new Path(ua))));
+        }
+
+        Propagator propagator = (src, dst) -> {
+            // don't propagate unless the src is a ua in a target path association or an already propagated to dst node
+            if (!uasFromTargetPathAssociations.contains(src) && !pathsToUAs.containsKey(src)) {
+                return;
+            }
+
+            Set<Path> srcPaths = pathsToUAs.get(src);
+            Set<Path> dstPaths = pathsToUAs.getOrDefault(dst, new HashSet<>());
+
+            for (Path srcPath : srcPaths) {
+                Path copy = new Path(srcPath);
+                copy.addFirst(dst);
+                dstPaths.add(copy);
+            }
+
+            pathsToUAs.put(dst, dstPaths);
+        };
+
+        new DepthFirstGraphWalker(graphQuerier)
+                .withPropagator(propagator)
+                .walk(user);
+
+        // transform the map so that the key is the last ua in the path pointing to it's paths
+        Set<Path> userPaths = pathsToUAs.get(user);
+        Map<String, Set<Path>> associationUAPaths = new HashMap<>();
+        for (Path userPath : userPaths) {
+            String assocUA = userPath.getLast();
+            Set<Path> assocUAPaths = associationUAPaths.getOrDefault(assocUA, new HashSet<>());
+            assocUAPaths.add(userPath);
+            associationUAPaths.put(assocUA, assocUAPaths);
+        }
+
+        return associationUAPaths;
+    }
+
+    private List<String> getUAsFromTargetPathAssociations(Map<String, Map<Path, List<Association>>> targetPaths) {
+        List<String> uas = new ArrayList<>();
+
+        for (Map.Entry<String, Map<Path, List<Association>>> pcPaths : targetPaths.entrySet()) {
+            for (Map.Entry<Path, List<Association>> pathAssociations : pcPaths.getValue().entrySet()) {
+                List<Association> associations = pathAssociations.getValue();
+                for (Association association : associations) {
+                    uas.add(association.getSource());
+                }
+            }
+        }
+
+        return uas;
+    }
+
     private void collectAssociationsFromBorderTargets(Collection<Association> assocs, Map<String, AccessRightSet> borderTargets) {
         for (Association association : assocs) {
             AccessRightSet ops = association.getAccessRightSet();
@@ -530,179 +703,5 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     private boolean inMemUattrHasOpsets(String uaNode) throws PMException {
         return !graphQuerier.getAssociationsWithSource(uaNode).isEmpty();
-    }
-
-    /**
-     * Given a set of paths starting at a user, and a set of paths starting at an object, return the paths from
-     * the user to the target node (through an association) that belong to each policy class. A path is added to a policy
-     * class' entry in the returned map if the user path ends in an association in which the target of the association
-     * exists in a target path. That same target path must also end in a policy class. If the path does not end in a policy
-     * class the target path is ignored.
-     *
-     * @param userPaths the set of paths starting with a user.
-     * @param targetPaths the set of paths starting with a target node.
-     * @param target the name of the target node.
-     * @return the set of paths from a user to a target node (through an association) for each policy class in the system.
-     * @throws PMException if there is an exception traversing the graph
-     */
-    public static Map<String, PolicyClassExplain> resolvePaths(GraphQuerier graphQuerier, List<EdgePath> userPaths, List<EdgePath> targetPaths, String target) throws PMException {
-        Map<String, PolicyClassExplain> results = new HashMap<>();
-
-        for (EdgePath targetPath : targetPaths) {
-            Relationship pcEdge = targetPath.getEdges().get(targetPath.getEdges().size()-1);
-
-            // if the last element in the target path is a pc, the target belongs to that pc, add the pc to the results
-            // skip to the next target path if it is not a policy class
-            if (!isPolicyClass(graphQuerier, pcEdge.getTarget())) {
-                continue;
-            }
-
-            PolicyClassExplain policyClass = results.getOrDefault(pcEdge.getTarget(), new PolicyClassExplain());
-
-            // compute the paths for this target path
-            Set<Path> paths = computeExplainPaths(userPaths, targetPath, target);
-
-            // add all paths
-            Set<Path> existingPaths = policyClass.getPaths();
-            existingPaths.addAll(paths);
-
-            // collect all ops
-            for (Path p : paths) {
-                policyClass.getArset().addAll(p.getAssociation().getAccessRightSet());
-            }
-
-            // update results
-            results.put(pcEdge.getTarget(), policyClass);
-        }
-
-        return results;
-    }
-
-    public static boolean isPolicyClass(GraphQuerier graphQuerier, String node) throws PMException {
-        return graphQuerier.getPolicyClasses().contains(node);
-    }
-
-    public static Set<Path> computeExplainPaths(List<EdgePath> userEdgePaths, EdgePath targetEdgePath, String target) {
-        Set<Path> computedPaths = new HashSet<>();
-
-        for(EdgePath userEdgePath : userEdgePaths) {
-            Relationship lastUserEdge = userEdgePath.getEdges().get(userEdgePath.getEdges().size()-1);
-
-            // if the last edge does not have any ops, it is not an association, so ignore it
-            if (!lastUserEdge.isAssociation()) {
-                continue;
-            }
-
-            for(int i = 0; i < targetEdgePath.getEdges().size(); i++) {
-                Relationship curEdge = targetEdgePath.getEdges().get(i);
-                // if the target of the last edge in a user resolvedPath does not match the target of the current edge in the target
-                // resolvedPath, continue to the next target edge
-                String lastUserEdgeTarget = lastUserEdge.getTarget();
-                String curEdgeSource = curEdge.getSource();
-                String curEdgeTarget = curEdge.getTarget();
-
-                // if the target of the last edge in a user path does not match the target of the current edge in the target path
-                // AND if the target of the last edge in a user path does not match the source of the current edge in the target path
-                //     OR if the target of the last edge in a user path does not match the target of the explain
-                // continue to the next target edge
-                if((!lastUserEdgeTarget.equals(curEdgeTarget)) &&
-                        (!lastUserEdgeTarget.equals(curEdgeSource) || !lastUserEdgeTarget.equals(target))) {
-                    continue;
-                }
-
-                List<String> userPathToAssociation = userEdgePath.toPath();
-                List<String> targetPathToPolicyClass = targetEdgePath.toPath();
-
-
-                Path path = new Path(userPathToAssociation, targetPathToPolicyClass,
-                        new Association(lastUserEdge.getSource(), lastUserEdgeTarget, lastUserEdge.getAccessRightSet()));
-
-                computedPaths.add(path);
-            }
-        }
-
-        return computedPaths;
-    }
-
-    private List<EdgePath> explainDfs(String start) throws PMException {
-        List<EdgePath> paths = new ArrayList<>();
-        Map<String, List<EdgePath>> propPaths = new HashMap<>();
-
-        Visitor visitor = nodeName -> {
-            Node node = graphQuerier.getNode(nodeName);
-            List<EdgePath> nodePaths = new ArrayList<>();
-
-            for(String desc : graphQuerier.getAdjacentDescendants(nodeName)) {
-                Relationship edge = new Relationship(node.getName(), desc);
-                List<EdgePath> descPaths = propPaths.get(desc);
-                if(descPaths.isEmpty()) {
-                    EdgePath path = new EdgePath();
-                    path.addEdge(edge);
-                    nodePaths.add(0, path);
-                } else {
-                    for(EdgePath p : descPaths) {
-                        EdgePath descPath = new EdgePath();
-                        for(Relationship e : p.getEdges()) {
-                            descPath.addEdge(new Relationship(e.getSource(), e.getTarget(), e.getAccessRightSet()));
-                        }
-
-                        descPath.getEdges().addFirst(edge);
-                        nodePaths.add(descPath);
-                    }
-                }
-            }
-
-            Collection<Association> assocs = graphQuerier.getAssociationsWithSource(node.getName());
-            for(Association association : assocs) {
-                Node targetNode = graphQuerier.getNode(association.getTarget());
-                EdgePath path = new EdgePath();
-                path.addEdge(new Relationship(node.getName(), targetNode.getName(), association.getAccessRightSet()));
-                nodePaths.add(path);
-            }
-
-            // if the node being visited is the start node, add all the found nodePaths
-            // we don't need the if for users, only when the target is an OA, so it might have something to do with
-            // leafs vs non leafs
-            if (node.getName().equals(start)) {
-                paths.clear();
-                paths.addAll(nodePaths);
-            } else {
-                propPaths.put(node.getName(), nodePaths);
-            }
-        };
-
-        Propagator propagator = (desc, asc) -> {
-            Node descNode = graphQuerier.getNode(desc);
-            Node ascNode = graphQuerier.getNode(asc);
-            List<EdgePath> ascPaths = propPaths.computeIfAbsent(ascNode.getName(), k -> new ArrayList<>());
-            List<EdgePath> descPaths = propPaths.get(descNode.getName());
-
-            for(EdgePath p : descPaths) {
-                EdgePath path = new EdgePath();
-                for(Relationship edge : p.getEdges()) {
-                    path.addEdge(new Relationship(edge.getSource(), edge.getTarget(), edge.getAccessRightSet()));
-                }
-
-                EdgePath newPath = new EdgePath();
-                newPath.getEdges().addAll(path.getEdges());
-                Relationship edge = new Relationship(ascNode.getName(), descNode.getName(), null);
-                newPath.getEdges().add(0, edge);
-                ascPaths.add(newPath);
-                propPaths.put(ascNode.getName(), ascPaths);
-            }
-
-            if (ascNode.getName().equals(start)) {
-                paths.clear();
-                paths.addAll(propPaths.get(ascNode.getName()));
-            }
-        };
-
-        new DepthFirstGraphWalker(graphQuerier)
-                .withVisitor(visitor)
-                .withPropagator(propagator)
-                .withDirection(Direction.DESCENDANTS)
-                .walk(start);
-
-        return paths;
     }
 }

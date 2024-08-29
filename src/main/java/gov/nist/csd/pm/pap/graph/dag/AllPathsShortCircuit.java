@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.pap.graph.dag;
 
+import gov.nist.csd.pm.pap.exception.PMException;
+
 public class AllPathsShortCircuit implements ShortCircuit{
 
     private boolean s;
@@ -11,7 +13,7 @@ public class AllPathsShortCircuit implements ShortCircuit{
     }
 
     @Override
-    public boolean evaluate(String node) {
+    public boolean evaluate(String node) throws PMException {
         boolean e = this.shortCircuit.evaluate(node);
         if (!s) {
             s = e;
