@@ -20,7 +20,7 @@ class PreparedOperationTest {
     void testExecute() throws PMException {
         Operation<Void> op1 = new Operation<>("op1", List.of("a", "b", "c", "d"), List.of("c", "d")) {
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
 
             }
 

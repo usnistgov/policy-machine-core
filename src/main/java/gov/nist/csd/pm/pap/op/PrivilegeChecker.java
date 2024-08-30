@@ -17,7 +17,23 @@ import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 
 public class PrivilegeChecker {
 
-    public static void check(PAP pap, UserContext userCtx, String target, Collection<String> toCheck) throws PMException {
+    private PAP pap;
+    private boolean explain;
+
+    public PrivilegeChecker(PAP pap) {
+        this.pap = pap;
+        this.explain = false;
+    }
+
+    public boolean isExplain() {
+        return explain;
+    }
+
+    public void setExplain(boolean explain) {
+        this.explain = explain;
+    }
+
+    public void check(UserContext userCtx, String target, Collection<String> toCheck) throws PMException {
         // if checking the permissions on a PC, check the permissions on the target node for the PC
         Node targetNode = pap.query().graph().getNode(target);
 
@@ -25,43 +41,41 @@ public class PrivilegeChecker {
             target = AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName();
         }
 
-        AccessRightSet accessRights = pap.query().access().computePrivileges(userCtx, target);
-        if (!accessRights.containsAll(toCheck)) {
-            throw new UnauthorizedException(userCtx, target, toCheck.toArray(String[]::new));
-        }
+        AccessRightSet computed = pap.query().access().computePrivileges(userCtx, target);
+        checkIsAuthorized(userCtx, target, computed, toCheck);
     }
 
-    public static void check(PAP pap, UserContext userCtx, String target, String... toCheck) throws PMException {
-        // if checking the permissions on a PC, check the permissions on the target node for the PC
-        Node targetNode = pap.query().graph().getNode(target);
-
-        if (targetNode.getType().equals(PC)) {
-            target = AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName();
-        }
-
-        AccessRightSet accessRights = pap.query().access().computePrivileges(userCtx, target);
-        if (!accessRights.containsAll(Arrays.asList(toCheck))) {
-            throw new UnauthorizedException(userCtx, target, toCheck);
-        }
+    public void check(UserContext userCtx, String target, String... toCheck) throws PMException {
+        check(userCtx, target, Arrays.asList(toCheck));
     }
 
-    public static void check(PAP pap, UserContext userCtx, Collection<String> targets, String... toCheck) throws PMException {
+    public void check(UserContext userCtx, Collection<String> targets, String... toCheck) throws PMException {
         for (String target : targets) {
-            check(pap, userCtx, target, toCheck);
+            check(userCtx, target, toCheck);
         }
     }
 
-    public static void checkPattern(PAP pap, UserContext userCtx, Pattern pattern, String toCheck) throws PMException {
+    public void checkPattern(UserContext userCtx, Pattern pattern, String toCheck) throws PMException {
         ReferencedNodes referencedNodes = pattern.getReferencedNodes();
         if (referencedNodes.isAny()) {
-            PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), toCheck);
+            check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), toCheck);
 
             return;
         }
 
         for (String entity : referencedNodes.nodes()) {
-            PrivilegeChecker.check(pap, userCtx, entity, toCheck);
+            check(userCtx, entity, toCheck);
         }
 
+    }
+    
+    private void checkIsAuthorized(UserContext userCtx, String target, AccessRightSet computed, Collection<String> toCheck) throws PMException {
+        if (!computed.containsAll(toCheck)) {
+            if (explain) {
+                throw new UnauthorizedException(pap.query().access().explain(userCtx, target), userCtx, target, toCheck);
+            } else {
+                throw new UnauthorizedException(null, userCtx, target, toCheck);
+            }
+        }
     }
 }

@@ -27,15 +27,25 @@ public class PDP implements EventEmitter, AccessAdjudication {
 
     protected final PAP pap;
     protected final List<EventProcessor> eventProcessors;
+    private final PrivilegeChecker privilegeChecker;
 
     public PDP(PAP pap) {
         this.pap = pap;
         this.eventProcessors = new ArrayList<>();
+        this.privilegeChecker = new PrivilegeChecker(pap);
+    }
+
+    public void setExplain(boolean explain) {
+        privilegeChecker.setExplain(explain);
+    }
+
+    public boolean isExplain() {
+        return privilegeChecker.isExplain();
     }
 
     public void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, pap, eventProcessors);
+            PDPTx pdpTx = new PDPTx(userCtx, privilegeChecker, pap, eventProcessors);
             txRunner.run(pdpTx);
         });
     }
@@ -87,9 +97,9 @@ public class PDP implements EventEmitter, AccessAdjudication {
         }
 
         try {
-            PrivilegeChecker.check(pap, user, target, resourceOperation);
+            privilegeChecker.check(user, target, resourceOperation);
         } catch (UnauthorizedException e) {
-            return new ResourceAdjudicationResponse(Decision.DENY);
+            return new ResourceAdjudicationResponse(Decision.DENY, pap.query().access().explain(user, target));
         }
 
         Node node = pap.query().graph().getNode(target);
@@ -132,7 +142,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
                 }
             });
         } catch(UnauthorizedException e){
-            return new AdminAdjudicationResponse(Decision.DENY);
+            return new AdminAdjudicationResponse(e);
         }
 
         return new AdminAdjudicationResponse(Decision.GRANT);
@@ -141,15 +151,19 @@ public class PDP implements EventEmitter, AccessAdjudication {
     @Override
     public AdminAdjudicationResponse adjudicateAdminRoutine(UserContext user, RoutineRequest request) throws PMException {
         Routine<?> adminRoutine = pap.query().routines().getAdminRoutine(request.name());
-        runTx(user, tx -> {
-            PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
+        try {
+            runTx(user, tx -> {
+                PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
 
-            if (adminRoutine instanceof PMLRoutine) {
-                ((PMLRoutine)adminRoutine).setCtx(ctx);
-            }
+                if (adminRoutine instanceof PMLRoutine) {
+                    ((PMLRoutine) adminRoutine).setCtx(ctx);
+                }
 
-            tx.executeAdminExecutable(adminRoutine, request.operands());
-        });
+                tx.executeAdminExecutable(adminRoutine, request.operands());
+            });
+        } catch (UnauthorizedException e) {
+            return new AdminAdjudicationResponse(e);
+        }
 
         return new AdminAdjudicationResponse(Decision.GRANT);
     }

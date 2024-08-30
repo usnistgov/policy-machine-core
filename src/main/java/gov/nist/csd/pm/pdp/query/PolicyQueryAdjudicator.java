@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.*;
 
 public class PolicyQueryAdjudicator extends PolicyQuerier {
@@ -12,14 +13,14 @@ public class PolicyQueryAdjudicator extends PolicyQuerier {
     private final OperationsQueryAdjudicator operations;
     private final RoutinesQueryAdjudicator routines;
 
-    public PolicyQueryAdjudicator(UserContext userCtx, PAP pap) {
+    public PolicyQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         super(pap.query());
-        this.access = new AccessQueryAdjudicator(userCtx, pap);
-        this.graph = new GraphQueryAdjudicator(userCtx, pap);
-        this.prohibitions = new ProhibitionsQueryAdjudicator(userCtx, pap);
-        this.obligations = new ObligationsQueryAdjudicator(userCtx, pap);
-        this.operations = new OperationsQueryAdjudicator(userCtx, pap);
-        this.routines = new RoutinesQueryAdjudicator(userCtx, pap);
+        this.access = new AccessQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.graph = new GraphQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.prohibitions = new ProhibitionsQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.obligations = new ObligationsQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.operations = new OperationsQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.routines = new RoutinesQueryAdjudicator(userCtx, pap, privilegeChecker);
     }
 
     @Override

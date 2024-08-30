@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.pap.exception.OperationExistsException;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.query.UserContext;
 import org.junit.jupiter.api.Nested;
@@ -22,7 +23,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
     Operation<?> testOp = new Operation<>("test", List.of()) {
         @Override
-        public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
 
         }
 

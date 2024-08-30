@@ -22,11 +22,13 @@ public class ProhibitionsQueryAdjudicator extends ProhibitionsQuerier {
 
     private final UserContext userCtx;
     private final PAP pap;
+    private final PrivilegeChecker privilegeChecker;
 
-    public ProhibitionsQueryAdjudicator(UserContext userCtx, PAP pap) {
+    public ProhibitionsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         super(pap.query());
         this.userCtx = userCtx;
         this.pap = pap;
+        this.privilegeChecker = privilegeChecker;
     }
 
     @Override
@@ -52,14 +54,14 @@ public class ProhibitionsQueryAdjudicator extends ProhibitionsQuerier {
 
         // check user has access to subject
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-            PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), GET_PROCESS_PROHIBITIONS);
+            privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), GET_PROCESS_PROHIBITIONS);
         } else {
-            PrivilegeChecker.check(pap, userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
+            privilegeChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
         }
 
         // check user has access to each container condition
         for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            PrivilegeChecker.check(pap, userCtx, containerCondition.getName(), GET_PROHIBITIONS);
+            privilegeChecker.check(userCtx, containerCondition.getName(), GET_PROHIBITIONS);
         }
 
         return prohibition;
@@ -67,14 +69,14 @@ public class ProhibitionsQueryAdjudicator extends ProhibitionsQuerier {
 
     @Override
     public Collection<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException {
-        PrivilegeChecker.check(pap, this.userCtx, subject, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, subject, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().prohibitions().getInheritedProhibitionsFor(subject);
     }
 
     @Override
     public Collection<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
-        PrivilegeChecker.check(pap, this.userCtx, container, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, container, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().prohibitions().getProhibitionsWithContainer(container);
     }
@@ -86,15 +88,15 @@ public class ProhibitionsQueryAdjudicator extends ProhibitionsQuerier {
             try {
                 // check user has access to subject prohibitions
                 if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-                    PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(),
+                    privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(),
                             GET_PROCESS_PROHIBITIONS);
                 } else {
-                    PrivilegeChecker.check(pap, userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
+                    privilegeChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
                 }
 
                 // check user has access to each target prohibitions
                 for (ContainerCondition containerCondition : prohibition.getContainers()) {
-                    PrivilegeChecker.check(pap, userCtx, containerCondition.getName(), GET_PROHIBITIONS);
+                    privilegeChecker.check(userCtx, containerCondition.getName(), GET_PROHIBITIONS);
                 }
 
                 return false;

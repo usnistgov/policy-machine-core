@@ -27,12 +27,12 @@ public abstract class DeleteNodeOp extends GraphOp {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, (String) operands.get(NAME_OPERAND), reqCap);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        privilegeChecker.check(userCtx, (String) operands.get(NAME_OPERAND), reqCap);
 
         Collection<String> descs = (Collection<String>) operands.get(DESCENDANTS_OPERAND);
         for (String desc : descs) {
-            PrivilegeChecker.check(pap, userCtx, desc, descsReqCap);
+            privilegeChecker.check(userCtx, desc, descsReqCap);
         }
     }
 

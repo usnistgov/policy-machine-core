@@ -22,11 +22,13 @@ public class ObligationsQueryAdjudicator extends ObligationsQuerier {
 
     private final UserContext userCtx;
     private final PAP pap;
+    private final PrivilegeChecker privilegeChecker;
 
-    public ObligationsQueryAdjudicator(UserContext userCtx, PAP pap) {
+    public ObligationsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         super(pap.query());
         this.userCtx = userCtx;
         this.pap = pap;
+        this.privilegeChecker = privilegeChecker;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class ObligationsQueryAdjudicator extends ObligationsQuerier {
 
     @Override
     public Collection<Obligation> getObligationsWithAuthor(String user) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, user, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(userCtx, user, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().obligations().getObligationsWithAuthor(user);
     }
@@ -83,14 +85,14 @@ public class ObligationsQueryAdjudicator extends ObligationsQuerier {
         EventPattern eventPattern = rule.getEventPattern();
 
         // check subject
-        PrivilegeChecker.checkPattern(pap, userCtx, eventPattern.getSubjectPattern(), GET_OBLIGATION);
+        privilegeChecker.checkPattern(userCtx, eventPattern.getSubjectPattern(), GET_OBLIGATION);
 
         // cannot check operation as it is not a node
 
         // check operands
         for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : eventPattern.getOperandPatterns().entrySet()) {
             for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
-                PrivilegeChecker.checkPattern(pap, userCtx, operandPatternExpression, GET_OBLIGATION);
+                privilegeChecker.checkPattern(userCtx, operandPatternExpression, GET_OBLIGATION);
             }
         }
     }

@@ -32,8 +32,8 @@ public class AssignOp extends GraphOp {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, (String) operands.get(ASCENDANT_OPERAND), ASSIGN);
-        PrivilegeChecker.check(pap, userCtx, (List<String>) operands.get(DESCENDANTS_OPERAND), ASSIGN_TO);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        privilegeChecker.check(userCtx, (String) operands.get(ASCENDANT_OPERAND), ASSIGN);
+        privilegeChecker.check(userCtx, (List<String>) operands.get(DESCENDANTS_OPERAND), ASSIGN_TO);
     }
 }

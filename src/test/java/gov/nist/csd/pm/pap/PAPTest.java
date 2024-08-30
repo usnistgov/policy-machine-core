@@ -5,6 +5,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
@@ -48,7 +49,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
             pap.modify().operations().createAdminOperation(new Operation<Value>("testFunc") {
                 @Override
-                public void canExecute(PAP pap, UserContext userCtx, Map operands) throws PMException {
+                public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
 
                 }
 

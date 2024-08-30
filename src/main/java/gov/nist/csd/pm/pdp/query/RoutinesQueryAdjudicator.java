@@ -15,24 +15,25 @@ public class RoutinesQueryAdjudicator extends RoutinesQuerier {
 
     private PAP pap;
     private UserContext userCtx;
+    private final PrivilegeChecker privilegeChecker;
 
-    public RoutinesQueryAdjudicator(UserContext userCtx, PAP pap) {
+    public RoutinesQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         super(pap.query());
-
-        this.pap = pap;
         this.userCtx = userCtx;
+        this.pap = pap;
+        this.privilegeChecker = privilegeChecker;
     }
 
     @Override
     public Collection<String> getAdminRoutineNames() throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().routines().getAdminRoutineNames();
     }
 
     @Override
     public Routine<?> getAdminRoutine(String routineName) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().routines().getAdminRoutine(routineName);
     }

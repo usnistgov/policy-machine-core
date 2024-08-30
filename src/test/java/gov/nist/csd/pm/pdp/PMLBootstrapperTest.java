@@ -4,6 +4,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
@@ -43,7 +44,7 @@ class PMLBootstrapperTest {
 
         Operation<?> op1 = new Operation<>("op1") {
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Map operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
 
             }
 

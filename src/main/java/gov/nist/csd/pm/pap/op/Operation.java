@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.op;
 
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.OperandsDoNotMatchException;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.query.UserContext;
@@ -47,7 +46,7 @@ public abstract class Operation<T> extends AdminExecutable<T> implements Seriali
         return nodeOperands;
     }
 
-    public abstract void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException;
+    public abstract void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException;
 
     public PreparedOperation<T> withOperands(Map<String, Object> actualOperands) throws OperandsDoNotMatchException {
         validateOperands(actualOperands);

@@ -22,9 +22,9 @@ public class DeassignOp extends GraphOp {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, (String) operands.get(ASCENDANT_OPERAND), DEASSIGN);
-        PrivilegeChecker.check(pap, userCtx, (List<String>) operands.get(DESCENDANTS_OPERAND), DEASSIGN_FROM);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        privilegeChecker.check(userCtx, (String) operands.get(ASCENDANT_OPERAND), DEASSIGN);
+        privilegeChecker.check(userCtx, (List<String>) operands.get(DESCENDANTS_OPERAND), DEASSIGN_FROM);
     }
 
     @Override

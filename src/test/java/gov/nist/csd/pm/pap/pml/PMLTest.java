@@ -41,8 +41,8 @@ public class PMLTest {
 
         Operation<?> op1 = new Operation<>("op1", List.of("a", "b", "c")) {
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), "assign");
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+                PrivilegeChecker.check(privilegeChecker, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), "assign");
             }
 
             @Override

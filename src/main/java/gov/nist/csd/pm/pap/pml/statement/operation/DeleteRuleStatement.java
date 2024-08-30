@@ -5,6 +5,7 @@ import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -81,11 +82,11 @@ public class DeleteRuleStatement extends OperationStatement {
         }
 
         @Override
-        public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
             new DeleteObligationOp()
-                    .canExecute(pap, userCtx, operands);
+                    .canExecute(privilegeChecker, userCtx, operands);
             new CreateObligationOp()
-                    .canExecute(pap, userCtx, operands);
+                    .canExecute(privilegeChecker, userCtx, operands);
         }
 
         @Override

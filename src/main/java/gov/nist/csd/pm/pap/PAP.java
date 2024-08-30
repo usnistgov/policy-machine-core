@@ -44,14 +44,16 @@ public abstract class PAP implements PolicyPoint, AdminExecutor {
         this(pap.policyStore);
     }
 
-    public abstract PolicyQuerier query();
-
-    public PolicyModifier modify() {
-        return modifier;
-    }
-
     protected PolicyStore policyStore() {
         return policyStore;
+    }
+
+    @Override
+    public abstract PolicyQuerier query();
+
+    @Override
+    public PolicyModifier modify() {
+        return modifier;
     }
 
     @Override

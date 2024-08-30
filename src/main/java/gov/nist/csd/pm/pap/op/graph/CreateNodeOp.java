@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.op.graph;
 
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.UserContext;
 
@@ -32,11 +31,11 @@ public abstract class CreateNodeOp extends GraphOp {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
         Collection<?> coll = (Collection<?>) operands.get(DESCENDANTS_OPERAND);
         for (Object o : coll) {
             if (o instanceof String strColOp) {
-                PrivilegeChecker.check(pap, userCtx, strColOp, ar);
+                privilegeChecker.check(userCtx, strColOp, ar);
             }
         }
     }

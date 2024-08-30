@@ -32,9 +32,9 @@ public class AssociateOp extends GraphOp {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, (String) operands.get(UA_OPERAND), ASSOCIATE);
-        PrivilegeChecker.check(pap, userCtx, (String) operands.get(TARGET_OPERAND), ASSOCIATE_TO);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        privilegeChecker.check(userCtx, (String) operands.get(UA_OPERAND), ASSOCIATE);
+        privilegeChecker.check(userCtx, (String) operands.get(TARGET_OPERAND), ASSOCIATE_TO);
 
     }
 }
