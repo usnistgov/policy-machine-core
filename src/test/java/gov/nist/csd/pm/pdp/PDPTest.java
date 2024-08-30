@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
+import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
 import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static gov.nist.csd.pm.pdp.Decision.DENY;
@@ -395,5 +396,24 @@ class PDPTest {
         EPP epp = new EPP(pdp, pap);
         pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1", Map.of())));
         assertFalse(pap.query().graph().nodeExists("test"));
+    }
+
+    @Test
+    void testExplainFalseDoesNotIncludeExplainInResponse() throws PMException {
+        MemoryPAP pap = new MemoryPAP();
+        pap.executePML(new UserContext("u1"), """
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc1"]
+                
+                create u "u1" in ["ua1"]
+               
+                """);
+
+        PDP pdp = new PDP(pap);
+        AdminAdjudicationResponse response = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("create_policy_class", Map.of(NAME_OPERAND, "test"))));
+        assertEquals(response.getDecision(), DENY);
+        assertNull(response.getExplain());
     }
 }
