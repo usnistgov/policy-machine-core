@@ -8,8 +8,10 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.ProhibitionsQuerier;
+import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,14 +20,14 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.GET_PROCESS_PROHIBITIONS;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.GET_PROHIBITIONS;
 
-public class ProhibitionsQueryAdjudicator extends ProhibitionsQuerier {
+public class ProhibitionsQueryAdjudicator extends Adjudicator implements ProhibitionsQuery {
 
     private final UserContext userCtx;
     private final PAP pap;
     private final PrivilegeChecker privilegeChecker;
 
     public ProhibitionsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
+        super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;

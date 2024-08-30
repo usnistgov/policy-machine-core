@@ -145,7 +145,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                                         List.of(
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa1", List.of(
-                                                        new ExplainAssociation("ua1", "oa1", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua1")))
+                                                        new ExplainAssociation("ua1", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua1")))
                                                 )),
                                                 new ExplainNode("pc1", List.of())
                                         )
@@ -157,7 +157,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa3", List.of()),
                                                 new ExplainNode("oa2", List.of(
-                                                        new ExplainAssociation("ua2", "oa2", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua2")))
+                                                        new ExplainAssociation("ua2", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua2")))
                                                 )),
                                                 new ExplainNode("pc2", List.of())
                                         )
@@ -231,7 +231,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                                         List.of(
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa4", List.of(
-                                                        new ExplainAssociation("ua4", "oa4", new AccessRightSet("read"), List.of(new Path("u1", "ua4")))
+                                                        new ExplainAssociation("ua4", new AccessRightSet("read"), List.of(new Path("u1", "ua4")))
                                                 )),
                                                 new ExplainNode("pc2", List.of())
                                         )
@@ -244,20 +244,20 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                                         List.of(
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa3", List.of(
-                                                        new ExplainAssociation("ua3", "oa3", new AccessRightSet("read"), List.of(new Path("u1", "ua3")))
+                                                        new ExplainAssociation("ua3", new AccessRightSet("read"), List.of(new Path("u1", "ua3")))
                                                 )),
                                                 new ExplainNode("oa1", List.of(
-                                                        new ExplainAssociation("ua1", "oa1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
+                                                        new ExplainAssociation("ua1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
                                                 )),
                                                 new ExplainNode("pc1", List.of())
                                         ),
                                         List.of(
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa2", List.of(
-                                                        new ExplainAssociation("ua2", "oa2", new AccessRightSet("read"), List.of(new Path("u1", "ua2")))
+                                                        new ExplainAssociation("ua2", new AccessRightSet("read"), List.of(new Path("u1", "ua2")))
                                                 )),
                                                 new ExplainNode("oa1", List.of(
-                                                        new ExplainAssociation("ua1", "oa1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
+                                                        new ExplainAssociation("ua1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
                                                 )),
                                                 new ExplainNode("pc1", List.of())
                                         )
@@ -280,20 +280,20 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                                         List.of(
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa3", List.of(
-                                                        new ExplainAssociation("ua3", "oa3", new AccessRightSet("read"), List.of(new Path("u1", "ua3")))
+                                                        new ExplainAssociation("ua3", new AccessRightSet("read"), List.of(new Path("u1", "ua3")))
                                                 )),
                                                 new ExplainNode("oa1", List.of(
-                                                        new ExplainAssociation("ua1", "oa1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
+                                                        new ExplainAssociation("ua1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
                                                 )),
                                                 new ExplainNode("pc1", List.of())
                                         ),
                                         List.of(
                                                 new ExplainNode("o1", List.of()),
                                                 new ExplainNode("oa2", List.of(
-                                                        new ExplainAssociation("ua2", "oa2", new AccessRightSet("read"), List.of(new Path("u1", "ua2")))
+                                                        new ExplainAssociation("ua2", new AccessRightSet("read"), List.of(new Path("u1", "ua2")))
                                                 )),
                                                 new ExplainNode("oa1", List.of(
-                                                        new ExplainAssociation("ua1", "oa1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
+                                                        new ExplainAssociation("ua1", new AccessRightSet("read"), List.of(new Path("u1", "ua2", "ua1"), new Path("u1", "ua3", "ua1")))
                                                 )),
                                                 new ExplainNode("pc1", List.of())
                                         )
@@ -320,7 +320,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Explain actual = pap.query().access().explain(new UserContext("u1"), "oa2");
-        assertEquals(
+        assertExplainEquals(
                 new Explain(
                         new AccessRightSet("read", "write"),
                         List.of(
@@ -330,10 +330,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                                         List.of(
                                                 List.of(
                                                         new ExplainNode("oa2", List.of(
-                                                                new ExplainAssociation("ua1", "oa2", new AccessRightSet("read"), List.of(new Path("u1", "ua1")))
+                                                                new ExplainAssociation("ua1", new AccessRightSet("read"), List.of(new Path("u1", "ua1")))
                                                         )),
                                                         new ExplainNode("oa1", List.of(
-                                                                new ExplainAssociation("ua1", "oa1", new AccessRightSet("write"), List.of(new Path("u1", "ua1")))
+                                                                new ExplainAssociation("ua1", new AccessRightSet("write"), List.of(new Path("u1", "ua1")))
                                                         )),
                                                         new ExplainNode("pc1", List.of())
                                                 )
@@ -345,6 +345,226 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 ),
                 actual
         );
+    }
+
+    @Test
+    void testExplainNoPaths() throws PMException {
+        String pml = """
+                set resource operations ["read", "write"]
+                create pc "pc1"
+                    create UA "ua1" in ["pc1"]
+                    create UA "ua2" in ["pc1"]
+                    create oa "oa1" in ["pc1"]
+                    create oa "oa2" in ["oa1"]
+
+                    associate "ua1" and "oa1" with ["write"]
+               
+                create user "u1" in ["ua2"]
+                create object "o1" in ["oa1"]
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        assertExplainEquals(
+                new Explain(
+                        new AccessRightSet(),
+                        List.of(
+                                new PolicyClassExplain(
+                                        "pc1",
+                                        new AccessRightSet(),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa1", List.of(
+                                                                new ExplainAssociation("ua1", new AccessRightSet("write"), List.of())
+                                                        )),
+                                                        new ExplainNode("pc1", List.of())
+                                                )
+                                        )
+                                )
+                        ),
+                        new AccessRightSet(),
+                        List.of()
+                ),
+                actual
+        );
+    }
+
+    @Test
+    void testExplainPathsButNoPrivileges() throws PMException {
+        String pml = """
+                set resource operations ["read", "write"]
+                create pc "pc1"
+                    create UA "ua1" in ["pc1"]
+                    create oa "oa1" in ["pc1"]
+
+                    associate "ua1" and "oa1" with ["write"]
+                    
+                create pc "pc2"
+                    create UA "ua2" in ["pc2"]
+                    create OA "oa2" in ["pc2"]
+                    
+                    associate "ua2" and "oa2" with ["read"]
+               
+                create user "u1" in ["ua1", "ua2"]
+                create object "o1" in ["oa1", "oa2"]
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        assertExplainEquals(
+                new Explain(
+                        new AccessRightSet(),
+                        List.of(
+                                new PolicyClassExplain(
+                                        "pc1",
+                                        new AccessRightSet("write"),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa1", List.of(
+                                                                new ExplainAssociation("ua1", new AccessRightSet("write"), List.of(new Path("u1", "ua1")))
+                                                        )),
+                                                        new ExplainNode("pc1", List.of())
+                                                )
+                                        )
+                                ),
+                                new PolicyClassExplain(
+                                        "pc2",
+                                        new AccessRightSet("read"),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa2", List.of(
+                                                                new ExplainAssociation("ua2", new AccessRightSet("read"), List.of(new Path("u1", "ua2")))
+                                                        )),
+                                                        new ExplainNode("pc2", List.of())
+                                                )
+                                        )
+                                )
+                        ),
+                        new AccessRightSet(),
+                        List.of()
+                ),
+                actual
+        );
+    }
+
+    @Test
+    void testExplainMultiplePolicyClasses() throws PMException {
+        // test all pcs have same access rights
+        String pml = """
+                set resource operations ["read", "write"]
+                create pc "pc1"
+                    create UA "ua1" in ["pc1"]
+                    create oa "oa1" in ["pc1"]
+
+                    associate "ua1" and "oa1" with ["read", "write"]
+                    
+                create pc "pc2"
+                    create UA "ua2" in ["pc2"]
+                    create OA "oa2" in ["pc2"]
+                    
+                    associate "ua2" and "oa2" with ["read", "write"]
+               
+                create user "u1" in ["ua1", "ua2"]
+                create object "o1" in ["oa1", "oa2"]
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        assertExplainEquals(
+                new Explain(
+                        new AccessRightSet("read", "write"),
+                        List.of(
+                                new PolicyClassExplain(
+                                        "pc1",
+                                        new AccessRightSet("read", "write"),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa1", List.of(
+                                                                new ExplainAssociation("ua1", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua1")))
+                                                        )),
+                                                        new ExplainNode("pc1", List.of())
+                                                )
+                                        )
+                                ),
+                                new PolicyClassExplain(
+                                        "pc2",
+                                        new AccessRightSet("read", "write"),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa2", List.of(
+                                                                new ExplainAssociation("ua2", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua2")))
+                                                        )),
+                                                        new ExplainNode("pc2", List.of())
+                                                )
+                                        )
+                                )
+                        ),
+                        new AccessRightSet(),
+                        List.of()
+                ),
+                actual
+        );
+
+        // test all pcs do not have same ars
+        pml = """
+                set resource operations ["read", "write"]
+                create pc "pc1"
+                    create UA "ua1" in ["pc1"]
+                    create oa "oa1" in ["pc1"]
+
+                    associate "ua1" and "oa1" with ["read", "write"]
+                    
+                create pc "pc2"
+                    create UA "ua2" in ["pc2"]
+                    create OA "oa2" in ["pc2"]
+                    
+                    associate "ua2" and "oa2" with ["read"]
+               
+                create user "u1" in ["ua1", "ua2"]
+                create object "o1" in ["oa1", "oa2"]
+                """;
+        pap.reset();
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        assertExplainEquals(
+                new Explain(
+                        new AccessRightSet("read"),
+                        List.of(
+                                new PolicyClassExplain(
+                                        "pc1",
+                                        new AccessRightSet("read", "write"),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa1", List.of(
+                                                                new ExplainAssociation("ua1", new AccessRightSet("read", "write"), List.of(new Path("u1", "ua1")))
+                                                        )),
+                                                        new ExplainNode("pc1", List.of())
+                                                )
+                                        )
+                                ),
+                                new PolicyClassExplain(
+                                        "pc2",
+                                        new AccessRightSet("read"),
+                                        List.of(
+                                                List.of(
+                                                        new ExplainNode("o1", List.of()),
+                                                        new ExplainNode("oa2", List.of(
+                                                                new ExplainAssociation("ua2", new AccessRightSet("read"), List.of(new Path("u1", "ua2")))
+                                                        )),
+                                                        new ExplainNode("pc2", List.of())
+                                                )
+                                        )
+                                )
+                        ),
+                        new AccessRightSet(),
+                        List.of()
+                ),
+                actual
+        );
+
     }
 
     @Test

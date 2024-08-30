@@ -355,8 +355,8 @@ public class MemoryAccessQuerier extends AccessQuerier {
             String pc = targetPathEntry.getKey();
             Map<Path, List<Association>> targetPathAssociations = targetPathEntry.getValue();
 
-            AccessRightSet arset = getArsetFromPaths(targetPathAssociations);
             List<List<ExplainNode>> paths = getExplainNodePaths(targetPathAssociations, userPaths);
+            AccessRightSet arset = getArsetFromPaths(paths);
 
             result.add(new PolicyClassExplain(pc, arset, paths));
         }
@@ -383,14 +383,10 @@ public class MemoryAccessQuerier extends AccessQuerier {
                         continue;
                     }
 
-                    Set<Path> userPathsToAssoc = userPaths.get(ua);
-                    if (userPathsToAssoc == null || userPathsToAssoc.isEmpty()) {
-                        continue;
-                    }
+                    Set<Path> userPathsToAssoc = userPaths.getOrDefault(ua, new HashSet<>());
 
                     explainAssocs.add(new ExplainAssociation(
                             ua,
-                            pathAssoc.getTarget(),
                             pathAssoc.getAccessRightSet(),
                             new ArrayList<>(userPathsToAssoc)
                     ));
@@ -405,11 +401,18 @@ public class MemoryAccessQuerier extends AccessQuerier {
         return paths;
     }
 
-    private AccessRightSet getArsetFromPaths(Map<Path, List<Association>> targetPathAssociations) {
+    private AccessRightSet getArsetFromPaths(List<List<ExplainNode>> paths) {
         AccessRightSet accessRightSet = new AccessRightSet();
-        for (List<Association> associations : targetPathAssociations.values()) {
-            for (Association association : associations) {
-                accessRightSet.addAll(association.getAccessRightSet());
+        for (List<ExplainNode> path : paths) {
+            for (ExplainNode explainNode : path) {
+                List<ExplainAssociation> associations = explainNode.associations();
+                for (ExplainAssociation association : associations) {
+                    if (association.userPaths().isEmpty()) {
+                        continue;
+                    }
+
+                    accessRightSet.addAll(association.arset());
+                }
             }
         }
 
@@ -498,7 +501,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
                 .walk(user);
 
         // transform the map so that the key is the last ua in the path pointing to it's paths
-        Set<Path> userPaths = pathsToUAs.get(user);
+        Set<Path> userPaths = pathsToUAs.getOrDefault(user, new HashSet<>());
         Map<String, Set<Path>> associationUAPaths = new HashMap<>();
         for (Path userPath : userPaths) {
             String assocUA = userPath.getLast();

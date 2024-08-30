@@ -12,24 +12,9 @@ public class ResourceAdjudicationResponse {
     private Node resource;
     private Explain explain;
 
-    public ResourceAdjudicationResponse(Decision decision, Node resource) {
-        this.decision = decision;
+    public ResourceAdjudicationResponse(Node resource) {
+        this.decision = Decision.GRANT;
         this.resource = resource;
-    }
-
-    public ResourceAdjudicationResponse(Decision decision, Node resource, Explain explain) {
-        this.decision = decision;
-        this.resource = resource;
-        this.explain = explain;
-    }
-
-    public ResourceAdjudicationResponse(Decision decision, Explain explain) {
-        this.decision = decision;
-        this.explain = explain;
-    }
-
-    public ResourceAdjudicationResponse(Decision decision) {
-        this.decision = decision;
     }
 
     public ResourceAdjudicationResponse(UnauthorizedException e) {

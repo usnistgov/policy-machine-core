@@ -38,12 +38,15 @@ public class CheckStatement implements PMLStatement {
             }
         }
 
+        PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
+        privilegeChecker.setExplain(ctx.isExplain());
+
         if (target.getType().isString()) {
-            PrivilegeChecker.check(pap, ctx.author(), target.getStringValue(), arsToCheck);
+            privilegeChecker.check(ctx.author(), target.getStringValue(), arsToCheck);
         } else {
             List<Value> arrayValue = target.getArrayValue();
             for (Value value : arrayValue) {
-                PrivilegeChecker.check(pap, ctx.author(), value.getStringValue(), arsToCheck);
+                privilegeChecker.check(ctx.author(), value.getStringValue(), arsToCheck);
             }
         }
 

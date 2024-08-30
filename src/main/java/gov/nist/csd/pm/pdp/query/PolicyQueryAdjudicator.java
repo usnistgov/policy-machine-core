@@ -4,7 +4,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.*;
 
-public class PolicyQueryAdjudicator extends PolicyQuerier {
+public class PolicyQueryAdjudicator implements PolicyQuery {
 
     private final AccessQueryAdjudicator access;
     private final GraphQueryAdjudicator graph;
@@ -14,7 +14,6 @@ public class PolicyQueryAdjudicator extends PolicyQuerier {
     private final RoutinesQueryAdjudicator routines;
 
     public PolicyQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
         this.access = new AccessQueryAdjudicator(userCtx, pap, privilegeChecker);
         this.graph = new GraphQueryAdjudicator(userCtx, pap, privilegeChecker);
         this.prohibitions = new ProhibitionsQueryAdjudicator(userCtx, pap, privilegeChecker);
@@ -49,7 +48,7 @@ public class PolicyQueryAdjudicator extends PolicyQuerier {
     }
 
     @Override
-    public RoutinesQuerier routines() {
+    public RoutinesQueryAdjudicator routines() {
         return routines;
     }
 

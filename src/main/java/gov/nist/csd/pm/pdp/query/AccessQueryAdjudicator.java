@@ -6,20 +6,22 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.AccessQuerier;
+import gov.nist.csd.pm.pap.query.AccessQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.query.explain.Explain;
+import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 import java.util.Map;
 
-public class AccessQueryAdjudicator extends AccessQuerier {
+public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     private final UserContext userCtx;
     private final PAP pap;
     private final PrivilegeChecker privilegeChecker;
 
     public AccessQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
+        super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;

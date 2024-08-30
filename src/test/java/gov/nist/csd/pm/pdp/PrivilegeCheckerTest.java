@@ -34,9 +34,10 @@ class PrivilegeCheckerTest {
         pap.modify().graph().createUser("u1", List.of("ua1"));
         pap.modify().graph().createObject("o1", List.of("oa1"));
 
-        PrivilegeChecker.check(pap, new UserContext("u1"), "o1", "read");
-        PrivilegeChecker.check(pap, new UserContext("u1"), "pc1", AdminAccessRights.ASSIGN_TO);
-        assertThrows(UnauthorizedException.class, () -> PrivilegeChecker.check(pap, new UserContext("u1"), "pc1", AdminAccessRights.DELETE_POLICY_CLASS));
+        PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
+        privilegeChecker.check(new UserContext("u1"), "o1", "read");
+        privilegeChecker.check(new UserContext("u1"), "pc1", AdminAccessRights.ASSIGN_TO);
+        assertThrows(UnauthorizedException.class, () -> privilegeChecker.check(new UserContext("u1"), "pc1", AdminAccessRights.DELETE_POLICY_CLASS));
     }
 
 }

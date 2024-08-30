@@ -54,7 +54,7 @@ class PMLOperationWrapperTest {
 
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                PrivilegeChecker.check(privilegeChecker, userCtx, (String) operands.get("a"), "assign");
+                privilegeChecker.check(userCtx, (String) operands.get("a"), "assign");
             }
         };
 
@@ -95,7 +95,7 @@ class PMLOperationWrapperTest {
 
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                PrivilegeChecker.check(privilegeChecker, userCtx, (String) operands.get("a"), "assign");
+                privilegeChecker.check(userCtx, (String) operands.get("a"), "assign");
             }
         };
 

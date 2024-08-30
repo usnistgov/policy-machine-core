@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.executable.AdminExecutor;
+import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.modification.PolicyModifier;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -11,6 +12,7 @@ import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.PolicyQuerier;
+import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pap.exception.PMException;
@@ -44,15 +46,15 @@ public abstract class PAP implements PolicyPoint, AdminExecutor {
         this(pap.policyStore);
     }
 
-    protected PolicyStore policyStore() {
+    public PolicyStore policyStore() {
         return policyStore;
     }
 
     @Override
-    public abstract PolicyQuerier query();
+    public abstract PolicyQuery query();
 
     @Override
-    public PolicyModifier modify() {
+    public PolicyModification modify() {
         return modifier;
     }
 

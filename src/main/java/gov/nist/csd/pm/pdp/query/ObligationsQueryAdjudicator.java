@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.modification.ObligationsModification;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
@@ -8,8 +9,10 @@ import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.query.ObligationsQuerier;
+import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pdp.Adjudicator;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 
 import java.util.Collection;
@@ -18,14 +21,14 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.GET_OBLIGATION;
 
-public class ObligationsQueryAdjudicator extends ObligationsQuerier {
+public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
 
     private final UserContext userCtx;
     private final PAP pap;
     private final PrivilegeChecker privilegeChecker;
 
     public ObligationsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
+        super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;

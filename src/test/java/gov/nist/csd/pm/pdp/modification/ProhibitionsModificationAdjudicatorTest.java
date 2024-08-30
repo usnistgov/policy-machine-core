@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pdp.modification;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.obligation.EventContext;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.epp.EPP;
@@ -60,8 +61,8 @@ class ProhibitionsModificationAdjudicatorTest {
         testEventProcessor = new TestEventProcessor();
         pdp.addEventListener(testEventProcessor);
 
-        ok = new ProhibitionsModificationAdjudicator(new UserContext("u1"), pap, pdp);
-        fail = new ProhibitionsModificationAdjudicator(new UserContext("u2"), pap, pdp);
+        ok = new ProhibitionsModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
+        fail = new ProhibitionsModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());
     }
 
     @Test

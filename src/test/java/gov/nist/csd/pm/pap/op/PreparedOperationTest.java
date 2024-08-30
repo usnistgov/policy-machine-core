@@ -39,7 +39,7 @@ class PreparedOperationTest {
         )
         );
 
-        EventContext execute = preparedOperation.execute(new MemoryPAP(), new UserContext("u1"));
+        EventContext execute = preparedOperation.execute(new MemoryPAP(), new UserContext("u1"), new PrivilegeChecker(new MemoryPAP()));
         assertEquals(execute, new EventContext("u1", "", op1,
                 Map.of(ASCENDANT_OPERAND, "c", DESCENDANTS_OPERAND, List.of("a", "b"))));
     }

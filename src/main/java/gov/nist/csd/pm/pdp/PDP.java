@@ -35,6 +35,10 @@ public class PDP implements EventEmitter, AccessAdjudication {
         this.privilegeChecker = new PrivilegeChecker(pap);
     }
 
+    public PrivilegeChecker getPrivilegeChecker() {
+        return privilegeChecker;
+    }
+
     public void setExplain(boolean explain) {
         privilegeChecker.setExplain(explain);
     }
@@ -99,7 +103,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
         try {
             privilegeChecker.check(user, target, resourceOperation);
         } catch (UnauthorizedException e) {
-            return new ResourceAdjudicationResponse(Decision.DENY, pap.query().access().explain(user, target));
+            return new ResourceAdjudicationResponse(e);
         }
 
         Node node = pap.query().graph().getNode(target);
@@ -112,7 +116,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
                 List.of("target")
         ));
 
-        return new ResourceAdjudicationResponse(Decision.GRANT, node);
+        return new ResourceAdjudicationResponse(node);
     }
 
     @Override

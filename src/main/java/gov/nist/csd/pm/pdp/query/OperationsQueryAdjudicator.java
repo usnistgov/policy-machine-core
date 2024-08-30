@@ -4,22 +4,25 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.OperationsQuerier;
+import gov.nist.csd.pm.pap.query.OperationsQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 
-public class OperationsQueryAdjudicator extends OperationsQuerier {
+public class OperationsQueryAdjudicator extends Adjudicator implements OperationsQuery {
 
     private UserContext userCtx;
     private PAP pap;
     private final PrivilegeChecker privilegeChecker;
 
     public OperationsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
+        super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;
@@ -45,6 +48,4 @@ public class OperationsQueryAdjudicator extends OperationsQuerier {
 
         return pap.query().operations().getAdminOperation(operationName);
     }
-
-
 }

@@ -6,6 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public record ExplainAssociation(String ua, String target, AccessRightSet arset, List<Path> userPaths) {
+public record ExplainAssociation(String ua, AccessRightSet arset, List<Path> userPaths) {
 
 }

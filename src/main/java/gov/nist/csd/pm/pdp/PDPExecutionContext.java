@@ -52,6 +52,7 @@ public class PDPExecutionContext extends ExecutionContext {
         // to avoid having access checks inside for loops when they call
         // ctx.executeStatements()
         ExecutionContext ctx = new ExecutionContext(copy.author(), pdpTx.pap, copy.scope());
+        ctx.setExplain(pdpTx.getPrivilegeChecker().isExplain());
 
         for (PMLStatement statement : stmts) {
             Value value = statement.execute(ctx, pdpTx.pap);

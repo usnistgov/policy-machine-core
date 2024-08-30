@@ -20,10 +20,6 @@ public abstract class PolicyQuerier extends Querier implements PolicyQuery {
         this.routinesQuerier = new RoutinesQuerier(store);
     }
 
-    public PolicyQuerier(Querier querier) {
-        this(querier.store);
-    }
-
     @Override
     public abstract AccessQuerier access();
 

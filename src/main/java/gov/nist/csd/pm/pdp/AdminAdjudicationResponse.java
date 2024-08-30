@@ -14,11 +14,6 @@ public class AdminAdjudicationResponse {
         this.decision = decision;
     }
 
-    public AdminAdjudicationResponse(Decision decision, Explain explain) {
-        this.decision = decision;
-        this.explain = explain;
-    }
-
     public AdminAdjudicationResponse(UnauthorizedException e) {
         this.decision = Decision.DENY;
         this.explain = e.getExplain();

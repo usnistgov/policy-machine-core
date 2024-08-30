@@ -58,8 +58,8 @@ class RoutinesModificationAdjudicatorTest {
         testEventProcessor = new TestEventProcessor();
         pdp.addEventListener(testEventProcessor);
 
-        ok = new RoutinesModificationAdjudicator(new UserContext("u1"), pap, pdp);
-        fail = new RoutinesModificationAdjudicator(new UserContext("u2"), pap, pdp);
+        ok = new RoutinesModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
+        fail = new RoutinesModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());
     }
 
 

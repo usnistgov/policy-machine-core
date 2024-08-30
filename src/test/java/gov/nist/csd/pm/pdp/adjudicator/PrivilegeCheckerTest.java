@@ -46,30 +46,30 @@ class PrivilegeCheckerTest {
     @Test
     void testCheckUserAndTargetDoesNotExist() throws PMException {
         assertThrows(NodeDoesNotExistException.class,
-                     () -> PrivilegeChecker.check(pap, new UserContext("u3"), "o1", "read"));
+                     () -> new PrivilegeChecker(pap).check(new UserContext("u3"), "o1", "read"));
         assertThrows(NodeDoesNotExistException.class,
-                     () -> PrivilegeChecker.check(pap, new UserContext("u1"), "o2", "read"));
+                     () -> new PrivilegeChecker(pap).check(new UserContext("u1"), "o2", "read"));
     }
 
     @Test
     void testCheckNodeIsPC() {
-        assertDoesNotThrow(() -> PrivilegeChecker.check(pap, new UserContext("u1"), "pc1", "read"));
+        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext("u1"), "pc1", "read"));
     }
 
     @Test
     void testAuthorize() {
-        assertDoesNotThrow(() -> PrivilegeChecker.check(pap, new UserContext("u1"), "o1", "read"));
+        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext("u1"), "o1", "read"));
     }
 
     @Test
     void testUnauthorized() {
         assertThrows(PMException.class,
-                     () -> PrivilegeChecker.check(pap, new UserContext("u2"), "o1", "read"));
+                     () -> new PrivilegeChecker(pap).check(new UserContext("u2"), "o1", "read"));
     }
 
     @Test
     void testEmptyAccessRights() {
-        assertDoesNotThrow(() -> PrivilegeChecker.check(pap, new UserContext("u1"), "o1"));
+        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext("u1"), "o1"));
     }
 
 }

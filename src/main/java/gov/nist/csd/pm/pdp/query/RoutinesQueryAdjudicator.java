@@ -6,19 +6,21 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.RoutinesQuerier;
+import gov.nist.csd.pm.pap.query.RoutinesQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 
-public class RoutinesQueryAdjudicator extends RoutinesQuerier {
+public class RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQuery {
 
     private PAP pap;
     private UserContext userCtx;
     private final PrivilegeChecker privilegeChecker;
 
     public RoutinesQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
+        super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;

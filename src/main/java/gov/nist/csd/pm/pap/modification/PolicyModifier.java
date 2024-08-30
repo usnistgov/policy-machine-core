@@ -28,10 +28,6 @@ public class PolicyModifier extends Modifier implements PolicyModification, Admi
         this.routinesModifier = new RoutinesModifier(store);
     }
 
-    public PolicyModifier(PolicyModifier modifier) throws PMException {
-        this(modifier.store);
-    }
-
     @Override
     public GraphModifier graph() {
         return graphModifier;

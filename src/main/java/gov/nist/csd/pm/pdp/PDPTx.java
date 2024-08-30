@@ -43,8 +43,8 @@ public class PDPTx extends PAP {
         this.privilegeChecker = privilegeChecker;
         this.pap = pap;
         this.eventEmitter = new PDPEventEmitter(epps);
-        this.pdpModifier = new PolicyModificationAdjudicator(userCtx, pap, eventEmitter);
-        this.pdpQuerier = new PolicyQueryAdjudicator(userCtx, pap, this.privilegeChecker);
+        this.pdpModifier = new PolicyModificationAdjudicator(this.userCtx, this.pap, this.eventEmitter, this.privilegeChecker);
+        this.pdpQuerier = new PolicyQueryAdjudicator(this.userCtx, this.pap, this.privilegeChecker);
     }
 
     public PolicyModificationAdjudicator modify() {
@@ -53,6 +53,10 @@ public class PDPTx extends PAP {
 
     public PolicyQueryAdjudicator query() {
         return pdpQuerier;
+    }
+
+    public PrivilegeChecker getPrivilegeChecker() {
+        return privilegeChecker;
     }
 
     @Override
@@ -109,7 +113,7 @@ public class PDPTx extends PAP {
         if (adminExecutable instanceof Routine<?> routine) {
             return routine.execute(this, operands);
         } else if (adminExecutable instanceof Operation<?> operation) {
-            operation.canExecute(pap, userCtx, operands);
+            operation.canExecute(privilegeChecker, userCtx, operands);
             return operation.execute(pap, operands);
         }
 

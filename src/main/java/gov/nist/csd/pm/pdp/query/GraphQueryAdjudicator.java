@@ -8,7 +8,9 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.GraphQuerier;
+import gov.nist.csd.pm.pap.query.GraphQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pdp.Adjudicator;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 
 import java.util.ArrayList;
@@ -18,14 +20,14 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.REVIEW_POLICY;
 
-public class GraphQueryAdjudicator extends GraphQuerier {
+public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     private final UserContext userCtx;
     private final PAP pap;
     private final PrivilegeChecker privilegeChecker;
 
     public GraphQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(pap.query());
+        super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;

@@ -4,9 +4,11 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.*;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pdp.Adjudicator;
 
-public class PolicyModificationAdjudicator extends PolicyModifier {
+public class PolicyModificationAdjudicator extends Adjudicator implements PolicyModification {
 
     private final GraphModificationAdjudicator graph;
     private final ProhibitionsModificationAdjudicator prohibitions;
@@ -14,37 +16,37 @@ public class PolicyModificationAdjudicator extends PolicyModifier {
     private final OperationsModificationAdjudicator operations;
     private final RoutinesModificationAdjudicator routines;
 
-    public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventEmitter eventEmitter) throws PMException {
-        super(pap.modify());
-        this.graph = new GraphModificationAdjudicator(userCtx, pap, eventEmitter);
-        this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap, eventEmitter);
-        this.obligations = new ObligationsModificationAdjudicator(userCtx, pap, eventEmitter);
-        this.operations = new OperationsModificationAdjudicator(userCtx, pap, eventEmitter);
-        this.routines = new RoutinesModificationAdjudicator(userCtx, pap, eventEmitter);
+    public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventEmitter eventEmitter, PrivilegeChecker privilegeChecker) throws PMException {
+        super(privilegeChecker);
+        this.graph = new GraphModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
+        this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
+        this.obligations = new ObligationsModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
+        this.operations = new OperationsModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
+        this.routines = new RoutinesModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
     }
 
     @Override
-    public GraphModifier graph() {
+    public GraphModificationAdjudicator graph() {
         return graph;
     }
 
     @Override
-    public ProhibitionsModifier prohibitions() {
+    public ProhibitionsModificationAdjudicator prohibitions() {
         return prohibitions;
     }
 
     @Override
-    public ObligationsModifier obligations() {
+    public ObligationsModificationAdjudicator obligations() {
         return obligations;
     }
 
     @Override
-    public OperationsModifier operations() {
+    public OperationsModificationAdjudicator operations() {
         return operations;
     }
 
     @Override
-    public RoutinesModifier routines() {
+    public RoutinesModificationAdjudicator routines() {
         return routines;
     }
 
