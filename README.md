@@ -18,7 +18,7 @@ mvn clean install
 <dependency>
     <groupId>gov.nist.csd.pm</groupId>
     <artifactId>policy-machine-core</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.0-alpha.0</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ Then, add the maven dependency
 <dependency>
     <groupId>com.github.usnistgov</groupId>
     <artifactId>policy-machine-core</artifactId>
-    <version>VERSION</version>
+    <version>v3.0.0-alpha.0</version>
 </dependency>
 ```
 ## Package Description
