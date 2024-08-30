@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.PMException;
@@ -19,33 +20,52 @@ public class JSONDeserializer implements PolicyDeserializer {
         Gson gson = new Gson();
         JSONPolicy jsonPolicy = gson.fromJson(input, new TypeToken<JSONPolicy>() {}.getType());
 
-        pap.modify().operations().setResourceOperations(jsonPolicy.getResourceOperations());
+        // account for the json schema allowing null properties
+        AccessRightSet resourceOperations = jsonPolicy.getResourceOperations();
+        if (resourceOperations == null) {
+            resourceOperations = new AccessRightSet();
+        }
 
-        Map<String, JSONNode> uaMap = new HashMap<>();
-        Map<String, JSONNode> oaMap = new HashMap<>();
-        Map<String, JSONNode> uMap = new HashMap<>();
-        Map<String, JSONNode> oMap = new HashMap<>();
-
-        for (JSONNode jsonNode : jsonPolicy.getGraph().uas) {
-            uaMap.put(jsonNode.getName(), jsonNode);
-        }
-        for (JSONNode jsonNode : jsonPolicy.getGraph().oas) {
-            oaMap.put(jsonNode.getName(), jsonNode);
-        }
-        for (JSONNode jsonNode : jsonPolicy.getGraph().users) {
-            uMap.put(jsonNode.getName(), jsonNode);
-        }
-        for (JSONNode jsonNode : jsonPolicy.getGraph().objects) {
-            oMap.put(jsonNode.getName(), jsonNode);
+        JSONGraph graph = jsonPolicy.getGraph();
+        if (graph == null) {
+            graph = new JSONGraph();
         }
 
         List<String> prohibitions = jsonPolicy.getProhibitions();
-        List<String> obligations = jsonPolicy.getObligations();
-        List<String> operations = jsonPolicy.getOperations();
-        List<String> routines = jsonPolicy.getRoutines();
+        if (prohibitions == null) {
+            prohibitions = new ArrayList<>();
+        }
 
-        createGraph(pap, jsonPolicy.getGraph().pcs, uaMap, oaMap, uMap, oMap);
-        createRestOfPolicy(pap, author, prohibitions, obligations, operations, routines);
+        List<String> obligations = jsonPolicy.getObligations();
+        if (obligations == null) {
+            obligations = new ArrayList<>();
+        }
+
+        List<String> operations = jsonPolicy.getOperations();
+        if (operations == null) {
+            operations = new ArrayList<>();
+        }
+
+        List<String> routines = jsonPolicy.getRoutines();
+        if (routines == null) {
+            routines = new ArrayList<>();
+        }
+
+        // set resource operations
+        pap.modify().operations().setResourceOperations(resourceOperations);
+
+        // create the graph
+        createGraph(pap, graph);
+
+        // create prohibitions, obligations, operations, and routines
+        createRestOfPolicy(
+                pap,
+                author,
+                prohibitions,
+                obligations,
+                operations,
+                routines
+        );
     }
 
     private void createRestOfPolicy(PAP pap,
@@ -74,14 +94,46 @@ public class JSONDeserializer implements PolicyDeserializer {
         pap.executePML(author, sb.toString());
     }
 
-    private void createGraph(PAP pap,
-                             List<JSONNode> pcs,
-                             Map<String, JSONNode> uaMap,
-                             Map<String, JSONNode> oaMap,
-                             Map<String, JSONNode> uMap,
-                             Map<String, JSONNode> oMap)
+    private void createGraph(PAP pap, JSONGraph graph)
             throws PMException {
-        createPCs(pap, pcs);
+        Map<String, JSONNode> uaMap = new HashMap<>();
+        Map<String, JSONNode> oaMap = new HashMap<>();
+        Map<String, JSONNode> uMap = new HashMap<>();
+        Map<String, JSONNode> oMap = new HashMap<>();
+
+        // account for type maps in json graph being null
+        if (graph.pcs == null) {
+            graph.pcs = new ArrayList<>();
+        }
+        if (graph.uas == null) {
+            graph.uas = new ArrayList<>();
+        }
+        if (graph.oas == null) {
+            graph.oas = new ArrayList<>();
+        }
+        if (graph.users == null) {
+            graph.users = new ArrayList<>();
+        }
+        if (graph.objects == null) {
+            graph.objects = new ArrayList<>();
+        }
+
+
+        // organize nodes into a map for fast look up during creation
+        for (JSONNode jsonNode : graph.uas) {
+            uaMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : graph.oas) {
+            oaMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : graph.users) {
+            uMap.put(jsonNode.getName(), jsonNode);
+        }
+        for (JSONNode jsonNode : graph.objects) {
+            oMap.put(jsonNode.getName(), jsonNode);
+        }
+
+        createPCs(pap, graph.pcs);
 
         // create uas
         createNodes(pap, UA, uaMap);
