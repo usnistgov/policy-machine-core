@@ -1,5 +1,4 @@
 {
-    "$schema": "https://www.github.com/usnistgov/policy-machine-core/tree/master/src/main/resources/pm.schema.json",
     "resourceOperations": [
         "read",
         "delete_readme",
