@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +23,14 @@ public class JSONGraph {
         this.oas = oas;
         this.users = users;
         this.objects = objects;
+    }
+
+    public JSONGraph() {
+        this.pcs = new ArrayList<>();
+        this.uas = new ArrayList<>();
+        this.oas = new ArrayList<>();
+        this.users = new ArrayList<>();
+        this.objects = new ArrayList<>();
     }
 
     public List<JSONNode> getPcs() {
