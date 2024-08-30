@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.modification.RoutinesModification;
 import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.modification.RoutinesModifier;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.pap.op.routine.DeleteAdminRoutineOp;

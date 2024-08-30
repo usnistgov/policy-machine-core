@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.impl.memory.pap;
 
-import gov.nist.csd.pm.pap.query.*;
+import gov.nist.csd.pm.pap.PolicyQuerier;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 public class MemoryPolicyQuerier extends PolicyQuerier {

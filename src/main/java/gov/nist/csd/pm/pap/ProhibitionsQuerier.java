@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.dag.DepthFirstGraphWalker;
@@ -6,6 +6,7 @@ import gov.nist.csd.pm.pap.graph.dag.Direction;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.exception.ProhibitionDoesNotExistException;
+import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.ArrayList;

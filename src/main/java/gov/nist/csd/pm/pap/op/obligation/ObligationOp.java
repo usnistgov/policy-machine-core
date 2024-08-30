@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;

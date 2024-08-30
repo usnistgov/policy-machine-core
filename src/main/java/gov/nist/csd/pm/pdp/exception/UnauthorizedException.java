@@ -4,7 +4,6 @@ import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.query.explain.Explain;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 public class UnauthorizedException extends PMException {

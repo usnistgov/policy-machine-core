@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.modification.ProhibitionsModifier;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;

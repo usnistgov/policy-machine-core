@@ -1,14 +1,15 @@
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.query.OperationsQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
-public class OperationsQuerier extends Querier implements OperationsQuery{
+public class OperationsQuerier extends Querier implements OperationsQuery {
 
     public OperationsQuerier(PolicyStore store) {
         super(store);

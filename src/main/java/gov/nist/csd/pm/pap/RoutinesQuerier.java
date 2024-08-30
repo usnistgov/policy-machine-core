@@ -1,7 +1,8 @@
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.exception.RoutineDoesNotExistException;
+import gov.nist.csd.pm.pap.query.RoutinesQuery;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 

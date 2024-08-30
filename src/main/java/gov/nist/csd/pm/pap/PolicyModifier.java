@@ -1,8 +1,9 @@
-package gov.nist.csd.pm.pap.modification;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import static gov.nist.csd.pm.pap.graph.node.NodeType.OA;

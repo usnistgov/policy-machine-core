@@ -47,16 +47,18 @@ public class PDPTx extends PAP {
         this.pdpQuerier = new PolicyQueryAdjudicator(this.userCtx, this.pap, this.privilegeChecker);
     }
 
+    public PrivilegeChecker getPrivilegeChecker() {
+        return privilegeChecker;
+    }
+
+    @Override
     public PolicyModificationAdjudicator modify() {
         return pdpModifier;
     }
 
+    @Override
     public PolicyQueryAdjudicator query() {
         return pdpQuerier;
-    }
-
-    public PrivilegeChecker getPrivilegeChecker() {
-        return privilegeChecker;
     }
 
     @Override

@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.query.AccessQuerier;
 import gov.nist.csd.pm.pap.query.AccessQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.query.explain.Explain;

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.modification;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.tx.Transactional;

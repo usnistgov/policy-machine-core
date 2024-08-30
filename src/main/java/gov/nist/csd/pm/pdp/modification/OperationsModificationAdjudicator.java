@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.modification.OperationsModifier;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp;

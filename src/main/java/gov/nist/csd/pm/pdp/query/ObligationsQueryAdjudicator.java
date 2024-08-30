@@ -1,14 +1,12 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.modification.ObligationsModification;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
-import gov.nist.csd.pm.pap.query.ObligationsQuerier;
 import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.obligation.Obligation;

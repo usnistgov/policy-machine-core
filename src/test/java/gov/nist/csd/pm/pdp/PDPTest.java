@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.modification;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.dag.Direction;
@@ -6,6 +6,7 @@ import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.Assignment;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;

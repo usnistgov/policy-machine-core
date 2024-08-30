@@ -1,6 +1,7 @@
-package gov.nist.csd.pm.pap.modification;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.exception.ProhibitionContainerDoesNotExistException;
@@ -12,7 +13,7 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static gov.nist.csd.pm.pap.modification.GraphModifier.checkAccessRightsValid;
+import static gov.nist.csd.pm.pap.GraphModifier.checkAccessRightsValid;
 
 public class ProhibitionsModifier extends Modifier implements ProhibitionsModification {
 

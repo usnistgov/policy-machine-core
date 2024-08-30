@@ -4,11 +4,10 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.query.explain.*;
-import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.query.explain.*;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -313,8 +312,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     create oa "oa1" in ["pc1"]
                     create oa "oa2" in ["oa1"]
 
-                    associate "ua1" and "oa1" with ["write"]                    
-                    associate "ua1" and "oa2" with ["read"]                    
+                    associate "ua1" and "oa1" with ["write"]
+                    associate "ua1" and "oa2" with ["read"]
                
                 create user "u1" in ["ua1"]
                 """;

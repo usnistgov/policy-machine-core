@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.query.explain;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;

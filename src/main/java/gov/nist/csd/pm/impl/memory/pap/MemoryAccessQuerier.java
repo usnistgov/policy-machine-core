@@ -7,12 +7,12 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.query.explain.*;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.pap.query.AccessQuerier;
-import gov.nist.csd.pm.pap.query.GraphQuerier;
-import gov.nist.csd.pm.pap.query.ProhibitionsQuerier;
+import gov.nist.csd.pm.pap.AccessQuerier;
+import gov.nist.csd.pm.pap.GraphQuerier;
+import gov.nist.csd.pm.pap.ProhibitionsQuerier;
 import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.explain.*;
 import gov.nist.csd.pm.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
@@ -20,7 +20,7 @@ import java.util.*;
 
 import static gov.nist.csd.pm.pap.graph.node.NodeType.U;
 import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.pap.query.AccessRightResolver.*;
+import static gov.nist.csd.pm.pap.AccessRightResolver.*;
 
 public class MemoryAccessQuerier extends AccessQuerier {
 
