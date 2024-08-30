@@ -1,5 +1,6 @@
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 public abstract class PolicyQuerier extends Querier implements PolicyQuery {
@@ -18,10 +19,6 @@ public abstract class PolicyQuerier extends Querier implements PolicyQuery {
         this.obligationsQuerier = new ObligationsQuerier(store);
         this.operationsQuerier = new OperationsQuerier(store);
         this.routinesQuerier = new RoutinesQuerier(store);
-    }
-
-    public PolicyQuerier(Querier querier) {
-        this(querier.store);
     }
 
     @Override

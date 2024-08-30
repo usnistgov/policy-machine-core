@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.query.explain;
 
+import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
 
@@ -7,23 +8,25 @@ import java.util.*;
 
 public class Explain {
     private AccessRightSet privileges;
-    private Map<String, PolicyClassExplain> policyClasses;
+    private List<PolicyClassExplain> policyClasses;
     private AccessRightSet deniedPrivileges;
     private List<Prohibition> prohibitions;
 
     public Explain() {
         privileges = new AccessRightSet();
-        policyClasses = new HashMap<>();
+        policyClasses = new ArrayList<>();
         deniedPrivileges = new AccessRightSet();
         prohibitions = new ArrayList<>();
     }
 
-    public Explain(AccessRightSet privileges, Map<String, PolicyClassExplain> policyClasses) {
+    public Explain(AccessRightSet privileges, List<PolicyClassExplain> policyClasses) {
         this.privileges = privileges;
         this.policyClasses = policyClasses;
+        this.deniedPrivileges = new AccessRightSet();
+        this.prohibitions = new ArrayList<>();
     }
 
-    public Explain(AccessRightSet privileges, Map<String, PolicyClassExplain> policyClasses, AccessRightSet deniedPrivileges,
+    public Explain(AccessRightSet privileges, List<PolicyClassExplain> policyClasses, AccessRightSet deniedPrivileges,
                    List<Prohibition> prohibitions) {
         this.privileges = privileges;
         this.policyClasses = policyClasses;
@@ -39,11 +42,11 @@ public class Explain {
         this.privileges = privileges;
     }
 
-    public Map<String, PolicyClassExplain> getPolicyClasses() {
+    public List<PolicyClassExplain> getPolicyClasses() {
         return policyClasses;
     }
 
-    public void setPolicyClasses(Map<String, PolicyClassExplain> policyClasses) {
+    public void setPolicyClasses(List<PolicyClassExplain> policyClasses) {
         this.policyClasses = policyClasses;
     }
 
@@ -65,47 +68,15 @@ public class Explain {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder("Privileges: " + privileges.toString());
-        str.append("\nDenied: ").append(deniedPrivileges);
-
-        for (String pc : policyClasses.keySet()) {
-            PolicyClassExplain policyClass = policyClasses.get(pc);
-            str.append("\n\t\t").append(pc).append(": ").append(policyClass.getArset());
-        }
-
-        str.append("\nPaths:");
-        for (String pc : policyClasses.keySet()) {
-            PolicyClassExplain policyClass = policyClasses.get(pc);
-            str.append("\n\t\t").append(pc).append(": ").append(policyClass.getArset());
-            Set<Path> paths = policyClass.getPaths();
-            for (Path path : paths) {
-                str.append("\n\t\t\t- ").append(path);
-            }
-        }
-
-        if (!deniedPrivileges.isEmpty()) {
-            str.append("\nProhibitions:");
-            for (Prohibition p : prohibitions) {
-                str.append("\n- ").append(p);
-            }
-        }
-
-        return str.toString();
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Explain explain = (Explain) o;
-        return Objects.equals(privileges, explain.privileges) && Objects.equals(
-                policyClasses, explain.policyClasses) && Objects.equals(
-                deniedPrivileges, explain.deniedPrivileges) && Objects.equals(
-                prohibitions, explain.prohibitions);
+        if (this == o) return true;
+        if (!(o instanceof Explain explain)) return false;
+        return Objects.equals(privileges, explain.privileges) && Objects.equals(policyClasses, explain.policyClasses)
+                && Objects.equals(deniedPrivileges, explain.deniedPrivileges) && Objects.equals(prohibitions, explain.prohibitions);
     }
 
     @Override

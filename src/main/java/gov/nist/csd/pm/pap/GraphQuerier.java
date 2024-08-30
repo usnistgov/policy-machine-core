@@ -1,16 +1,17 @@
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.pap.query.GraphQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.Collection;
 import java.util.Map;
 
-public class GraphQuerier extends Querier implements GraphQuery{
+public class GraphQuerier extends Querier implements GraphQuery {
 
     public GraphQuerier(PolicyStore store) {
         super(store);

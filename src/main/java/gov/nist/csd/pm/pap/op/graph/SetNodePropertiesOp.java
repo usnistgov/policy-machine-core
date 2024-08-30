@@ -32,7 +32,7 @@ public class SetNodePropertiesOp extends GraphOp {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, (String) operands.get(NAME_OPERAND), SET_NODE_PROPERTIES);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        privilegeChecker.check(userCtx, (String) operands.get(NAME_OPERAND), SET_NODE_PROPERTIES);
     }
 }

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.executable.operation.builtin;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
@@ -32,7 +33,7 @@ public class Append extends PMLOperation {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
 
     }
 }

@@ -46,11 +46,11 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
         @Test
         void testTx() throws PMException {
             pap.runTx(tx -> {
-                PolicyModifier modify = pap.modify();
+                PolicyModification modify = pap.modify();
                 modify.graph().createPolicyClass("pc1");
             });
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                PolicyModifier modify = pap.modify();
+                PolicyModification modify = pap.modify();
                 modify.graph().createPolicyClass("pc2");
                 modify.graph().createPolicyClass("pc3");
                 throw new PMException("");
@@ -140,7 +140,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                 pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
             });
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                PolicyModifier modify = pap.modify();
+                PolicyModification modify = pap.modify();
                 pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
                 pap.modify().graph().createObjectAttribute("oa3", List.of("pc1"));
                 throw new PMException("");

@@ -20,7 +20,7 @@ class PreparedOperationTest {
     void testExecute() throws PMException {
         Operation<Void> op1 = new Operation<>("op1", List.of("a", "b", "c", "d"), List.of("c", "d")) {
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
 
             }
 
@@ -39,7 +39,7 @@ class PreparedOperationTest {
         )
         );
 
-        EventContext execute = preparedOperation.execute(new MemoryPAP(), new UserContext("u1"));
+        EventContext execute = preparedOperation.execute(new MemoryPAP(), new UserContext("u1"), new PrivilegeChecker(new MemoryPAP()));
         assertEquals(execute, new EventContext("u1", "", op1,
                 Map.of(ASCENDANT_OPERAND, "c", DESCENDANTS_OPERAND, List.of("a", "b"))));
     }

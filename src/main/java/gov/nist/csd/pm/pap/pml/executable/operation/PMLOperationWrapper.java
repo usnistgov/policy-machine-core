@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.executable.operation;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.UserContext;
@@ -32,8 +33,8 @@ public class PMLOperationWrapper extends PMLOperation {
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        operation.canExecute(pap, userCtx, operands);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        operation.canExecute(privilegeChecker, userCtx, operands);
     }
 
     @Override

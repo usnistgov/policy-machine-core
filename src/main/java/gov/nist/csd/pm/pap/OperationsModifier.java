@@ -1,9 +1,10 @@
-package gov.nist.csd.pm.pap.modification;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.pap.exception.OperationExistsException;
+import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.op.AdminOperations;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.store.PolicyStore;
@@ -11,7 +12,7 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.isWildcardAccessRight;
 
-public class OperationsModifier extends Modifier implements OperationsModification{
+public class OperationsModifier extends Modifier implements OperationsModification {
 
     public OperationsModifier(PolicyStore store) throws PMException {
         super(store);

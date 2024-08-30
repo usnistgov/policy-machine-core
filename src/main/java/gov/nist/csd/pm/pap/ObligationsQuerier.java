@@ -1,15 +1,16 @@
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.exception.ObligationDoesNotExistException;
+import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ObligationsQuerier extends Querier implements ObligationsQuery{
+public class ObligationsQuerier extends Querier implements ObligationsQuery {
 
     public ObligationsQuerier(PolicyStore store) {
         super(store);

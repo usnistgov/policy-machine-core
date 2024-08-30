@@ -10,6 +10,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.query.explain.*;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
 import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
+import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
 import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pdp.Decision.DENY;
 import static gov.nist.csd.pm.pdp.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,8 +44,14 @@ class PDPTest {
             txPAP.modify().graph().createObject("o1", List.of("oa1"));
         });
 
-        assertThrows(PMException.class, () -> pdp.runTx(new UserContext("u1"), ((policy) ->
-                policy.modify().graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT_ATTRIBUTE)))));
+        PMException e = assertThrows(
+                PMException.class,
+                () -> pdp.runTx(
+                        new UserContext("u1"),
+                        policy -> policy.modify().graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT_ATTRIBUTE))
+                )
+        );
+        assertEquals("[user=u1] does not have access right [associate] on [ua1]", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -135,13 +144,34 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
+        pdp.setExplain(true);
+
         ResourceAdjudicationResponse resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "read");
         assertEquals(resp.getResource(), pap.query().graph().getNode("o1"));
         assertEquals(resp.getDecision(), GRANT);
+        assertNull(resp.getExplain());
 
         resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "write");
         assertNull(resp.getResource());
         assertEquals(resp.getDecision(), Decision.DENY);
+        assertEquals(new Explain(
+                new AccessRightSet("read"),
+                List.of(
+                        new PolicyClassExplain(
+                                "pc1",
+                                new AccessRightSet("read"),
+                                List.of(
+                                        List.of(
+                                                new ExplainNode("o1", List.of()),
+                                                new ExplainNode("oa1", List.of(
+                                                        new ExplainAssociation("ua1", new AccessRightSet("read"), List.of(new Path("u1", "ua1")))
+                                                )),
+                                                new ExplainNode("pc1", List.of())
+                                        )
+                                )
+                        )
+                )
+        ), resp.getExplain());
     }
 
     @Test
@@ -168,6 +198,7 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
+        pdp.setExplain(true);
 
         // builtin operation
         AdminAdjudicationResponse resp = pdp.adjudicateAdminOperations(
@@ -183,6 +214,23 @@ class PDPTest {
         // denied
         resp = pdp.adjudicateAdminOperations(new UserContext("u2"), List.of(new OperationRequest("op1", Map.of())));
         assertEquals(Decision.DENY, resp.getDecision());
+        assertEquals(new Explain(
+                new AccessRightSet(),
+                List.of(
+                        new PolicyClassExplain(
+                                "pc1",
+                                new AccessRightSet(),
+                                List.of(
+                                        List.of(
+                                                new ExplainNode("oa2", List.of(
+                                                        new ExplainAssociation("ua1", new AccessRightSet("assign_to"), List.of())
+                                                )),
+                                                new ExplainNode("pc1", List.of())
+                                        )
+                                )
+                        )
+                )
+        ), resp.getExplain());
     }
 
     @Test
@@ -229,6 +277,8 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
+        pdp.setExplain(true);
+
         AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of("a", "test")));
         assertEquals(GRANT, response.getDecision());
         response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine2", Map.of()));
@@ -237,11 +287,25 @@ class PDPTest {
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));
 
-        UnauthorizedException e = assertThrows(
-                UnauthorizedException.class,
-                () -> pdp.adjudicateAdminRoutine(new UserContext("u2"), new RoutineRequest("routine1", Map.of("a", "test3")))
-        );
-        assertEquals("[user=u2] does not have access right [create_policy_class] on [PM_ADMIN:object]", e.getMessage());
+        response = pdp.adjudicateAdminRoutine(new UserContext("u2"), new RoutineRequest("routine1", Map.of("a", "test3")));
+        assertEquals(DENY, response.getDecision());
+        assertEquals(new Explain(
+                new AccessRightSet(),
+                List.of(
+                        new PolicyClassExplain(
+                                "PM_ADMIN",
+                                new AccessRightSet(),
+                                List.of(
+                                        List.of(
+                                                new ExplainNode(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), List.of(
+                                                        new ExplainAssociation("ua1", new AccessRightSet("*"), List.of())
+                                                )),
+                                                new ExplainNode("PM_ADMIN", List.of())
+                                        )
+                                )
+                        )
+                )
+        ), response.getExplain());
     }
 
     @Test
@@ -267,7 +331,8 @@ class PDPTest {
         pap.executePML(new UserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of())));
+        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of()));
+        assertEquals(DENY, response.getDecision());
     }
 
     @Test
@@ -331,5 +396,24 @@ class PDPTest {
         EPP epp = new EPP(pdp, pap);
         pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1", Map.of())));
         assertFalse(pap.query().graph().nodeExists("test"));
+    }
+
+    @Test
+    void testExplainFalseDoesNotIncludeExplainInResponse() throws PMException {
+        MemoryPAP pap = new MemoryPAP();
+        pap.executePML(new UserContext("u1"), """
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc1"]
+                
+                create u "u1" in ["ua1"]
+               
+                """);
+
+        PDP pdp = new PDP(pap);
+        AdminAdjudicationResponse response = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("create_policy_class", Map.of(NAME_OPERAND, "test"))));
+        assertEquals(response.getDecision(), DENY);
+        assertNull(response.getExplain());
     }
 }

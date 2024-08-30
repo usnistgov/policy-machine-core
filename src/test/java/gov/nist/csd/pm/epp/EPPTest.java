@@ -10,6 +10,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
@@ -95,7 +96,7 @@ class EPPTest {
             }
 
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Map operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
 
             }
         });
@@ -310,7 +311,7 @@ class EPPTest {
 
         PMLOperation pmlOperation = new PMLOperation("testFunc", Type.voidType()) {
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
 
             }
 

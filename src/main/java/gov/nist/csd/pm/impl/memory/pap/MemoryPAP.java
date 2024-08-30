@@ -3,7 +3,7 @@ package gov.nist.csd.pm.impl.memory.pap;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.store.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.PolicyQuerier;
+import gov.nist.csd.pm.pap.PolicyQuerier;
 
 public class MemoryPAP extends PAP {
 

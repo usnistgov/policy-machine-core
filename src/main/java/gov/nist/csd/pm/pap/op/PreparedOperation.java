@@ -38,9 +38,9 @@ public class PreparedOperation<T> {
         return op.execute(pap, operands);
     }
 
-    public EventContext execute(PAP pap, UserContext userCtx) throws PMException {
+    public EventContext execute(PAP pap, UserContext userCtx, PrivilegeChecker privilegeChecker) throws PMException {
         // check user can execute op with given operands
-        op.canExecute(pap, userCtx, operands);
+        op.canExecute(privilegeChecker, userCtx, operands);
 
         // execute the op with the given operands
         op.execute(pap, operands);

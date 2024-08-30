@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.op.obligation;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
@@ -36,11 +37,13 @@ class ObligationOpTest {
                 create o "o1" in ["oa1"]
                 """);
 
-        checkPatternPrivileges(pap, new UserContext("u1"), new SubjectPattern(), CREATE_OBLIGATION);
-        assertThrows(UnauthorizedException.class,
-                () -> checkPatternPrivileges(pap, new UserContext("u2"), new SubjectPattern(), CREATE_OBLIGATION));
+        PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
 
-        checkPatternPrivileges(pap, new UserContext("u1"), new LogicalSubjectPatternExpression(
+        checkPatternPrivileges(privilegeChecker, new UserContext("u1"), new SubjectPattern(), CREATE_OBLIGATION);
+        assertThrows(UnauthorizedException.class,
+                () -> checkPatternPrivileges(privilegeChecker, new UserContext("u2"), new SubjectPattern(), CREATE_OBLIGATION));
+
+        checkPatternPrivileges(privilegeChecker, new UserContext("u1"), new LogicalSubjectPatternExpression(
                 new NodeOperandPattern("oa1"),
                 new InOperandPattern("oa2"),
                 true

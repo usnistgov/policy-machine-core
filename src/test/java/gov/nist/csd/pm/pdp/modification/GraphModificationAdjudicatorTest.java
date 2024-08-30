@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.graph.*;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
@@ -66,8 +67,8 @@ class GraphModificationAdjudicatorTest {
         testEventProcessor = new TestEventProcessor();
         pdp.addEventListener(testEventProcessor);
 
-        ok = new GraphModificationAdjudicator(new UserContext("u1"), pap, pdp);
-        fail = new GraphModificationAdjudicator(new UserContext("u2"), pap, pdp);
+        ok = new GraphModificationAdjudicator(new UserContext("u1"), pap, pdp, new PrivilegeChecker(pap));
+        fail = new GraphModificationAdjudicator(new UserContext("u2"), pap, pdp, new PrivilegeChecker(pap));
     }
 
     @Test

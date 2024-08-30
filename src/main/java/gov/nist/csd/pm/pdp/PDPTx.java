@@ -27,77 +27,86 @@ import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
 
 public class PDPTx extends PAP {
 
-    private final UserContext userCtx;
     final PAP pap;
+
+    private final UserContext userCtx;
+    private final PrivilegeChecker privilegeChecker;
     private final PDPEventEmitter eventEmitter;
 
     private final PolicyModificationAdjudicator pdpModifier;
     private final PolicyQueryAdjudicator pdpQuerier;
 
-    public PDPTx(UserContext userCtx, PAP pap, List<EventProcessor> epps) throws PMException {
+    public PDPTx(UserContext userCtx, PrivilegeChecker privilegeChecker, PAP pap, List<EventProcessor> epps) throws PMException {
         super(pap);
 
         this.userCtx = userCtx;
+        this.privilegeChecker = privilegeChecker;
         this.pap = pap;
         this.eventEmitter = new PDPEventEmitter(epps);
-        this.pdpModifier = new PolicyModificationAdjudicator(userCtx, pap, eventEmitter);
-        this.pdpQuerier = new PolicyQueryAdjudicator(userCtx, pap);
+        this.pdpModifier = new PolicyModificationAdjudicator(this.userCtx, this.pap, this.eventEmitter, this.privilegeChecker);
+        this.pdpQuerier = new PolicyQueryAdjudicator(this.userCtx, this.pap, this.privilegeChecker);
     }
 
+    public PrivilegeChecker getPrivilegeChecker() {
+        return privilegeChecker;
+    }
+
+    @Override
     public PolicyModificationAdjudicator modify() {
         return pdpModifier;
     }
 
+    @Override
     public PolicyQueryAdjudicator query() {
         return pdpQuerier;
     }
 
     @Override
     public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_OPS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_OPS);
 
         super.setPMLOperations(pmlOperations);
     }
 
     @Override
     public void setPMLOperations(PMLOperation... operations) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_OPS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_OPS);
         super.setPMLOperations(operations);
     }
 
     @Override
     public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_ROUTINES);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_ROUTINES);
         super.setPMLRoutines(pmlRoutines);
     }
 
     @Override
     public void setPMLRoutines(PMLRoutine... routines) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_ROUTINES);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_ROUTINES);
         super.setPMLRoutines(routines);
     }
 
     @Override
     public Map<String, PMLOperation> getPMLOperations() throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
         return super.getPMLOperations();
     }
 
     @Override
     public Map<String, PMLRoutine> getPMLRoutines() throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
         return super.getPMLRoutines();
     }
 
     @Override
     public void setPMLConstants(Map<String, Value> pmlConstants) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_CONSTANTS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_CONSTANTS);
         super.setPMLConstants(pmlConstants);
     }
 
     @Override
     public Map<String, Value> getPMLConstants() throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
         return super.getPMLConstants();
     }
 
@@ -106,7 +115,7 @@ public class PDPTx extends PAP {
         if (adminExecutable instanceof Routine<?> routine) {
             return routine.execute(this, operands);
         } else if (adminExecutable instanceof Operation<?> operation) {
-            operation.canExecute(pap, userCtx, operands);
+            operation.canExecute(privilegeChecker, userCtx, operands);
             return operation.execute(pap, operands);
         }
 
@@ -115,14 +124,14 @@ public class PDPTx extends PAP {
 
     @Override
     public void reset() throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), RESET);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), RESET);
 
         pap.reset();
     }
 
     @Override
     public String serialize(PolicySerializer serializer) throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SERIALIZE_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SERIALIZE_POLICY);
 
         return pap.serialize(serializer);
     }
@@ -130,7 +139,7 @@ public class PDPTx extends PAP {
     @Override
     public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
             throws PMException {
-        PrivilegeChecker.check(pap, userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), DESERIALIZE_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), DESERIALIZE_POLICY);
 
         pap.deserialize(author, input, policyDeserializer);
     }
