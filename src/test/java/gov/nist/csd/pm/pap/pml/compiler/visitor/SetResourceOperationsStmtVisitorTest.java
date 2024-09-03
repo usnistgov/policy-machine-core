@@ -18,9 +18,7 @@ class SetResourceOperationsStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.SetResourceOperationsStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                set resource operations ["a", "b"]
-                """,
+                "set resource operations [\"a\", \"b\"]",
                 PMLParser.SetResourceOperationsStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new SetResourceOperationsStmtVisitor(visitorCtx)
@@ -37,9 +35,7 @@ class SetResourceOperationsStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                set resource operations "a"
-                """, visitorCtx, 1,
+                "set resource operations \"a\"", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
         );
     }

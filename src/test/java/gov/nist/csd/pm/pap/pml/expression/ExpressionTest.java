@@ -23,9 +23,7 @@ class ExpressionTest {
     @Test
     void testAllowedTypes() throws PMException {
         PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                a
-                """, PMLParser.VariableReferenceExpressionContext.class);
+                "a", PMLParser.VariableReferenceExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         visitorContext.scope().addVariable("a", new Variable("a", Type.string(), false));
         Expression actual = Expression.compile(visitorContext, ctx, Type.string());
@@ -35,9 +33,7 @@ class ExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                a
-                """, PMLParser.VariableReferenceExpressionContext.class);
+                "a", PMLParser.VariableReferenceExpressionContext.class);
         visitorContext = new VisitorContext(new CompileGlobalScope());
         visitorContext.scope().addVariable("a", new Variable("a", Type.array(Type.string()), false));
         actual = Expression.compile(visitorContext, ctx, Type.array(Type.string()));
@@ -50,9 +46,7 @@ class ExpressionTest {
     @Test
     void testDisallowedTypes() throws PMException {
         PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                a
-                """, PMLParser.VariableReferenceExpressionContext.class);
+                "a", PMLParser.VariableReferenceExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         visitorContext.scope().addVariable("a", new Variable("a", Type.string(), false));
         PMLCompilationRuntimeException e = assertThrows(

@@ -23,18 +23,16 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testComputeAccessibleAscendants() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                
-                create u "u1" in ["ua1"]
-                create o "o1" in ["oa1"]
-                create o "o2" in ["oa1"]
-                """;
+        String pml = "                set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"oa1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]\n" +
+                "                create o \"o2\" in [\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> actual = pap.query().access().computeAccessibleAscendants(new UserContext("u1"), "oa1");
@@ -46,19 +44,17 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testComputeAccessibleDescendants() throws PMException {
-        String pml = """
-               set resource operations ["read", "write"]
-               create pc "pc1"
-               create ua "ua1" in ["pc1"]
-               create oa "oa1" in ["pc1"]
-               create oa "oa2" in ["pc1"]
-               create oa "oa3" in ["pc1"]
-                       associate "ua1" and "oa1" with ["read", "write"]
-                       associate "ua1" and "oa2" with ["read", "write"]
-
-               create u "u1" in ["ua1"]
-               create o "o1" in ["oa1", "oa2"]
-               """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "               create pc \"pc1\"\n" +
+                "               create ua \"ua1\" in [\"pc1\"]\n" +
+                "               create oa \"oa1\" in [\"pc1\"]\n" +
+                "               create oa \"oa2\" in [\"pc1\"]\n" +
+                "               create oa \"oa3\" in [\"pc1\"]\n" +
+                "                       associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                       associate \"ua1\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "\n" +
+                "               create u \"u1\" in [\"ua1\"]\n" +
+                "               create o \"o1\" in [\"oa1\", \"oa2\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> actual = pap.query().access().computeAccessibleDescendants(new UserContext("u1"), "o1");
@@ -70,30 +66,28 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testBuildPOS() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                create pc "pc2"
-                create ua "ua2" in ["pc2"]
-                create oa "oa2" in ["pc2"]
-                create oa "oa3" in ["oa2"]
-                create oa "oa4" in ["pc2"]
-
-                associate "ua2" and "oa2" with ["read", "write"]
-                associate "ua2" and "oa4" with ["read"]               
-                
-                create u "u1" in ["ua1", "ua2"]
-                create o "o1" in ["oa1", "oa3"]
-                create o "o2" in ["oa4"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                create pc \"pc2\"\n" +
+                "                create ua \"ua2\" in [\"pc2\"]\n" +
+                "                create oa \"oa2\" in [\"pc2\"]\n" +
+                "                create oa \"oa3\" in [\"oa2\"]\n" +
+                "                create oa \"oa4\" in [\"pc2\"]\n" +
+                "\n" +
+                "                associate \"ua2\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "                associate \"ua2\" and \"oa4\" with [\"read\"]               \n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\", \"ua2\"]\n" +
+                "                create o \"o1\" in [\"oa1\", \"oa3\"]\n" +
+                "                create o \"o2\" in [\"oa4\"]\n" +
+                "                \n" +
+                "                create prohibition \"p1\"\n" +
+                "                deny user \"u1\" \n" +
+                "                access rights [\"write\"]\n" +
+                "                on union of [\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> u1 = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
@@ -105,32 +99,30 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testExplain() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                
-                create pc "pc2"
-                create ua "ua2" in ["pc2"]
-                create oa "oa2" in ["pc2"]
-                create oa "oa3" in ["oa2"]
-                associate "ua2" and "oa2" with ["read", "write"]
-                    
-                create u "u1" in ["ua1", "ua2"]
-                create o "o1" in ["oa1", "oa3"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                
-                create prohibition "p2"
-                deny user "u1" 
-                access rights ["write"]
-                on union of [!"oa1"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                \n" +
+                "                create pc \"pc2\"\n" +
+                "                create ua \"ua2\" in [\"pc2\"]\n" +
+                "                create oa \"oa2\" in [\"pc2\"]\n" +
+                "                create oa \"oa3\" in [\"oa2\"]\n" +
+                "                associate \"ua2\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "                    \n" +
+                "                create u \"u1\" in [\"ua1\", \"ua2\"]\n" +
+                "                create o \"o1\" in [\"oa1\", \"oa3\"]\n" +
+                "                \n" +
+                "                create prohibition \"p1\"\n" +
+                "                deny user \"u1\" \n" +
+                "                access rights [\"write\"]\n" +
+                "                on union of [\"oa1\"]\n" +
+                "                \n" +
+                "                create prohibition \"p2\"\n" +
+                "                deny user \"u1\" \n" +
+                "                access rights [\"write\"]\n" +
+                "                on union of [!\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Explain explain = pap.query().access().explain(new UserContext("u1"), "o1");
@@ -191,31 +183,29 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testExplain2() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                
-                create pc "pc1"
-                
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["ua1"]
-                create ua "ua3" in ["ua1"]
-                
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-                create oa "oa3" in ["oa1"]
-                
-                associate "ua2" and "oa2" with ["read"]
-                associate "ua3" and "oa3" with ["read"]
-                associate "ua1" and "oa1" with ["read"]
-                
-                create pc "pc2"
-                create ua "ua4" in ["pc2"]
-                create oa "oa4" in ["pc2"]
-                associate "ua4" and "oa4" with ["read"]
-                
-                create user "u1" in ["ua2", "ua3", "ua4"]
-                create object "o1" in ["oa2", "oa3", "oa4"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                \n" +
+                "                create pc \"pc1\"\n" +
+                "                \n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"ua1\"]\n" +
+                "                create ua \"ua3\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"oa1\"]\n" +
+                "                create oa \"oa3\" in [\"oa1\"]\n" +
+                "                \n" +
+                "                associate \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "                associate \"ua3\" and \"oa3\" with [\"read\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\"]\n" +
+                "                \n" +
+                "                create pc \"pc2\"\n" +
+                "                create ua \"ua4\" in [\"pc2\"]\n" +
+                "                create oa \"oa4\" in [\"pc2\"]\n" +
+                "                associate \"ua4\" and \"oa4\" with [\"read\"]\n" +
+                "                \n" +
+                "                create user \"u1\" in [\"ua2\", \"ua3\", \"ua4\"]\n" +
+                "                create object \"o1\" in [\"oa2\", \"oa3\", \"oa4\"]";
         MemoryPAP pap = new MemoryPAP();
         pap.executePML(new UserContext(""), pml);
 
@@ -305,18 +295,16 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testExplainOnObjAttrWithAssociation() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                    create UA "ua1" in ["pc1"]
-                    create oa "oa1" in ["pc1"]
-                    create oa "oa2" in ["oa1"]
-
-                    associate "ua1" and "oa1" with ["write"]
-                    associate "ua1" and "oa2" with ["read"]
-               
-                create user "u1" in ["ua1"]
-                """;
+        String pml = "                set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                    create UA \"ua1\" in [\"pc1\"]\n" +
+                "                    create oa \"oa1\" in [\"pc1\"]\n" +
+                "                    create oa \"oa2\" in [\"oa1\"]\n" +
+                "\n" +
+                "                    associate \"ua1\" and \"oa1\" with [\"write\"]\n" +
+                "                    associate \"ua1\" and \"oa2\" with [\"read\"]\n" +
+                "               \n" +
+                "                create user \"u1\" in [\"ua1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Explain actual = pap.query().access().explain(new UserContext("u1"), "oa2");
         assertExplainEquals(
@@ -348,19 +336,17 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testExplainNoPaths() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                    create UA "ua1" in ["pc1"]
-                    create UA "ua2" in ["pc1"]
-                    create oa "oa1" in ["pc1"]
-                    create oa "oa2" in ["oa1"]
-
-                    associate "ua1" and "oa1" with ["write"]
-               
-                create user "u1" in ["ua2"]
-                create object "o1" in ["oa1"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                    create UA \"ua1\" in [\"pc1\"]\n" +
+                "                    create UA \"ua2\" in [\"pc1\"]\n" +
+                "                    create oa \"oa1\" in [\"pc1\"]\n" +
+                "                    create oa \"oa2\" in [\"oa1\"]\n" +
+                "\n" +
+                "                    associate \"ua1\" and \"oa1\" with [\"write\"]\n" +
+                "               \n" +
+                "                create user \"u1\" in [\"ua2\"]\n" +
+                "                create object \"o1\" in [\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
         assertExplainEquals(
@@ -390,23 +376,21 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testExplainPathsButNoPrivileges() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                    create UA "ua1" in ["pc1"]
-                    create oa "oa1" in ["pc1"]
-
-                    associate "ua1" and "oa1" with ["write"]
-                    
-                create pc "pc2"
-                    create UA "ua2" in ["pc2"]
-                    create OA "oa2" in ["pc2"]
-                    
-                    associate "ua2" and "oa2" with ["read"]
-               
-                create user "u1" in ["ua1", "ua2"]
-                create object "o1" in ["oa1", "oa2"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                    create UA \"ua1\" in [\"pc1\"]\n" +
+                "                    create oa \"oa1\" in [\"pc1\"]\n" +
+                "\n" +
+                "                    associate \"ua1\" and \"oa1\" with [\"write\"]\n" +
+                "                    \n" +
+                "                create pc \"pc2\"\n" +
+                "                    create UA \"ua2\" in [\"pc2\"]\n" +
+                "                    create OA \"oa2\" in [\"pc2\"]\n" +
+                "                    \n" +
+                "                    associate \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "               \n" +
+                "                create user \"u1\" in [\"ua1\", \"ua2\"]\n" +
+                "                create object \"o1\" in [\"oa1\", \"oa2\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
         assertExplainEquals(
@@ -450,23 +434,21 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testExplainMultiplePolicyClasses() throws PMException {
         // test all pcs have same access rights
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                    create UA "ua1" in ["pc1"]
-                    create oa "oa1" in ["pc1"]
-
-                    associate "ua1" and "oa1" with ["read", "write"]
-                    
-                create pc "pc2"
-                    create UA "ua2" in ["pc2"]
-                    create OA "oa2" in ["pc2"]
-                    
-                    associate "ua2" and "oa2" with ["read", "write"]
-               
-                create user "u1" in ["ua1", "ua2"]
-                create object "o1" in ["oa1", "oa2"]
-                """;
+        String pml = "                set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                    create UA \"ua1\" in [\"pc1\"]\n" +
+                "                    create oa \"oa1\" in [\"pc1\"]\n" +
+                "\n" +
+                "                    associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                    \n" +
+                "                create pc \"pc2\"\n" +
+                "                    create UA \"ua2\" in [\"pc2\"]\n" +
+                "                    create OA \"oa2\" in [\"pc2\"]\n" +
+                "                    \n" +
+                "                    associate \"ua2\" and \"oa2\" with [\"read\", \"write\"]\n" +
+                "               \n" +
+                "                create user \"u1\" in [\"ua1\", \"ua2\"]\n" +
+                "                create object \"o1\" in [\"oa1\", \"oa2\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
         assertExplainEquals(
@@ -507,23 +489,21 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         );
 
         // test all pcs do not have same ars
-        pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                    create UA "ua1" in ["pc1"]
-                    create oa "oa1" in ["pc1"]
-
-                    associate "ua1" and "oa1" with ["read", "write"]
-                    
-                create pc "pc2"
-                    create UA "ua2" in ["pc2"]
-                    create OA "oa2" in ["pc2"]
-                    
-                    associate "ua2" and "oa2" with ["read"]
-               
-                create user "u1" in ["ua1", "ua2"]
-                create object "o1" in ["oa1", "oa2"]
-                """;
+        pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                    create UA \"ua1\" in [\"pc1\"]\n" +
+                "                    create oa \"oa1\" in [\"pc1\"]\n" +
+                "\n" +
+                "                    associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                    \n" +
+                "                create pc \"pc2\"\n" +
+                "                    create UA \"ua2\" in [\"pc2\"]\n" +
+                "                    create OA \"oa2\" in [\"pc2\"]\n" +
+                "                    \n" +
+                "                    associate \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "               \n" +
+                "                create user \"u1\" in [\"ua1\", \"ua2\"]\n" +
+                "                create object \"o1\" in [\"oa1\", \"oa2\"]";
         pap.reset();
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         actual = pap.query().access().explain(new UserContext("u1"), "o1");
@@ -568,18 +548,16 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testComputeSubgraphPrivileges() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-
-                associate "ua1" and "oa1" with ["read", "write"]
-                
-                create u "u1" in ["ua1"]
-                create o "o1" in ["oa2"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"oa1\"]\n" +
+                "\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create o \"o1\" in [\"oa2\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Map<String, AccessRightSet> u1 =
                 pap.query().access().computeAscendantPrivileges(new UserContext("u1"), "oa1");
@@ -594,19 +572,17 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testFindBorderAttributes() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                   
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua2" and "oa2" with ["read"]
-                
-                create u "u1" in ["ua1", "ua2"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                   \n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"oa1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                associate \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\", \"ua2\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Map<String, AccessRightSet> u1 = pap.query().access().computeDestinationAttributes("u1");
         assertEquals(
@@ -620,19 +596,17 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testBuildACL() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua2" and "oa1" with ["read"]
-                
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                create o "o1" in ["oa1"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                associate \"ua2\" and \"oa1\" with [\"read\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Map<String, AccessRightSet> o1 = pap.query().access().computeACL("o1");
         assertEquals(
@@ -646,24 +620,22 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testBuildCapabilityList() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua1" and "oa2" with ["read"]
-                
-                create u "u1" in ["ua1"]
-                create o "o1" in ["oa1"]
-                create o "o2" in ["oa2"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                associate \"ua1\" and \"oa2\" with [\"read\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]\n" +
+                "                create o \"o2\" in [\"oa2\"]\n" +
+                "                \n" +
+                "                create prohibition \"p1\"\n" +
+                "                deny user \"u1\" \n" +
+                "                access rights [\"write\"]\n" +
+                "                on union of [\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Map<String, AccessRightSet> u1 = pap.query().access().computeCapabilityList(new UserContext("u1"));
         assertEquals(
@@ -679,21 +651,19 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testComputeDeniedPrivileges() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                
-                create u "u1" in ["ua1"]
-                create o "o1" in ["oa1"]
-                
-                create prohibition "p1"
-                deny user "u1" 
-                access rights ["write"]
-                on union of ["oa1"]
-                """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]\n" +
+                "                \n" +
+                "                create prohibition \"p1\"\n" +
+                "                deny user \"u1\" \n" +
+                "                access rights [\"write\"]\n" +
+                "                on union of [\"oa1\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         AccessRightSet deniedPrivileges = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), "o1");
         assertEquals(new AccessRightSet("write"), deniedPrivileges);
@@ -701,21 +671,19 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testComputePolicyClassAccessRights() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create UA "ua1" in ["pc1"]
-                create OA "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-
-                create pc "pc2"
-                create UA "ua2" in ["pc2"]
-                create OA "oa2" in ["pc2"]
-                associate "ua2" and "oa2" with ["read"]
-                
-                create u "u1" in ["ua1", "ua2"]
-                create o "o1" in ["oa1", "oa2"]
-                """;
+        String pml = " set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create UA \"ua1\" in [\"pc1\"]\n" +
+                "                create OA \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                "\n" +
+                "                create pc \"pc2\"\n" +
+                "                create UA \"ua2\" in [\"pc2\"]\n" +
+                "                create OA \"oa2\" in [\"pc2\"]\n" +
+                "                associate \"ua2\" and \"oa2\" with [\"read\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\", \"ua2\"]\n" +
+                "                create o \"o1\" in [\"oa1\", \"oa2\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Map<String, AccessRightSet> policyClassAccessRights =
                 pap.query().access().computePolicyClassAccessRights(new UserContext("u1"), "o1");

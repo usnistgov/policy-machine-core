@@ -13,7 +13,18 @@ import org.antlr.v4.runtime.ListTokenSource;
 import java.util.List;
 import java.util.Objects;
 
-public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLExecutableSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
+public final class VisitorContext {
+    private final CommonTokenStream tokens;
+    private final Scope<Variable, PMLExecutableSignature> scope;
+    private final ErrorLog errorLog;
+    private final PMLErrorHandler pmlErrorHandler;
+
+    public VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLExecutableSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
+        this.tokens = tokens;
+        this.scope = scope;
+        this.errorLog = errorLog;
+        this.pmlErrorHandler = pmlErrorHandler;
+    }
 
     public VisitorContext(Scope<Variable, PMLExecutableSignature> scope) {
         this(new CommonTokenStream(new ListTokenSource(List.of())), scope, new ErrorLog(), new PMLErrorHandler());
@@ -45,4 +56,30 @@ public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLExecut
     public int hashCode() {
         return Objects.hash(tokens, scope, errorLog);
     }
+
+    public CommonTokenStream tokens() {
+        return tokens;
+    }
+
+    public Scope<Variable, PMLExecutableSignature> scope() {
+        return scope;
+    }
+
+    public ErrorLog errorLog() {
+        return errorLog;
+    }
+
+    public PMLErrorHandler pmlErrorHandler() {
+        return pmlErrorHandler;
+    }
+
+    @Override
+    public String toString() {
+        return "VisitorContext[" +
+                "tokens=" + tokens + ", " +
+                "scope=" + scope + ", " +
+                "errorLog=" + errorLog + ", " +
+                "pmlErrorHandler=" + pmlErrorHandler + ']';
+    }
+
 }

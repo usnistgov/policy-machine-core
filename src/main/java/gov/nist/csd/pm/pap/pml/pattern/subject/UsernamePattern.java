@@ -39,7 +39,8 @@ public class UsernamePattern extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UsernamePattern that)) return false;
+        if (!(o instanceof UsernamePattern)) return false;
+        UsernamePattern that = (UsernamePattern) o;
         return Objects.equals(user, that.user);
     }
 

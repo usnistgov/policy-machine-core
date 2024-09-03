@@ -52,17 +52,15 @@ class ReferenceByDotIndexTest {
 
     @Test
     void testIndexChain() throws PMException {
-        String pml = """
-                a := {
-                    "b": {
-                        "c": {
-                            "d": "e"
-                        }  
-                    }
-                }
-                
-                create policy class a.b.c.d
-                """;
+        String pml = "a := {\n" +
+                "                    \"b\": {\n" +
+                "                        \"c\": {\n" +
+                "                            \"d\": \"e\"\n" +
+                "                        }  \n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create policy class a.b.c.d";
         PAP pap = new MemoryPAP();
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));

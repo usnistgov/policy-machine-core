@@ -19,14 +19,12 @@ class PDPTxTest {
     @Test
     void testReset() throws PMException {
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]");
         PDPTx u2 = new PDPTx(new UserContext("u2"), new PrivilegeChecker(pap), pap, List.of());
         assertThrows(UnauthorizedException.class, u2::reset);
 
@@ -37,14 +35,12 @@ class PDPTxTest {
     @Test
     void testSerialize() throws PMException {
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]");
         PDPTx u2 = new PDPTx(new UserContext("u2"), new PrivilegeChecker(pap), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.serialize(new JSONSerializer()));
 
@@ -55,14 +51,12 @@ class PDPTxTest {
     @Test
     void testDeserialize() throws PMException {
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]");
 
         String serialize = "create pc \"test\"";
 

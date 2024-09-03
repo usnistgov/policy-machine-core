@@ -18,9 +18,7 @@ class DeleteRuleStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.DeleteRuleStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete rule "rule1" from obligation "obl1"
-                """,
+                "delete rule \"rule1\" from obligation \"obl1\"",
                 PMLParser.DeleteRuleStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
@@ -36,16 +34,12 @@ class DeleteRuleStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                delete rule ["rule1"] from obligation "obl1"
-                """, visitorCtx, 1,
+                " delete rule [\"rule1\"] from obligation \"obl1\"", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
 
         testCompilationError(
-                """
-                delete rule "rule1" from obligation ["obl1"]
-                """, visitorCtx, 1,
+                "delete rule \"rule1\" from obligation [\"obl1\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
     }

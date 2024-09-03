@@ -59,16 +59,14 @@ public class CreateObligationStatement extends OperationStatement {
         }
 
         String indent = indent(indentLevel);
-        return String.format(
-                """
-                %screate obligation %s {
-                %s%s}""", indent, name, sb, indent);
+        return indent + "create obligation " + name + " {\n" + sb + indent + "}";
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CreateObligationStatement that)) return false;
+        if (!(o instanceof CreateObligationStatement)) return false;
+        CreateObligationStatement that = (CreateObligationStatement) o;
         return Objects.equals(name, that.name) && Objects.equals(ruleStmts, that.ruleStmts);
     }
 

@@ -22,25 +22,21 @@ class OperationPatternTest {
 
     @Test
     void testPML() throws PMException {
-        String pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when any user
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        String pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when any user\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         CreateRuleStatement stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new OperationPattern(), stmt.getOperationPattern());
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when any user
-                    performs "op1"
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"op1\"\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new OperationPattern("op1"), stmt.getOperationPattern());
     }

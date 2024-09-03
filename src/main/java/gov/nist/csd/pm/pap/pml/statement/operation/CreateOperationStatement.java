@@ -49,9 +49,10 @@ public class CreateOperationStatement extends PreparedOperation<Void> implements
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CreateOperationStatement that)) {
+        if (!(o instanceof CreateOperationStatement)) {
             return false;
         }
+        CreateOperationStatement that = (CreateOperationStatement) o;
         if (!super.equals(o)) {
             return false;
         }

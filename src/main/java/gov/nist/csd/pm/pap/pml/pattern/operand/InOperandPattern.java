@@ -40,7 +40,8 @@ public class InOperandPattern extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof InOperandPattern that)) return false;
+        if (!(o instanceof InOperandPattern)) return false;
+        InOperandPattern that = (InOperandPattern) o;
         return Objects.equals(container, that.container);
     }
 

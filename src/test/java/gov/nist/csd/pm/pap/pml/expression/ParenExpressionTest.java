@@ -30,9 +30,7 @@ class ParenExpressionTest {
     @Test
     void testParenExpression() throws PMException {
         PMLParser.ExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true && (true || false)
-                """, PMLParser.ExpressionContext.class);
+                "true && (true || false)", PMLParser.ExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(compileGlobalScope);
         Expression e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -43,9 +41,7 @@ class ParenExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                (false || false) && (true || false)
-                """, PMLParser.ExpressionContext.class);
+                "(false || false) && (true || false)", PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -56,9 +52,7 @@ class ParenExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                (false || false) || (true || false)
-                """, PMLParser.ExpressionContext.class);
+                "(false || false) || (true || false)", PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -69,9 +63,7 @@ class ParenExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                !(false || false) && (true || false)
-                """, PMLParser.ExpressionContext.class);
+                "!(false || false) && (true || false)", PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -82,9 +74,7 @@ class ParenExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                !(false || false) && (false || false || true)
-                """, PMLParser.ExpressionContext.class);
+                "!(false || false) && (false || false || true)", PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -95,9 +85,7 @@ class ParenExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                !(false || false) && (false || false || true) && false
-                """, PMLParser.ExpressionContext.class);
+                "!(false || false) && (false || false || true) && false", PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -111,9 +99,7 @@ class ParenExpressionTest {
     @Test
     void testComplexParen() throws PMException {
         PMLParser.ParenExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ((true || (true && false)) && (false || (false && true)))
-                """,
+                "((true || (true && false)) && (false || (false && true)))",
                 PMLParser.ParenExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(compileGlobalScope);
         Expression expression = ParenExpression.compileParenExpression(visitorContext, ctx);

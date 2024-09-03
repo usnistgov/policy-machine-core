@@ -32,9 +32,7 @@ class CreateNonPCStmtVisitorTest {
     @Test
     void testSuccess() {
         PMLParser.CreateNonPCStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create user attribute "ua1" in ["a"]
-                """,
+                "create user attribute \"ua1\" in [\"a\"]",
                 PMLParser.CreateNonPCStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
@@ -49,16 +47,12 @@ class CreateNonPCStmtVisitorTest {
     void testInvalidExpressions() {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         testCompilationError(
-                """
-                create user attribute ["ua1"] in ["a"]
-                """, visitorCtx, 1,
+                "create user attribute [\"ua1\"] in [\"a\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
 
         testCompilationError(
-                """
-                create user attribute "ua1" in "a"
-                """, visitorCtx, 1,
+                "create user attribute \"ua1\" in \"a\"", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
         );
     }

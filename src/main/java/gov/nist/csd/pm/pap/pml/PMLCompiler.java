@@ -61,7 +61,8 @@ public class PMLCompiler {
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
-            if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
+            if (operation instanceof PMLStmtsOperation) {
+                PMLStmtsOperation pmlStmtsOperation = (PMLStmtsOperation) operation;
                 this.executableSignatures.put(pmlStmtsOperation.getName(), pmlStmtsOperation.getSignature());
             } else {
                 this.executableSignatures.put(opName, new PMLOperationWrapper(operation).getSignature());
@@ -71,7 +72,8 @@ public class PMLCompiler {
         Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
         for (String routineName : routineNames) {
             Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
-            if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
+            if (routine instanceof PMLStmtsRoutine) {
+                PMLStmtsRoutine pmlStmtsRoutine = (PMLStmtsRoutine) routine;
                 this.executableSignatures.put(routine.getName(), pmlStmtsRoutine.getSignature());
             } else {
                 this.executableSignatures.put(routineName, new PMLRoutineWrapper(routine).getSignature());

@@ -68,7 +68,8 @@ public class CheckStatement implements PMLStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CheckStatement that)) return false;
+        if (!(o instanceof CheckStatement)) return false;
+        CheckStatement that = (CheckStatement) o;
         return Objects.equals(arsExpr, that.arsExpr) && Objects.equals(targetExpr, that.targetExpr);
     }
 

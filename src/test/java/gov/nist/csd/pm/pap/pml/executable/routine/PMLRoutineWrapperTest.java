@@ -48,14 +48,12 @@ class PMLRoutineWrapperTest {
             }
         };
 
-        String pml = """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["assign"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                create u "u1" in ["ua1"]
-                """;
+        String pml = "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"assign\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]";
         MemoryPAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 

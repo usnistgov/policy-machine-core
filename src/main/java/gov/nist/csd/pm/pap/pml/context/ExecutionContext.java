@@ -108,9 +108,10 @@ public class ExecutionContext implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ExecutionContext that)) {
+        if (!(o instanceof ExecutionContext)) {
             return false;
         }
+        ExecutionContext that = (ExecutionContext) o;
         return Objects.equals(author, that.author) && Objects.equals(
                 scope,
                 that.scope

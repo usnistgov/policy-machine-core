@@ -22,9 +22,7 @@ class LogicalExpressionTest {
     @Test
     void testCompile() throws PMException {
         PMLParser.LogicalExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true && false
-                """,
+                "true && false",
                 PMLParser.LogicalExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
@@ -40,9 +38,7 @@ class LogicalExpressionTest {
     @Test
     void testExecute() throws PMException {
         PMLParser.LogicalExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true && false
-                """,
+                "true && false",
                 PMLParser.LogicalExpressionContext.class);
         PAP pap = new MemoryPAP();
 
@@ -58,9 +54,7 @@ class LogicalExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                false || true
-                """,
+                "false || true",
                 PMLParser.LogicalExpressionContext.class);
         visitorContext = new VisitorContext(new CompileGlobalScope());
         expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);

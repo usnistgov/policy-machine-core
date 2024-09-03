@@ -53,7 +53,8 @@ public class CreateRoutineStatement extends PreparedOperation<Void> implements C
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CreateRoutineStatement that)) return false;
+        if (!(o instanceof CreateRoutineStatement)) return false;
+        CreateRoutineStatement that = (CreateRoutineStatement) o;
         if (!super.equals(o)) return false;
         return Objects.equals(routine, that.routine);
     }

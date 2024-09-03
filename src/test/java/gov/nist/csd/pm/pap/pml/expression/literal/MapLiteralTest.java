@@ -19,12 +19,10 @@ class MapLiteralTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                {
-                    "a": ["1", "2"],
-                    "b": "c"
-                }
-                """,
+                "{\n" +
+                        "                    \"a\": [\"1\", \"2\"],\n" +
+                        "                    \"b\": \"c\"\n" +
+                        "                }",
                 PMLParser.LiteralExpressionContext.class);
 
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());

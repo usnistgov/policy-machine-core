@@ -37,7 +37,8 @@ public class CreatePolicyStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CreatePolicyStatement that)) return false;
+        if (!(o instanceof CreatePolicyStatement)) return false;
+        CreatePolicyStatement that = (CreatePolicyStatement) o;
         return Objects.equals(name, that.name);
     }
 

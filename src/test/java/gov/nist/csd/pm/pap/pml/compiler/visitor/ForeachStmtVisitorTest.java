@@ -37,9 +37,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testSuccess() {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a", "b"] {}
-                """,
+                "foreach x in [\"a\", \"b\"] {}",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -50,9 +48,7 @@ class ForeachStmtVisitorTest {
         );
 
         ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x, y in {"a": "b"} {}
-                """,
+                "foreach x, y in {\"a\": \"b\"} {}",
                 PMLParser.ForeachStatementContext.class);
         visitorCtx = new VisitorContext(testGlobalScope);
         stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -68,17 +64,13 @@ class ForeachStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
 
         testCompilationError(
-                """
-                foreach x in "a" {}
-                """, visitorCtx, 1,
+                "foreach x in \"a\" {}", visitorCtx, 1,
                 "expected expression type(s) [[]any], got string"
 
         );
 
         testCompilationError(
-                """
-                foreach x in {"a": "b"} {}
-                """, visitorCtx, 1,
+                "foreach x in {\"a\": \"b\"} {}", visitorCtx, 1,
                 "expected expression type(s) [[]any], got map[string]string"
 
         );
@@ -89,9 +81,7 @@ class ForeachStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
 
         testCompilationError(
-                """
-                foreach x, y in ["a"] {}
-                """, visitorCtx, 1,
+                "foreach x, y in [\"a\"] {}", visitorCtx, 1,
                 "expected expression type(s) [map[any]any], got []string"
 
         );
@@ -102,9 +92,7 @@ class ForeachStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
 
         testCompilationError(
-                """
-                foreach x in arr {}
-                """, visitorCtx, 1,
+                "foreach x in arr {}", visitorCtx, 1,
                 "unknown variable 'arr' in scope"
 
         );
@@ -116,9 +104,7 @@ class ForeachStmtVisitorTest {
         visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
 
         testCompilationError(
-                """
-                foreach x in ["a"] {}
-                """, visitorCtx, 1,
+                "foreach x in [\"a\"] {}", visitorCtx, 1,
                 "variable 'x' already defined in scope"
 
         );
@@ -127,9 +113,7 @@ class ForeachStmtVisitorTest {
         visitorCtx.scope().addVariable("y", new Variable("y", Type.string(), false));
 
         testCompilationError(
-                """
-                foreach x, y in {"a": "b"} {}
-                """, visitorCtx, 1,
+                "foreach x, y in {\"a\": \"b\"} {}", visitorCtx, 1,
                 "variable 'y' already defined in scope"
 
         );
@@ -140,9 +124,7 @@ class ForeachStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
 
         testCompilationError(
-                """
-                foreach x in {"a": "b"} {}
-                """, visitorCtx, 1,
+                "foreach x in {\"a\": \"b\"} {}", visitorCtx, 1,
                 "expected expression type(s) [[]any], got map[string]string"
 
         );
@@ -153,9 +135,7 @@ class ForeachStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
 
         testCompilationError(
-                """
-                foreach x, y in ["a": "b"] {}
-                """, visitorCtx, 1,
+                "foreach x, y in [\"a\": \"b\"] {}", visitorCtx, 1,
                 "expected expression type(s) [map[any]any], got []string"
 
         );

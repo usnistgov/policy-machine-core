@@ -37,7 +37,8 @@ public class NegateOperandPatternExpression extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NegateOperandPatternExpression that)) return false;
+        if (!(o instanceof NegateOperandPatternExpression)) return false;
+        NegateOperandPatternExpression that = (NegateOperandPatternExpression) o;
         return Objects.equals(operandPatternExpression, that.operandPatternExpression);
     }
 

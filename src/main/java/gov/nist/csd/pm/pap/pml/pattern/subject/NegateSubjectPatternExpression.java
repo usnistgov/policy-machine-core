@@ -37,7 +37,8 @@ public class NegateSubjectPatternExpression extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NegateSubjectPatternExpression that)) return false;
+        if (!(o instanceof NegateSubjectPatternExpression)) return false;
+        NegateSubjectPatternExpression that = (NegateSubjectPatternExpression) o;
         return Objects.equals(subjectPatternExpression, that.subjectPatternExpression);
     }
 

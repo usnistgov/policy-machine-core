@@ -46,7 +46,8 @@ public class SetNodePropertiesStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SetNodePropertiesStatement that)) return false;
+        if (!(o instanceof SetNodePropertiesStatement)) return false;
+        SetNodePropertiesStatement that = (SetNodePropertiesStatement) o;
         return Objects.equals(nameExpr, that.nameExpr) && Objects.equals(propertiesExpr, that.propertiesExpr);
     }
 

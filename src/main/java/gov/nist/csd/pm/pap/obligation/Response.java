@@ -43,7 +43,8 @@ public class Response implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Response response)) return false;
+        if (!(o instanceof Response)) return false;
+        Response response = (Response) o;
         return Objects.equals(stmts, response.stmts) && Objects.equals(eventCtxVariable, response.eventCtxVariable);
     }
 

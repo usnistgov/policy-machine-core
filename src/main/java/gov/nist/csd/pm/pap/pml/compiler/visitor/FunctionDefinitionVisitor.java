@@ -6,6 +6,7 @@ import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
+import gov.nist.csd.pm.pap.pml.executable.operation.FormalOperand;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -35,8 +36,9 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
         PMLStmtsOperationBody body = parseBody(isOp, ctx, signature.getOperands(), signature.getOperandTypes(), signature.getReturnType());
 
         // check if the function is an operation
-        if (signature instanceof PMLOperationSignature pmlOperationSignature) {
-            return new CreateOperationStatement(new PMLStmtsOperation(
+        if (signature instanceof PMLOperationSignature) {
+	        PMLOperationSignature pmlOperationSignature = (PMLOperationSignature) signature;
+	        return new CreateOperationStatement(new PMLStmtsOperation(
                     pmlOperationSignature.getFunctionName(),
                     pmlOperationSignature.getReturnType(),
                     pmlOperationSignature.getOperands(),
@@ -63,8 +65,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
         VisitorContext localVisitorCtx = visitorCtx.copy();
 
         // add the args to the local scope, overwriting any variables with the same ID as the formal args
-        for (int i = 0; i < operandNames.size(); i++) {
-            String name = operandNames.get(i);
+        for (String name : operandNames) {
             Type type = operandTypes.get(name);
 
             localVisitorCtx.scope().addOrOverwriteVariable(
@@ -109,11 +110,11 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
             Map<String, Type> operandTypes = new HashMap<>();
 
             for (FormalOperand operand : args) {
-                operandNames.add(operand.name);
-                operandTypes.put(operand.name, operand.type);
+                operandNames.add(operand.name());
+                operandTypes.put(operand.name(), operand.type());
 
-                if (operand.isNodeop) {
-                    nodeops.add(operand.name);
+                if (operand.isNodeop()) {
+                    nodeops.add(operand.name());
                 }
             }
 
@@ -143,8 +144,6 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
                 return new PMLRoutineSignature(funcName, returnType, operandNames, operandTypes);
             }
         }
-
-        private record FormalOperand(String name, Type type, boolean isNodeop) {}
 
         private List<FormalOperand> parseFormalArgs(PMLParser.FormalArgListContext formalArgListCtx) {
             List<FormalOperand> formalArgs = new ArrayList<>();

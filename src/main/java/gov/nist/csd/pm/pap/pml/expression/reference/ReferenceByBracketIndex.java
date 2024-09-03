@@ -37,7 +37,8 @@ public class ReferenceByBracketIndex extends ReferenceByIndex{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ReferenceByBracketIndex that)) return false;
+        if (!(o instanceof ReferenceByBracketIndex)) return false;
+        ReferenceByBracketIndex that = (ReferenceByBracketIndex) o;
         return Objects.equals(varRef, that.varRef) && Objects.equals(index, that.index);
     }
 

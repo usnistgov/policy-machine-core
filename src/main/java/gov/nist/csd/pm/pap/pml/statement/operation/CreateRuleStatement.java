@@ -109,23 +109,11 @@ public class CreateRuleStatement implements PMLStatement {
             List<OperandPatternExpression> value = operandExpr.getValue();
 
             operandsStr += indent(indentLevel+1) +
-                     operandExpr.getKey() + ": " + (value.size() == 1 ? value.getFirst() : value);
+                     operandExpr.getKey() + ": " + (value.size() == 1 ? value.get(0) : value);
         }
         operandsStr = operandPattern.isEmpty() ? "" : indent + "on {\n" + operandsStr + "\n" + indent + "}";
 
-        return String.format(
-                """
-                %screate rule %s
-                %swhen %s
-                %sperforms %s
-                %s
-                %sdo (%s) %s""",
-                indent, name,
-                indent, subjectPattern,
-                indent, operationPattern.isAny() ? operationPattern.toString() : "\"" + operationPattern.toString() + "\"",
-                operandsStr,
-                indent, responseBlock.evtVar, block.toFormattedString(indentLevel)
-        );
+        return indent + "create rule " + name + "\n" + indent + "when " + subjectPattern + "\n" + indent + "performs " + (operationPattern.isAny() ? operationPattern.toString() : "\"" + operationPattern.toString() + "\"") + "\n" + operandsStr + "\n" + indent + "do (" + responseBlock.evtVar + ") " + block.toFormattedString(indentLevel);
     }
 
     @Override

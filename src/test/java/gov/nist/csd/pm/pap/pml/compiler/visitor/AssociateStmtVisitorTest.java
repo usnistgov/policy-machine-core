@@ -24,9 +24,7 @@ class AssociateStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.AssociateStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                associate "a" and "b" with ["c", "d"]
-                """,
+                "associate \"a\" and \"b\" with [\"c\", \"d\"]",
                 PMLParser.AssociateStatementContext.class);
         PMLStatement stmt = new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -39,23 +37,17 @@ class AssociateStmtVisitorTest {
     @Test
     void testInvalidExpressions() throws PMException {
         testCompilationError(
-                """
-                associate ["a"] and "b" with ["c", "d"]
-                """, visitorCtx, 1,
+                "associate [\"a\"] and \"b\" with [\"c\", \"d\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
 
         testCompilationError(
-                """
-                associate "a" and ["b"] with ["c", "d"]
-                """, visitorCtx, 1,
+                "associate \"a\" and [\"b\"] with [\"c\", \"d\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
 
         testCompilationError(
-                """
-                associate "a" and "b" with "c"
-                """, visitorCtx, 1,
+                "associate \"a\" and \"b\" with \"c\"", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
         );
     }

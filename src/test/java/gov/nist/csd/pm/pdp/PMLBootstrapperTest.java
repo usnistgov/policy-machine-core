@@ -24,23 +24,21 @@ class PMLBootstrapperTest {
         PAP pap = new MemoryPAP();
         PDP pdp = new PDP(pap);
 
-        String input = """
-                set resource operations ["read", "write"]
-                
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["read"]
-                
-                create user "u1" in ["ua1"]
-                
-                op1()
-                
-                routine1()
-                
-                create pc TEST_CONST
-                """;
+        String input = "set resource operations [\"read\", \"write\"]\n" +
+                "                \n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\"]\n" +
+                "                \n" +
+                "                create user \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                op1()\n" +
+                "                \n" +
+                "                routine1()\n" +
+                "                \n" +
+                "                create pc TEST_CONST";
 
         Operation<?> op1 = new Operation<>("op1") {
             @Override

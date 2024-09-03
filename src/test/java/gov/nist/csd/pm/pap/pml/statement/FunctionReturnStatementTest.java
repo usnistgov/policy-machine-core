@@ -11,17 +11,15 @@ class FunctionReturnStatementTest {
 
     @Test
     void testReturnValueIsUnwrapped() throws PMException {
-        String pml = """
-                operation f1() string {
-                    return f2()
-                }
-                
-                operation f2() string {
-                    return "test"
-                }
-                
-                create policy class f1()
-                """;
+        String pml = "operation f1() string {\n" +
+                "                    return f2()\n" +
+                "                }\n" +
+                "                \n" +
+                "                operation f2() string {\n" +
+                "                    return \"test\"\n" +
+                "                }\n" +
+                "                \n" +
+                "                create policy class f1()";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
     }

@@ -40,7 +40,8 @@ public class DissociateStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DissociateStatement that)) return false;
+        if (!(o instanceof DissociateStatement)) return false;
+        DissociateStatement that = (DissociateStatement) o;
         return Objects.equals(uaExpr, that.uaExpr) && Objects.equals(targetExpr, that.targetExpr);
     }
 

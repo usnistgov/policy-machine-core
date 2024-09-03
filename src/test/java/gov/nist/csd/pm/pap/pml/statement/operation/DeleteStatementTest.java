@@ -78,9 +78,7 @@ class DeleteStatementTest {
         assertEquals("delete U \"test\"", stmt5.toFormattedString(0));
         assertEquals("delete UA \"test\"", stmt6.toFormattedString(0));
         assertEquals(
-                """
-                            delete OA "test"
-                        """,
+                "    delete OA \"test\"\n",
                 stmt.toFormattedString(1) + "\n"
         );
     }

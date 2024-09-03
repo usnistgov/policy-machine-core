@@ -29,25 +29,24 @@ class CreateRuleStatementTest {
         );
 
         String actual = createRuleStatement.toFormattedString(0);
-        assertTrue(actual.equals("""
-                create rule "rule1"
-                when any user
-                performs any operation
-                on {
-                    a: any,
-                    b: [in "test", "test"]
-                }
-                do () {
-                }""".trim()) || actual.equals("""
-                create rule "rule1"
-                when any user
-                performs any operation
-                on {
-                    b: [in "test", "test"],
-                    a: any
-                }
-                do () {
-                }"""));
+        assertTrue(actual.equals("create rule \"rule1\"\n" +
+                "when any user\n" +
+                "performs any operation\n" +
+                "on {\n" +
+                "    a: any,\n" +
+                "    b: [in \"test\", \"test\"]\n" +
+                "}\n" +
+                "do () {\n" +
+                "}".trim()) || actual.equals("create rule \"rule1\"\n" +
+                "when any user\n" +
+                "performs any operation\n" +
+                "on {\n" +
+                "    b: [in \"test\", \"test\"],\n" +
+                "    a: any\n" +
+                "}\n" +
+                "do () {\n" +
+                "}"));
+
     }
 
 }

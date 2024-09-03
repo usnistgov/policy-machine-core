@@ -1,19 +1,18 @@
-package gov.nist.csd.pm.pap.pml.compiler;
+package gov.nist.csd.pm.pap.pml.executable.operation;
 
 import gov.nist.csd.pm.pap.pml.type.Type;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public final class Variable {
+public final class FormalOperand {
     private final String name;
     private final Type type;
-    private final boolean isConst;
+    private final boolean isNodeop;
 
-    public Variable(String name, Type type, boolean isConst) {
+    public FormalOperand(String name, Type type, boolean isNodeop) {
         this.name = name;
         this.type = type;
-        this.isConst = isConst;
+        this.isNodeop = isNodeop;
     }
 
     public String name() {
@@ -24,30 +23,31 @@ public final class Variable {
         return type;
     }
 
-    public boolean isConst() {
-        return isConst;
+    public boolean isNodeop() {
+        return isNodeop;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Variable) obj;
+        var that = (FormalOperand) obj;
         return Objects.equals(this.name, that.name) &&
                 Objects.equals(this.type, that.type) &&
-                this.isConst == that.isConst;
+                this.isNodeop == that.isNodeop;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, isConst);
+        return Objects.hash(name, type, isNodeop);
     }
 
     @Override
     public String toString() {
-        return "Variable[" +
+        return "FormalOperand[" +
                 "name=" + name + ", " +
                 "type=" + type + ", " +
-                "isConst=" + isConst + ']';
+                "isNodeop=" + isNodeop + ']';
     }
 }
+

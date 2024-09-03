@@ -13,6 +13,7 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
@@ -51,8 +52,9 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
             return false;
         }
 
-        PMLStatement lastStmt = statements.getLast();
-        if (lastStmt instanceof FunctionReturnStatement functionReturnStatement) {
+        PMLStatement lastStmt = statements.get(statements.size()-1);
+        if (lastStmt instanceof FunctionReturnStatement) {
+            FunctionReturnStatement functionReturnStatement = (FunctionReturnStatement) lastStmt;
             if (!functionReturnStatement.matchesReturnType(returnType, visitorCtx.scope())) {
                 throw new PMException("return statement \"" + functionReturnStatement + "\" does not match return type " + returnType);
             }
@@ -66,7 +68,8 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         for (int i = 0; i < statements.size(); i++) {
             pmlStatement = statements.get(i);
 
-            if (pmlStatement instanceof FunctionReturnStatement functionReturnStatement) {
+            if (pmlStatement instanceof FunctionReturnStatement) {
+                FunctionReturnStatement functionReturnStatement = (FunctionReturnStatement) pmlStatement;
                 if (i < statements.size() - 1) {
                     throw new PMException("function return should be last statement in block");
                 }
@@ -76,7 +79,8 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
                 }
 
                 return true;
-            } else if (pmlStatement instanceof IfStatement ifStatement) {
+            } else if (pmlStatement instanceof IfStatement) {
+                IfStatement ifStatement = (IfStatement) pmlStatement;
                 if (!allIfStatementPathsReturned(visitorCtx, ifStatement, returnType)) {
                     return false;
                 } else {
@@ -107,7 +111,44 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         return checkAllPathsReturned(visitorCtx, ifStatement.getElseBlock().getStmts(), returnType);
     }
 
-    public record Result(boolean allPathsReturned, PMLStatementBlock stmts) {
+    public final class Result {
+        private final boolean allPathsReturned;
+        private final PMLStatementBlock stmts;
 
-    }
+        public Result(boolean allPathsReturned, PMLStatementBlock stmts) {
+            this.allPathsReturned = allPathsReturned;
+            this.stmts = stmts;
+        }
+
+        public boolean allPathsReturned() {
+            return allPathsReturned;
+        }
+
+        public PMLStatementBlock stmts() {
+            return stmts;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (Result) obj;
+            return this.allPathsReturned == that.allPathsReturned &&
+                    Objects.equals(this.stmts, that.stmts);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(allPathsReturned, stmts);
+        }
+
+        @Override
+        public String toString() {
+            return "Result[" +
+                    "allPathsReturned=" + allPathsReturned + ", " +
+                    "stmts=" + stmts + ']';
+        }
+
+
+        }
 }

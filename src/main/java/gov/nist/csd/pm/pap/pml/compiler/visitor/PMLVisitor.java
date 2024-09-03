@@ -48,8 +48,45 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
         return new SortedStatements(functionCtxs, statementCtxs);
     }
 
-    private record SortedStatements(List<PMLParser.FunctionDefinitionStatementContext> functionCtxs,
-                                    List<PMLParser.StatementContext> statementCtxs) {}
+    private final class SortedStatements {
+        private final List<PMLParser.FunctionDefinitionStatementContext> functionCtxs;
+        private final List<PMLParser.StatementContext> statementCtxs;
+
+        private SortedStatements(List<PMLParser.FunctionDefinitionStatementContext> functionCtxs,
+                                 List<PMLParser.StatementContext> statementCtxs) {
+            this.functionCtxs = functionCtxs;
+            this.statementCtxs = statementCtxs;
+        }
+
+        public List<PMLParser.FunctionDefinitionStatementContext> functionCtxs() {
+            return functionCtxs;
+        }
+
+        public List<PMLParser.StatementContext> statementCtxs() {
+            return statementCtxs;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (SortedStatements) obj;
+            return Objects.equals(this.functionCtxs, that.functionCtxs) &&
+                    Objects.equals(this.statementCtxs, that.statementCtxs);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(functionCtxs, statementCtxs);
+        }
+
+        @Override
+        public String toString() {
+            return "SortedStatements[" +
+                    "functionCtxs=" + functionCtxs + ", " +
+                    "statementCtxs=" + statementCtxs + ']';
+        }
+    }
 
     private CompiledExecutables compileExecutables(VisitorContext visitorCtx, List<PMLParser.FunctionDefinitionStatementContext> functionSignatureCtxs) {
         Map<String, PMLExecutableSignature> executables = new HashMap<>(visitorCtx.scope().global().getExecutables());
@@ -95,9 +132,11 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
             try {
                 CreateFunctionStatement funcStmt =
                         functionDefinitionVisitor.visitFunctionDefinitionStatement(functionDefinitionStatementContext);
-                if (funcStmt instanceof CreateOperationStatement createOperationStatement) {
+                if (funcStmt instanceof CreateOperationStatement) {
+                    CreateOperationStatement createOperationStatement = (CreateOperationStatement) funcStmt;
                     operations.add(createOperationStatement);
-                } else if (funcStmt instanceof CreateRoutineStatement createRoutineStatement) {
+                } else if (funcStmt instanceof CreateRoutineStatement) {
+                    CreateRoutineStatement createRoutineStatement = (CreateRoutineStatement) funcStmt;
                     routines.add(createRoutineStatement);
                 }
             } catch (PMLCompilationRuntimeException e) {
@@ -108,7 +147,44 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
         return new CompiledExecutables(operations, routines);
     }
 
-    private record CompiledExecutables(List<CreateOperationStatement> operations, List<CreateRoutineStatement> routines) {}
+    private final class CompiledExecutables {
+        private final List<CreateOperationStatement> operations;
+        private final List<CreateRoutineStatement> routines;
+
+        private CompiledExecutables(List<CreateOperationStatement> operations, List<CreateRoutineStatement> routines) {
+            this.operations = operations;
+            this.routines = routines;
+        }
+
+        public List<CreateOperationStatement> operations() {
+            return operations;
+        }
+
+        public List<CreateRoutineStatement> routines() {
+            return routines;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (CompiledExecutables) obj;
+            return Objects.equals(this.operations, that.operations) &&
+                    Objects.equals(this.routines, that.routines);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(operations, routines);
+        }
+
+        @Override
+        public String toString() {
+            return "CompiledExecutables[" +
+                    "operations=" + operations + ", " +
+                    "routines=" + routines + ']';
+        }
+    }
 
     private List<PMLStatement> compileStatements(List<PMLParser.StatementContext> statementCtxs) {
         List<PMLStatement> statements = new ArrayList<>();

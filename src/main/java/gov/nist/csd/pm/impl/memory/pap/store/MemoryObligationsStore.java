@@ -18,7 +18,7 @@ class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
 
     @Override
     public void createObligation(String author, String name, List<Rule> rules) throws PMException {
-        Obligation obligation = new Obligation(author, name, rules.stream().toList());
+        Obligation obligation = new Obligation(author, name, new ArrayList<>(rules));
 
         policy.obligations.add(obligation);
 

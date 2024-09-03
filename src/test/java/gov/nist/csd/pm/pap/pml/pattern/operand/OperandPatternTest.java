@@ -28,18 +28,16 @@ public class OperandPatternTest {
         pap.modify().graph().createObject("o1", List.of("oa1"));
         pap.modify().graph().createObject("o2", List.of("oa2"));
 
-        String pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1"
-                    performs "assign"
-                    on {
-                        ascendant: "o1",
-                        descendants: "oa1"
-                    }
-                    do(ctx) { }
-                }
-                """;
+        String pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs \"assign\"\n" +
+                "                    on {\n" +
+                "                        ascendant: \"o1\",\n" +
+                "                        descendants: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         CreateRuleStatement stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
@@ -48,21 +46,19 @@ public class OperandPatternTest {
                 ),
                 stmt.getOperandPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertTrue(stmt.getOperandPattern().get("ascendant").get(0).matches("o1", pap));
+        assertTrue(stmt.getOperandPattern().get("descendants").get(0).matches("oa1", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1"
-                    performs "assign"
-                    on {
-                        ascendant: ["o1"],
-                        descendants: ["oa1"]
-                    }
-                    do(ctx) { }
-                }
-                """;
+        pml = " create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs \"assign\"\n" +
+                "                    on {\n" +
+                "                        ascendant: [\"o1\"],\n" +
+                "                        descendants: [\"oa1\"]\n" +
+                "                    }\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
@@ -71,21 +67,19 @@ public class OperandPatternTest {
                 ),
                 stmt.getOperandPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertTrue(stmt.getOperandPattern().get("ascendant").get(0).matches("o1", pap));
+        assertTrue(stmt.getOperandPattern().get("descendants").get(0).matches("oa1", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1"
-                    performs "assign"
-                    on {
-                        ascendant: ["o1", "o2"],
-                        descendants: [!"oa1"]
-                    }
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs \"assign\"\n" +
+                "                    on {\n" +
+                "                        ascendant: [\"o1\", \"o2\"],\n" +
+                "                        descendants: [!\"oa1\"]\n" +
+                "                    }\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
@@ -94,25 +88,23 @@ public class OperandPatternTest {
                 ),
                 stmt.getOperandPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertFalse(stmt.getOperandPattern().get("ascendant").getFirst().matches("o2", pap));
+        assertTrue(stmt.getOperandPattern().get("ascendant").get(0).matches("o1", pap));
+        assertFalse(stmt.getOperandPattern().get("ascendant").get(0).matches("o2", pap));
         assertTrue(stmt.getOperandPattern().get("ascendant").get(1).matches("o2", pap));
         assertFalse(stmt.getOperandPattern().get("ascendant").get(1).matches("o3", pap));
-        assertFalse(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").getFirst().matches("oa2", pap));
+        assertFalse(stmt.getOperandPattern().get("descendants").get(0).matches("oa1", pap));
+        assertTrue(stmt.getOperandPattern().get("descendants").get(0).matches("oa2", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1"
-                    performs "assign"
-                    on {
-                        ascendant: ["o1", any],
-                        descendants: [!"oa1", ("oa1" || "oa2")]
-                    }
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs \"assign\"\n" +
+                "                    on {\n" +
+                "                        ascendant: [\"o1\", any],\n" +
+                "                        descendants: [!\"oa1\", (\"oa1\" || \"oa2\")]\n" +
+                "                    }\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
@@ -130,11 +122,11 @@ public class OperandPatternTest {
                 ),
                 stmt.getOperandPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertFalse(stmt.getOperandPattern().get("ascendant").getFirst().matches("o2", pap));
+        assertTrue(stmt.getOperandPattern().get("ascendant").get(0).matches("o1", pap));
+        assertFalse(stmt.getOperandPattern().get("ascendant").get(0).matches("o2", pap));
         assertTrue(stmt.getOperandPattern().get("ascendant").get(1).matches("o2", pap));
         assertTrue(stmt.getOperandPattern().get("ascendant").get(1).matches("o3", pap));
-        assertFalse(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertFalse(stmt.getOperandPattern().get("descendants").get(0).matches("oa1", pap));
         assertTrue(stmt.getOperandPattern().get("descendants").get(1).matches("oa1", pap));
         assertTrue(stmt.getOperandPattern().get("descendants").get(1).matches("oa2", pap));
     }
@@ -145,21 +137,19 @@ public class OperandPatternTest {
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
         pap.modify().graph().createUser("u1", List.of("ua1"));
-        assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext("u1"), """
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1"
-                    performs "create_object_attribute"
-                    on {
-                        name: "oa2",
-                        descendants: any
-                    }
-                    do(ctx) {
-                        create oa "oa2" in ["oa1"]
-                    }
-                }
-                """));
+        assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext("u1"), "associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs \"create_object_attribute\"\n" +
+                "                    on {\n" +
+                "                        name: \"oa2\",\n" +
+                "                        descendants: any\n" +
+                "                    }\n" +
+                "                    do(ctx) {\n" +
+                "                        create oa \"oa2\" in [\"oa1\"]\n" +
+                "                    }\n" +
+                "                }"));
     }
 
 }

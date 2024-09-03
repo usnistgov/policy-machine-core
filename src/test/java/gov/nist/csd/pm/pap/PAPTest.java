@@ -94,25 +94,23 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testRecursiveOperation() throws PMException {
-        String pml = """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create u "u1" in ["ua1"]
-                
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
-                associate "ua1" and "ua2" with ["assign"]
-                
-                operation op1(nodeop string a) {
-                    check "assign" on a
-                } {
-                    if a == PM_ADMIN_OBJECT {
-                        op1("ua2")
-                    }
-                    
-                    create pc a + "_PC"
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"assign\"]\n" +
+                "                associate \"ua1\" and \"ua2\" with [\"assign\"]\n" +
+                "                \n" +
+                "                operation op1(nodeop string a) {\n" +
+                "                    check \"assign\" on a\n" +
+                "                } {\n" +
+                "                    if a == PM_ADMIN_OBJECT {\n" +
+                "                        op1(\"ua2\")\n" +
+                "                    }\n" +
+                "                    \n" +
+                "                    create pc a + \"_PC\"\n" +
+                "                }";
         MemoryPAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 
@@ -123,20 +121,18 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testExecutePMLCreatesObligationBeforeAuthorUserThrowsException() {
-        String pml = """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                
-                create obligation "o1" {
-                    create rule "r1"
-                    when any user 
-                    performs any operation
-                    do(ctx) {}
-                }
-                
-                create u "u1" in ["ua1"]
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                create obligation \"o1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when any user \n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) {}\n" +
+                "                }\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]";
         assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext("u1"), pml));
     }
 }

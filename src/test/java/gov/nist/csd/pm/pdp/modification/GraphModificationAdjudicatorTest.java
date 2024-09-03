@@ -39,27 +39,25 @@ class GraphModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new MemoryPAP();
 
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create pc "pc2"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create ua "ua3" in ["pc1"]
-                create ua "ua4" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and "oa2" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                associate "ua3" and "ua1" with ["*a"]
-                associate "ua1" and "ua4" with ["*a"]
-                associate "ua1" and "ua3" with ["*a"]
-                
-                create u "u1" in ["ua1", "ua3"]
-                create u "u2" in ["ua2"]
-                create o "o1" in ["oa1"]
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create pc \"pc2\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create ua \"ua3\" in [\"pc1\"]\n" +
+                "                create ua \"ua4\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and \"oa2\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                associate \"ua3\" and \"ua1\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and \"ua4\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and \"ua3\" with [\"*a\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\", \"ua3\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]");
 
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);

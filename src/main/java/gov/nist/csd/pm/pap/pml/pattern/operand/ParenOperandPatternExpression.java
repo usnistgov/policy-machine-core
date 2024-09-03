@@ -37,7 +37,8 @@ public class ParenOperandPatternExpression extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ParenOperandPatternExpression that)) return false;
+        if (!(o instanceof ParenOperandPatternExpression)) return false;
+        ParenOperandPatternExpression that = (ParenOperandPatternExpression) o;
         return Objects.equals(expression, that.expression);
     }
 

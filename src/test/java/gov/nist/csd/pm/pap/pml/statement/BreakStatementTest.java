@@ -13,15 +13,13 @@ class BreakStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        String pml = """
-                foreach x in ["a", "b", "c"] {
-                    create policy class x
-                    
-                    if x == "b" {
-                        break
-                    }                  
-                }
-                """;
+        String pml = "                foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                "                    create policy class x\n" +
+                "                    \n" +
+                "                    if x == \"b\" {\n" +
+                "                        break\n" +
+                "                    }                  \n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(""), pml);
 
@@ -32,17 +30,15 @@ class BreakStatementTest {
 
     @Test
     void testMultipleLevels() throws PMException {
-        String pml = """
-                foreach x in ["a", "b", "c"] {
-                    create policy class x
-                    
-                    if x == "b" {
-                        if x == "b" {
-                            break
-                        }
-                    }                 
-                }
-                """;
+        String pml = "                foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                "                    create policy class x\n" +
+                "                    \n" +
+                "                    if x == \"b\" {\n" +
+                "                        if x == \"b\" {\n" +
+                "                            break\n" +
+                "                        }\n" +
+                "                    }                 \n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(""), pml);
 

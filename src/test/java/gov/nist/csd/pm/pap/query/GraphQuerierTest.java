@@ -239,22 +239,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testGetAttributeDescendants() throws PMException {
         String pml =
-                """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-                create oa "oa3" in ["oa2"]
-                create oa "oa4" in ["pc1"]
-    
-                create pc "pc2"
-                create oa "oa5" in ["pc2"]
-                create oa "oa6" in ["oa5"]
-                                
-                create pc "pc3"
-                                
-                create o "o1" in ["oa3", "oa6"]
-                """;
+                "                set resource operations [\"read\", \"write\"]\n" +
+                        "                create pc \"pc1\"\n" +
+                        "                create oa \"oa1\" in [\"pc1\"]\n" +
+                        "                create oa \"oa2\" in [\"oa1\"]\n" +
+                        "                create oa \"oa3\" in [\"oa2\"]\n" +
+                        "                create oa \"oa4\" in [\"pc1\"]\n" +
+                        "    \n" +
+                        "                create pc \"pc2\"\n" +
+                        "                create oa \"oa5\" in [\"pc2\"]\n" +
+                        "                create oa \"oa6\" in [\"oa5\"]\n" +
+                        "                                \n" +
+                        "                create pc \"pc3\"\n" +
+                        "                                \n" +
+                        "                create o \"o1\" in [\"oa3\", \"oa6\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> conts = pap.query().graph().getAttributeDescendants("o1");
@@ -265,22 +263,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGetPolicyClassDescendants() throws PMException {
-        String pml = """
-                      set resource operations ["read", "write"]
-                      create pc "pc1"
-                      create oa "oa1" in ["pc1"]
-                      create oa "oa2" in ["oa1"]
-                      create oa "oa3" in ["oa2"]
-                      create oa "oa4" in ["pc1"]
-
-                      create pc "pc2"
-                      create oa "oa5" in ["pc2"]
-                      create oa "oa6" in ["oa5"]
-                                      
-                      create pc "pc3"
-                                      
-                      create o "o1" in ["oa3", "oa6"]
-                      """;
+        String pml = "set resource operations [\"read\", \"write\"]\n" +
+                "                      create pc \"pc1\"\n" +
+                "                      create oa \"oa1\" in [\"pc1\"]\n" +
+                "                      create oa \"oa2\" in [\"oa1\"]\n" +
+                "                      create oa \"oa3\" in [\"oa2\"]\n" +
+                "                      create oa \"oa4\" in [\"pc1\"]\n" +
+                "\n" +
+                "                      create pc \"pc2\"\n" +
+                "                      create oa \"oa5\" in [\"pc2\"]\n" +
+                "                      create oa \"oa6\" in [\"oa5\"]\n" +
+                "                                      \n" +
+                "                      create pc \"pc3\"\n" +
+                "                                      \n" +
+                "                      create o \"o1\" in [\"oa3\", \"oa6\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> pcs = pap.query().graph().getPolicyClassDescendants("o1");
@@ -291,22 +287,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
     @Test
     void testIsAscendant() throws PMException {
-        String pml = """
-                      set resource operations ["read", "write"]
-                      create pc "pc1"
-                      create oa "oa1" in ["pc1"]
-                      create oa "oa2" in ["oa1"]
-                      create oa "oa3" in ["oa2"]
-                      create oa "oa4" in ["pc1"]
-
-                      create pc "pc2"
-                      create oa "oa5" in ["pc2"]
-                      create oa "oa6" in ["oa5"]
-                     
-                      create pc "pc3"
-                                      
-                      create o "o1" in ["oa3", "oa6"]
-                      """;
+        String pml = "                      set resource operations [\"read\", \"write\"]\n" +
+                "                      create pc \"pc1\"\n" +
+                "                      create oa \"oa1\" in [\"pc1\"]\n" +
+                "                      create oa \"oa2\" in [\"oa1\"]\n" +
+                "                      create oa \"oa3\" in [\"oa2\"]\n" +
+                "                      create oa \"oa4\" in [\"pc1\"]\n" +
+                "\n" +
+                "                      create pc \"pc2\"\n" +
+                "                      create oa \"oa5\" in [\"pc2\"]\n" +
+                "                      create oa \"oa6\" in [\"oa5\"]\n" +
+                "                     \n" +
+                "                      create pc \"pc3\"\n" +
+                "                                      \n" +
+                "                      create o \"o1\" in [\"oa3\", \"oa6\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         assertTrue(pap.query().graph().isAscendant("o1", "oa1"));
@@ -319,22 +313,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
     @Test
     void testIsDescendant() throws PMException {
-        String pml = """
-                      set resource operations ["read", "write"]
-                      create pc "pc1"
-                      create oa "oa1" in ["pc1"]
-                      create oa "oa2" in ["oa1"]
-                      create oa "oa3" in ["oa2"]
-                      create oa "oa4" in ["pc1"]
-
-                      create pc "pc2"
-                      create oa "oa5" in ["pc2"]
-                      create oa "oa6" in ["oa5"]
-                     
-                      create pc "pc3"
-                                      
-                      create o "o1" in ["oa3", "oa6"]
-                      """;
+        String pml = "                      set resource operations [\"read\", \"write\"]\n" +
+                "                      create pc \"pc1\"\n" +
+                "                      create oa \"oa1\" in [\"pc1\"]\n" +
+                "                      create oa \"oa2\" in [\"oa1\"]\n" +
+                "                      create oa \"oa3\" in [\"oa2\"]\n" +
+                "                      create oa \"oa4\" in [\"pc1\"]\n" +
+                "\n" +
+                "                      create pc \"pc2\"\n" +
+                "                      create oa \"oa5\" in [\"pc2\"]\n" +
+                "                      create oa \"oa6\" in [\"oa5\"]\n" +
+                "                     \n" +
+                "                      create pc \"pc3\"\n" +
+                "                                      \n" +
+                "                      create o \"o1\" in [\"oa3\", \"oa6\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         assertTrue(pap.query().graph().isDescendant("o1", "oa1"));
@@ -348,22 +340,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testGetAscendants() throws PMException {
         String pml =
-                """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-                create oa "oa3" in ["oa2"]
-                create oa "oa4" in ["pc1"]
-    
-                create pc "pc2"
-                create oa "oa5" in ["pc2"]
-                create oa "oa6" in ["oa5"]
-
-                create pc "pc3"
-
-                create o "o1" in ["oa3", "oa6"]
-                """;
+                "                set resource operations [\"read\", \"write\"]\n" +
+                        "                create pc \"pc1\"\n" +
+                        "                create oa \"oa1\" in [\"pc1\"]\n" +
+                        "                create oa \"oa2\" in [\"oa1\"]\n" +
+                        "                create oa \"oa3\" in [\"oa2\"]\n" +
+                        "                create oa \"oa4\" in [\"pc1\"]\n" +
+                        "    \n" +
+                        "                create pc \"pc2\"\n" +
+                        "                create oa \"oa5\" in [\"pc2\"]\n" +
+                        "                create oa \"oa6\" in [\"oa5\"]\n" +
+                        "\n" +
+                        "                create pc \"pc3\"\n" +
+                        "\n" +
+                        "                create o \"o1\" in [\"oa3\", \"oa6\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> conts = pap.query().graph().getAscendants("pc1");
@@ -378,22 +368,21 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testGetDescendants() throws PMException {
         String pml =
-                """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["oa1"]
-                create oa "oa3" in ["oa2"]
-                create oa "oa4" in ["pc1"]
-    
-                create pc "pc2"
-                create oa "oa5" in ["pc2"]
-                create oa "oa6" in ["oa5"]
-
-                create pc "pc3"
-
-                create o "o1" in ["oa3", "oa6"]
-                """;
+                "\n" +
+                        "                set resource operations [\"read\", \"write\"]\n" +
+                        "                create pc \"pc1\"\n" +
+                        "                create oa \"oa1\" in [\"pc1\"]\n" +
+                        "                create oa \"oa2\" in [\"oa1\"]\n" +
+                        "                create oa \"oa3\" in [\"oa2\"]\n" +
+                        "                create oa \"oa4\" in [\"pc1\"]\n" +
+                        "    \n" +
+                        "                create pc \"pc2\"\n" +
+                        "                create oa \"oa5\" in [\"pc2\"]\n" +
+                        "                create oa \"oa6\" in [\"oa5\"]\n" +
+                        "\n" +
+                        "                create pc \"pc3\"\n" +
+                        "\n" +
+                        "                create o \"o1\" in [\"oa3\", \"oa6\"]";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         Collection<String> conts = pap.query().graph().getDescendants("o1");

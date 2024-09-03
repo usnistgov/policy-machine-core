@@ -52,7 +52,8 @@ public class SubjectPattern extends Pattern {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SubjectPattern that)) return false;
+        if (!(o instanceof SubjectPattern)) return false;
+        SubjectPattern that = (SubjectPattern) o;
         return isAny == that.isAny && Objects.equals(subjectPatternExpression, that.subjectPatternExpression);
     }
 

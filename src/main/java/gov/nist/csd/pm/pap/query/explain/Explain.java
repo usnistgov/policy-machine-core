@@ -74,7 +74,8 @@ public class Explain {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Explain explain)) return false;
+        if (!(o instanceof Explain)) return false;
+        Explain explain = (Explain) o;
         return Objects.equals(privileges, explain.privileges) && Objects.equals(policyClasses, explain.policyClasses)
                 && Objects.equals(deniedPrivileges, explain.deniedPrivileges) && Objects.equals(prohibitions, explain.prohibitions);
     }

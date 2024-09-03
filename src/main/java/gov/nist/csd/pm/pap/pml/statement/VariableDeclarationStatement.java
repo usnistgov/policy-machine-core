@@ -67,23 +67,45 @@ public class VariableDeclarationStatement extends ControlStatement {
         return sb.toString();
     }
 
-    public record Declaration(String id, Expression expression) {
+    public static final class Declaration {
+        private final String id;
+        private final Expression expression;
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
+        public Declaration(String id, Expression expression) {
+            this.id = id;
+            this.expression = expression;
+        }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
+                Declaration that = (Declaration) o;
+                return Objects.equals(id, that.id) && Objects.equals(expression, that.expression);
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(id, expression);
             }
-            Declaration that = (Declaration) o;
-            return Objects.equals(id, that.id) && Objects.equals(expression, that.expression);
+
+        public String id() {
+            return id;
+        }
+
+        public Expression expression() {
+            return expression;
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(id, expression);
+        public String toString() {
+            return "Declaration[" +
+                    "id=" + id + ", " +
+                    "expression=" + expression + ']';
         }
     }
 }

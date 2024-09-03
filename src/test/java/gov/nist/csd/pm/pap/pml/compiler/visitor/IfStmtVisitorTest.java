@@ -26,15 +26,13 @@ class IfStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.IfStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                if true {
-                    x := "a"
-                } else if false {
-                    x := "b"
-                } else {
-                    x := "c"
-                }
-                """,
+                "if true {\n" +
+                        "                    x := \"a\"\n" +
+                        "                } else if false {\n" +
+                        "                    x := \"b\"\n" +
+                        "                } else {\n" +
+                        "                    x := \"c\"\n" +
+                        "                }",
                 PMLParser.IfStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new IfStmtVisitor(visitorCtx)
@@ -55,32 +53,28 @@ class IfStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                if "a" {
-                    x := "a"
-                } else if "b" {
-                    x := "b"
-                } else {
-                    x := "c"
-                }
-                """, visitorCtx, 1,
+                "if \"a\" {\n" +
+                        "                    x := \"a\"\n" +
+                        "                } else if \"b\" {\n" +
+                        "                    x := \"b\"\n" +
+                        "                } else {\n" +
+                        "                    x := \"c\"\n" +
+                        "                }", visitorCtx, 1,
                 "expected expression type(s) [bool], got string"
                 );
     }
 
     @Test
     void testReturnVoidInIf() throws PMException {
-        String pml = """
-                operation f1() {
-                    if true {
-                        return
-                    }
-                    
-                    create policy class "pc1"
-                }
-                
-                f1()
-                """;
+        String pml = "operation f1() {\n" +
+                "                    if true {\n" +
+                "                        return\n" +
+                "                    }\n" +
+                "                    \n" +
+                "                    create policy class \"pc1\"\n" +
+                "                }\n" +
+                "                \n" +
+                "                f1()";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));

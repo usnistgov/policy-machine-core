@@ -25,12 +25,10 @@ class CreateProhibitionStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.CreateProhibitionStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create prohibition "test"
-                deny user "u1"
-                ["read"]
-                on union of [!"oa1"]
-                """,
+                "create prohibition \"test\"\n" +
+                        "                deny user \"u1\"\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of [!\"oa1\"]",
                 PMLParser.CreateProhibitionStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
@@ -53,42 +51,34 @@ class CreateProhibitionStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                create prohibition ["test"]
-                deny user "u1"
-                ["read"]
-                on union of [!"oa1"]
-                """, visitorCtx, 1,
+                "create prohibition [\"test\"]\n" +
+                        "                deny user \"u1\"\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of [!\"oa1\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
 
         testCompilationError(
-                """
-                create prohibition "test"
-                deny user ["u1"]
-                ["read"]
-                on union of [!"oa1"]
-                """, visitorCtx, 1,
+                "create prohibition \"test\"\n" +
+                        "                deny user [\"u1\"]\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of [!\"oa1\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
                 );
 
         testCompilationError(
-                """
-                create prohibition "test"
-                deny user "u1"
-                "read"
-                on union of [!"oa1"]
-                """, visitorCtx, 1,
+                "create prohibition \"test\"\n" +
+                        "                deny user \"u1\"\n" +
+                        "                \"read\"\n" +
+                        "                on union of [!\"oa1\"]", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
                 );
 
         testCompilationError(
-                """
-                 create prohibition "test"
-                deny user "u1"
-                ["read"]
-                on union of !"oa1"
-                """, visitorCtx, 1,
+                "create prohibition \"test\"\n" +
+                        "                deny user \"u1\"\n" +
+                        "                [\"read\"]\n" +
+                        "                on union of !\"oa1\"", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
                 );
 

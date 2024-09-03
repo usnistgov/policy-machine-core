@@ -66,9 +66,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testVoidReturnType() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                voidFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "voidFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(scope);
 
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
@@ -105,9 +103,7 @@ class FunctionInvokeExpressionTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                voidFunc("a", "b")
-                """, visitorCtx, 1,
+                "voidFunc(\"a\", \"b\")", visitorCtx, 1,
                 "unknown function 'voidFunc' in scope"
         );
     }
@@ -117,9 +113,7 @@ class FunctionInvokeExpressionTest {
         VisitorContext visitorCtx = new VisitorContext(scope);
 
         testCompilationError(
-                """
-                voidFunc("a")
-                """, visitorCtx, 1,
+                "voidFunc(\"a\")", visitorCtx, 1,
                 "wrong number of args for function call voidFunc: expected 2, got 1"
         );
     }
@@ -129,9 +123,7 @@ class FunctionInvokeExpressionTest {
         VisitorContext visitorCtx = new VisitorContext(scope);
 
         testCompilationError(
-                """
-                voidFunc("a", ["b", "c"])
-                """, visitorCtx, 1,
+                "voidFunc(\"a\", [\"b\", \"c\"])", visitorCtx, 1,
                 "invalid argument type: expected string, got []string at arg 1"
         );
     }
@@ -139,9 +131,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testExecuteReturnValue() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                stringFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "stringFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(scope);
 
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
@@ -155,9 +145,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testExecuteWithFunctionExecutor() throws PMException {
         PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                stringFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                "stringFunc(\"a\", \"b\")", PMLParser.FunctionInvokeExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(scope);
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
@@ -182,25 +170,23 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testChainMethodCall() throws PMException {
-        String pml = """
-                a("123")
-                
-                operation c(string x) string {
-                    return "c" + x
-                }
-                                
-                operation b(string x, string y) {
-                    create policy class c(x)
-                    create policy class c(y)
-                }
-                                
-                operation a(string x) {
-                    x = "x"
-                    y := "y"
-                                
-                    b(x, y)
-                }
-                """;
+        String pml = "a(\"123\")\n" +
+                "                \n" +
+                "                operation c(string x) string {\n" +
+                "                    return \"c\" + x\n" +
+                "                }\n" +
+                "                                \n" +
+                "                operation b(string x, string y) {\n" +
+                "                    create policy class c(x)\n" +
+                "                    create policy class c(y)\n" +
+                "                }\n" +
+                "                                \n" +
+                "                operation a(string x) {\n" +
+                "                    x = \"x\"\n" +
+                "                    y := \"y\"\n" +
+                "                                \n" +
+                "                    b(x, y)\n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
         assertTrue(pap.query().graph().nodeExists("cx"));
@@ -209,14 +195,12 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testReassignArgValueInFunctionDoesNotUpdateVariableOutsideOfScope() throws PMException {
-        String pml = """
-                x := "test"
-                a(x)
-                create pc x
-                operation a(string x) {
-                    x = "x"
-                }
-                """;
+        String pml = "x := \"test\"\n" +
+                "                a(x)\n" +
+                "                create pc x\n" +
+                "                operation a(string x) {\n" +
+                "                    x = \"x\"\n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
         assertFalse(pap.query().graph().nodeExists("x"));
@@ -225,17 +209,15 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testReturnInIf() throws PMException {
-        String pml = """            
-                operation a() {
-                    if true {
-                        return
-                    }
-                    
-                    create pc "pc1"                               
-                }
-                
-                a()
-                """;
+        String pml = "operation a() {\n" +
+                "                    if true {\n" +
+                "                        return\n" +
+                "                    }\n" +
+                "                    \n" +
+                "                    create pc \"pc1\"                               \n" +
+                "                }\n" +
+                "                \n" +
+                "                a()";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));

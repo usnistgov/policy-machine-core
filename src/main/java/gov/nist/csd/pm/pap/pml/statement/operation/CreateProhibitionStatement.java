@@ -81,23 +81,14 @@ public class CreateProhibitionStatement extends OperationStatement {
     public String toFormattedString(int indentLevel) {
         String subjectStr = getSubjectStr();
         String indent = indent(indentLevel);
-        return String.format(
-                """
-                %screate prohibition %s
-                %s  deny %s %s
-                %s  access rights %s
-                %s  on %s of %s""",
-                indent, name,
-                indent, subjectStr, subject,
-                indent, accessRights,
-                indent, (isIntersection ? "intersection" : "union"), containers
-        );
+        return indent + "create prohibition " + name + "\n" + indent + "  deny " + subjectStr + " " + subject + "\n" + indent + "  access rights " + accessRights + "\n" + indent + "  on " + (isIntersection ? "intersection" : "union") + " of " + containers;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CreateProhibitionStatement that)) return false;
+        if (!(o instanceof CreateProhibitionStatement)) return false;
+        CreateProhibitionStatement that = (CreateProhibitionStatement) o;
         return isIntersection == that.isIntersection && Objects.equals(name, that.name) && Objects.equals(subject, that.subject) && subjectType == that.subjectType && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers, that.containers);
     }
 
@@ -109,9 +100,9 @@ public class CreateProhibitionStatement extends OperationStatement {
     private String getSubjectStr() {
         String subjectStr = "";
         switch (subjectType) {
-            case USER_ATTRIBUTE -> subjectStr = "UA";
-            case USER -> subjectStr = "U";
-            case PROCESS -> subjectStr = "process";
+            case USER_ATTRIBUTE: subjectStr = "UA"; break;
+            case USER: subjectStr = "U"; break;
+            case PROCESS: subjectStr = "process"; break;
         }
 
         return subjectStr;

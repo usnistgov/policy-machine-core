@@ -32,38 +32,32 @@ class SubjectPatternTest {
         pap.modify().graph().createUser("u1", List.of("ua1", "ua2"));
         pap.modify().graph().createUser("u2", List.of("ua2"));
 
-        String pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when any user
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        String pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when any user\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         CreateRuleStatement stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(), stmt.getSubjectPattern());
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1"
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(new UsernamePattern("u1")), stmt.getSubjectPattern());
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1" || "u2"
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\" || \"u2\"\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(new LogicalSubjectPatternExpression(
                 new UsernamePattern("u1"),
@@ -72,14 +66,12 @@ class SubjectPatternTest {
         )), stmt.getSubjectPattern());
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user "u1" && in "ua2"
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user \"u1\" && in \"ua2\"\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(new LogicalSubjectPatternExpression(
                 new UsernamePattern("u1"),
@@ -89,14 +81,12 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
         assertFalse(stmt.getSubjectPattern().matches("u2", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user !in "ua1"
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user !in \"ua1\"\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(new NegateSubjectPatternExpression(
                 new InSubjectPattern("ua1")
@@ -104,14 +94,12 @@ class SubjectPatternTest {
         assertFalse(stmt.getSubjectPattern().matches("u1", pap));
         assertTrue(stmt.getSubjectPattern().matches("u2", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user ("u1" && in "ua2") || "u2"
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user (\"u1\" && in \"ua2\") || \"u2\"\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(new LogicalSubjectPatternExpression(
                 new ParenSubjectPatternExpression(
@@ -127,14 +115,12 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
         assertTrue(stmt.getSubjectPattern().matches("u2", pap));
 
-        pml = """
-                create obligation "ob1" {
-                    create rule "r1"
-                    when user process "p1"
-                    performs any operation
-                    do(ctx) { }
-                }
-                """;
+        pml = "create obligation \"ob1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when user process \"p1\"\n" +
+                "                    performs any operation\n" +
+                "                    do(ctx) { }\n" +
+                "                }";
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(new SubjectPattern(new ProcessSubjectPattern("p1")), stmt.getSubjectPattern());
         assertTrue(stmt.getSubjectPattern().matches("p1", pap));

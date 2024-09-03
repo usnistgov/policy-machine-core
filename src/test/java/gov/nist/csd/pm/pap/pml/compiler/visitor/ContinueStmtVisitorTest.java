@@ -21,11 +21,9 @@ class ContinueStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a"] {
-                    continue
-                }
-                """,
+                "foreach x in [\"a\"] {\n" +
+                        "                    continue\n" +
+                        "                }",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -43,9 +41,7 @@ class ContinueStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                continue
-                """, visitorCtx, 1,
+                "continue", visitorCtx, 1,
                 "continue statement not in foreach"
                 );
     }

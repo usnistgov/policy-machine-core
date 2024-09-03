@@ -48,7 +48,8 @@ public class AssignStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AssignStatement that)) return false;
+        if (!(o instanceof AssignStatement)) return false;
+        AssignStatement that = (AssignStatement) o;
         return Objects.equals(ascendant, that.ascendant) && Objects.equals(descendants, that.descendants);
     }
 

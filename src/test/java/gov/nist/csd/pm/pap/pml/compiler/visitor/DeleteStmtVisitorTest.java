@@ -18,9 +18,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteNode() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete object attribute "oa1"
-                """,
+                "delete object attribute \"oa1\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -36,9 +34,7 @@ class DeleteStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                delete object attribute ["oa1"]
-                """, visitorCtx, 1,
+                "delete object attribute [\"oa1\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
     }
@@ -46,9 +42,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteObligation() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete obligation "test"
-                """,
+                "delete obligation \"test\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
@@ -62,9 +56,7 @@ class DeleteStmtVisitorTest {
     @Test
     void testDeleteProhibition() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                delete prohibition "test"
-                """,
+                "delete prohibition \"test\"",
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);

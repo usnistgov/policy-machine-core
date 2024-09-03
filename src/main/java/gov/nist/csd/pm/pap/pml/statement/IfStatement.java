@@ -98,5 +98,42 @@ public class IfStatement extends ControlStatement {
         return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(Expression condition, PMLStatementBlock block) implements Serializable { }
+    public static final class ConditionalBlock {
+        private final Expression condition;
+        private final PMLStatementBlock block;
+
+        public ConditionalBlock(Expression condition, PMLStatementBlock block) {
+            this.condition = condition;
+            this.block = block;
+        }
+
+        public Expression condition() {
+            return condition;
+        }
+
+        public PMLStatementBlock block() {
+            return block;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (ConditionalBlock) obj;
+            return Objects.equals(this.condition, that.condition) &&
+                    Objects.equals(this.block, that.block);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(condition, block);
+        }
+
+        @Override
+        public String toString() {
+            return "ConditionalBlock[" +
+                    "condition=" + condition + ", " +
+                    "block=" + block + ']';
+        }
+    }
 }

@@ -18,9 +18,7 @@ class CreatePolicyStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create policy class "test"
-                """,
+                "create policy class \"test\"",
                 PMLParser.CreatePolicyStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
@@ -35,9 +33,7 @@ class CreatePolicyStmtVisitorTest {
     @Test
     void testSuccessWithProperties() throws PMException {
         PMLParser.CreatePolicyStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create policy class "test" 
-                """,
+                "create policy class \"test\" ",
                 PMLParser.CreatePolicyStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
@@ -53,9 +49,7 @@ class CreatePolicyStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                create policy class ["test"]
-                """, visitorCtx, 1,
+                "create policy class [\"test\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
     }

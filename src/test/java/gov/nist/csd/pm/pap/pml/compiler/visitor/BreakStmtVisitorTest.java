@@ -21,11 +21,9 @@ class BreakStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                foreach x in ["a"] {
-                    break
-                }
-                """,
+                "foreach x in [\"a\"] {\n" +
+                        "                    break\n" +
+                        "                }",
                 PMLParser.ForeachStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
@@ -43,9 +41,7 @@ class BreakStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                break
-                """, visitorCtx, 1,
+                "break", visitorCtx, 1,
                 "break statement not in foreach"
         );
     }

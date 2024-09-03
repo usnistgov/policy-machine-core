@@ -79,19 +79,17 @@ class CreateProhibitionStatementTest {
                 )
         );
         assertEquals(
-                """
-                        create prohibition "pro1"
-                          deny UA "ua2"
-                          access rights ["read"]
-                          on intersection of ["oa1", !"oa2"]""",
+                "create prohibition \"pro1\"\n" +
+                        "  deny UA \"ua2\"\n" +
+                        "  access rights [\"read\"]\n" +
+                        "  on intersection of [\"oa1\", !\"oa2\"]",
                 stmt.toFormattedString(0)
         );
         assertEquals(
-                """
-                            create prohibition "pro1"
-                              deny UA "ua2"
-                              access rights ["read"]
-                              on intersection of ["oa1", !"oa2"]""",
+                "create prohibition \"pro1\"\n" +
+                        "  deny UA \"ua2\"\n" +
+                        "  access rights [\"read\"]\n" +
+                        "  on intersection of [\"oa1\", !\"oa2\"]",
                 stmt.toFormattedString(0)
         );
     }

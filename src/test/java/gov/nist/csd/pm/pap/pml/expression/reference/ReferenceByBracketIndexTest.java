@@ -50,17 +50,15 @@ class ReferenceByBracketIndexTest {
 
     @Test
     void testIndexChain() throws PMException {
-        String pml = """
-                a := {
-                    "b": {
-                        "c": {
-                            "d": "e"
-                        }  
-                    }
-                }
-                
-                create policy class a["b"]["c"]["d"]
-                """;
+        String pml = "a := {\n" +
+                "                    \"b\": {\n" +
+                "                        \"c\": {\n" +
+                "                            \"d\": \"e\"\n" +
+                "                        }  \n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create policy class a[\"b\"][\"c\"][\"d\"]";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 
@@ -69,17 +67,15 @@ class ReferenceByBracketIndexTest {
 
     @Test
     void testWrongKeyType() throws PMException {
-        String pml = """
-                a := {
-                    "b": {
-                        "c": {
-                            "d": "e"
-                        }  
-                    }
-                }
-                
-                create policy class a[true]["c"]["d"]
-                """;
+        String pml = "a := {\n" +
+                "                    \"b\": {\n" +
+                "                        \"c\": {\n" +
+                "                            \"d\": \"e\"\n" +
+                "                        }  \n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create policy class a[true][\"c\"][\"d\"]";
         PAP pap = new MemoryPAP();
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
@@ -91,17 +87,15 @@ class ReferenceByBracketIndexTest {
 
     @Test
     void testKeyDoesNotExist() throws PMException {
-        String pml = """
-                a := {
-                    "b": {
-                        "c": {
-                            "d": "e"
-                        }  
-                    }
-                }
-                
-                create policy class a["z"]["c"]["d"]
-                """;
+        String pml = "a := {\n" +
+                "                    \"b\": {\n" +
+                "                        \"c\": {\n" +
+                "                            \"d\": \"e\"\n" +
+                "                        }  \n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create policy class a[\"z\"][\"c\"][\"d\"]";
         PAP pap = new MemoryPAP();
         assertThrows(NullPointerException.class,
                      () -> pap.executePML(new UserContext("u1"), pml));
@@ -109,13 +103,11 @@ class ReferenceByBracketIndexTest {
 
     @Test
     void testArrayKey() throws PMException {
-        String pml = """
-                a := {
-                    ["a"]: "test"
-                }
-                
-                create policy class a[["a"]]
-                """;
+        String pml = "a := {\n" +
+                "                    [\"a\"]: \"test\"\n" +
+                "                }\n" +
+                "                \n" +
+                "                create policy class a[[\"a\"]]";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 

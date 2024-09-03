@@ -22,22 +22,20 @@ class CheckStatementTest {
     @Test
     void test() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-               
-                create oa "oa1" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["assign", "assign_to"]
-                
-                create o "o1" in ["oa1"]
-                create o "o2" in ["oa1"]
-                create o "o3" in ["oa1"]
-                
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                """);
+        pap.executePML(new UserContext("u1"), "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "               \n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"assign\", \"assign_to\"]\n" +
+                "                \n" +
+                "                create o \"o1\" in [\"oa1\"]\n" +
+                "                create o \"o2\" in [\"oa1\"]\n" +
+                "                create o \"o3\" in [\"oa1\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]");
 
         ExecutionContext ctx = new ExecutionContext(new UserContext("u1"), pap);
 
@@ -93,24 +91,22 @@ class CheckStatementTest {
 
     @Test
     void testOperationInCheck() throws PMException {
-        String pml = """
-                operation testOp() string {
-                    return PM_ADMIN_OBJECT
-                }
-                
-                operation op1() {
-                    check "assign" on testOp()
-                } {
-                    create policy class "pc2"
-                }
-                
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                               
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
-                
-                create u "u1" in ["ua1"]                
-                """;
+        String pml = "operation testOp() string {\n" +
+                "                    return PM_ADMIN_OBJECT\n" +
+                "                }\n" +
+                "                \n" +
+                "                operation op1() {\n" +
+                "                    check \"assign\" on testOp()\n" +
+                "                } {\n" +
+                "                    create policy class \"pc2\"\n" +
+                "                }\n" +
+                "                \n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                               \n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"assign\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]     ";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 

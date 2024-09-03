@@ -29,8 +29,8 @@
                 <version>3.10.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>

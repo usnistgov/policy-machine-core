@@ -36,13 +36,13 @@ public class DeleteStatement extends OperationStatement {
     public String toFormattedString(int indentLevel) {
         String typeStr = "";
         switch (type) {
-            case PROHIBITION -> typeStr = "prohibition";
-            case OBLIGATION -> typeStr = "obligation";
-            case POLICY_CLASS -> typeStr = "PC";
-            case OBJECT_ATTRIBUTE -> typeStr = "OA";
-            case USER_ATTRIBUTE -> typeStr = "UA";
-            case OBJECT -> typeStr = "O";
-            case USER -> typeStr = "U";
+            case PROHIBITION: typeStr = "prohibition"; break;
+            case OBLIGATION: typeStr = "obligation"; break;
+            case POLICY_CLASS: typeStr = "PC"; break;
+            case OBJECT_ATTRIBUTE: typeStr = "OA"; break;
+            case USER_ATTRIBUTE: typeStr = "UA"; break;
+            case OBJECT: typeStr = "O"; break;
+            case USER: typeStr = "U";
         }
 
         return indent(indentLevel) + String.format("delete %s %s", typeStr, expression);
@@ -51,7 +51,8 @@ public class DeleteStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeleteStatement that)) return false;
+        if (!(o instanceof DeleteStatement)) return false;
+        DeleteStatement that = (DeleteStatement) o;
         return type == that.type && Objects.equals(expression, that.expression);
     }
 
@@ -71,14 +72,14 @@ public class DeleteStatement extends OperationStatement {
     }
 
     private static Operation<Void> getOpFromType(Type type) {
-        return switch (type) {
-            case POLICY_CLASS -> new DeletePolicyClassOp();
-            case OBJECT_ATTRIBUTE -> new DeleteObjectAttributeOp();
-            case USER_ATTRIBUTE -> new DeleteUserAttributeOp();
-            case OBJECT -> new DeleteObjectOp();
-            case USER -> new DeleteUserOp();
-            case PROHIBITION -> new DeleteProhibitionOp();
-            case OBLIGATION -> new DeleteObligationOp();
-        };
+        switch (type) {
+            case POLICY_CLASS: return new DeletePolicyClassOp();
+            case OBJECT_ATTRIBUTE: return new DeleteObjectAttributeOp();
+            case USER_ATTRIBUTE: return new DeleteUserAttributeOp();
+            case OBJECT: return new DeleteObjectOp();
+            case USER: return new DeleteUserOp();
+            case PROHIBITION: return new DeleteProhibitionOp();
+            default: return new DeleteObligationOp();
+        }
     }
 }

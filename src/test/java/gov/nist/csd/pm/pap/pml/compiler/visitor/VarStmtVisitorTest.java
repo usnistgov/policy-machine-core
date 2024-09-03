@@ -36,9 +36,7 @@ class VarStmtVisitorTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException {
             PMLParser.VarDeclarationContext ctx = PMLContextVisitor.toCtx(
-                    """
-                     var x = "a"
-                     """, PMLParser.VarDeclarationContext.class);
+                    "var x = \"a\"", PMLParser.VarDeclarationContext.class);
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
             new VarStmtVisitor(visitorCtx)
                     .visitVarDeclaration(ctx);
@@ -52,9 +50,7 @@ class VarStmtVisitorTest {
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
             testCompilationError(
-                    """
-                     var x = "a"
-                    """, visitorCtx, 1,
+                    "var x = \"a\"", visitorCtx, 1,
                     "variable 'x' already defined in scope"
             );
         }
@@ -62,16 +58,12 @@ class VarStmtVisitorTest {
         @Test
         void testReassignConstant() throws VariableAlreadyDefinedInScopeException {
             PMLParser.VarDeclarationContext ctx = PMLContextVisitor.toCtx(
-                    """
-                     var x = "a"
-                     """, PMLParser.VarDeclarationContext.class);
+                    "var x = \"a\"", PMLParser.VarDeclarationContext.class);
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
 
             testCompilationError(
-                    """
-                     var x = "a"
-                    """, visitorCtx, 1,
+                    "var x = \"a\"", visitorCtx, 1,
                     "variable 'x' already defined in scope"
             );
         }
@@ -82,12 +74,10 @@ class VarStmtVisitorTest {
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
 
             testCompilationError(
-                    """
-                    var (
-                        x = "a"
-                        x = "b"
-                     )
-                    """, visitorCtx, 1,
+                    "var (\n" +
+                            "                        x = \"a\"\n" +
+                            "                        x = \"b\"\n" +
+                            "                     )", visitorCtx, 1,
                     "variable 'x' already defined in scope"
             );
         }
@@ -99,9 +89,7 @@ class VarStmtVisitorTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException {
             PMLParser.ShortDeclarationContext ctx = PMLContextVisitor.toCtx(
-                    """
-                     x := "a"
-                     """, PMLParser.ShortDeclarationContext.class);
+                    " x := \"a\"", PMLParser.ShortDeclarationContext.class);
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
             new VarStmtVisitor(visitorCtx)
                     .visitShortDeclaration(ctx);
@@ -115,9 +103,7 @@ class VarStmtVisitorTest {
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
             testCompilationError(
-                    """
-                     x := "a"
-                    """, visitorCtx, 1,
+                    "x := \"a\"", visitorCtx, 1,
                     "variable x already exists"
             );
         }
@@ -128,9 +114,7 @@ class VarStmtVisitorTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException, VariableAlreadyDefinedInScopeException {
             PMLParser.VariableAssignmentStatementContext ctx = PMLContextVisitor.toCtx(
-                    """
-                     x = "a"
-                     """, PMLParser.VariableAssignmentStatementContext.class);
+                    "x = \"a\"", PMLParser.VariableAssignmentStatementContext.class);
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
             VariableAssignmentStatement stmt =
@@ -142,9 +126,7 @@ class VarStmtVisitorTest {
             assertFalse(stmt.isPlus());
 
             ctx = PMLContextVisitor.toCtx(
-                    """
-                     x += "a"
-                     """, PMLParser.VariableAssignmentStatementContext.class);
+                    "x += \"a\"", PMLParser.VariableAssignmentStatementContext.class);
             visitorCtx = new VisitorContext(testGlobalScope);
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
             stmt = (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
@@ -160,9 +142,7 @@ class VarStmtVisitorTest {
             VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
 
             testCompilationError(
-                    """
-                     x = "a"
-                    """, visitorCtx, 1,
+                    "x = \"a\"", visitorCtx, 1,
                     "unknown variable 'x' in scope"
             );
         }
@@ -173,9 +153,7 @@ class VarStmtVisitorTest {
             visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
 
             testCompilationError(
-                    """
-                     x = "a"
-                    """, visitorCtx, 1,
+                    "x = \"a\"", visitorCtx, 1,
                     "cannot reassign const variable"
             );
         }

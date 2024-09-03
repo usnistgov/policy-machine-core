@@ -63,7 +63,8 @@ public class DeleteRuleStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeleteRuleStatement that)) return false;
+        if (!(o instanceof DeleteRuleStatement)) return false;
+        DeleteRuleStatement that = (DeleteRuleStatement) o;
         return Objects.equals(ruleExpr, that.ruleExpr) && Objects.equals(oblExpr, that.oblExpr);
     }
 

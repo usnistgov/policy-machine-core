@@ -232,10 +232,10 @@ public class JSONDeserializer implements PolicyDeserializer {
     private void createNode(PAP pap, NodeType type, String key, JSONNode value, List<String> existingAssignmentNodes)
             throws PMException {
         switch (type) {
-            case OA -> pap.modify().graph().createObjectAttribute(key, existingAssignmentNodes);
-            case UA -> pap.modify().graph().createUserAttribute(key, existingAssignmentNodes);
-            case O -> pap.modify().graph().createObject(key, value.getAssignments());
-            case U -> pap.modify().graph().createUser(key, value.getAssignments());
+            case OA: pap.modify().graph().createObjectAttribute(key, existingAssignmentNodes); break;
+            case UA: pap.modify().graph().createUserAttribute(key, existingAssignmentNodes); break;
+            case O: pap.modify().graph().createObject(key, value.getAssignments()); break;
+            case U: pap.modify().graph().createUser(key, value.getAssignments()); break;
         }
     }
 }

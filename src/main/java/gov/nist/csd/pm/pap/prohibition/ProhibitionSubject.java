@@ -58,23 +58,24 @@ public class ProhibitionSubject implements Serializable {
 
     private Type typeFromString(String s) throws InvalidProhibitionSubjectException {
         switch (s) {
-            case "USER_ATTRIBUTE" -> {
+            case "USER_ATTRIBUTE": {
                 return Type.USER_ATTRIBUTE;
             }
-            case "USER" -> {
+            case "USER": {
                 return Type.USER;
             }
-            case "PROCESS" -> {
+            case "PROCESS": {
                 return Type.PROCESS;
             }
-            default -> throw new InvalidProhibitionSubjectException(s);
+            default: throw new InvalidProhibitionSubjectException(s);
         }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProhibitionSubject subject)) return false;
+        if (!(o instanceof ProhibitionSubject)) return false;
+        ProhibitionSubject subject = (ProhibitionSubject) o;
         return Objects.equals(name, subject.name) && type == subject.type;
     }
 

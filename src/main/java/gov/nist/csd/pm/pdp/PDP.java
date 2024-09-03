@@ -150,8 +150,9 @@ public class PDP implements EventEmitter, AccessAdjudication {
                 operation.getNodeOperands()
         ));
 
-        if (ret instanceof Value value) {
-            return value.toObject();
+        if (ret instanceof Value) {
+	        Value value = (Value) ret;
+	        return value.toObject();
         }
 
         return ret;
@@ -184,8 +185,9 @@ public class PDP implements EventEmitter, AccessAdjudication {
                 }
 
                 Object o = tx.executeAdminExecutable(adminRoutine, operands);
-                if (o instanceof Value value) {
-                    return value.toObject();
+                if (o instanceof Value) {
+	                Value value = (Value) o;
+	                return value.toObject();
                 }
 
                 return o;

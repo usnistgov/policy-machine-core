@@ -52,7 +52,8 @@ public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LogicalSubjectPatternExpression that)) return false;
+        if (!(o instanceof LogicalSubjectPatternExpression)) return false;
+        LogicalSubjectPatternExpression that = (LogicalSubjectPatternExpression) o;
         return isAnd == that.isAnd && Objects.equals(left, that.left) && Objects.equals(right, that.right);
     }
 

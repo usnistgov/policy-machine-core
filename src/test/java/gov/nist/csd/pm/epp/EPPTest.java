@@ -44,50 +44,48 @@ class EPPTest {
     @Test
     void testCustomOperationEvent() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                
-                operation op1(nodeop string a, nodeop []string b) {
-                    
-                }
-                
-                create obligation "obl1" {
-                    create rule "op1"
-                    when any user
-                    performs "op1"
-                    on {
-                        a: "oa1",
-                        b: "oa1"
-                    }
-                    do(ctx) {
-                        create pc ctx.operands.a + "pc1"
-                        
-                        foreach x in ctx.operands.b {
-                            create pc x + "pc2"
-                        }
-                    }
-                    
-                    create rule "op2"
-                    when any user
-                    performs "op2"
-                    on {
-                        a: "oa2",
-                        b: "oa2"
-                    }
-                    do(ctx) {
-                        create pc ctx.operands.a + "pc1"
-                        
-                        foreach x in ctx.operands.b {
-                            create pc x + "pc2"
-                        }
-                    }
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                operation op1(nodeop string a, nodeop []string b) {\n" +
+                "                    \n" +
+                "                }\n" +
+                "                \n" +
+                "                create obligation \"obl1\" {\n" +
+                "                    create rule \"op1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"op1\"\n" +
+                "                    on {\n" +
+                "                        a: \"oa1\",\n" +
+                "                        b: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(ctx) {\n" +
+                "                        create pc ctx.operands.a + \"pc1\"\n" +
+                "                        \n" +
+                "                        foreach x in ctx.operands.b {\n" +
+                "                            create pc x + \"pc2\"\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                    \n" +
+                "                    create rule \"op2\"\n" +
+                "                    when any user\n" +
+                "                    performs \"op2\"\n" +
+                "                    on {\n" +
+                "                        a: \"oa2\",\n" +
+                "                        b: \"oa2\"\n" +
+                "                    }\n" +
+                "                    do(ctx) {\n" +
+                "                        create pc ctx.operands.a + \"pc1\"\n" +
+                "                        \n" +
+                "                        foreach x in ctx.operands.b {\n" +
+                "                            create pc x + \"pc2\"\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                }");
 
         pap.modify().operations().createAdminOperation(new Operation<>("op2", List.of("a", "b"), List.of("a", "b")) {
             @Override
@@ -134,31 +132,31 @@ class EPPTest {
     @Test
     void testResourceOperationEvent() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                
-                set resource operations ["read"]
-                
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                
-                create obligation "obl1" {
-                    create rule "op1"
-                    when any user
-                    performs "read"
-                    on {
-                        target: "oa1"
-                    }
-                    do(ctx) {
-                        create pc ctx.operands.target + "pc1"
-                    }
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                set resource operations [\"read\"]\n" +
+                "                \n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                \n" +
+                "                create obligation \"obl1\" {\n" +
+                "                    create rule \"op1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"read\"\n" +
+                "                    on {\n" +
+                "                        target: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(ctx) {\n" +
+                "                        create pc ctx.operands.target + \"pc1\"\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                ");
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         ResourceAdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read");
@@ -173,25 +171,23 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """
-                create pc "pc1"
-                create oa "oa1" in ["pc1"]
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
-                    }
-                    do(evtCtx) {
-                        create policy class "pc2"
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"*\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*\"]\n" +
+                "                create obligation \"test\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"create_object_attribute\"\n" +
+                "                    on {\n" +
+                "                        descendants: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(evtCtx) {\n" +
+                "                        create policy class \"pc2\"\n" +
+                "                    }\n" +
+                "                }";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
@@ -209,35 +205,33 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create oa "oa1" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
-                    }
-                    do(ctx) {
-                        name := ctx.opName
-                        create policy class name
-
-                        name = ctx.operands.name
-                        create policy class name + "_test"
-                        set properties of name + "_test" to {"key": name}
-
-                        userCtx := ctx["user"]
-                        create policy class ctx["user"] + "_test"
-                    }
-                }
-                """;
+        String pml = " create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                \n" +
+                "                create obligation \"test\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"create_object_attribute\"\n" +
+                "                    on {\n" +
+                "                        descendants: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(ctx) {\n" +
+                "                        name := ctx.opName\n" +
+                "                        create policy class name\n" +
+                "\n" +
+                "                        name = ctx.operands.name\n" +
+                "                        create policy class name + \"_test\"\n" +
+                "                        set properties of name + \"_test\" to {\"key\": name}\n" +
+                "\n" +
+                "                        userCtx := ctx[\"user\"]\n" +
+                "                        create policy class ctx[\"user\"] + \"_test\"\n" +
+                "                    }\n" +
+                "                }";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
@@ -330,27 +324,25 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create oa "oa1" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
-                
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
-                    }
-                    do(evtCtx) {
-                        testFunc()
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"create_policy_class\"]\n" +
+                "                                \n" +
+                "                create obligation \"test\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"create_object_attribute\"\n" +
+                "                    on {\n" +
+                "                        descendants: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(evtCtx) {\n" +
+                "                        testFunc()\n" +
+                "                    }\n" +
+                "                }";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> {
@@ -369,31 +361,29 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create oa "oa1" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
-                
-                create obligation "test" {
-                    create rule "rule1"
-                    when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
-                    }
-                    do(evtCtx) {
-                        if true {
-                            return
-                        }
-                        
-                        create policy class "test"
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"create_policy_class\"]\n" +
+                "                \n" +
+                "                create obligation \"test\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"create_object_attribute\"\n" +
+                "                    on {\n" +
+                "                        descendants: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(evtCtx) {\n" +
+                "                        if true {\n" +
+                "                            return\n" +
+                "                        }\n" +
+                "                        \n" +
+                "                        create policy class \"test\"\n" +
+                "                    }\n" +
+                "                }";
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", List.of("oa1")));
@@ -402,37 +392,35 @@ class EPPTest {
 
     @Test
     void testErrorInResponseOperation() throws PMException {
-        String pml = """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                associate "ua2" and PM_ADMIN_OBJECT with ["*a"]
-                
-                operation op1() {
-                    check "assign" on "oa1"
-                } {
-                    create pc "test_pc"
-                }
-                
-                routine routine1() {
-                    create o "o1" in ["oa1"]
-                }
-                
-                create obligation "obl1" {
-                    create rule "rule1"
-                    when any user
-                    performs "create_policy_class"
-                    do(ctx) {
-                        op1()
-                        routine1()
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"*a\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                associate \"ua2\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                \n" +
+                "                operation op1() {\n" +
+                "                    check \"assign\" on \"oa1\"\n" +
+                "                } {\n" +
+                "                    create pc \"test_pc\"\n" +
+                "                }\n" +
+                "                \n" +
+                "                routine routine1() {\n" +
+                "                    create o \"o1\" in [\"oa1\"]\n" +
+                "                }\n" +
+                "                \n" +
+                "                create obligation \"obl1\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"create_policy_class\"\n" +
+                "                    do(ctx) {\n" +
+                "                        op1()\n" +
+                "                        routine1()\n" +
+                "                    }\n" +
+                "                }";
         // as u1 - ok
         MemoryPAP pap = new MemoryPAP();
         PDP pdp = new PDP(pap);

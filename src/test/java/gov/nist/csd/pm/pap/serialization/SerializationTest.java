@@ -66,11 +66,9 @@ public class SerializationTest {
     @Test
     void testSerializationWithAdminNodes() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]                
-                """);
+        pap.executePML(new UserContext("u1"), "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]   ");
         String pml = pap.serialize(new PMLSerializer());
         String json = pap.serialize(new JSONSerializer());
 
@@ -87,11 +85,9 @@ public class SerializationTest {
     @Test
     void testSerializationNodeProperties() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                set properties of "ua1" to {"a": "b"}
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                set properties of \"ua1\" to {\"a\": \"b\"}");
         String pml = pap.serialize(new PMLSerializer());
         String json = pap.serialize(new JSONSerializer());
 

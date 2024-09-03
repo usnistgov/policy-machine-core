@@ -13,15 +13,13 @@ class ContinueStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        String pml = """
-                foreach x in ["a", "b", "c"] {
-                    if x == "b" {
-                        continue
-                    }         
-                    
-                    create policy class x         
-                }
-                """;
+        String pml = "                foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                "                    if x == \"b\" {\n" +
+                "                        continue\n" +
+                "                    }         \n" +
+                "                    \n" +
+                "                    create policy class x         \n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(""), pml);
 
@@ -32,17 +30,15 @@ class ContinueStatementTest {
 
     @Test
     void testMultipleLevels() throws PMException {
-        String pml = """
-                foreach x in ["a", "b", "c"] {
-                    if x == "b" {
-                        if x == "b" {
-                            continue
-                        }   
-                    }         
-                    
-                    create policy class x         
-                }
-                """;
+        String pml = "                foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                "                    if x == \"b\" {\n" +
+                "                        if x == \"b\" {\n" +
+                "                            continue\n" +
+                "                        }   \n" +
+                "                    }         \n" +
+                "                    \n" +
+                "                    create policy class x         \n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(""), pml);
 

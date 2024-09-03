@@ -112,29 +112,28 @@ class CreateObligationStatementTest {
 
         );
         assertEquals(
-                """
-                        create obligation "obl1" {
-                            create rule "rule1"
-                            when any user
-                            performs "e1"
-                            on {
-                                opnd1: "oa1" || "oa2"
-                            }
-                            do (evtCtx) {
-                                create PC "pc2"
-                            }
-                            
-                            create rule "rule2"
-                            when user "u1"
-                            performs "e3"
-                            on {
-                                opnd1: "oa1" || "oa2"
-                            }
-                            do (evtCtx) {
-                                create PC "pc3"
-                            }
-                            
-                        }""",
+                "create obligation \"obl1\" {\n" +
+                        "    create rule \"rule1\"\n" +
+                        "    when any user\n" +
+                        "    performs \"e1\"\n" +
+                        "    on {\n" +
+                        "        opnd1: \"oa1\" || \"oa2\"\n" +
+                        "    }\n" +
+                        "    do (evtCtx) {\n" +
+                        "        create PC \"pc2\"\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    create rule \"rule2\"\n" +
+                        "    when user \"u1\"\n" +
+                        "    performs \"e3\"\n" +
+                        "    on {\n" +
+                        "        opnd1: \"oa1\" || \"oa2\"\n" +
+                        "    }\n" +
+                        "    do (evtCtx) {\n" +
+                        "        create PC \"pc3\"\n" +
+                        "    }\n" +
+                        "\n" +
+                        "}",
                 stmt.toFormattedString(0)
         );
     }

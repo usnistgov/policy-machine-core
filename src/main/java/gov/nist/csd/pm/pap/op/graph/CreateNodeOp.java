@@ -34,7 +34,8 @@ public abstract class CreateNodeOp extends GraphOp {
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
         Collection<?> coll = (Collection<?>) operands.get(DESCENDANTS_OPERAND);
         for (Object o : coll) {
-            if (o instanceof String strColOp) {
+            if (o instanceof String) {
+                String strColOp = (String) o;
                 privilegeChecker.check(userCtx, strColOp, ar);
             }
         }

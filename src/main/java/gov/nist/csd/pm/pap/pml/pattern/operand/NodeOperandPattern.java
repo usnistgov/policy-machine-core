@@ -39,7 +39,8 @@ public class NodeOperandPattern extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NodeOperandPattern that)) return false;
+        if (!(o instanceof NodeOperandPattern)) return false;
+        NodeOperandPattern that = (NodeOperandPattern) o;
         return Objects.equals(node, that.node);
     }
 

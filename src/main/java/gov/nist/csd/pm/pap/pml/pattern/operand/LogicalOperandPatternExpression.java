@@ -52,7 +52,8 @@ public class LogicalOperandPatternExpression extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LogicalOperandPatternExpression that)) return false;
+        if (!(o instanceof LogicalOperandPatternExpression)) return false;
+        LogicalOperandPatternExpression that = (LogicalOperandPatternExpression) o;
         return isAnd == that.isAnd && Objects.equals(left, that.left) && Objects.equals(right, that.right);
     }
 

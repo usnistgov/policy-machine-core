@@ -112,9 +112,11 @@ public class PDPTx extends PAP {
 
     @Override
     public Object executeAdminExecutable(AdminExecutable<?> adminExecutable, Map<String, Object> operands) throws PMException {
-        if (adminExecutable instanceof Routine<?> routine) {
+        if (adminExecutable instanceof Routine<?>) {
+            Routine<?> routine = (Routine<?>) adminExecutable;
             return routine.execute(this, operands);
-        } else if (adminExecutable instanceof Operation<?> operation) {
+        } else if (adminExecutable instanceof Operation<?>) {
+            Operation<?> operation = (Operation<?>) adminExecutable;
             operation.canExecute(privilegeChecker, userCtx, operands);
             return operation.execute(pap, operands);
         }

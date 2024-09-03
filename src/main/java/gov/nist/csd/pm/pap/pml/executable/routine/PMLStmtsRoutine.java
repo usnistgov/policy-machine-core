@@ -53,7 +53,8 @@ public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializa
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLStmtsRoutine that)) return false;
+        if (!(o instanceof PMLStmtsRoutine)) return false;
+        PMLStmtsRoutine that = (PMLStmtsRoutine) o;
         return Objects.equals(statements, that.statements);
     }
 

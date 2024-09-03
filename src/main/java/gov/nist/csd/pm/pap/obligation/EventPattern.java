@@ -68,7 +68,8 @@ public class EventPattern implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EventPattern that)) return false;
+        if (!(o instanceof EventPattern)) return false;
+        EventPattern that = (EventPattern) o;
         return Objects.equals(subjectPattern, that.subjectPattern) && Objects.equals(operationPattern, that.operationPattern) && Objects.equals(operandPatterns, that.operandPatterns);
     }
 
@@ -116,21 +117,24 @@ public class EventPattern implements Serializable {
             Object operandValue = operands.get(nodeOperand);
             List<OperandPatternExpression> expressions = operandPatterns.get(nodeOperand);
 
+            if (operandValue == null) {
+                continue;
+            }
+
             // needs to match each expression in pattern list
             for (OperandPatternExpression operandPatternExpression : expressions) {
-                switch (operandValue) {
-                    case null -> {}
-                    case String operandValueStr -> {
-                        if (!operandPatternExpression.matches(operandValueStr, pap)) {
-                            return false;
-                        }
+                if (operandValue instanceof String) {
+                    String operandValueStr = (String) operandValue;
+                    if (!operandPatternExpression.matches(operandValueStr, pap)) {
+                        return false;
                     }
-                    case Collection<?> operandValueCollection -> {
-                        if (!operandPatternExpression.matches((Collection<String>) operandValueCollection, pap)) {
-                            return false;
-                        }
+                } else if (operandValue instanceof Collection<?>) {
+                    Collection<?> operandValueCollection = (Collection<?>) operandValue;
+                    if (!operandPatternExpression.matches((Collection<String>) operandValueCollection, pap)) {
+                        return false;
                     }
-                    default -> throw new UnexpectedOperandTypeException(operandValue.getClass());
+                } else {
+                    throw new UnexpectedOperandTypeException(operandValue.getClass());
                 }
             }
         }

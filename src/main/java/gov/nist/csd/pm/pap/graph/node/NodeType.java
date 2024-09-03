@@ -43,13 +43,14 @@ public enum NodeType implements Serializable {
         if (type == null) {
             throw new UnknownTypeException(null);
         }
-        return switch (type.toUpperCase()) {
-            case "OA" -> NodeType.OA;
-            case "UA" -> NodeType.UA;
-            case "U" -> NodeType.U;
-            case "O" -> NodeType.O;
-            case "PC" -> NodeType.PC;
-            default -> throw new UnknownTypeException(type);
-        };
+
+        switch (type.toUpperCase()) {
+            case "OA": return NodeType.OA;
+            case "UA": return NodeType.UA;
+            case "U": return NodeType.U;
+            case "O": return NodeType.O;
+            case "PC": return NodeType.PC;
+            default: throw new UnknownTypeException(type);
+        }
     }
 }

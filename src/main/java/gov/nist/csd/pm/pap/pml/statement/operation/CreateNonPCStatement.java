@@ -59,7 +59,8 @@ public class CreateNonPCStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CreateNonPCStatement that)) return false;
+        if (!(o instanceof CreateNonPCStatement)) return false;
+        CreateNonPCStatement that = (CreateNonPCStatement) o;
         return Objects.equals(name, that.name) && type == that.type && Objects.equals(assignTo, that.assignTo);
     }
 
@@ -69,11 +70,11 @@ public class CreateNonPCStatement extends OperationStatement {
     }
 
     private static Operation<Void> getOpFromType(NodeType type) {
-        return switch (type) {
-            case OA -> new CreateObjectAttributeOp();
-            case O -> new CreateObjectOp();
-            case UA -> new CreateUserAttributeOp();
-            default -> new CreateUserOp();
-        };
+        switch (type) {
+            case OA: return new CreateObjectAttributeOp();
+            case O: return new CreateObjectOp();
+            case UA: return new CreateUserAttributeOp();
+            default: return new CreateUserOp();
+        }
     }
 }

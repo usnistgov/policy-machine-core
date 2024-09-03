@@ -53,7 +53,8 @@ public class AssociateStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AssociateStatement that)) return false;
+        if (!(o instanceof AssociateStatement)) return false;
+        AssociateStatement that = (AssociateStatement) o;
         return Objects.equals(ua, that.ua) && Objects.equals(target, that.target) && Objects.equals(accessRights, that.accessRights);
     }
 

@@ -46,7 +46,8 @@ public class DeassignStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeassignStatement that)) return false;
+        if (!(o instanceof DeassignStatement)) return false;
+        DeassignStatement that = (DeassignStatement) o;
         return Objects.equals(ascendant, that.ascendant) && Objects.equals(deassignFrom, that.deassignFrom);
     }
 

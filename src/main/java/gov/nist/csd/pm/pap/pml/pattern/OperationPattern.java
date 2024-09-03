@@ -46,7 +46,8 @@ public class OperationPattern extends Pattern {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OperationPattern that)) return false;
+        if (!(o instanceof OperationPattern)) return false;
+        OperationPattern that = (OperationPattern) o;
         return isAny == that.isAny && Objects.equals(value, that.value);
     }
 

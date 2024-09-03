@@ -20,9 +20,7 @@ class CreateObligationStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.CreateObligationStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                create obligation "test" {}
-                """,
+                "create obligation \"test\" {}",
                 PMLParser.CreateObligationStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
@@ -38,9 +36,7 @@ class CreateObligationStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                create obligation ["test"] {}
-                """, visitorCtx, 1,
+                "create obligation [\"test\"] {}", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
                 );
     }

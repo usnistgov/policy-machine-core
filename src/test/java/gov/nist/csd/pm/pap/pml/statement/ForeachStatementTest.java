@@ -100,17 +100,15 @@ class ForeachStatementTest {
                                                      )
         );
 
-        assertEquals("""
-                             foreach x in ["a", "b", "c"] {
-                                 create PC x
-                             }""",
+        assertEquals("foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                        "    create PC x\n" +
+                        "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 foreach x in ["a", "b", "c"] {
-                                     create PC x
-                                 }
-                             """,
+        assertEquals("    foreach x in [\"a\", \"b\", \"c\"] {\n" +
+                        "        create PC x\n" +
+                        "    }\n" +
+                        "",
                      stmt.toFormattedString(1) + "\n");
     }
 
@@ -122,54 +120,48 @@ class ForeachStatementTest {
                                                      )
         );
 
-        assertEquals("""
-                             foreach x, y in {"a": "b", "c": "d"} {
-                                 create PC x
-                             }""",
+        assertEquals("foreach x, y in {\"a\": \"b\", \"c\": \"d\"} {\n" +
+                        "    create PC x\n" +
+                        "}",
                      stmt.toFormattedString(0));
 
-        assertEquals("""
-                                 foreach x, y in {"a": "b", "c": "d"} {
-                                     create PC x
-                                 }
-                             """,
+        assertEquals("    foreach x, y in {\"a\": \"b\", \"c\": \"d\"} {\n" +
+                        "        create PC x\n" +
+                        "    }\n" +
+                        "",
                      stmt.toFormattedString(1) + "\n");
     }
 
     @Test
     void testReturnEndsExecution() throws PMException {
-        String pml = """
-                f1()
-                
-                operation f1() {
-                    foreach x in ["1", "2", "3"] {
-                        if x == "2" {
-                            return
-                        }
-                        
-                        create PC x
-                    }
-                }
-                """;
+        String pml = "                f1()\n" +
+                "                \n" +
+                "                operation f1() {\n" +
+                "                    foreach x in [\"1\", \"2\", \"3\"] {\n" +
+                "                        if x == \"2\" {\n" +
+                "                            return\n" +
+                "                        }\n" +
+                "                        \n" +
+                "                        create PC x\n" +
+                "                    }\n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));
 
-        pml = """
-                f1()
-                
-                operation f1() {
-                    foreach x, y in {"1": "1", "2": "2"} {
-                        if x == "2" {
-                            return
-                        }
-                        
-                        create PC x
-                    }
-                }
-                """;
+        pml = "                f1()\n" +
+                "                \n" +
+                "                operation f1() {\n" +
+                "                    foreach x, y in {\"1\": \"1\", \"2\": \"2\"} {\n" +
+                "                        if x == \"2\" {\n" +
+                "                            return\n" +
+                "                        }\n" +
+                "                        \n" +
+                "                        create PC x\n" +
+                "                    }\n" +
+                "                }";
         pap = new MemoryPAP();
         pap.executePML(new UserContext(), pml);
 

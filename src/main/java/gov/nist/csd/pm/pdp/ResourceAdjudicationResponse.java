@@ -49,7 +49,8 @@ public class ResourceAdjudicationResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResourceAdjudicationResponse that)) return false;
+        if (!(o instanceof ResourceAdjudicationResponse)) return false;
+        ResourceAdjudicationResponse that = (ResourceAdjudicationResponse) o;
         return decision == that.decision && Objects.equals(resource, that.resource) && Objects.equals(explain, that.explain);
     }
 

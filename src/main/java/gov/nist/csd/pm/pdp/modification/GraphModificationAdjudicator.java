@@ -104,10 +104,10 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         Operation<?> op = new DeletePolicyClassOp();
 
         switch (nodeType) {
-            case OA -> op = new DeleteObjectAttributeOp();
-            case UA -> op = new DeleteUserAttributeOp();
-            case O -> op = new DeleteObjectOp();
-            case U -> op = new DeleteUserOp();
+            case OA: op = new DeleteObjectAttributeOp(); break;
+            case UA: op = new DeleteUserAttributeOp(); break;
+            case O: op = new DeleteObjectOp(); break;
+            case U: op = new DeleteUserOp(); break;
         }
 
         EventContext event = op.

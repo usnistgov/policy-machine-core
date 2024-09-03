@@ -19,9 +19,7 @@ class SetNodePropertiesStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.SetNodePropertiesStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                set properties of "o1" to {"a": "b"}
-                """,
+                "set properties of \"o1\" to {\"a\": \"b\"}",
                 PMLParser.SetNodePropertiesStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new SetNodePropertiesStmtVisitor(visitorCtx)
@@ -38,16 +36,12 @@ class SetNodePropertiesStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                set properties of ["o1"] to {"a": "b"}
-                """, visitorCtx, 1,
+                "set properties of [\"o1\"] to {\"a\": \"b\"}", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
 
         testCompilationError(
-                """
-                set properties of "o1" to ["a", "b"]
-                """, visitorCtx, 1,
+                "set properties of \"o1\" to [\"a\", \"b\"]", visitorCtx, 1,
                 "expected expression type(s) [map[string]string], got []string"
         );
     }

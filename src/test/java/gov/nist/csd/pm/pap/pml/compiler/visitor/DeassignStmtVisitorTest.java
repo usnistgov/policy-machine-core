@@ -19,9 +19,7 @@ class DeassignStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.DeassignStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                deassign "a" from ["b", "c"]
-                """,
+                "deassign \"a\" from [\"b\", \"c\"]",
                 PMLParser.DeassignStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new DeassignStmtVisitor(visitorCtx).visitDeassignStatement(ctx);
@@ -37,16 +35,12 @@ class DeassignStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                deassign "a" from "c"
-                """, visitorCtx, 1,
+                "deassign \"a\" from \"c\"", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
         );
 
         testCompilationError(
-                """
-                deassign ["a"] from ["b", "c"]
-                """, visitorCtx, 1,
+                "deassign [\"a\"] from [\"b\", \"c\"]", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
     }

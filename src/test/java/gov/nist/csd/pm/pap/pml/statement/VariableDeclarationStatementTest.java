@@ -51,20 +51,18 @@ class VariableDeclarationStatementTest {
                 )
         );
 
-        String expected = """
-                var (
-                    c = "c"
-                    d = "d"
-                )
-                """;
+        String expected =
+                "var (\n" +
+                "    c = \"c\"\n" +
+                "    d = \"d\"\n" +
+                ")\n";
         assertEquals(expected, stmt.toFormattedString(0) + "\n");
 
-        expected = """
-                    var (
-                        c = "c"
-                        d = "d"
-                    )
-                """;
+        expected =
+                "    var (\n" +
+                "        c = \"c\"\n" +
+                "        d = \"d\"\n" +
+                "    )\n";
         assertEquals(expected, stmt.toFormattedString(1) + "\n");
     }
 

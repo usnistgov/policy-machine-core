@@ -436,7 +436,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
                 // add DST to the path from SRC
                 List<String> targetPath = new ArrayList<>(entry.getKey());
                 List<Association> associations = new ArrayList<>(entry.getValue());
-                targetPath.addFirst(dst);
+                targetPath.add(0, dst);
 
                 // collect any associations for the DST node
                 Collection<Association> associationsWithTarget = graphQuerier.getAssociationsWithTarget(dst);
@@ -460,7 +460,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
             Path targetPath = new Path(entry.getKey());
             List<Association> associations = new ArrayList<>(entry.getValue());
 
-            String pc = targetPath.getLast();
+            String pc = targetPath.get(targetPath.size()-1);
 
             Map<Path, List<Association>> pcPathAssocs = pcMap.getOrDefault(pc, new HashMap<>());
             pcPathAssocs.put(targetPath, associations);
@@ -489,7 +489,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
             for (Path srcPath : srcPaths) {
                 Path copy = new Path(srcPath);
-                copy.addFirst(dst);
+                copy.add(0, dst);
                 dstPaths.add(copy);
             }
 
@@ -504,7 +504,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
         Set<Path> userPaths = pathsToUAs.getOrDefault(user, new HashSet<>());
         Map<String, Set<Path>> associationUAPaths = new HashMap<>();
         for (Path userPath : userPaths) {
-            String assocUA = userPath.getLast();
+            String assocUA = userPath.get(userPath.size()-1);
             Set<Path> assocUAPaths = associationUAPaths.getOrDefault(assocUA, new HashSet<>());
             assocUAPaths.add(userPath);
             associationUAPaths.put(assocUA, assocUAPaths);

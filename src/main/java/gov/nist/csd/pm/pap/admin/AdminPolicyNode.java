@@ -15,10 +15,10 @@ public enum AdminPolicyNode {
 
     public static AdminPolicyNode fromNodeName(String ascendant) {
         switch (ascendant) {
-            case "PM_ADMIN" -> {
+            case "PM_ADMIN": {
                 return PM_ADMIN_PC;
             }
-            case "PM_ADMIN:object" -> {
+            case "PM_ADMIN:object": {
                 return PM_ADMIN_OBJECT;
             }
         }

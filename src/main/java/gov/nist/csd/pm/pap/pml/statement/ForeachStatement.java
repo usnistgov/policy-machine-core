@@ -32,9 +32,11 @@ public class ForeachStatement extends ControlStatement {
         }
 
         Value iterValue = iter.execute(ctx, pap);
-        if (iterValue instanceof ArrayValue arrayValue) {
+        if (iterValue instanceof ArrayValue) {
+            ArrayValue arrayValue = (ArrayValue) iterValue;
             return executeArrayIterator(ctx, arrayValue);
-        } else if (iterValue instanceof MapValue mapValue) {
+        } else if (iterValue instanceof MapValue) {
+            MapValue mapValue = (MapValue) iterValue;
             return executeMapIterator(ctx, mapValue, pap);
         }
 
@@ -87,7 +89,8 @@ public class ForeachStatement extends ControlStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ForeachStatement that)) return false;
+        if (!(o instanceof ForeachStatement)) return false;
+        ForeachStatement that = (ForeachStatement) o;
         return Objects.equals(varName, that.varName) && Objects.equals(valueVarName, that.valueVarName) && Objects.equals(iter, that.iter) && Objects.equals(statements, that.statements);
     }
 

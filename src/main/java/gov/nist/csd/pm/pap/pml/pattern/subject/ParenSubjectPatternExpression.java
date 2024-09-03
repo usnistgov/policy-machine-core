@@ -37,7 +37,8 @@ public class ParenSubjectPatternExpression extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ParenSubjectPatternExpression that)) return false;
+        if (!(o instanceof ParenSubjectPatternExpression)) return false;
+        ParenSubjectPatternExpression that = (ParenSubjectPatternExpression) o;
         return Objects.equals(expression, that.expression);
     }
 

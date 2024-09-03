@@ -44,9 +44,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1("a", "b", ["c", "d"])
-                """,
+                "func1(\"a\", \"b\", [\"c\", \"d\"])",
                 PMLParser.FunctionInvokeStatementContext.class);
 
 
@@ -68,9 +66,7 @@ class FunctionInvokeStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                func1("a", "b", ["c", "d"])
-                """, visitorCtx, 1,
+                "func1(\"a\", \"b\", [\"c\", \"d\"])", visitorCtx, 1,
                 "unknown function 'func1' in scope"
         );
     }
@@ -83,9 +79,7 @@ class FunctionInvokeStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(compileGlobalScope);
 
         testCompilationError(
-                """
-                func1("a", "b")
-                """, visitorCtx, 1,
+                "func1(\"a\", \"b\")", visitorCtx, 1,
                 "wrong number of args for function call func1: expected 3, got 2"
         );
     }
@@ -97,9 +91,7 @@ class FunctionInvokeStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(compileGlobalScope);
 
         testCompilationError(
-                """
-                func1("a", "b", true)
-                """, visitorCtx, 1,
+                "func1(\"a\", \"b\", true)", visitorCtx, 1,
                 "invalid argument type: expected []string, got bool at arg 2"
         );
     }
@@ -107,9 +99,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testNoArgs() throws PMException {
         PMLParser.FunctionInvokeStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                func1()
-                """,
+                "func1()",
                 PMLParser.FunctionInvokeStatementContext.class);
 
         PMLExecutableSignature signature = new PMLExecutableSignature(

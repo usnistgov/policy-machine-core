@@ -95,7 +95,8 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
             return;
         }
 
-        if (vertex instanceof VertexWithProps vertexWithProps) {
+        if (vertex instanceof VertexWithProps) {
+            VertexWithProps vertexWithProps = (VertexWithProps) vertex;
             if (newProperties.isEmpty()) {
                 policy.graph.put(name, vertexWithProps.getVertex());
             } else {

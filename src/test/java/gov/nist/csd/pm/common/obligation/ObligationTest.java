@@ -27,27 +27,25 @@ class ObligationTest {
 
     @Test
     void testResponseWithExistingFunction() throws PMException {
-        String pml = """
-                create pc "pc1"
-                create oa "oa1" in ["pc1"]
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
-                
-                create obligation "obl1" {
-                    create rule "rule1"
-                    when user "u1"
-                    performs "assign"
-                    on {
-                        ascendant: any,
-                        descendant: "oa1"
-                    }
-                    do(ctx) {
-                        createX()
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"create_policy_class\"]\n" +
+                "                \n" +
+                "                create obligation \"obl1\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when user \"u1\"\n" +
+                "                    performs \"assign\"\n" +
+                "                    on {\n" +
+                "                        ascendant: any,\n" +
+                "                        descendant: \"oa1\"\n" +
+                "                    }\n" +
+                "                    do(ctx) {\n" +
+                "                        createX()\n" +
+                "                    }\n" +
+                "                }";
 
         MemoryPAP pap = new MemoryPAP();
 

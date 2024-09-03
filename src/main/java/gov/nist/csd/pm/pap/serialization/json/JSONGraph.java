@@ -76,7 +76,8 @@ public class JSONGraph {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof JSONGraph jsonGraph)) return false;
+        if (!(o instanceof JSONGraph)) return false;
+        JSONGraph jsonGraph = (JSONGraph) o;
         return Objects.equals(pcs, jsonGraph.pcs) && Objects.equals(uas, jsonGraph.uas) && Objects.equals(oas, jsonGraph.oas) && Objects.equals(users, jsonGraph.users) && Objects.equals(objects, jsonGraph.objects);
     }
 

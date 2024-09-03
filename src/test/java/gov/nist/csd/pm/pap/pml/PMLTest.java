@@ -25,18 +25,16 @@ public class PMLTest {
     @Test
     void testCallingNonPMLOperationAndRoutineFromPMLWithOperandsAndReturnValue() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
-                
-                create prohibition "pro1"
-                deny user "u2"
-                access rights ["assign"]
-                on union of [PM_ADMIN_OBJECT]
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua1\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"assign\"]\n" +
+                "                \n" +
+                "                create prohibition \"pro1\"\n" +
+                "                deny user \"u2\"\n" +
+                "                access rights [\"assign\"]\n" +
+                "                on union of [PM_ADMIN_OBJECT]");
 
         Operation<?> op1 = new Operation<>("op1", List.of("a", "b", "c")) {
             @Override
@@ -76,9 +74,7 @@ public class PMLTest {
         });
 
         PDP pdp = new PDP(pap);
-        pdp.executePML(new UserContext("u1"), """
-                op1("a", ["b", "c"], {"d": "e", "f": "g"})
-                """);
+        pdp.executePML(new UserContext("u1"), "op1(\"a\", [\"b\", \"c\"], {\"d\": \"e\", \"f\": \"g\"})");
         assertTrue(pap.query().graph().nodeExists("1a"));
         assertTrue(pap.query().graph().nodeExists("1b"));
         assertTrue(pap.query().graph().nodeExists("1c"));
@@ -87,13 +83,9 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext("u2"), """
-                op1("a", ["b", "c"], {"d": "e", "f": "g"})
-                """));
+        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext("u2"), " op1(\"a\", [\"b\", \"c\"], {\"d\": \"e\", \"f\": \"g\"})"));
 
-        pdp.executePML(new UserContext("u1"), """
-                routine1("1", ["2", "3"], {"4": "5", "6": "7"})
-                """);
+        pdp.executePML(new UserContext("u1"), "routine1(\"1\", [\"2\", \"3\"], {\"4\": \"5\", \"6\": \"7\"})");
         assertTrue(pap.query().graph().nodeExists("11"));
         assertTrue(pap.query().graph().nodeExists("12"));
         assertTrue(pap.query().graph().nodeExists("13"));
@@ -102,48 +94,44 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext("u2"), """
-                routine1("1", ["2", "3"], {"4": "5", "6": "7"})
-                """));
+        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext("u2"), "routine1(\"1\", [\"2\", \"3\"], {\"4\": \"5\", \"6\": \"7\"})"));
     }
 
     @Test
     void testCallPMLOperationAndRoutineFromNonPML() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
-                
-                create prohibition "pro1"
-                deny user "u2"
-                access rights ["assign"]
-                on union of [PM_ADMIN_OBJECT]
-                
-                operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on PM_ADMIN_OBJECT
-                } {
-                    create pc "1" + a
-                
-                    foreach x in b {
-                        create pc "1" + x
-                    }
-                
-                    foreach x, y in c {
-                        create pc "1" + x
-                        create pc "1" + y
-                    }
-                }
-                
-                routine routine1(string a, []string b, map[string]string c) {
-                    op1(a, b, c)
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua1\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"assign\"]\n" +
+                "                \n" +
+                "                create prohibition \"pro1\"\n" +
+                "                deny user \"u2\"\n" +
+                "                access rights [\"assign\"]\n" +
+                "                on union of [PM_ADMIN_OBJECT]\n" +
+                "                \n" +
+                "                operation op1(string a, []string b, map[string]string c) {\n" +
+                "                    check \"assign\" on PM_ADMIN_OBJECT\n" +
+                "                } {\n" +
+                "                    create pc \"1\" + a\n" +
+                "                    \n" +
+                "                    foreach x in b {\n" +
+                "                        create pc \"1\" + x\n" +
+                "                    }\n" +
+                "                    \n" +
+                "                    foreach x, y in c {\n" +
+                "                        create pc \"1\" + x\n" +
+                "                        create pc \"1\" + y\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                routine routine1(string a, []string b, map[string]string c) {\n" +
+                "                    op1(a, b, c)\n" +
+                "                }");
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), 
+        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"),
                 "op1", Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")));
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("1a"));

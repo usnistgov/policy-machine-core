@@ -21,24 +21,22 @@ class PrivilegeCheckerTest {
         pap = new MemoryPAP();
         pap.deserialize(
                 new UserContext("u1"),
-                """
-                        set resource operations ["read", "write"]
-                        
-                        create policy class "pc1"
-                            create ua "ua1" in ["pc1"]
-                            create ua "ua2" in ["pc1"]
-
-                            create oa "oa1" in ["pc1"]
-                            create oa "oa2" in ["pc1"]
-
-                            associate "ua1" and "oa1" with ["read", "write"]
-                            associate "ua1" and PM_ADMIN_OBJECT with ["read"]
-                      
-                        create user "u1" in ["ua1"]
-                        create user "u2" in ["ua2"]
-                        
-                        create object "o1" in ["oa1"]
-                        """,
+                "set resource operations [\"read\", \"write\"]\n" +
+                        "                        \n" +
+                        "                        create policy class \"pc1\"\n" +
+                        "                            create ua \"ua1\" in [\"pc1\"]\n" +
+                        "                            create ua \"ua2\" in [\"pc1\"]\n" +
+                        "\n" +
+                        "                            create oa \"oa1\" in [\"pc1\"]\n" +
+                        "                            create oa \"oa2\" in [\"pc1\"]\n" +
+                        "\n" +
+                        "                            associate \"ua1\" and \"oa1\" with [\"read\", \"write\"]\n" +
+                        "                            associate \"ua1\" and PM_ADMIN_OBJECT with [\"read\"]\n" +
+                        "                      \n" +
+                        "                        create user \"u1\" in [\"ua1\"]\n" +
+                        "                        create user \"u2\" in [\"ua2\"]\n" +
+                        "                        \n" +
+                        "                        create object \"o1\" in [\"oa1\"]",
                         new PMLDeserializer()
         );
     }

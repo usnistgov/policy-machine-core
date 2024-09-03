@@ -53,7 +53,8 @@ public class AdminAdjudicationResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AdminAdjudicationResponse response)) return false;
+        if (!(o instanceof AdminAdjudicationResponse)) return false;
+	    AdminAdjudicationResponse response = (AdminAdjudicationResponse) o;
 	    return decision == response.decision && Objects.equals(value, response.value) && Objects.equals(explain, response.explain);
     }
 

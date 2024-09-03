@@ -19,9 +19,7 @@ class AssignStmtVisitorTest {
     @Test
     void testSuccess() throws PMException {
         PMLParser.AssignStatementContext ctx = PMLContextVisitor.toCtx(
-                """
-                assign "a" to ["b", "c"]
-                """,
+                "assign \"a\" to [\"b\", \"c\"]",
                 PMLParser.AssignStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
         PMLStatement stmt = new AssignStmtVisitor(visitorCtx).visitAssignStatement(ctx);
@@ -37,16 +35,12 @@ class AssignStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
 
         testCompilationError(
-                """
-                assign "a" to "b"
-                """, visitorCtx, 1,
+                " assign \"a\" to \"b\"", visitorCtx, 1,
                 "expected expression type(s) [[]string], got string"
         );
 
         testCompilationError(
-                """
-                assign ["a"] to "b"
-                """, visitorCtx, 1,
+                "assign [\"a\"] to \"b\"", visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );
     }

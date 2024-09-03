@@ -37,7 +37,8 @@ public class JSONAssociation {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof JSONAssociation that)) return false;
+        if (!(o instanceof JSONAssociation)) return false;
+        JSONAssociation that = (JSONAssociation) o;
         return Objects.equals(target, that.target) && Objects.equals(arset, that.arset);
     }
 

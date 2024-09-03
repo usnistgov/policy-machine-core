@@ -44,7 +44,8 @@ public class SetResourceOperationsStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SetResourceOperationsStatement that)) return false;
+        if (!(o instanceof SetResourceOperationsStatement)) return false;
+        SetResourceOperationsStatement that = (SetResourceOperationsStatement) o;
         return Objects.equals(ops, that.ops);
     }
 

@@ -24,9 +24,7 @@ class VariableReferenceTest {
         @Test
         void testReferenceById() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+                    "a", PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
             visitorContext.scope().addVariable("a", new Variable("a", Type.string(), false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
@@ -40,9 +38,7 @@ class VariableReferenceTest {
         @Test
         void testUnknownVariable() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+                    "a", PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
             PMLCompilationRuntimeException e = assertThrows(
                     PMLCompilationRuntimeException.class,
@@ -61,9 +57,7 @@ class VariableReferenceTest {
         @Test
         void testSuccess() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a.b.c
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+                    "a.b.c", PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
             visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
@@ -74,9 +68,7 @@ class VariableReferenceTest {
             );
 
             ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a["b"]["c"]
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+                    "a[\"b\"][\"c\"]", PMLParser.VariableReferenceExpressionContext.class);
             visitorContext = new VisitorContext(new CompileGlobalScope());
             visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false));
             actual = compileVariableReference(visitorContext, ctx.variableReference());
@@ -90,9 +82,7 @@ class VariableReferenceTest {
         @Test
         void testUnknownVariable() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a.b.c
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+                    "a.b.c", PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
             PMLCompilationRuntimeException e = assertThrows(
                     PMLCompilationRuntimeException.class,
@@ -108,9 +98,7 @@ class VariableReferenceTest {
         @Test
         void testVarRefNotAMap() throws PMException {
             PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a.b.c
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+                    "a.b.c", PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
             visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.string()), false));
             PMLCompilationRuntimeException e = assertThrows(

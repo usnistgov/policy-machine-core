@@ -8,7 +8,9 @@ import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.pap.store.ProhibitionsStore;
 
+import java.sql.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MemoryProhibitionsStore extends MemoryStore implements ProhibitionsStore {
 
@@ -32,7 +34,7 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
                 subject,
                 accessRightSet,
                 intersection,
-                containerConditions.stream().toList()
+                new ArrayList<>(containerConditions)
         );
 
         existingPros.add(p);

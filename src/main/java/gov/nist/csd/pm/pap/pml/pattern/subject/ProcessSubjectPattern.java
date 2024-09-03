@@ -38,7 +38,8 @@ public class ProcessSubjectPattern extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProcessSubjectPattern that)) return false;
+        if (!(o instanceof ProcessSubjectPattern)) return false;
+        ProcessSubjectPattern that = (ProcessSubjectPattern) o;
         return Objects.equals(process, that.process);
     }
 

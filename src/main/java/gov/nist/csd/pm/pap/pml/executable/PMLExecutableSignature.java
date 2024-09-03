@@ -61,7 +61,8 @@ public class PMLExecutableSignature implements PMLStatementSerializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLExecutableSignature signature)) return false;
+        if (!(o instanceof PMLExecutableSignature)) return false;
+        PMLExecutableSignature signature = (PMLExecutableSignature) o;
         return Objects.equals(functionName, signature.functionName) && Objects.equals(returnType, signature.returnType) && Objects.equals(operands, signature.operands) && Objects.equals(operandTypes, signature.operandTypes);
     }
 

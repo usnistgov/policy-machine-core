@@ -97,9 +97,11 @@ public class FunctionInvokeExpression extends Expression {
 
         // set the execution context if exec is a PML exec
         AdminExecutable<?> executable = funcInvokeCtx.scope().getFunction(name);
-        if (executable instanceof PMLRoutine pmlRoutine) {
+        if (executable instanceof PMLRoutine) {
+            PMLRoutine pmlRoutine = (PMLRoutine) executable;
             pmlRoutine.setCtx(funcInvokeCtx);
-        } else if (executable instanceof PMLOperation pmlOperation) {
+        } else if (executable instanceof PMLOperation) {
+            PMLOperation pmlOperation = (PMLOperation) executable;
             pmlOperation.setCtx(funcInvokeCtx);
         }
 
@@ -116,7 +118,8 @@ public class FunctionInvokeExpression extends Expression {
 
         // return the value
         Value value = Value.fromObject(o);
-        if (value instanceof ReturnValue returnValue) {
+        if (value instanceof ReturnValue) {
+            ReturnValue returnValue = (ReturnValue) value;
             return returnValue.getValue();
         } else {
             return value;
@@ -180,7 +183,8 @@ public class FunctionInvokeExpression extends Expression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FunctionInvokeExpression that)) return false;
+        if (!(o instanceof FunctionInvokeExpression)) return false;
+        FunctionInvokeExpression that = (FunctionInvokeExpression) o;
         return Objects.equals(signature, that.signature) && Objects.equals(actualArgsList, that.actualArgsList) && Objects.equals(operands, that.operands);
     }
 

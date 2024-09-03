@@ -57,7 +57,8 @@ public class EventContext {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EventContext that)) return false;
+        if (!(o instanceof EventContext)) return false;
+        EventContext that = (EventContext) o;
         return Objects.equals(user, that.user) && Objects.equals(process, that.process) && Objects.equals(opName, that.opName) && Objects.equals(operands, that.operands) && Objects.equals(nodeOperands, that.nodeOperands);
     }
 

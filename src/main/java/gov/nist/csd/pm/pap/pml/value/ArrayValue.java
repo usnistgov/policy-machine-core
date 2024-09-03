@@ -43,7 +43,7 @@ public class ArrayValue extends Value {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Value value : value) {
-            if (!sb.isEmpty()) {
+            if (sb.length() != 0) {
                 sb.append(", ");
             }
 

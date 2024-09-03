@@ -42,7 +42,8 @@ public class PMLStmtsOperationBody extends ControlStatement {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof PMLStmtsOperationBody that)) return false;
+		if (!(o instanceof PMLStmtsOperationBody)) return false;
+		PMLStmtsOperationBody that = (PMLStmtsOperationBody) o;
 		return Objects.equals(checks, that.checks) && Objects.equals(statements, that.statements);
 	}
 

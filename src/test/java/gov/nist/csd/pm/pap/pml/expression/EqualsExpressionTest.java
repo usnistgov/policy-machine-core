@@ -23,9 +23,7 @@ class EqualsExpressionTest {
     @Test
     void testEqualsString() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                "a" == "a"
-                """,
+                "\"a\" == \"a\"",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -49,9 +47,7 @@ class EqualsExpressionTest {
     @Test
     void testNotEqualsString() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                "a" != "a"
-                """,
+                "\"a\" != \"a\"",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -73,9 +69,7 @@ class EqualsExpressionTest {
     @Test
     void testEqualsArray() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ["a", "b"] == ["a", "b"]
-                """,
+                "[\"a\", \"b\"] == [\"a\", \"b\"]",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -94,9 +88,7 @@ class EqualsExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ["a", "b"] == ["b", "a"]
-                """,
+                "[\"a\", \"b\"] == [\"b\", \"a\"]",
                 PMLParser.EqualsExpressionContext.class);
         visitorContext = new VisitorContext(new CompileGlobalScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -118,9 +110,7 @@ class EqualsExpressionTest {
     @Test
     void testNotEqualsArray() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ["a", "b"] != ["a", "b"]
-                """,
+                "[\"a\", \"b\"] != [\"a\", \"b\"]",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -142,9 +132,7 @@ class EqualsExpressionTest {
     @Test
     void testEqualsBool() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true == true
-                """,
+                "true == true",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -163,9 +151,7 @@ class EqualsExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true == false
-                """,
+                "true == false",
                 PMLParser.EqualsExpressionContext.class);
         visitorContext = new VisitorContext(new CompileGlobalScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -187,9 +173,7 @@ class EqualsExpressionTest {
     @Test
     void testNotEqualsBool() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                true != true
-                """,
+                "true != true",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -211,9 +195,7 @@ class EqualsExpressionTest {
     @Test
     void testEqualsMap() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                {"a": "a", "b": "b"} == {"a": "a", "b": "b"}
-                """,
+                "{\"a\": \"a\", \"b\": \"b\"} == {\"a\": \"a\", \"b\": \"b\"}",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -232,9 +214,7 @@ class EqualsExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                {"a": "a", "b": "b"} == {"a": "a", "b": "c"}
-                """,
+                "{\"a\": \"a\", \"b\": \"b\"} == {\"a\": \"a\", \"b\": \"c\"}",
                 PMLParser.EqualsExpressionContext.class);
         visitorContext = new VisitorContext(new CompileGlobalScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -256,9 +236,7 @@ class EqualsExpressionTest {
     @Test
     void testNotEqualsMap() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                {"a": "a", "b": "b"} != {"a": "a", "b": "b"}
-                """,
+                "{\"a\": \"a\", \"b\": \"b\"} != {\"a\": \"a\", \"b\": \"b\"}",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -280,9 +258,7 @@ class EqualsExpressionTest {
     @Test
     void testEqualsWithParens() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ("a" + "b") == ("a" + "b")
-                """,
+                "(\"a\" + \"b\") == (\"a\" + \"b\")",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -309,9 +285,7 @@ class EqualsExpressionTest {
         );
 
         ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ("a" + "b") == ("a" + "c")
-                """,
+                "(\"a\" + \"b\") == (\"a\" + \"c\")",
                 PMLParser.EqualsExpressionContext.class);
         visitorContext = new VisitorContext(new CompileGlobalScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
@@ -341,9 +315,7 @@ class EqualsExpressionTest {
     @Test
     void testNotEqualsDifferentTypes() throws PMException {
         PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                ("a" + "b") == (true)
-                """,
+                "(\"a\" + \"b\") == (true)",
                 PMLParser.EqualsExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);

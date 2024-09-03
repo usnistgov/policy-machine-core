@@ -69,9 +69,11 @@ public class Type implements Serializable {
             type = Type.string();
         } else if (varTypeContext instanceof PMLParser.BooleanTypeContext) {
             type = Type.bool();
-        } else if (varTypeContext instanceof PMLParser.ArrayVarTypeContext arrayVarTypeCtx) {
+        } else if (varTypeContext instanceof PMLParser.ArrayVarTypeContext) {
+            PMLParser.ArrayVarTypeContext arrayVarTypeCtx = (PMLParser.ArrayVarTypeContext) varTypeContext;
             type = Type.array(toType(arrayVarTypeCtx.arrayType().variableType()));
-        } else if (varTypeContext instanceof PMLParser.MapVarTypeContext mapVarTypeContext) {
+        } else if (varTypeContext instanceof PMLParser.MapVarTypeContext) {
+            PMLParser.MapVarTypeContext mapVarTypeContext = (PMLParser.MapVarTypeContext) varTypeContext;
             type = Type.map(
                     toType(mapVarTypeContext.mapType().keyType),
                     toType(mapVarTypeContext.mapType().valueType)
@@ -137,7 +139,8 @@ public class Type implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Type type) {
+        if (obj instanceof Type) {
+            Type type = (Type) obj;
             if (this.isAny || type.isAny) {
                 return true;
             } else if (isVoid && type.isVoid) {

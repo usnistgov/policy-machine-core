@@ -23,9 +23,7 @@ class PlusExpressionTest {
     @Test
     void testPlus() throws PMException {
         PMLParser.PlusExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                "a" + "b"
-                """,
+                "\"a\" + \"b\"",
                 PMLParser.PlusExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = PlusExpression.compilePlusExpression(visitorContext, ctx);
@@ -47,9 +45,7 @@ class PlusExpressionTest {
     @Test
     void testPlus3Expressions() throws PMException {
         PMLParser.PlusExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                "a" + "b" + "c"
-                """,
+                "\"a\" + \"b\" + \"c\"",
                 PMLParser.PlusExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = PlusExpression.compilePlusExpression(visitorContext, ctx);
@@ -71,9 +67,7 @@ class PlusExpressionTest {
     @Test
     void testNonStringType() throws PMException {
         PMLParser.PlusExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                """
-                "a" + "b" + ["c"]
-                """,
+                "\"a\" + \"b\" + [\"c\"]",
                 PMLParser.PlusExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         PMLCompilationRuntimeException e = assertThrows(

@@ -136,16 +136,14 @@ class PDPTest {
     @Test
     void testAdjudicateResourceOperation() throws PMException {
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
-                
-                create u "u1" in ["ua1"]
-                create o "o1" in ["oa1"]
-                """);
+        pap.executePML(new UserContext(""), "set resource operations [\"read\", \"write\"]\n" +
+                "                create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"read\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]");
 
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
@@ -181,26 +179,24 @@ class PDPTest {
     @Test
     void testAdjudicateAdminOperation() throws PMException {
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create ua "ua2" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["assign"]
-                associate "ua1" and "oa2" with ["assign_to"]
-                
-                create u "u1" in ["ua1"]
-                create u "u2" in ["ua2"]
-                create o "o1" in ["oa1"]
-                
-                operation op1() string {
-                    check "assign_to" on "oa2"
-                } {
-                    create pc "test"
-                    return "test"
-                }
-                """);
+        pap.executePML(new UserContext(""), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create ua \"ua2\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"assign\"]\n" +
+                "                associate \"ua1\" and \"oa2\" with [\"assign_to\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                create u \"u2\" in [\"ua2\"]\n" +
+                "                create o \"o1\" in [\"oa1\"]\n" +
+                "                \n" +
+                "                operation op1() string {\n" +
+                "                    check \"assign_to\" on \"oa2\"\n" +
+                "                } {\n" +
+                "                    create pc \"test\"\n" +
+		        "                    return \"test\"" +
+                "                }");
 
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
@@ -242,14 +238,11 @@ class PDPTest {
     @Test
     void testAdjudicateDoesNotExist() throws PMException {
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                
-                set resource operations ["read", "write"]
-
-                """);
+        pap.executePML(new UserContext(""), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                set resource operations [\"read\", \"write\"]\n");
         PDP pdp = new PDP(pap);
         assertThrows(OperationDoesNotExistException.class,
                 () -> pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of()));
@@ -276,12 +269,10 @@ class PDPTest {
                 return "test1";
             }
         });
-        pap.executePML(new UserContext("u1"), """
-                routine routine2() map[string]string {
-                    create policy class "test2"
-                    return {"test2": "test2"}
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "routine routine2() map[string]string {\n" +
+                "                    create policy class \"test2\"\n" +
+                "                    return {\"test2\": \"test2\"}\n" +
+                "                }");
 
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
@@ -319,23 +310,21 @@ class PDPTest {
 
     @Test
     void testRoutineWithForLoop() throws PMException {
-        String pml = """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                create u "u1" in ["ua1"]
-                
-                associate "ua1" and "oa1" with ["create_object"]
-                
-                routine routine1() {
-                    foreach x in ["oa1", "oa2"] {
-                        if true {
-                            create o x + "_o" in [x]
-                        }
-                    }
-                }
-                """;
+        String pml = "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and \"oa1\" with [\"create_object\"]\n" +
+                "                \n" +
+                "                routine routine1() {\n" +
+                "                    foreach x in [\"oa1\", \"oa2\"] {\n" +
+                "                        if true {\n" +
+                "                            create o x + \"_o\" in [x]\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                }";
         PAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 
@@ -347,21 +336,19 @@ class PDPTest {
     @Test
     void testRoutineTx() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["create_object"]
-                
-                create u "u1" in ["ua1"]
-                
-                routine r1() {
-                    create o "o1" in ["oa1"]
-                    create o "o2" in ["oa1"]
-                    create o "o3" in ["oa2"]
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"create_object\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                routine r1() {\n" +
+                "                    create o \"o1\" in [\"oa1\"]\n" +
+                "                    create o \"o2\" in [\"oa1\"]\n" +
+                "                    create o \"o3\" in [\"oa2\"]\n" +
+                "                }");
         PDP pdp = new PDP(pap);
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext("u1"), tx -> {
             tx.executePML(new UserContext("u1"), "r1()");
@@ -375,32 +362,30 @@ class PDPTest {
     @Test
     void testPMLOperationDoesNotEmitEvents() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["create_object"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                
-                create u "u1" in ["ua1"]
-                
-                operation op1() {
-                    create pc "pc2"
-                    foreach x in ["ua2", "ua3"] {
-                        create ua x in ["pc2"]
-                    }
-                }
-                
-                create obligation "o1" {
-                    create rule "r1"
-                    when any user
-                    performs "create_user_attribute"
-                    do(ctx) {
-                        create pc "test"
-                    }
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                associate \"ua1\" and \"oa1\" with [\"create_object\"]\n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"*a\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                operation op1() {\n" +
+                "                    create pc \"pc2\"\n" +
+                "                    foreach x in [\"ua2\", \"ua3\"] {\n" +
+                "                        create ua x in [\"pc2\"]\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                \n" +
+                "                create obligation \"o1\" {\n" +
+                "                    create rule \"r1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"create_user_attribute\"\n" +
+                "                    do(ctx) {\n" +
+                "                        create pc \"test\"\n" +
+                "                    }\n" +
+                "                }");
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
@@ -411,29 +396,27 @@ class PDPTest {
     @Test
     void testAdjudicateRoutineListOfOperations() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class", "create_object_attribute"]
-                
-                create u "u1" in ["ua1"]
-                
-                operation op1(string name) {
-                    create pc name
-                }
-                
-                create obligation "obl1" {
-                    create rule "rule1"
-                    when any user
-                    performs "op1"
-                    do(ctx) {
-                        create oa "oa_" + ctx.operands.name in [ctx.operands.name]
-                    }
-                }
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                associate \"ua1\" and PM_ADMIN_OBJECT with [\"create_policy_class\", \"create_object_attribute\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]\n" +
+                "                \n" +
+                "                operation op1(string name) {\n" +
+                "                    create pc name\n" +
+                "                }\n" +
+                "                \n" +
+                "                create obligation \"obl1\" {\n" +
+                "                    create rule \"rule1\"\n" +
+                "                    when any user\n" +
+                "                    performs \"op1\"\n" +
+                "                    do(ctx) {\n" +
+                "                        create oa \"oa_\" + ctx.operands.name in [ctx.operands.name]\n" +
+                "                    }\n" +
+                "                }");
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
@@ -454,15 +437,12 @@ class PDPTest {
     @Test
     void testExplainFalseDoesNotIncludeExplainInResponse() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                create oa "oa2" in ["pc1"]
-                
-                create u "u1" in ["ua1"]
-               
-                """);
+        pap.executePML(new UserContext("u1"), "create pc \"pc1\"\n" +
+                "                create ua \"ua1\" in [\"pc1\"]\n" +
+                "                create oa \"oa1\" in [\"pc1\"]\n" +
+                "                create oa \"oa2\" in [\"pc1\"]\n" +
+                "                \n" +
+                "                create u \"u1\" in [\"ua1\"]");
 
         PDP pdp = new PDP(pap);
         AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), "create_policy_class", Map.of(NAME_OPERAND, "test"));

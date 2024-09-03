@@ -27,24 +27,22 @@ class CreateRuleStmtVisitorTest {
     
     @Test
     void testSubjectClause() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "any user"
-                        when any user
-                        performs "test_event"
-                        do(ctx) {}
-                        
-                        create rule "users"
-                        when user "u1"
-                        performs "test_event"
-                        do(ctx) {}
-                        
-                        create rule "users list"
-                        when user "u1" || "u2"
-                        performs "test_event"
-                        do(ctx) {}
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"any user\"\n" +
+                "                        when any user\n" +
+                "                        performs \"test_event\"\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"users\"\n" +
+                "                        when user \"u1\"\n" +
+                "                        performs \"test_event\"\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"users list\"\n" +
+                "                        when user \"u1\" || \"u2\"\n" +
+                "                        performs \"test_event\"\n" +
+                "                        do(ctx) {}\n" +
+                "                    }";
         List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
@@ -82,14 +80,12 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testPerformsClause() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "r1"
-                        when any user
-                        performs any operation
-                        do(ctx) {}
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"r1\"\n" +
+                "                        when any user\n" +
+                "                        performs any operation\n" +
+                "                        do(ctx) {}\n" +
+                "                    }";
         List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
@@ -108,45 +104,41 @@ class CreateRuleStmtVisitorTest {
         );
         assertEquals(expected, stmt);
 
-        String pml2 = """
-            create obligation "obligation1" {
-                create rule "r1"
-                when any user
-                do(ctx) {}
-            }
-            """;
+        String pml2 = "create obligation \"obligation1\" {\n" +
+                "                create rule \"r1\"\n" +
+                "                when any user\n" +
+                "                do(ctx) {}\n" +
+                "            }";
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class,
                 () -> pmlCompiler.compilePML(pml2)
         );
         assertEquals(1, e.getErrors().size());
-        assertEquals("mismatched input 'do' expecting 'performs'", e.getErrors().getFirst().errorMessage());
+        assertEquals("mismatched input 'do' expecting 'performs'", e.getErrors().get(0).errorMessage());
     }
 
     @Test
     void testOnClause() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "any operand"
-                        when any user
-                        performs any operation
-                        do(ctx) {}
-                        
-                        create rule "any operand with on"
-                        when any user
-                        performs any operation
-                        on {}
-                        do(ctx) {}
-                        
-                        create rule "an operand"
-                        when any user
-                        performs "assign"
-                        on {
-                            ascendant: any
-                        }
-                        do(ctx) {}
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"any operand\"\n" +
+                "                        when any user\n" +
+                "                        performs any operation\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"any operand with on\"\n" +
+                "                        when any user\n" +
+                "                        performs any operation\n" +
+                "                        on {}\n" +
+                "                        do(ctx) {}\n" +
+                "                        \n" +
+                "                        create rule \"an operand\"\n" +
+                "                        when any user\n" +
+                "                        performs \"assign\"\n" +
+                "                        on {\n" +
+                "                            ascendant: any\n" +
+                "                        }\n" +
+                "                        do(ctx) {}\n" +
+                "                    }";
         List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
@@ -185,21 +177,19 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testResponse() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "r1"
-                        when any user
-                        performs any operation
-                        do(ctx) {
-                            create policy class "pc1"
-                            create policy class "pc2"
-                        }
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"r1\"\n" +
+                "                        when any user\n" +
+                "                        performs any operation\n" +
+                "                        do(ctx) {\n" +
+                "                            create policy class \"pc1\"\n" +
+                "                            create policy class \"pc2\"\n" +
+                "                        }\n" +
+                "                    }";
         List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
-        CreateObligationStatement stmt = (CreateObligationStatement)stmts.getFirst();
+        CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
                 new StringLiteral("obligation1"),
                 List.of(
@@ -220,38 +210,34 @@ class CreateRuleStmtVisitorTest {
 
     @Test
     void testFunctionInResponseReturnsError() throws PMException {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "e1 and e2"
-                        when any user
-                        performs any operation
-                        do(ctx) {
-                            operation f1() {}
-                        }
-                    }
-                    """;
+        String pml = " create obligation \"obligation1\" {\n" +
+                "                        create rule \"e1 and e2\"\n" +
+                "                        when any user\n" +
+                "                        performs any operation\n" +
+                "                        do(ctx) {\n" +
+                "                            operation f1() {}\n" +
+                "                        }\n" +
+                "                    }";
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class,
                 () -> pmlCompiler.compilePML(pml)
         );
         assertEquals(
                 "operations/routines are not allowed inside response blocks",
-                e.getErrors().getFirst().errorMessage()
+                e.getErrors().get(0).errorMessage()
         );
     }
 
     @Test
     void testReturnValueInResponseThrowsException() {
-        String pml = """
-                    create obligation "obligation1" {
-                        create rule "any user"
-                        when subject => pAny()
-                        performs op => pEquals(op, "test_event")
-                        do(ctx) {
-                            return "test"
-                        }
-                    }
-                    """;
+        String pml = "create obligation \"obligation1\" {\n" +
+                "                        create rule \"any user\"\n" +
+                "                        when subject => pAny()\n" +
+                "                        performs op => pEquals(op, \"test_event\")\n" +
+                "                        do(ctx) {\n" +
+                "                            return \"test\"\n" +
+                "                        }\n" +
+                "                    }";
         assertThrows(PMLCompilationException.class, () -> pmlCompiler.compilePML(pml));
     }
 }

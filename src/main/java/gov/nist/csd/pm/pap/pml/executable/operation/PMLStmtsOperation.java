@@ -72,8 +72,9 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLStmtsOperation that)) return false;
-        if (!super.equals(o)) return false;
+        if (!(o instanceof PMLStmtsOperation)) return false;
+	    PMLStmtsOperation that = (PMLStmtsOperation) o;
+	    if (!super.equals(o)) return false;
 	    return Objects.equals(body, that.body);
     }
 

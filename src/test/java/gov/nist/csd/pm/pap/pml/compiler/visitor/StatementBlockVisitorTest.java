@@ -29,11 +29,9 @@ class StatementBlockVisitorTest {
     @Test
     void testFunctionInBlock() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
-                """
-                {
-                    operation f1() {}
-                }
-                """
+                "{\n" +
+                        "                    operation f1() {}\n" +
+                        "                }"
         );
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
         PMLCompilationRuntimeException e = assertThrows(

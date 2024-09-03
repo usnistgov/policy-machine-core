@@ -40,7 +40,8 @@ public class InSubjectPattern extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof InSubjectPattern that)) return false;
+        if (!(o instanceof InSubjectPattern)) return false;
+        InSubjectPattern that = (InSubjectPattern) o;
         return Objects.equals(container, that.container);
     }
 

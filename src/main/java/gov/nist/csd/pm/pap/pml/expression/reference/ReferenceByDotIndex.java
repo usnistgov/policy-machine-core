@@ -54,7 +54,8 @@ public class ReferenceByDotIndex extends ReferenceByIndex{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ReferenceByDotIndex that)) return false;
+        if (!(o instanceof ReferenceByDotIndex)) return false;
+        ReferenceByDotIndex that = (ReferenceByDotIndex) o;
         return Objects.equals(varRef, that.varRef) && Objects.equals(index, that.index);
     }
 

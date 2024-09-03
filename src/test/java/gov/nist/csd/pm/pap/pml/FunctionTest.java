@@ -12,15 +12,13 @@ public class FunctionTest {
 
     @Test
     void testElseIfNotAllPathsReturn() {
-        String pml = """
-                operation fun(string a) string {
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    }
-                }
-                """;
+        String pml = "operation fun(string a) string {\n" +
+                "                    if equals(a, \"a\") {\n" +
+                "                        return \"a\"\n" +
+                "                    } else if equals(a, \"b\") {\n" +
+                "                        return \"b\"\n" +
+                "                    }\n" +
+                "                }";
 
         PMLCompilationException e = assertThrows(PMLCompilationException.class, () -> {
             PAP pap = new MemoryPAP();
@@ -31,17 +29,15 @@ public class FunctionTest {
 
     @Test
     void testElseAllPathsReturn() {
-        String pml2 = """
-                operation fun(string a) string {
-                    if equals(a, "a") {
-                        return "a"
-                    } else if equals(a, "b") {
-                        return "b"
-                    } else {
-                        return "c"
-                    }
-                }
-                """;
+        String pml2 = "operation fun(string a) string {\n" +
+                "                    if equals(a, \"a\") {\n" +
+                "                        return \"a\"\n" +
+                "                    } else if equals(a, \"b\") {\n" +
+                "                        return \"b\"\n" +
+                "                    } else {\n" +
+                "                        return \"c\"\n" +
+                "                    }\n" +
+                "                }";
 
         assertDoesNotThrow(() -> {
             PAP pap = new MemoryPAP();
@@ -51,15 +47,13 @@ public class FunctionTest {
 
     @Test
     void testElseWithNoElseIfAllPathsReturn() {
-        String pml2 = """
-                operation fun(string a) string {
-                    if equals(a, "a") {
-                        return "a"
-                    } else {
-                        return "b"
-                    }
-                }
-                """;
+        String pml2 = "operation fun(string a) string {\n" +
+                "                    if equals(a, \"a\") {\n" +
+                "                        return \"a\"\n" +
+                "                    } else {\n" +
+                "                        return \"b\"\n" +
+                "                    }\n" +
+                "                }";
 
         assertDoesNotThrow(() -> {
             PAP pap = new MemoryPAP();

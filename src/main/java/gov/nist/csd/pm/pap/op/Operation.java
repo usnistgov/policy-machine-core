@@ -73,7 +73,8 @@ public abstract class Operation<T> extends AdminExecutable<T> implements Seriali
                 continue;
             }
 
-            if (operandValue instanceof Collection<?> collection) {
+            if (operandValue instanceof Collection<?>) {
+                Collection<?> collection = (Collection<?>) operandValue;
                 if (collection.isEmpty()) {
                     continue;
                 }

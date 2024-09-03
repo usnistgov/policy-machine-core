@@ -54,7 +54,8 @@ public class ExecuteGlobalScope extends GlobalScope<Value, AdminExecutable<?>> {
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
-            if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
+            if (operation instanceof PMLStmtsOperation) {
+                PMLStmtsOperation pmlStmtsOperation = (PMLStmtsOperation) operation;
                 addExecutable(opName, pmlStmtsOperation);
             } else {
                 addExecutable(opName, new PMLOperationWrapper(operation));
@@ -64,7 +65,8 @@ public class ExecuteGlobalScope extends GlobalScope<Value, AdminExecutable<?>> {
         Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
         for (String routineName : routineNames) {
             Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
-            if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
+            if (routine instanceof PMLStmtsRoutine) {
+                PMLStmtsRoutine pmlStmtsRoutine = (PMLStmtsRoutine) routine;
                 addExecutable(routineName, pmlStmtsRoutine);
             } else {
                 addExecutable(routineName, new PMLRoutineWrapper(routine));

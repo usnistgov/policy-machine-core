@@ -200,38 +200,34 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                pap.executePML(new UserContext("u1"), """
-                    create obligation "ob1" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    
-                    create obligation "ob2" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    """);
+                pap.executePML(new UserContext("u1"), "                    create obligation \"ob1\" {\n" +
+                        "                        create rule \"r1\"\n" +
+                        "                        when any user \n" +
+                        "                        performs any operation\n" +
+                        "                        do(ctx) { }\n" +
+                        "                    }\n" +
+                        "                    \n" +
+                        "                    create obligation \"ob2\" {\n" +
+                        "                        create rule \"r1\"\n" +
+                        "                        when any user \n" +
+                        "                        performs any operation\n" +
+                        "                        do(ctx) { }\n" +
+                        "                    }");
             });
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                pap.executePML(new UserContext("u1"), """
-                    create obligation "ob3" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    
-                    create obligation "ob4" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    """);
+                pap.executePML(new UserContext("u1"), "                    create obligation \"ob3\" {\n" +
+                        "                        create rule \"r1\"\n" +
+                        "                        when any user \n" +
+                        "                        performs any operation\n" +
+                        "                        do(ctx) { }\n" +
+                        "                    }\n" +
+                        "                    \n" +
+                        "                    create obligation \"ob4\" {\n" +
+                        "                        create rule \"r1\"\n" +
+                        "                        when any user \n" +
+                        "                        performs any operation\n" +
+                        "                        do(ctx) { }\n" +
+                        "                    }");
                 throw new PMException("");
             }));
 
@@ -248,14 +244,12 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
         public void testSuccess() throws PMException, IOException {
             loadSamplePolicyFromPML(pap);
 
-            pap.executePML(new UserContext("u1"), """
-                    create obligation "ob1" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    """);
+            pap.executePML(new UserContext("u1"), "                    create obligation \"ob1\" {\n" +
+                    "                        create rule \"r1\"\n" +
+                    "                        when any user \n" +
+                    "                        performs any operation\n" +
+                    "                        do(ctx) { }\n" +
+                    "                    }");
 
             pap.modify().obligations().deleteObligation("ob1");
 
@@ -267,21 +261,19 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                pap.executePML(new UserContext("u1"), """
-                    create obligation "ob1" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    
-                    create obligation "ob2" {
-                        create rule "r1"
-                        when any user 
-                        performs any operation
-                        do(ctx) { }
-                    }
-                    """);
+                pap.executePML(new UserContext("u1"), "                    create obligation \"ob1\" {\n" +
+                        "                        create rule \"r1\"\n" +
+                        "                        when any user \n" +
+                        "                        performs any operation\n" +
+                        "                        do(ctx) { }\n" +
+                        "                    }\n" +
+                        "                    \n" +
+                        "                    create obligation \"ob2\" {\n" +
+                        "                        create rule \"r1\"\n" +
+                        "                        when any user \n" +
+                        "                        performs any operation\n" +
+                        "                        do(ctx) { }\n" +
+                        "                    }");
             });
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
                 pap.modify().obligations().deleteObligation("ob1");

@@ -6,7 +6,14 @@ import org.antlr.v4.runtime.misc.Interval;
 
 import java.util.Objects;
 
-public record CompileError(Position position, String errorMessage) {
+public final class CompileError {
+    private final Position position;
+    private final String errorMessage;
+
+    public CompileError(Position position, String errorMessage) {
+        this.position = position;
+        this.errorMessage = errorMessage;
+    }
 
     public static String getText(ParserRuleContext ctx) {
         int startIndex = ctx.start.getStartIndex();
@@ -42,4 +49,13 @@ public record CompileError(Position position, String errorMessage) {
                 ", errorMessage='" + errorMessage + '\'' +
                 '}';
     }
+
+    public Position position() {
+        return position;
+    }
+
+    public String errorMessage() {
+        return errorMessage;
+    }
+
 }

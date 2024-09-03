@@ -98,31 +98,27 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
-                    create prohibition "p1"
-                    deny user attribute "ua1"
-                    access rights ["read"]
-                    on union of ["US project"]
-                    
-                    create prohibition "p2"
-                    deny user attribute "ua1"
-                    access rights ["read"]
-                    on union of ["US project"]
-                    """);
+                tx.executePML(new UserContext("u1"), "create prohibition \"p1\"\n" +
+                        "                    deny user attribute \"ua1\"\n" +
+                        "                    access rights [\"read\"]\n" +
+                        "                    on union of [\"US project\"]\n" +
+                        "                    \n" +
+                        "                    create prohibition \"p2\"\n" +
+                        "                    deny user attribute \"ua1\"\n" +
+                        "                    access rights [\"read\"]\n" +
+                        "                    on union of [\"US project\"]");
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
-                    create prohibition "p3"
-                    deny user attribute "ua1"
-                    access rights ["read"]
-                    on union of ["US project"]
-                    
-                    create prohibition "p4"
-                    deny user attribute "ua1"
-                    access rights ["read"]
-                    on union of ["US project"]
-                    """);
+                tx.executePML(new UserContext("u1"), "                    create prohibition \"p3\"\n" +
+                        "                    deny user attribute \"ua1\"\n" +
+                        "                    access rights [\"read\"]\n" +
+                        "                    on union of [\"US project\"]\n" +
+                        "                    \n" +
+                        "                    create prohibition \"p4\"\n" +
+                        "                    deny user attribute \"ua1\"\n" +
+                        "                    access rights [\"read\"]\n" +
+                        "                    on union of [\"US project\"]");
                 throw new PMException("");
             }));
 
@@ -170,24 +166,20 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
-                    create prohibition "p1"
-                    deny user attribute "ua1"
-                    access rights ["read"]
-                    on union of ["US project"]
-                    
-                    create prohibition "p2"
-                    deny user attribute "ua1"
-                    access rights ["read"]
-                    on union of ["US project"]
-                    """);
+                tx.executePML(new UserContext("u1"), "create prohibition \"p1\"\n" +
+                        "                    deny user attribute \"ua1\"\n" +
+                        "                    access rights [\"read\"]\n" +
+                        "                    on union of [\"US project\"]\n" +
+                        "                    \n" +
+                        "                    create prohibition \"p2\"\n" +
+                        "                    deny user attribute \"ua1\"\n" +
+                        "                    access rights [\"read\"]\n" +
+                        "                    on union of [\"US project\"]");
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
-                    delete prohibition "p1"
-                    delete prohibition "p2"
-                    """);
+                tx.executePML(new UserContext("u1"), "                    delete prohibition \"p1\"\n" +
+                        "                    delete prohibition \"p2\"");
                 throw new PMException("");
             }));
 
