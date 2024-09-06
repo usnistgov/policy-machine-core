@@ -56,13 +56,13 @@ public class PolicyModifier extends Modifier implements PolicyModification, Admi
 
     @Override
     public void verifyAdminPolicy() throws PMException {
-        String pc = AdminPolicyNode.ADMIN_POLICY.nodeName();
+        String pc = AdminPolicyNode.PM_ADMIN_PC.nodeName();
 
         if (!store.graph().nodeExists(pc)) {
             store.graph().createNode(pc, PC);
         }
 
-        String oa = AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName();
+        String oa = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
         if (!store.graph().nodeExists(oa)) {
             store.graph().createNode(oa, OA);
         }

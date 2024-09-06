@@ -51,7 +51,7 @@ class GraphModificationAdjudicatorTest {
                 
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and "oa2" with ["*a"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 associate "ua3" and "ua1" with ["*a"]
                 associate "ua1" and "ua4" with ["*a"]
                 associate "ua1" and "ua3" with ["*a"]

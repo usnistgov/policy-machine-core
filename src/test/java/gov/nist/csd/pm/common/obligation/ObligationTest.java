@@ -33,7 +33,7 @@ class ObligationTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["create_policy_class"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
                 
                 create obligation "obl1" {
                     create rule "rule1"

@@ -27,8 +27,8 @@ public class CompileGlobalScope extends GlobalScope<Variable, PMLExecutableSigna
         Map<String, Variable> builtinConstants = new HashMap<>();
 
         // admin policy nodes constants
-        builtinConstants.put(ADMIN_POLICY.constantName(), new Variable(ADMIN_POLICY.constantName(), Type.string(), true));
-        builtinConstants.put(ADMIN_POLICY_OBJECT.constantName(), new Variable(ADMIN_POLICY_OBJECT.constantName(), Type.string(), true));
+        builtinConstants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.constantName(), Type.string(), true));
+        builtinConstants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.constantName(), Type.string(), true));
 
         // add builtin operations
         addConstants(builtinConstants);

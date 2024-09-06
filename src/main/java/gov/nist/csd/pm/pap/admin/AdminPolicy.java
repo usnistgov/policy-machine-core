@@ -10,13 +10,13 @@ import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.*;
 public class AdminPolicy {
 
     public static final Set<String> ALL_NODE_NAMES = new HashSet<>(List.of(
-            ADMIN_POLICY.nodeName(),
-            ADMIN_POLICY_OBJECT.nodeName()
+            PM_ADMIN_PC.nodeName(),
+            PM_ADMIN_OBJECT.nodeName()
     ));
 
     public static final Set<String> AL_NODE_CONSTANT_NAMES = new HashSet<>(List.of(
-            ADMIN_POLICY.constantName(),
-            ADMIN_POLICY_OBJECT.constantName()
+            PM_ADMIN_PC.constantName(),
+            PM_ADMIN_OBJECT.constantName()
     ));
 
     public static boolean isAdminPolicyNodeConstantName(String name) {
@@ -28,9 +28,9 @@ public class AdminPolicy {
     }
 
     /**
-     * Create {@link AdminPolicyNode#ADMIN_POLICY}
-     * Create the {@link AdminPolicyNode#ADMIN_POLICY} policy class.<p>
-     * Create the {@link AdminPolicyNode#ADMIN_POLICY_OBJECT} in the ADMIN_POLICY.<p>
+     * Create {@link AdminPolicyNode#PM_ADMIN_PC}
+     * Create the {@link AdminPolicyNode#PM_ADMIN_PC} policy class.<p>
+     * Create the {@link AdminPolicyNode#PM_ADMIN_OBJECT} in the PM_ADMIN_PC.<p>
      *
      * @param verifier The verifier used to verify the admin policy nodes exist.
      * @throws PMException If there is an error verifying any element of the admin policy.

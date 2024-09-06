@@ -21,10 +21,6 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
         super(store);
     }
 
-    public ProhibitionsModifier(Modifier modifier) {
-        super(modifier);
-    }
-
     @Override
     public void createProhibition(String name,
                                   ProhibitionSubject subject,

@@ -104,23 +104,23 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperations(
+        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(
                 new UserContext("u1"),
-                List.of(new OperationRequest("op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))))
+                "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
         );
         assertEquals(Decision.DENY, response.getDecision());
 
-        pap.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*a"));
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*a"));
 
-        response = pdp.adjudicateAdminOperations(
+        response = pdp.adjudicateAdminOperation(
                 new UserContext("u1"),
-                List.of(new OperationRequest("op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))))
+                "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
         );
         assertEquals(GRANT, response.getDecision());
 
-        response = pdp.adjudicateAdminOperations(
+        response = pdp.adjudicateAdminOperation(
                 new UserContext("u1"),
-                List.of(new OperationRequest("op2", Map.of("a", "oa2", "b", "oa2")))
+                "op2", Map.of("a", "oa2", "b", "oa2")
         );
         assertEquals(GRANT, response.getDecision());
 
@@ -145,7 +145,7 @@ class EPPTest {
                 create oa "oa2" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 
                 create obligation "obl1" {
                     create rule "op1"
@@ -179,7 +179,7 @@ class EPPTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
                 create obligation "test" {
                     create rule "rule1"
                     when any user
@@ -216,7 +216,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -259,14 +259,14 @@ class EPPTest {
             txPAP.modify().graph().createUserAttribute("ua1", List.of("pc1"));
             txPAP.modify().graph().createUserAttribute("ua2", List.of("pc1"));
             txPAP.modify().graph().associate("ua2", "ua1", new AccessRightSet("*"));
-            txPAP.modify().graph().associate("ua2", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*"));
+            txPAP.modify().graph().associate("ua2", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
             txPAP.modify().graph().createObjectAttribute("oa1",  List.of("pc1"));
             txPAP.modify().graph().createUser("u1",  List.of("ua1", "ua2"));
             txPAP.modify().graph().createObject("o1",  List.of("oa1"));
-            txPAP.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(),
+            txPAP.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(),
                     new AccessRightSet(CREATE_OBLIGATION));
             txPAP.modify().graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
-            txPAP.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*"));
+            txPAP.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext("u1"), (policy) -> {
@@ -286,6 +286,8 @@ class EPPTest {
                             ))
                     ))
             );
+
+            return null;
         });
 
         EventContext eventCtx = new EventContext(
@@ -335,7 +337,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["create_policy_class"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -353,6 +355,8 @@ class EPPTest {
 
         pdp.runTx(new UserContext("u1"), (txPDP) -> {
             txPDP.modify().graph().createObjectAttribute("oa2", List.of("oa1"));
+
+            return null;
         });
 
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -372,7 +376,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["create_policy_class"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -406,8 +410,8 @@ class EPPTest {
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]
-                associate "ua2" and ADMIN_POLICY_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua2" and PM_ADMIN_OBJECT with ["*a"]
                 
                 operation op1() {
                     check "assign" on "oa1"

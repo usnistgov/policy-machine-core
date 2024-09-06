@@ -27,14 +27,14 @@ public class RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQue
 
     @Override
     public Collection<String> getAdminRoutineNames() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().routines().getAdminRoutineNames();
     }
 
     @Override
     public Routine<?> getAdminRoutine(String routineName) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().routines().getAdminRoutine(routineName);
     }

@@ -7,7 +7,6 @@ import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
-import gov.nist.csd.pm.pdp.RoutineRequest;
 import gov.nist.csd.pm.pdp.PDP;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ class PMLRoutineWrapperTest {
                 create ua "ua1" in ["pc1"]
                 create ua "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["assign"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 create u "u1" in ["ua1"]
                 """;
         MemoryPAP pap = new MemoryPAP();
@@ -63,8 +62,8 @@ class PMLRoutineWrapperTest {
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1",
-                Map.of("a", "a", "b", "b", "c", "c")));
+        pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1",
+                Map.of("a", "a", "b", "b", "c", "c"));
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
         assertTrue(pap.query().graph().nodeExists("c"));
@@ -74,7 +73,10 @@ class PMLRoutineWrapperTest {
         pdp = new PDP(pap);
         pap.executePML(new UserContext("u1"), pml);
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
-        pdp.runTx(new UserContext("u1"), tx -> tx.executePML(new UserContext("u1"), "routine1(\"a\", \"b\", \"c\")"));
+        pdp.runTx(new UserContext("u1"), tx -> {
+            tx.executePML(new UserContext("u1"), "routine1(\"a\", \"b\", \"c\")");
+            return null;
+        });
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
         assertTrue(pap.query().graph().nodeExists("c"));

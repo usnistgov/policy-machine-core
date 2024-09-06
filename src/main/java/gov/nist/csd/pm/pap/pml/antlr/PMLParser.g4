@@ -148,11 +148,10 @@ varSpec: ID ASSIGN_EQUALS expression;
 
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
-functionDefinitionStatement: functionSignature statementBlock ;
+functionDefinitionStatement: functionSignature checkStatementBlock? statementBlock ;
 functionSignature:
     (ROUTINE | OPERATION) ID OPEN_PAREN formalArgList CLOSE_PAREN
-    returnType=variableType?
-    checkStatementBlock?;
+    returnType=variableType? ;
 formalArgList: (formalArg (COMMA formalArg)*)? ;
 formalArg: NODEOP? variableType ID;
 returnStatement: RETURN expression?;

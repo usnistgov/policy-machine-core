@@ -38,7 +38,7 @@ public class PrivilegeChecker {
         Node targetNode = pap.query().graph().getNode(target);
 
         if (targetNode.getType().equals(PC)) {
-            target = AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName();
+            target = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
         }
 
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, target);
@@ -58,7 +58,7 @@ public class PrivilegeChecker {
     public void checkPattern(UserContext userCtx, Pattern pattern, String toCheck) throws PMException {
         ReferencedNodes referencedNodes = pattern.getReferencedNodes();
         if (referencedNodes.isAny()) {
-            check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), toCheck);
+            check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), toCheck);
 
             return;
         }

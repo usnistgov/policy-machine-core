@@ -12,10 +12,6 @@ public class RoutinesModifier extends Modifier implements RoutinesModification {
         super(store);
     }
 
-    public RoutinesModifier(Modifier modifier) {
-        super(modifier);
-    }
-
     @Override
     public void createAdminRoutine(Routine<?> routine) throws PMException {
         if (store.routines().getAdminRoutineNames().contains(routine.getName())) {

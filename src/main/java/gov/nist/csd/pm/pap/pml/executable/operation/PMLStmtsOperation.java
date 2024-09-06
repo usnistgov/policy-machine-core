@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -17,51 +16,43 @@ import java.util.Objects;
 
 public class PMLStmtsOperation extends PMLOperation implements PMLStatementSerializable {
 
-    private PMLStatementBlock checks;
-    private PMLStatementBlock statements;
+    private PMLStmtsOperationBody body;
 
     public PMLStmtsOperation(String name,
                              Type returnType,
                              List<String> allOperands,
                              List<String> nodeOperands,
                              Map<String, Type> operandTypes,
-                             PMLStatementBlock checks,
-                             PMLStatementBlock statements) {
+                             PMLStmtsOperationBody body) {
         super(name, returnType, allOperands, nodeOperands, operandTypes);
-        this.checks = checks;
-        this.statements = statements;
+        this.body = body;
     }
 
-    public PMLStatementBlock getChecks() {
-        return checks;
-    }
-
-    public PMLStatementBlock getStatements() {
-        return statements;
+    public PMLStmtsOperationBody getBody() {
+        return body;
     }
 
     @Override
     public PMLExecutableSignature getSignature() {
-        return new PMLStmtsOperationSignature(
+        return new PMLOperationSignature(
                 getName(),
                 getReturnType(),
                 getOperandNames(),
                 getNodeOperands(),
-                getOperandTypes(),
-                getChecks()
+                getOperandTypes()
         );
     }
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        ctx.executeOperationStatements(getChecks().getStmts(), operands);
+        ctx.executeOperationStatements(this.body.getChecks().getStmts(), operands);
     }
 
     @Override
     public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeOperationStatements(statements.getStmts(), operands);
+        return ctx.executeOperationStatements(this.body.getStatements().getStmts(), operands);
     }
 
     @Override
@@ -69,7 +60,7 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
         return String.format(
                 "%s%s",
                 getSignature().toFormattedString(indentLevel),
-                getStatements().toFormattedString(indentLevel)
+                body.toFormattedString(indentLevel)
         );
     }
 
@@ -81,14 +72,13 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof PMLStmtsOperation that)) return false;
         if (!super.equals(o)) return false;
-        PMLStmtsOperation that = (PMLStmtsOperation) o;
-        return Objects.equals(statements, that.statements);
+	    return Objects.equals(body, that.body);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), statements);
+        return Objects.hash(super.hashCode(), body);
     }
 }

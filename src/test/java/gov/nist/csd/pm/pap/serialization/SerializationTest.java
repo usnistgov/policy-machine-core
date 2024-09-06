@@ -69,7 +69,7 @@ public class SerializationTest {
         pap.executePML(new UserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]                
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]                
                 """);
         String pml = pap.serialize(new PMLSerializer());
         String json = pap.serialize(new JSONSerializer());

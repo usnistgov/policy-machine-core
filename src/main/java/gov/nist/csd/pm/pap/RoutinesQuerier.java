@@ -14,10 +14,6 @@ public class RoutinesQuerier extends Querier implements RoutinesQuery {
         super(store);
     }
 
-    public RoutinesQuerier(Querier querier) {
-        super(querier);
-    }
-
     @Override
     public Collection<String> getAdminRoutineNames() throws PMException {
         return store.routines().getAdminRoutineNames();

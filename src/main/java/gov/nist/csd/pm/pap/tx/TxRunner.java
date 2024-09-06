@@ -4,11 +4,12 @@ import gov.nist.csd.pm.pap.exception.PMException;
 
 public class TxRunner {
 
-    public static <T extends Transactional> void runTx(T t, Runner<T> runner) throws PMException {
+    public static <T extends Transactional> Object runTx(T t, Runner<T> runner) throws PMException {
         try {
             t.beginTx();
-            runner.run();
+            Object result = runner.run();
             t.commit();
+            return result;
         } catch (PMException e) {
             t.rollback();
             throw e;
@@ -17,7 +18,7 @@ public class TxRunner {
 
     @FunctionalInterface
     public interface Runner<T> {
-        void run() throws PMException;
+        Object run() throws PMException;
     }
 
 }

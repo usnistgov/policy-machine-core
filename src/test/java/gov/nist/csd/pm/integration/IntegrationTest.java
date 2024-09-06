@@ -6,7 +6,6 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pdp.OperationRequest;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.RoutineRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,7 +24,7 @@ class IntegrationTest {
                 create U "u1" in ["ua1"]
                 create OA "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
                 
                 operation op1(string name) {
                     check "assign" on "oa1"
@@ -49,6 +48,8 @@ class IntegrationTest {
         EPP epp = new EPP(pdp, pap);
         pdp.runTx(new UserContext("u1"), tx -> {
             tx.modify().graph().createPolicyClass("test2");
+
+            return null;
         });
 
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -63,7 +64,7 @@ class IntegrationTest {
                 create U "u1" in ["ua1"]
                 create OA "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
                 
                 routine op1(string name) {
                     if !nodeExists(name) {
@@ -87,6 +88,7 @@ class IntegrationTest {
         EPP epp = new EPP(pdp, pap);
         pdp.runTx(new UserContext("u1"), tx -> {
             tx.modify().graph().createPolicyClass("test2");
+            return null;
         });
 
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -127,9 +129,7 @@ class IntegrationTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(
-                new OperationRequest("op2", Map.of())
-        ));
+        pdp.adjudicateAdminOperation(new UserContext("u1"), "op2", Map.of());
 
         assertFalse(pap.query().graph().nodeExists("pc3"));
     }
@@ -165,7 +165,7 @@ class IntegrationTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of()));
+        pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of());
 
         assertFalse(pap.query().graph().nodeExists("pc3"));
     }

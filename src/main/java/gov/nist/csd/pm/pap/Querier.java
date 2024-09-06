@@ -9,8 +9,4 @@ public abstract class Querier {
     public Querier(PolicyStore store) {
         this.store = store;
     }
-
-    public Querier(Querier querier) {
-        this(querier.store);
-    }
 }

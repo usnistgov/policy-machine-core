@@ -32,7 +32,7 @@ class PrivilegeCheckerTest {
                             create oa "oa2" in ["pc1"]
 
                             associate "ua1" and "oa1" with ["read", "write"]
-                            associate "ua1" and ADMIN_POLICY_OBJECT with ["read"]
+                            associate "ua1" and PM_ADMIN_OBJECT with ["read"]
                       
                         create user "u1" in ["ua1"]
                         create user "u2" in ["ua2"]

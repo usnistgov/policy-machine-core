@@ -42,6 +42,7 @@ class CreateOperationStatementTest {
             tx.executePML(new UserContext("u1"), """
                 op1("o1", ["o2", "o3"])
                 """);
+            return null;
         });
         assertTrue(pap.query().graph().nodeExists("test"));
 
@@ -49,6 +50,7 @@ class CreateOperationStatementTest {
             tx.executePML(new UserContext("u2"), """
                 op1("o1", ["o2", "o3"])
                 """);
+            return null;
         }));
     }
 
@@ -79,6 +81,7 @@ class CreateOperationStatementTest {
             tx.executePML(new UserContext("u1"), """
                 op1("test1", ["o2", "o3"])
                 """);
+            return null;
         });
         assertTrue(pap.query().graph().nodeExists("test1"));
 
@@ -86,6 +89,7 @@ class CreateOperationStatementTest {
             tx.executePML(new UserContext("u2"), """
                 op1("test2", ["o2", "o3"])
                 """);
+            return null;
         });
         assertTrue(pap.query().graph().nodeExists("test2"));
     }

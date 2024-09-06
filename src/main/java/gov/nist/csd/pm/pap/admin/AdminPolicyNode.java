@@ -3,9 +3,9 @@ package gov.nist.csd.pm.pap.admin;
 public enum AdminPolicyNode {
 
     // Admin policy class
-    ADMIN_POLICY("PM_ADMIN"),
+    PM_ADMIN_PC("PM_ADMIN"),
     // Admin policy object attribute
-    ADMIN_POLICY_OBJECT("PM_ADMIN:object");
+    PM_ADMIN_OBJECT("PM_ADMIN:object");
 
     private final String value;
 
@@ -16,10 +16,10 @@ public enum AdminPolicyNode {
     public static AdminPolicyNode fromNodeName(String ascendant) {
         switch (ascendant) {
             case "PM_ADMIN" -> {
-                return ADMIN_POLICY;
+                return PM_ADMIN_PC;
             }
             case "PM_ADMIN:object" -> {
-                return ADMIN_POLICY_OBJECT;
+                return PM_ADMIN_OBJECT;
             }
         }
 

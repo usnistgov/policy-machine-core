@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.pap.pml.executable.operation;
 
-import gov.nist.csd.pm.pap.pml.statement.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.statement.operation.CheckStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
@@ -15,13 +13,12 @@ class PMLStmtsOperationSignatureTest {
 
     @Test
     void testToFormattedString() {
-        PMLStmtsOperationSignature pmlStmtsOperationSignature = new PMLStmtsOperationSignature(
+        PMLOperationSignature pmlStmtsOperationSignature = new PMLOperationSignature(
                 "op1",
                 Type.string(),
                 List.of("a", "b", "c"),
                 List.of("a"),
-                Map.of("a", Type.array(Type.string()), "b", Type.string(), "c", Type.string()),
-                new PMLStatementBlock()
+                Map.of("a", Type.array(Type.string()), "b", Type.string(), "c", Type.string())
         );
 
         assertEquals(

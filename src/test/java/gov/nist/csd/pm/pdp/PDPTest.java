@@ -48,7 +48,10 @@ class PDPTest {
                 PMException.class,
                 () -> pdp.runTx(
                         new UserContext("u1"),
-                        policy -> policy.modify().graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT_ATTRIBUTE))
+                        policy -> {
+	                        policy.modify().graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT_ATTRIBUTE));
+                            return null;
+                        }
                 )
         );
         assertEquals("[user=u1] does not have access right [associate] on [ua1]", e.getMessage());
@@ -113,13 +116,14 @@ class PDPTest {
         pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
         pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
         pap.modify().graph().createUser("u1", List.of("ua1"));
-        pap.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*"));
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
 
         assertThrows(NodeNameExistsException.class, () -> {
             pdp.runTx(new UserContext("u1"), policy -> {
                 policy.modify().graph().createPolicyClass("pc2");
                 // expect error and rollback
                 policy.modify().graph().createObjectAttribute("oa1", List.of("pc2"));
+                return null;
             });
         });
 
@@ -190,10 +194,11 @@ class PDPTest {
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 
-                operation op1() {
+                operation op1() string {
                     check "assign_to" on "oa2"
                 } {
                     create pc "test"
+                    return "test"
                 }
                 """);
 
@@ -201,18 +206,19 @@ class PDPTest {
         pdp.setExplain(true);
 
         // builtin operation
-        AdminAdjudicationResponse resp = pdp.adjudicateAdminOperations(
+        AdminAdjudicationResponse resp = pdp.adjudicateAdminOperation(
                 new UserContext("u1"),
-                List.of(new OperationRequest("assign", Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa2"))))
+                "assign", Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa2"))
         );
         assertEquals(GRANT, resp.getDecision());
 
         // custom operation
-        resp = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1", Map.of())));
+        resp = pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of());
         assertEquals(GRANT, resp.getDecision());
+        assertEquals("test", resp.getValue());
 
         // denied
-        resp = pdp.adjudicateAdminOperations(new UserContext("u2"), List.of(new OperationRequest("op1", Map.of())));
+        resp = pdp.adjudicateAdminOperation(new UserContext("u2"), "op1", Map.of());
         assertEquals(Decision.DENY, resp.getDecision());
         assertEquals(new Explain(
                 new AccessRightSet(),
@@ -246,7 +252,7 @@ class PDPTest {
                 """);
         PDP pdp = new PDP(pap);
         assertThrows(OperationDoesNotExistException.class,
-                () -> pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1", Map.of()))));
+                () -> pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of()));
         assertThrows(NodeDoesNotExistException.class,
                 () -> pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read"));
         assertThrows(OperationDoesNotExistException.class,
@@ -261,33 +267,36 @@ class PDPTest {
         pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
         pap.modify().graph().createUser("u1", List.of("ua1"));
         pap.modify().graph().createUser("u2", List.of("ua2"));
-        pap.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*"));
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
 
-        pap.modify().routines().createAdminRoutine(new Routine<Void>("routine1", List.of("a")) {
+        pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of("a")) {
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public String execute(PAP pap, Map<String, Object> operands) throws PMException {
                 pap.modify().graph().createPolicyClass((String) operands.get("a"));
-                return null;
+                return "test1";
             }
         });
         pap.executePML(new UserContext("u1"), """
-                routine routine2() {
+                routine routine2() map[string]string {
                     create policy class "test2"
+                    return {"test2": "test2"}
                 }
                 """);
 
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
 
-        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of("a", "test")));
+        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of("a", "test"));
         assertEquals(GRANT, response.getDecision());
-        response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine2", Map.of()));
+        assertEquals("test1", response.getValue());
+        response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine2", Map.of());
         assertEquals(GRANT, response.getDecision());
+        assertEquals(Map.of("test2", "test2"), response.getValue());
 
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));
 
-        response = pdp.adjudicateAdminRoutine(new UserContext("u2"), new RoutineRequest("routine1", Map.of("a", "test3")));
+        response = pdp.adjudicateAdminRoutine(new UserContext("u2"), "routine1", Map.of("a", "test3"));
         assertEquals(DENY, response.getDecision());
         assertEquals(new Explain(
                 new AccessRightSet(),
@@ -297,7 +306,7 @@ class PDPTest {
                                 new AccessRightSet(),
                                 List.of(
                                         List.of(
-                                                new ExplainNode(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), List.of(
+                                                new ExplainNode(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), List.of(
                                                         new ExplainAssociation("ua1", new AccessRightSet("*"), List.of())
                                                 )),
                                                 new ExplainNode("PM_ADMIN", List.of())
@@ -331,7 +340,7 @@ class PDPTest {
         pap.executePML(new UserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), new RoutineRequest("routine1", Map.of()));
+        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of());
         assertEquals(DENY, response.getDecision());
     }
 
@@ -356,6 +365,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext("u1"), tx -> {
             tx.executePML(new UserContext("u1"), "r1()");
+            return null;
         }));
         assertFalse(pap.query().graph().nodeExists("o1"));
         assertFalse(pap.query().graph().nodeExists("o2"));
@@ -371,7 +381,7 @@ class PDPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 associate "ua1" and "oa1" with ["create_object"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -394,8 +404,51 @@ class PDPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1", Map.of())));
+        pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of());
         assertFalse(pap.query().graph().nodeExists("test"));
+    }
+
+    @Test
+    void testAdjudicateRoutineListOfOperations() throws PMException {
+        MemoryPAP pap = new MemoryPAP();
+        pap.executePML(new UserContext("u1"), """
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc1"]
+                
+                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class", "create_object_attribute"]
+                
+                create u "u1" in ["ua1"]
+                
+                operation op1(string name) {
+                    create pc name
+                }
+                
+                create obligation "obl1" {
+                    create rule "rule1"
+                    when any user
+                    performs "op1"
+                    do(ctx) {
+                        create oa "oa_" + ctx.operands.name in [ctx.operands.name]
+                    }
+                }
+                """);
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+
+        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), List.of(
+                new OperationRequest("op1", Map.of("name", "pc2")),
+                new OperationRequest("op1", Map.of("name", "pc3"))
+        ));
+
+        assertNull(response.getValue());
+
+        assertTrue(pap.query().graph().nodeExists("pc2"));
+        assertTrue(pap.query().graph().nodeExists("pc3"));
+        assertTrue(pap.query().graph().nodeExists("oa_pc3"));
+        assertTrue(pap.query().graph().nodeExists("oa_pc3"));
     }
 
     @Test
@@ -412,7 +465,7 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("create_policy_class", Map.of(NAME_OPERAND, "test"))));
+        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), "create_policy_class", Map.of(NAME_OPERAND, "test"));
         assertEquals(response.getDecision(), DENY);
         assertNull(response.getExplain());
     }

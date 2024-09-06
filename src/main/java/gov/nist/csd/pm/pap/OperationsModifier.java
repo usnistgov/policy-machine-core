@@ -19,11 +19,6 @@ public class OperationsModifier extends Modifier implements OperationsModificati
         AdminOperations.init(store.operations());
     }
 
-    public OperationsModifier(Modifier modifier) throws PMException {
-        super(modifier);
-        AdminOperations.init(store.operations());
-    }
-
     @Override
     public void setResourceOperations(AccessRightSet resourceOperations) throws PMException {
         checkSetResourceAccessRightsInput(resourceOperations);

@@ -81,15 +81,15 @@ public abstract class PAPTest extends PAPTestInitializer {
     }
 
     public static void testAdminPolicy(PAP pap, int numExpectedPolicyClasses) throws PMException {
-        assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.ADMIN_POLICY.nodeName()));
-        Collection<String> ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.ADMIN_POLICY.nodeName());
+        assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_PC.nodeName()));
+        Collection<String> ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.PM_ADMIN_PC.nodeName());
         assertEquals(1, ascendants.size());
-        assertTrue(ascendants.contains(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName()));
+        assertTrue(ascendants.contains(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName()));
 
-        assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName()));
-        Collection<String> descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName());
+        assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName()));
+        Collection<String> descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName());
         assertEquals(1, descendants.size());
-        assertTrue(descendants.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()));
+        assertTrue(descendants.contains(AdminPolicyNode.PM_ADMIN_PC.nodeName()));
     }
 
     @Test
@@ -100,13 +100,13 @@ public abstract class PAPTest extends PAPTestInitializer {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
                 associate "ua1" and "ua2" with ["assign"]
                 
                 operation op1(nodeop string a) {
                     check "assign" on a
                 } {
-                    if a == ADMIN_POLICY_OBJECT {
+                    if a == PM_ADMIN_OBJECT {
                         op1("ua2")
                     }
                     
@@ -116,7 +116,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         MemoryPAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), pml);
 
-        pap.executePML(new UserContext("u1"), "op1(ADMIN_POLICY_OBJECT)");
+        pap.executePML(new UserContext("u1"), "op1(PM_ADMIN_OBJECT)");
         assertTrue(pap.query().graph().nodeExists("ua2_PC"));
         assertTrue(pap.query().graph().nodeExists("PM_ADMIN:object_PC"));
     }

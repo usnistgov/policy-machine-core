@@ -52,7 +52,7 @@ public abstract class ObligationOp extends Operation<Void> {
     static void checkPatternPrivileges(PrivilegeChecker privilegeChecker, UserContext userCtx, Pattern pattern, String toCheck) throws PMException {
         ReferencedNodes referencedNodes = pattern.getReferencedNodes();
         if (referencedNodes.isAny()) {
-            privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), toCheck);
+            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), toCheck);
 
             return;
         }

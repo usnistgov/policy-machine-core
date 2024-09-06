@@ -9,7 +9,4 @@ public abstract class AccessQuerier extends Querier implements AccessQuery {
         super(store);
     }
 
-    public AccessQuerier(Querier querier) {
-        super(querier);
-    }
 }

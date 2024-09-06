@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.serialization.json;
 
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
@@ -136,7 +135,7 @@ public class JSONSerializer implements PolicySerializer {
 
     private boolean isUnmodifiedAdminNodeOrTarget(PolicyQuery policyQuery, String node) throws PMException {
         Collection<String> descendants = policyQuery.graph().getAdjacentDescendants(node);
-        return descendants.contains(AdminPolicyNode.ADMIN_POLICY.nodeName()) && descendants.size() == 1;
+        return descendants.contains(AdminPolicyNode.PM_ADMIN_PC.nodeName()) && descendants.size() == 1;
     }
 
     private List<JSONNode> buildUserAttributes(PolicyQuery policyQuery) throws PMException {

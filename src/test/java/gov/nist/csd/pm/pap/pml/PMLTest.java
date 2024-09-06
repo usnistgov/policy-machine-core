@@ -9,7 +9,6 @@ import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.AdminAdjudicationResponse;
-import gov.nist.csd.pm.pdp.OperationRequest;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.Test;
@@ -31,18 +30,18 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
                 
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of [ADMIN_POLICY_OBJECT]
+                on union of [PM_ADMIN_OBJECT]
                 """);
 
         Operation<?> op1 = new Operation<>("op1", List.of("a", "b", "c")) {
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), "assign");
+                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), "assign");
             }
 
             @Override
@@ -116,22 +115,22 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and ADMIN_POLICY_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
                 
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of [ADMIN_POLICY_OBJECT]
+                on union of [PM_ADMIN_OBJECT]
                 
                 operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on ADMIN_POLICY_OBJECT
+                    check "assign" on PM_ADMIN_OBJECT
                 } {
                     create pc "1" + a
-                    
+                
                     foreach x in b {
                         create pc "1" + x
                     }
-                    
+                
                     foreach x, y in c {
                         create pc "1" + x
                         create pc "1" + y
@@ -144,8 +143,8 @@ public class PMLTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1",
-                Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")))));
+        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), 
+                "op1", Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")));
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("1a"));
         assertTrue(pap.query().graph().nodeExists("1b"));
@@ -156,12 +155,12 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1g"));
 
 
-        response = pdp.adjudicateAdminOperations(new UserContext("u2"), List.of(new OperationRequest("op1",
-                Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")))));
+        response = pdp.adjudicateAdminOperation(new UserContext("u2"), "op1",
+                Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")));
         assertEquals(DENY, response.getDecision());
 
-        response = pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1",
-                Map.of("a", "1", "b", List.of("2", "3"), "c", Map.of("4", "5", "6", "7")))));
+        response = pdp.adjudicateAdminOperation(new UserContext("u1"), "op1",
+                Map.of("a", "1", "b", List.of("2", "3"), "c", Map.of("4", "5", "6", "7")));
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("11"));
         assertTrue(pap.query().graph().nodeExists("12"));
@@ -171,9 +170,8 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        response = pdp.adjudicateAdminOperations(new UserContext("u2"), List.of(new OperationRequest("op1",
-                Map.of("a", "1", "b", List.of("2", "3"), "c", Map.of("4", "5", "6", "7")))));
+        response = pdp.adjudicateAdminOperation(new UserContext("u2"), "op1",
+                Map.of("a", "1", "b", List.of("2", "3"), "c", Map.of("4", "5", "6", "7")));
         assertEquals(DENY, response.getDecision());
     }
-
 }
