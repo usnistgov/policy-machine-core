@@ -35,10 +35,6 @@ public class GraphModifier extends Modifier implements GraphModification {
         super(store);
     }
 
-    public GraphModifier(Modifier modifier) {
-        super(modifier);
-    }
-
     @Override
     public String createPolicyClass(String name) throws PMException {
         if (!checkCreatePolicyClassInput(name)) {
@@ -162,7 +158,7 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkCreatePolicyClassInput(String name) throws PMException {
-        if (name.equals(AdminPolicyNode.ADMIN_POLICY.nodeName())) {
+        if (name.equals(AdminPolicyNode.PM_ADMIN_PC.nodeName())) {
             return false;
         } else if (store.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
@@ -181,7 +177,7 @@ public class GraphModifier extends Modifier implements GraphModification {
      * assignment.
      */
     protected boolean checkCreateNodeInput(String name, NodeType type, Collection<String> descendants) throws PMException {
-        if (name.equals(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName())) {
+        if (name.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName())) {
             return false;
         } else if (store.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
@@ -373,8 +369,8 @@ public class GraphModifier extends Modifier implements GraphModification {
                 throw new NodeDoesNotExistException(ascendant);
             } else if (!store.graph().nodeExists(descendant)) {
                 throw new NodeDoesNotExistException(descendant);
-            } else if (ascendant.equals(AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName()) &&
-                    descendant.equals(AdminPolicyNode.ADMIN_POLICY.nodeName())) {
+            } else if (ascendant.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName()) &&
+                    descendant.equals(AdminPolicyNode.PM_ADMIN_PC.nodeName())) {
                 throw new CannotDeleteAdminPolicyConfigException();
             }
 

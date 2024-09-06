@@ -5,6 +5,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.statement.operation.*;
@@ -28,13 +29,15 @@ class FunctionDefinitionStatementTest {
                 List.of("a", "b", "c"),
                 List.of("a"),
                 Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
-                new PMLStatementBlock(
-                    new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
-                    new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
-                ),
-                new PMLStatementBlock(
-                        List.of(
-                                new FunctionReturnStatement(new StringLiteral("test"))
+                new PMLStmtsOperationBody(
+                        new PMLStatementBlock(
+                                new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
+                                new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
+                        ),
+                        new PMLStatementBlock(
+                                List.of(
+                                        new FunctionReturnStatement(new StringLiteral("test"))
+                                )
                         )
                 )
         ));
@@ -95,13 +98,15 @@ class FunctionDefinitionStatementTest {
                 List.of("a", "b", "c"),
                 List.of("a"),
                 Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
-                new PMLStatementBlock(
-                        new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
-                        new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
-                ),
-                new PMLStatementBlock(
-                        List.of(
-                                new FunctionReturnStatement()
+                new PMLStmtsOperationBody(
+                        new PMLStatementBlock(
+                                new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
+                                new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
+                        ),
+                        new PMLStatementBlock(
+                                List.of(
+                                        new FunctionReturnStatement()
+                                )
                         )
                 )
         ));

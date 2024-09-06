@@ -5,6 +5,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateFunctionStatement;
 import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.IfStatement;
@@ -38,7 +39,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
 
         try {
             boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
-            return new Result(allPathsReturned, stmts);
+            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
         } catch (PMException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
@@ -106,7 +107,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         return checkAllPathsReturned(visitorCtx, ifStatement.getElseBlock().getStmts(), returnType);
     }
 
-    public record Result(boolean allPathsReturned, List<PMLStatement> stmts) {
+    public record Result(boolean allPathsReturned, PMLStatementBlock stmts) {
 
     }
 }

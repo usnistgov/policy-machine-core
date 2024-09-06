@@ -55,7 +55,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
 
         // check user has access to subject
         if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-            privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), GET_PROCESS_PROHIBITIONS);
+            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), GET_PROCESS_PROHIBITIONS);
         } else {
             privilegeChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);
         }
@@ -89,7 +89,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
             try {
                 // check user has access to subject prohibitions
                 if (prohibition.getSubject().getType() == ProhibitionSubject.Type.PROCESS) {
-                    privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(),
+                    privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(),
                             GET_PROCESS_PROHIBITIONS);
                 } else {
                     privilegeChecker.check(userCtx, prohibition.getSubject().getName(), GET_PROHIBITIONS);

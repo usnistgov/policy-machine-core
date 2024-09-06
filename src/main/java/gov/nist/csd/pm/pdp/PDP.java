@@ -6,10 +6,13 @@ import gov.nist.csd.pm.epp.EventEmitter;
 import gov.nist.csd.pm.epp.EventProcessor;
 import gov.nist.csd.pm.pap.*;
 import gov.nist.csd.pm.pap.exception.OperationDoesNotExistException;
+import gov.nist.csd.pm.pap.op.AdminOperations;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.pap.exception.PMException;
@@ -18,6 +21,7 @@ import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 import static gov.nist.csd.pm.pap.graph.node.NodeType.ANY;
@@ -47,15 +51,18 @@ public class PDP implements EventEmitter, AccessAdjudication {
         return privilegeChecker.isExplain();
     }
 
-    public void runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
-        TxRunner.runTx(pap, () -> {
+    public Object runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
+        return TxRunner.runTx(pap, () -> {
             PDPTx pdpTx = new PDPTx(userCtx, privilegeChecker, pap, eventProcessors);
-            txRunner.run(pdpTx);
+            return txRunner.run(pdpTx);
         });
     }
 
     public void executePML(UserContext userCtx, String pml) throws PMException {
-        runTx(userCtx, tx -> tx.executePML(userCtx, pml));
+        runTx(userCtx, tx -> {
+            tx.executePML(userCtx, pml);
+            return null;
+        });
     }
 
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
@@ -71,10 +78,15 @@ public class PDP implements EventEmitter, AccessAdjudication {
 
         boolean prohibitionsEmpty = pap.query().prohibitions().getProhibitions().isEmpty();
         boolean obligationsEmpty = pap.query().obligations().getObligations().isEmpty();
+        boolean resOpsEmpty = pap.query().operations().getResourceOperations().isEmpty();
+
+        Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
+        boolean adminOpsEmpty = adminOperationNames.size() == AdminOperations.ADMIN_OP_NAMES.size()
+                && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
+        boolean routinesEmpty = pap.query().routines().getAdminRoutineNames().isEmpty();
 
         return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODE_NAMES))) &&
-                prohibitionsEmpty &&
-                obligationsEmpty;
+                prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
     }
 
     @Override
@@ -119,56 +131,88 @@ public class PDP implements EventEmitter, AccessAdjudication {
         return new ResourceAdjudicationResponse(node);
     }
 
-    @Override
-    public AdminAdjudicationResponse adjudicateAdminOperations(UserContext user, List<OperationRequest> requests) throws PMException {
-        try {
-            runTx(user, tx -> {
-                PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
+    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
+        Operation<?> operation = pap.query()
+                .operations()
+                .getAdminOperation(name);
 
-                for (OperationRequest request : requests) {
-                    Operation<?> operation = pap.query()
-                            .operations()
-                            .getAdminOperation(request.name());
-
-                    if (operation instanceof PMLOperation) {
-                        ((PMLOperation)operation).setCtx(ctx);
-                    }
-
-                    tx.executeAdminExecutable(operation, request.operands());
-
-                    emitEvent(new EventContext(
-                            user.getUser(),
-                            user.getProcess(),
-                            operation.getName(),
-                            request.operands(),
-                            operation.getNodeOperands()
-                    ));
-                }
-            });
-        } catch(UnauthorizedException e){
-            return new AdminAdjudicationResponse(e);
+        if (operation instanceof PMLOperation) {
+            ((PMLOperation)operation).setCtx(ctx);
         }
 
-        return new AdminAdjudicationResponse(Decision.GRANT);
+        Object ret = pdpTx.executeAdminExecutable(operation, operands);
+
+        emitEvent(new EventContext(
+                user.getUser(),
+                user.getProcess(),
+                operation.getName(),
+                operands,
+                operation.getNodeOperands()
+        ));
+
+        if (ret instanceof Value value) {
+            return value.toObject();
+        }
+
+        return ret;
     }
 
     @Override
-    public AdminAdjudicationResponse adjudicateAdminRoutine(UserContext user, RoutineRequest request) throws PMException {
-        Routine<?> adminRoutine = pap.query().routines().getAdminRoutine(request.name());
+    public AdminAdjudicationResponse adjudicateAdminOperation(UserContext user, String name, Map<String, Object> operands) throws PMException {
         try {
-            runTx(user, tx -> {
+            Object returnValue = runTx(user, tx -> {
+                PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
+
+                return executeOperation(user, ctx, tx, name, operands);
+            });
+
+            return new AdminAdjudicationResponse(Decision.GRANT, returnValue);
+        } catch(UnauthorizedException e){
+            return new AdminAdjudicationResponse(e);
+        }
+    }
+
+    @Override
+    public AdminAdjudicationResponse adjudicateAdminRoutine(UserContext user, String name, Map<String, Object> operands) throws PMException {
+        Routine<?> adminRoutine = pap.query().routines().getAdminRoutine(name);
+        try {
+            Object returnValue = runTx(user, tx -> {
                 PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
 
                 if (adminRoutine instanceof PMLRoutine) {
                     ((PMLRoutine) adminRoutine).setCtx(ctx);
                 }
 
-                tx.executeAdminExecutable(adminRoutine, request.operands());
+                Object o = tx.executeAdminExecutable(adminRoutine, operands);
+                if (o instanceof Value value) {
+                    return value.toObject();
+                }
+
+                return o;
             });
+
+            return new AdminAdjudicationResponse(Decision.GRANT, returnValue);
         } catch (UnauthorizedException e) {
             return new AdminAdjudicationResponse(e);
         }
+    }
 
-        return new AdminAdjudicationResponse(Decision.GRANT);
+    @Override
+    public AdminAdjudicationResponse adjudicateAdminRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
+        try {
+            runTx(user, tx -> {
+                PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
+
+                for (OperationRequest request : operationRequests) {
+                   executeOperation(user, ctx, tx, request.name(), request.operands());
+                }
+
+                return null;
+            });
+
+            return new AdminAdjudicationResponse(Decision.GRANT);
+        } catch(UnauthorizedException e){
+            return new AdminAdjudicationResponse(e);
+        }
     }
 }

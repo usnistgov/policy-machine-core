@@ -24,10 +24,6 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
         this.graphQuerier = graphQuerier;
     }
 
-    public ProhibitionsQuerier(Querier querier) {
-        super(querier);
-    }
-
     @Override
     public Map<String, Collection<Prohibition>> getProhibitions() throws PMException {
         return store.prohibitions().getProhibitions();

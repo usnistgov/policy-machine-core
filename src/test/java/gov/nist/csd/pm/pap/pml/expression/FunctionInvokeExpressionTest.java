@@ -4,6 +4,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
@@ -36,11 +37,12 @@ class FunctionInvokeExpressionTest {
             List.of("a", "b"),
             List.of(),
             Map.of("a", Type.string(), "b", Type.string()),
+            new PMLStmtsOperationBody(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                             new CreatePolicyStatement(new ReferenceByID("a")),
                             new CreatePolicyStatement(new ReferenceByID("b"))
-            )));
+            ))));
     static PMLStmtsOperation stringFunc = new PMLStmtsOperation("stringFunc",
             Type.string(),
             List.of("a", "b"),
@@ -49,11 +51,12 @@ class FunctionInvokeExpressionTest {
                     "a", Type.string(),
                     "b", Type.string()
             ),
+            new PMLStmtsOperationBody(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                     new VariableAssignmentStatement("x", false, new StringLiteral("test")),
                     new FunctionReturnStatement(new StringLiteral("test_ret"))
-            )));
+            ))));
 
     static {
         scope.addExecutable(voidFunc.getName(), voidFunc.getSignature());

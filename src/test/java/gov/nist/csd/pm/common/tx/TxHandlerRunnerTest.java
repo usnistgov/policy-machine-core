@@ -16,6 +16,7 @@ class TxHandlerRunnerTest {
 
         runTx(pap, () -> {
             pap.modify().graph().createPolicyClass("pc1");
+            return null;
         });
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
@@ -25,6 +26,7 @@ class TxHandlerRunnerTest {
             pap.modify().graph().createPolicyClass("pc2");
             // expect error and rollback
             pap.modify().graph().createPolicyClass("pc2");
+            return null;
         }));
 
         assertTrue(pap.query().graph().nodeExists("pc1"));

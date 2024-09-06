@@ -86,6 +86,10 @@ public abstract class Value implements Serializable {
             }
 
             return map;
+        } else if (type.isVoid()){
+            return null;
+        } else if (type.isPattern()) {
+            return getPatternValue();
         }
 
         throw new PMRuntimeException("cannot convert value of type " + type + " to an object");

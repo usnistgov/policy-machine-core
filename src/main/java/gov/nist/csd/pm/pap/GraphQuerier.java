@@ -17,10 +17,6 @@ public class GraphQuerier extends Querier implements GraphQuery {
         super(store);
     }
 
-    public GraphQuerier(Querier querier) {
-        this(querier.store);
-    }
-
     @Override
     public Node getNode(String name) throws PMException {
         checkNodeExists(name);

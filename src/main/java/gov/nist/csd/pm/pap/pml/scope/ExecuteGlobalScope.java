@@ -27,8 +27,8 @@ public class ExecuteGlobalScope extends GlobalScope<Value, AdminExecutable<?>> {
         // buitin variables
         Map<String, Value> builtinConstants = new HashMap<>();
 
-        builtinConstants.put(ADMIN_POLICY.constantName(), new StringValue(ADMIN_POLICY.nodeName()));
-        builtinConstants.put(ADMIN_POLICY_OBJECT.constantName(), new StringValue(ADMIN_POLICY_OBJECT.nodeName()));
+        builtinConstants.put(PM_ADMIN_PC.constantName(), new StringValue(PM_ADMIN_PC.nodeName()));
+        builtinConstants.put(PM_ADMIN_OBJECT.constantName(), new StringValue(PM_ADMIN_OBJECT.nodeName()));
 
         addConstants(builtinConstants);
 

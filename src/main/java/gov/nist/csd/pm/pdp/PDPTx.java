@@ -63,50 +63,50 @@ public class PDPTx extends PAP {
 
     @Override
     public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_OPS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_OPS);
 
         super.setPMLOperations(pmlOperations);
     }
 
     @Override
     public void setPMLOperations(PMLOperation... operations) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_OPS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_OPS);
         super.setPMLOperations(operations);
     }
 
     @Override
     public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_ROUTINES);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_ROUTINES);
         super.setPMLRoutines(pmlRoutines);
     }
 
     @Override
     public void setPMLRoutines(PMLRoutine... routines) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_ROUTINES);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_ROUTINES);
         super.setPMLRoutines(routines);
     }
 
     @Override
     public Map<String, PMLOperation> getPMLOperations() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), REVIEW_POLICY);
         return super.getPMLOperations();
     }
 
     @Override
     public Map<String, PMLRoutine> getPMLRoutines() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), REVIEW_POLICY);
         return super.getPMLRoutines();
     }
 
     @Override
     public void setPMLConstants(Map<String, Value> pmlConstants) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SET_PML_CONSTANTS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_CONSTANTS);
         super.setPMLConstants(pmlConstants);
     }
 
     @Override
     public Map<String, Value> getPMLConstants() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), REVIEW_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), REVIEW_POLICY);
         return super.getPMLConstants();
     }
 
@@ -124,14 +124,14 @@ public class PDPTx extends PAP {
 
     @Override
     public void reset() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), RESET);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), RESET);
 
         pap.reset();
     }
 
     @Override
     public String serialize(PolicySerializer serializer) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), SERIALIZE_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SERIALIZE_POLICY);
 
         return pap.serialize(serializer);
     }
@@ -139,7 +139,7 @@ public class PDPTx extends PAP {
     @Override
     public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
             throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), DESERIALIZE_POLICY);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), DESERIALIZE_POLICY);
 
         pap.deserialize(author, input, policyDeserializer);
     }

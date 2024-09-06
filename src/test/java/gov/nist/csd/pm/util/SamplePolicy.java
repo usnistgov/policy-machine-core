@@ -21,7 +21,7 @@ public class SamplePolicy {
         pap.modify().graph().createPolicyClass("test_pc");
         pap.modify().graph().createUserAttribute("ua1", Collections.singleton("test_pc"));
         pap.modify().graph().createUser("u1", Collections.singleton("ua1"));
-        pap.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*"));
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
 
         pap.deserialize(new UserContext("u1"), s, new PMLDeserializer());
     }
@@ -31,7 +31,7 @@ public class SamplePolicy {
         pap.modify().graph().createPolicyClass("test_pc");
         pap.modify().graph().createUserAttribute("ua1", Collections.singleton("test_pc"));
         pap.modify().graph().createUser("u1", Collections.singleton("ua1"));
-        pap.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet("*"));
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
 
         pap.deserialize(new UserContext("u1"), s, new JSONDeserializer());
     }

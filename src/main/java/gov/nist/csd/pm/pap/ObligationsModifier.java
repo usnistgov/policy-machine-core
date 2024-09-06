@@ -17,10 +17,6 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
         super(store);
     }
 
-    public ObligationsModifier(Modifier modifier) {
-        super(modifier);
-    }
-
     @Override
     public void createObligation(String author, String name, List<Rule> rules) throws PMException {
         checkCreateInput(author, name, rules);

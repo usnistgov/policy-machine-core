@@ -28,7 +28,7 @@ class PrivilegeCheckerTest {
         pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
 
         pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
-        pap.modify().graph().associate("ua1", AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), new AccessRightSet(
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet(
                 AdminAccessRights.ASSIGN_TO));
 
         pap.modify().graph().createUser("u1", List.of("ua1"));

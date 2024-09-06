@@ -16,10 +16,6 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
         super(store);
     }
 
-    public ObligationsQuerier(Querier querier) {
-        super(querier);
-    }
-
     @Override
     public Obligation getObligation(String name) throws PMException {
         if (!obligationExists(name)) {

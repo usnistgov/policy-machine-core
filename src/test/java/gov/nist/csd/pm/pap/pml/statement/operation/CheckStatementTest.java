@@ -8,10 +8,12 @@ import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -87,6 +89,35 @@ class CheckStatementTest {
         } else {
             assertDoesNotThrow(() -> checkStatement.execute(ctx, pap));
         }
+    }
+
+    @Test
+    void testOperationInCheck() throws PMException {
+        String pml = """
+                operation testOp() string {
+                    return PM_ADMIN_OBJECT
+                }
+                
+                operation op1() {
+                    check "assign" on testOp()
+                } {
+                    create policy class "pc2"
+                }
+                
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                               
+                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                
+                create u "u1" in ["ua1"]                
+                """;
+        PAP pap = new MemoryPAP();
+        pap.executePML(new UserContext("u1"), pml);
+
+        PDP pdp = new PDP(pap);
+        pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of());
+
+        assertTrue(pap.query().graph().nodeExists("pc2"));
     }
 
 }

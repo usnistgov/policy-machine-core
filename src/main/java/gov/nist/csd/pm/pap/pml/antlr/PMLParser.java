@@ -3145,6 +3145,9 @@ public class PMLParser extends Parser {
 		public StatementBlockContext statementBlock() {
 			return getRuleContext(StatementBlockContext.class,0);
 		}
+		public CheckStatementBlockContext checkStatementBlock() {
+			return getRuleContext(CheckStatementBlockContext.class,0);
+		}
 		public FunctionDefinitionStatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3172,7 +3175,17 @@ public class PMLParser extends Parser {
 			{
 			setState(409);
 			functionSignature();
-			setState(410);
+			setState(411);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,24,_ctx) ) {
+			case 1:
+				{
+				setState(410);
+				checkStatementBlock();
+				}
+				break;
+			}
+			setState(413);
 			statementBlock();
 			}
 		}
@@ -3198,9 +3211,6 @@ public class PMLParser extends Parser {
 		public TerminalNode CLOSE_PAREN() { return getToken(PMLParser.CLOSE_PAREN, 0); }
 		public TerminalNode ROUTINE() { return getToken(PMLParser.ROUTINE, 0); }
 		public TerminalNode OPERATION() { return getToken(PMLParser.OPERATION, 0); }
-		public CheckStatementBlockContext checkStatementBlock() {
-			return getRuleContext(CheckStatementBlockContext.class,0);
-		}
 		public VariableTypeContext variableType() {
 			return getRuleContext(VariableTypeContext.class,0);
 		}
@@ -3230,7 +3240,7 @@ public class PMLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(412);
+			setState(415);
 			_la = _input.LA(1);
 			if ( !(_la==OPERATION || _la==ROUTINE) ) {
 			_errHandler.recoverInline(this);
@@ -3240,34 +3250,24 @@ public class PMLParser extends Parser {
 				_errHandler.reportMatch(this);
 				consume();
 			}
-			setState(413);
-			match(ID);
-			setState(414);
-			match(OPEN_PAREN);
-			setState(415);
-			formalArgList();
 			setState(416);
-			match(CLOSE_PAREN);
+			match(ID);
+			setState(417);
+			match(OPEN_PAREN);
 			setState(418);
+			formalArgList();
+			setState(419);
+			match(CLOSE_PAREN);
+			setState(421);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (((((_la - 16)) & ~0x3f) == 0 && ((1L << (_la - 16)) & 9013800619474945L) != 0)) {
 				{
-				setState(417);
+				setState(420);
 				((FunctionSignatureContext)_localctx).returnType = variableType();
 				}
 			}
 
-			setState(421);
-			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,25,_ctx) ) {
-			case 1:
-				{
-				setState(420);
-				checkStatementBlock();
-				}
-				break;
-			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -5787,8 +5787,8 @@ public class PMLParser extends Parser {
 		"\u001f\u0001\u001f\u0005\u001f\u0182\b\u001f\n\u001f\f\u001f\u0185\t\u001f"+
 		"\u0001\u001f\u0003\u001f\u0188\b\u001f\u0001\u001f\u0001\u001f\u0001\u001f"+
 		"\u0003\u001f\u018d\b\u001f\u0001 \u0001 \u0001 \u0001 \u0001!\u0001!\u0003"+
-		"!\u0195\b!\u0001!\u0001!\u0001!\u0001\"\u0001\"\u0001\"\u0001#\u0001#"+
-		"\u0001#\u0001#\u0001#\u0001#\u0003#\u01a3\b#\u0001#\u0003#\u01a6\b#\u0001"+
+		"!\u0195\b!\u0001!\u0001!\u0001!\u0001\"\u0001\"\u0003\"\u019c\b\"\u0001"+
+		"\"\u0001\"\u0001#\u0001#\u0001#\u0001#\u0001#\u0001#\u0003#\u01a6\b#\u0001"+
 		"$\u0001$\u0001$\u0005$\u01ab\b$\n$\f$\u01ae\t$\u0003$\u01b0\b$\u0001%"+
 		"\u0003%\u01b3\b%\u0001%\u0001%\u0001%\u0001&\u0001&\u0003&\u01ba\b&\u0001"+
 		"\'\u0001\'\u0001\'\u0001\'\u0001\'\u0001(\u0001(\u0005(\u01c3\b(\n(\f"+
@@ -5830,7 +5830,7 @@ public class PMLParser extends Parser {
 		"6\u016b\u0001\u0000\u0000\u00008\u0172\u0001\u0000\u0000\u0000:\u0174"+
 		"\u0001\u0000\u0000\u0000<\u0176\u0001\u0000\u0000\u0000>\u018c\u0001\u0000"+
 		"\u0000\u0000@\u018e\u0001\u0000\u0000\u0000B\u0192\u0001\u0000\u0000\u0000"+
-		"D\u0199\u0001\u0000\u0000\u0000F\u019c\u0001\u0000\u0000\u0000H\u01af"+
+		"D\u0199\u0001\u0000\u0000\u0000F\u019f\u0001\u0000\u0000\u0000H\u01af"+
 		"\u0001\u0000\u0000\u0000J\u01b2\u0001\u0000\u0000\u0000L\u01b7\u0001\u0000"+
 		"\u0000\u0000N\u01bb\u0001\u0000\u0000\u0000P\u01c0\u0001\u0000\u0000\u0000"+
 		"R\u01c9\u0001\u0000\u0000\u0000T\u01d6\u0001\u0000\u0000\u0000V\u01d8"+
@@ -5994,13 +5994,13 @@ public class PMLParser extends Parser {
 		"\u0194\u0005@\u0000\u0000\u0193\u0195\u0005R\u0000\u0000\u0194\u0193\u0001"+
 		"\u0000\u0000\u0000\u0194\u0195\u0001\u0000\u0000\u0000\u0195\u0196\u0001"+
 		"\u0000\u0000\u0000\u0196\u0197\u0005G\u0000\u0000\u0197\u0198\u0003h4"+
-		"\u0000\u0198C\u0001\u0000\u0000\u0000\u0199\u019a\u0003F#\u0000\u019a"+
-		"\u019b\u0003\u0004\u0002\u0000\u019bE\u0001\u0000\u0000\u0000\u019c\u019d"+
-		"\u0007\u0005\u0000\u0000\u019d\u019e\u0005@\u0000\u0000\u019e\u019f\u0005"+
-		"A\u0000\u0000\u019f\u01a0\u0003H$\u0000\u01a0\u01a2\u0005B\u0000\u0000"+
-		"\u01a1\u01a3\u0003b1\u0000\u01a2\u01a1\u0001\u0000\u0000\u0000\u01a2\u01a3"+
-		"\u0001\u0000\u0000\u0000\u01a3\u01a5\u0001\u0000\u0000\u0000\u01a4\u01a6"+
-		"\u0003P(\u0000\u01a5\u01a4\u0001\u0000\u0000\u0000\u01a5\u01a6\u0001\u0000"+
+		"\u0000\u0198C\u0001\u0000\u0000\u0000\u0199\u019b\u0003F#\u0000\u019a"+
+		"\u019c\u0003P(\u0000\u019b\u019a\u0001\u0000\u0000\u0000\u019b\u019c\u0001"+
+		"\u0000\u0000\u0000\u019c\u019d\u0001\u0000\u0000\u0000\u019d\u019e\u0003"+
+		"\u0004\u0002\u0000\u019eE\u0001\u0000\u0000\u0000\u019f\u01a0\u0007\u0005"+
+		"\u0000\u0000\u01a0\u01a1\u0005@\u0000\u0000\u01a1\u01a2\u0005A\u0000\u0000"+
+		"\u01a2\u01a3\u0003H$\u0000\u01a3\u01a5\u0005B\u0000\u0000\u01a4\u01a6"+
+		"\u0003b1\u0000\u01a5\u01a4\u0001\u0000\u0000\u0000\u01a5\u01a6\u0001\u0000"+
 		"\u0000\u0000\u01a6G\u0001\u0000\u0000\u0000\u01a7\u01ac\u0003J%\u0000"+
 		"\u01a8\u01a9\u0005H\u0000\u0000\u01a9\u01ab\u0003J%\u0000\u01aa\u01a8"+
 		"\u0001\u0000\u0000\u0000\u01ab\u01ae\u0001\u0000\u0000\u0000\u01ac\u01aa"+
@@ -6113,7 +6113,7 @@ public class PMLParser extends Parser {
 		"\u0000\u0000\u0000\u0276\u0277\u0005B\u0000\u0000\u0277\u0083\u0001\u0000"+
 		"\u0000\u00002\u0087\u00a1\u00a7\u00bf\u00cd\u00d5\u00df\u00e6\u00ee\u00f3"+
 		"\u00fb\u00fe\u0106\u010e\u011b\u0122\u0129\u0135\u013d\u0172\u0183\u0187"+
-		"\u018c\u0194\u01a2\u01a5\u01ac\u01af\u01b2\u01b9\u01c4\u01cf\u01d2\u01dc"+
+		"\u018c\u0194\u019b\u01a5\u01ac\u01af\u01b2\u01b9\u01c4\u01cf\u01d2\u01dc"+
 		"\u01ec\u01f0\u01ff\u0215\u0220\u0222\u022a\u0231\u0239\u0243\u0246\u0250"+
 		"\u0253\u0262\u026b\u0274";
 	public static final ATN _ATN =

@@ -15,10 +15,6 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
         super(store);
     }
 
-    public OperationsQuerier(Querier querier) {
-        super(querier);
-    }
-
     @Override
     public AccessRightSet getResourceOperations() throws PMException {
         return store.operations().getResourceOperations();

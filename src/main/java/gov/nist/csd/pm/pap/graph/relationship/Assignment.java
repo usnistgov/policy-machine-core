@@ -19,7 +19,7 @@ public class Assignment extends Relationship implements Serializable {
     static {
         validAssignments.put(NodeType.PC, new NodeType[]{});
         validAssignments.put(NodeType.OA, new NodeType[]{NodeType.PC, NodeType.OA});
-        validAssignments.put(NodeType.O, new NodeType[]{NodeType.OA});
+        validAssignments.put(NodeType.O, new NodeType[]{NodeType.OA, NodeType.PC});
         validAssignments.put(NodeType.UA, new NodeType[]{NodeType.UA, NodeType.PC});
         validAssignments.put(NodeType.U, new NodeType[]{NodeType.UA});
     }

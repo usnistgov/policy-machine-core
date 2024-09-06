@@ -1501,6 +1501,38 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), "oa1");
             assertFalse(deniedAccessRights.contains("read"));
         }
-    }
 
+        @Test
+        void testAssociationWithObject() throws PMException {
+            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+            pap.modify().graph().createObject("o1", List.of("pc1"));
+            pap.modify().graph().createUser("u1", List.of("ua1"));
+            pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
+
+            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            assertEquals(new AccessRightSet("read"), accessRightSet);
+        }
+
+        @Test
+        void testAssociationWithObjectAndProhibitions() throws PMException {
+            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+            pap.modify().graph().createObject("o1", List.of("pc1"));
+            pap.modify().graph().createUser("u1", List.of("ua1"));
+            pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
+
+            pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+                    Collections.singleton(new ContainerCondition("o1",  false))
+            );
+
+
+            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            assertEquals(new AccessRightSet(), accessRightSet);
+        }
+    }
 }

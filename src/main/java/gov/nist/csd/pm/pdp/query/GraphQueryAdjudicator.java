@@ -73,7 +73,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         List<String> policyClasses = new ArrayList<>();
         for (String pc : pap.query().graph().getPolicyClasses()) {
             try {
-                privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName());
+                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName());
             } catch (UnauthorizedException e) {
                 continue;
             }

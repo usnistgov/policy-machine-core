@@ -35,7 +35,7 @@ public abstract class ProhibitionOp extends Operation<Void> {
         ProhibitionSubject subject = (ProhibitionSubject) operands.get(SUBJECT_OPERAND);
 
         if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
-            privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), processReqCap);
+            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), processReqCap);
         } else {
             privilegeChecker.check(userCtx, subject.getName(), reqCap);
         }
@@ -48,7 +48,7 @@ public abstract class ProhibitionOp extends Operation<Void> {
             // there is another access right needed if the condition is a complement since it applies to a greater
             // number of nodes
             if (contCond.isComplement()) {
-                privilegeChecker.check(userCtx, AdminPolicyNode.ADMIN_POLICY_OBJECT.nodeName(), reqCap);
+                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), reqCap);
             }
         }
     }

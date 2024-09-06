@@ -27,7 +27,7 @@ public class Association extends Relationship implements Serializable {
         validAssociations.put(PC, new NodeType[]{});
         validAssociations.put(OA, new NodeType[]{});
         validAssociations.put(O, new NodeType[]{});
-        validAssociations.put(UA, new NodeType[]{UA, OA});
+        validAssociations.put(UA, new NodeType[]{UA, OA, O});
         validAssociations.put(U, new NodeType[]{});
     }
 

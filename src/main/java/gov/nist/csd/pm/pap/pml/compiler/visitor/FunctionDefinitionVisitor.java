@@ -4,8 +4,9 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationSignature;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationSignature;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
@@ -31,17 +32,16 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
 
         PMLExecutableSignature signature = new FunctionSignatureVisitor(visitorCtx, isOp).visitFunctionSignature(functionSignatureContext);
 
-        PMLStatementBlock body = parseBody(ctx, signature.getOperands(), signature.getOperandTypes(), signature.getReturnType());
+        PMLStmtsOperationBody body = parseBody(isOp, ctx, signature.getOperands(), signature.getOperandTypes(), signature.getReturnType());
 
         // check if the function is an operation
-        if (signature instanceof PMLStmtsOperationSignature pmlOperationSignature) {
+        if (signature instanceof PMLOperationSignature pmlOperationSignature) {
             return new CreateOperationStatement(new PMLStmtsOperation(
                     pmlOperationSignature.getFunctionName(),
                     pmlOperationSignature.getReturnType(),
                     pmlOperationSignature.getOperands(),
                     pmlOperationSignature.getNodeOperands(),
                     pmlOperationSignature.getOperandTypes(),
-                    pmlOperationSignature.getChecks(),
                     body
             ));
         } else {
@@ -50,15 +50,15 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
                     signature.getReturnType(),
                     signature.getOperands(),
                     signature.getOperandTypes(),
-                    body
+                    body.getStatements() // ignore body check stmts for routines
             ));
         }
     }
 
-    private PMLStatementBlock parseBody(PMLParser.FunctionDefinitionStatementContext ctx,
-                                        List<String> operandNames,
-                                        Map<String, Type> operandTypes,
-                                        Type returnType) {
+    private PMLStmtsOperationBody parseBody(boolean isOp, PMLParser.FunctionDefinitionStatementContext ctx,
+                                            List<String> operandNames,
+                                            Map<String, Type> operandTypes,
+                                            Type returnType) {
         // create a new scope for the function body
         VisitorContext localVisitorCtx = visitorCtx.copy();
 
@@ -80,7 +80,14 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
             throw new PMLCompilationRuntimeException(ctx, "not all conditional paths return");
         }
 
-        return new PMLStatementBlock(result.stmts());
+        // get checks
+        PMLStatementBlock checks = new PMLStatementBlock();
+        if (isOp) {
+            CheckStatementBlockVisitor checkStatementBlockVisitor = new CheckStatementBlockVisitor(localVisitorCtx);
+            checks = checkStatementBlockVisitor.visitCheckStatementBlock(ctx.checkStatementBlock());
+        }
+
+        return new PMLStmtsOperationBody(checks, result.stmts());
     }
 
     public static class FunctionSignatureVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
@@ -124,17 +131,13 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
 
             Type returnType = parseReturnType(ctx.returnType);
 
-            CheckStatementBlockVisitor checkStatementBlockVisitor = new CheckStatementBlockVisitor(copy);
-            PMLStatementBlock block = checkStatementBlockVisitor.visitCheckStatementBlock(ctx.checkStatementBlock());
-
             if (isOp) {
-                return new PMLStmtsOperationSignature(
+                return new PMLOperationSignature(
                         funcName,
                         returnType,
                         operandNames,
                         nodeops,
-                        operandTypes,
-                        block
+                        operandTypes
                 );
             } else {
                 return new PMLRoutineSignature(funcName, returnType, operandNames, operandTypes);

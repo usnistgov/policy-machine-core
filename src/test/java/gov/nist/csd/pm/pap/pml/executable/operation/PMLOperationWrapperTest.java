@@ -71,8 +71,8 @@ class PMLOperationWrapperTest {
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperations(new UserContext("u1"), List.of(new OperationRequest("op1",
-                Map.of("a", "oa1", "b", "b", "c", "c"))));
+        pdp.adjudicateAdminOperation(new UserContext("u1"), "op1",
+                Map.of("a", "oa1", "b", "b", "c", "c"));
         assertTrue(pap.query().graph().nodeExists("b"));
 
         // try again using pml
@@ -80,7 +80,10 @@ class PMLOperationWrapperTest {
         pdp = new PDP(pap);
         pap.executePML(new UserContext("u1"), pml);
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
-        pdp.runTx(new UserContext("u1"), tx -> tx.executePML(new UserContext("u1"), "op1(\"oa1\", \"b\", \"c\")"));
+        pdp.runTx(new UserContext("u1"), tx -> {
+            tx.executePML(new UserContext("u1"), "op1(\"oa1\", \"b\", \"c\")");
+            return null;
+        });
         assertTrue(pap.query().graph().nodeExists("b"));
     }
 
