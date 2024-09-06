@@ -55,6 +55,10 @@ public class ExecutionContext implements Serializable {
         return new ExecutionContext(author, pap, scope.copy());
     }
 
+    public ExecutionContext copyWithoutScope() throws PMException {
+        return new ExecutionContext(author, pap);
+    }
+
     public Value executeStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
         ExecutionContext copy = writeOperandsToScope(operands);
 
