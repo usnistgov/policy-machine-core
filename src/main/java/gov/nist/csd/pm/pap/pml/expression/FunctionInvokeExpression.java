@@ -92,7 +92,7 @@ public class FunctionInvokeExpression extends Expression {
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
         String name = signature.getFunctionName();
-        ExecutionContext funcInvokeCtx = ctx.copy();
+        ExecutionContext funcInvokeCtx = ctx.copyWithoutScope();
         Map<String, Value> operandValues = prepareOperandExpressions(ctx, pap);
 
         // set the execution context if exec is a PML exec

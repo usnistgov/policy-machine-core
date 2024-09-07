@@ -87,22 +87,22 @@ public class GraphModifier extends Modifier implements GraphModification {
 
     @Override
     public void assign(String ascendant, Collection<String> descendants) throws PMException {
-        if(!checkAssignInput(ascendant, descendants)) {
-            return;
-        }
-
         for (String descendant : descendants) {
+            if(!checkAssignInput(ascendant, descendant)) {
+                continue;
+            }
+
             store.graph().createAssignment(ascendant, descendant);
         }
     }
 
     @Override
     public void deassign(String ascendant, Collection<String> descendants) throws PMException {
-        if(!checkDeassignInput(ascendant, descendants)) {
-            return;
-        }
-
         for (String descendant : descendants) {
+            if(!checkDeassignInput(ascendant, descendant)) {
+                continue;
+            }
+
             store.graph().deleteAssignment(ascendant, descendant);
         }
     }
@@ -322,33 +322,31 @@ public class GraphModifier extends Modifier implements GraphModification {
      * return false to indicate to the caller that execution should not proceed.
      *
      * @param ascendant  The ascendant node.
-     * @param descendants The descendant nodes.
+     * @param descendant The descendant node.
      * @return True if the execution should proceed, false otherwise.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected boolean checkAssignInput(String ascendant, Collection<String> descendants) throws PMException {
-        for (String descendant : descendants) {
-            // getting both nodes will check if they exist
-            if (!store.graph().nodeExists(ascendant)) {
-                throw new NodeDoesNotExistException(ascendant);
-            } else if (!store.graph().nodeExists(descendant)) {
-                throw new NodeDoesNotExistException(descendant);
-            }
-
-            // ignore if assignment already exists
-            if (store.graph().getAdjacentDescendants(ascendant).contains(descendant)) {
-                return false;
-            }
-
-            Node ascNode = store.graph().getNode(ascendant);
-            Node descNode = store.graph().getNode(descendant);
-
-            // check node types make a valid assignment relation
-            Assignment.checkAssignment(ascNode.getType(), descNode.getType());
-
-            // check the assignment won't create a loop
-            checkAssignmentDoesNotCreateLoop(ascendant, descendant);
+    protected boolean checkAssignInput(String ascendant, String descendant) throws PMException {
+        // getting both nodes will check if they exist
+        if (!store.graph().nodeExists(ascendant)) {
+            throw new NodeDoesNotExistException(ascendant);
+        } else if (!store.graph().nodeExists(descendant)) {
+            throw new NodeDoesNotExistException(descendant);
         }
+
+        // ignore if assignment already exists
+        if (store.graph().getAdjacentDescendants(ascendant).contains(descendant)) {
+            return false;
+        }
+
+        Node ascNode = store.graph().getNode(ascendant);
+        Node descNode = store.graph().getNode(descendant);
+
+        // check node types make a valid assignment relation
+        Assignment.checkAssignment(ascNode.getType(), descNode.getType());
+
+        // check the assignment won't create a loop
+        checkAssignmentDoesNotCreateLoop(ascendant, descendant);
 
         return true;
     }
@@ -359,29 +357,27 @@ public class GraphModifier extends Modifier implements GraphModification {
      * an error will occur.
      *
      * @param ascendant  The ascendant node.
-     * @param descendants The descendant nodes.
+     * @param descendant The descendant node.
      * @return True if the execution should proceed, false otherwise.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected boolean checkDeassignInput(String ascendant, Collection<String> descendants) throws PMException {
-        for (String descendant : descendants) {
-            if (!store.graph().nodeExists(ascendant)) {
-                throw new NodeDoesNotExistException(ascendant);
-            } else if (!store.graph().nodeExists(descendant)) {
-                throw new NodeDoesNotExistException(descendant);
-            } else if (ascendant.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName()) &&
-                    descendant.equals(AdminPolicyNode.PM_ADMIN_PC.nodeName())) {
-                throw new CannotDeleteAdminPolicyConfigException();
-            }
+    protected boolean checkDeassignInput(String ascendant, String descendant) throws PMException {
+        if (!store.graph().nodeExists(ascendant)) {
+            throw new NodeDoesNotExistException(ascendant);
+        } else if (!store.graph().nodeExists(descendant)) {
+            throw new NodeDoesNotExistException(descendant);
+        } else if (ascendant.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName()) &&
+                descendant.equals(AdminPolicyNode.PM_ADMIN_PC.nodeName())) {
+            throw new CannotDeleteAdminPolicyConfigException();
+        }
 
-            Collection<String> descs = store.graph().getAdjacentDescendants(ascendant);
-            if (!descs.contains(descendant)) {
-                return false;
-            }
+        Collection<String> descs = store.graph().getAdjacentDescendants(ascendant);
+        if (!descs.contains(descendant)) {
+            return false;
+        }
 
-            if (descs.size() == 1) {
-                throw new DisconnectedNodeException(ascendant, descendant);
-            }
+        if (descs.size() == 1) {
+            throw new DisconnectedNodeException(ascendant, descendant);
         }
 
         return true;

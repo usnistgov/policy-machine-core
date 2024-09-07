@@ -31,6 +31,11 @@ public class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
+    public ExecutionContext copyWithoutScope() throws PMException {
+        return new PDPExecutionContext(author, pdpTx);
+    }
+
+    @Override
     public Value executeStatements(List<PMLStatement> statements, Map<String, Object> operands) throws PMException {
         ExecutionContext copy = writeOperandsToScope(operands);
 

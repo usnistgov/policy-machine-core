@@ -240,4 +240,21 @@ class FunctionInvokeExpressionTest {
         pap.executePML(new UserContext(), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
+
+    @Test
+    void testScopeIsNotCopiedToFunctionInvokeExpression() throws PMException {
+        String pml = """
+                operation op1() {
+                    x := ""
+                    op2()
+                }
+                
+                operation op2() {
+                    x := ""
+                }
+                
+                op1()
+                """;
+        assertDoesNotThrow(() -> new MemoryPAP().executePML(new UserContext("u1"), pml));
+    }
 }
