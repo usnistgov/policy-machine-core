@@ -611,6 +611,18 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             assertTrue(pap.query().graph().isAscendant("ua4", "ua2"));
             assertFalse(pap.query().graph().isAscendant("ua4", "ua3"));
         }
+
+        @Test
+        void testOneDescendantIsAlreadyAssigned() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
+
+            pap.modify().graph().assign("ua2", List.of("pc1", "ua1"));
+
+            assertTrue(pap.query().graph().isAscendant("ua2", "pc1"));
+            assertTrue(pap.query().graph().isAscendant("ua2", "ua1"));
+        }
     }
 
     @Nested
@@ -681,6 +693,18 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             assertTrue(pap.query().graph().isAscendant("ua4", "ua3"));
         }
 
+        @Test
+        void testOneDescendantIsAlreadyDeassigned() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("ua3", List.of("ua1", "ua2"));
+
+            pap.modify().graph().deassign("ua3", List.of("pc1", "ua1"));
+
+            assertFalse(pap.query().graph().getAdjacentDescendants("ua3").contains("pc1"));
+            assertFalse(pap.query().graph().getAdjacentDescendants("ua3").contains("ua1"));
+        }
     }
 
     @Nested
