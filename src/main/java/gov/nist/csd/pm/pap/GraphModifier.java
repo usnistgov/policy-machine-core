@@ -322,7 +322,7 @@ public class GraphModifier extends Modifier implements GraphModification {
      * return false to indicate to the caller that execution should not proceed.
      *
      * @param ascendant  The ascendant node.
-     * @param descendants The descendant nodes.
+     * @param descendant The descendant node.
      * @return True if the execution should proceed, false otherwise.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
@@ -357,7 +357,7 @@ public class GraphModifier extends Modifier implements GraphModification {
      * an error will occur.
      *
      * @param ascendant  The ascendant node.
-     * @param descendants The descendant nodes.
+     * @param descendant The descendant node.
      * @return True if the execution should proceed, false otherwise.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
