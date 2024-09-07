@@ -225,18 +225,16 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testScopeIsNotCopiedToFunctionInvokeExpression() throws PMException {
-        String pml = """
-                operation op1() {
-                    x := ""
-                    op2()
-                }
-                
-                operation op2() {
-                    x := ""
-                }
-                
-                op1()
-                """;
+        String pml = "operation op1() {\n" +
+                "                    x := \"\"\n" +
+                "                    op2()\n" +
+                "                }\n" +
+                "                \n" +
+                "                operation op2() {\n" +
+                "                    x := \"\"\n" +
+                "                }\n" +
+                "                \n" +
+                "                op1()";
         assertDoesNotThrow(() -> new MemoryPAP().executePML(new UserContext("u1"), pml));
     }
 }
