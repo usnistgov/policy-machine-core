@@ -74,13 +74,15 @@ pap.modify().graph().createUser("u1", List.of("ua1"));
 pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
 pap.modify().graph().createObject("o1", List.of("oa1"));
 
+pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
+
 // create a prohibition
 pap.modify().prohibitions().createProhibition(
         "deny u1 write on oa1", 
         ProhibitionSubject.userAttribute("u1"), 
         new AccessRightSet("write"), 
         false,
-        List.of("oa1")
+        List.of(new ContainerCondition("oa1", false))
 );
 
 // create an obligation that associates ua1 with any OA
@@ -90,8 +92,8 @@ create obligation "sample_obligation" {
 	when any user
 	performs "create_object_attribute"
 	on {
-        descendants: "oa1"
-    }
+		descendants: "oa1"
+	}
 	do(ctx) {
 		associate "ua1" and ctx.operands.name with ["read", "write"]
 	}
@@ -113,6 +115,8 @@ create oa "oa1" in ["pc1"]
 create ua "ua1" in ["pc1"]
 create u "u1" in ["ua1"]
 create o "o1" in ["oa1"]
+
+associate "ua1" and "oa1" with ["read", "write"]
 
 create prohibition "deny u1 write on oa1" 
 deny user "u1" 
@@ -149,6 +153,7 @@ pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
 ```java
 AccessRightSet privileges = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+// expected output: [read]
 ```
 
 ### PDP Usage
