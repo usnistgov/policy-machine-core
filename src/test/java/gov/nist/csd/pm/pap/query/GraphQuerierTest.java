@@ -7,6 +7,8 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -346,7 +348,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     }
 
     @Test
-    void testGetAscendants() throws PMException {
+    void testGetAscendantSubgraph() throws PMException {
         String pml =
                 """
                 set resource operations ["read", "write"]
@@ -366,17 +368,44 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        Collection<String> conts = pap.query().graph().getAscendants("pc1");
-        List<String> expected = List.of("oa1", "oa2", "oa3", "oa4", "o1");
-        assertEquals(new HashSet<>(expected), new HashSet<>(conts));
+        AscendantSubgraph actual = pap.query().graph().getAscendantSubgraph("pc1");
+        assertSubgraphEquals(new AscendantSubgraph(
+                "pc1", Set.of(
+                new AscendantSubgraph(
+                        "oa1", Set.of(
+                        new AscendantSubgraph(
+                                "oa2", Set.of(
+                                new AscendantSubgraph(
+                                        "oa3", Set.of(
+                                        new AscendantSubgraph(
+                                                "o1", Set.of()
+                                        ))
+                                ))
+                        ))
+                ),
+                new AscendantSubgraph("oa4", Set.of()))
+        ), actual);
+    }
 
-        conts = pap.query().graph().getAscendants("oa1");
-        expected = List.of("oa3", "oa2", "o1");
-        assertEquals(new HashSet<>(expected), new HashSet<>(conts));
+    private boolean assertSubgraphEquals(AscendantSubgraph expected, AscendantSubgraph actual) {
+        if (!expected.name().equals(actual.name())) {
+            return false;
+        }
+
+        int ok = 0;
+        for (AscendantSubgraph expectedSubgraph : expected.ascendants()) {
+            for (AscendantSubgraph actualSubgraph : actual.ascendants()) {
+                if (assertSubgraphEquals(expectedSubgraph, actualSubgraph)) {
+                    ok++;
+                }
+            }
+        }
+
+        return ok == expected.ascendants().size();
     }
 
     @Test
-    void testGetDescendants() throws PMException {
+    void testGetDescendantSubgraph() throws PMException {
         String pml =
                 """
                 set resource operations ["read", "write"]
@@ -396,12 +425,40 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        Collection<String> conts = pap.query().graph().getDescendants("o1");
-        List<String> expected = List.of("oa3", "oa2", "oa5", "oa6", "pc2", "oa1", "pc1");
-        assertEquals(new HashSet<>(expected), new HashSet<>(conts));
+        DescendantSubgraph actual = pap.query().graph().getDescendantSubgraph("o1");
+        assertSubgraphEquals(new DescendantSubgraph(
+                "oa3", Set.of(
+                new DescendantSubgraph(
+                        "oa2", Set.of(
+                        new DescendantSubgraph(
+                                "oa1", Set.of(
+                                new DescendantSubgraph(
+                                        "pc1", Set.of()
+                                ))
+                        ))
+                ),
+                new DescendantSubgraph("oa6", Set.of(
+                        new DescendantSubgraph("oa5", Set.of(
+                                new DescendantSubgraph("pc2", Set.of())
+                        ))
+                )))
+        ), actual);
+    }
 
-        conts = pap.query().graph().getDescendants("pc1");
-        expected = List.of();
-        assertEquals(new HashSet<>(expected), new HashSet<>(conts));
+    private boolean assertSubgraphEquals(DescendantSubgraph expected, DescendantSubgraph actual) {
+        if (!expected.name().equals(actual.name())) {
+            return false;
+        }
+
+        int ok = 0;
+        for (DescendantSubgraph expectedSubgraph : expected.descendants()) {
+            for (DescendantSubgraph actualSubgraph : actual.descendants()) {
+                if (assertSubgraphEquals(expectedSubgraph, actualSubgraph)) {
+                    ok++;
+                }
+            }
+        }
+
+        return ok == expected.descendants().size();
     }
 }

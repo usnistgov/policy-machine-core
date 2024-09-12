@@ -6,8 +6,9 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.AccessQuery;
+import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.query.UserContext;
-import gov.nist.csd.pm.pap.query.explain.Explain;
+import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
@@ -73,10 +74,17 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAscendantPrivileges(UserContext userCtx, String root) throws PMException {
+    public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
         privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
-        return pap.query().access().computeAscendantPrivileges(userCtx, root);
+        return pap.query().access().computeSubgraphPrivileges(userCtx, root);
+    }
+
+    @Override
+    public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
+        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+
+        return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
     }
 
     @Override
@@ -92,21 +100,5 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
         privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computePersonalObjectSystem(userCtx);
-    }
-
-    @Override
-    public Collection<String> computeAccessibleAscendants(UserContext userCtx, String root) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
-        privilegeChecker.check(userCtx, root, AdminAccessRights.REVIEW_POLICY);
-
-        return pap.query().access().computeAccessibleAscendants(userCtx, root);
-    }
-
-    @Override
-    public Collection<String> computeAccessibleDescendants(UserContext userCtx, String root) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
-        privilegeChecker.check(userCtx, root, AdminAccessRights.REVIEW_POLICY);
-
-        return pap.query().access().computeAccessibleDescendants(userCtx, root);
     }
 }

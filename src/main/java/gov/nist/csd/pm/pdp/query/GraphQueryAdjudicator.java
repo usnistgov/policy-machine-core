@@ -9,6 +9,8 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pdp.Adjudicator;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 
@@ -86,34 +88,16 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Collection<String> getAdjacentDescendants(String node) throws PMException {
-        List<String> descendants = new ArrayList<>();
-        for (String descendant : pap.query().graph().getAdjacentDescendants(node)) {
-            try {
-                privilegeChecker.check(userCtx, descendant);
-            } catch (UnauthorizedException e) {
-                continue;
-            }
+        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
 
-            descendants.add(descendant);
-        }
-
-        return descendants;
+        return pap.query().graph().getAdjacentDescendants(node);
     }
 
     @Override
     public Collection<String> getAdjacentAscendants(String node) throws PMException {
-        List<String> ascendants = new ArrayList<>();
-        for (String ascendant : pap.query().graph().getAdjacentAscendants(node)) {
-            try {
-                privilegeChecker.check(userCtx, ascendant);
-            } catch (UnauthorizedException e) {
-                continue;
-            }
+        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
 
-            ascendants.add(ascendant);
-        }
-
-        return ascendants;
+        return pap.query().graph().getAdjacentAscendants(node);
     }
 
     @Override
@@ -124,6 +108,20 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     @Override
     public Collection<Association> getAssociationsWithTarget(String target) throws PMException {
         return getAssociations(pap.query().graph().getAssociationsWithTarget(target));
+    }
+
+    @Override
+    public AscendantSubgraph getAscendantSubgraph(String node) throws PMException {
+        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+
+        return pap.query().graph().getAscendantSubgraph(node);
+    }
+
+    @Override
+    public DescendantSubgraph getDescendantSubgraph(String node) throws PMException {
+        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+
+        return pap.query().graph().getDescendantSubgraph(node);
     }
 
     @Override
@@ -153,20 +151,6 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         privilegeChecker.check(userCtx, ascendant, REVIEW_POLICY);
 
         return pap.query().graph().isDescendant(ascendant, descendant);
-    }
-
-    @Override
-    public Collection<String> getAscendants(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
-
-        return pap.query().graph().getAscendants(node);
-    }
-
-    @Override
-    public Collection<String> getDescendants(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
-
-        return pap.query().graph().getDescendants(node);
     }
 
     private List<Association> getAssociations(Collection<Association> associations) {

@@ -12,7 +12,9 @@ import gov.nist.csd.pm.pap.AccessQuerier;
 import gov.nist.csd.pm.pap.GraphQuerier;
 import gov.nist.csd.pm.pap.ProhibitionsQuerier;
 import gov.nist.csd.pm.pap.query.UserContext;
-import gov.nist.csd.pm.pap.query.explain.*;
+import gov.nist.csd.pm.pap.query.model.explain.*;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
@@ -128,24 +130,32 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAscendantPrivileges(UserContext userCtx, String root) throws PMException {
-        Map<String, AccessRightSet> results = new HashMap<>();
+    public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
+        List<SubgraphPrivileges> subgraphs = new ArrayList<>();
 
-        UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
-        if (userDagResult.borderTargets().isEmpty()) {
-            return results;
+        Collection<String> adjacentAscendants = graphQuerier.getAdjacentAscendants(root);
+        for (String adjacent : adjacentAscendants) {
+            subgraphs.add(computeSubgraphPrivileges(userCtx, adjacent));
         }
 
-        Set<String> descendants = getDescendants(root);
-        for (String descendant : descendants) {
-            if (results.containsKey(descendant)) {
+        return new SubgraphPrivileges(root, computePrivileges(userCtx, root), subgraphs);
+    }
+
+    @Override
+    public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
+        Map<String, AccessRightSet> ascendantPrivs = new HashMap<>();
+
+        Collection<String> adjacentAscendants = graphQuerier.getAdjacentAscendants(root);
+        for (String adjacentAscendant : adjacentAscendants) {
+            AccessRightSet accessRightSet = computePrivileges(userCtx, adjacentAscendant);
+            if (accessRightSet.isEmpty()) {
                 continue;
             }
 
-            getAndStorePrivileges(results, userDagResult, descendant);
+            ascendantPrivs.put(adjacentAscendant, accessRightSet);
         }
 
-        return results;
+        return ascendantPrivs;
     }
 
     @Override
@@ -201,36 +211,6 @@ public class MemoryAccessQuerier extends AccessQuerier {
         }
 
         return new HashSet<>(hsOa);
-    }
-
-    @Override
-    public Collection<String> computeAccessibleAscendants(UserContext userCtx, String root) throws PMException {
-        List<String> ascendants = new ArrayList<>(graphQuerier.getAdjacentAscendants(root));
-        ascendants.removeIf(ascendant -> {
-            try {
-                return computePrivileges(userCtx, ascendant).isEmpty();
-            } catch (PMException e) {
-                e.printStackTrace();
-                return true;
-            }
-        });
-
-        return ascendants;
-    }
-
-    @Override
-    public Collection<String> computeAccessibleDescendants(UserContext userCtx, String root) throws PMException {
-        List<String> descs = new ArrayList<>(graphQuerier.getAdjacentDescendants(root));
-        descs.removeIf(desc -> {
-            try {
-                return computePrivileges(userCtx, desc).isEmpty();
-            } catch (PMException e) {
-                e.printStackTrace();
-                return true;
-            }
-        });
-
-        return descs;
     }
 
     private void getAndStorePrivileges(Map<String, AccessRightSet> arsetMap, UserDagResult userDagResult, String target) throws PMException {

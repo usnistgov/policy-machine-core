@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.pap.graph.node.Node;
-import gov.nist.csd.pm.pap.query.explain.Explain;
+import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 
 import java.util.Objects;

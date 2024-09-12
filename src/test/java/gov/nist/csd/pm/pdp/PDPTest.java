@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.query.explain.*;
+import gov.nist.csd.pm.pap.query.model.explain.*;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.Test;

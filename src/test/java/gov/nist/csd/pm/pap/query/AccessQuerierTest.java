@@ -7,7 +7,9 @@ import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.query.explain.*;
+import gov.nist.csd.pm.pap.query.model.explain.*;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     private static final AccessRightSet RWE = new AccessRightSet("read", "write", "execute");
 
     @Test
-    void testComputeAccessibleAscendants() throws PMException {
+    void testComputeAdjacentAscendantPrivileges() throws PMException {
         String pml = """
                 set resource operations ["read", "write"]
                 create pc "pc1"
@@ -37,34 +39,12 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        Collection<String> actual = pap.query().access().computeAccessibleAscendants(new UserContext("u1"), "oa1");
+        Map<String, AccessRightSet> actual = pap.query().access().computeAdjacentAscendantPrivileges(new UserContext("u1"), "oa1");
         assertEquals(
-                Set.of("oa2", "o1", "o2"),
-                new HashSet<>(actual)
-        );
-    }
-
-    @Test
-    void testComputeAccessibleDescendants() throws PMException {
-        String pml = """
-               set resource operations ["read", "write"]
-               create pc "pc1"
-               create ua "ua1" in ["pc1"]
-               create oa "oa1" in ["pc1"]
-               create oa "oa2" in ["pc1"]
-               create oa "oa3" in ["pc1"]
-                       associate "ua1" and "oa1" with ["read", "write"]
-                       associate "ua1" and "oa2" with ["read", "write"]
-
-               create u "u1" in ["ua1"]
-               create o "o1" in ["oa1", "oa2"]
-               """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-
-        Collection<String> actual = pap.query().access().computeAccessibleDescendants(new UserContext("u1"), "o1");
-        assertEquals(
-                Set.of("oa1", "oa2"),
-                new HashSet<>(actual)
+                Map.of("oa2", new AccessRightSet("read", "write"),
+                        "o1", new AccessRightSet("read", "write"),
+                        "o2", new AccessRightSet("read", "write")),
+                new HashMap<>(actual)
         );
     }
 
@@ -576,20 +556,44 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create oa "oa2" in ["oa1"]
 
                 associate "ua1" and "oa1" with ["read", "write"]
+               
                 
                 create u "u1" in ["ua1"]
                 create o "o1" in ["oa2"]
+                create o "o2" in ["oa2"]
+                
+                create prohibition "p1"
+                deny user "u1"
+                access rights ["write"]
+                on union of ["o1"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Map<String, AccessRightSet> u1 =
-                pap.query().access().computeAscendantPrivileges(new UserContext("u1"), "oa1");
-        assertEquals(
-                Map.of(
-                        "oa2", new AccessRightSet("read", "write"),
-                        "o1", new AccessRightSet("read", "write")
-                ),
-                u1
-        );
+        SubgraphPrivileges actual = pap.query().access().computeSubgraphPrivileges(new UserContext("u1"), "oa1");
+        assertSubgraphPrivilegesEquals(new SubgraphPrivileges(
+                "oa1", new AccessRightSet("read", "write"), List.of(
+                new SubgraphPrivileges("oa2", new AccessRightSet("read", "write"), List.of(
+                        new SubgraphPrivileges("o1", new AccessRightSet("read"), List.of()),
+                        new SubgraphPrivileges("o2", new AccessRightSet("read", "write"), List.of())
+                ))
+        )
+        ), actual);
+    }
+
+    private boolean assertSubgraphPrivilegesEquals(SubgraphPrivileges expected, SubgraphPrivileges actual) {
+        if (!expected.name().equals(actual.name())) {
+            return false;
+        }
+
+        int ok = 0;
+        for (SubgraphPrivileges expectedSubgraph : expected.ascendants()) {
+            for (SubgraphPrivileges actualSubgraph : actual.ascendants()) {
+                if (assertSubgraphPrivilegesEquals(expectedSubgraph, actualSubgraph)) {
+                    ok++;
+                }
+            }
+        }
+
+        return ok == expected.ascendants().size();
     }
 
     @Test
@@ -725,28 +729,6 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                         "pc2", new AccessRightSet("read")
                 ),
                 policyClassAccessRights
-        );
-    }
-
-    @Test
-    void testGetAscendants() throws PMException {
-
-        pap.modify().operations().setResourceOperations(RWE);
-
-        String pc1 = pap.modify().graph().createPolicyClass("pc1");
-        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
-        String o2 = pap.modify().graph().createObject("o2", List.of(oa1));
-        String o3 = pap.modify().graph().createObject("o3", List.of(oa1));
-
-        AccessRightSet arset = new AccessRightSet("read", "write");
-        pap.modify().graph().associate(ua1, oa1, arset);
-        Map<String, AccessRightSet> subgraph = pap.query().access().computeAscendantPrivileges(new UserContext(u1), oa1);
-        assertEquals(
-                Map.of("o1", arset, "o2", arset, "o3", arset),
-                subgraph
         );
     }
 

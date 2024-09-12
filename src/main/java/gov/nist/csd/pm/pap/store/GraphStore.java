@@ -5,6 +5,8 @@ import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.tx.Transactional;
 
 import java.util.Collection;
@@ -28,10 +30,10 @@ public interface GraphStore extends Transactional {
     Collection<String> getAdjacentAscendants(String name) throws PMException;
     Collection<Association> getAssociationsWithSource(String ua) throws PMException;
     Collection<Association> getAssociationsWithTarget(String target) throws PMException;
-    Collection<String> getAscendants(String node) throws PMException;
     Collection<String> getPolicyClassDescendants(String node) throws PMException;
     Collection<String> getAttributeDescendants(String node) throws PMException;
-    Collection<String> getDescendants(String node) throws PMException;
+    DescendantSubgraph getDescendantSubgraph(String node) throws PMException;
+    AscendantSubgraph getAscendantSubgraph(String node) throws PMException;
     boolean isAscendant(String asc, String dsc) throws PMException;
     boolean isDescendant(String asc, String dsc) throws PMException;
 }
