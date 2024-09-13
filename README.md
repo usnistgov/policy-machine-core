@@ -58,7 +58,7 @@ Then, add the maven dependency
 The following examples use the provided in memory PAP.
 
 ```java
-package gov.nist.csd.pm.pap.query;
+package gov.nist.csd.pm;
 
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -67,6 +67,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 
 import java.util.List;
@@ -102,17 +103,17 @@ public class Main {
 
 		// create an obligation that associates ua1 with any OA
 		String obligationPML = """
-		create obligation "sample_obligation" {
-			create rule "rule1"
-			when any user
-			performs "create_object_attribute"
-			on {
-		        descendants: "oa1"
-		    }
-			do(ctx) {
-				associate "ua1" and ctx.operands.name with ["read", "write"]
-			}
-		}""";
+				create obligation "sample_obligation" {
+					create rule "rule1"
+					when any user
+					performs "create_object_attribute"
+					on {
+				        descendants: "oa1"
+				    }
+					do(ctx) {
+						associate "ua1" and ctx.operands.name with ["read", "write"]
+					}
+				}""";
 
 		// when creating an obligation a user is required
 		// this is the user the obligation response will be executed on behalf of
@@ -124,21 +125,21 @@ public class Main {
 
 		String pml = """
 		set resource operations ["read", "write"]
-		
+
 		create pc "pc1"
 		create oa "oa1" in ["pc1"]
 		create ua "ua1" in ["pc1"]
 		create u "u1" in ["ua1"]
 		create o "o1" in ["oa1"]
-		
+
 		associate "ua1" and "oa1" with ["read", "write", "create_object_attribute", "associate", "associate_to"]
 		associate "ua2" and "ua1" with ["associate"]
 
-		create prohibition "deny u1 write on oa1" 
-		deny user "u1" 
-		access rights ["write"] 
+		create prohibition "deny u1 write on oa1"
+		deny user "u1"
+		access rights ["write"]
 		on union of ["oa1"]
-		
+
 		create obligation "sample_obligation" {
 		    create rule "rule1"
 		    when any user
@@ -153,7 +154,6 @@ public class Main {
 		""";
 
 		pap.executePML(new UserContext("u1")), pml);
-		
 		*/
 
 		AccessRightSet privileges = pap.query().access().computePrivileges(new UserContext("u1"), "o1");

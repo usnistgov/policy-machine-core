@@ -6,7 +6,10 @@ import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.store.GraphStore;
+import gov.nist.csd.pm.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 
 import java.util.*;
@@ -193,22 +196,6 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     }
 
     @Override
-    public Collection<String> getAscendants(String node) throws PMException {
-        Set<String> ascs = new HashSet<>();
-
-        new GraphStoreDFS(this)
-                .withDirection(Direction.ASCENDANTS)
-                .withVisitor(n -> {
-                    ascs.add(n);
-                })
-                .walk(node);
-
-        ascs.remove(node);
-
-        return ascs;
-    }
-
-    @Override
     public Collection<String> getPolicyClassDescendants(String node) throws PMException {
         Set<String> pcs = new HashSet<>();
 
@@ -250,17 +237,27 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     }
 
     @Override
-    public Collection<String> getDescendants(String node) throws PMException {
-        Set<String> descs = new HashSet<>();
+    public DescendantSubgraph getDescendantSubgraph(String node) throws PMException {
+        List<DescendantSubgraph> adjacentSubgraphs = new ArrayList<>();
 
-        new GraphStoreDFS(this)
-                .withDirection(Direction.DESCENDANTS)
-                .withVisitor(descs::add)
-                .walk(node);
+        Collection<String> adjacentDescendants = getAdjacentDescendants(node);
+        for (String adjacent : adjacentDescendants) {
+            adjacentSubgraphs.add(getDescendantSubgraph(adjacent));
+        }
 
-        descs.remove(node);
+        return new DescendantSubgraph(node, adjacentSubgraphs);
+    }
 
-        return descs;
+    @Override
+    public AscendantSubgraph getAscendantSubgraph(String node) throws PMException {
+        List<AscendantSubgraph> adjacentSubgraphs = new ArrayList<>();
+
+        Collection<String> adjacentAscendants = getAdjacentAscendants(node);
+        for (String adjacent : adjacentAscendants) {
+            adjacentSubgraphs.add(getAscendantSubgraph(adjacent));
+        }
+
+        return new AscendantSubgraph(node, adjacentSubgraphs);
     }
 
     @Override

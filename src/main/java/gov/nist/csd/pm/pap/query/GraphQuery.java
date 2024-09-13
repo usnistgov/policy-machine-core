@@ -4,6 +4,8 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 
 import java.util.Collection;
 import java.util.Map;
@@ -88,20 +90,20 @@ public interface GraphQuery {
     Collection<Association> getAssociationsWithTarget(String target) throws PMException;
 
     /**
-     * Get all ascendants of the node in no particular order.
+     * Get the recursive structure of all ascendants of the given node.
      * @param node The node to get the ascendants for.
      * @return The ascendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<String> getAscendants(String node) throws PMException;
+    AscendantSubgraph getAscendantSubgraph(String node) throws PMException;
 
     /**
-     * Get all descendants of the node in no particular order.
+     * Get the recursive structure of all descendants of the given node.
      * @param node The node to get the descendants for.
-     * @return The descendants of the given node.
+     * @return The recursive descendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<String> getDescendants(String node) throws PMException;
+    DescendantSubgraph getDescendantSubgraph(String node) throws PMException;
 
     /**
      * Get the descendants of the given node that are attributes.

@@ -6,6 +6,8 @@ import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.query.GraphQuery;
+import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.Collection;
@@ -48,6 +50,18 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
+    public AscendantSubgraph getAscendantSubgraph(String node) throws PMException {
+        checkNodeExists(node);
+        return store.graph().getAscendantSubgraph(node);
+    }
+
+    @Override
+    public DescendantSubgraph getDescendantSubgraph(String node) throws PMException {
+        checkNodeExists(node);
+        return store.graph().getDescendantSubgraph(node);
+    }
+
+    @Override
     public Collection<String> getAttributeDescendants(String node) throws PMException {
         checkNodeExists(node);
         return store.graph().getAttributeDescendants(node);
@@ -86,18 +100,6 @@ public class GraphQuerier extends Querier implements GraphQuery {
     @Override
     public Collection<String> getPolicyClasses() throws PMException {
         return store.graph().getPolicyClasses();
-    }
-
-    @Override
-    public Collection<String> getAscendants(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getAscendants(node);
-    }
-
-    @Override
-    public Collection<String> getDescendants(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getDescendants(node);
     }
 
     /**

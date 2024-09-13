@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.query.explain;
+package gov.nist.csd.pm.pap.query.model.explain;
 
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;

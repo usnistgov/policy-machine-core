@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.query.explain;
+package gov.nist.csd.pm.pap.query.model.explain;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp.exception;
 
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.query.explain.Explain;
+import gov.nist.csd.pm.pap.query.model.explain.Explain;
 
 import java.util.Collection;
 
