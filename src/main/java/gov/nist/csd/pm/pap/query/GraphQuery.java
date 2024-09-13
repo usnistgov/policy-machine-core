@@ -90,7 +90,7 @@ public interface GraphQuery {
     Collection<Association> getAssociationsWithTarget(String target) throws PMException;
 
     /**
-     * Get all ascendants of the node in no particular order.
+     * Get the recursive structure of all ascendants of the given node.
      * @param node The node to get the ascendants for.
      * @return The ascendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
@@ -98,9 +98,9 @@ public interface GraphQuery {
     AscendantSubgraph getAscendantSubgraph(String node) throws PMException;
 
     /**
-     * Get all descendants of the node in no particular order.
+     * Get the recursive structure of all descendants of the given node.
      * @param node The node to get the descendants for.
-     * @return The descendants of the given node.
+     * @return The recursive descendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     DescendantSubgraph getDescendantSubgraph(String node) throws PMException;

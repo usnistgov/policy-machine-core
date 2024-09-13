@@ -68,7 +68,7 @@ public interface AccessQuery {
     /**
      * Compute the privileges for all nodes in the subgraph starting at the root node. The returned Subgraph object stores
      * the privileges for the user on the root node and a recursive list of the users access to the root node's subgraph.
-     * If a node is not accessible (no privileges) it will not be included in the returned object.
+     * Any node that the user does not have access to will be included in the result but will have an empty privileges set.
      * @param userCtx The user and process (optional).
      * @param root The root node.
      * @return The Subgraph for the root node.
@@ -77,8 +77,8 @@ public interface AccessQuery {
     SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException;
 
     /**
-     * Compute the privileges for the adjacent ascendants of the given root node. If a node is not accessible
-     * it will not be included in the returned object.
+     * Compute the privileges for the adjacent ascendants of the given root node. Any node that the user does not have
+     * access to will be included in the result but will have an empty privileges set.
      * @param userCtx The user and process (optional).
      * @param root The root node.
      * @return A Map of the adjacent ascendants of the root node the user has access to and the privileges on each.

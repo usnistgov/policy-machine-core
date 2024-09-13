@@ -147,12 +147,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
         Collection<String> adjacentAscendants = graphQuerier.getAdjacentAscendants(root);
         for (String adjacentAscendant : adjacentAscendants) {
-            AccessRightSet accessRightSet = computePrivileges(userCtx, adjacentAscendant);
-            if (accessRightSet.isEmpty()) {
-                continue;
-            }
-
-            ascendantPrivs.put(adjacentAscendant, accessRightSet);
+            ascendantPrivs.put(adjacentAscendant, computePrivileges(userCtx, adjacentAscendant));
         }
 
         return ascendantPrivs;
