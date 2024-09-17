@@ -11,7 +11,6 @@ import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
-import java.util.Collection;
 import java.util.Map;
 
 public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
@@ -96,7 +95,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Collection<String> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+    public Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
         privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computePersonalObjectSystem(userCtx);

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.impl.memory.pap;
 
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.dag.*;
 import gov.nist.csd.pm.pap.graph.node.Node;
@@ -13,13 +14,13 @@ import gov.nist.csd.pm.pap.GraphQuerier;
 import gov.nist.csd.pm.pap.ProhibitionsQuerier;
 import gov.nist.csd.pm.pap.query.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.*;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.pap.graph.node.NodeType.U;
 import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.AccessRightResolver.*;
@@ -38,6 +39,12 @@ public class MemoryAccessQuerier extends AccessQuerier {
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, String target) throws PMException  {
         AccessRightSet accessRights = new AccessRightSet();
+
+        // if the target node is a PC, check privileges on the PM_ADMIN_OBJECT
+        Node targetNode = graphQuerier.getNode(target);
+        if (targetNode.getType().equals(PC)) {
+            target = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
+        }
 
         // traverse the user side of the graph to get the associations
         UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
@@ -173,39 +180,26 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Collection<String> computePersonalObjectSystem(UserContext userCtx) throws PMException {
-        // Prepare the hashset to return.
-        HashSet<String> hsOa = new HashSet<>();
+    public Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+        Map<String, AccessRightSet> pos = new HashMap<>();
 
-        // Call find_border_oa_priv(u). The result is a Hashtable
-        // htoa = {oa -> {op -> pcset}}:
-        Hashtable<String, Hashtable<String, Set<String>>> htOa = findBorderOaPrivRestrictedInternal(userCtx);
+        for (String pc : graphQuerier.getPolicyClasses()) {
+            new BreadthFirstGraphWalker(graphQuerier)
+                    .withDirection(Direction.ASCENDANTS)
+                    .withVisitor(n -> {
+                        AccessRightSet privs = computePrivileges(userCtx, n);
+                        if (privs.isEmpty()) {
+                            return;
+                        }
 
-        // For each returned oa (key in htOa)
-        for (Enumeration<String> oas = htOa.keys(); oas.hasMoreElements(); ) {
-            String oa = oas.nextElement();
-
-            // Compute oa's required PCs by calling find_pc_set(oa).
-            HashSet<String> hsReqPcs = inMemFindPcSet(oa);
-            // Extract oa's label.
-            Hashtable<String, Set<String>> htOaLabel = htOa.get(oa);
-
-            // Walk through the op -> pcset of the oa's label.
-            // For each operation/access right
-            for (Enumeration ops = htOaLabel.keys(); ops.hasMoreElements(); ) {
-                String sOp = (String)ops.nextElement();
-                // Extract the pcset corresponding to this operation/access right.
-                Set<String> hsActualPcs = htOaLabel.get(sOp);
-                // if the set of required PCs is a subset of the actual pcset,
-                // then user u has some privileges on the current oa node.
-                if (hsActualPcs.containsAll(hsReqPcs)) {
-                    hsOa.add(oa);
-                    break;
-                }
-            }
+                        pos.put(n, privs);
+                    })
+                    .withSinglePathShortCircuit(n -> {
+                        return pos.containsKey(n);
+                    })
+                    .walk(pc);
         }
-
-        return new HashSet<>(hsOa);
+        return pos;
     }
 
     private void getAndStorePrivileges(Map<String, AccessRightSet> arsetMap, UserDagResult userDagResult, String target) throws PMException {
