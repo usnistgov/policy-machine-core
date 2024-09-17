@@ -34,15 +34,14 @@ public class PrivilegeChecker {
     }
 
     public void check(UserContext userCtx, String target, Collection<String> toCheck) throws PMException {
-        // if checking the permissions on a PC, check the permissions on the target node for the PC
-        Node targetNode = pap.query().graph().getNode(target);
-
-        if (targetNode.getType().equals(PC)) {
-            target = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
-        }
-
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, target);
-        checkIsAuthorized(userCtx, target, computed, toCheck);
+        if (!computed.containsAll(toCheck)) {
+            if (explain) {
+                throw new UnauthorizedException(pap.query().access().explain(userCtx, target), userCtx, target, toCheck);
+            } else {
+                throw new UnauthorizedException(null, userCtx, target, toCheck);
+            }
+        }
     }
 
     public void check(UserContext userCtx, String target, String... toCheck) throws PMException {
@@ -67,15 +66,5 @@ public class PrivilegeChecker {
             check(userCtx, entity, toCheck);
         }
 
-    }
-    
-    private void checkIsAuthorized(UserContext userCtx, String target, AccessRightSet computed, Collection<String> toCheck) throws PMException {
-        if (!computed.containsAll(toCheck)) {
-            if (explain) {
-                throw new UnauthorizedException(pap.query().access().explain(userCtx, target), userCtx, target, toCheck);
-            } else {
-                throw new UnauthorizedException(null, userCtx, target, toCheck);
-            }
-        }
     }
 }

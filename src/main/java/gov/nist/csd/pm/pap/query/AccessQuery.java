@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -103,6 +102,6 @@ public interface AccessQuery {
      * @return A set of nodes representing the first level of the user's POS.
      * @throws PMException If there is an error in the PM.
      */
-    Collection<String> computePersonalObjectSystem(UserContext userCtx) throws PMException;
+    Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException;
 
 }

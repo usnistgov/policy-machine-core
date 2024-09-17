@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.admin.AdminPolicy;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
@@ -52,6 +54,52 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     void testBuildPOS() throws PMException {
         String pml = """
                 set resource operations ["read", "write"]
+                
+                create pc "pc1"
+                create oa "oa1" in ["pc1"]
+                create oa "oa1-1" in ["oa1"]
+                create oa "oa2" in ["pc1"]
+                create oa "oa2-1" in ["oa2"]
+                create oa "oa2-2" in ["oa2"]
+                                
+                create pc "pc2"
+                create oa "oa3" in ["pc2"]
+                create oa "oa3-1" in ["oa3"]
+                
+                create ua "ua1" in ["pc1"]
+                create u "u1" in ["ua1"]
+                
+                associate "ua1" and "oa2" with ["read", "write"]
+                associate "ua1" and "oa2-1" with ["read", "write"]
+                associate "ua1" and "oa3-1" with ["read", "write"]
+
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        Map<String, AccessRightSet> actual = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
+        assertEquals(
+                Map.of("oa2", new AccessRightSet("read", "write"), "oa3-1", new AccessRightSet("read", "write")),
+                actual
+        );
+
+        pap.modify().graph().dissociate("ua1", "oa2");
+
+        actual = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
+        assertEquals(
+                Map.of("oa2-1", new AccessRightSet("read", "write"), "oa3-1", new AccessRightSet("read", "write")),
+                actual
+        );
+
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("read"));
+
+        actual = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
+        assertEquals(
+                Map.of("pc1", new AccessRightSet("read"), "pc2", new AccessRightSet("read"), "PM_ADMIN", new AccessRightSet("read")),
+                actual
+        );
+
+        pml = """
+                set resource operations ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -74,12 +122,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 access rights ["write"]
                 on union of ["oa1"]
                 """;
+        pap.reset();
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        actual = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
 
-        Collection<String> u1 = pap.query().access().computePersonalObjectSystem(new UserContext("u1"));
         assertEquals(
-                Set.of("oa1", "oa2", "oa4"),
-                new HashSet<>(u1)
+                Map.of("oa1", new AccessRightSet("read"), "oa2", new AccessRightSet("read", "write"), "oa4", new AccessRightSet("read")),
+                actual
         );
     }
 
