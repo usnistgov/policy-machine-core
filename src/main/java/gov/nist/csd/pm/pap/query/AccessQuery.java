@@ -96,10 +96,12 @@ public interface AccessQuery {
     Explain explain(UserContext userCtx, String target) throws PMException;
 
     /**
-     * Compute the original configuration of a user's POS.
+     * Compute the original configuration of a user's Personal Object System. The returned nodes are the nodes closest
+     * to policy class nodes that the user has privileges on. If the user has privileges on policy classes, the returned
+     * nodes will just be the set of policy classes.
      *
      * @param userCtx The user and process (optional).
-     * @return A set of nodes representing the first level of the user's POS.
+     * @return A map of nodes representing the first level of the user's POS and the privileges of the user.
      * @throws PMException If there is an error in the PM.
      */
     Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException;
