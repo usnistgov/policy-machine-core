@@ -20,6 +20,7 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.pap.graph.node.NodeType.U;
 import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
@@ -43,7 +44,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
         // if the target node is a PC, check privileges on the PM_ADMIN_OBJECT
         Node targetNode = graphQuerier.getNode(target);
         if (targetNode.getType().equals(PC)) {
-            target = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
+            target = PM_ADMIN_OBJECT.nodeName();
         }
 
         // traverse the user side of the graph to get the associations
@@ -63,6 +64,12 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public AccessRightSet computeDeniedPrivileges(UserContext userCtx, String target) throws PMException {
         AccessRightSet accessRights = new AccessRightSet();
 
+        // if the target node is a PC, check privileges on the PM_ADMIN_OBJECT
+        Node targetNode = graphQuerier.getNode(target);
+        if (targetNode.getType().equals(PC)) {
+            target = PM_ADMIN_OBJECT.nodeName();
+        }
+
         // traverse the user side of the graph to get the associations
         UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
         if (userDagResult.borderTargets().isEmpty()) {
@@ -78,6 +85,12 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Map<String, AccessRightSet> computePolicyClassAccessRights(UserContext userCtx, String target) throws PMException {
+        // if the target node is a PC, check privileges on the PM_ADMIN_OBJECT
+        Node targetNode = graphQuerier.getNode(target);
+        if (targetNode.getType().equals(PC)) {
+            target = PM_ADMIN_OBJECT.nodeName();
+        }
+
         // traverse the user side of the graph to get the associations
         UserDagResult userDagResult = processUserDAG(userCtx.getUser(), userCtx.getProcess());
         if (userDagResult.borderTargets().isEmpty()) {
@@ -112,6 +125,14 @@ public class MemoryAccessQuerier extends AccessQuerier {
                 }
 
                 getAndStorePrivileges(results, userDagResult, descendant);
+            }
+        }
+
+        // add policy classes
+        if (results.containsKey(PM_ADMIN_OBJECT.nodeName())) {
+            AccessRightSet arset = results.get(PM_ADMIN_OBJECT.nodeName());
+            for (String pc : graphQuerier.getPolicyClasses()) {
+                results.put(pc, arset);
             }
         }
 
@@ -176,6 +197,11 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public Explain explain(UserContext userCtx, String target) throws PMException {
         Node userNode = graphQuerier.getNode(userCtx.getUser());
         Node targetNode = graphQuerier.getNode(target);
+
+        // if the target node is a PC, check privileges on the PM_ADMIN_OBJECT
+        if (targetNode.getType().equals(PC)) {
+            target = PM_ADMIN_OBJECT.nodeName();
+        }
 
         Map<String, Map<Path, List<Association>>> targetPaths = explainTarget(targetNode.getName());
         Map<String, Set<Path>> userPaths = explainUser(userNode.getName(), targetPaths);

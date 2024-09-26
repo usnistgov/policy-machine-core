@@ -753,6 +753,21 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 ),
                 u1
         );
+
+        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("read"));
+        u1 = pap.query().access().computeCapabilityList(new UserContext("u1"));
+        assertEquals(
+                Map.of(
+                        "o1", new AccessRightSet("read"),
+                        "o2", new AccessRightSet("read"),
+                        "oa1", new AccessRightSet("read"),
+                        "oa2", new AccessRightSet("read"),
+                        "pc1", new AccessRightSet("read"),
+                        "PM_ADMIN", new AccessRightSet("read"),
+                        AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("read")
+                ),
+                u1
+        );
     }
 
     @Test
