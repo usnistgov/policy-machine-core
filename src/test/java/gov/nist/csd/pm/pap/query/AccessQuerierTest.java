@@ -51,6 +51,31 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     }
 
     @Test
+    void testComputeAdjacentDescendantPrivileges() throws PMException {
+        String pml = """
+                set resource operations ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["oa1"]
+                create oa "oa3" in ["oa1"]
+                
+                associate "ua1" and "oa2" with ["read", "write"]
+                
+                create u "u1" in ["ua1"]
+                create o "o1" in ["oa2", "oa3"]
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        Map<String, AccessRightSet> actual = pap.query().access().computeAdjacentDescendantPrivileges(new UserContext("u1"), "o1");
+        assertEquals(
+                Map.of("oa2", new AccessRightSet("read", "write"),
+                        "oa3", new AccessRightSet()),
+                new HashMap<>(actual)
+        );
+    }
+
+    @Test
     void testBuildPOS() throws PMException {
         String pml = """
                 set resource operations ["read", "write"]

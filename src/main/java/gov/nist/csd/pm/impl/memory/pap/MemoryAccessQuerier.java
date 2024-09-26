@@ -161,6 +161,18 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
+    public Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+        Map<String, AccessRightSet> descendantPrivs = new HashMap<>();
+
+        Collection<String> adjacentDescendants = graphQuerier.getAdjacentDescendants(root);
+        for (String adjacentDescendant : adjacentDescendants) {
+            descendantPrivs.put(adjacentDescendant, computePrivileges(userCtx, adjacentDescendant));
+        }
+
+        return descendantPrivs;
+    }
+
+    @Override
     public Explain explain(UserContext userCtx, String target) throws PMException {
         Node userNode = graphQuerier.getNode(userCtx.getUser());
         Node targetNode = graphQuerier.getNode(target);

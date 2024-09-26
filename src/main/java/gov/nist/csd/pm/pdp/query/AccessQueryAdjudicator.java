@@ -28,16 +28,16 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, String target) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
-        privilegeChecker.check(userCtx, target, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, target, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computePrivileges(userCtx, target);
     }
 
     @Override
     public AccessRightSet computeDeniedPrivileges(UserContext userCtx, String target) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
-        privilegeChecker.check(userCtx, target, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, target, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computeDeniedPrivileges(userCtx, target);
     }
@@ -45,59 +45,66 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     @Override
     public Map<String, AccessRightSet> computePolicyClassAccessRights(UserContext userCtx, String target)
             throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
-        privilegeChecker.check(userCtx, target, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, target, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computePolicyClassAccessRights(userCtx, target);
     }
 
     @Override
     public Map<String, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computeCapabilityList(userCtx);
     }
 
     @Override
     public Map<String, AccessRightSet> computeACL(String target) throws PMException {
-        privilegeChecker.check(userCtx, target, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, target, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computeACL(target);
     }
 
     @Override
     public Map<String, AccessRightSet> computeDestinationAttributes(String user) throws PMException {
-        privilegeChecker.check(userCtx, user, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, user, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computeDestinationAttributes(user);
     }
 
     @Override
     public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computeSubgraphPrivileges(userCtx, root);
     }
 
     @Override
     public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
     }
 
     @Override
+    public Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+
+        return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
+    }
+
+    @Override
     public Explain explain(UserContext userCtx, String target) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
-        privilegeChecker.check(userCtx, target, AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+        privilegeChecker.check(this.userCtx, target, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().access().explain(userCtx, target);
     }
 
     @Override
     public Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
-        privilegeChecker.check(userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
+	    privilegeChecker.check(this.userCtx, userCtx.getUser(), AdminAccessRights.REVIEW_POLICY);
 
-        return pap.query().access().computePersonalObjectSystem(userCtx);
+	    return pap.query().access().computePersonalObjectSystem(userCtx);
     }
 }

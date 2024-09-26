@@ -86,6 +86,16 @@ public interface AccessQuery {
     Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException;
 
     /**
+     * Compute the privileges for the adjacent descendants of the given root node. Any node that the user does not have
+     * access to will be included in the result but will have an empty privileges set.
+     * @param userCtx The user and process (optional).
+     * @param root The root node.
+     * @return A Map of the adjacent descendants of the root node the user has access to and the privileges on each.
+     * @throws PMException If there is an error in the PM.
+     */
+    Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException;
+
+    /**
      * Explain why a user may or may not have privileges on a target node.
      * @param userCtx The user and process (optional).
      * @param target The target node.
