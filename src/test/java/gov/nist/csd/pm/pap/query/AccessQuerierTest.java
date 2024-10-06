@@ -686,7 +686,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create u "u1" in ["ua1", "ua2"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Map<String, AccessRightSet> u1 = pap.query().access().computeDestinationAttributes("u1");
+        Map<String, AccessRightSet> u1 = pap.query().access().computeDestinationAttributes(new UserContext("u1"));
         assertEquals(
                 Map.of(
                         "oa1", new AccessRightSet("read", "write"),

@@ -127,9 +127,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeDestinationAttributes(String user) throws PMException {
+    public Map<String, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
         return new MemoryUserEvaluator(store)
-                .evaluate(new UserContext(user))
+                .evaluate(userCtx)
                 .borderTargets();
     }
 

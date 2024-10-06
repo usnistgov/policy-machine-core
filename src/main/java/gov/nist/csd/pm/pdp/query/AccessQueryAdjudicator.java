@@ -66,10 +66,10 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeDestinationAttributes(String user) throws PMException {
-        privilegeChecker.check(this.adjUserContext, user, AdminAccessRights.REVIEW_POLICY);
+    public Map<String, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+        privilegeChecker.check(this.adjUserContext, userCtx.getNodes(), AdminAccessRights.REVIEW_POLICY);
 
-        return pap.query().access().computeDestinationAttributes(user);
+        return pap.query().access().computeDestinationAttributes(userCtx);
     }
 
     @Override
