@@ -15,9 +15,9 @@ public class AccessRightResolver {
 
     private AccessRightResolver() {}
 
-    public static AccessRightSet resolvePrivileges(UserDagResult userCtx, TargetDagResult targetCtx, String target, AccessRightSet resourceOps) {
+    public static AccessRightSet resolvePrivileges(UserDagResult userCtx, TargetDagResult targetCtx, AccessRightSet resourceOps) {
         Map<String, AccessRightSet> resolvedPcMap = new HashMap<>();
-        for (Map.Entry<String, AccessRightSet> pc : targetCtx.pcSet().entrySet()) {
+        for (Map.Entry<String, AccessRightSet> pc : targetCtx.pcMap().entrySet()) {
             AccessRightSet pcOps = pc.getValue();
 
             // replace instances of *, *a or *r with the literal access rights
@@ -29,19 +29,19 @@ public class AccessRightResolver {
         AccessRightSet result = resolvePolicyClassAccessRightSets(resolvedPcMap);
 
         // remove any prohibited access rights
-        AccessRightSet denied = resolveDeniedAccessRights(userCtx, targetCtx, target);
+        AccessRightSet denied = resolveDeniedAccessRights(userCtx, targetCtx);
         result.removeAll(denied);
 
         return result;
     }
 
-    public static AccessRightSet resolveDeniedAccessRights(UserDagResult userCtx, TargetDagResult targetCtx, String target) {
+    public static AccessRightSet resolveDeniedAccessRights(UserDagResult userCtx, TargetDagResult targetCtx) {
         AccessRightSet denied = new AccessRightSet();
         Set<Prohibition> prohibitions = userCtx.prohibitions();
         Set<String> reachedTargets = targetCtx.reachedTargets();
 
         for(Prohibition p : prohibitions) {
-            if (isProhibitionSatisfied(p, reachedTargets, target)) {
+            if (isProhibitionSatisfied(p, reachedTargets)) {
                 denied.addAll(p.getAccessRightSet());
             }
         }
@@ -49,15 +49,14 @@ public class AccessRightResolver {
         return denied;
     }
 
-    public static List<Prohibition> computeSatisfiedProhibitions(UserDagResult userDagResult, TargetDagResult targetDagResult,
-                                                          String target) {
+    public static List<Prohibition> computeSatisfiedProhibitions(UserDagResult userDagResult, TargetDagResult targetDagResult) {
         List<Prohibition> satisfied = new ArrayList<>();
 
         Set<Prohibition> prohibitions = userDagResult.prohibitions();
         Set<String> reachedTargets = targetDagResult.reachedTargets();
 
         for(Prohibition p : prohibitions) {
-            if (isProhibitionSatisfied(p, reachedTargets, target)) {
+            if (isProhibitionSatisfied(p, reachedTargets)) {
                 satisfied.add(p);
             }
         }
@@ -106,7 +105,7 @@ public class AccessRightResolver {
         }
     }
 
-    private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<String> reachedTargets, String target) {
+    private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<String> reachedTargets) {
         boolean inter = prohibition.isIntersection();
         Collection<ContainerCondition> containers = prohibition.getContainers();
         boolean addOps = false;
@@ -115,34 +114,11 @@ public class AccessRightResolver {
             String contName = containerCondition.getName();
             boolean isComplement = containerCondition.isComplement();
 
-            if (target.equals(contName)) {
-                // if the prohibition is UNION and the target is the container then the prohibition is satisfied
-                // if the prohibition is INTERSECTION and the target is the container then the prohibition is not satisfied
-                if (!inter && !isComplement) {
-                    addOps = true;
-                }
+            addOps = !isComplement && reachedTargets.contains(contName) ||
+                    isComplement && !reachedTargets.contains(contName);
 
+            if ((addOps && !inter) || (!addOps && inter)) {
                 break;
-            }
-
-            if (!isComplement && reachedTargets.contains(contName) || isComplement && !reachedTargets.contains(contName)) {
-                addOps = true;
-
-                // if the prohibition is not intersection, one satisfied container condition means
-                // the prohibition is satisfied
-                if (!inter) {
-                    break;
-                }
-            } else {
-                // since the intersection requires the target to satisfy each node condition in the prohibition
-                // if one is not satisfied then the whole is not satisfied
-                addOps = false;
-
-                // if the prohibition is the intersection, one unsatisfied container condition means the whole
-                // prohibition is not satisfied
-                if (inter) {
-                    break;
-                }
             }
         }
 

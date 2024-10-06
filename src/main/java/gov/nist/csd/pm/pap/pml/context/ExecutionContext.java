@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteGlobalScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.*;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 
 import java.io.Serializable;

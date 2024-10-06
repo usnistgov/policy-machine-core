@@ -4,7 +4,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
@@ -67,9 +67,9 @@ class PDPTxTest {
         String serialize = "create pc \"test\"";
 
         PDPTx u2 = new PDPTx(new UserContext("u2"), new PrivilegeChecker(pap), pap, List.of());
-        assertThrows(UnauthorizedException.class, () -> u2.deserialize(new UserContext(), serialize, new PMLDeserializer()));
+        assertThrows(UnauthorizedException.class, () -> u2.deserialize(new UserContext(""), serialize, new PMLDeserializer()));
 
         PDPTx u1 = new PDPTx(new UserContext("u1"), new PrivilegeChecker(pap), pap, List.of());
-        assertDoesNotThrow(() -> u1.deserialize(new UserContext(), serialize, new PMLDeserializer()));
+        assertDoesNotThrow(() -> u1.deserialize(new UserContext(""), serialize, new PMLDeserializer()));
     }
 }

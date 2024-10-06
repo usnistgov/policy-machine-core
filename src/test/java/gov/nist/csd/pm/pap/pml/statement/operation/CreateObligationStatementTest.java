@@ -12,7 +12,7 @@ import gov.nist.csd.pm.pap.pml.pattern.operand.LogicalOperandPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

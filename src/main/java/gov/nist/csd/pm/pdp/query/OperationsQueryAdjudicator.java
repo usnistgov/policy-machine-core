@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.OperationsQuery;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;

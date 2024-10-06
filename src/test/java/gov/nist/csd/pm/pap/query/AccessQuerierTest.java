@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.exception.PMException;
@@ -9,8 +8,9 @@ import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.*;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.junit.jupiter.api.Nested;
@@ -187,7 +187,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
 
-        Explain explain = pap.query().access().explain(new UserContext("u1"), "o1");
+        Explain explain = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         Explain expected = new Explain(
                 new AccessRightSet("read"),
                 List.of(
@@ -273,7 +273,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         MemoryPAP pap = new MemoryPAP();
         pap.executePML(new UserContext(""), pml);
 
-        Explain explain = pap.query().access().explain(new UserContext("u1"), "o1");
+        Explain explain = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         Explain expected = new Explain(
                 new AccessRightSet("read"),
                 List.of(
@@ -322,7 +322,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().deassign("o1", List.of("oa4"));
 
-        explain = pap.query().access().explain(new UserContext("u1"), "o1");
+        explain = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         expected = new Explain(
                 new AccessRightSet("read"),
                 List.of(
@@ -372,7 +372,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create user "u1" in ["ua1"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Explain actual = pap.query().access().explain(new UserContext("u1"), "oa2");
+        Explain actual = pap.query().access().explain(new UserContext("u1"), new TargetContext("oa2"));
         assertExplainEquals(
                 new Explain(
                         new AccessRightSet("read", "write"),
@@ -416,7 +416,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create object "o1" in ["oa1"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        Explain actual = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         assertExplainEquals(
                 new Explain(
                         new AccessRightSet(),
@@ -462,7 +462,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create object "o1" in ["oa1", "oa2"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        Explain actual = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         assertExplainEquals(
                 new Explain(
                         new AccessRightSet(),
@@ -522,7 +522,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create object "o1" in ["oa1", "oa2"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Explain actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        Explain actual = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         assertExplainEquals(
                 new Explain(
                         new AccessRightSet("read", "write"),
@@ -580,7 +580,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 """;
         pap.reset();
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        actual = pap.query().access().explain(new UserContext("u1"), "o1");
+        actual = pap.query().access().explain(new UserContext("u1"), new TargetContext("o1"));
         assertExplainEquals(
                 new Explain(
                         new AccessRightSet("read"),
@@ -712,7 +712,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o1" in ["oa1"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Map<String, AccessRightSet> o1 = pap.query().access().computeACL("o1");
+        Map<String, AccessRightSet> o1 = pap.query().access().computeACL(new TargetContext("o1"));
         assertEquals(
                 Map.of(
                         "u1", new AccessRightSet("read", "write"),
@@ -788,7 +788,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 on union of ["oa1"]
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        AccessRightSet deniedPrivileges = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), "o1");
+        AccessRightSet deniedPrivileges = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("o1"));
         assertEquals(new AccessRightSet("write"), deniedPrivileges);
     }
 
@@ -811,7 +811,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
         Map<String, AccessRightSet> policyClassAccessRights =
-                pap.query().access().computePolicyClassAccessRights(new UserContext("u1"), "o1");
+                pap.query().access().computePolicyClassAccessRights(new UserContext("u1"), new TargetContext("o1"));
         assertEquals(
                 Map.of(
                         "pc1", new AccessRightSet("read", "write"),
@@ -863,7 +863,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
             pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -883,7 +883,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
         }
 
         @Test
@@ -899,7 +899,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -918,7 +918,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
             assertEquals(
                     new AccessRightSet("read", "write"),
-                    pap.query().access().computePrivileges(new UserContext(u1), o1)
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1))
             );
         }
 
@@ -939,7 +939,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
         }
 
         @Test
@@ -959,7 +959,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
         }
 
         @Test
@@ -978,7 +978,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
         }
 
         @Test
@@ -994,7 +994,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), o1);
+            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -1014,7 +1014,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), o1);
+            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -1037,7 +1037,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -1055,7 +1055,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertEquals(new AccessRightSet(), pap.query().access().computePrivileges(new UserContext(u1), o1));
+            assertEquals(new AccessRightSet(), pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)));
         }
 
         @Test
@@ -1074,7 +1074,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -1093,7 +1093,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), o1);
+            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.contains("read"));
         }
@@ -1114,7 +1114,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), o1);
+            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -1135,7 +1135,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), o1);
+            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -1156,7 +1156,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         // removed graph7 due to adding the descendant IDs to the createNode, need to always connect to the testCtx.policy().graph().
@@ -1175,7 +1175,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
         }
 
         @Test
@@ -1192,7 +1192,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
         }
 
         @Test
@@ -1212,7 +1212,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read")));
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
         }
 
         @Test
@@ -1232,7 +1232,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
         }
 
         @Test
@@ -1250,7 +1250,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -1278,13 +1278,14 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), o1);
+            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
             assertEquals(1, list.size());
             assertTrue(list.contains("execute"));
         }
 
         @Test
-        void testGraph24WithProhibitions() throws PMException {            pap.modify().operations().setResourceOperations(RWE);
+        void testGraph24WithProhibitions() throws PMException {
+            pap.modify().operations().setResourceOperations(RWE);
 
             String pc1 = pap.modify().graph().createPolicyClass("pc1");
             String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1306,8 +1307,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).contains("read"));
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o2).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o2)).isEmpty());
 
             pap.modify().graph().associate(ua1, oa2, new AccessRightSet("read"));
 
@@ -1319,7 +1320,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
             assertEquals(
                     new AccessRightSet(),
-                    pap.query().access().computePrivileges(new UserContext(u1, "1234"), o1)
+                    pap.query().access().computePrivileges(new UserContext(u1, "1234"), new TargetContext(o1))
             );
         }
 
@@ -1346,9 +1347,9 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), oa5).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(oa5)).isEmpty());
             assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), o1).containsAll(Arrays.asList("read", "write")));
+                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
         }
 
         @Test
@@ -1372,7 +1373,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), o1).isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
         }
 
         @Test
@@ -1392,7 +1393,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(ua1), oa1)
+            assertTrue(pap.query().access().computePrivileges(new UserContext(ua1), new TargetContext(oa1))
                     .containsAll(Arrays.asList("read", "write")));
         }
 
@@ -1471,22 +1472,22 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pap.query().access().computePrivileges(new UserContext("u1"), "o2");
+            list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o2"));
             assertTrue(list.contains("read") && list.contains("write"));
 
-            list = pap.query().access().computePrivileges(new UserContext("u2"), "o2");
+            list = pap.query().access().computePrivileges(new UserContext("u2"), new TargetContext("o2"));
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pap.query().access().computePrivileges(new UserContext("u3"), "o2");
+            list = pap.query().access().computePrivileges(new UserContext("u3"), new TargetContext("o2"));
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pap.query().access().computePrivileges(new UserContext("u4"), "o1");
+            list = pap.query().access().computePrivileges(new UserContext("u4"), new TargetContext("o1"));
             assertTrue(list.contains("read") && !list.contains("write"));
 
-            list = pap.query().access().computePrivileges(new UserContext("u4"), "o2");
+            list = pap.query().access().computePrivileges(new UserContext("u4"), new TargetContext("o2"));
             assertTrue(list.contains("read") && !list.contains("write"));
         }
 
@@ -1502,17 +1503,17 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             pap.modify().graph().associate(ua1, oa1, allAccessRights());
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
 
             pap.modify().graph().associate(ua1, oa1, allAdminAccessRights());
-            list = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
             assertTrue(list.containsAll(allAdminAccessRights()));
             assertFalse(list.containsAll(RWE));
 
             pap.modify().graph().associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
-            list = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
             assertFalse(list.containsAll(allAdminAccessRights()));
             assertTrue(list.containsAll(RWE));
         }
@@ -1534,7 +1535,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             pap.modify().graph().associate("ua3", "oa1", new AccessRightSet("read"));
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext("u1"), "o1").isEmpty());
+            assertTrue(pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1")).isEmpty());
         }
 
         @Test
@@ -1551,7 +1552,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), "oa1");
+            AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
             assertTrue(deniedAccessRights.contains("read"));
         }
 
@@ -1569,7 +1570,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), "oa1");
+            AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
             assertFalse(deniedAccessRights.contains("read"));
         }
 
@@ -1583,7 +1584,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createUser("u1", List.of("ua1"));
             pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
 
-            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
             assertEquals(new AccessRightSet("read"), accessRightSet);
         }
 
@@ -1602,8 +1603,86 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
             );
 
 
-            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
             assertEquals(new AccessRightSet(), accessRightSet);
         }
+    }
+
+    @Test
+    void testAttributesInUserAndTargetContexts() throws PMException {
+        String pml = """
+                set resource operations ["read", "write"]
+                
+                create pc "pc1"
+                create pc "pc2"
+                create ua "ua1" in ["pc1"]
+                create ua "ua2" in ["pc2"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc2"]
+                
+                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua2" and "oa2" with ["read"]
+
+                create u "u1" in ["ua1", "ua2"]                
+                create o "o1" in ["oa1", "oa2"]                
+                """;
+        MemoryPAP pap = new MemoryPAP();
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        AccessRightSet actual = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext(List.of("ua1", "ua2")), new TargetContext("o1"));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext(List.of("oa1", "oa2")));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext(List.of("ua1", "ua2")), new TargetContext(List.of("oa1", "oa2")));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        // create a prohibition for the user on the object
+        pml = """
+                create prohibition "p1"
+                deny user "u1"
+                access rights ["read"]
+                on union of ["o1"]
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        actual = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertEquals(new AccessRightSet(), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext(List.of("ua1", "ua2")), new TargetContext("o1"));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext(List.of("oa1", "oa2")));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext(List.of("ua1", "ua2")), new TargetContext(List.of("oa1", "oa2")));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        pml = """
+                delete prohibition "p1"
+                
+                create prohibition "p1"
+                deny user "u1"
+                access rights ["read"]
+                on intersection of ["oa1", "oa2"]
+                """;
+        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+
+        actual = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertEquals(new AccessRightSet(), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext(List.of("ua1", "ua2")), new TargetContext("o1"));
+        assertEquals(new AccessRightSet("read"), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext(List.of("oa1", "oa2")));
+        assertEquals(new AccessRightSet(), actual);
+
+        actual = pap.query().access().computePrivileges(new UserContext(List.of("ua1", "ua2")), new TargetContext(List.of("oa1", "oa2")));
+        assertEquals(new AccessRightSet("read"), actual);
+
     }
 }

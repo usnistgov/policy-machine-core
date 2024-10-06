@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.pap.op.operation.DeleteAdminOperationOp;
 import gov.nist.csd.pm.pap.op.operation.SetResourceOperationsOp;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +70,7 @@ class OperationsModificationAdjudicatorTest {
     void setResourceOperations() throws PMException {
         assertDoesNotThrow(() -> ok.setResourceOperations(new AccessRightSet("read")));
         assertEquals(
-                new EventContext("u1", "", new SetResourceOperationsOp(), Map.of(OPERATIONS_OPERAND, new AccessRightSet("read"))),
+                new EventContext("u1", null, new SetResourceOperationsOp(), Map.of(OPERATIONS_OPERAND, new AccessRightSet("read"))),
                 testEventProcessor.getEventContext()
         );
         assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceOperations());
@@ -93,7 +93,7 @@ class OperationsModificationAdjudicatorTest {
 
         assertDoesNotThrow(() -> ok.createAdminOperation(op1));
         assertEquals(
-                new EventContext("u1", "", new CreateAdminOperationOp(), Map.of(OPERATION_OPERAND, op1)),
+                new EventContext("u1", null, new CreateAdminOperationOp(), Map.of(OPERATION_OPERAND, op1)),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().operations().getAdminOperationNames().contains("op1"));
@@ -117,7 +117,7 @@ class OperationsModificationAdjudicatorTest {
 
         assertDoesNotThrow(() -> ok.deleteAdminOperation("op1"));
         assertEquals(
-                new EventContext("u1", "", new DeleteAdminOperationOp(), Map.of(NAME_OPERAND, "op1")),
+                new EventContext("u1", null, new DeleteAdminOperationOp(), Map.of(NAME_OPERAND, "op1")),
                 testEventProcessor.getEventContext()
         );
 

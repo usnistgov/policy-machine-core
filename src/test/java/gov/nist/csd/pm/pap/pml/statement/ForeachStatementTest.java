@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
@@ -152,7 +152,7 @@ class ForeachStatementTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(), pml);
+        pap.executePML(new UserContext(""), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));
@@ -171,7 +171,7 @@ class ForeachStatementTest {
                 }
                 """;
         pap = new MemoryPAP();
-        pap.executePML(new UserContext(), pml);
+        pap.executePML(new UserContext(""), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.HashMap;
 import java.util.List;

@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

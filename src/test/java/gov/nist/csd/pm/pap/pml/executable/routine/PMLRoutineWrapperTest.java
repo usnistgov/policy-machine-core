@@ -5,7 +5,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.PDP;
 import org.junit.jupiter.api.Test;

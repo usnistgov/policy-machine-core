@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;

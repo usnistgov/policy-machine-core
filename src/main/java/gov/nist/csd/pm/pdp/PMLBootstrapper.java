@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;

@@ -2,6 +2,8 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 
@@ -14,31 +16,33 @@ public interface AccessQuery {
 
     /**
      * Compute the privileges the user has on the target node.
-     * @param userCtx The user and process (optional).
-     * @param target The target node.
+     *
+     * @param userCtx   The user and process (optional).
+     * @param targetCtx The target node.
      * @return An AccessRightSet that contains the users privileges on the target node.
      * @throws PMException If there is an error in the PM.
      */
-    AccessRightSet computePrivileges(UserContext userCtx, String target) throws PMException;
+    AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException;
 
     /**
      * Compute the privileges that are denied for the user on the target node.
      * @param userCtx The user and process (optional).
-     * @param target The target node.
+     * @param targetCtx The target node.
      * @return An AccessRightSet that contains the users denied privileges on the target node.
      * @throws PMException If there is an error in the PM.
      */
-    AccessRightSet computeDeniedPrivileges(UserContext userCtx, String target) throws PMException;
+    AccessRightSet computeDeniedPrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException;
 
     /**
      * Compute the access rights that a user has access to under each policy class the target is an ascendant of. This
      * does not include prohibitions.
-     * @param userCtx The user and process (optional).
-     * @param target The target node.
+     *
+     * @param userCtx   The user and process (optional).
+     * @param targetCtx The target node.
      * @return A mapping of policy class names to the access rights the user has under them on the target node.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computePolicyClassAccessRights(UserContext userCtx, String target) throws PMException;
+    Map<String, AccessRightSet> computePolicyClassAccessRights(UserContext userCtx, TargetContext targetCtx) throws PMException;
 
     /**
      * Compute a mapping of all the nodes the user has access to the access rights they have on each.
@@ -50,11 +54,11 @@ public interface AccessQuery {
 
     /**
      * Compute the Access Control List for the given target.
-     * @param target The target node.
+     * @param targetCtx The target node.
      * @return A mapping of each user and their privileges on the target.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computeACL(String target) throws PMException;
+    Map<String, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException;
 
     /**
      * Compute the attributes that are targets of associations in which the user attribute is a descendant of the user.
@@ -98,12 +102,12 @@ public interface AccessQuery {
     /**
      * Explain why a user may or may not have privileges on a target node.
      * @param userCtx The user and process (optional).
-     * @param target The target node.
+     * @param targetCtx The target node.
      * @return An Explain object which enumerates the paths under each policy class that the user has access to the
      *         target node.
      * @throws PMException If there is an error in the PM.
      */
-    Explain explain(UserContext userCtx, String target) throws PMException;
+    Explain explain(UserContext userCtx, TargetContext targetCtx) throws PMException;
 
     /**
      * Compute the original configuration of a user's Personal Object System. The returned nodes are the nodes closest

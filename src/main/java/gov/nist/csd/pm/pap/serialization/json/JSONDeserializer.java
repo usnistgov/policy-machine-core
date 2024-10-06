@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.graph.node.NodeType;
 
 import java.util.*;

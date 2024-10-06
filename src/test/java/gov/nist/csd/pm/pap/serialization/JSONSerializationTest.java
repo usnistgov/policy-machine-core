@@ -3,12 +3,10 @@ package gov.nist.csd.pm.pap.serialization;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.pap.serialization.json.JSONGraph;
 import gov.nist.csd.pm.pap.serialization.json.JSONPolicy;
-import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
-import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -37,7 +35,7 @@ public class JSONSerializationTest {
         );
 
         for (JSONPolicy policy : policies) {
-            assertDoesNotThrow(() -> new MemoryPAP().deserialize(new UserContext(), policy.toString(), new JSONDeserializer()));
+            assertDoesNotThrow(() -> new MemoryPAP().deserialize(new UserContext(""), policy.toString(), new JSONDeserializer()));
         }
     }
 

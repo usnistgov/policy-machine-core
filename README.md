@@ -67,7 +67,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 
 import java.util.List;

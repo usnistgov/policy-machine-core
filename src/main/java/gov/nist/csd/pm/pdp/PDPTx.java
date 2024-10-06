@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;

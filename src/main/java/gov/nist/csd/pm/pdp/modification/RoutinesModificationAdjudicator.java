@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.pap.op.routine.DeleteAdminRoutineOp;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.Adjudicator;
 

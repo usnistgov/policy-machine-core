@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.Test;

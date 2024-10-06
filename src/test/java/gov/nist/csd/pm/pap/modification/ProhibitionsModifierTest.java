@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.exception.*;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

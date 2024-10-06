@@ -23,15 +23,19 @@ public class EventContext {
     }
 
     public EventContext(String user, String opName, Map<String, Object> operands, List<String> nodeOperands) {
-        this(user, "", opName, operands, nodeOperands);
+        this(user, null, opName, operands, nodeOperands);
     }
 
     public EventContext(String user, String process, Operation<?> op, Map<String, Object> operands) {
         this(user, process, op.getName(), operands, op.getNodeOperands());
     }
 
+    public EventContext(String user, Operation<?> op, Map<String, Object> operands) {
+        this(user, null, op.getName(), operands, op.getNodeOperands());
+    }
+
     public EventContext(String user, String opName, Map<String, Object> operands) {
-        this(user, "", opName, operands, List.of());
+        this(user, null, opName, operands, List.of());
     }
 
     public String user() {

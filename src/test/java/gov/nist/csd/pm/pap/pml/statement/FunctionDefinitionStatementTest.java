@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.statement.operation.*;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;

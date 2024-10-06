@@ -17,7 +17,7 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.InSubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

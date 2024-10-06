@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.tx.TxRunner;
@@ -21,7 +21,6 @@ import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 import static gov.nist.csd.pm.pap.graph.node.NodeType.ANY;
