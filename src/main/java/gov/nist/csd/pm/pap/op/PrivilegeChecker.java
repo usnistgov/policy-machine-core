@@ -36,7 +36,7 @@ public class PrivilegeChecker {
         TargetContext targetContext = new TargetContext(target);
 
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
-        if (!computed.containsAll(toCheck)) {
+        if (!computed.containsAll(toCheck) || (toCheck.isEmpty() && computed.isEmpty())) {
             if (explain) {
                 throw new UnauthorizedException(pap.query().access().explain(userCtx, targetContext), userCtx, target, toCheck);
             } else {

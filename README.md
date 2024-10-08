@@ -68,6 +68,7 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pdp.PDP;
 
 import java.util.List;
@@ -156,7 +157,7 @@ public class Main {
 		pap.executePML(new UserContext("u1")), pml);
 		*/
 
-		AccessRightSet privileges = pap.query().access().computePrivileges(new UserContext("u1"), "o1");
+		AccessRightSet privileges = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
 		System.out.println(privileges);
 		// expected output: {associate, read, create_object_attribute, associate_to}
 
