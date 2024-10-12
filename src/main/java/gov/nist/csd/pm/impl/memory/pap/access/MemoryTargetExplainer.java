@@ -1,7 +1,9 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
 import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.pap.graph.dag.Propagator;
+import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.explain.Path;
@@ -9,6 +11,9 @@ import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
+
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
+import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 
 public class MemoryTargetExplainer {
 
@@ -28,34 +33,49 @@ public class MemoryTargetExplainer {
 			pcPathAssociations.put(pc, new HashMap<>(Map.of(new ArrayList<>(List.of(pc)), new ArrayList<>())));
 		}
 
-		List<String> nodes = targetCtx.getNodes();
+		Propagator propagator = (src, dst) -> {
+			Map<List<String>, List<Association>> srcPathAssocs = pcPathAssociations.get(src);
+			Map<List<String>, List<Association>> dstPathAssocs = pcPathAssociations.getOrDefault(dst, new HashMap<>());
+
+			for (Map.Entry<List<String>, List<Association>> entry : srcPathAssocs.entrySet()) {
+				// add DST to the path from SRC
+				List<String> targetPath = new ArrayList<>(entry.getKey());
+				List<Association> associations = new ArrayList<>(entry.getValue());
+				targetPath.addFirst(dst);
+
+				// collect any associations for the DST node
+				Collection<Association> associationsWithTarget = policyStore.graph().getAssociationsWithTarget(dst);
+				associations.addAll(associationsWithTarget);
+				dstPathAssocs.put(targetPath, associations);
+			}
+
+			// update dst entry
+			pcPathAssociations.put(dst, dstPathAssocs);
+		};
+
+		// DFS from target node
+		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
+				.withPropagator(propagator);
+
+		List<String> nodes = new ArrayList<>();
+		if (targetCtx.isNode()) {
+			String target = targetCtx.getTarget();
+			Node targetNode = policyStore.graph().getNode(target);
+			if (targetNode.getType().equals(PC)) {
+				target = PM_ADMIN_OBJECT.nodeName();
+			}
+
+			nodes.add(target);
+
+			dfs.walk(target);
+		} else {
+			nodes.addAll(targetCtx.getAttributes());
+
+			dfs.walk(targetCtx.getAttributes());
+		}
+
+		// convert the map created above into a map where the policy classes are the keys
 		for (String target : nodes) {
-			Propagator propagator = (src, dst) -> {
-				Map<List<String>, List<Association>> srcPathAssocs = pcPathAssociations.get(src);
-				Map<List<String>, List<Association>> dstPathAssocs = pcPathAssociations.getOrDefault(dst, new HashMap<>());
-
-				for (Map.Entry<List<String>, List<Association>> entry : srcPathAssocs.entrySet()) {
-					// add DST to the path from SRC
-					List<String> targetPath = new ArrayList<>(entry.getKey());
-					List<Association> associations = new ArrayList<>(entry.getValue());
-					targetPath.addFirst(dst);
-
-					// collect any associations for the DST node
-					Collection<Association> associationsWithTarget = policyStore.graph().getAssociationsWithTarget(dst);
-					associations.addAll(associationsWithTarget);
-					dstPathAssocs.put(targetPath, associations);
-				}
-
-				// update dst entry
-				pcPathAssociations.put(dst, dstPathAssocs);
-			};
-
-			// DFS from target node
-			new GraphStoreDFS(policyStore.graph())
-					.withPropagator(propagator)
-					.walk(target);
-
-			// convert the map created above into a map where the policy classes are the keys
 			Map<List<String>, List<Association>> targetPathAssocs = pcPathAssociations.get(target);
 			for (Map.Entry<List<String>, List<Association>> entry : targetPathAssocs.entrySet()) {
 				Path targetPath = new Path(entry.getKey());

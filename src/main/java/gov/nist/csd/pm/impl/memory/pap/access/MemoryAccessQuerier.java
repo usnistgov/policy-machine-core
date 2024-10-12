@@ -25,14 +25,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        AccessRightSet accessRights = new AccessRightSet();
-
         // traverse the user side of the graph to get the associations
         MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
         UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
-        if (userDagResult.borderTargets().isEmpty()) {
-            return accessRights;
-        }
 
         // traverse the target side of the graph to get permissions per policy class
         MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(store);

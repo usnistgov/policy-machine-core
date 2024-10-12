@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
 import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.pap.graph.dag.Propagator;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -27,32 +28,42 @@ public class MemoryUserExplainer {
 			pathsToUAs.put(ua, new HashSet<>(Set.of(new Path(ua))));
 		}
 
-		List<String> nodes = userCtx.getNodes();
+		Propagator propagator = (src, dst) -> {
+			// don't propagate unless the src is a ua in a target path association or an already propagated to dst node
+			if (!uasFromTargetPathAssociations.contains(src) && !pathsToUAs.containsKey(src)) {
+				return;
+			}
+
+			Set<Path> srcPaths = pathsToUAs.get(src);
+			Set<Path> dstPaths = pathsToUAs.getOrDefault(dst, new HashSet<>());
+
+			for (Path srcPath : srcPaths) {
+				Path copy = new Path(srcPath);
+				copy.addFirst(dst);
+				dstPaths.add(copy);
+			}
+
+			pathsToUAs.put(dst, dstPaths);
+		};
+
+		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
+				.withPropagator(propagator);
+
+		List<String> nodes = new ArrayList<>();
+		if (userCtx.isUser()) {
+			String user = userCtx.getUser();
+			nodes.add(user);
+			dfs.walk(user);
+		} else {
+			List<String> attributes = userCtx.getAttributes();
+			nodes.addAll(attributes);
+			dfs.walk(attributes);
+		}
+
+		// transform the map so that the key is the last ua in the path pointing to it's paths
 		for (String node : nodes) {
-			Propagator propagator = (src, dst) -> {
-				// don't propagate unless the src is a ua in a target path association or an already propagated to dst node
-				if (!uasFromTargetPathAssociations.contains(src) && !pathsToUAs.containsKey(src)) {
-					return;
-				}
-
-				Set<Path> srcPaths = pathsToUAs.get(src);
-				Set<Path> dstPaths = pathsToUAs.getOrDefault(dst, new HashSet<>());
-
-				for (Path srcPath : srcPaths) {
-					Path copy = new Path(srcPath);
-					copy.addFirst(dst);
-					dstPaths.add(copy);
-				}
-
-				pathsToUAs.put(dst, dstPaths);
-			};
-
-			new GraphStoreDFS(policyStore.graph())
-					.withPropagator(propagator)
-					.walk(node);
-
-			// transform the map so that the key is the last ua in the path pointing to it's paths
 			Set<Path> userPaths = pathsToUAs.getOrDefault(node, new HashSet<>());
+
 			for (Path userPath : userPaths) {
 				String assocUA = userPath.getLast();
 				Set<Path> assocUAPaths = associationUAPaths.getOrDefault(assocUA, new HashSet<>());

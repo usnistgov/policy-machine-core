@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AccessQuerierTest extends PAPTestInitializer {
 
-    private static final AccessRightSet RWE = new AccessRightSet("read", "write", "execute");
+    public static final AccessRightSet RWE = new AccessRightSet("read", "write", "execute");
 
     @Test
     void testComputeAdjacentAscendantPrivileges() throws PMException {

@@ -5,6 +5,8 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.dag.*;
 import gov.nist.csd.pm.pap.graph.node.Node;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
+import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
@@ -29,69 +31,84 @@ public class MemoryTargetEvaluator {
 	 * each policy class.
 	 */
 	public TargetDagResult evaluate(UserDagResult userCtx, TargetContext targetCtx) throws PMException {
-		List<String> targetNodes = targetCtx.getNodes();
-		for (int i = 0; i < targetNodes.size(); i++) {
-			String target = targetNodes.get(i);
-			if (!policyStore.graph().nodeExists(target)) {
-				throw new NodeDoesNotExistException(target);
-			}
-
-			Node targetNode = policyStore.graph().getNode(target);
-			if (targetNode.getType().equals(PC)) {
-				 targetNodes.set(i, PM_ADMIN_OBJECT.nodeName());
-			}
-		}
-
 		Collection<String> policyClasses = policyStore.graph().getPolicyClasses();
 		Map<String, AccessRightSet> borderTargets = userCtx.borderTargets();
+		Set<String> userProhibitionTargets = collectUserProhibitionTargets(userCtx.prohibitions());
 		Map<String, Map<String, AccessRightSet>> visitedNodes = new HashMap<>();
 		Set<String> reachedTargets = new HashSet<>();
 
-		for (String target : targetNodes) {
-			Visitor visitor = node -> {
-				// mark the node as reached, to be used for resolving prohibitions
-				if (userCtx.prohibitionTargets().contains(node)) {
-					reachedTargets.add(node);
-				}
+		Visitor visitor = node -> {
+			// mark the node as reached, to be used for resolving prohibitions
+			if (userProhibitionTargets.contains(node)) {
+				reachedTargets.add(node);
+			}
 
-				Map<String, AccessRightSet> nodeCtx = visitedNodes.getOrDefault(node, new HashMap<>());
-				if (nodeCtx.isEmpty()) {
-					visitedNodes.put(node, nodeCtx);
-				}
+			Map<String, AccessRightSet> nodeCtx = visitedNodes.getOrDefault(node, new HashMap<>());
+			if (nodeCtx.isEmpty()) {
+				visitedNodes.put(node, nodeCtx);
+			}
 
-				if (policyClasses.contains(node)) {
-					nodeCtx.put(node, new AccessRightSet());
-				} else {
-					if (borderTargets.containsKey(node)) {
-						Set<String> uaOps = borderTargets.get(node);
-						for (String pc : nodeCtx.keySet()) {
-							AccessRightSet pcOps = nodeCtx.getOrDefault(pc, new AccessRightSet());
-							pcOps.addAll(uaOps);
-							nodeCtx.put(pc, pcOps);
-						}
-					}
-				}
-			};
+			if (policyClasses.contains(node)) {
+				nodeCtx.put(node, new AccessRightSet());
+			} else if (borderTargets.containsKey(node)) {
+				Set<String> uaOps = borderTargets.get(node);
 
-			Propagator propagator = (desc, asc) -> {
-				Map<String, AccessRightSet> descCtx = visitedNodes.get(desc);
-				Map<String, AccessRightSet> nodeCtx = visitedNodes.getOrDefault(asc, new HashMap<>());
-				for (String name : descCtx.keySet()) {
-					AccessRightSet ops = nodeCtx.getOrDefault(name, new AccessRightSet());
-					ops.addAll(descCtx.get(name));
-					nodeCtx.put(name, ops);
+				for (String pc : nodeCtx.keySet()) {
+					AccessRightSet pcOps = nodeCtx.getOrDefault(pc, new AccessRightSet());
+					pcOps.addAll(uaOps);
+					nodeCtx.put(pc, pcOps);
 				}
-				visitedNodes.put(asc, nodeCtx);
-			};
+			}
+		};
 
-			new GraphStoreDFS(policyStore.graph())
-					.withDirection(Direction.DESCENDANTS)
-					.withVisitor(visitor)
-					.withPropagator(propagator)
-					.walk(target);
+		Propagator propagator = (desc, asc) -> {
+			Map<String, AccessRightSet> descCtx = visitedNodes.get(desc);
+			Map<String, AccessRightSet> ascCtx = visitedNodes.getOrDefault(asc, new HashMap<>());
+
+			for (String name : descCtx.keySet()) {
+				AccessRightSet ops = ascCtx.getOrDefault(name, new AccessRightSet());
+				ops.addAll(descCtx.get(name));
+				ascCtx.put(name, ops);
+			}
+
+			visitedNodes.put(asc, ascCtx);
+		};
+
+		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
+				.withDirection(Direction.DESCENDANTS)
+				.withVisitor(visitor)
+				.withPropagator(propagator);
+
+		List<String> targetNodes = new ArrayList<>();
+		if (targetCtx.isNode()) {
+			String target = targetCtx.getTarget();
+			Node targetNode = policyStore.graph().getNode(target);
+			if (targetNode.getType().equals(PC)) {
+				target = PM_ADMIN_OBJECT.nodeName();
+			}
+
+			targetNodes.add(target);
+
+			dfs.walk(target);
+		} else {
+			List<String> attrs = targetCtx.getAttributes();
+			targetNodes.addAll(attrs);
+
+			dfs.walk(attrs);
 		}
 
 		return new TargetDagResult(mergeResults(targetNodes, visitedNodes), reachedTargets);
+	}
+
+	private Set<String> collectUserProhibitionTargets(Set<Prohibition> prohibitions) {
+		Set<String> userProhibitionTargets = new HashSet<>();
+		for (Prohibition prohibition : prohibitions) {
+			for (ContainerCondition cc : prohibition.getContainers()) {
+				userProhibitionTargets.add(cc.getName());
+			}
+		}
+
+		return userProhibitionTargets;
 	}
 
 	private Map<String, AccessRightSet> mergeResults(List<String> targetNodes, Map<String, Map<String, AccessRightSet>> visitedNodes) {

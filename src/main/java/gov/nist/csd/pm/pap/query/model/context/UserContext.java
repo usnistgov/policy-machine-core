@@ -57,14 +57,6 @@ public class UserContext implements Serializable {
         return user != null;
     }
 
-    public List<String> getNodes() {
-        if (isUser()) {
-            return new ArrayList<>(List.of(user));
-        } else {
-            return new ArrayList<>(attributes);
-        }
-    }
-
     @Override
     public String toString() {
         String s = "%s";

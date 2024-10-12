@@ -54,7 +54,7 @@ class PDPTest {
                         }
                 )
         );
-        assertEquals("[user=u1] does not have access right [associate] on [ua1]", e.getMessage());
+        assertEquals("[user=u1] does not have access right [associate] on [target=ua1]", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));

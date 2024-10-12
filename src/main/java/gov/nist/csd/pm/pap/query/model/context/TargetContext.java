@@ -37,14 +37,6 @@ public class TargetContext {
 		return target != null;
 	}
 
-	public List<String> getNodes() {
-		if (isNode()) {
-			return new ArrayList<>(List.of(target));
-		} else {
-			return new ArrayList<>(attributes);
-		}
-	}
-
 	@Override
 	public String toString() {
 		String s = "%s";

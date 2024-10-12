@@ -1,16 +1,12 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
-import gov.nist.csd.pm.impl.memory.pap.store.MemoryPolicyStore;
-import gov.nist.csd.pm.pap.GraphQuerier;
-import gov.nist.csd.pm.pap.ProhibitionsQuerier;
-import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.pap.graph.dag.Direction;
 import gov.nist.csd.pm.pap.graph.dag.UserDagResult;
 import gov.nist.csd.pm.pap.graph.dag.Visitor;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.store.GraphStoreBFS;
@@ -37,47 +33,34 @@ public class MemoryUserEvaluator {
 	 */
 	protected UserDagResult evaluate(UserContext userCtx) throws PMException {
 		final Map<String, AccessRightSet> borderTargets = new HashMap<>();
-		final Set<String> prohibitionTargets = new HashSet<>();
-		// initialize with the prohibitions for the provided process
-		final Set<Prohibition> reachedProhibitions = new HashSet<>();
-		if (userCtx.getProcess() != null) {
-			Collection<Prohibition> processPros = policyStore.prohibitions().getProhibitions().getOrDefault(userCtx.getProcess(), new ArrayList<>());
-			reachedProhibitions.addAll(processPros);
+		// initialize with the prohibitions or the provided process
+		final Set<Prohibition> reachedProhibitions = new HashSet<>(getProhibitionsWithSubject(userCtx.getProcess()));
+
+		Visitor visitor = node -> {
+			// cache prohibitions reached by the user
+			Collection<Prohibition> subjectProhibitions = getProhibitionsWithSubject(node);
+			reachedProhibitions.addAll(subjectProhibitions);
+
+			Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
+			collectAssociationsFromBorderTargets(nodeAssociations, borderTargets);
+		};
+
+		// start the bfs
+		BreadthFirstGraphWalker bfs = new GraphStoreBFS(policyStore.graph())
+				.withDirection(Direction.DESCENDANTS)
+				.withVisitor(visitor);
+
+		if (userCtx.isUser()) {
+			bfs.walk(userCtx.getUser());
+		} else {
+			bfs.walk(userCtx.getAttributes());
 		}
 
-		List<String> nodes = userCtx.getNodes();
-		for (String subject : nodes) {
-			if (!policyStore.graph().nodeExists(subject)) {
-				throw new NodeDoesNotExistException(subject);
-			}
+		return new UserDagResult(borderTargets, reachedProhibitions);
+	}
 
-			// get the associations for the subject, it the subject is a user, nothing will be returned
-			// this is only when a UA is the subject
-			Collection<Association> subjectAssociations = policyStore.graph().getAssociationsWithSource(subject);
-			collectAssociationsFromBorderTargets(subjectAssociations, borderTargets);
-
-			Visitor visitor = node -> {
-				Collection<Prohibition> subjectProhibitions = policyStore.prohibitions().getProhibitions().getOrDefault(node, new ArrayList<>());
-				reachedProhibitions.addAll(subjectProhibitions);
-				for (Prohibition prohibition : subjectProhibitions) {
-					Collection<ContainerCondition> containers = prohibition.getContainers();
-					for (ContainerCondition cont : containers) {
-						prohibitionTargets.add(cont.getName());
-					}
-				}
-
-				Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
-				collectAssociationsFromBorderTargets(nodeAssociations, borderTargets);
-			};
-
-			// start the bfs
-			new GraphStoreBFS(policyStore.graph())
-					.withDirection(Direction.DESCENDANTS)
-					.withVisitor(visitor)
-					.walk(subject);
-		}
-
-		return new UserDagResult(borderTargets, reachedProhibitions, prohibitionTargets);
+	private Collection<Prohibition> getProhibitionsWithSubject(String node) throws PMException {
+		return policyStore.prohibitions().getProhibitions().getOrDefault(node, new ArrayList<>());
 	}
 
 	private void collectAssociationsFromBorderTargets(Collection<Association> assocs, Map<String, AccessRightSet> borderTargets) {

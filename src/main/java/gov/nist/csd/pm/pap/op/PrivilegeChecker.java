@@ -36,13 +36,34 @@ public class PrivilegeChecker {
         TargetContext targetContext = new TargetContext(target);
 
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
-        if (!computed.containsAll(toCheck) || (toCheck.isEmpty() && computed.isEmpty())) {
-            if (explain) {
-                throw new UnauthorizedException(pap.query().access().explain(userCtx, targetContext), userCtx, target, toCheck);
-            } else {
-                throw new UnauthorizedException(null, userCtx, target, toCheck);
-            }
+
+        checkOrThrow(userCtx, targetContext, computed, toCheck);
+    }
+
+    public void check(UserContext userCtx, UserContext target, Collection<String> toCheck) throws PMException {
+        TargetContext targetContext;
+        if (target.isUser()) {
+            targetContext = new TargetContext(target.getUser());
+        } else {
+            targetContext = new TargetContext(target.getAttributes());
         }
+
+        AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
+
+        checkOrThrow(userCtx, targetContext, computed, toCheck);
+    }
+
+    public void check(UserContext userCtx, TargetContext target, Collection<String> toCheck) throws PMException {
+        TargetContext targetContext;
+        if (target.isNode()) {
+            targetContext = new TargetContext(target.getTarget());
+        } else {
+            targetContext = new TargetContext(target.getAttributes());
+        }
+
+        AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
+
+        checkOrThrow(userCtx, targetContext, computed, toCheck);
     }
 
     public void check(UserContext userCtx, String target, String... toCheck) throws PMException {
@@ -72,6 +93,20 @@ public class PrivilegeChecker {
         for (String entity : referencedNodes.nodes()) {
             check(userCtx, entity, toCheck);
         }
+    }
 
+    private void checkOrThrow(UserContext userContext, TargetContext targetContext, AccessRightSet computed, Collection<String> toCheck) throws PMException {
+        if (!computed.containsAll(toCheck) || (toCheck.isEmpty() && computed.isEmpty())) {
+            if (explain) {
+                throw new UnauthorizedException(
+                        pap.query().access().explain(userContext, targetContext),
+                        userContext,
+                        targetContext,
+                        toCheck
+                );
+            } else {
+                throw new UnauthorizedException(null, userContext, targetContext, toCheck);
+            }
+        }
     }
 }
