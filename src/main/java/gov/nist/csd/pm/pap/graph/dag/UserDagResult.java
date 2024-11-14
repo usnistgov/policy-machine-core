@@ -9,9 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 public record UserDagResult(Map<String, AccessRightSet> borderTargets,
-                            Set<Prohibition> prohibitions,
-                            Set<String> prohibitionTargets) {
+                            Set<Prohibition> prohibitions) {
     public UserDagResult() {
-        this(new HashMap<>(), new HashSet<>(), new HashSet<>());
+        this(new HashMap<>(), new HashSet<>());
     }
 }

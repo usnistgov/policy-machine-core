@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

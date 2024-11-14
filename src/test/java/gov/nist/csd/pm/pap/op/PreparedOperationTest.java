@@ -4,7 +4,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,7 +40,7 @@ class PreparedOperationTest {
         );
 
         EventContext execute = preparedOperation.execute(new MemoryPAP(), new UserContext("u1"), new PrivilegeChecker(new MemoryPAP()));
-        assertEquals(execute, new EventContext("u1", "", op1,
+        assertEquals(execute, new EventContext("u1", null, op1,
                 Map.of(ASCENDANT_OPERAND, "c", DESCENDANTS_OPERAND, List.of("a", "b"))));
     }
 

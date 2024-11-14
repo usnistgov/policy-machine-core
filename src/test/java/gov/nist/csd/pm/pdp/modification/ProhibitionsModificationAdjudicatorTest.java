@@ -10,7 +10,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +75,7 @@ class ProhibitionsModificationAdjudicatorTest {
         ));
         assertEquals(
                 new EventContext(
-                        "u1", "",
+                        "u1",
                         new CreateProhibitionOp(),
                         Map.of(
                                 NAME_OPERAND, "pro1",
@@ -99,7 +99,7 @@ class ProhibitionsModificationAdjudicatorTest {
         ));
         assertEquals(
                 new EventContext(
-                        "u1", "",
+                        "u1",
                         new CreateProhibitionOp(),
                         Map.of(
                                 NAME_OPERAND, "pro2",
@@ -147,7 +147,7 @@ class ProhibitionsModificationAdjudicatorTest {
 
         assertEquals(
                 new EventContext(
-                        "u1", "",
+                        "u1",
                         new DeleteProhibitionOp(),
                         Map.of(
                                 NAME_OPERAND, "pro1",

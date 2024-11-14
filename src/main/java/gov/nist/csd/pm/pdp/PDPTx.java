@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
@@ -64,7 +64,6 @@ public class PDPTx extends PAP {
     @Override
     public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_OPS);
-
         super.setPMLOperations(pmlOperations);
     }
 

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

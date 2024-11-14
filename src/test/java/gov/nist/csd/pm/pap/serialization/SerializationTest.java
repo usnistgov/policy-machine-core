@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.PolicyEquals;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Test;

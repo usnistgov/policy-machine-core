@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.exception.*;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
 import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.query.model.explain.*;
@@ -54,7 +54,7 @@ class PDPTest {
                         }
                 )
         );
-        assertEquals("[user=u1] does not have access right [associate] on [ua1]", e.getMessage());
+        assertEquals("[user=u1] does not have access right [associate] on [target=ua1]", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -253,8 +253,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         assertThrows(OperationDoesNotExistException.class,
                 () -> pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of()));
-        assertThrows(NodeDoesNotExistException.class,
-                () -> pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read"));
+        assertThrows(NodeDoesNotExistException.class, () -> pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read"));
         assertThrows(OperationDoesNotExistException.class,
                 () -> pdp.adjudicateResourceOperation(new UserContext("u1"), "ua1", "x"));
     }

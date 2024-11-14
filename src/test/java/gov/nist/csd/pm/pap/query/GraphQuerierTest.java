@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;

@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.statement.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.ShortDeclarationStatement;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
@@ -82,7 +82,7 @@ class IfStmtVisitorTest {
                 f1()
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(), pml);
+        pap.executePML(new UserContext(""), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
 

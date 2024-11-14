@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,7 +4,7 @@ import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;

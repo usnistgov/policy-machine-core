@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.util.PolicyEquals;

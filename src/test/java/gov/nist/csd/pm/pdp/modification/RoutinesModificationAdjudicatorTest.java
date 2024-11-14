@@ -7,7 +7,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.pap.op.routine.DeleteAdminRoutineOp;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
@@ -74,7 +74,7 @@ class RoutinesModificationAdjudicatorTest {
 
         assertDoesNotThrow(() -> ok.createAdminRoutine(routine1));
         assertEquals(
-                new EventContext("u1", "", new CreateAdminRoutineOp(), Map.of(ROUTINE_OPERAND, routine1)),
+                new EventContext("u1", new CreateAdminRoutineOp(), Map.of(ROUTINE_OPERAND, routine1)),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().routines().getAdminRoutineNames().contains("routine1"));
@@ -93,7 +93,7 @@ class RoutinesModificationAdjudicatorTest {
 
         assertDoesNotThrow(() -> ok.deleteAdminRoutine("routine1"));
         assertEquals(
-                new EventContext("u1", "", new DeleteAdminRoutineOp(), Map.of(NAME_OPERAND, "routine1")),
+                new EventContext("u1", new DeleteAdminRoutineOp(), Map.of(NAME_OPERAND, "routine1")),
                 testEventProcessor.getEventContext()
         );
 

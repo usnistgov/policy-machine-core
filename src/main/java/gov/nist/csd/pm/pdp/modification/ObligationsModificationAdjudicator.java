@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pdp.Adjudicator;
 

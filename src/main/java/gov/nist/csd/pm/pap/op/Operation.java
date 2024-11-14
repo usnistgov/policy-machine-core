@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.op;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.exception.OperandsDoNotMatchException;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.io.Serializable;
 import java.util.*;

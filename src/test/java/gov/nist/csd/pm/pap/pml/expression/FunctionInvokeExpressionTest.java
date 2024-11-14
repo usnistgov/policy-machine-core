@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -202,7 +202,7 @@ class FunctionInvokeExpressionTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(), pml);
+        pap.executePML(new UserContext(""), pml);
         assertTrue(pap.query().graph().nodeExists("cx"));
         assertTrue(pap.query().graph().nodeExists("cy"));
     }
@@ -218,7 +218,7 @@ class FunctionInvokeExpressionTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(), pml);
+        pap.executePML(new UserContext(""), pml);
         assertFalse(pap.query().graph().nodeExists("x"));
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -237,7 +237,7 @@ class FunctionInvokeExpressionTest {
                 a()
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(), pml);
+        pap.executePML(new UserContext(""), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
 

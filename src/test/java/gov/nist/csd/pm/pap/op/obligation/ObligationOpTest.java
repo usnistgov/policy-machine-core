@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 

@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.routine.Routine;
 import org.junit.jupiter.api.Test;
 

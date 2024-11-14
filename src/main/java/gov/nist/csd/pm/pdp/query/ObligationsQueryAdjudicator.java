@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.op.AdminAccessRights;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.query.ObligationsQuery;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pdp.Adjudicator;
 import gov.nist.csd.pm.pdp.exception.UnauthorizedException;

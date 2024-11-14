@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.GraphQuery;
-import gov.nist.csd.pm.pap.query.UserContext;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pdp.Adjudicator;
