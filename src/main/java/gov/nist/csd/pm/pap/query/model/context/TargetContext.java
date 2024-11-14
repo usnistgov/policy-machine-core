@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.pap.query.model.context;
 
-import java.util.ArrayList;
+import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.store.GraphStore;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +14,14 @@ public class TargetContext {
 
 	public TargetContext(String target) {
 		this.target = target;
+	}
+
+	public TargetContext(UserContext target) {
+		if (target.isUser()) {
+			this.target = target.getUser();
+		} else {
+			this.attributes = target.getAttributes();
+		}
 	}
 
 	public TargetContext(List<String> attributes) {
@@ -35,6 +46,20 @@ public class TargetContext {
 
 	public boolean isNode() {
 		return target != null;
+	}
+
+	public void checkExists(GraphStore graphStore) throws PMException {
+		if (isNode()) {
+			if (!graphStore.nodeExists(target)) {
+				throw new NodeDoesNotExistException(target);
+			}
+		} else {
+			for (String attribute : attributes) {
+				if (!graphStore.nodeExists(attribute)) {
+					throw new NodeDoesNotExistException(attribute);
+				}
+			}
+		}
 	}
 
 	@Override

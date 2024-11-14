@@ -253,7 +253,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         assertThrows(OperationDoesNotExistException.class,
                 () -> pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of()));
-        assertDoesNotThrow(() -> pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read"));
+        assertThrows(NodeDoesNotExistException.class, () -> pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read"));
         assertThrows(OperationDoesNotExistException.class,
                 () -> pdp.adjudicateResourceOperation(new UserContext("u1"), "ua1", "x"));
     }

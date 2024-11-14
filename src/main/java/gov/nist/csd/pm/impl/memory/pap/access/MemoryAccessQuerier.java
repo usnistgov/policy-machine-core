@@ -23,6 +23,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public MemoryAccessQuerier(PolicyStore memoryPolicyStore) {
         super(memoryPolicyStore);
     }
+
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
         // traverse the user side of the graph to get the associations
@@ -35,6 +36,26 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
         // resolve the permissions
         return resolvePrivileges(userDagResult, targetDagResult, store.operations().getResourceOperations());
+    }
+
+    @Override
+    public List<AccessRightSet> computePrivileges(UserContext userCtx, List<TargetContext> targetCtxs) throws PMException {
+        // traverse the user side of the graph to get the associations
+        MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
+        UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
+
+        // traverse the target side of the graph to get permissions per policy class
+        MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(store);
+
+        List<AccessRightSet> accessRightSets = new ArrayList<>();
+        for (TargetContext targetCtx : targetCtxs) {
+            TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
+            AccessRightSet privs = resolvePrivileges(userDagResult, targetDagResult, store.operations().getResourceOperations());
+
+            accessRightSets.add(privs);
+        }
+
+        return accessRightSets;
     }
 
     @Override
@@ -54,22 +75,6 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
         // resolve the permissions
         return resolveDeniedAccessRights(userDagResult, targetDagResult);
-    }
-
-    @Override
-    public Map<String, AccessRightSet> computePolicyClassAccessRights(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        // traverse the user side of the graph to get the associations
-        MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
-        UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
-        if (userDagResult.borderTargets().isEmpty()) {
-            return new HashMap<>();
-        }
-
-        // traverse the target side of the graph to get permissions per policy class
-        MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(store);
-        TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
-
-        return targetDagResult.pcMap();
     }
 
     @Override

@@ -24,10 +24,11 @@ public class MemoryTargetExplainer {
 	}
 
 	public Map<String, Map<Path, List<Association>>> explainTarget(TargetContext targetCtx) throws PMException {
+		targetCtx.checkExists(policyStore.graph());
+
 		Collection<String> policyClasses = policyStore.graph().getPolicyClasses();
 
 		// initialize map with policy classes
-		Map<String, Map<Path, List<Association>>> pcMap = new HashMap<>();
 		Map<String, Map<List<String>, List<Association>>> pcPathAssociations = new HashMap<>();
 		for (String pc : policyClasses) {
 			pcPathAssociations.put(pc, new HashMap<>(Map.of(new ArrayList<>(List.of(pc)), new ArrayList<>())));
@@ -75,6 +76,8 @@ public class MemoryTargetExplainer {
 		}
 
 		// convert the map created above into a map where the policy classes are the keys
+		Map<String, Map<Path, List<Association>>> pcMap = new HashMap<>();
+
 		for (String target : nodes) {
 			Map<List<String>, List<Association>> targetPathAssocs = pcPathAssociations.get(target);
 			for (Map.Entry<List<String>, List<Association>> entry : targetPathAssocs.entrySet()) {

@@ -793,35 +793,6 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     }
 
     @Test
-    void testComputePolicyClassAccessRights() throws PMException {
-        String pml = """
-                set resource operations ["read", "write"]
-                create pc "pc1"
-                create UA "ua1" in ["pc1"]
-                create OA "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-
-                create pc "pc2"
-                create UA "ua2" in ["pc2"]
-                create OA "oa2" in ["pc2"]
-                associate "ua2" and "oa2" with ["read"]
-                
-                create u "u1" in ["ua1", "ua2"]
-                create o "o1" in ["oa1", "oa2"]
-                """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
-        Map<String, AccessRightSet> policyClassAccessRights =
-                pap.query().access().computePolicyClassAccessRights(new UserContext("u1"), new TargetContext("o1"));
-        assertEquals(
-                Map.of(
-                        "pc1", new AccessRightSet("read", "write"),
-                        "pc2", new AccessRightSet("read")
-                ),
-                policyClassAccessRights
-        );
-    }
-
-    @Test
     void testGetAccessibleNodes() throws PMException {
         pap.modify().operations().setResourceOperations(RWE);
 

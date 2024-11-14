@@ -62,7 +62,6 @@ public class AdminAccessRights {
     public static final String CREATE_ADMIN_ROUTINE = "create_admin_routine";
     public static final String DELETE_ADMIN_ROUTINE = "delete_admin_routine";
 
-
     // policy review
     public static final String REVIEW_POLICY = "review_policy";
 

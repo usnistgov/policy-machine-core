@@ -19,7 +19,9 @@ public class MemoryUserExplainer {
 		this.policyStore = policyStore;
 	}
 
-	public Map<String, Set<Path>> explainUser(UserContext userCtx, Map<String, Map<Path, List<Association>>> targetPaths) throws PMException {
+	public Map<String, Set<Path>> explainIntersectionOfTargetPaths(UserContext userCtx, Map<String, Map<Path, List<Association>>> targetPaths) throws PMException {
+		userCtx.checkExists(policyStore.graph());
+
 		// initialize map with the UAs of the target path associations
 		Map<String, Set<Path>> associationUAPaths = new HashMap<>();
 		Set<String> uasFromTargetPathAssociations = new HashSet<>(getUAsFromTargetPathAssociations(targetPaths));
@@ -53,10 +55,12 @@ public class MemoryUserExplainer {
 		if (userCtx.isUser()) {
 			String user = userCtx.getUser();
 			nodes.add(user);
+
 			dfs.walk(user);
 		} else {
 			List<String> attributes = userCtx.getAttributes();
 			nodes.addAll(attributes);
+
 			dfs.walk(attributes);
 		}
 

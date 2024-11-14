@@ -1,7 +1,10 @@
 package gov.nist.csd.pm.pap.query.model.context;
 
+import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.store.GraphStore;
+
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,6 +58,20 @@ public class UserContext implements Serializable {
 
     public boolean isUser() {
         return user != null;
+    }
+
+    public void checkExists(GraphStore graphStore) throws PMException {
+        if (isUser()) {
+            if (!graphStore.nodeExists(user)) {
+                throw new NodeDoesNotExistException(user);
+            }
+        } else {
+            for (String attribute : attributes) {
+                if (!graphStore.nodeExists(attribute)) {
+                    throw new NodeDoesNotExistException(attribute);
+                }
+            }
+        }
     }
 
     @Override

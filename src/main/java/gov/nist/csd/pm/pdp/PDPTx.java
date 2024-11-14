@@ -64,7 +64,6 @@ public class PDPTx extends PAP {
     @Override
     public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_PML_OPS);
-
         super.setPMLOperations(pmlOperations);
     }
 

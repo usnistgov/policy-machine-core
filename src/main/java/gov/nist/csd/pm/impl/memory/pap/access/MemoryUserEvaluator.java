@@ -32,6 +32,8 @@ public class MemoryUserEvaluator {
 	 * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
 	 */
 	protected UserDagResult evaluate(UserContext userCtx) throws PMException {
+		userCtx.checkExists(policyStore.graph());
+
 		final Map<String, AccessRightSet> borderTargets = new HashMap<>();
 		// initialize with the prohibitions or the provided process
 		final Set<Prohibition> reachedProhibitions = new HashSet<>(getProhibitionsWithSubject(userCtx.getProcess()));

@@ -41,26 +41,14 @@ public class PrivilegeChecker {
     }
 
     public void check(UserContext userCtx, UserContext target, Collection<String> toCheck) throws PMException {
-        TargetContext targetContext;
-        if (target.isUser()) {
-            targetContext = new TargetContext(target.getUser());
-        } else {
-            targetContext = new TargetContext(target.getAttributes());
-        }
+        TargetContext targetContext = new TargetContext(target);
 
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
 
         checkOrThrow(userCtx, targetContext, computed, toCheck);
     }
 
-    public void check(UserContext userCtx, TargetContext target, Collection<String> toCheck) throws PMException {
-        TargetContext targetContext;
-        if (target.isNode()) {
-            targetContext = new TargetContext(target.getTarget());
-        } else {
-            targetContext = new TargetContext(target.getAttributes());
-        }
-
+    public void check(UserContext userCtx, TargetContext targetContext, Collection<String> toCheck) throws PMException {
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
 
         checkOrThrow(userCtx, targetContext, computed, toCheck);
@@ -73,12 +61,6 @@ public class PrivilegeChecker {
     public void check(UserContext userCtx, List<String> targets, String... toCheck) throws PMException {
         for (String target : targets) {
             check(userCtx, target, Arrays.asList(toCheck));
-        }
-    }
-
-    public void check(UserContext userCtx, Collection<String> targets, String... toCheck) throws PMException {
-        for (String target : targets) {
-            check(userCtx, target, toCheck);
         }
     }
 
@@ -107,6 +89,15 @@ public class PrivilegeChecker {
             } else {
                 throw new UnauthorizedException(null, userContext, targetContext, toCheck);
             }
+        }
+    }
+
+    private void checkOrThrow(UserContext userCtx, List<TargetContext> targetContexts, List<AccessRightSet> privileges, Collection<String> toCheck) throws PMException {
+        for (int i = 0; i < targetContexts.size(); i++) {
+            TargetContext targetContext = targetContexts.get(i);
+            AccessRightSet privs = privileges.get(i);
+
+            checkOrThrow(userCtx, targetContext, privs, toCheck);
         }
     }
 }

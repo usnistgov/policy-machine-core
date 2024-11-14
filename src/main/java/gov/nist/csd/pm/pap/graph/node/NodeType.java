@@ -15,21 +15,29 @@ import java.io.Serializable;
  * OS = Operation Set
  */
 public enum NodeType implements Serializable {
-    OA("OA"),
-    UA("UA"),
-    U("U"),
-    O("O"),
-    PC("PC"),
-    ANY("ANY");
+    OA(0),
+    UA(1),
+    U(2),
+    O(3),
+    PC(4),
+    ANY(5);
 
-    private final String label;
+    private final int i;
 
-    NodeType(String label) {
-        this.label = label;
+    NodeType(int i) {
+        this.i = i;
     }
 
     public String toString() {
-        return label;
+        return switch (i) {
+            case 0 -> "OA";
+            case 1 -> "UA";
+            case 2 -> "U";
+            case 3 -> "O";
+            case 4 -> "PC";
+            case 5 -> "ANY";
+	        default -> throw new IllegalStateException("Unexpected value: " + i);
+        };
     }
 
     /**

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
-import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.graph.dag.*;
 import gov.nist.csd.pm.pap.graph.node.Node;
@@ -31,6 +30,8 @@ public class MemoryTargetEvaluator {
 	 * each policy class.
 	 */
 	public TargetDagResult evaluate(UserDagResult userCtx, TargetContext targetCtx) throws PMException {
+		targetCtx.checkExists(policyStore.graph());
+
 		Collection<String> policyClasses = policyStore.graph().getPolicyClasses();
 		Map<String, AccessRightSet> borderTargets = userCtx.borderTargets();
 		Set<String> userProhibitionTargets = collectUserProhibitionTargets(userCtx.prohibitions());

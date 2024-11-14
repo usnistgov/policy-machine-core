@@ -47,7 +47,7 @@ public class MemoryExplainer {
 		MemoryUserExplainer userExplainer = new MemoryUserExplainer(policyStore);
 		MemoryTargetExplainer targetExplainer = new MemoryTargetExplainer(policyStore);
 		Map<String, Map<Path, List<Association>>> targetPaths = targetExplainer.explainTarget(targetCtx);
-		Map<String, Set<Path>> userPaths = userExplainer.explainUser(userCtx, targetPaths);
+		Map<String, Set<Path>> userPaths = userExplainer.explainIntersectionOfTargetPaths(userCtx, targetPaths);
 
 		List<PolicyClassExplain> result = new ArrayList<>();
 
