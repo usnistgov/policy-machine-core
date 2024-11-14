@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "gov.nist.csd.pm.pap.op.graph.proto";
+option java_outer_classname = "GraphProto";
+
+message AssignOp {
+  string ascendant = 1;
+  repeated string descendants = 2;
+}
+
+message AssociateOp {
+  string ua = 1;
+  string target = 2;
+  repeated string arset = 3;
+}
+
+message CreatePolicyClassOp {
+  string name = 1;
+}
+
+message CreateUserAttributeOp {
+  string name = 1;
+  repeated string descendants = 2;
+}
+
+message CreateObjectAttributeOp {
+  string name = 1;
+  repeated string descendants = 2;
+}
+
+message CreateUserOp {
+  string name = 1;
+  repeated string descendants = 2;
+}
+
+message CreateObjectOp {
+  string name = 1;
+  repeated string descendants = 2;
+}
+
+message DeassignOp {
+  string ascendant = 1;
+  repeated string descendants = 2;
+}
+
+message DeleteNodeOp {
+  string name = 1;
+}
+
+message SetNodePropertiesOp {
+  string name = 1;
+  map<string, string> properties = 2;
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "gov.nist.csd.pm.pap.op.operation.proto";
+option java_outer_classname = "OperationProto";
+
+message CreateAdminOperationOp {
+  string pml = 1;
+}
+
+message DeleteAdminOperationOp {
+  string name = 1;
+}
+
+message SetResourceOperationsOp {
+  repeated string operations = 1;
+}
