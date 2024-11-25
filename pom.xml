@@ -14,14 +14,32 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.class</include>
+                        <include>${project.build.directory}/generated-sources/**/*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>add-source</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
-                <version>3.3.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -31,6 +49,7 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/antlr4</generatedSourcesDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -77,7 +96,7 @@
                 <version>${antlr.version}</version>
                 <configuration>
                     <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
-                    <outputDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
                     <visitor>true</visitor>
                     <arguments>
                         <argument>-package</argument>
@@ -86,9 +105,15 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>generate-antlr-sources</id>
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
+                            <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -134,13 +159,6 @@
             <version>8.5.13</version>
         </dependency>
 
-        <!-- grpc deps -->
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-            <version>1.67.1</version>
-            <scope>runtime</scope>
-        </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
