@@ -10,7 +10,43 @@
     <version>3.0.0-alpha.1</version>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
+
         <plugins>
+            <!-- grpc plugins -->
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                    <clearOutputDirectory>false</clearOutputDirectory>
+                    <!-- Protobuf Compiler -->
+                    <protocArtifact>com.google.protobuf:protoc:3.24.3:exe:${os.detected.classifier}</protocArtifact>
+                    <!-- gRPC Compiler -->
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.57.0:exe:${os.detected.classifier}</pluginArtifact>
+                </configuration>
+                <executions>
+                    <!-- Execution for Message Classes -->
+                    <execution>
+                        <id>generate-protobuf-messages</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -35,7 +71,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-sources</source>
+                                <source>${project.build.directory}/generated-sources/gov/nist/csd/pm</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -49,7 +85,7 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
-                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/antlr4</generatedSourcesDirectory>
+                    <generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -96,7 +132,7 @@
                 <version>${antlr.version}</version>
                 <configuration>
                     <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
                     <visitor>true</visitor>
                     <arguments>
                         <argument>-package</argument>
@@ -111,13 +147,14 @@
                         </goals>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
                             <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+
     </build>
 
     <dependencies>
@@ -160,14 +197,19 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.24.3</version>
+        </dependency>
+        <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.67.1</version>
+            <version>1.57.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.67.1</version>
+            <version>1.57.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>

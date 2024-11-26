@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.obligation;
 
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
@@ -60,7 +61,7 @@ public class EventPattern implements Serializable {
             return userMatches;
         }
 
-        boolean operandsMatch = operandsMatch(eventCtx.operands(), eventCtx.nodeOperands(), pap);
+        boolean operandsMatch = operandsMatch(eventCtx.opName(), eventCtx.operands(), pap);
 
         return userMatches && opMatches && operandsMatch;
     }
@@ -97,7 +98,10 @@ public class EventPattern implements Serializable {
         return operationPattern.matches(opName, pap);
     }
 
-    private boolean operandsMatch(Map<String, Object> operands, List<String> nodeOperands, PAP pap) throws PMException {
+    private boolean operandsMatch(String opName, Map<String, Object> operands, PAP pap) throws PMException {
+        // get the operands of the operation that represent nodes
+        List<String> nodeOperands = getOperationNodeOperands(opName, pap);
+
         // if more patterns than operands - false
         // if no patterns - true (match everything)
         if (operandPatterns.size() > operands.size()) {
@@ -136,5 +140,14 @@ public class EventPattern implements Serializable {
         }
 
         return true;
+    }
+
+    private List<String> getOperationNodeOperands(String opName, PAP pap) throws PMException {
+        if (pap.query().operations().getResourceOperations().contains(opName)) {
+            return List.of("target");
+        }
+
+        Operation<?> adminOperation = pap.query().operations().getAdminOperation(opName);
+        return adminOperation.getNodeOperands();
     }
 }
