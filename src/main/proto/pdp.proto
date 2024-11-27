@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "gov.nist.csd.pm.pdp.proto";
+option java_outer_classname = "PDPProto";
+
+message ResourceOperationRequest {
+  string operation = 1;
+}
+
+message ResourceOperationResponse {
+  string operation = 1;
+}
+
+service ResourcePDP {
+  rpc AdjudicateResourceOperation(ResourceOperationRequest) returns (ResourceOperationResponse) {}
+}
+
+message AdminOperationRequest {
+  string opName = 1;
+  map<string, bytes> operands = 2;
+}
+
+message AdminOperationResponse {}
+
+message AdminRoutineRequest {
+  repeated AdminOperationRequest ops = 1;
+}
+
+message AdminRoutineResponse {}
+
+
+service AdminPDP {
+  rpc AdjudicateAdminOperation(AdminOperationRequest) returns (AdminOperationResponse) {}
+  rpc AdjudicateAdminRoutine(AdminRoutineRequest) returns (AdminRoutineResponse) {}
+}

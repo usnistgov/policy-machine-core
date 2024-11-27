@@ -10,18 +10,72 @@
     <version>3.0.0-alpha.1</version>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
+
         <plugins>
+            <!-- grpc plugins -->
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                    <clearOutputDirectory>false</clearOutputDirectory>
+                    <!-- Protobuf Compiler -->
+                    <protocArtifact>com.google.protobuf:protoc:3.24.3:exe:${os.detected.classifier}</protocArtifact>
+                    <!-- gRPC Compiler -->
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.57.0:exe:${os.detected.classifier}</pluginArtifact>
+                </configuration>
+                <executions>
+                    <!-- Execution for Message Classes -->
+                    <execution>
+                        <id>generate-protobuf-messages</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.class</include>
+                        <include>${project.build.directory}/generated-sources/**/*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>add-source</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/gov/nist/csd/pm</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
-                <version>3.3.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -31,6 +85,7 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -77,7 +132,7 @@
                 <version>${antlr.version}</version>
                 <configuration>
                     <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
-                    <outputDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
                     <visitor>true</visitor>
                     <arguments>
                         <argument>-package</argument>
@@ -86,13 +141,20 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>generate-antlr-sources</id>
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
+                            <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+
     </build>
 
     <dependencies>
@@ -134,22 +196,20 @@
             <version>8.5.13</version>
         </dependency>
 
-        <!-- grpc deps -->
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-            <version>1.67.1</version>
-            <scope>runtime</scope>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.24.3</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.67.1</version>
+            <version>1.57.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.67.1</version>
+            <version>1.57.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>

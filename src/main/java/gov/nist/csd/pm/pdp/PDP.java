@@ -123,8 +123,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
                 user.getUser(),
                 user.getProcess(),
                 resourceOperation,
-                Map.of("target", target),
-                List.of("target")
+                Map.of("target", target)
         ));
 
         return new ResourceAdjudicationResponse(node);
@@ -145,8 +144,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
                 user.getUser(),
                 user.getProcess(),
                 operation.getName(),
-                operands,
-                operation.getNodeOperands()
+                operands
         ));
 
         if (ret instanceof Value value) {
