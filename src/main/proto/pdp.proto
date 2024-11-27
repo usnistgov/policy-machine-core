@@ -6,10 +6,11 @@ option java_outer_classname = "PDPProto";
 
 message ResourceOperationRequest {
   string operation = 1;
+  string target = 2;
 }
 
 message ResourceOperationResponse {
-  string operation = 1;
+  bytes node = 1;
 }
 
 service ResourcePDP {
