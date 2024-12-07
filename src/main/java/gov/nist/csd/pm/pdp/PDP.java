@@ -1,40 +1,39 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.graph.node.Node;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.epp.EventEmitter;
-import gov.nist.csd.pm.epp.EventProcessor;
+import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.EventPublisher;
+import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.pap.*;
-import gov.nist.csd.pm.pap.exception.OperationDoesNotExistException;
-import gov.nist.csd.pm.pap.op.AdminOperations;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
+import gov.nist.csd.pm.pap.AdminOperations;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.exception.BootstrapExistingPolicyException;
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.tx.TxRunner;
-import gov.nist.csd.pm.pap.routine.Routine;
-import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
+import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.tx.TxRunner;
+import gov.nist.csd.pm.common.routine.Routine;
 
 import java.util.*;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
-import static gov.nist.csd.pm.pap.graph.node.NodeType.ANY;
-import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 
-public class PDP implements EventEmitter, AccessAdjudication {
+public class PDP implements EventPublisher, AccessAdjudication {
 
     protected final PAP pap;
-    protected final List<EventProcessor> eventProcessors;
+    protected final List<EventSubscriber> eventSubscribers;
     private final PrivilegeChecker privilegeChecker;
 
     public PDP(PAP pap) {
         this.pap = pap;
-        this.eventProcessors = new ArrayList<>();
+        this.eventSubscribers = new ArrayList<>();
         this.privilegeChecker = new PrivilegeChecker(pap);
     }
 
@@ -52,7 +51,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
 
     public Object runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         return TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, privilegeChecker, pap, eventProcessors);
+            PDPTx pdpTx = new PDPTx(userCtx, privilegeChecker, pap, eventSubscribers);
             return txRunner.run(pdpTx);
         });
     }
@@ -89,18 +88,18 @@ public class PDP implements EventEmitter, AccessAdjudication {
     }
 
     @Override
-    public void addEventListener(EventProcessor processor) {
-        eventProcessors.add(processor);
+    public void addEventSubscriber(EventSubscriber processor) {
+        eventSubscribers.add(processor);
     }
 
     @Override
-    public void removeEventListener(EventProcessor processor) {
-        eventProcessors.remove(processor);
+    public void removeEventSubscriber(EventSubscriber processor) {
+        eventSubscribers.remove(processor);
     }
 
     @Override
-    public void emitEvent(EventContext event) throws PMException {
-        for (EventProcessor listener : eventProcessors) {
+    public void publishEvent(EventContext event) throws PMException {
+        for (EventSubscriber listener : eventSubscribers) {
             listener.processEvent(event);
         }
     }
@@ -119,7 +118,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
 
         Node node = pap.query().graph().getNode(target);
 
-        emitEvent(new EventContext(
+        publishEvent(new EventContext(
                 user.getUser(),
                 user.getProcess(),
                 resourceOperation,
@@ -140,7 +139,7 @@ public class PDP implements EventEmitter, AccessAdjudication {
 
         Object ret = pdpTx.executeAdminExecutable(operation, operands);
 
-        emitEvent(new EventContext(
+        publishEvent(new EventContext(
                 user.getUser(),
                 user.getProcess(),
                 operation.getName(),

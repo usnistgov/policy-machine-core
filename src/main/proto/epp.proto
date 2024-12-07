@@ -1,12 +1,19 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "gov.nist.csd.pm.epp.proto";
+option java_package = "gov.nist.csd.pm.proto.epp";
 option java_outer_classname = "EPPProto";
+
+message StringList {
+  repeated string values = 1;
+}
 
 message OperandEntry {
   string name = 1;
-  repeated string value = 2;
+  oneof value {
+    string stringValue = 2;
+    StringList listValue = 3;
+  }
 }
 
 message EventContext {

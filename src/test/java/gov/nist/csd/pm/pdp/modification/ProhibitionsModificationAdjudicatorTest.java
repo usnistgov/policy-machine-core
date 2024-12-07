@@ -1,26 +1,26 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
+import gov.nist.csd.pm.pdp.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.prohibition.ProhibitionOp.*;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProhibitionsModificationAdjudicatorTest {
@@ -29,7 +29,7 @@ class ProhibitionsModificationAdjudicatorTest {
     PDP pdp;
     EPP epp;
 
-    TestEventProcessor testEventProcessor;
+    TestEventSubscriber testEventProcessor;
     ProhibitionsModificationAdjudicator ok;
     ProhibitionsModificationAdjudicator fail;
 
@@ -57,8 +57,8 @@ class ProhibitionsModificationAdjudicatorTest {
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
 
-        testEventProcessor = new TestEventProcessor();
-        pdp.addEventListener(testEventProcessor);
+        testEventProcessor = new TestEventSubscriber();
+        pdp.addEventSubscriber(testEventProcessor);
 
         ok = new ProhibitionsModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
         fail = new ProhibitionsModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());

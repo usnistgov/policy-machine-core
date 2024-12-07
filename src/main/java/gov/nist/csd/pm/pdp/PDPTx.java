@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.epp.EventProcessor;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.common.executable.AdminExecutable;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
@@ -14,7 +14,7 @@ import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pdp.modification.PolicyModificationAdjudicator;
@@ -23,7 +23,7 @@ import gov.nist.csd.pm.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 
 public class PDPTx extends PAP {
 
@@ -31,18 +31,18 @@ public class PDPTx extends PAP {
 
     private final UserContext userCtx;
     private final PrivilegeChecker privilegeChecker;
-    private final PDPEventEmitter eventEmitter;
+    private final PDPEventPublisher eventEmitter;
 
     private final PolicyModificationAdjudicator pdpModifier;
     private final PolicyQueryAdjudicator pdpQuerier;
 
-    public PDPTx(UserContext userCtx, PrivilegeChecker privilegeChecker, PAP pap, List<EventProcessor> epps) throws PMException {
+    public PDPTx(UserContext userCtx, PrivilegeChecker privilegeChecker, PAP pap, List<EventSubscriber> epps) throws PMException {
         super(pap);
 
         this.userCtx = userCtx;
         this.privilegeChecker = privilegeChecker;
         this.pap = pap;
-        this.eventEmitter = new PDPEventEmitter(epps);
+        this.eventEmitter = new PDPEventPublisher(epps);
         this.pdpModifier = new PolicyModificationAdjudicator(this.userCtx, this.pap, this.eventEmitter, this.privilegeChecker);
         this.pdpQuerier = new PolicyQueryAdjudicator(this.userCtx, this.pap, this.privilegeChecker);
     }

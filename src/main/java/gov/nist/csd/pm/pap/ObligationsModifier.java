@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.common.exception.ObligationNameExistsException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.modification.ObligationsModification;
-import gov.nist.csd.pm.pap.obligation.EventPattern;
-import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.common.obligation.EventPattern;
+import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
-import gov.nist.csd.pm.pap.exception.*;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 

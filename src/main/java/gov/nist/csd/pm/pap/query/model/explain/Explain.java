@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.query.model.explain;
 
 import com.google.gson.GsonBuilder;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
 
 import java.util.*;
 

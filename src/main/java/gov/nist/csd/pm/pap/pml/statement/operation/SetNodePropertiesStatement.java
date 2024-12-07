@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.graph.SetNodePropertiesOp;
+import gov.nist.csd.pm.common.op.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.PROPERTIES_OPERAND;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.PROPERTIES_OPERAND;
 
 
 public class SetNodePropertiesStatement extends OperationStatement {

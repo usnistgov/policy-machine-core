@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.PreparedOperation;
-import gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.common.op.PreparedOperation;
+import gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
+import static gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
 
 public class CreateOperationStatement extends PreparedOperation<Void> implements CreateFunctionStatement {
 

@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.obligation.Obligation;
-import gov.nist.csd.pm.pap.exception.ObligationDoesNotExistException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 

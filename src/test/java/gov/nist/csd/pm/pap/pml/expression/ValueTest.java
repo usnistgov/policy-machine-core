@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.pap.op.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.op.graph.CreateObjectAttributeOp;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
-import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.PROPERTIES_OPERAND;
+import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
+import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.PROPERTIES_OPERAND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

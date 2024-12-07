@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.exception;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.pap.pml.compiler.error.ErrorLog;
 

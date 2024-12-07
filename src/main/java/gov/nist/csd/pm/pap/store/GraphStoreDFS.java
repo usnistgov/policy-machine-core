@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.store;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.dag.DepthFirstGraphWalker;
-import gov.nist.csd.pm.pap.graph.dag.Direction;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.common.graph.dag.Direction;
 
 import java.util.Collection;
 

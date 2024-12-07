@@ -7,7 +7,7 @@
     <groupId>gov.nist.csd.pm</groupId>
     <artifactId>policy-machine-core</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.0-alpha.1</version>
+    <version>3.0.0</version>
 
     <build>
         <extensions>
@@ -28,10 +28,10 @@
                     <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                     <clearOutputDirectory>false</clearOutputDirectory>
                     <!-- Protobuf Compiler -->
-                    <protocArtifact>com.google.protobuf:protoc:3.24.3:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:3.25.5:exe:${os.detected.classifier}</protocArtifact>
                     <!-- gRPC Compiler -->
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.57.0:exe:${os.detected.classifier}</pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.61.1:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
                     <!-- Execution for Message Classes -->
@@ -191,6 +191,11 @@
             <version>3.13.0</version>
         </dependency>
         <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
+        <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
             <version>8.5.13</version>
@@ -204,18 +209,24 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.57.0</version>
+            <version>1.61.1</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.57.0</version>
+            <version>1.61.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>annotations-api</artifactId>
             <version>6.0.53</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>5.25.1</version>
         </dependency>
     </dependencies>
 

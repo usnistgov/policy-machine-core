@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.query;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.exception.RoutineDoesNotExistException;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
+import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,23 +16,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
+    static Routine<Object> r1 = new Routine<>("r1", List.of()) {
+        @Override
+        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+    static Routine<Object> r2 = new Routine<>("r2", List.of()) {
+        @Override
+        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
     @Test
     void testGetAdminRoutineNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.modify().routines().createAdminRoutine(new Routine<Object>("r1", List.of()) {
-            @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                return null;
-            }
-        });
-
-        pap.modify().routines().createAdminRoutine(new Routine<Object>("r2", List.of()) {
-            @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                return null;
-            }
-        });
+        pap.modify().routines().createAdminRoutine(r1);
+        pap.modify().routines().createAdminRoutine(r2);
 
         Collection<String> adminRoutineNames = pap.query().routines().getAdminRoutineNames();
         assertEquals(new HashSet<>(adminRoutineNames), Set.of("r1", "r2", "deleteAllProjects"));
@@ -45,17 +47,10 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            Routine<Object> routine = new Routine<>("r1", List.of()) {
-                @Override
-                public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                    return null;
-                }
-            };
+            pap.modify().routines().createAdminRoutine(r1);
 
-            pap.modify().routines().createAdminRoutine(routine);
-
-            Routine<?> actual = pap.query().routines().getAdminRoutine(routine.getName());
-            assertEquals(routine, actual);
+            Routine<?> actual = pap.query().routines().getAdminRoutine(r1.getName());
+            assertEquals(r1, actual);
         }
 
         @Test

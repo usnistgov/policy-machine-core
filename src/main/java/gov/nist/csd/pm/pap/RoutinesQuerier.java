@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.exception.RoutineDoesNotExistException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
 import gov.nist.csd.pm.pap.query.RoutinesQuery;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;

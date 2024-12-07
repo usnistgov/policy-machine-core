@@ -1,16 +1,15 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.exception.AdminAccessRightExistsException;
-import gov.nist.csd.pm.pap.exception.OperationExistsException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.exception.AdminAccessRightExistsException;
+import gov.nist.csd.pm.common.exception.OperationExistsException;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
-import gov.nist.csd.pm.pap.op.AdminOperations;
-import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.isWildcardAccessRight;
+import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.pap.AdminAccessRights.isWildcardAccessRight;
 
 public class OperationsModifier extends Modifier implements OperationsModification {
 

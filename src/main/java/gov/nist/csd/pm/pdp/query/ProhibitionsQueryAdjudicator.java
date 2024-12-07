@@ -1,23 +1,23 @@
 package gov.nist.csd.pm.pdp.query;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.AdminAccessRights;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.pap.AdminAccessRights;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.GET_PROCESS_PROHIBITIONS;
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.GET_PROHIBITIONS;
+import static gov.nist.csd.pm.pap.AdminAccessRights.GET_PROCESS_PROHIBITIONS;
+import static gov.nist.csd.pm.pap.AdminAccessRights.GET_PROHIBITIONS;
 
 public class ProhibitionsQueryAdjudicator extends Adjudicator implements ProhibitionsQuery {
 

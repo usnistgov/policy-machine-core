@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.impl.memory.pap;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.store.MemoryPolicyStore;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PolicyQuerier;
-import gov.nist.csd.pm.pap.store.PolicyStore;
 
 public class MemoryPAP extends PAP {
 
@@ -17,11 +16,6 @@ public class MemoryPAP extends PAP {
 
     public MemoryPAP(MemoryPolicyStore store) throws PMException {
         super(store);
-        this.querier = new MemoryPolicyQuerier(policyStore());
-    }
-
-    public MemoryPAP(PAP pap) throws PMException {
-        super(pap.policyStore());
         this.querier = new MemoryPolicyQuerier(policyStore());
     }
 

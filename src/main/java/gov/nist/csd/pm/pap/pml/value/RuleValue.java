@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.value;
 
-import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.Objects;

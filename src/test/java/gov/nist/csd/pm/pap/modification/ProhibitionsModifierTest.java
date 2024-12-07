@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.exception.*;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.exception.*;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
+import static gov.nist.csd.pm.pap.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class ProhibitionsModifierTest extends PAPTestInitializer {

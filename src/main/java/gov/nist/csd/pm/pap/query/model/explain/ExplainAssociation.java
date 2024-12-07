@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.query.model.explain;
 
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 
 import java.util.List;
 

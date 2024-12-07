@@ -2,23 +2,22 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.*;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AccessQuerierTest extends PAPTestInitializer {
@@ -819,764 +818,757 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         assertEquals(arset, accessibleNodes.get(o3));
     }
 
-    @Nested
-    class GetPrivilegesTests {
-
-        @Test
-        void testGraph1() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+    @Test
+    void testGraph1() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testGraph2() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1, pc2));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
-
-        @Test
-        void testGraph2() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1, pc2));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
+    }
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
-        }
+    @Test
+    void testGraph3() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-        @Test
-        void testGraph3() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+    }
 
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
+    @Test
+    void testGraph4() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-        @Test
-        void testGraph4() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
 
+        assertEquals(
+                new AccessRightSet("read", "write"),
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1))
+        );
+    }
 
-            assertEquals(
-                    new AccessRightSet("read", "write"),
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1))
-            );
-        }
+    @Test
+    void testGraph5() throws PMException {            pap.modify().operations().setResourceOperations(RWE);
 
-        @Test
-        void testGraph5() throws PMException {            pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
+
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
+    }
+
+    @Test
+    void testGraph6() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
 
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
-        }
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
+    }
 
-        @Test
-        void testGraph6() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+    @Test
+    void testGraph7() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read"));
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
 
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
-        }
 
-        @Test
-        void testGraph7() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
+    }
+
+    @Test
+    void testGraph8() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
 
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
+        Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(RWE));
+    }
 
+    @Test
+    void testGraph9() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        pap.modify().graph().associate(ua2, oa1, new AccessRightSet("read", "write"));
 
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
-        }
 
-        @Test
-        void testGraph8() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(RWE));
+    }
 
+    @Test
+    void testGraph10() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write"))
+        );
+    }
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.containsAll(RWE));
-        }
+    @Test
+    void testGraph11() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+
+
 
-        @Test
-        void testGraph9() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+        assertEquals(new AccessRightSet(), pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)));
+    }
+
+    @Test
+    void testGraph12() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
+
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write"))
+        );
+    }
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
-            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("read", "write"));
+    @Test
+    void testGraph13() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(oa2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.containsAll(RWE));
-        }
+        Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.contains("read"));
+    }
 
-        @Test
-        void testGraph10() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+    @Test
+    void testGraph14() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1, pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        pap.modify().graph().associate(ua2, oa1, new AccessRightSet("*"));
 
 
 
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
+        Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(RWE));
+    }
 
-        @Test
-        void testGraph11() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+    @Test
+    void testGraph15() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(oa2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
 
-            assertEquals(new AccessRightSet(), pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)));
-        }
+        Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(RWE));
+    }
 
-        @Test
-        void testGraph12() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+    @Test
+    void testGraph16() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
 
 
 
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+    }
 
-        @Test
-        void testGraph13() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(oa2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+    // removed graph7 due to adding the descendant IDs to the createNode, need to always connect to the testCtx.policy().graph().
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read"));
+    @Test
+    void testGraph18() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa2));
 
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.contains("read"));
-        }
 
-        @Test
-        void testGraph14() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1, pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
+    }
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
-            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("*"));
+    @Test
+    void testGraph19() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.containsAll(RWE));
-        }
 
-        @Test
-        void testGraph15() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(oa2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
+    }
+
+    @Test
+    void testGraph20() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("*"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read"));
 
 
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
+    }
 
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.containsAll(RWE));
-        }
+    @Test
+    void testGraph21() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa2, new AccessRightSet("write"));
 
-        @Test
-        void testGraph16() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
+    }
+
+    @Test
+    void testGraph22() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String pc2 = pap.modify().graph().createPolicyClass("pc2");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
+
+
+
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testGraph23WithProhibitions() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
+        String oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(oa3));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(oa4));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
+                List.of(new ContainerCondition(oa1, false),
+                        new ContainerCondition(oa2, false))
+        );
+
+        pap.modify().prohibitions().createProhibition("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
+                true,
+                Collections.singleton(new ContainerCondition(oa3, false))
+        );
 
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
 
-
-
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
-
-        // removed graph7 due to adding the descendant IDs to the createNode, need to always connect to the testCtx.policy().graph().
-
-        @Test
-        void testGraph18() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
-        }
-
-        @Test
-        void testGraph19() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
-        }
-
-        @Test
-        void testGraph20() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
-
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read")));
-        }
-
-        @Test
-        void testGraph21() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa2, new AccessRightSet("write"));
-
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
-        }
-
-        @Test
-        void testGraph22() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String pc2 = pap.modify().graph().createPolicyClass("pc2");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-
-
-
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
-
-        @Test
-        void testGraph23WithProhibitions() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
-            String oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(oa3));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(oa4));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-
-            pap.modify().graph().associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
-            pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
-                    List.of(new ContainerCondition(oa1, false),
-                            new ContainerCondition(oa2, false))
-            );
-
-            pap.modify().prohibitions().createProhibition("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
-                    true,
-                    Collections.singleton(new ContainerCondition(oa3, false))
-            );
-
-
-            Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-            assertEquals(1, list.size());
-            assertTrue(list.contains("execute"));
-        }
-
-        @Test
-        void testGraph24WithProhibitions() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-            String o2 = pap.modify().graph().createObject("o2", List.of(oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-
-            pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute(ua1),
-                    new AccessRightSet("read"),
-                    true,
-                    List.of(
-                            new ContainerCondition(oa1, false),
-                            new ContainerCondition(oa2, true)
-                    )
-            );
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o2)).isEmpty());
-
-            pap.modify().graph().associate(ua1, oa2, new AccessRightSet("read"));
-
-            pap.modify().prohibitions().createProhibition("deny-process", ProhibitionSubject.process("1234"),
-                    new AccessRightSet("read"),
-                    false,
-                    Collections.singleton(new ContainerCondition(oa1, false))
-            );
-
-            assertEquals(
-                    new AccessRightSet(),
-                    pap.query().access().computePrivileges(new UserContext(u1, "1234"), new TargetContext(o1))
-            );
-        }
-
-        @Test
-        void testGraph25WithProhibitions() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(oa1));
-            String oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(oa1));
-            String oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(oa3));
-            String oa5 = pap.modify().graph().createObjectAttribute("oa5", List.of(oa2));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa4));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-
-            pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
-                    true,
-                    List.of(new ContainerCondition(oa4, true),
-                            new ContainerCondition(oa1, false))
-            );
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(oa5)).isEmpty());
-            assertTrue(
-                    pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
-        }
-
-        @Test
-        void testGraph25WithProhibitions2() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-
-
-            pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
-                    true,
-                    List.of(new ContainerCondition(oa1, false),
-                            new ContainerCondition(oa2, false))
-            );
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
-        }
-
-        @Test
-        void testDeciderWithUA() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
-            String o2 = pap.modify().graph().createObject("o2", List.of(oa2));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
-            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext(ua1), new TargetContext(oa1))
-                    .containsAll(Arrays.asList("read", "write")));
-        }
-
-        @Test
-        void testProhibitionsAllCombinations() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa3", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa4", List.of("pc1"));
-            pap.modify().graph().createObject("o1", List.of("oa1", "oa2", "oa3"));
-            pap.modify().graph().createObject("o2", List.of("oa1", "oa4"));
-
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().createUser("u1", List.of("ua1"));
-            pap.modify().graph().createUser("u2", List.of("ua1"));
-            pap.modify().graph().createUser("u3", List.of("ua1"));
-            pap.modify().graph().createUser("u4", List.of("ua1"));
-
-            pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
-
-
-            pap.modify().prohibitions().createProhibition(
-                    "p1",
-                    ProhibitionSubject.user("u1"),
-                    new AccessRightSet("write"),
-                    true,
-                    List.of(
-                            new ContainerCondition("oa1", false),
-                            new ContainerCondition("oa2", false),
-                            new ContainerCondition("oa3", false)
-                    )
-            );
-
-            pap.modify().prohibitions().createProhibition(
-                    "p2",
-                    ProhibitionSubject.user("u2"),
-                    new AccessRightSet("write"),
-                    false,
-                    List.of(
-                            new ContainerCondition("oa1", false),
-                            new ContainerCondition("oa2", false),
-                            new ContainerCondition("oa3", false)
-                    )
-            );
-
-            pap.modify().prohibitions().createProhibition(
-                    "p3",
-                    ProhibitionSubject.user("u3"),
-                    new AccessRightSet("write"),
-                    true,
-                    List.of(
-                            new ContainerCondition("oa1", false),
-                            new ContainerCondition("oa2", true)
-                    )
-            );
-
-            pap.modify().prohibitions().createProhibition(
-                    "p4",
-                    ProhibitionSubject.user("u4"),
-                    new AccessRightSet("write"),
-                    false,
-                    List.of(
-                            new ContainerCondition("oa1", false),
-                            new ContainerCondition("oa2", true)
-                    )
-            );
-
-            pap.modify().prohibitions().createProhibition(
-                    "p5",
-                    ProhibitionSubject.user("u4"),
-                    new AccessRightSet("write"),
-                    false,
-                    Collections.singleton(new ContainerCondition("oa2", true))
-            );
-
-
-            Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
-            assertTrue(list.contains("read") && !list.contains("write"));
-
-            list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o2"));
-            assertTrue(list.contains("read") && list.contains("write"));
-
-            list = pap.query().access().computePrivileges(new UserContext("u2"), new TargetContext("o2"));
-            assertTrue(list.contains("read") && !list.contains("write"));
-
-            list = pap.query().access().computePrivileges(new UserContext("u3"), new TargetContext("o2"));
-            assertTrue(list.contains("read") && !list.contains("write"));
-
-            list = pap.query().access().computePrivileges(new UserContext("u4"), new TargetContext("o1"));
-            assertTrue(list.contains("read") && !list.contains("write"));
-
-            list = pap.query().access().computePrivileges(new UserContext("u4"), new TargetContext("o2"));
-            assertTrue(list.contains("read") && !list.contains("write"));
-        }
-
-        @Test
-        void testPermissions() throws PMException {            pap.modify().operations().setResourceOperations(RWE);
-
-            String pc1 = pap.modify().graph().createPolicyClass("pc1");
-            String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-            String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-            String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
-
-            pap.modify().graph().associate(ua1, oa1, allAccessRights());
-
-
-            Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.containsAll(RWE));
-
-            pap.modify().graph().associate(ua1, oa1, allAdminAccessRights());
-            list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
-            assertTrue(list.containsAll(allAdminAccessRights()));
-            assertFalse(list.containsAll(RWE));
-
-            pap.modify().graph().associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
-            list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
-            assertFalse(list.containsAll(allAdminAccessRights()));
-            assertTrue(list.containsAll(RWE));
-        }
-
-        @Test
-        void testPermissionsInOnlyOnePC() throws PMException {
-            pap.modify().operations().setResourceOperations(RWE);
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createPolicyClass("pc2");
-            pap.modify().graph().createUserAttribute("ua3", List.of("pc1"));
-            pap.modify().graph().createUserAttribute("ua2", List.of("ua3"));
-            pap.modify().graph().createUserAttribute("u1", List.of("ua2"));
-
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa3", List.of("pc2"));
-            pap.modify().graph().assign("oa3", List.of("oa1"));
-            pap.modify().graph().createObject("o1", List.of("oa3"));
-
-            pap.modify().graph().associate("ua3", "oa1", new AccessRightSet("read"));
-
-
-            assertTrue(pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1")).isEmpty());
-        }
-
-        @Test
-        void testProhibitionsWithContainerAsTarget() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createUser("u1", List.of("ua1"));
-            pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
-
-            pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
-                    Collections.singleton(new ContainerCondition("oa1", false))
-            );
-
-
-            AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
-            assertTrue(deniedAccessRights.contains("read"));
-        }
-
-        @Test
-        void testProhibitionWithContainerAsTargetComplement() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createUser("u1", List.of("ua1"));
-            pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
-
-            pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
-                    Collections.singleton(new ContainerCondition("oa1", true))
-            );
-
-
-            AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
-            assertFalse(deniedAccessRights.contains("read"));
-        }
-
-        @Test
-        void testAssociationWithObject() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObject("o1", List.of("pc1"));
-            pap.modify().graph().createUser("u1", List.of("ua1"));
-            pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
-
-            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
-            assertEquals(new AccessRightSet("read"), accessRightSet);
-        }
-
-        @Test
-        void testAssociationWithObjectAndProhibitions() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObject("o1", List.of("pc1"));
-            pap.modify().graph().createUser("u1", List.of("ua1"));
-            pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
-
-            pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
-                    Collections.singleton(new ContainerCondition("o1",  false))
-            );
-
-
-            AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
-            assertEquals(new AccessRightSet(), accessRightSet);
-        }
+        Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
+        assertEquals(1, list.size());
+        assertTrue(list.contains("execute"));
+    }
+
+    @Test
+    void testGraph24WithProhibitions() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+        String o2 = pap.modify().graph().createObject("o2", List.of(oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute(ua1),
+                new AccessRightSet("read"),
+                true,
+                List.of(
+                        new ContainerCondition(oa1, false),
+                        new ContainerCondition(oa2, true)
+                )
+        );
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o2)).isEmpty());
+
+        pap.modify().graph().associate(ua1, oa2, new AccessRightSet("read"));
+
+        pap.modify().prohibitions().createProhibition("deny-process", ProhibitionSubject.process("1234"),
+                new AccessRightSet("read"),
+                false,
+                Collections.singleton(new ContainerCondition(oa1, false))
+        );
+
+        assertEquals(
+                new AccessRightSet(),
+                pap.query().access().computePrivileges(new UserContext(u1, "1234"), new TargetContext(o1))
+        );
+    }
+
+    @Test
+    void testGraph25WithProhibitions() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(oa1));
+        String oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(oa1));
+        String oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(oa3));
+        String oa5 = pap.modify().graph().createObjectAttribute("oa5", List.of(oa2));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa4));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
+
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+                true,
+                List.of(new ContainerCondition(oa4, true),
+                        new ContainerCondition(oa1, false))
+        );
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(oa5)).isEmpty());
+        assertTrue(
+                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testGraph25WithProhibitions2() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
+
+
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+                true,
+                List.of(new ContainerCondition(oa1, false),
+                        new ContainerCondition(oa2, false))
+        );
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
+    }
+
+    @Test
+    void testDeciderWithUA() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
+        String o2 = pap.modify().graph().createObject("o2", List.of(oa2));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+        pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext(ua1), new TargetContext(oa1))
+                .containsAll(Arrays.asList("read", "write")));
+    }
+
+    @Test
+    void testProhibitionsAllCombinations() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().graph().createPolicyClass("pc1");
+        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa3", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa4", List.of("pc1"));
+        pap.modify().graph().createObject("o1", List.of("oa1", "oa2", "oa3"));
+        pap.modify().graph().createObject("o2", List.of("oa1", "oa4"));
+
+        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().createUser("u2", List.of("ua1"));
+        pap.modify().graph().createUser("u3", List.of("ua1"));
+        pap.modify().graph().createUser("u4", List.of("ua1"));
+
+        pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read", "write"));
+
+
+        pap.modify().prohibitions().createProhibition(
+                "p1",
+                ProhibitionSubject.user("u1"),
+                new AccessRightSet("write"),
+                true,
+                List.of(
+                        new ContainerCondition("oa1", false),
+                        new ContainerCondition("oa2", false),
+                        new ContainerCondition("oa3", false)
+                )
+        );
+
+        pap.modify().prohibitions().createProhibition(
+                "p2",
+                ProhibitionSubject.user("u2"),
+                new AccessRightSet("write"),
+                false,
+                List.of(
+                        new ContainerCondition("oa1", false),
+                        new ContainerCondition("oa2", false),
+                        new ContainerCondition("oa3", false)
+                )
+        );
+
+        pap.modify().prohibitions().createProhibition(
+                "p3",
+                ProhibitionSubject.user("u3"),
+                new AccessRightSet("write"),
+                true,
+                List.of(
+                        new ContainerCondition("oa1", false),
+                        new ContainerCondition("oa2", true)
+                )
+        );
+
+        pap.modify().prohibitions().createProhibition(
+                "p4",
+                ProhibitionSubject.user("u4"),
+                new AccessRightSet("write"),
+                false,
+                List.of(
+                        new ContainerCondition("oa1", false),
+                        new ContainerCondition("oa2", true)
+                )
+        );
+
+        pap.modify().prohibitions().createProhibition(
+                "p5",
+                ProhibitionSubject.user("u4"),
+                new AccessRightSet("write"),
+                false,
+                Collections.singleton(new ContainerCondition("oa2", true))
+        );
+
+
+        Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertTrue(list.contains("read") && !list.contains("write"));
+
+        list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o2"));
+        assertTrue(list.contains("read") && list.contains("write"));
+
+        list = pap.query().access().computePrivileges(new UserContext("u2"), new TargetContext("o2"));
+        assertTrue(list.contains("read") && !list.contains("write"));
+
+        list = pap.query().access().computePrivileges(new UserContext("u3"), new TargetContext("o2"));
+        assertTrue(list.contains("read") && !list.contains("write"));
+
+        list = pap.query().access().computePrivileges(new UserContext("u4"), new TargetContext("o1"));
+        assertTrue(list.contains("read") && !list.contains("write"));
+
+        list = pap.query().access().computePrivileges(new UserContext("u4"), new TargetContext("o2"));
+        assertTrue(list.contains("read") && !list.contains("write"));
+    }
+
+    @Test
+    void testPermissions() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+
+        String pc1 = pap.modify().graph().createPolicyClass("pc1");
+        String ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        String u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        String oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        String o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+
+        pap.modify().graph().associate(ua1, oa1, allAccessRights());
+
+        Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(RWE));
+
+        pap.modify().graph().associate(ua1, oa1, allAdminAccessRights());
+        list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertFalse(list.containsAll(RWE));
+
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
+        list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertFalse(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(RWE));
+    }
+
+    @Test
+    void testPermissionsInOnlyOnePC() throws PMException {
+        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().graph().createPolicyClass("pc1");
+        pap.modify().graph().createPolicyClass("pc2");
+        pap.modify().graph().createUserAttribute("ua3", List.of("pc1"));
+        pap.modify().graph().createUserAttribute("ua2", List.of("ua3"));
+        pap.modify().graph().createUserAttribute("u1", List.of("ua2"));
+
+        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa3", List.of("pc2"));
+        pap.modify().graph().assign("oa3", List.of("oa1"));
+        pap.modify().graph().createObject("o1", List.of("oa3"));
+
+        pap.modify().graph().associate("ua3", "oa1", new AccessRightSet("read"));
+
+
+        assertTrue(pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1")).isEmpty());
+    }
+
+    @Test
+    void testProhibitionsWithContainerAsTarget() throws PMException {
+        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().graph().createPolicyClass("pc1");
+        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
+
+        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+                Collections.singleton(new ContainerCondition("oa1", false))
+        );
+
+
+        AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
+        assertTrue(deniedAccessRights.contains("read"));
+    }
+
+    @Test
+    void testProhibitionWithContainerAsTargetComplement() throws PMException {
+        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().graph().createPolicyClass("pc1");
+        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
+
+        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+                Collections.singleton(new ContainerCondition("oa1", true))
+        );
+
+        AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
+        assertFalse(deniedAccessRights.contains("read"));
+    }
+
+    @Test
+    void testAssociationWithObject() throws PMException {
+        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().graph().createPolicyClass("pc1");
+        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+        pap.modify().graph().createObject("o1", List.of("pc1"));
+        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
+
+        AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertEquals(new AccessRightSet("read"), accessRightSet);
+    }
+
+    @Test
+    void testAssociationWithObjectAndProhibitions() throws PMException {
+        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().graph().createPolicyClass("pc1");
+        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
+        pap.modify().graph().createObject("o1", List.of("pc1"));
+        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
+
+        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
+                Collections.singleton(new ContainerCondition("o1",  false))
+        );
+
+
+        AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
+        assertEquals(new AccessRightSet(), accessRightSet);
     }
 
     @Test

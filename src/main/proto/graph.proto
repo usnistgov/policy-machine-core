@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "gov.nist.csd.pm.pap.op.graph.proto";
+option java_package = "gov.nist.csd.pm.proto.graph";
 option java_outer_classname = "GraphProto";
 
 message AssignOp {
@@ -46,6 +46,11 @@ message DeassignOp {
 
 message DeleteNodeOp {
   string name = 1;
+}
+
+message DissociateOp {
+  string ua = 1;
+  string target = 2;
 }
 
 message SetNodePropertiesOp {

@@ -1,15 +1,14 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,19 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest extends PAPTestInitializer {
+
+    static Operation<Value> op = new Operation<Value>("testFunc") {
+        @Override
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
+
+        }
+
+        @Override
+        public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
+            pap.modify().graph().createPolicyClass("pc3");
+            return new VoidValue();
+        }
+    };
 
     @Test
     void testTx() throws PMException {
@@ -47,18 +59,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         try {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().operations().createAdminOperation(new Operation<Value>("testFunc") {
-                @Override
-                public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
-
-                }
-
-                @Override
-                public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
-                    pap.modify().graph().createPolicyClass("pc3");
-                    return new VoidValue();
-                }
-            });
+            pap.modify().operations().createAdminOperation(op);
 
             pap.executePML(new UserContext("u1"), "create ua \"ua4\" in [\"Location\"]\ntestFunc()");
             assertTrue(pap.query().graph().nodeExists("ua4"));
@@ -70,17 +71,17 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testAdminPolicyCreatedInConstructor() throws PMException {
-        testAdminPolicy(pap, 1);
+        testAdminPolicy(pap);
     }
 
     @Test
     void testResetInitializesAdminPolicy() throws PMException {
         pap.reset();
 
-        testAdminPolicy(pap, 1);
+        testAdminPolicy(pap);
     }
 
-    public static void testAdminPolicy(PAP pap, int numExpectedPolicyClasses) throws PMException {
+    public static void testAdminPolicy(PAP pap) throws PMException {
         assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_PC.nodeName()));
         Collection<String> ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.PM_ADMIN_PC.nodeName());
         assertEquals(1, ascendants.size());

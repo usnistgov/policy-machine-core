@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.op.Operation;
 
 /**
  * Methods to manage NGAC resource and administrative operations.

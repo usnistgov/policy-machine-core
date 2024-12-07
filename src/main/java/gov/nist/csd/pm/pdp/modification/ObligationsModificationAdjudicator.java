@@ -1,36 +1,36 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.pap.modification.ObligationsModification;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.pap.obligation.Obligation;
-import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.common.op.obligation.CreateObligationOp;
+import gov.nist.csd.pm.common.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.obligation.ObligationOp.AUTHOR_OPERAND;
-import static gov.nist.csd.pm.pap.op.obligation.ObligationOp.RULES_OPERAND;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.RULES_OPERAND;
 
 public class ObligationsModificationAdjudicator extends Adjudicator implements ObligationsModification {
 
     private final UserContext userCtx;
     private final PAP pap;
-    private final EventEmitter eventEmitter;
+    private final EventPublisher eventPublisher;
 
-    public ObligationsModificationAdjudicator(UserContext userCtx, PAP pap, EventEmitter eventEmitter, PrivilegeChecker privilegeChecker) {
+    public ObligationsModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
-        this.eventEmitter = eventEmitter;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
                 .withOperands(Map.of(AUTHOR_OPERAND, author, NAME_OPERAND, name, RULES_OPERAND, rules))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -54,6 +54,6 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
                 ))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 }

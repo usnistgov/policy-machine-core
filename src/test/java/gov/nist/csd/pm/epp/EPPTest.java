@@ -1,16 +1,16 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.pap.graph.node.NodeType;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.pap.obligation.EventPattern;
-import gov.nist.csd.pm.pap.obligation.Response;
-import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.obligation.EventPattern;
+import gov.nist.csd.pm.common.obligation.Response;
+import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
@@ -18,7 +18,7 @@ import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -26,16 +26,16 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.*;
-import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
+import gov.nist.csd.pm.pdp.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.*;
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static gov.nist.csd.pm.pdp.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
 

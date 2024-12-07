@@ -1,8 +1,10 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.dag.*;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.dag.Direction;
+import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
+import gov.nist.csd.pm.common.graph.dag.UserDagResult;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.AccessQuerier;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
@@ -15,8 +17,8 @@ import java.util.*;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.AccessRightResolver.*;
-import static gov.nist.csd.pm.pap.graph.node.NodeType.U;
-import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 
 public class MemoryAccessQuerier extends AccessQuerier {
     
