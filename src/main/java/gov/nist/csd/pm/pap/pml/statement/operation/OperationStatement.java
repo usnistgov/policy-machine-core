@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
+import java.io.Serializable;
 import java.util.*;
 
 public abstract class OperationStatement extends PreparedOperation<Void> implements PMLStatement {
