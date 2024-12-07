@@ -51,6 +51,7 @@ public enum NodeType implements Serializable {
         if (type == null) {
             throw new UnknownTypeException(null);
         }
+
         return switch (type.toUpperCase()) {
             case "OA" -> NodeType.OA;
             case "UA" -> NodeType.UA;

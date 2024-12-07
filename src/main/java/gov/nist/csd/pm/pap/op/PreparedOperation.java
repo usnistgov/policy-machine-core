@@ -5,10 +5,11 @@ import gov.nist.csd.pm.pap.obligation.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
-public class PreparedOperation<T> {
+public class PreparedOperation<T> implements Serializable {
 
     private Operation<T> op;
     private Map<String, Object> operands;
@@ -16,6 +17,9 @@ public class PreparedOperation<T> {
     public PreparedOperation(Operation<T> op, Map<String, Object> operands) {
         this.op = op;
         this.operands = operands;
+    }
+
+    public PreparedOperation() {
     }
 
     public Operation<T> getOp() {
