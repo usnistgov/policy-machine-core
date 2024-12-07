@@ -19,6 +19,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
+    static Operation<Object> op1 = new Operation<Object>("op1", List.of()) {
+        @Override
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+
+        }
+
+        @Override
+        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
+    static Operation<Object> op2 = new Operation<Object>("op2", List.of()) {
+        @Override
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+
+        }
+
+        @Override
+        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
     @Nested
     class GetResourceAccessRights {
         @Test
@@ -33,29 +57,8 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
     void testGetAdminOperationNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.modify().operations().createAdminOperation(new Operation<Object>("op1", List.of()) {
-            @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                
-            }
-
-            @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                return null;
-            }
-        });
-
-        pap.modify().operations().createAdminOperation(new Operation<Object>("op2", List.of()) {
-            @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                
-            }
-
-            @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                return null;
-            }
-        });
+        pap.modify().operations().createAdminOperation(op1);
+        pap.modify().operations().createAdminOperation(op2);
 
         Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
@@ -64,21 +67,21 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
     @Nested
     class GetAdminOperation {
 
+        static Operation<Object> operation = new Operation<>("op1", List.of()) {
+            @Override
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+
+            }
+
+            @Override
+            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+                return null;
+            }
+        };
+
         @Test
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
-
-            Operation<Object> operation = new Operation<Object>("op1", List.of()) {
-                @Override
-                public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                    
-                }
-
-                @Override
-                public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                    return null;
-                }
-            };
 
             pap.modify().operations().createAdminOperation(operation);
 

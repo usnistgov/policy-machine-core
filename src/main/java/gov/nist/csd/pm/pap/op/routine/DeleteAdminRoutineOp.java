@@ -16,7 +16,7 @@ public class DeleteAdminRoutineOp extends Operation<Void> {
 
     public DeleteAdminRoutineOp() {
         super(
-                "create_admin_routine",
+                "delete_admin_routine",
                 List.of(NAME_OPERAND)
         );
     }

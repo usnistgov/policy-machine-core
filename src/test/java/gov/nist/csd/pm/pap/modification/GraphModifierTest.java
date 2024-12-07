@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.pap.graph.node.NodeType;
 import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.graph.relationship.Association;
 import gov.nist.csd.pm.pap.graph.relationship.InvalidAssignmentException;
@@ -300,11 +301,12 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.runTx(tx -> {
                 pap.modify().graph().createObject("o1", List.of("oa1"));
             });
-            assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                pap.modify().graph().createUserAttribute("o2", List.of("oa1"));
-                pap.modify().graph().createUserAttribute("o3", List.of("oa1"));
-                throw new PMException("");
+            PMException e = assertThrows(PMException.class, () -> pap.runTx(tx -> {
+                pap.modify().graph().createObject("o2", List.of("oa1"));
+                pap.modify().graph().createObject("o3", List.of("oa1"));
+                throw new PMException("test");
             }));
+            assertEquals("test", e.getMessage());
             assertTrue(pap.query().graph().nodeExists("o1"));
             assertFalse(pap.query().graph().nodeExists("o2"));
             assertFalse(pap.query().graph().nodeExists("o3"));

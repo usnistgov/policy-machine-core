@@ -9,6 +9,7 @@ import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,6 +23,26 @@ public class DeleteStatement extends OperationStatement {
     public DeleteStatement(Type type, Expression expression) {
         super(getOpFromType(type));
         this.type = type;
+        this.expression = expression;
+    }
+
+    public DeleteStatement(Operation<Void> op) {
+        super(op);
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    public void setExpression(Expression expression) {
         this.expression = expression;
     }
 

@@ -70,7 +70,7 @@ class PDPTest {
             p.modify().graph().createPolicyClass("pc1");
         });
 
-        testAdminPolicy(pap, 2);
+        testAdminPolicy(pap);
         assertTrue(pap.query().graph().nodeExists("pc1"));
     }
 

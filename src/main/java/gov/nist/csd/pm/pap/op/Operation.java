@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import java.io.Serializable;
 import java.util.*;
 
-public abstract class Operation<T> extends AdminExecutable<T> implements Serializable {
+public abstract class Operation<T> extends AdminExecutable<T> {
 
     public static final String NAME_OPERAND = "name";
 

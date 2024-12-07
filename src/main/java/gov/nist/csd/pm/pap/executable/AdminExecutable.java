@@ -1,13 +1,25 @@
 package gov.nist.csd.pm.pap.executable;
 
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.routine.Routine;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.QueryExecutionException;
+import org.neo4j.graphdb.ResultTransformer;
+import org.neo4j.graphdb.Transaction;
 
+import java.io.*;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
-public abstract class AdminExecutable<T> {
+public abstract class AdminExecutable<T> implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     protected final String name;
     protected final List<String> operandNames;
 
@@ -24,5 +36,17 @@ public abstract class AdminExecutable<T> {
 
     public List<String> getOperandNames() {
         return operandNames;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AdminExecutable<?> that)) return false;
+	    return Objects.equals(name, that.name) && Objects.equals(operandNames, that.operandNames);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, operandNames);
     }
 }
