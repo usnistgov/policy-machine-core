@@ -28,10 +28,10 @@
                     <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                     <clearOutputDirectory>false</clearOutputDirectory>
                     <!-- Protobuf Compiler -->
-                    <protocArtifact>com.google.protobuf:protoc:3.24.3:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:3.25.5:exe:${os.detected.classifier}</protocArtifact>
                     <!-- gRPC Compiler -->
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.57.0:exe:${os.detected.classifier}</pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.61.1:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
                     <!-- Execution for Message Classes -->
@@ -209,12 +209,12 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.57.0</version>
+            <version>1.61.1</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.57.0</version>
+            <version>1.61.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
