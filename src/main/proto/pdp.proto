@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "epp.proto";
+
 option java_multiple_files = true;
 option java_package = "gov.nist.csd.pm.pdp.proto";
 option java_outer_classname = "PDPProto";
@@ -9,8 +11,14 @@ message ResourceOperationRequest {
   string target = 2;
 }
 
+message Node {
+  string name = 1;
+  string type = 2;
+  map<string, string> properties = 3;
+}
+
 message ResourceOperationResponse {
-  bytes node = 1;
+  Node node = 1;
 }
 
 service ResourcePDP {
@@ -19,7 +27,7 @@ service ResourcePDP {
 
 message AdminOperationRequest {
   string opName = 1;
-  map<string, bytes> operands = 2;
+  repeated OperandEntry operands = 2;
 }
 
 message AdminOperationResponse {}
