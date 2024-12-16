@@ -36,10 +36,16 @@ message AdminRoutineRequest {
   repeated AdminOperationRequest ops = 1;
 }
 
+message NamedAdminRoutineRequest {
+  string name = 1;
+  repeated OperandEntry operands = 2;
+}
+
 message AdminRoutineResponse {}
 
 
 service AdminPDP {
   rpc AdjudicateAdminOperation(AdminOperationRequest) returns (AdminOperationResponse) {}
   rpc AdjudicateAdminRoutine(AdminRoutineRequest) returns (AdminRoutineResponse) {}
+  rpc AdjudicateNamedAdminRoutine(NamedAdminRoutineRequest) returns (AdminRoutineResponse) {}
 }
