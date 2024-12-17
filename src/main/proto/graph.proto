@@ -48,6 +48,11 @@ message DeleteNodeOp {
   string name = 1;
 }
 
+message DissociateOp {
+  string ua = 1;
+  string target = 2;
+}
+
 message SetNodePropertiesOp {
   string name = 1;
   map<string, string> properties = 2;
