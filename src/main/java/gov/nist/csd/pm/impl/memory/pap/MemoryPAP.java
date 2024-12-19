@@ -21,7 +21,7 @@ public class MemoryPAP extends PAP {
     }
 
     public MemoryPAP(PAP pap) throws PMException {
-        super(pap);
+        super(pap.policyStore());
         this.querier = new MemoryPolicyQuerier(policyStore());
     }
 
