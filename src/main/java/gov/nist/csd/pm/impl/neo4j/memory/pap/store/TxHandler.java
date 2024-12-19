@@ -7,9 +7,9 @@ import org.neo4j.graphdb.Transaction;
 
 public class TxHandler implements Transactional {
 
-	private Transaction tx;
-	private int txCounter;
-	private GraphDatabaseService graphDb;
+	protected Transaction tx;
+	protected int txCounter;
+	protected GraphDatabaseService graphDb;
 
 	public TxHandler(GraphDatabaseService graphDb) {
 		this.graphDb = graphDb;

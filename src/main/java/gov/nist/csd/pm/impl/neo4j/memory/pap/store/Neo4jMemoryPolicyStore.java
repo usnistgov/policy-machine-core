@@ -43,6 +43,10 @@ public class Neo4jMemoryPolicyStore implements PolicyStore {
 		return txHandler;
 	}
 
+	public void setTxHandler(TxHandler txHandler) {
+		this.txHandler = txHandler;
+	}
+
 	@Override
 	public GraphStore graph() throws PMException {
 		return new Neo4jMemoryGraphStore(txHandler);
