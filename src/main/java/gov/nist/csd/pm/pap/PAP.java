@@ -45,7 +45,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
         this(pap.policyStore);
     }
 
-    protected PolicyStore policyStore() {
+    public PolicyStore policyStore() {
         return policyStore;
     }
 
