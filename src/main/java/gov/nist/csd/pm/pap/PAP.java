@@ -26,7 +26,6 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     protected final PolicyStore policyStore;
     private final PolicyModifier modifier;
-
     private Map<String, PMLOperation> pmlOperations;
     private Map<String, PMLRoutine> pmlRoutines;
     private Map<String, Value> pmlConstants;
@@ -34,18 +33,19 @@ public abstract class PAP implements AdminExecutor, Transactional {
     public PAP(PolicyStore policyStore) throws PMException {
         this.policyStore = policyStore;
         this.modifier = new PolicyModifier(policyStore);
-        AdminPolicy.verify(modifier);
-
         this.pmlOperations = new HashMap<>();
         this.pmlRoutines = new HashMap<>();
         this.pmlConstants = new HashMap<>();
+
+        // verify admin policy
+        this.policyStore.verifyAdminPolicy();
     }
 
     public PAP(PAP pap) throws PMException {
         this(pap.policyStore);
     }
 
-    public PolicyStore policyStore() {
+    protected PolicyStore policyStore() {
         return policyStore;
     }
 
@@ -58,7 +58,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
     public void reset() throws PMException {
         policyStore.reset();
 
-        AdminPolicy.verify(modifier);
+        policyStore.verifyAdminPolicy();
     }
 
     @Override

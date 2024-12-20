@@ -27,25 +27,4 @@ public class AdminPolicy {
         return ALL_NODE_NAMES.contains(name);
     }
 
-    /**
-     * Create {@link AdminPolicyNode#PM_ADMIN_PC}
-     * Create the {@link AdminPolicyNode#PM_ADMIN_PC} policy class.<p>
-     * Create the {@link AdminPolicyNode#PM_ADMIN_OBJECT} in the PM_ADMIN_PC.<p>
-     *
-     * @param verifier The verifier used to verify the admin policy nodes exist.
-     * @throws PMException If there is an error verifying any element of the admin policy.
-     */
-    public static void verify(Verifier verifier) throws PMException {
-        try {
-            verifier.verifyAdminPolicy();
-        } catch (PMException e) {
-            throw new AdminPolicyVerificationException(e);
-        }
-    }
-
-    public interface Verifier {
-        void verifyAdminPolicy() throws PMException;
-    }
-
-
 }

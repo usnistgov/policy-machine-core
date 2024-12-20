@@ -12,7 +12,7 @@ import static gov.nist.csd.pm.pap.graph.node.NodeType.PC;
 /**
  * PolicyStore is an abstract class that outlines the expected behavior of a backend implementation.
  */
-public class PolicyModifier extends Modifier implements PolicyModification, AdminPolicy.Verifier {
+public class PolicyModifier extends Modifier implements PolicyModification {
 
     private GraphModifier graphModifier;
     private ProhibitionsModifier prohibitionsModifier;
@@ -52,23 +52,5 @@ public class PolicyModifier extends Modifier implements PolicyModification, Admi
     @Override
     public RoutinesModifier routines() {
         return routinesModifier;
-    }
-
-    @Override
-    public void verifyAdminPolicy() throws PMException {
-        String pc = AdminPolicyNode.PM_ADMIN_PC.nodeName();
-
-        if (!store.graph().nodeExists(pc)) {
-            store.graph().createNode(pc, PC);
-        }
-
-        String oa = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
-        if (!store.graph().nodeExists(oa)) {
-            store.graph().createNode(oa, OA);
-        }
-
-        if (!store.graph().getAdjacentDescendants(oa).contains(pc)) {
-            store.graph().createAssignment(oa, pc);
-        }
     }
 }

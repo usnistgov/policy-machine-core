@@ -20,11 +20,6 @@ public class MemoryPAP extends PAP {
         this.querier = new MemoryPolicyQuerier(policyStore());
     }
 
-    public MemoryPAP(PAP pap) throws PMException {
-        super(pap);
-        this.querier = new MemoryPolicyQuerier(policyStore());
-    }
-
     @Override
     public PolicyQuerier query() {
         return querier;
