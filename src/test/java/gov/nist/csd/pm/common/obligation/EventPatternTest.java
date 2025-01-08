@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.common.obligation;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.pap.obligation.EventPattern;
-import gov.nist.csd.pm.pap.obligation.UnexpectedOperandTypeException;
-import gov.nist.csd.pm.pap.op.graph.AssignOp;
+import gov.nist.csd.pm.common.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
@@ -18,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.ASCENDANT_OPERAND;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EventPatternTest {

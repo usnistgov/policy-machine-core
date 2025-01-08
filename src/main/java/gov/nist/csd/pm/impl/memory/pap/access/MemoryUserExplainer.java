@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.dag.DepthFirstGraphWalker;
-import gov.nist.csd.pm.pap.graph.dag.Propagator;
-import gov.nist.csd.pm.pap.graph.relationship.Association;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.common.graph.dag.Propagator;
+import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Path;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;

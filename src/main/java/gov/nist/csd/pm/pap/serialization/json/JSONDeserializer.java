@@ -2,16 +2,16 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.graph.node.NodeType.*;
+import static gov.nist.csd.pm.common.graph.node.NodeType.*;
 
 public class JSONDeserializer implements PolicyDeserializer {
 

@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.common.obligation;
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.common.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.type.Type;
@@ -14,13 +14,13 @@ import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.*;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ObligationTest {

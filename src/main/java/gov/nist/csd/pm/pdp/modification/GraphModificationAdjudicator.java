@@ -1,35 +1,35 @@
 package gov.nist.csd.pm.pdp.modification;
 
+import gov.nist.csd.pm.common.op.graph.*;
 import gov.nist.csd.pm.pap.modification.GraphModification;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.op.graph.*;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.*;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
     private final UserContext userCtx;
     private final PAP pap;
-    private final EventEmitter eventEmitter;
+    private final EventPublisher eventPublisher;
 
-    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventEmitter eventEmitter, PrivilegeChecker privilegeChecker) {
+    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
-        this.eventEmitter = eventEmitter;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(NAME_OPERAND, name))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
 
         return name;
     }
@@ -49,7 +49,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
 
         return name;
     }
@@ -60,7 +60,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
 
         return name;
     }
@@ -71,7 +71,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
 
         return name;
     }
@@ -82,7 +82,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
 
         return name;
     }
@@ -93,7 +93,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(NAME_OPERAND, name, PROPERTIES_OPERAND, properties))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 withOperands(Map.of(NAME_OPERAND, name, TYPE_OPERAND, nodeType, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target, ARSET_OPERAND, accessRights))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
                 .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
 
     }
 }

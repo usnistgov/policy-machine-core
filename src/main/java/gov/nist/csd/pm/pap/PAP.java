@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.executable.AdminExecutor;
+import gov.nist.csd.pm.common.executable.AdminExecutable;
+import gov.nist.csd.pm.common.executable.AdminExecutor;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -14,9 +14,9 @@ import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.store.PolicyStore;
-import gov.nist.csd.pm.pap.tx.Transactional;
+import gov.nist.csd.pm.common.tx.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +26,6 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     protected final PolicyStore policyStore;
     private final PolicyModifier modifier;
-
     private Map<String, PMLOperation> pmlOperations;
     private Map<String, PMLRoutine> pmlRoutines;
     private Map<String, Value> pmlConstants;
@@ -34,11 +33,12 @@ public abstract class PAP implements AdminExecutor, Transactional {
     public PAP(PolicyStore policyStore) throws PMException {
         this.policyStore = policyStore;
         this.modifier = new PolicyModifier(policyStore);
-        AdminPolicy.verify(modifier);
-
         this.pmlOperations = new HashMap<>();
         this.pmlRoutines = new HashMap<>();
         this.pmlConstants = new HashMap<>();
+
+        // verify admin policy
+        this.policyStore.verifyAdminPolicy();
     }
 
     public PAP(PAP pap) throws PMException {
@@ -58,7 +58,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
     public void reset() throws PMException {
         policyStore.reset();
 
-        AdminPolicy.verify(modifier);
+        policyStore.verifyAdminPolicy();
     }
 
     @Override

@@ -1,18 +1,16 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.exception.*;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.exception.*;
-import gov.nist.csd.pm.pap.exception.PMException;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.query.model.explain.*;
-import gov.nist.csd.pm.pap.routine.Routine;
-import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
+import gov.nist.csd.pm.common.routine.Routine;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -20,10 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.ASCENDANT_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static gov.nist.csd.pm.pdp.Decision.DENY;
 import static gov.nist.csd.pm.pdp.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +68,7 @@ class PDPTest {
             p.modify().graph().createPolicyClass("pc1");
         });
 
-        testAdminPolicy(pap, 2);
+        testAdminPolicy(pap);
         assertTrue(pap.query().graph().nodeExists("pc1"));
     }
 
@@ -372,7 +370,7 @@ class PDPTest {
     }
 
     @Test
-    void testPMLOperationDoesNotEmitEvents() throws PMException {
+    void testPMLOperationDoesNotPublishEvents() throws PMException {
         MemoryPAP pap = new MemoryPAP();
         pap.executePML(new UserContext("u1"), """
                 create pc "pc1"

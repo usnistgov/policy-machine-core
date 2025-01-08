@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.*;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
@@ -16,13 +16,13 @@ public class PolicyModificationAdjudicator extends Adjudicator implements Policy
     private final OperationsModificationAdjudicator operations;
     private final RoutinesModificationAdjudicator routines;
 
-    public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventEmitter eventEmitter, PrivilegeChecker privilegeChecker) throws PMException {
+    public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) throws PMException {
         super(privilegeChecker);
-        this.graph = new GraphModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
-        this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
-        this.obligations = new ObligationsModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
-        this.operations = new OperationsModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
-        this.routines = new RoutinesModificationAdjudicator(userCtx, pap, eventEmitter, privilegeChecker);
+        this.graph = new GraphModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
+        this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
+        this.obligations = new ObligationsModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
+        this.operations = new OperationsModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
+        this.routines = new RoutinesModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
     }
 
     @Override

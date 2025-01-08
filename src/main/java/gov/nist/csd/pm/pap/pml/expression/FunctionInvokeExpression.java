@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
+import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;

@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.REVIEW_POLICY;
+import static gov.nist.csd.pm.pap.AdminAccessRights.REVIEW_POLICY;
 
 public abstract class Adjudicator {
 

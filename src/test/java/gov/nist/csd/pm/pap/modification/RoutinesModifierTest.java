@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.exception.RoutineExistsException;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.common.exception.RoutineExistsException;
+import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,46 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class RoutinesModifierTest extends PAPTestInitializer {
 
+    static Routine routine1 = new Routine<Void>(
+            "routine1",
+            List.of("a", "b")
+    ) {
+        @Override
+        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine routine2 = new Routine<Void>(
+            "routine2",
+            List.of("a", "b")
+    ) {
+        @Override
+        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine routine3 = new Routine<Void>(
+            "routine3",
+            List.of("a", "b")
+    ) {
+        @Override
+        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine routine4 = new Routine<Void>(
+            "routine4",
+            List.of("a", "b")
+    ) {
+        @Override
+        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            return null;
+        }
+    };
+
     @Nested
     class CreateAdminRoutine {
 
@@ -24,15 +64,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().routines().createAdminRoutine(new Routine<Void>(
-                    "routine1",
-                    List.of("a", "b")
-            ) {
-                @Override
-                public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                    return null;
-                }
-            });
+            pap.modify().routines().createAdminRoutine(routine1);
 
             assertTrue(pap.query().routines().getAdminRoutineNames().contains("routine1"));
         }
@@ -41,26 +73,10 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
         void testRoutineExists() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().routines().createAdminRoutine(new Routine<Void>(
-                    "routine1",
-                    List.of("a", "b")
-            ) {
-                @Override
-                public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                    return null;
-                }
-            });
+            pap.modify().routines().createAdminRoutine(routine1);
 
             assertThrows(RoutineExistsException.class, () -> {
-                pap.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine1",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
+                pap.modify().routines().createAdminRoutine(routine1);
             });
         }
 
@@ -69,45 +85,13 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine1",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
-                tx.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine2",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
+                tx.modify().routines().createAdminRoutine(routine1);
+                tx.modify().routines().createAdminRoutine(routine2);
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine3",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
-                tx.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine4",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
+                tx.modify().routines().createAdminRoutine(routine3);
+                tx.modify().routines().createAdminRoutine(routine4);
 
                 throw new PMException("");
             }));
@@ -123,15 +107,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
         @Test
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
-            pap.modify().routines().createAdminRoutine(new Routine<Void>(
-                    "routine1",
-                    List.of("a", "b")
-            ) {
-                @Override
-                public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                    return null;
-                }
-            });
+            pap.modify().routines().createAdminRoutine(routine1);
 
             pap.modify().routines().deleteAdminRoutine("routine1");
             pap.modify().routines().deleteAdminRoutine("routine1");
@@ -143,24 +119,8 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine1",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
-                tx.modify().routines().createAdminRoutine(new Routine<Void>(
-                        "routine2",
-                        List.of("a", "b")
-                ) {
-                    @Override
-                    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-                        return null;
-                    }
-                });
+                tx.modify().routines().createAdminRoutine(routine1);
+                tx.modify().routines().createAdminRoutine(routine2);
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {

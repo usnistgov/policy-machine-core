@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.exception.AdminAccessRightExistsException;
-import gov.nist.csd.pm.pap.exception.OperationExistsException;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.op.graph.AssignOp;
+import gov.nist.csd.pm.common.exception.AdminAccessRightExistsException;
+import gov.nist.csd.pm.common.exception.OperationExistsException;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.common.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.AdminAccessRights.CREATE_POLICY_CLASS;
+import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_POLICY_CLASS;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    Operation<?> testOp = new Operation<>("test", List.of()) {
+    static Operation<?> testOp = new Operation<>("test", List.of()) {
         @Override
         public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
 

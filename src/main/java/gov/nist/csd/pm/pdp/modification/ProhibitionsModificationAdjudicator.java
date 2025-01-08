@@ -1,36 +1,36 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
-import gov.nist.csd.pm.pap.obligation.EventContext;
-import gov.nist.csd.pm.epp.EventEmitter;
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.op.PrivilegeChecker;
-import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pdp.Adjudicator;
 
 import java.util.Collection;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.prohibition.ProhibitionOp.*;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
 
 public class ProhibitionsModificationAdjudicator extends Adjudicator implements ProhibitionsModification {
     private final UserContext userCtx;
     private final PAP pap;
-    private final EventEmitter eventEmitter;
+    private final EventPublisher eventPublisher;
 
-    public ProhibitionsModificationAdjudicator(UserContext userCtx, PAP pap, EventEmitter eventEmitter, PrivilegeChecker privilegeChecker) {
+    public ProhibitionsModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
-        this.eventEmitter = eventEmitter;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
                 ))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -62,6 +62,6 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
                 ))
                 .execute(pap, userCtx, privilegeChecker);
 
-        eventEmitter.emitEvent(event);
+        eventPublisher.publishEvent(event);
     }
 }

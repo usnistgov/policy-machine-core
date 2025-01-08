@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 
 import java.util.List;
 

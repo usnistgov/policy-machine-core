@@ -1,13 +1,14 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.pap.obligation.EventContext;
+import gov.nist.csd.pm.common.event.EventSubscriber;
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.obligation.Obligation;
-import gov.nist.csd.pm.pap.obligation.Response;
-import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.common.obligation.Response;
+import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pdp.PDPExecutionContext;
 
 import java.util.Collection;
@@ -15,24 +16,24 @@ import java.util.List;
 
 public class EPP {
 
-    private final EPPEventProcessor eventListener;
+    private final EPPEventSubscriber eventListener;
 
     public EPP(PDP pdp, PAP pap) throws PMException {
-        eventListener = new EPPEventProcessor(pdp, pap);
+        eventListener = new EPPEventSubscriber(pdp, pap);
 
-        pdp.addEventListener(eventListener);
+        pdp.addEventSubscriber(eventListener);
     }
 
-    public EPPEventProcessor getEventProcessor() {
+    public EPPEventSubscriber getEventProcessor() {
         return eventListener;
     }
 
-    public static class EPPEventProcessor implements EventProcessor {
+    public static class EPPEventSubscriber implements EventSubscriber {
 
         private PDP pdp;
         private PAP pap;
 
-        public EPPEventProcessor(PDP pdp, PAP pap) {
+        public EPPEventSubscriber(PDP pdp, PAP pap) {
             this.pdp = pdp;
             this.pap = pap;
         }

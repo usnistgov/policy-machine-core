@@ -1,18 +1,18 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.pap.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.op.graph.*;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.graph.*;
-import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.common.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 
 public class DeleteStatement extends OperationStatement {
 
@@ -22,6 +22,26 @@ public class DeleteStatement extends OperationStatement {
     public DeleteStatement(Type type, Expression expression) {
         super(getOpFromType(type));
         this.type = type;
+        this.expression = expression;
+    }
+
+    public DeleteStatement(Operation<Void> op) {
+        super(op);
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    public void setExpression(Expression expression) {
         this.expression = expression;
     }
 

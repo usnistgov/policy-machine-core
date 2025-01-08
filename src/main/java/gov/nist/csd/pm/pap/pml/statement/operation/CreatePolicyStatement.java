@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.op.graph.CreatePolicyClassOp;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.op.graph.CreatePolicyClassOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.NAME_OPERAND;
 
 public class CreatePolicyStatement extends OperationStatement {
 

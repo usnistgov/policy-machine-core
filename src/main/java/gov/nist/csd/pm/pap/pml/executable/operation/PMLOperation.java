@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.pap.pml.executable.operation;
 
-import gov.nist.csd.pm.pap.exception.OperandsDoNotMatchException;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PreparedOperation;
+import gov.nist.csd.pm.common.exception.OperandsDoNotMatchException;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.common.op.PreparedOperation;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 

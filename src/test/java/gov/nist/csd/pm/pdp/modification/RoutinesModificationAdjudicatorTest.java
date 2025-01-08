@@ -1,24 +1,24 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.obligation.EventContext;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp;
-import gov.nist.csd.pm.pap.op.routine.DeleteAdminRoutineOp;
+import gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp;
+import gov.nist.csd.pm.common.op.routine.DeleteAdminRoutineOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
+import gov.nist.csd.pm.pdp.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp.ROUTINE_OPERAND;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp.ROUTINE_OPERAND;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoutinesModificationAdjudicatorTest {
@@ -27,7 +27,7 @@ class RoutinesModificationAdjudicatorTest {
     PDP pdp;
     EPP epp;
 
-    TestEventProcessor testEventProcessor;
+    TestEventSubscriber testEventProcessor;
     RoutinesModificationAdjudicator ok;
     RoutinesModificationAdjudicator fail;
 
@@ -55,8 +55,8 @@ class RoutinesModificationAdjudicatorTest {
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
 
-        testEventProcessor = new TestEventProcessor();
-        pdp.addEventListener(testEventProcessor);
+        testEventProcessor = new TestEventSubscriber();
+        pdp.addEventSubscriber(testEventProcessor);
 
         ok = new RoutinesModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
         fail = new RoutinesModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());

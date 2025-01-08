@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.obligation.EventPattern;
-import gov.nist.csd.pm.pap.obligation.Response;
-import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.obligation.EventPattern;
+import gov.nist.csd.pm.common.obligation.Response;
+import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.exception.UnauthorizedException;
+import gov.nist.csd.pm.pdp.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class ObligationsModificationAdjudicatorTest {
     PDP pdp;
     EPP epp;
 
-    TestEventProcessor testEventProcessor;
+    TestEventSubscriber testEventProcessor;
     ObligationsModificationAdjudicator ok;
     ObligationsModificationAdjudicator fail;
 
@@ -54,8 +54,8 @@ class ObligationsModificationAdjudicatorTest {
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
 
-        testEventProcessor = new TestEventProcessor();
-        pdp.addEventListener(testEventProcessor);
+        testEventProcessor = new TestEventSubscriber();
+        pdp.addEventSubscriber(testEventProcessor);
 
         ok = new ObligationsModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
         fail = new ObligationsModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());

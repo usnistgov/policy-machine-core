@@ -1,19 +1,19 @@
 package gov.nist.csd.pm.util;
 
-import gov.nist.csd.pm.pap.exception.PMException;
-import gov.nist.csd.pm.pap.graph.node.Node;
-import gov.nist.csd.pm.pap.graph.node.NodeType;
-import gov.nist.csd.pm.pap.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.graph.relationship.Association;
-import gov.nist.csd.pm.pap.obligation.Obligation;
-import gov.nist.csd.pm.pap.prohibition.Prohibition;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.Association;
+import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

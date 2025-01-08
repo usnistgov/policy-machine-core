@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.pap.tx.Transactional;
+import gov.nist.csd.pm.common.tx.Transactional;
 
 import java.util.Objects;
 

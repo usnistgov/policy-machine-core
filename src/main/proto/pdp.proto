@@ -3,7 +3,7 @@ syntax = "proto3";
 import "epp.proto";
 
 option java_multiple_files = true;
-option java_package = "gov.nist.csd.pm.pdp.proto";
+option java_package = "gov.nist.csd.pm.proto.pdp";
 option java_outer_classname = "PDPProto";
 
 message ResourceOperationRequest {
@@ -36,10 +36,16 @@ message AdminRoutineRequest {
   repeated AdminOperationRequest ops = 1;
 }
 
+message NamedAdminRoutineRequest {
+  string name = 1;
+  repeated OperandEntry operands = 2;
+}
+
 message AdminRoutineResponse {}
 
 
 service AdminPDP {
   rpc AdjudicateAdminOperation(AdminOperationRequest) returns (AdminOperationResponse) {}
   rpc AdjudicateAdminRoutine(AdminRoutineRequest) returns (AdminRoutineResponse) {}
+  rpc AdjudicateNamedAdminRoutine(NamedAdminRoutineRequest) returns (AdminRoutineResponse) {}
 }
