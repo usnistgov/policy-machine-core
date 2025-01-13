@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.RoutinesQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
-import gov.nist.csd.pm.pdp.Adjudicator;
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;
 

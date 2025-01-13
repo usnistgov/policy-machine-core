@@ -18,12 +18,17 @@ import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.tx.TxRunner;
 import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pdp.adjudication.AccessAdjudication;
+import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
+import gov.nist.csd.pm.pdp.adjudication.OperationRequest;
+import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 
 public class PDP implements EventPublisher, AccessAdjudication {
 
@@ -105,7 +110,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public ResourceAdjudicationResponse adjudicateResourceOperation(UserContext user, String target, String resourceOperation) throws PMException {
+    public AdjudicationResponse adjudicateResourceOperation(UserContext user, String target, String resourceOperation) throws PMException {
         if (!pap.query().operations().getResourceOperations().contains(resourceOperation)) {
             throw new OperationDoesNotExistException(resourceOperation);
         }
@@ -113,7 +118,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         try {
             privilegeChecker.check(user, target, resourceOperation);
         } catch (UnauthorizedException e) {
-            return new ResourceAdjudicationResponse(e);
+            return new AdjudicationResponse(e);
         }
 
         Node node = pap.query().graph().getNode(target);
@@ -125,7 +130,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 Map.of("target", target)
         ));
 
-        return new ResourceAdjudicationResponse(node);
+        return new AdjudicationResponse(GRANT, node);
     }
 
     private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
@@ -154,7 +159,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public AdminAdjudicationResponse adjudicateAdminOperation(UserContext user, String name, Map<String, Object> operands) throws PMException {
+    public AdjudicationResponse adjudicateAdminOperation(UserContext user, String name, Map<String, Object> operands) throws PMException {
         try {
             Object returnValue = runTx(user, tx -> {
                 PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
@@ -162,14 +167,14 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 return executeOperation(user, ctx, tx, name, operands);
             });
 
-            return new AdminAdjudicationResponse(Decision.GRANT, returnValue);
+            return new AdjudicationResponse(GRANT, returnValue);
         } catch(UnauthorizedException e){
-            return new AdminAdjudicationResponse(e);
+            return new AdjudicationResponse(e);
         }
     }
 
     @Override
-    public AdminAdjudicationResponse adjudicateAdminRoutine(UserContext user, String name, Map<String, Object> operands) throws PMException {
+    public AdjudicationResponse adjudicateAdminRoutine(UserContext user, String name, Map<String, Object> operands) throws PMException {
         Routine<?> adminRoutine = pap.query().routines().getAdminRoutine(name);
         try {
             Object returnValue = runTx(user, tx -> {
@@ -187,14 +192,14 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 return o;
             });
 
-            return new AdminAdjudicationResponse(Decision.GRANT, returnValue);
+            return new AdjudicationResponse(GRANT, returnValue);
         } catch (UnauthorizedException e) {
-            return new AdminAdjudicationResponse(e);
+            return new AdjudicationResponse(e);
         }
     }
 
     @Override
-    public AdminAdjudicationResponse adjudicateAdminRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
+    public AdjudicationResponse adjudicateAdminRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
         try {
             runTx(user, tx -> {
                 PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
@@ -206,9 +211,9 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 return null;
             });
 
-            return new AdminAdjudicationResponse(Decision.GRANT);
+            return new AdjudicationResponse(GRANT);
         } catch(UnauthorizedException e){
-            return new AdminAdjudicationResponse(e);
+            return new AdjudicationResponse(e);
         }
     }
 }

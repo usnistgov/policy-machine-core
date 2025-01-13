@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.adjudication;
 
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 

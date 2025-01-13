@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
-import gov.nist.csd.pm.pdp.Adjudicator;
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;
 import java.util.HashMap;
