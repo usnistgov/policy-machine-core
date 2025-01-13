@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.pdp.Adjudicator;
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 
 import java.util.Collection;

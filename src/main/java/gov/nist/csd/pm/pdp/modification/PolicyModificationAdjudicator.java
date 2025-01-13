@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.*;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pdp.Adjudicator;
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
 public class PolicyModificationAdjudicator extends Adjudicator implements PolicyModification {
 

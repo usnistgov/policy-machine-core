@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.query.GraphQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
-import gov.nist.csd.pm.pdp.Adjudicator;
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 
 import java.util.ArrayList;

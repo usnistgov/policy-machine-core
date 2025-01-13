@@ -1,36 +1,38 @@
 syntax = "proto3";
 
 import "epp.proto";
+import "google/protobuf/struct.proto";
 
 option java_multiple_files = true;
 option java_package = "gov.nist.csd.pm.proto.pdp";
 option java_outer_classname = "PDPProto";
 
+enum Decision {
+  GRANT = 0;
+  DENY = 1;
+}
+
+message AdjudicationResponse {
+  Decision decision = 1;
+  optional google.protobuf.Struct value = 2;
+  optional google.protobuf.Struct explain = 3;
+}
+
+// resource
 message ResourceOperationRequest {
   string operation = 1;
   string target = 2;
 }
 
-message Node {
-  string name = 1;
-  string type = 2;
-  map<string, string> properties = 3;
-}
-
-message ResourceOperationResponse {
-  Node node = 1;
-}
-
 service ResourcePDP {
-  rpc AdjudicateResourceOperation(ResourceOperationRequest) returns (ResourceOperationResponse) {}
+  rpc AdjudicateResourceOperation(ResourceOperationRequest) returns (AdjudicationResponse) {}
 }
 
+// admin
 message AdminOperationRequest {
   string opName = 1;
   repeated OperandEntry operands = 2;
 }
-
-message AdminOperationResponse {}
 
 message AdminRoutineRequest {
   repeated AdminOperationRequest ops = 1;
@@ -41,11 +43,8 @@ message NamedAdminRoutineRequest {
   repeated OperandEntry operands = 2;
 }
 
-message AdminRoutineResponse {}
-
-
 service AdminPDP {
-  rpc AdjudicateAdminOperation(AdminOperationRequest) returns (AdminOperationResponse) {}
-  rpc AdjudicateAdminRoutine(AdminRoutineRequest) returns (AdminRoutineResponse) {}
-  rpc AdjudicateNamedAdminRoutine(NamedAdminRoutineRequest) returns (AdminRoutineResponse) {}
+  rpc AdjudicateAdminOperation(AdminOperationRequest) returns (AdjudicationResponse) {}
+  rpc AdjudicateAdminRoutine(AdminRoutineRequest) returns (AdjudicationResponse) {}
+  rpc AdjudicateNamedAdminRoutine(NamedAdminRoutineRequest) returns (AdjudicationResponse) {}
 }

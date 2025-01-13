@@ -11,6 +11,9 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.query.model.explain.*;
 import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
+import gov.nist.csd.pm.pdp.adjudication.Decision;
+import gov.nist.csd.pm.pdp.adjudication.OperationRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -22,8 +25,8 @@ import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.ASCENDANT_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
-import static gov.nist.csd.pm.pdp.Decision.DENY;
-import static gov.nist.csd.pm.pdp.Decision.GRANT;
+import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
+import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PDPTest {
@@ -148,13 +151,13 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
 
-        ResourceAdjudicationResponse resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "read");
-        assertEquals(resp.getResource(), pap.query().graph().getNode("o1"));
+        AdjudicationResponse resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "read");
+        assertEquals(resp.getValue(), pap.query().graph().getNode("o1"));
         assertEquals(resp.getDecision(), GRANT);
         assertNull(resp.getExplain());
 
         resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "write");
-        assertNull(resp.getResource());
+        assertNull(resp.getValue());
         assertEquals(resp.getDecision(), Decision.DENY);
         assertEquals(new Explain(
                 new AccessRightSet("read"),
@@ -204,7 +207,7 @@ class PDPTest {
         pdp.setExplain(true);
 
         // builtin operation
-        AdminAdjudicationResponse resp = pdp.adjudicateAdminOperation(
+        AdjudicationResponse resp = pdp.adjudicateAdminOperation(
                 new UserContext("u1"),
                 "assign", Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa2"))
         );
@@ -283,7 +286,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
 
-        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of("a", "test"));
+        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of("a", "test"));
         assertEquals(GRANT, response.getDecision());
         assertEquals("test1", response.getValue());
         response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine2", Map.of());
@@ -337,7 +340,7 @@ class PDPTest {
         pap.executePML(new UserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of());
+        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of());
         assertEquals(DENY, response.getDecision());
     }
 
@@ -435,7 +438,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        AdminAdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), List.of(
+        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new UserContext("u1"), List.of(
                 new OperationRequest("op1", Map.of("name", "pc2")),
                 new OperationRequest("op1", Map.of("name", "pc3"))
         ));
@@ -462,7 +465,7 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), "create_policy_class", Map.of(NAME_OPERAND, "test"));
+        AdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), "create_policy_class", Map.of(NAME_OPERAND, "test"));
         assertEquals(response.getDecision(), DENY);
         assertNull(response.getExplain());
     }

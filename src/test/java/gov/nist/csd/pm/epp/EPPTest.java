@@ -27,6 +27,8 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.*;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
+import gov.nist.csd.pm.pdp.adjudication.Decision;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -36,7 +38,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
-import static gov.nist.csd.pm.pdp.Decision.GRANT;
+import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EPPTest {
@@ -104,7 +106,7 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(
+        AdjudicationResponse response = pdp.adjudicateAdminOperation(
                 new UserContext("u1"),
                 "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
         );
@@ -161,7 +163,7 @@ class EPPTest {
                 """);
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        ResourceAdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read");
+        AdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read");
         assertEquals(GRANT, response.getDecision());
 
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));

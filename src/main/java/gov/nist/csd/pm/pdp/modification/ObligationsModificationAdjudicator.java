@@ -11,7 +11,7 @@ import gov.nist.csd.pm.common.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.common.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pdp.Adjudicator;
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
 import java.util.List;
 import java.util.Map;

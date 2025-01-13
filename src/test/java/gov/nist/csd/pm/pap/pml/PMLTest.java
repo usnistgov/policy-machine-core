@@ -8,7 +8,7 @@ import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
-import gov.nist.csd.pm.pdp.AdminAdjudicationResponse;
+import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pdp.Decision.DENY;
-import static gov.nist.csd.pm.pdp.Decision.GRANT;
+import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
+import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PMLTest {
@@ -143,7 +143,7 @@ public class PMLTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdminAdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"), 
+        AdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"),
                 "op1", Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")));
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("1a"));

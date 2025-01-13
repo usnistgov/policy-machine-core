@@ -1,25 +1,26 @@
-package gov.nist.csd.pm.pdp;
+package gov.nist.csd.pm.pdp.adjudication;
 
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
+import gov.nist.csd.pm.pdp.UnauthorizedException;
 
 import java.util.Objects;
 
-public class AdminAdjudicationResponse {
+public class AdjudicationResponse {
 
     private Decision decision;
     private Object value;
     private Explain explain;
 
-    public AdminAdjudicationResponse(Decision decision) {
+    public AdjudicationResponse(Decision decision) {
         this.decision = decision;
     }
 
-    public AdminAdjudicationResponse(Decision decision, Object value) {
+    public AdjudicationResponse(Decision decision, Object value) {
         this.decision = decision;
         this.value = value;
     }
 
-    public AdminAdjudicationResponse(UnauthorizedException e) {
+    public AdjudicationResponse(UnauthorizedException e) {
         this.decision = Decision.DENY;
         this.explain = e.getExplain();
     }
@@ -51,7 +52,7 @@ public class AdminAdjudicationResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AdminAdjudicationResponse response)) return false;
+        if (!(o instanceof AdjudicationResponse response)) return false;
 	    return decision == response.decision && Objects.equals(value, response.value) && Objects.equals(explain, response.explain);
     }
 
