@@ -52,8 +52,15 @@ public class AdminOperations {
     public static Set<String> ADMIN_OP_NAMES = new HashSet<>(adminOperationNames());
 
     public static void init(OperationsStore operationsStore) throws PMException {
+        Set<String> adminOperationNames = new HashSet<>(operationsStore.getAdminOperationNames());
+
         for (Operation<?> op : ADMIN_OPERATIONS) {
+            if (adminOperationNames.contains(op.getName())) {
+                continue;
+            }
+
             operationsStore.createAdminOperation(op);
+            adminOperationNames.add(op.getName());
         }
     }
 
