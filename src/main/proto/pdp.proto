@@ -7,6 +7,8 @@ option java_multiple_files = true;
 option java_package = "gov.nist.csd.pm.proto.pdp";
 option java_outer_classname = "PDPProto";
 
+package gov.nist.csd.pm.proto.pdp;
+
 enum Decision {
   GRANT = 0;
   DENY = 1;
@@ -31,7 +33,7 @@ service ResourcePDP {
 // admin
 message AdminOperationRequest {
   string opName = 1;
-  repeated OperandEntry operands = 2;
+  repeated gov.nist.csd.pm.proto.epp.OperandEntry operands = 2;
 }
 
 message AdminRoutineRequest {
@@ -40,7 +42,7 @@ message AdminRoutineRequest {
 
 message NamedAdminRoutineRequest {
   string name = 1;
-  repeated OperandEntry operands = 2;
+  repeated gov.nist.csd.pm.proto.epp.OperandEntry operands = 2;
 }
 
 service AdminPDP {

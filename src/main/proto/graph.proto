@@ -4,6 +4,8 @@ option java_multiple_files = true;
 option java_package = "gov.nist.csd.pm.proto.graph";
 option java_outer_classname = "GraphProto";
 
+package gov.nist.csd.pm.proto.graph;
+
 message AssignOp {
   string ascendant = 1;
   repeated string descendants = 2;

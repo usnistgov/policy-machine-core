@@ -4,6 +4,8 @@ option java_multiple_files = true;
 option java_package = "gov.nist.csd.pm.proto.epp";
 option java_outer_classname = "EPPProto";
 
+package gov.nist.csd.pm.proto.epp;
+
 message StringList {
   repeated string values = 1;
 }

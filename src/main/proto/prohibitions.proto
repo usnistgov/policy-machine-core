@@ -4,6 +4,8 @@ option java_multiple_files = true;
 option java_package = "gov.nist.csd.pm.proto.prohibition";
 option java_outer_classname = "ProhibitionProto";
 
+package gov.nist.csd.pm.proto.prohibitions;
+
 message CreateProhibitionOp {
   string name = 1;
   string subject = 2;
