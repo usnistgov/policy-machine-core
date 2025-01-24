@@ -93,10 +93,10 @@ class PDPTest {
         pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
         pap.modify().graph().createObject("o1", List.of("oa1"));
 
-        pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject("u1", ProhibitionSubject.Type.USER),
-                new AccessRightSet("read"), true,
-                Collections.singleton(new ContainerCondition("oa1", false))
-        );
+        pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject("u1", ProhibitionSubject.Type.USER), ,
+		        new AccessRightSet("read"),
+		        true,
+		        Collections.singleton(new ContainerCondition("oa1", false)));
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
             pdp.bootstrap((policy) -> {});
@@ -152,7 +152,7 @@ class PDPTest {
         pdp.setExplain(true);
 
         AdjudicationResponse resp = pdp.adjudicateResourceOperation(new UserContext("u1"), "o1", "read");
-        assertEquals(resp.getValue(), pap.query().graph().getNode("o1"));
+        assertEquals(resp.getValue(), pap.query().graph().getNodeByName("o1"));
         assertEquals(resp.getDecision(), GRANT);
         assertNull(resp.getExplain());
 

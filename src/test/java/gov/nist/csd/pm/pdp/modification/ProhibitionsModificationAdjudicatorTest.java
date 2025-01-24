@@ -68,18 +68,17 @@ class ProhibitionsModificationAdjudicatorTest {
     void createProhibition() throws PMException {
         assertDoesNotThrow(() -> ok.createProhibition(
                 "pro1",
-                new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
-                new AccessRightSet("assign"),
-                true,
-                List.of(new ContainerCondition("oa1", false))
-        ));
+                new ProhibitionSubject("u2", ProhibitionSubject.Type.USER), ,
+		        new AccessRightSet("assign"),
+		        true,
+		        List.of(new ContainerCondition("oa1", false))));
         assertEquals(
                 new EventContext(
                         "u1",
                         new CreateProhibitionOp(),
                         Map.of(
                                 NAME_OPERAND, "pro1",
-                                SUBJECT_OPERAND, new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
+		                        SUBJECT_TYPE_OPERAND, new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
                                 ARSET_OPERAND, new AccessRightSet("assign"),
                                 INTERSECTION_OPERAND, true,
                                 CONTAINERS_OPERAND, List.of(new ContainerCondition("oa1", false))
@@ -92,18 +91,17 @@ class ProhibitionsModificationAdjudicatorTest {
 
         assertDoesNotThrow(() -> ok.createProhibition(
                 "pro2",
-                new ProhibitionSubject("123", ProhibitionSubject.Type.PROCESS),
-                new AccessRightSet("assign"),
-                true,
-                List.of(new ContainerCondition("oa1", true))
-        ));
+                new ProhibitionSubject("123", ProhibitionSubject.Type.PROCESS), ,
+		        new AccessRightSet("assign"),
+		        true,
+		        List.of(new ContainerCondition("oa1", true))));
         assertEquals(
                 new EventContext(
                         "u1",
                         new CreateProhibitionOp(),
                         Map.of(
                                 NAME_OPERAND, "pro2",
-                                SUBJECT_OPERAND, new ProhibitionSubject("123", ProhibitionSubject.Type.PROCESS),
+		                        SUBJECT_TYPE_OPERAND, new ProhibitionSubject("123", ProhibitionSubject.Type.PROCESS),
                                 ARSET_OPERAND, new AccessRightSet("assign"),
                                 INTERSECTION_OPERAND, true,
                                 CONTAINERS_OPERAND, List.of(new ContainerCondition("oa1", true))
@@ -117,30 +115,27 @@ class ProhibitionsModificationAdjudicatorTest {
 
         assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
                 "pro1",
-                new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
-                new AccessRightSet("assign"),
-                true,
-                List.of(new ContainerCondition("oa1", false))
-        ));
+                new ProhibitionSubject("u2", ProhibitionSubject.Type.USER), ,
+		        new AccessRightSet("assign"),
+		        true,
+		        List.of(new ContainerCondition("oa1", false))));
 
         assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
                 "pro1",
-                new ProhibitionSubject("123", ProhibitionSubject.Type.PROCESS),
-                new AccessRightSet("assign"),
-                true,
-                List.of(new ContainerCondition("oa1", true))
-        ));
+                new ProhibitionSubject("123", ProhibitionSubject.Type.PROCESS), ,
+		        new AccessRightSet("assign"),
+		        true,
+		        List.of(new ContainerCondition("oa1", true))));
     }
 
     @Test
     void deleteProhibition() throws PMException {
         ok.createProhibition(
                 "pro1",
-                new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
-                new AccessRightSet("assign"),
-                true,
-                List.of(new ContainerCondition("oa1", false))
-        );
+                new ProhibitionSubject("u2", ProhibitionSubject.Type.USER), ,
+		        new AccessRightSet("assign"),
+		        true,
+		        List.of(new ContainerCondition("oa1", false)));
 
         assertThrows(UnauthorizedException.class, () -> fail.deleteProhibition("pro1"));
         assertDoesNotThrow(() -> ok.deleteProhibition("pro1"));
@@ -151,7 +146,7 @@ class ProhibitionsModificationAdjudicatorTest {
                         new DeleteProhibitionOp(),
                         Map.of(
                                 NAME_OPERAND, "pro1",
-                                SUBJECT_OPERAND, new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
+		                        SUBJECT_TYPE_OPERAND, new ProhibitionSubject("u2", ProhibitionSubject.Type.USER),
                                 ARSET_OPERAND, new AccessRightSet("assign"),
                                 INTERSECTION_OPERAND, true,
                                 CONTAINERS_OPERAND, List.of(new ContainerCondition("oa1", false))

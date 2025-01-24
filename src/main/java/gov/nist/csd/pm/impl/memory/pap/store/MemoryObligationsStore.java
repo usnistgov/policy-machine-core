@@ -17,8 +17,8 @@ class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
     }
 
     @Override
-    public void createObligation(String author, String name, List<Rule> rules) throws PMException {
-        Obligation obligation = new Obligation(author, name, rules.stream().toList());
+    public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
+        Obligation obligation = new Obligation(authorId, name, rules.stream().toList());
 
         policy.obligations.add(obligation);
 
@@ -56,7 +56,7 @@ class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
     public Collection<Obligation> getObligationsWithAuthor(String user) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : getObligations()) {
-            if (obligation.getAuthor().equals(user)) {
+            if (obligation.getAuthorId().equals(user)) {
                 obls.add(obligation);
             }
         }
@@ -65,9 +65,9 @@ class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
     }
 
     @Override
-    public void deleteObligation(String name) throws PMException {
-        Obligation old = getObligation(name);
-        policy.obligations.removeIf(o -> o.getName().equals(name));
+    public void deleteObligation(long id) throws PMException {
+        Obligation old = getObligation(id);
+        policy.obligations.removeIf(o -> o.getName().equals(id));
         txCmdTracker.trackOp(tx, new TxCmd.DeleteObligationTxCmd(old));
     }
 

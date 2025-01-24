@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_ID_OPERAND;
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.RULES_OPERAND;
 
 public class ObligationsModificationAdjudicator extends Adjudicator implements ObligationsModification {
@@ -34,21 +34,21 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
     }
 
     @Override
-    public void createObligation(String author, String name, List<Rule> rules) throws PMException {
+    public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
         EventContext event = new CreateObligationOp()
-                .withOperands(Map.of(AUTHOR_OPERAND, author, NAME_OPERAND, name, RULES_OPERAND, rules))
+                .withOperands(Map.of(AUTHOR_ID_OPERAND, authorId, NAME_OPERAND, name, RULES_OPERAND, rules))
                 .execute(pap, userCtx, privilegeChecker);
 
         eventPublisher.publishEvent(event);
     }
 
     @Override
-    public void deleteObligation(String name) throws PMException {
-        Obligation obligation = pap.query().obligations().getObligation(name);
+    public void deleteObligation(long id) throws PMException {
+        Obligation obligation = pap.query().obligations().getObligation(id);
 
         EventContext event = new DeleteObligationOp()
                 .withOperands(Map.of(
-                        AUTHOR_OPERAND, obligation.getAuthor(),
+                        AUTHOR_ID_OPERAND, obligation.getAuthorId(),
                         NAME_OPERAND, obligation.getName(),
                         RULES_OPERAND, obligation.getRules()
                 ))

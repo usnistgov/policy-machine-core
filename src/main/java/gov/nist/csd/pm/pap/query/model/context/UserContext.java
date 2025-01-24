@@ -10,42 +10,42 @@ import java.util.Objects;
 
 public class UserContext implements Serializable {
 
-    private String user;
-    private List<String> attributes;
+    private long userId;
+    private long[] attributeIds;
     private String process;
 
-    public UserContext(String user, String process) {
-        this.user = user;
+    public UserContext(long userId, String process) {
+        this.userId = userId;
         this.process = process;
     }
 
-    public UserContext(String user) {
-        this.user = user;
+    public UserContext(long userId) {
+        this.userId = userId;
     }
 
-    public UserContext(List<String> attributes, String process) {
-        this.attributes = attributes;
+    public UserContext(long[] attributeIds, String process) {
+        this.attributeIds = attributeIds;
         this.process = process;
     }
 
-    public UserContext(List<String> attributes) {
-        this.attributes = attributes;
+    public UserContext(long[] attributeIds) {
+        this.attributeIds = attributeIds;
     }
 
-    public String getUser() {
-        return user;
+    public long getUser() {
+        return userId;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
-    public List<String> getAttributes() {
-        return attributes;
+    public long[] getAttributeIds() {
+        return attributeIds;
     }
 
-    public void setAttributes(List<String> attributes) {
-        this.attributes = attributes;
+    public void setAttributeIds(long[] attributeIds) {
+        this.attributeIds = attributeIds;
     }
 
     public String getProcess() {
@@ -56,17 +56,17 @@ public class UserContext implements Serializable {
         this.process = process;
     }
 
-    public boolean isUser() {
-        return user != null;
+    public boolean isUserDefined() {
+        return userId != 0;
     }
 
     public void checkExists(GraphStore graphStore) throws PMException {
-        if (isUser()) {
-            if (!graphStore.nodeExists(user)) {
-                throw new NodeDoesNotExistException(user);
+        if (isUserDefined()) {
+            if (!graphStore.nodeExists(userId)) {
+                throw new NodeDoesNotExistException(userId);
             }
         } else {
-            for (String attribute : attributes) {
+            for (long attribute : attributeIds) {
                 if (!graphStore.nodeExists(attribute)) {
                     throw new NodeDoesNotExistException(attribute);
                 }
@@ -81,10 +81,10 @@ public class UserContext implements Serializable {
             s += ", process=" + process + "]";
         }
 
-        if (isUser()) {
-            return String.format(s, "user=" + user);
+        if (isUserDefined()) {
+            return String.format(s, "user=" + userId);
         } else {
-            return String.format(s, "attributes=" + attributes);
+            return String.format(s, "attributes=" + attributeIds);
         }
     }
 
@@ -92,11 +92,11 @@ public class UserContext implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserContext that)) return false;
-        return Objects.equals(user, that.user) && Objects.equals(attributes, that.attributes) && Objects.equals(process, that.process);
+        return Objects.equals(userId, that.userId) && Objects.equals(attributeIds, that.attributeIds) && Objects.equals(process, that.process);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, attributes, process);
+        return Objects.hash(userId, attributeIds, process);
     }
 }

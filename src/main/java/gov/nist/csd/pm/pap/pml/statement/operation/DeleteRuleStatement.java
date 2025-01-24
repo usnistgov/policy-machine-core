@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_ID_OPERAND;
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.RULES_OPERAND;
 
 
@@ -49,7 +49,7 @@ public class DeleteRuleStatement extends OperationStatement {
         }
 
         return Map.of(
-                AUTHOR_OPERAND, obligation.getAuthor(),
+                AUTHOR_ID_OPERAND, obligation.getAuthorId(),
                 NAME_OPERAND, obligation.getName(),
                 RULES_OPERAND, rules
         );
@@ -77,7 +77,7 @@ public class DeleteRuleStatement extends OperationStatement {
         public UpdateObligationOp() {
             super(
                     "delete_rule",
-                    List.of(AUTHOR_OPERAND, NAME_OPERAND, RULES_OPERAND)
+                    List.of(AUTHOR_ID_OPERAND, NAME_OPERAND, RULES_OPERAND)
             );
         }
 
@@ -91,7 +91,7 @@ public class DeleteRuleStatement extends OperationStatement {
 
         @Override
         public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-            String author = (String) operands.get(AUTHOR_OPERAND);
+            String author = (String) operands.get(AUTHOR_ID_OPERAND);
             String name = (String) operands.get(NAME_OPERAND);
             List<Rule> rules = (List<Rule>) operands.get(RULES_OPERAND);
 

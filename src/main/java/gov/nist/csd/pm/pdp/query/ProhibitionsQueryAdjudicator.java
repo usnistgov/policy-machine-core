@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
@@ -33,7 +34,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     }
 
     @Override
-    public Map<String, Collection<Prohibition>> getProhibitions() throws PMException {
+    public Map<Node, Collection<Prohibition>> getProhibitions() throws PMException {
         Map<String, Collection<Prohibition>> prohibitions = pap.query().prohibitions().getProhibitions();
         Map<String, Collection<Prohibition>> retProhibitions = new HashMap<>();
         for (String subject : prohibitions.keySet()) {
@@ -62,7 +63,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
 
         // check user has access to each container condition
         for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            privilegeChecker.check(userCtx, containerCondition.getName(), GET_PROHIBITIONS);
+            privilegeChecker.check(userCtx, containerCondition.getId(), GET_PROHIBITIONS);
         }
 
         return prohibition;
@@ -97,7 +98,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
 
                 // check user has access to each target prohibitions
                 for (ContainerCondition containerCondition : prohibition.getContainers()) {
-                    privilegeChecker.check(userCtx, containerCondition.getName(), GET_PROHIBITIONS);
+                    privilegeChecker.check(userCtx, containerCondition.getId(), GET_PROHIBITIONS);
                 }
 
                 return false;

@@ -7,6 +7,7 @@ import gov.nist.csd.pm.common.op.graph.AssociateOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.query.GraphQuery;
 
 import java.util.Map;
 import java.util.Objects;
@@ -41,7 +42,12 @@ public class AssociateStatement extends OperationStatement {
             accessRightSet.add(v.getStringValue());
         }
 
-        return Map.of(UA_OPERAND, uaValue.getStringValue(), TARGET_OPERAND, targetValue.getStringValue(), ARSET_OPERAND, accessRightSet);
+        GraphQuery graph = pap.query().graph();
+
+        long uaId = graph.getNodeByName(uaValue.getStringValue()).getId();
+        long targetId = graph.getNodeByName(targetValue.getStringValue()).getId();
+
+        return Map.of(UA_OPERAND, uaId, TARGET_OPERAND, targetId, ARSET_OPERAND, accessRightSet);
     }
 
     @Override

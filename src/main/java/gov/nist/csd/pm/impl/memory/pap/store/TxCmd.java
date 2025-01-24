@@ -92,7 +92,7 @@ public abstract class TxCmd implements TxRollbackSupport {
             NodeType type = nodeToDelete.getType();
             Map<String, String> properties = nodeToDelete.getProperties();
 
-            memoryPolicyStore.graph().createNode(name, nodeToDelete.getType());
+            memoryPolicyStore.graph().createNode(, name, nodeToDelete.getType());
 
             for (String descendant : descendants) {
                 memoryPolicyStore.graph().createAssignment(name, descendant);
@@ -217,7 +217,7 @@ public abstract class TxCmd implements TxRollbackSupport {
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
             memoryPolicyStore.obligations().createObligation(
-                    obligationToDelete.getAuthor(),
+                    obligationToDelete.getAuthorId(),
                     obligationToDelete.getName(),
                     obligationToDelete.getRules()
             );

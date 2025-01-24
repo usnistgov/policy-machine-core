@@ -38,7 +38,7 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
                 getName(),
                 getReturnType(),
                 getOperandNames(),
-                getNodeOperands(),
+                getEventCtxOperandNames(),
                 getOperandTypes()
         );
     }

@@ -52,10 +52,10 @@ public class MemoryUserEvaluator {
 				.withDirection(Direction.DESCENDANTS)
 				.withVisitor(visitor);
 
-		if (userCtx.isUser()) {
+		if (userCtx.isUserDefined()) {
 			bfs.walk(userCtx.getUser());
 		} else {
-			bfs.walk(userCtx.getAttributes());
+			bfs.walk(userCtx.getAttributeIds());
 		}
 
 		return new UserDagResult(borderTargets, reachedProhibitions);

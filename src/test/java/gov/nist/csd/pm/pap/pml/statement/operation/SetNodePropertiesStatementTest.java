@@ -34,7 +34,7 @@ class SetNodePropertiesStatementTest {
 
         assertEquals(
                 Map.of("a", "b", "c", "d"),
-                pap.query().graph().getNode("ua1").getProperties()
+                pap.query().graph().getNodeByName("ua1").getProperties()
         );
     }
 

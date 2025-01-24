@@ -1,10 +1,13 @@
 package gov.nist.csd.pm.common.op.graph;
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +26,8 @@ public class AssignOp extends GraphOp {
 
     @Override
     public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        String asc = (String) operands.get(ASCENDANT_OPERAND);
-        List<String> descs = (List<String>) operands.get(DESCENDANTS_OPERAND);
+        long asc = (long) operands.get(ASCENDANT_OPERAND);
+        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
 
         pap.modify().graph().assign(asc, descs);
 
@@ -33,7 +36,24 @@ public class AssignOp extends GraphOp {
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, (String) operands.get(ASCENDANT_OPERAND), ASSIGN);
-        privilegeChecker.check(userCtx, (List<String>) operands.get(DESCENDANTS_OPERAND), ASSIGN_TO);
+        privilegeChecker.check(userCtx, (long) operands.get(ASCENDANT_OPERAND), ASSIGN);
+        privilegeChecker.check(userCtx, (List<Long>) operands.get(DESCENDANTS_OPERAND), ASSIGN_TO);
+    }
+
+    @Override
+    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        Map<String, Object> operandsWithNames = new HashMap<>();
+
+        long asc = (long) operands.get(ASCENDANT_OPERAND);
+        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
+        List<String> descNames = new ArrayList<>();
+        for (Long desc : descs) {
+            descNames.add(pap.query().graph().getNodeById(desc).getName());
+        }
+
+        operandsWithNames.put(ASCENDANT_OPERAND, pap.query().graph().getNodeById(asc).getName());
+        operandsWithNames.put(DESCENDANTS_OPERAND, descNames);
+
+        return new EventContext(userCtx.getUser(), userCtx.getProcess(), this, operandsWithNames);
     }
 }

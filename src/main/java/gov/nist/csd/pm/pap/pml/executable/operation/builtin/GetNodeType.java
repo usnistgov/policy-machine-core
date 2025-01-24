@@ -32,7 +32,7 @@ public class GetNodeType extends PMLOperation {
 
     @Override
     public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
-        Node node = pap.query().graph().getNode(((Value) operands.get("nodeName")).getStringValue());
+        Node node = pap.query().graph().getNodeByName(((Value) operands.get("nodeName")).getStringValue());
         return new StringValue(node.getType().toString());
     }
 }

@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,14 +44,12 @@ public class PreparedOperation<T> implements Serializable {
         return op.execute(pap, operands);
     }
 
-    public EventContext execute(PAP pap, UserContext userCtx, PrivilegeChecker privilegeChecker) throws PMException {
+    public void execute(PAP pap, UserContext userCtx, PrivilegeChecker privilegeChecker) throws PMException {
         // check user can execute op with given operands
         op.canExecute(privilegeChecker, userCtx, operands);
 
         // execute the op with the given operands
         op.execute(pap, operands);
-
-        return new EventContext(userCtx.getUser(), userCtx.getProcess(), op, operands);
     }
 
     @Override

@@ -36,14 +36,14 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
 
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
-                    List.of(
-                            new ContainerCondition("oa1", true),
-                            new ContainerCondition("oa2", false)));
-            pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
-                    List.of(
-                            new ContainerCondition("oa3", true),
-                            new ContainerCondition("oa4", false)));
+            pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		            true, List.of(
+		                    new ContainerCondition("oa1", true),
+		                    new ContainerCondition("oa2", false)));
+            pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		            true, List.of(
+		                    new ContainerCondition("oa3", true),
+		                    new ContainerCondition("oa4", false)));
 
             Map<String, Collection<Prohibition>> prohibitions = pap.query().prohibitions().getProhibitions();
             assertEquals(1, prohibitions.size());
@@ -96,12 +96,12 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa4", List.of("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject1"), new AccessRightSet("read"), true,
-                    List.of(new ContainerCondition("oa1", true),
-                            new ContainerCondition("oa2", false)));
-            pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject2"), new AccessRightSet("read"), true,
-                    List.of(new ContainerCondition("oa3", true),
-                            new ContainerCondition("oa4", false)));
+            pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject1"), , new AccessRightSet("read"),
+		            true, List.of(new ContainerCondition("oa1", true),
+		                    new ContainerCondition("oa2", false)));
+            pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject2"), , new AccessRightSet("read"),
+		            true, List.of(new ContainerCondition("oa3", true),
+		                    new ContainerCondition("oa4", false)));
 
             Collection<Prohibition> pros = pap.query().prohibitions().getProhibitionsWithSubject("subject1");
             assertEquals(1, pros.size());
@@ -137,12 +137,12 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa4", List.of("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
-                    List.of(new ContainerCondition("oa1", true),
-                            new ContainerCondition("oa2", false)));
-            pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
-                    List.of(new ContainerCondition("oa3", true),
-                            new ContainerCondition("oa4", false)));
+            pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		            true, List.of(new ContainerCondition("oa1", true),
+		                    new ContainerCondition("oa2", false)));
+            pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		            true, List.of(new ContainerCondition("oa3", true),
+		                    new ContainerCondition("oa4", false)));
 
             Prohibition p = pap.query().prohibitions().getProhibition("label1");
             assertEquals("label1", p.getName());
@@ -166,10 +166,10 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
         pap.modify().graph().createUserAttribute("ua3", List.of("ua2"));
         pap.modify().graph().assign("u1", Collections.singleton("ua3"));
 
-        pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("ua2"), new AccessRightSet("read"), true,
-                List.of(new ContainerCondition("US project", true)));
-        pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("ua3"), new AccessRightSet("read"), true,
-                List.of(new ContainerCondition("US project", true)));
+        pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("ua2"), , new AccessRightSet("read"),
+		        true, List.of(new ContainerCondition("US project", true)));
+        pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("ua3"), , new AccessRightSet("read"),
+		        true, List.of(new ContainerCondition("US project", true)));
 
         Collection<Prohibition> prohibitions = pap.query().prohibitions().getInheritedProhibitionsFor("u1");
         assertEquals(2, prohibitions.size());
@@ -179,10 +179,10 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
     void testGetProhibitionsForContainer() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
-                List.of(new ContainerCondition("US project", true)));
-        pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
-                List.of(new ContainerCondition("US project", true)));
+        pap.modify().prohibitions().createProhibition("label1", ProhibitionSubject.userAttribute("ua1"), , new AccessRightSet("read"),
+		        true, List.of(new ContainerCondition("US project", true)));
+        pap.modify().prohibitions().createProhibition("label2", ProhibitionSubject.userAttribute("ua1"), , new AccessRightSet("read"),
+		        true, List.of(new ContainerCondition("US project", true)));
 
 
         Collection<Prohibition> prohibitions = pap.query().prohibitions().getProhibitionsWithContainer("US project");

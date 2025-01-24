@@ -35,68 +35,68 @@ public class GraphModifier extends Modifier implements GraphModification {
     }
 
     @Override
-    public String createPolicyClass(String name) throws PMException {
+    public long createPolicyClass(String name) throws PMException {
         if (!checkCreatePolicyClassInput(name)) {
             return name;
         }
 
         // create pc node
-        store.graph().createNode(name, PC);
+        store.graph().createNode(, name, PC);
 
         return name;
     }
 
     @Override
-    public String createUserAttribute(String name, Collection<String> assignments)
+    public long createUserAttribute(String name, Collection<Long> assignments)
             throws PMException {
         return createNonPolicyClassNode(name, UA, assignments);
     }
 
     @Override
-    public String createObjectAttribute(String name, Collection<String> assignments)
+    public long createObjectAttribute(String name, Collection<Long> assignments)
             throws PMException {
         return createNonPolicyClassNode(name, OA, assignments);
     }
 
     @Override
-    public String createObject(String name, Collection<String> assignments) throws PMException {
+    public long createObject(String name, Collection<Long> assignments) throws PMException {
         return createNonPolicyClassNode(name, O, assignments);
     }
 
     @Override
-    public String createUser(String name, Collection<String> assignments) throws PMException {
+    public long createUser(String name, Collection<Long> assignments) throws PMException {
         return createNonPolicyClassNode(name, U, assignments);
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
-        checkSetNodePropertiesInput(name);
+    public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
+        checkSetNodePropertiesInput(id);
 
-        store.graph().setNodeProperties(name, properties);
+        store.graph().setNodeProperties(id, properties);
     }
 
     @Override
-    public void deleteNode(String name) throws PMException {
-        if(!checkDeleteNodeInput(name)) {
+    public void deleteNode(long id) throws PMException {
+        if(!checkDeleteNodeInput(id)) {
             return;
         }
 
-        store.graph().deleteNode(name);
+        store.graph().deleteNode(id);
     }
 
     @Override
-    public void assign(String ascendant, Collection<String> descendants) throws PMException {
+    public void assign(long ascId, Collection<Long> descendants) throws PMException {
         for (String descendant : descendants) {
-            if(!checkAssignInput(ascendant, descendant)) {
+            if(!checkAssignInput(ascId, descendant)) {
                 continue;
             }
 
-            store.graph().createAssignment(ascendant, descendant);
+            store.graph().createAssignment(ascId, descendant);
         }
     }
 
     @Override
-    public void deassign(String ascendant, Collection<String> descendants) throws PMException {
+    public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         for (String descendant : descendants) {
             if(!checkDeassignInput(ascendant, descendant)) {
                 continue;
@@ -107,14 +107,14 @@ public class GraphModifier extends Modifier implements GraphModification {
     }
 
     @Override
-    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
+    public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         checkAssociateInput(ua, target, accessRights);
 
         store.graph().createAssociation(ua, target, accessRights);
     }
 
     @Override
-    public void dissociate(String ua, String target) throws PMException {
+    public void dissociate(long ua, long target) throws PMException {
         if(!checkDissociateInput(ua, target)) {
             return;
         }
@@ -141,7 +141,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                     loop.set(true);
                 }))
                 .withDirection(Direction.DESCENDANTS)
-                .withAllPathShortCircuit(node -> node.equals(ascendant))
+                .withAllPathShortCircuit(nodeId -> node.equals(ascendant))
                 .walk(descendant);
 
         if (loop.get()) {
@@ -202,7 +202,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                 throw new NodeDoesNotExistException(assignment);
             }
 
-            Node assignNode = store.graph().getNode(assignment);
+            Node assignNode = store.graph().getNodeById(assignment);
             Assignment.checkAssignment(type, assignNode.getType());
         }
 
@@ -284,7 +284,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         Collection<Obligation> obligations = store.obligations().getObligations();
         for (Obligation obligation : obligations) {
             // if the node is the author of the obligation or referenced in any rules throw an exception
-            if (obligation.getAuthor().equals(name)) {
+            if (obligation.getAuthorId().equals(name)) {
                 throw new NodeReferencedInObligationException(name, obligation.getName());
             }
 
@@ -338,8 +338,8 @@ public class GraphModifier extends Modifier implements GraphModification {
             return false;
         }
 
-        Node ascNode = store.graph().getNode(ascendant);
-        Node descNode = store.graph().getNode(descendant);
+        Node ascNode = store.graph().getNodeById(ascendant);
+        Node descNode = store.graph().getNodeById(descendant);
 
         // check node types make a valid assignment relation
         Assignment.checkAssignment(ascNode.getType(), descNode.getType());
@@ -399,8 +399,8 @@ public class GraphModifier extends Modifier implements GraphModification {
             throw new NodeDoesNotExistException(target);
         }
 
-        Node uaNode = store.graph().getNode(ua);
-        Node targetNode = store.graph().getNode(target);
+        Node uaNode = store.graph().getNodeById(ua);
+        Node targetNode = store.graph().getNodeById(target);
 
         // check the access rights are valid
         checkAccessRightsValid(store.operations().getResourceOperations(), accessRights);
@@ -451,7 +451,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         }
 
         for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            if (containerCondition.getName().equals(name)) {
+            if (containerCondition.getId().equals(name)) {
                 return true;
             }
         }
@@ -466,7 +466,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                 return name;
             }
 
-            store.graph().createNode(name, type);
+            store.graph().createNode(, name, type);
 
             for (String assignmentNode : assignments) {
                 store.graph().createAssignment(name, assignmentNode);

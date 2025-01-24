@@ -33,7 +33,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public String createPolicyClass(String name) throws PMException {
+    public long createPolicyClass(String name) throws PMException {
         EventContext event = new CreatePolicyClassOp()
                 .withOperands(Map.of(NAME_OPERAND, name))
                 .execute(pap, userCtx, privilegeChecker);
@@ -44,7 +44,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public String createUserAttribute(String name, Collection<String> descendants) throws PMException {
+    public long createUserAttribute(String name, Collection<Long> descendants) throws PMException {
         EventContext event = new CreateUserAttributeOp()
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
@@ -55,7 +55,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public String createObjectAttribute(String name, Collection<String> descendants) throws PMException {
+    public long createObjectAttribute(String name, Collection<Long> descendants) throws PMException {
         EventContext event = new CreateObjectAttributeOp()
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
@@ -66,7 +66,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public String createObject(String name, Collection<String> descendants) throws PMException {
+    public long createObject(String name, Collection<Long> descendants) throws PMException {
         EventContext event = new CreateObjectOp()
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
@@ -77,7 +77,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public String createUser(String name, Collection<String> descendants) throws PMException {
+    public long createUser(String name, Collection<Long> descendants) throws PMException {
         EventContext event = new CreateUserOp()
                 .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
@@ -88,18 +88,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
+    public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         EventContext event = new SetNodePropertiesOp()
-                .withOperands(Map.of(NAME_OPERAND, name, PROPERTIES_OPERAND, properties))
+                .withOperands(Map.of(NAME_OPERAND, id, PROPERTIES_OPERAND, properties))
                 .execute(pap, userCtx, privilegeChecker);
 
         eventPublisher.publishEvent(event);
     }
 
     @Override
-    public void deleteNode(String name) throws PMException {
-        NodeType nodeType = pap.query().graph().getNode(name).getType();
-        Collection<String> descendants = pap.query().graph().getAdjacentDescendants(name);
+    public void deleteNode(long id) throws PMException {
+        NodeType nodeType = pap.query().graph().getNodeByName(id).getType();
+        Collection<String> descendants = pap.query().graph().getAdjacentDescendants(id);
 
         Operation<?> op = new DeletePolicyClassOp();
 
@@ -111,23 +111,23 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         }
 
         EventContext event = op.
-                withOperands(Map.of(NAME_OPERAND, name, TYPE_OPERAND, nodeType, DESCENDANTS_OPERAND, descendants))
+                withOperands(Map.of(NAME_OPERAND, id, TYPE_OPERAND, nodeType, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
         eventPublisher.publishEvent(event);
     }
 
     @Override
-    public void assign(String ascendant, Collection<String> descendants) throws PMException {
+    public void assign(long ascId, Collection<Long> descendants) throws PMException {
         EventContext event = new AssignOp()
-                .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
+                .withOperands(Map.of(ASCENDANT_OPERAND, ascId, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
 
         eventPublisher.publishEvent(event);
     }
 
     @Override
-    public void deassign(String ascendant, Collection<String> descendants) throws PMException {
+    public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         EventContext event = new DeassignOp()
                 .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
                 .execute(pap, userCtx, privilegeChecker);
@@ -136,7 +136,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
+    public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         EventContext event = new AssociateOp()
                 .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target, ARSET_OPERAND, accessRights))
                 .execute(pap, userCtx, privilegeChecker);
@@ -145,7 +145,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     @Override
-    public void dissociate(String ua, String target) throws PMException {
+    public void dissociate(long ua, long target) throws PMException {
         EventContext event = new DissociateOp()
                 .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target))
                 .execute(pap, userCtx, privilegeChecker);

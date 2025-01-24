@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.query.GraphQuery;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class BreadthFirstGraphWalker implements GraphWalker {
@@ -76,7 +75,7 @@ public class BreadthFirstGraphWalker implements GraphWalker {
     }
 
     @Override
-    public void walk(String start) throws PMException {
+    public void walk(long start) throws PMException {
         visitor.visit(start);
         if (allPathsShortCircuit.evaluate(start)
                 || singlePathShortCircuit.evaluate(start)){
@@ -87,7 +86,7 @@ public class BreadthFirstGraphWalker implements GraphWalker {
     }
 
     @Override
-    public void walk(List<String> firstLevel) throws PMException {
+    public void walk(long[] firstLevel) throws PMException {
         for (String node : firstLevel) {
             walk(node);
         }

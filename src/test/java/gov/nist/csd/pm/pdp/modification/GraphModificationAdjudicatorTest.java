@@ -138,7 +138,7 @@ class GraphModificationAdjudicatorTest {
                 new EventContext("u1", new SetNodePropertiesOp(), Map.of(NAME_OPERAND, "o1", PROPERTIES_OPERAND, Map.of("a", "b"))),
                 testEventProcessor.getEventContext()
         );
-        assertTrue(pap.query().graph().getNode("o1").getProperties().equals(Map.of("a", "b")));
+        assertTrue(pap.query().graph().getNodeByName("o1").getProperties().equals(Map.of("a", "b")));
 
         assertThrows(UnauthorizedException.class, () -> fail.setNodeProperties("o1", Map.of("a", "b")));
     }

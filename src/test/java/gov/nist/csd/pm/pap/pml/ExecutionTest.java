@@ -63,7 +63,7 @@ public class ExecutionTest {
         assertTrue(pap.query().graph().nodeExists("o1"));
         assertTrue(pap.query().graph().nodeExists("u1"));
 
-        assertEquals("v", pap.query().graph().getNode("pc1").getProperties().get("k"));
+        assertEquals("v", pap.query().graph().getNodeByName("pc1").getProperties().get("k"));
 
         Collection<String> ascendants = pap.query().graph().getAdjacentAscendants("pc1");
         assertTrue(ascendants.containsAll(Arrays.asList("ua1", "ua2", "ua3")));

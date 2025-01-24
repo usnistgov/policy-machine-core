@@ -16,15 +16,15 @@ import java.util.Map;
 
 public abstract class ObligationOp extends Operation<Void> {
 
-    public static final String AUTHOR_OPERAND = "author";
+    public static final String AUTHOR_ID_OPERAND = "authorId";
     public static final String RULES_OPERAND = "rules";
 
     private String reqCap;
 
-    public ObligationOp(String opName, String reqCap) {
+    public ObligationOp(String opName, List<String> allOperands, String reqCap) {
         super(
                 opName,
-                List.of(AUTHOR_OPERAND, NAME_OPERAND,  RULES_OPERAND)
+                allOperands
         );
 
         this.reqCap = reqCap;
@@ -52,13 +52,13 @@ public abstract class ObligationOp extends Operation<Void> {
     static void checkPatternPrivileges(PrivilegeChecker privilegeChecker, UserContext userCtx, Pattern pattern, String toCheck) throws PMException {
         ReferencedNodes referencedNodes = pattern.getReferencedNodes();
         if (referencedNodes.isAny()) {
-            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), toCheck);
+            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), toCheck);
 
             return;
         }
 
-        for (String entity : referencedNodes.nodes()) {
-            privilegeChecker.check(userCtx, entity, toCheck);
+        for (long node : referencedNodes.nodes()) {
+            privilegeChecker.check(userCtx, node, toCheck);
         }
     }
 }

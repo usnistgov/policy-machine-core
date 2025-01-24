@@ -45,9 +45,9 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public Node getNode(String name) throws PMException {
+    public Node getNodeByName(String name) throws PMException {
         // get node
-        Node node = pap.query().graph().getNode(name);
+        Node node = pap.query().graph().getNodeByName(name);
 
         // check user has permissions on the node
         privilegeChecker.check(userCtx, name);
@@ -56,7 +56,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public Collection<String> search(NodeType type, Map<String, String> properties) throws PMException {
+    public Collection<Node> search(NodeType type, Map<String, String> properties) throws PMException {
         Collection<String> search = pap.query().graph().search(type, properties);
         search.removeIf(node -> {
             try {
@@ -87,70 +87,70 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public Collection<String> getAdjacentDescendants(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+    public Collection<String> getAdjacentDescendants(long nodeId) throws PMException {
+        privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
-        return pap.query().graph().getAdjacentDescendants(node);
+        return pap.query().graph().getAdjacentDescendants(nodeId);
     }
 
     @Override
-    public Collection<String> getAdjacentAscendants(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+    public Collection<String> getAdjacentAscendants(long nodeId) throws PMException {
+        privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
-        return pap.query().graph().getAdjacentAscendants(node);
+        return pap.query().graph().getAdjacentAscendants(nodeId);
     }
 
     @Override
-    public Collection<Association> getAssociationsWithSource(String ua) throws PMException {
-        return getAssociations(pap.query().graph().getAssociationsWithSource(ua));
+    public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
+        return getAssociations(pap.query().graph().getAssociationsWithSource(uaId));
     }
 
     @Override
-    public Collection<Association> getAssociationsWithTarget(String target) throws PMException {
-        return getAssociations(pap.query().graph().getAssociationsWithTarget(target));
+    public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
+        return getAssociations(pap.query().graph().getAssociationsWithTarget(targetId));
     }
 
     @Override
-    public AscendantSubgraph getAscendantSubgraph(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+    public AscendantSubgraph getAscendantSubgraph(long nodeId) throws PMException {
+        privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
-        return pap.query().graph().getAscendantSubgraph(node);
+        return pap.query().graph().getAscendantSubgraph(nodeId);
     }
 
     @Override
-    public DescendantSubgraph getDescendantSubgraph(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+    public DescendantSubgraph getDescendantSubgraph(long nodeId) throws PMException {
+        privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
-        return pap.query().graph().getDescendantSubgraph(node);
+        return pap.query().graph().getDescendantSubgraph(nodeId);
     }
 
     @Override
-    public Collection<String> getAttributeDescendants(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+    public long[] getAttributeDescendants(long nodeId) throws PMException {
+        privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
-        return pap.query().graph().getAttributeDescendants(node);
+        return pap.query().graph().getAttributeDescendants(nodeId);
     }
 
     @Override
-    public Collection<String> getPolicyClassDescendants(String node) throws PMException {
-        privilegeChecker.check(userCtx, node, REVIEW_POLICY);
+    public long[] getPolicyClassDescendants(long nodeId) throws PMException {
+        privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
-        return pap.query().graph().getPolicyClassDescendants(node);
+        return pap.query().graph().getPolicyClassDescendants(nodeId);
     }
 
     @Override
-    public boolean isAscendant(String ascendant, String descendant) throws PMException {
-        privilegeChecker.check(userCtx, ascendant, REVIEW_POLICY);
-        privilegeChecker.check(userCtx, descendant, REVIEW_POLICY);
+    public boolean isAscendant(long ascendantId, long descendantId) throws PMException {
+        privilegeChecker.check(userCtx, ascendantId, REVIEW_POLICY);
+        privilegeChecker.check(userCtx, descendantId, REVIEW_POLICY);
 
-        return pap.query().graph().isAscendant(ascendant, descendant);
+        return pap.query().graph().isAscendant(ascendantId, descendantId);
     }
 
     @Override
-    public boolean isDescendant(String ascendant, String descendant) throws PMException {
-        privilegeChecker.check(userCtx, ascendant, REVIEW_POLICY);
+    public boolean isDescendant(long ascendantId, long descendantId) throws PMException {
+        privilegeChecker.check(userCtx, ascendantId, REVIEW_POLICY);
 
-        return pap.query().graph().isDescendant(ascendant, descendant);
+        return pap.query().graph().isDescendant(ascendantId, descendantId);
     }
 
     private List<Association> getAssociations(Collection<Association> associations) {

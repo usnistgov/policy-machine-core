@@ -12,7 +12,6 @@ import java.io.Serializable;
  * U = User
  * O = Object
  * PC = policy class
- * OS = Operation Set
  */
 public enum NodeType implements Serializable {
     OA(0),

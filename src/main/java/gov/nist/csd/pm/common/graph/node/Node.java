@@ -8,6 +8,8 @@ import java.util.Map;
  * Stores information needed for a node.
  */
 public class Node implements Serializable {
+
+    private long id;
     private String              name;
     private NodeType            type;
     private Map<String, String> properties;
@@ -17,9 +19,10 @@ public class Node implements Serializable {
     }
 
     public Node(Node node) {
-        this.name = node.getName();
-        this.type = node.getType();
-        this.properties = node.getProperties() == null ? new HashMap<>() : new HashMap<>(node.getProperties());
+        this.id = node.id;
+        this.name = node.name;
+        this.type = node.type;
+        this.properties = node.properties == null ? new HashMap<>() : new HashMap<>(node.properties);
     }
 
     public Node(String name, NodeType type, Map<String, String> properties) {
@@ -47,24 +50,32 @@ public class Node implements Serializable {
         return this;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
-    }
-
-    public NodeType getType() {
-        return type;
-    }
-
-    public Map<String, String> getProperties() {
-        return properties;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public NodeType getType() {
+        return type;
+    }
+
     public void setType(NodeType type) {
         this.type = type;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     public void setProperties(Map<String, String> properties) {

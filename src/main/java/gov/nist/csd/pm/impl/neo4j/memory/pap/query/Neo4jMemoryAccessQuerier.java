@@ -48,22 +48,22 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	@Override
-	public Map<String, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
+	public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
 		return memoryAccessQuerier.computeCapabilityList(userCtx);
 	}
 
 	@Override
-	public Map<String, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
+	public Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
 		return memoryAccessQuerier.computeACL(targetCtx);
 	}
 
 	@Override
-	public Map<String, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
 		return memoryAccessQuerier.computeDestinationAttributes(userCtx);
 	}
 
 	@Override
-	public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
+	public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
 		return memoryAccessQuerier.computeSubgraphPrivileges(userCtx, root);
 	}
 
@@ -73,7 +73,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	@Override
-	public Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
 		return memoryAccessQuerier.computeAdjacentDescendantPrivileges(userCtx, root);
 	}
 
@@ -83,7 +83,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	@Override
-	public Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
 		return memoryAccessQuerier.computePersonalObjectSystem(userCtx);
 	}
 
@@ -92,14 +92,14 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 		Set<Prohibition> userPros = new HashSet<>();
 
 		Collection<String> attrs;
-		if (userCtx.isUser()) {
+		if (userCtx.isUserDefined()) {
 			attrs = store.graph().getAdjacentDescendants(userCtx.getUser());
 
 			// visit user
 			Collection<Prohibition> prohibitions = store.prohibitions().getProhibitions().getOrDefault(userCtx.getUser(), new ArrayList<>());
 			userPros.addAll(prohibitions);
 		} else {
-			attrs = userCtx.getAttributes();
+			attrs = userCtx.getAttributeIds();
 		}
 
 		for (String userAttr : attrs) {
@@ -160,17 +160,17 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 		AccessRightSet arsetToTarget = new AccessRightSet();
 		Collection<String> attrs;
 		if (targetCtx.isNode()) {
-			reachedContainers.add(targetCtx.getTarget());
+			reachedContainers.add(targetCtx.getTargetId());
 
-			attrs = store.graph().getAdjacentDescendants(targetCtx.getTarget());
+			attrs = store.graph().getAdjacentDescendants(targetCtx.getTargetId());
 
-			Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, targetCtx.getTarget());
+			Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, targetCtx.getTargetId());
 			ResourceIterable<Relationship> relationships = targetNode.getRelationships(Direction.INCOMING, ASSOCIATION_RELATIONSHIP_TYPE);
 			for (Relationship relationship : relationships) {
 				arsetToTarget.addAll(Arrays.asList((String[]) relationship.getProperty(ARSET_PROPERTY)));
 			}
 		} else {
-			attrs = targetCtx.getAttributes();
+			attrs = targetCtx.getAttributeIds();
 		}
 
 		for (String targetAttr : attrs) {

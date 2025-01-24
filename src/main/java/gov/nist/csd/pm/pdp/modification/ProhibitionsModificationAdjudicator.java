@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
@@ -34,11 +35,11 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
     }
 
     @Override
-    public void createProhibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
+    public void createProhibition(String name, long subjectId, ProhibitionSubjectType subjectType, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
         EventContext event = new CreateProhibitionOp()
                 .withOperands(Map.of(
                         NAME_OPERAND, name,
-                        SUBJECT_OPERAND, subject,
+		                SUBJECT_TYPE_OPERAND, subjectId,
                         ARSET_OPERAND, accessRightSet,
                         INTERSECTION_OPERAND, intersection,
                         CONTAINERS_OPERAND, containerConditions
@@ -55,7 +56,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
         EventContext event = new DeleteProhibitionOp()
                 .withOperands(Map.of(
                         NAME_OPERAND, prohibition.getName(),
-                        SUBJECT_OPERAND, prohibition.getSubject(),
+		                SUBJECT_TYPE_OPERAND, prohibition.getSubject(),
                         ARSET_OPERAND, prohibition.getAccessRightSet(),
                         INTERSECTION_OPERAND, prohibition.isIntersection(),
                         CONTAINERS_OPERAND, prohibition.getContainers()

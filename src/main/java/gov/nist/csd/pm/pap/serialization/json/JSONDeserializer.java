@@ -2,7 +2,9 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.query.GraphQuery;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
@@ -10,6 +12,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
 
@@ -157,7 +160,7 @@ public class JSONDeserializer implements PolicyDeserializer {
             // set properties if any
             Map<String, String> properties = jsonPropertiesToMap(policyClass.getProperties());
             if (!properties.isEmpty()) {
-                pap.modify().graph().setNodeProperties(policyClass.getName(), properties);
+                pap.modify().graph().setNodeProperties(pap.query().graph().getNodeByName(policyClass.getName()).getId(), properties);
             }
         }
     }
@@ -184,7 +187,10 @@ public class JSONDeserializer implements PolicyDeserializer {
             }
 
             for (JSONAssociation jsonAssociation : associations) {
-                pap.modify().graph().associate(jsonNode.getName(), jsonAssociation.getTarget(), jsonAssociation.getArset());
+                Node uaNode = pap.query().graph().getNodeByName(jsonNode.getName());
+                Node targetNode = pap.query().graph().getNodeByName(jsonAssociation.getTarget());
+
+                pap.modify().graph().associate(uaNode.getId(), targetNode.getId(), jsonAssociation.getArset());
             }
         }
     }
@@ -216,26 +222,57 @@ public class JSONDeserializer implements PolicyDeserializer {
     }
 
     private void createOrAssign(PAP pap, Set<String> createdNodes, String name, NodeType type, JSONNode node, String assignment) throws PMException {
+        GraphQuery graph = pap.query().graph();
+
         if (!createdNodes.contains(name)) {
             // create node
             createNode(pap, type, name, node, List.of(assignment));
 
             // set properties
             if (node.getProperties() != null) {
-                pap.modify().graph().setNodeProperties(name, jsonPropertiesToMap(node.getProperties()));
+                pap.modify().graph().setNodeProperties(
+                        graph.getNodeByName(name).getId(),
+                        jsonPropertiesToMap(node.getProperties())
+                );
             }
         } else {
-            pap.modify().graph().assign(name, List.of(assignment));
+            pap.modify().graph().assign(
+                    graph.getNodeByName(name).getId(),
+                    List.of(graph.getNodeByName(assignment).getId())
+            );
         }
     }
 
     private void createNode(PAP pap, NodeType type, String key, JSONNode value, List<String> existingAssignmentNodes)
             throws PMException {
+        List<Long> ids;
+        if (type == OA || type == UA) {
+            ids = existingAssignmentNodes.stream()
+                    .map(m -> {
+                        try {
+                            return pap.query().graph().getNodeByName(m).getId();
+                        } catch (PMException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            ids = value.getAssignments().stream()
+                    .map(m -> {
+                        try {
+                            return pap.query().graph().getNodeByName(m).getId();
+                        } catch (PMException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
+
         switch (type) {
-            case OA -> pap.modify().graph().createObjectAttribute(key, existingAssignmentNodes);
-            case UA -> pap.modify().graph().createUserAttribute(key, existingAssignmentNodes);
-            case O -> pap.modify().graph().createObject(key, value.getAssignments());
-            case U -> pap.modify().graph().createUser(key, value.getAssignments());
+            case OA -> pap.modify().graph().createObjectAttribute(key, ids);
+            case UA -> pap.modify().graph().createUserAttribute(key, ids);
+            case O -> pap.modify().graph().createObject(key, ids);
+            case U -> pap.modify().graph().createUser(key,ids);
         }
     }
 }

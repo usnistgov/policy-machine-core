@@ -15,31 +15,17 @@ import java.util.Objects;
 public class Prohibition implements Serializable {
 
     private String name;
-    private ProhibitionSubject      subject;
+    private ProhibitionSubject subject;
     private Collection<ContainerCondition> containers;
     private AccessRightSet accessRightSet;
     private boolean      intersection;
 
-    public Prohibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection,
-                       Collection<ContainerCondition> containers) {
-        if (subject == null) {
-            throw new IllegalArgumentException("Prohibition subject cannot be null");
-        }
-
+    public Prohibition(String name, ProhibitionSubject subject, Collection<ContainerCondition> containers, AccessRightSet accessRightSet, boolean intersection) {
         this.name = name;
         this.subject = subject;
-
-        this.containers = Objects.requireNonNullElseGet(containers, ArrayList::new);
-        this.accessRightSet = Objects.requireNonNullElseGet(accessRightSet, AccessRightSet::new);
+        this.containers = containers;
+        this.accessRightSet = accessRightSet;
         this.intersection = intersection;
-    }
-
-    public Prohibition(Prohibition prohibition) {
-        this.name = prohibition.getName();
-        this.subject = new ProhibitionSubject(prohibition.getSubject().getName(), prohibition.getSubject().getType());
-        this.containers = new ArrayList<>(prohibition.containers);
-        this.accessRightSet = new AccessRightSet(prohibition.getAccessRightSet());
-        this.intersection = prohibition.isIntersection();
     }
 
     public String getName() {
@@ -62,7 +48,7 @@ public class Prohibition implements Serializable {
         return containers;
     }
 
-    public void setContainers(List<ContainerCondition> containers) {
+    public void setContainers(Collection<ContainerCondition> containers) {
         this.containers = containers;
     }
 
@@ -84,24 +70,28 @@ public class Prohibition implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Prohibition)) {
-            return false;
-        }
-        Prohibition that = (Prohibition) o;
-        return intersection == that.intersection && Objects.equals(name, that.name) && Objects.equals(
-                subject, that.subject) && Objects.equals(containers, that.containers) && Objects.equals(
-                accessRightSet, that.accessRightSet);
+        if (this == o) return true;
+        if (!(o instanceof Prohibition that)) return false;
+	    return intersection == that.intersection &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(subject, that.subject) &&
+                Objects.equals(containers, that.containers) &&
+                Objects.equals(accessRightSet, that.accessRightSet);
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, subject, containers, accessRightSet, intersection);
     }
 
     @Override
     public String toString() {
-        return CreateProhibitionStatement.fromProhibition(this).toString();
+        return "Prohibition{" +
+                "name='" + name + '\'' +
+                ", subject=" + subject +
+                ", containers=" + containers +
+                ", accessRightSet=" + accessRightSet +
+                ", intersection=" + intersection +
+                '}';
     }
 }

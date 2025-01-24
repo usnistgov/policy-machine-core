@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.common.graph.dag.Direction;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.exception.ProhibitionDoesNotExistException;
@@ -25,7 +26,7 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     }
 
     @Override
-    public Map<String, Collection<Prohibition>> getProhibitions() throws PMException {
+    public Map<Node, Collection<Prohibition>> getProhibitions() throws PMException {
         return store.prohibitions().getProhibitions();
     }
 
@@ -66,7 +67,7 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
             Collection<Prohibition> subjectProhibitions = prohibitions.get(subject);
             for (Prohibition prohibition : subjectProhibitions) {
                 for (ContainerCondition cc : prohibition.getContainers()) {
-                    if (cc.getName().equals(container)) {
+                    if (cc.getId().equals(container)) {
                         pros.add(prohibition);
                     }
                 }

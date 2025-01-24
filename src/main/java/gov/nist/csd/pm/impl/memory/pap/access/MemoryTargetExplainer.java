@@ -60,8 +60,8 @@ public class MemoryTargetExplainer {
 
 		List<String> nodes = new ArrayList<>();
 		if (targetCtx.isNode()) {
-			String target = targetCtx.getTarget();
-			Node targetNode = policyStore.graph().getNode(target);
+			String target = targetCtx.getTargetId();
+			Node targetNode = policyStore.graph().getNodeById(target);
 			if (targetNode.getType().equals(PC)) {
 				target = PM_ADMIN_OBJECT.nodeName();
 			}
@@ -70,9 +70,9 @@ public class MemoryTargetExplainer {
 
 			dfs.walk(target);
 		} else {
-			nodes.addAll(targetCtx.getAttributes());
+			nodes.addAll(targetCtx.getAttributeIds());
 
-			dfs.walk(targetCtx.getAttributes());
+			dfs.walk(targetCtx.getAttributeIds());
 		}
 
 		// convert the map created above into a map where the policy classes are the keys

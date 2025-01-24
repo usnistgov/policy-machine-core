@@ -34,7 +34,7 @@ public class HasPropertyKey extends PMLOperation {
     public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
         String nodeName = ((Value) operands.get("nodeName")).getStringValue();
         String key = ((Value) operands.get("key")).getStringValue();
-        Node node = pap.query().graph().getNode(nodeName);
+        Node node = pap.query().graph().getNodeByName(nodeName);
         boolean hasPropertyKey = node.getProperties().containsKey(key);
         return new BoolValue(hasPropertyKey);
     }

@@ -42,11 +42,13 @@ public class CheckStatement implements PMLStatement {
         privilegeChecker.setExplain(ctx.isExplain());
 
         if (target.getType().isString()) {
-            privilegeChecker.check(ctx.author(), target.getStringValue(), arsToCheck);
+            long id = pap.query().graph().getNodeByName(target.getStringValue()).getId();
+            privilegeChecker.check(ctx.author(), id, arsToCheck);
         } else {
             List<Value> arrayValue = target.getArrayValue();
             for (Value value : arrayValue) {
-                privilegeChecker.check(ctx.author(), value.getStringValue(), arsToCheck);
+                long id = pap.query().graph().getNodeByName(value.getStringValue()).getId();
+                privilegeChecker.check(ctx.author(), id, arsToCheck);
             }
         }
 

@@ -35,7 +35,13 @@ public class DeassignStatement extends OperationStatement {
             descs.add(value.getStringValue());
         }
 
-        return Map.of(GraphOp.ASCENDANT_OPERAND, asc, GraphOp.DESCENDANTS_OPERAND, descs);
+        long ascId = pap.query().graph().getNodeId(asc);
+        List<Long> descIds = new ArrayList<>();
+        for (String desc : descs) {
+            descIds.add(pap.query().graph().getNodeId(desc));
+        }
+
+        return Map.of(GraphOp.ASCENDANT_OPERAND, ascId, GraphOp.DESCENDANTS_OPERAND, descIds);
     }
 
     @Override

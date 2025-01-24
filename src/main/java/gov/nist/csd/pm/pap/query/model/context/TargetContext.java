@@ -4,57 +4,58 @@ import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.store.GraphStore;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class TargetContext {
 
-	private String target;
-	private List<String> attributes;
+	private long targetId;
+	private long[] attributeIds;
 
-	public TargetContext(String target) {
-		this.target = target;
+	public TargetContext(long targetId) {
+		this.targetId = targetId;
 	}
 
-	public TargetContext(UserContext target) {
-		if (target.isUser()) {
-			this.target = target.getUser();
+	public TargetContext(UserContext targetId) {
+		if (targetId.isUserDefined()) {
+			this.targetId = targetId.getUser();
 		} else {
-			this.attributes = target.getAttributes();
+			this.attributeIds = targetId.getAttributeIds();
 		}
 	}
 
-	public TargetContext(List<String> attributes) {
-		this.attributes = attributes;
+	public TargetContext(long[] attributeIds) {
+		this.attributeIds = attributeIds;
 	}
 
-	public String getTarget() {
-		return target;
+	public long getTargetId() {
+		return targetId;
 	}
 
-	public void setTarget(String target) {
-		this.target = target;
+	public void setTargetId(long targetId) {
+		this.targetId = targetId;
 	}
 
-	public List<String> getAttributes() {
-		return attributes;
+	public long[] getAttributeIds() {
+		return attributeIds;
 	}
 
-	public void setAttributes(List<String> attributes) {
-		this.attributes = attributes;
+	public void setAttributeIds(long[] attributeIds) {
+		this.attributeIds = attributeIds;
 	}
 
 	public boolean isNode() {
-		return target != null;
+		return targetId != 0;
 	}
 
 	public void checkExists(GraphStore graphStore) throws PMException {
 		if (isNode()) {
-			if (!graphStore.nodeExists(target)) {
-				throw new NodeDoesNotExistException(target);
+			if (!graphStore.nodeExists(targetId)) {
+				throw new NodeDoesNotExistException(targetId);
 			}
 		} else {
-			for (String attribute : attributes) {
+			for (long attribute : attributeIds) {
 				if (!graphStore.nodeExists(attribute)) {
 					throw new NodeDoesNotExistException(attribute);
 				}
@@ -66,9 +67,9 @@ public class TargetContext {
 	public String toString() {
 		String s = "%s";
 		if (isNode()) {
-			return String.format(s, "target=" + target);
+			return String.format(s, "target=" + targetId);
 		} else {
-			return String.format(s, "attributes=" + attributes);
+			return String.format(s, "attributes=" + Arrays.toString(attributeIds));
 		}
 	}
 
@@ -76,11 +77,11 @@ public class TargetContext {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof TargetContext that)) return false;
-		return Objects.equals(target, that.target) && Objects.equals(attributes, that.attributes);
+		return targetId == that.targetId && Objects.deepEquals(attributeIds, that.attributeIds);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(target, attributes);
+		return Objects.hash(targetId, Arrays.hashCode(attributeIds));
 	}
 }

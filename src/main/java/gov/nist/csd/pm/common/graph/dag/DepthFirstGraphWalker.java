@@ -4,7 +4,6 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 
 import java.util.Collection;
-import java.util.List;
 
 public class DepthFirstGraphWalker implements GraphWalker {
 
@@ -74,18 +73,18 @@ public class DepthFirstGraphWalker implements GraphWalker {
     }
 
     @Override
-    public void walk(String start) throws PMException {
+    public void walk(long start) throws PMException {
         walkInternal(start);
     }
 
     @Override
-    public void walk(List<String> firstLevel) throws PMException {
-        for (String node : firstLevel) {
+    public void walk(long[] firstLevel) throws PMException {
+        for (long node : firstLevel) {
             walkInternal(node);
         }
     }
 
-    private int walkInternal(String start) throws PMException {
+    private int walkInternal(long start) throws PMException {
         if (allPathsShortCircuit.evaluate(start)) {
             visitor.visit(start);
             return RETURN;
@@ -117,7 +116,7 @@ public class DepthFirstGraphWalker implements GraphWalker {
     protected static final int CONTINUE = 1;
     protected static final int RETURN = 2;
 
-    protected Collection<String> getNextLevel(String node) throws PMException {
+    protected Collection<String> getNextLevel(long node) throws PMException {
         if (direction == Direction.DESCENDANTS) {
             return graphQuery.getAdjacentDescendants(node);
         } else {

@@ -42,6 +42,7 @@ PROHIBITION: 'prohibition';
 OBLIGATION: 'obligation';
 ACCESS_RIGHTS: 'access rights' ;
 
+NODE: 'node' ;
 POLICY_CLASS: 'policy class' | 'pc' | 'PC' ;
 OBJECT_ATTRIBUTE: 'object attribute' | 'oa' | 'OA' ;
 USER_ATTRIBUTE: 'user attribute' | 'ua' | 'UA' ;

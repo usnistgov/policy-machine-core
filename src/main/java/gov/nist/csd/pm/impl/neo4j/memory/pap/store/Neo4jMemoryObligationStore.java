@@ -24,8 +24,8 @@ public class Neo4jMemoryObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public void createObligation(String author, String name, List<Rule> rules) throws PMException {
-		Obligation obligation = new Obligation(author, name, rules);
+	public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
+		Obligation obligation = new Obligation(authorId, name, rules);
 		String hex = Neo4jUtil.serialize(obligation);
 
 		txHandler.runTx(tx -> {
@@ -36,9 +36,9 @@ public class Neo4jMemoryObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public void deleteObligation(String name) throws PMException {
+	public void deleteObligation(long id) throws PMException {
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(OBLIGATION_LABEL, NAME_PROPERTY, name);
+			Node node = tx.findNode(OBLIGATION_LABEL, NAME_PROPERTY, id);
 			if (node == null) {
 				return;
 			}
@@ -94,7 +94,7 @@ public class Neo4jMemoryObligationStore implements ObligationsStore {
 	@Override
 	public Collection<Obligation> getObligationsWithAuthor(String user) throws PMException {
 		Collection<Obligation> obligations = new ArrayList<>(getObligations());
-		obligations.removeIf(o -> !o.getAuthor().equals(user));
+		obligations.removeIf(o -> !o.getAuthorId().equals(user));
 		return obligations;
 	}
 

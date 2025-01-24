@@ -28,7 +28,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void createNode(String name, NodeType type) throws PMException {
+	public void createNode(long id, String name, NodeType type) throws PMException {
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node node = tx.createNode(NODE_LABEL, typeToLabel(type));
 			node.setProperty(NAME_PROPERTY, name);
@@ -36,9 +36,9 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void deleteNode(String name) throws PMException {
+	public void deleteNode(long id) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
 
 			// delete edges
 			for (Relationship relationship : node.getRelationships()) {
@@ -51,7 +51,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
+	public void setNodeProperties(long name, Map<String, String> properties) throws PMException {
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
 
@@ -69,7 +69,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void createAssignment(String start, String end) throws PMException {
+	public void createAssignment(long start, long end) throws PMException {
 		txHandler.runTx(tx -> {
 			tx.findNode(NODE_LABEL, NAME_PROPERTY, start)
 					.createRelationshipTo(tx.findNode(NODE_LABEL, NAME_PROPERTY, end), ASSIGNMENT_RELATIONSHIP_TYPE);
@@ -77,7 +77,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void deleteAssignment(String start, String end) throws PMException {
+	public void deleteAssignment(long start, long end) throws PMException {
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node childNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, start);
 			try(ResourceIterable<Relationship> relationships = childNode.getRelationships(Direction.OUTGOING, ASSIGNMENT_RELATIONSHIP_TYPE)) {
@@ -91,7 +91,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void createAssociation(String ua, String target, AccessRightSet arset) throws PMException {
+	public void createAssociation(long ua, long target, AccessRightSet arset) throws PMException {
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node uaNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, ua);
 			org.neo4j.graphdb.Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, target);
@@ -115,7 +115,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void deleteAssociation(String ua, String target) throws PMException {
+	public void deleteAssociation(long ua, long target) throws PMException {
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node uaNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, ua);
 			try(ResourceIterable<Relationship> relationships = uaNode.getRelationships(Direction.OUTGOING, ASSOCIATION_RELATIONSHIP_TYPE)) {
@@ -129,7 +129,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Node getNode(String name) throws PMException {
+	public Node getNodeById(long name) throws PMException {
 		Map<String, String> properties = new HashMap<>();
 		AtomicReference<NodeType> typeAtomic  = new AtomicReference<>();
 
@@ -162,7 +162,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Collection<String> search(NodeType type, Map<String, String> properties) throws PMException {
+	public long[] search(NodeType type, Map<String, String> properties) throws PMException {
 		List<String> results = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -192,7 +192,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Collection<String> getPolicyClasses() throws PMException {
+	public long[] getPolicyClasses() throws PMException {
 		List<String> pcs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -207,7 +207,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Collection<String> getAdjacentDescendants(String name) throws PMException {
+	public long[] getAdjacentDescendants(String name) throws PMException {
 		List<String> children = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -226,7 +226,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Collection<String> getAdjacentAscendants(String name) throws PMException {
+	public long[] getAdjacentAscendants(String name) throws PMException {
 		List<String> parents = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -244,7 +244,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Collection<Association> getAssociationsWithSource(String ua) throws PMException {
+	public Association[] getAssociationsWithSource(String ua) throws PMException {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -380,7 +380,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public boolean isAscendant(String asc, String dsc) throws PMException {
+	public boolean isAscendant(long asc, long dsc) throws PMException {
 		AtomicBoolean b = new AtomicBoolean(false);
 
 		txHandler.runTx(tx -> {
@@ -409,7 +409,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public boolean isDescendant(String asc, String dsc) throws PMException {
+	public boolean isDescendant(long asc, long dsc) throws PMException {
 		AtomicBoolean b = new AtomicBoolean(false);
 
 		txHandler.runTx(tx -> {

@@ -26,7 +26,7 @@ public class SetResourceOperationsOp extends Operation<Void> {
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), SET_RESOURCE_OPERATIONS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_RESOURCE_OPERATIONS);
     }
 
     @Override

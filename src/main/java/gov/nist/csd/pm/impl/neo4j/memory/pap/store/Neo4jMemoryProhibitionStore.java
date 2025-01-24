@@ -130,7 +130,7 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 
 	private void createContainers(Transaction tx, Collection<ContainerCondition> containerConditions, Node prohibitionNode) throws PMException {
 		for (ContainerCondition cc : containerConditions) {
-			Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, cc.getName());
+			Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, cc.getId());
 			targetNode.createRelationshipTo(prohibitionNode, PROHIBITION_CONTAINER_REL_TYPE)
 					.setProperty(COMPLEMENT_PROPERTY, cc.isComplement());
 		}

@@ -5,23 +5,23 @@ import java.util.Objects;
 
 public class ContainerCondition implements Serializable {
 
-    private String name;
+    private long id;
     private boolean complement;
 
     public ContainerCondition() {
     }
 
-    public ContainerCondition(String name, boolean complement) {
-        this.name = name;
+    public ContainerCondition(long id, boolean complement) {
+        this.id = id;
         this.complement = complement;
     }
 
-    public String getName() {
-        return name;
+    public long getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public boolean isComplement() {
@@ -41,17 +41,18 @@ public class ContainerCondition implements Serializable {
             return false;
         }
         ContainerCondition that = (ContainerCondition) o;
-        return complement == that.complement && Objects.equals(name, that.name);
+        return complement == that.complement && Objects.equals(id, that.id);
     }
 
+    @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(id, complement);
     }
 
     @Override
     public String toString() {
         return "ContainerCondition[" +
-                "name=" + name + ", " +
+                "id=" + id + ", " +
                 "complement=" + complement + ']';
     }
 

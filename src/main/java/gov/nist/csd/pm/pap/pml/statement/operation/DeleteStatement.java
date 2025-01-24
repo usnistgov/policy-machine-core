@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pap.pml.expression.Expression;
 import java.util.Map;
 import java.util.Objects;
 
+import static gov.nist.csd.pm.common.op.Operation.ID_OPERAND;
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 
 public class DeleteStatement extends OperationStatement {
@@ -49,7 +50,13 @@ public class DeleteStatement extends OperationStatement {
     public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String name = expression.execute(ctx, pap).getStringValue();
 
-        return Map.of(NAME_OPERAND, name);
+        if (type == Type.PROHIBITION || type == Type.OBLIGATION) {
+            return Map.of(NAME_OPERAND, name);
+        } else {
+            // delete node by ID not name
+            long nodeId = pap.query().graph().getNodeId(name);
+            return Map.of(ID_OPERAND, nodeId);
+        }
     }
 
     @Override

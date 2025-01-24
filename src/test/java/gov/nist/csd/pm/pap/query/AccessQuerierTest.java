@@ -1232,15 +1232,15 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         String o1 = pap.modify().graph().createObject("o1", List.of(oa1, oa2));
 
         pap.modify().graph().associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
-        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), new AccessRightSet("read"), true,
-                List.of(new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, false))
-        );
-
-        pap.modify().prohibitions().createProhibition("deny2", ProhibitionSubject.user(u1), new AccessRightSet("write"),
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute("ua1"), , new AccessRightSet("read"),
                 true,
-                Collections.singleton(new ContainerCondition(oa3, false))
-        );
+                List.of(new ContainerCondition(oa1, false),
+                        new ContainerCondition(oa2, false)));
+
+        pap.modify().prohibitions().createProhibition("deny2", ProhibitionSubject.user(u1), ,
+                new AccessRightSet("write"),
+                true,
+                Collections.singleton(new ContainerCondition(oa3, false)));
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
@@ -1262,14 +1262,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
-        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute(ua1),
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.userAttribute(ua1), ,
                 new AccessRightSet("read"),
                 true,
                 List.of(
                         new ContainerCondition(oa1, false),
                         new ContainerCondition(oa2, true)
-                )
-        );
+                ));
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
@@ -1277,11 +1276,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().associate(ua1, oa2, new AccessRightSet("read"));
 
-        pap.modify().prohibitions().createProhibition("deny-process", ProhibitionSubject.process("1234"),
+        pap.modify().prohibitions().createProhibition("deny-process", ProhibitionSubject.process("1234"), ,
                 new AccessRightSet("read"),
                 false,
-                Collections.singleton(new ContainerCondition(oa1, false))
-        );
+                Collections.singleton(new ContainerCondition(oa1, false)));
 
         assertEquals(
                 new AccessRightSet(),
@@ -1305,11 +1303,11 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
-        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), ,
+                new AccessRightSet("read", "write"),
                 true,
                 List.of(new ContainerCondition(oa4, true),
-                        new ContainerCondition(oa1, false))
-        );
+                        new ContainerCondition(oa1, false)));
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(oa5)).isEmpty());
@@ -1331,11 +1329,11 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
 
-        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), new AccessRightSet("read", "write"),
+        pap.modify().prohibitions().createProhibition("deny", ProhibitionSubject.user(u1), ,
+                new AccessRightSet("read", "write"),
                 true,
                 List.of(new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, false))
-        );
+                        new ContainerCondition(oa2, false)));
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
@@ -1384,57 +1382,52 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().prohibitions().createProhibition(
                 "p1",
-                ProhibitionSubject.user("u1"),
+                ProhibitionSubject.user("u1"), ,
                 new AccessRightSet("write"),
                 true,
                 List.of(
                         new ContainerCondition("oa1", false),
                         new ContainerCondition("oa2", false),
                         new ContainerCondition("oa3", false)
-                )
-        );
+                ));
 
         pap.modify().prohibitions().createProhibition(
                 "p2",
-                ProhibitionSubject.user("u2"),
+                ProhibitionSubject.user("u2"), ,
                 new AccessRightSet("write"),
                 false,
                 List.of(
                         new ContainerCondition("oa1", false),
                         new ContainerCondition("oa2", false),
                         new ContainerCondition("oa3", false)
-                )
-        );
+                ));
 
         pap.modify().prohibitions().createProhibition(
                 "p3",
-                ProhibitionSubject.user("u3"),
+                ProhibitionSubject.user("u3"), ,
                 new AccessRightSet("write"),
                 true,
                 List.of(
                         new ContainerCondition("oa1", false),
                         new ContainerCondition("oa2", true)
-                )
-        );
+                ));
 
         pap.modify().prohibitions().createProhibition(
                 "p4",
-                ProhibitionSubject.user("u4"),
+                ProhibitionSubject.user("u4"), ,
                 new AccessRightSet("write"),
                 false,
                 List.of(
                         new ContainerCondition("oa1", false),
                         new ContainerCondition("oa2", true)
-                )
-        );
+                ));
 
         pap.modify().prohibitions().createProhibition(
                 "p5",
-                ProhibitionSubject.user("u4"),
+                ProhibitionSubject.user("u4"), ,
                 new AccessRightSet("write"),
                 false,
-                Collections.singleton(new ContainerCondition("oa2", true))
-        );
+                Collections.singleton(new ContainerCondition("oa2", true)));
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));
@@ -1512,9 +1505,9 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().createUser("u1", List.of("ua1"));
         pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
-        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
-                Collections.singleton(new ContainerCondition("oa1", false))
-        );
+        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), , new AccessRightSet("read"),
+                false,
+                Collections.singleton(new ContainerCondition("oa1", false)));
 
 
         AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
@@ -1530,9 +1523,9 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().createUser("u1", List.of("ua1"));
         pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
 
-        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
-                Collections.singleton(new ContainerCondition("oa1", true))
-        );
+        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), , new AccessRightSet("read"),
+                false,
+                Collections.singleton(new ContainerCondition("oa1", true)));
 
         AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext("u1"), new TargetContext("oa1"));
         assertFalse(deniedAccessRights.contains("read"));
@@ -1562,9 +1555,9 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().createUser("u1", List.of("ua1"));
         pap.modify().graph().associate("ua1", "o1", new AccessRightSet("read"));
 
-        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), new AccessRightSet("read"), false,
-                Collections.singleton(new ContainerCondition("o1",  false))
-        );
+        pap.modify().prohibitions().createProhibition("deny1", ProhibitionSubject.user("u1"), , new AccessRightSet("read"),
+                false,
+                Collections.singleton(new ContainerCondition("o1",  false)));
 
 
         AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext("u1"), new TargetContext("o1"));

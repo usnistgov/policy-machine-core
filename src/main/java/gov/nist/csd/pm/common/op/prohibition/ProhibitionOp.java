@@ -3,6 +3,7 @@ package gov.nist.csd.pm.common.op.prohibition;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -34,21 +35,21 @@ public abstract class ProhibitionOp extends Operation<Void> {
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
         ProhibitionSubject subject = (ProhibitionSubject) operands.get(SUBJECT_OPERAND);
 
-        if (subject.getType() == ProhibitionSubject.Type.PROCESS) {
-            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), processReqCap);
+        if (subject.isNode()) {
+            privilegeChecker.check(userCtx, subject.getNodeId(), reqCap);
         } else {
-            privilegeChecker.check(userCtx, subject.getName(), reqCap);
+            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), processReqCap);
         }
 
         // check that the user can create a prohibition for each container in the condition
         Collection<ContainerCondition> containers = (Collection<ContainerCondition>) operands.get(CONTAINERS_OPERAND);
         for (ContainerCondition contCond : containers) {
-            privilegeChecker.check(userCtx, contCond.getName(), reqCap);
+            privilegeChecker.check(userCtx, contCond.getId(), reqCap);
 
             // there is another access right needed if the condition is a complement since it applies to a greater
             // number of nodes
             if (contCond.isComplement()) {
-                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), reqCap);
+                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), reqCap);
             }
         }
     }

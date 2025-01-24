@@ -52,13 +52,13 @@ public class MemoryUserExplainer {
 				.withPropagator(propagator);
 
 		List<String> nodes = new ArrayList<>();
-		if (userCtx.isUser()) {
+		if (userCtx.isUserDefined()) {
 			String user = userCtx.getUser();
 			nodes.add(user);
 
 			dfs.walk(user);
 		} else {
-			List<String> attributes = userCtx.getAttributes();
+			List<String> attributes = userCtx.getAttributeIds();
 			nodes.addAll(attributes);
 
 			dfs.walk(attributes);

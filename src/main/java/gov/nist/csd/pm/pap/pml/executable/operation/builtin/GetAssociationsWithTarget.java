@@ -37,7 +37,8 @@ public class GetAssociationsWithTarget extends PMLOperation {
     @Override
     public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
         Value source = (Value) operands.get("target");
-        Collection<Association> associations = pap.query().graph().getAssociationsWithTarget(source.getStringValue());
+        long id = pap.query().graph().getNodeId(source.getStringValue());
+        Collection<Association> associations = pap.query().graph().getAssociationsWithTarget(id);
         List<Value> associationValues = new ArrayList<>(associations.size());
         for (Association association : associations) {
             associationValues.add(Value.fromObject(association));

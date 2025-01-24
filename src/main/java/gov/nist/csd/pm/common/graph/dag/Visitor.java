@@ -4,5 +4,5 @@ import gov.nist.csd.pm.common.exception.PMException;
 
 public interface Visitor {
 
-    void visit(String node) throws PMException;
+    void visit(long node) throws PMException;
 }

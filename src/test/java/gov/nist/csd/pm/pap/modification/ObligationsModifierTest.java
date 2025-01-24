@@ -84,9 +84,9 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
             pap.modify().graph().createUser("u1", List.of("ua1"));
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getRules());
+            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getRules());
 
-            assertThrows(ObligationNameExistsException.class, () -> pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getRules()));
+            assertThrows(ObligationNameExistsException.class, () -> pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getRules()));
         }
 
         @Test
@@ -186,10 +186,10 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
             pap.modify().graph().createUser("u1", List.of("ua1"));
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getRules());
+            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getRules());
 
             assertThrows(ObligationNameExistsException.class,
-                    () -> pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), List.of()));
+                    () -> pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), List.of()));
 
             Obligation actual = pap.query().obligations().getObligation(obligation1.getName());
             assertEquals(obligation1, actual);
@@ -308,8 +308,8 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
             pap.modify().graph().createUser("u1", List.of("ua1"));
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getRules());
-            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getRules());
+            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getRules());
+            pap.modify().obligations().createObligation(obligation2.getAuthorId(), obligation2.getName(), obligation2.getRules());
 
             pap.modify().obligations().deleteObligation(obligation1.getName());
 

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
@@ -23,13 +24,13 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
 
     @Override
     public void createProhibition(String name,
-                                  ProhibitionSubject subject,
-                                  AccessRightSet accessRightSet,
+                                  long subjectId,
+                                  ProhibitionSubjectType subjectType, AccessRightSet accessRightSet,
                                   boolean intersection,
                                   Collection<ContainerCondition> containerConditions) throws PMException {
-        checkCreateInput(name, subject, accessRightSet, new ArrayList<>(containerConditions));
+        checkCreateInput(name, subjectId, accessRightSet, new ArrayList<>(containerConditions));
 
-        store.prohibitions().createProhibition(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
+        store.prohibitions().createProhibition(name, subjectId, accessRightSet, intersection, new ArrayList<>(containerConditions));
     }
 
     @Override
@@ -90,8 +91,8 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
     protected void checkProhibitionContainersExist(Collection<ContainerCondition> containerConditions)
             throws PMException {
         for (ContainerCondition container : containerConditions) {
-            if (!store.graph().nodeExists(container.getName())) {
-                throw new ProhibitionContainerDoesNotExistException(container.getName());
+            if (!store.graph().nodeExists(container.getId())) {
+                throw new ProhibitionContainerDoesNotExistException(container.getId());
             }
         }
     }

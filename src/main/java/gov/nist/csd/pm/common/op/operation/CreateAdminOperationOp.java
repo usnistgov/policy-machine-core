@@ -34,6 +34,6 @@ public class CreateAdminOperationOp extends Operation<Void> {
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), CREATE_ADMIN_OPERATION);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), CREATE_ADMIN_OPERATION);
     }
 }

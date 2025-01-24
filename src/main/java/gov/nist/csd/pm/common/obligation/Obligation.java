@@ -9,21 +9,21 @@ import java.util.Objects;
 
 public class Obligation implements Serializable {
 
-    private String author;
+    private long authorId;
     private String name;
     private List<Rule> rules;
 
     public Obligation() {
     }
 
-    public Obligation(String author, String name) {
-        this.author = author;
+    public Obligation(long authorId, String name) {
+        this.authorId = authorId;
         this.name = name;
         this.rules = new ArrayList<>();
     }
 
-    public Obligation(String author, String name, List<Rule> rules) {
-        this.author = author;
+    public Obligation(long authorId, String name, List<Rule> rules) {
+        this.authorId = authorId;
         this.name = name;
         this.rules = rules;
     }
@@ -37,12 +37,12 @@ public class Obligation implements Serializable {
         rules.removeIf(rule -> rule.getName().equals(name));
     }
 
-    public String getAuthor() {
-        return author;
+    public long getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(String userCtx) {
-        this.author = userCtx;
+    public void setAuthorId(long authorId) {
+        this.authorId = authorId;
     }
 
     public String getName() {
@@ -81,12 +81,12 @@ public class Obligation implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Obligation that = (Obligation) o;
-        return Objects.equals(author, that.author) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
+        return Objects.equals(authorId, that.authorId) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, name, rules);
+        return Objects.hash(authorId, name, rules);
     }
 
     @Override

@@ -32,6 +32,6 @@ public class DeleteAdminRoutineOp extends Operation<Void> {
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), DELETE_ADMIN_ROUTINE);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_ROUTINE);
     }
 }

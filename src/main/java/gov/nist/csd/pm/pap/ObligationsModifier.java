@@ -19,19 +19,19 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     }
 
     @Override
-    public void createObligation(String author, String name, List<Rule> rules) throws PMException {
-        checkCreateInput(author, name, rules);
+    public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
+        checkCreateInput(authorId, name, rules);
 
-        store.obligations().createObligation(author, name, new ArrayList<>(rules));
+        store.obligations().createObligation(authorId, name, new ArrayList<>(rules));
     }
 
     @Override
-    public void deleteObligation(String name) throws PMException {
-        if(!checkDeleteInput(name)) {
+    public void deleteObligation(long id) throws PMException {
+        if(!checkDeleteInput(id)) {
             return;
         }
 
-        store.obligations().deleteObligation(name);
+        store.obligations().deleteObligation(id);
     }
 
     /**

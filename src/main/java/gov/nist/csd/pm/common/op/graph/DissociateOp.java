@@ -1,11 +1,14 @@
 package gov.nist.csd.pm.common.op.graph;
 
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +26,8 @@ public class DissociateOp extends GraphOp {
     @Override
     public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
         pap.modify().graph().dissociate(
-                (String) operands.get(UA_OPERAND),
-                (String) operands.get(TARGET_OPERAND)
+                (long) operands.get(UA_OPERAND),
+                (long) operands.get(TARGET_OPERAND)
         );
 
         return null;
@@ -32,7 +35,20 @@ public class DissociateOp extends GraphOp {
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, (String) operands.get(UA_OPERAND), DISSOCIATE);
-        privilegeChecker.check(userCtx, (String) operands.get(TARGET_OPERAND), DISSOCIATE_FROM);
+        privilegeChecker.check(userCtx, (long) operands.get(UA_OPERAND), DISSOCIATE);
+        privilegeChecker.check(userCtx, (long) operands.get(TARGET_OPERAND), DISSOCIATE_FROM);
+    }
+
+    @Override
+    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        Map<String, Object> operandsWithNames = new HashMap<>();
+
+        long uaId = (long) operands.get(UA_OPERAND);
+        long targetId = (long) operands.get(TARGET_OPERAND);
+
+        operandsWithNames.put(UA_OPERAND, pap.query().graph().getNodeById(uaId).getName());
+        operandsWithNames.put(TARGET_OPERAND, pap.query().graph().getNodeById(targetId).getName());
+
+        return new EventContext(userCtx.getUser(), userCtx.getProcess(), this, operandsWithNames);
     }
 }

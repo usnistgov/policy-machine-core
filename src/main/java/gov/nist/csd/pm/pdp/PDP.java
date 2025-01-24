@@ -121,7 +121,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
             return new AdjudicationResponse(e);
         }
 
-        Node node = pap.query().graph().getNode(target);
+        Node node = pap.query().graph().getNodeByName(target);
 
         publishEvent(new EventContext(
                 user.getUser(),

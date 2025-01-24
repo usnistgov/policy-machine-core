@@ -27,18 +27,18 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().createUserAttribute("subject", List.of("pc1"));
 
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false, List.of());
+            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet(), false, List.of());
 
             assertThrows(
                     ProhibitionExistsException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet(), false, List.of()));
         }
 
         @Test
         void testProhibitionSubjectDoesNotExistException() {
             assertThrows(
                     ProhibitionSubjectDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS), false, List.of()));
         }
 
 
@@ -49,7 +49,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
 
             assertThrows(
                     UnknownAccessRightException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"), false, List.of()));
         }
 
         @Test
@@ -59,9 +59,9 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
             assertThrows(
                     ProhibitionContainerDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), false,
-                            Collections.singleton(new ContainerCondition("oa1", true))
-                    ));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		                    false,
+		                    Collections.singleton(new ContainerCondition("oa1", true))));
         }
 
         @Test
@@ -72,12 +72,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
-                    List.of(
-                    new ContainerCondition("oa1", true),
-                    new ContainerCondition("oa2", false)
-                    )
-            );
+            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		            true,
+		            List.of(
+		            new ContainerCondition("oa1", true),
+		            new ContainerCondition("oa2", false)
+		            ));
 
             Prohibition p = pap.query().prohibitions().getProhibition("pro1");
             assertEquals("pro1", p.getName());
@@ -151,10 +151,10 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), new AccessRightSet("read"), true,
-                    List.of(
-                    new ContainerCondition("oa1", true),
-                    new ContainerCondition("oa2", false)));
+            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
+		            true, List.of(
+		            new ContainerCondition("oa1", true),
+		            new ContainerCondition("oa2", false)));
 
             assertDoesNotThrow(() -> pap.query().prohibitions().getProhibition("pro1"));
 

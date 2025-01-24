@@ -4,5 +4,5 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 
 import java.util.List;
 
-public record SubgraphPrivileges(String name, AccessRightSet privileges, List<SubgraphPrivileges> ascendants) {
+public record SubgraphPrivileges(long name, AccessRightSet privileges, List<SubgraphPrivileges> ascendants) {
 }

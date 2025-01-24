@@ -21,12 +21,12 @@ public interface PolicyStore extends Transactional {
         String pc = AdminPolicyNode.PM_ADMIN_PC.nodeName();
 
         if (!graph().nodeExists(pc)) {
-            graph().createNode(pc, PC);
+            graph().createNode(, pc, PC);
         }
 
         String oa = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
         if (!graph().nodeExists(oa)) {
-            graph().createNode(oa, OA);
+            graph().createNode(, oa, OA);
         }
 
         if (!graph().getAdjacentDescendants(oa).contains(pc)) {

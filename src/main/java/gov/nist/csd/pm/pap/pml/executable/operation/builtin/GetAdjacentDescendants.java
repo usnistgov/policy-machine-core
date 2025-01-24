@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.executable.operation.builtin;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
@@ -38,11 +39,15 @@ public class GetAdjacentDescendants extends PMLOperation {
     public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
         Value nodeName = (Value) operands.get("nodeName");
 
-        Collection<String> ascendants = pap.query().graph().getAdjacentDescendants(nodeName.getStringValue());
-        List<Value> ascValues = new ArrayList<>(ascendants.size());
+        long id = pap.query().graph().getNodeId(nodeName.getStringValue());
+        long[] descendants = pap.query().graph().getAdjacentDescendants(id);
+        List<Value> descValues = new ArrayList<>(descendants.length);
 
-        ascendants.forEach(ascendant -> ascValues.add(new StringValue(ascendant)));
+        for (long desc : descendants) {
+            Node node = pap.query().graph().getNodeById(desc);
+            descValues.add(new StringValue(node.getName()));
+        }
 
-        return new ArrayValue(ascValues, returnType);
+        return new ArrayValue(descValues, returnType);
     }
 }

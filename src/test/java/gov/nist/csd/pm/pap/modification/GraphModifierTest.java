@@ -117,7 +117,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             assertTrue(pap.query().graph().nodeExists("oa1"));
             assertTrue(pap.query().graph().nodeExists("oa2"));
-            assertEquals("v", pap.query().graph().getNode("oa2").getProperties().get("k"));
+            assertEquals("v", pap.query().graph().getNodeByName("oa2").getProperties().get("k"));
 
             assertTrue(pap.query().graph().getAdjacentAscendants("pc1").contains("oa1"));
             assertTrue(pap.query().graph().getAdjacentAscendants("oa1").contains("oa2"));
@@ -204,7 +204,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             assertTrue(pap.query().graph().nodeExists("ua1"));
             assertTrue(pap.query().graph().nodeExists("ua2"));
-            assertEquals("v", pap.query().graph().getNode("ua2").getProperties().get("k"));
+            assertEquals("v", pap.query().graph().getNodeByName("ua2").getProperties().get("k"));
 
             assertTrue(pap.query().graph().getAdjacentAscendants("pc1").contains("ua1"));
             assertTrue(pap.query().graph().getAdjacentDescendants("ua1").contains("pc1"));
@@ -285,7 +285,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().setNodeProperties("o1", toProperties("k", "v"));
 
             assertTrue(pap.query().graph().nodeExists("o1"));
-            assertEquals("v", pap.query().graph().getNode("o1").getProperties().get("k"));
+            assertEquals("v", pap.query().graph().getNodeByName("o1").getProperties().get("k"));
 
             assertTrue(pap.query().graph().getAdjacentAscendants("oa1").contains("o1"));
             assertTrue(pap.query().graph().getAdjacentDescendants("o1").contains("oa1"));
@@ -366,7 +366,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().setNodeProperties("u1", toProperties("k", "v"));
 
             assertTrue(pap.query().graph().nodeExists("u1"));
-            assertEquals("v", pap.query().graph().getNode("u1").getProperties().get("k"));
+            assertEquals("v", pap.query().graph().getNodeByName("u1").getProperties().get("k"));
 
             assertTrue(pap.query().graph().getAdjacentAscendants("ua1").contains("u1"));
             assertTrue(pap.query().graph().getAdjacentDescendants("u1").contains("ua1"));
@@ -405,7 +405,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().setNodeProperties("pc1", NO_PROPERTIES);
 
-            assertTrue(pap.query().graph().getNode("pc1").getProperties().isEmpty());
+            assertTrue(pap.query().graph().getNodeByName("pc1").getProperties().isEmpty());
         }
 
         @Test
@@ -413,7 +413,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().setNodeProperties("pc1", toProperties("k", "v"));
 
-            assertEquals("v", pap.query().graph().getNode("pc1").getProperties().get("k"));
+            assertEquals("v", pap.query().graph().getNodeByName("pc1").getProperties().get("k"));
         }
 
         @Test
@@ -459,9 +459,9 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
             pap.modify().graph().createUser("u1", List.of("ua2"));
             pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("ua1"),
-                    new AccessRightSet(), true, Collections.singleton(new ContainerCondition("oa1", true))
-            );
+            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("ua1"), ,
+                    new AccessRightSet(), true,
+                    Collections.singleton(new ContainerCondition("oa1", true)));
 
             assertThrows(NodeReferencedInProhibitionException.class,
                     () -> pap.modify().graph().deleteNode("ua1"));

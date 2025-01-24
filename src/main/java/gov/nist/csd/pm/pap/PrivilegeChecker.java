@@ -31,7 +31,7 @@ public class PrivilegeChecker {
         this.explain = explain;
     }
 
-    public void check(UserContext userCtx, String target, Collection<String> toCheck) throws PMException {
+    public void check(UserContext userCtx, long target, Collection<String> toCheck) throws PMException {
         TargetContext targetContext = new TargetContext(target);
 
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
@@ -53,12 +53,12 @@ public class PrivilegeChecker {
         checkOrThrow(userCtx, targetContext, computed, toCheck);
     }
 
-    public void check(UserContext userCtx, String target, String... toCheck) throws PMException {
+    public void check(UserContext userCtx, long target, String... toCheck) throws PMException {
         check(userCtx, target, Arrays.asList(toCheck));
     }
 
-    public void check(UserContext userCtx, List<String> targets, String... toCheck) throws PMException {
-        for (String target : targets) {
+    public void check(UserContext userCtx, List<Long> targets, String... toCheck) throws PMException {
+        for (long target : targets) {
             check(userCtx, target, Arrays.asList(toCheck));
         }
     }
@@ -66,12 +66,12 @@ public class PrivilegeChecker {
     public void checkPattern(UserContext userCtx, Pattern pattern, String toCheck) throws PMException {
         ReferencedNodes referencedNodes = pattern.getReferencedNodes();
         if (referencedNodes.isAny()) {
-            check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), toCheck);
+            check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), toCheck);
 
             return;
         }
 
-        for (String entity : referencedNodes.nodes()) {
+        for (long entity : referencedNodes.nodes()) {
             check(userCtx, entity, toCheck);
         }
     }

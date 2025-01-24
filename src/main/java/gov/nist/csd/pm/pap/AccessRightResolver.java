@@ -111,7 +111,7 @@ public class AccessRightResolver {
         boolean addOps = false;
 
         for (ContainerCondition containerCondition : containers) {
-            String contName = containerCondition.getName();
+            String contName = containerCondition.getId();
             boolean isComplement = containerCondition.isComplement();
 
             addOps = !isComplement && reachedTargets.contains(contName) ||

@@ -132,11 +132,9 @@ setResourceOperationsStatement:
 deleteStatement:
     DELETE deleteType expression ;
 deleteType:
-    nodeType #DeleteNode
+    NODE #DeleteNode
     | OBLIGATION #DeleteObligation
     | PROHIBITION #DeleteProhibition ;
-nodeType:
-    (POLICY_CLASS | OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
 deleteRuleStatement:
     DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression ;

@@ -14,47 +14,37 @@ import gov.nist.csd.pm.pdp.PDPExecutionContext;
 import java.util.Collection;
 import java.util.List;
 
-public class EPP {
+public class EPP implements EventSubscriber {
 
-    private final EPPEventSubscriber eventListener;
+    private PDP pdp;
+    private PAP pap;
 
     public EPP(PDP pdp, PAP pap) throws PMException {
-        eventListener = new EPPEventSubscriber(pdp, pap);
-
-        pdp.addEventSubscriber(eventListener);
+        this.pdp = pdp;
+        this.pap = pap;
     }
 
-    public EPPEventSubscriber getEventProcessor() {
-        return eventListener;
+    public EPP subscribeToPDP() {
+        pdp.addEventSubscriber(this);
+        return this;
     }
 
-    public static class EPPEventSubscriber implements EventSubscriber {
-
-        private PDP pdp;
-        private PAP pap;
-
-        public EPPEventSubscriber(PDP pdp, PAP pap) {
-            this.pdp = pdp;
-            this.pap = pap;
-        }
-
-        @Override
-        public void processEvent(EventContext eventCtx) throws PMException {
-            Collection<Obligation> obligations = pap.query().obligations().getObligations();
-            for(Obligation obligation : obligations) {
-                String author = obligation.getAuthor();
-                List<Rule> rules = obligation.getRules();
-                for(Rule rule : rules) {
-                    if(!rule.getEventPattern().matches(eventCtx, pap)) {
-                        continue;
-                    }
-
-                    Response response = rule.getResponse();
-                    UserContext userContext = new UserContext(author);
-
-                    // need to run pdp tx as author
-                    pdp.runTx(userContext, txPDP -> response.execute(new PDPExecutionContext(userContext, txPDP), eventCtx));
+    @Override
+    public void processEvent(EventContext eventCtx) throws PMException {
+        Collection<Obligation> obligations = pap.query().obligations().getObligations();
+        for(Obligation obligation : obligations) {
+            long author = obligation.getAuthorId();
+            List<Rule> rules = obligation.getRules();
+            for(Rule rule : rules) {
+                if(!rule.getEventPattern().matches(eventCtx, pap)) {
+                    continue;
                 }
+
+                Response response = rule.getResponse();
+                UserContext userContext = new UserContext(author);
+
+                // need to run pdp tx as author
+                pdp.runTx(userContext, txPDP -> response.execute(new PDPExecutionContext(userContext, txPDP), eventCtx));
             }
         }
     }

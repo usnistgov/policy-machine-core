@@ -36,7 +36,7 @@ public class HasPropertyValue extends PMLOperation {
         String nodeName = ((Value) operands.get("nodeName")).getStringValue();
         String key = ((Value) operands.get("key")).getStringValue();
         String value = ((Value) operands.get("value")).getStringValue();
-        Node node = pap.query().graph().getNode(nodeName);
+        Node node = pap.query().graph().getNodeByName(nodeName);
         boolean has = node.getProperties().containsKey(key);
         if (!has) {
             return new BoolValue(false);

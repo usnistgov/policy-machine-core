@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.executable.operation.builtin;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -40,13 +41,13 @@ public class Search extends PMLOperation {
             properties.put(prop.getKey().getStringValue(), prop.getValue().getStringValue());
         }
 
-        Collection<String> search = pap.query().graph().search(nodeType, properties);
+        Collection<Node> search = pap.query().graph().search(nodeType, properties);
 
         List<Value> ret = new ArrayList<>(search.size());
-        for (String s : search) {
-            ret.add(new StringValue(s));
+        for (Node n : search) {
+            ret.add(Value.fromObject(n));
         }
 
-        return new ArrayValue(ret, Type.array(Type.string()));
+        return new ArrayValue(ret, Type.array(Type.any()));
     }
 }

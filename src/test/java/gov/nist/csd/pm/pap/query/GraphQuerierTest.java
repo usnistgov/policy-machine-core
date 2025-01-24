@@ -41,7 +41,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void testNodeDoesNotExistException() {
-            assertThrows(NodeDoesNotExistException.class, () -> pap.query().graph().getNode("pc1"));
+            assertThrows(NodeDoesNotExistException.class, () -> pap.query().graph().getNodeByName("pc1"));
         }
 
         @Test
@@ -49,7 +49,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().setNodeProperties("pc1", toProperties("k", "v"));
 
-            Node pc1 = pap.query().graph().getNode("pc1");
+            Node pc1 = pap.query().graph().getNodeByName("pc1");
 
             assertEquals("pc1", pc1.getName());
             assertEquals(PC, pc1.getType());
@@ -62,7 +62,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
             pap.modify().graph().setNodeProperties("oa1", Properties.toProperties("k", "v"));
 
-            Node oa1 = pap.query().graph().getNode("oa1");
+            Node oa1 = pap.query().graph().getNodeByName("oa1");
 
             assertEquals("oa1", oa1.getName());
             assertEquals(OA, oa1.getType());
@@ -394,15 +394,15 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         }
 
         int ok = 0;
-        for (AscendantSubgraph expectedSubgraph : expected.ascendants()) {
-            for (AscendantSubgraph actualSubgraph : actual.ascendants()) {
+        for (AscendantSubgraph expectedSubgraph : expected.ascendantIds()) {
+            for (AscendantSubgraph actualSubgraph : actual.ascendantIds()) {
                 if (assertSubgraphEquals(expectedSubgraph, actualSubgraph)) {
                     ok++;
                 }
             }
         }
 
-        return ok == expected.ascendants().size();
+        return ok == expected.ascendantIds().size();
     }
 
     @Test

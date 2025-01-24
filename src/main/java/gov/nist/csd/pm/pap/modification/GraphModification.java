@@ -19,60 +19,57 @@ public interface GraphModification {
      * @return The name of the policy class.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    String createPolicyClass(String name) throws PMException;
+    long createPolicyClass(String name) throws PMException;
 
     /**
      * Create a new user attribute and assign it to the provided assignments. User attributes must have at
      * least one assignment initially.
      *
-     * @param name    the name of the user attribute
+     * @param name        the name of the user attribute
      * @param assignments A list of assignments to assign the new node to.
-     *
      * @return the name of the user attribute.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    String createUserAttribute(String name, Collection<String> assignments) throws PMException;
+    long createUserAttribute(String name, Collection<Long> assignments) throws PMException;
 
     /**
      * Create a new object attribute and assign it to the provided assignments. Object attributes must have at
      * least one assignment initially.
      *
-     * @param name    The name of the object attribute
+     * @param name        The name of the object attribute
      * @param assignments A list of 0 or more assignments to assign the new node to.
-     *
      * @return The name of the object attribute.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    String createObjectAttribute(String name, Collection<String> assignments) throws PMException;
+    long createObjectAttribute(String name, Collection<Long> assignments) throws PMException;
 
     /**
      * Create a new object and assign it to the provided assignments. Objects must have a least one assignment initially.
      *
-     * @param name    The name of the object attribute
+     * @param name        The name of the object attribute
      * @param assignments A list of 0 or more assignments to assign the new node to.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    String createObject(String name, Collection<String> assignments) throws PMException;
+    long createObject(String name, Collection<Long> assignments) throws PMException;
 
     /**
      * Create a new user and assign it to the provided assignments. Users must have a least one assignment initially.
      *
-     * @param name    The name of the object attribute
+     * @param name        The name of the object attribute
      * @param assignments A list of 0 or more assignments to assign the new node to.
-     *
      * @return The name of the object attribute.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    String createUser(String name, Collection<String> assignments) throws PMException;
+    long createUser(String name, Collection<Long> assignments) throws PMException;
 
     /**
      * Update the properties of the node with the given name. The given properties overwrite any existing properties.
      *
-     * @param name       The name of the node to update.
+     * @param id         The name of the node to update.
      * @param properties The properties to give the node.
      * @throws PMBackendException If there is an error executing the command in the PIP.
      */
-    void setNodeProperties(String name, Map<String, String> properties) throws PMException;
+    void setNodeProperties(long id, Map<String, String> properties) throws PMException;
 
     /**
      * Delete the node with the given name from the graph. If the node is a policy class this will also delete the
@@ -80,19 +77,19 @@ public interface GraphModification {
      * the node is defined in a prohibition or an obligation event pattern. If the node does not exist, no exception
      * will be thrown as this is the desired state.
      *
-     * @param name The name of the node to delete.
+     * @param id The name of the node to delete.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    void deleteNode(String name) throws PMException;
+    void deleteNode(long id) throws PMException;
 
     /**
      * Assign the ascendant node to the descendant node.
      *
-     * @param ascendant   The name of the ascendant node.
+     * @param ascId       The name of the ascendant node.
      * @param descendants The names of the descendant nodes.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    void assign(String ascendant, Collection<String> descendants) throws PMException;
+    void assign(long ascId, Collection<Long> descendants) throws PMException;
 
     /**
      * Delete the assignment between the ascendant and descendant nodes.
@@ -101,7 +98,7 @@ public interface GraphModification {
      * @param descendants The names of the descendant nodes.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    void deassign(String ascendant, Collection<String> descendants) throws PMException;
+    void deassign(long ascendant, Collection<Long> descendants) throws PMException;
 
     /**
      * Create an association between the user attribute and the target node with the provided access rights.
@@ -114,7 +111,7 @@ public interface GraphModification {
      * @param accessRights The set of access rights to add to the association.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    void associate(String ua, String target, AccessRightSet accessRights) throws PMException;
+    void associate(long ua, long target, AccessRightSet accessRights) throws PMException;
 
     /**
      * Delete the association between the user attribute and target node.  If either of the nodes does not exist an
@@ -125,6 +122,6 @@ public interface GraphModification {
      * @param target The name of the target attribute.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    void dissociate(String ua, String target) throws PMException;
+    void dissociate(long ua, long target) throws PMException;
 
 }

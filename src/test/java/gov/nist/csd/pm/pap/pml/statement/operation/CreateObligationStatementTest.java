@@ -57,7 +57,7 @@ class CreateObligationStatementTest {
 
         Obligation actual = pap.query().obligations().getObligation("o1");
         assertEquals(1, actual.getRules().size());
-        assertEquals("u2", actual.getAuthor());
+        assertEquals("u2", actual.getAuthorId());
         Rule rule = actual.getRules().get(0);
         assertEquals("rule1", rule.getName());
         assertEquals(new EventPattern(

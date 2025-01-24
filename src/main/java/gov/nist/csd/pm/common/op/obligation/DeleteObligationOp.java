@@ -3,6 +3,7 @@ package gov.nist.csd.pm.common.op.obligation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 
+import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_OBLIGATION;
@@ -10,7 +11,7 @@ import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_OBLIGATION;
 public class DeleteObligationOp extends ObligationOp {
 
     public DeleteObligationOp() {
-        super("delete_obligation", DELETE_OBLIGATION);
+        super("delete_obligation", List.of(NAME_OPERAND), DELETE_OBLIGATION);
     }
 
     @Override

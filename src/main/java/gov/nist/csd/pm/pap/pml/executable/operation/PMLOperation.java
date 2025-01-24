@@ -77,7 +77,7 @@ public abstract class PMLOperation extends Operation<Value> {
                 getName(),
                 getReturnType(),
                 getOperandNames(),
-                getNodeOperands(),
+                getEventCtxOperandNames(),
                 getOperandTypes()
         );
     }

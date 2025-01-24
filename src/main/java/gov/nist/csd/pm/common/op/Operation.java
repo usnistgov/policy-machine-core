@@ -11,15 +11,17 @@ import java.util.*;
 public abstract class Operation<T> extends AdminExecutable<T> {
 
     public static final String NAME_OPERAND = "name";
+    public static final String ID_OPERAND = "id";
 
-    protected List<String> nodeOperands;
+    // Operands that will be available in an EventContext
+    protected List<String> eventCtxOperandNames;
 
-    public Operation(String name, List<String> allOperands, List<String> nodeOperands) {
+    public Operation(String name, List<String> allOperands, List<String> eventCtxOperandNames) {
         super(name, allOperands);
 
-        validateOperandNames(allOperands, nodeOperands);
+        validateOperandNames(allOperands, eventCtxOperandNames);
 
-        this.nodeOperands = nodeOperands;
+        this.eventCtxOperandNames = eventCtxOperandNames;
     }
 
     public Operation(String name, List<String> allOperands) {
@@ -27,13 +29,13 @@ public abstract class Operation<T> extends AdminExecutable<T> {
 
         validateOperandNames(allOperands, new ArrayList<>());
 
-        this.nodeOperands = new ArrayList<>();
+        this.eventCtxOperandNames = new ArrayList<>();
     }
 
     public Operation(String name) {
         super(name, new ArrayList<>());
 
-        this.nodeOperands = new ArrayList<>();
+        this.eventCtxOperandNames = new ArrayList<>();
     }
 
     private void validateOperandNames(List<String> allOperands, List<String> nodeOperands) {
@@ -42,8 +44,8 @@ public abstract class Operation<T> extends AdminExecutable<T> {
         }
     }
 
-    public List<String> getNodeOperands() {
-        return nodeOperands;
+    public List<String> getEventCtxOperandNames() {
+        return eventCtxOperandNames;
     }
 
     public abstract void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException;
@@ -67,7 +69,7 @@ public abstract class Operation<T> extends AdminExecutable<T> {
             }
         }
 
-        for (String nodeOperandName : nodeOperands) {
+        for (String nodeOperandName : eventCtxOperandNames) {
             Object operandValue = actualOperands.get(nodeOperandName);
             if (operandValue instanceof String) {
                 continue;
@@ -84,7 +86,7 @@ public abstract class Operation<T> extends AdminExecutable<T> {
                 }
             }
 
-            throw new IllegalArgumentException("node operand can only be a string or collection of strings");
+            throw new IllegalArgumentException("eventCtx operand can only be a string or collection of strings");
         }
     }
 

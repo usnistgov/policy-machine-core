@@ -11,7 +11,7 @@ public class SinglePathShortCircuit implements ShortCircuit {
     }
 
     @Override
-    public boolean evaluate(String node) throws PMException {
-        return shortCircuit.evaluate(node);
+    public boolean evaluate(long nodeId) throws PMException {
+        return shortCircuit.evaluate(nodeId);
     }
 }

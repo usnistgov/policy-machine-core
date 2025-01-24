@@ -40,7 +40,7 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
         Collection<Obligation> obligations = store.obligations().getObligations();
         List<Obligation> withAuthor = new ArrayList<>();
         for (Obligation obligation : obligations) {
-            if(obligation.getAuthor().equals(author)) {
+            if(obligation.getAuthorId().equals(author)) {
                 withAuthor.add(obligation);
             }
         }

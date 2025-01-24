@@ -18,7 +18,7 @@ public class CreateObjectOp extends CreateNodeOp{
     public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
         pap.modify().graph().createObject(
                 (String) operands.get(NAME_OPERAND),
-                (Collection<String>) operands.get(DESCENDANTS_OPERAND)
+                (Collection<Long>) operands.get(DESCENDANTS_OPERAND)
         );
 
         return null;

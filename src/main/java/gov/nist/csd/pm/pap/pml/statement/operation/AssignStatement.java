@@ -37,7 +37,14 @@ public class AssignStatement extends OperationStatement {
             descs.add(value.getStringValue());
         }
 
-        return Map.of(ASCENDANT_OPERAND, asc, DESCENDANTS_OPERAND, descs);
+        // convert to ids
+        long ascId = pap.query().graph().getNodeByName(asc).getId();
+        List<Long> descIds = new ArrayList<>();
+        for (String desc : descs) {
+            descIds.add(pap.query().graph().getNodeByName(desc).getId());
+        }
+
+        return Map.of(ASCENDANT_OPERAND, ascId, DESCENDANTS_OPERAND, descIds);
     }
 
     @Override

@@ -45,11 +45,10 @@ class DeleteStatementTest {
                 new Response("e", List.of())
         )));
         pap.modify().prohibitions().createProhibition("p1",
-                                    new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE),
-                                    new AccessRightSet("read"),
-                                    true,
-                Collections.singleton(new ContainerCondition("oa1", true))
-        );
+                                    new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE), ,
+		        new AccessRightSet("read"),
+		        true,
+		        Collections.singleton(new ContainerCondition("oa1", true)));
 
         stmt2.execute(new ExecutionContext(userContext, pap), pap);
         stmt3.execute(new ExecutionContext(userContext, pap), pap);

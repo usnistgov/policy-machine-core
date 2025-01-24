@@ -59,7 +59,7 @@ class DepthFirstGraphWalkerTest {
                 .withVisitor(node -> {
                     visited.add(node);
                 })
-                .withAllPathShortCircuit(node -> node.equals("oa1-2-1"));
+                .withAllPathShortCircuit(nodeId -> node.equals("oa1-2-1"));
 
         dfs.walk("pc1");
 
@@ -76,7 +76,7 @@ class DepthFirstGraphWalkerTest {
                 .withVisitor(node -> {
                     visited.add(node);
                 })
-                .withSinglePathShortCircuit(node -> node.equals("oa1-1"));
+                .withSinglePathShortCircuit(nodeId -> node.equals("oa1-1"));
 
         dfs.walk("pc1");
 

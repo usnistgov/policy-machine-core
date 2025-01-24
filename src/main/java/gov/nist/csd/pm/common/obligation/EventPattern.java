@@ -2,6 +2,7 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
@@ -56,13 +57,14 @@ public class EventPattern implements Serializable {
     }
 
     public boolean matches(EventContext eventCtx, PAP pap) throws PMException {
-        boolean userMatches = userMatches(eventCtx.user(), pap) || processMatches(eventCtx.process(), pap);
-        boolean opMatches = operationMatches(eventCtx.opName(), pap);
+        Node userNode = pap.query().graph().getNodeById(eventCtx.getUserId());
+        boolean userMatches = userMatches(userNode.getName(), pap) || processMatches(eventCtx.getProcess(), pap);
+        boolean opMatches = operationMatches(eventCtx.getOpName(), pap);
         if (operationPattern.isAny()) {
             return userMatches;
         }
 
-        boolean operandsMatch = operandsMatch(eventCtx.opName(), eventCtx.operands(), pap);
+        boolean operandsMatch = operandsMatch(eventCtx.getOpName(), eventCtx.getOperands(), pap);
 
         return userMatches && opMatches && operandsMatch;
     }
@@ -149,6 +151,6 @@ public class EventPattern implements Serializable {
         }
 
         Operation<?> adminOperation = pap.query().operations().getAdminOperation(opName);
-        return adminOperation.getNodeOperands();
+        return adminOperation.getEventCtxOperandNames();
     }
 }

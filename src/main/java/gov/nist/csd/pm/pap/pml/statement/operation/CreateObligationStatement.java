@@ -48,7 +48,7 @@ public class CreateObligationStatement extends OperationStatement {
             rules.add(rule);
         }
 
-        return Map.of(AUTHOR_OPERAND, ctx.author().getUser(), NAME_OPERAND, nameStr, RULES_OPERAND, rules);
+        return Map.of(AUTHOR_ID_OPERAND, ctx.author().getUser(), NAME_OPERAND, nameStr, RULES_OPERAND, rules);
     }
 
     @Override

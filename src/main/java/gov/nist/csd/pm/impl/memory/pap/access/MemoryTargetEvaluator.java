@@ -82,8 +82,8 @@ public class MemoryTargetEvaluator {
 
 		List<String> targetNodes = new ArrayList<>();
 		if (targetCtx.isNode()) {
-			String target = targetCtx.getTarget();
-			Node targetNode = policyStore.graph().getNode(target);
+			String target = targetCtx.getTargetId();
+			Node targetNode = policyStore.graph().getNodeById(target);
 			if (targetNode.getType().equals(PC)) {
 				target = PM_ADMIN_OBJECT.nodeName();
 			}
@@ -92,7 +92,7 @@ public class MemoryTargetEvaluator {
 
 			dfs.walk(target);
 		} else {
-			List<String> attrs = targetCtx.getAttributes();
+			List<String> attrs = targetCtx.getAttributeIds();
 			targetNodes.addAll(attrs);
 
 			dfs.walk(attrs);
@@ -105,7 +105,7 @@ public class MemoryTargetEvaluator {
 		Set<String> userProhibitionTargets = new HashSet<>();
 		for (Prohibition prohibition : prohibitions) {
 			for (ContainerCondition cc : prohibition.getContainers()) {
-				userProhibitionTargets.add(cc.getName());
+				userProhibitionTargets.add(cc.getId());
 			}
 		}
 

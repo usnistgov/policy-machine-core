@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.Direction;
 import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.common.graph.dag.UserDagResult;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.AccessQuerier;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -80,7 +81,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
         Map<String, AccessRightSet> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no attrs are reachable
@@ -117,7 +118,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
         Map<String, AccessRightSet> acl = new HashMap<>();
         Collection<String> search = store.graph().search(U, NO_PROPERTIES);
         for (String user : search) {
@@ -129,14 +130,14 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+    public Map<Node, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
         return new MemoryUserEvaluator(store)
                 .evaluate(userCtx)
                 .borderTargets();
     }
 
     @Override
-    public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
+    public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
         List<SubgraphPrivileges> subgraphs = new ArrayList<>();
 
         Collection<String> adjacentAscendants = store.graph().getAdjacentAscendants(root);
@@ -160,7 +161,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+    public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
         Map<String, AccessRightSet> descendantPrivs = new HashMap<>();
 
         Collection<String> adjacentDescendants = store.graph().getAdjacentDescendants(root);
@@ -178,7 +179,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+    public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
         Map<String, AccessRightSet> pos = new HashMap<>();
 
         for (String pc : store.graph().getPolicyClasses()) {

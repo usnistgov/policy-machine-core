@@ -24,8 +24,8 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
             pap.modify().graph().createUser("u1", List.of("ua1"));
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getRules());
-            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getRules());
+            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getRules());
+            pap.modify().obligations().createObligation(obligation2.getAuthorId(), obligation2.getName(), obligation2.getRules());
 
             Collection<Obligation> obligations = pap.query().obligations().getObligations();
             assertEquals(2, obligations.size());
@@ -55,8 +55,8 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
             pap.modify().graph().createUser("u1", List.of("ua1"));
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getRules());
-            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getRules());
+            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getRules());
+            pap.modify().obligations().createObligation(obligation2.getAuthorId(), obligation2.getName(), obligation2.getRules());
 
             Obligation obligation = pap.query().obligations().getObligation(obligation1.getName());
             assertEquals(obligation1, obligation);

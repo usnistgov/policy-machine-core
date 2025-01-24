@@ -20,71 +20,71 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
-    public Node getNode(String name) throws PMException {
+    public Node getNodeByName(String name) throws PMException {
         checkNodeExists(name);
-        return store.graph().getNode(name);
+        return store.graph().getNodeById(name);
     }
 
     @Override
-    public Collection<String> getAdjacentDescendants(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getAdjacentDescendants(node);
+    public Collection<String> getAdjacentDescendants(long nodeId) throws PMException {
+        checkNodeExists(nodeId);
+        return store.graph().getAdjacentDescendants(nodeId);
     }
 
     @Override
-    public Collection<String> getAdjacentAscendants(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getAdjacentAscendants(node);
+    public Collection<String> getAdjacentAscendants(long nodeId) throws PMException {
+        checkNodeExists(nodeId);
+        return store.graph().getAdjacentAscendants(nodeId);
     }
 
     @Override
-    public Collection<Association> getAssociationsWithSource(String ua) throws PMException {
-        checkNodeExists(ua);
-        return store.graph().getAssociationsWithSource(ua);
+    public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
+        checkNodeExists(uaId);
+        return store.graph().getAssociationsWithSource(uaId);
     }
 
     @Override
-    public Collection<Association> getAssociationsWithTarget(String target) throws PMException {
-        checkNodeExists(target);
-        return store.graph().getAssociationsWithTarget(target);
+    public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
+        checkNodeExists(targetId);
+        return store.graph().getAssociationsWithTarget(targetId);
     }
 
     @Override
-    public AscendantSubgraph getAscendantSubgraph(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getAscendantSubgraph(node);
+    public AscendantSubgraph getAscendantSubgraph(long nodeId) throws PMException {
+        checkNodeExists(nodeId);
+        return store.graph().getAscendantSubgraph(nodeId);
     }
 
     @Override
-    public DescendantSubgraph getDescendantSubgraph(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getDescendantSubgraph(node);
+    public DescendantSubgraph getDescendantSubgraph(long nodeId) throws PMException {
+        checkNodeExists(nodeId);
+        return store.graph().getDescendantSubgraph(nodeId);
     }
 
     @Override
-    public Collection<String> getAttributeDescendants(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getAttributeDescendants(node);
+    public long[] getAttributeDescendants(long nodeId) throws PMException {
+        checkNodeExists(nodeId);
+        return store.graph().getAttributeDescendants(nodeId);
     }
 
     @Override
-    public Collection<String> getPolicyClassDescendants(String node) throws PMException {
-        checkNodeExists(node);
-        return store.graph().getPolicyClassDescendants(node);
+    public long[] getPolicyClassDescendants(long nodeId) throws PMException {
+        checkNodeExists(nodeId);
+        return store.graph().getPolicyClassDescendants(nodeId);
     }
 
     @Override
-    public boolean isAscendant(String ascendant, String descendant) throws PMException {
-        checkNodeExists(ascendant);
-        checkNodeExists(descendant);
-        return store.graph().isAscendant(ascendant, descendant);
+    public boolean isAscendant(long ascendantId, long descendantId) throws PMException {
+        checkNodeExists(ascendantId);
+        checkNodeExists(descendantId);
+        return store.graph().isAscendant(ascendantId, descendantId);
     }
 
     @Override
-    public boolean isDescendant(String ascendant, String descendant) throws PMException {
-        checkNodeExists(ascendant);
-        checkNodeExists(descendant);
-        return store.graph().isDescendant(ascendant, descendant);
+    public boolean isDescendant(long ascendantId, long descendantId) throws PMException {
+        checkNodeExists(ascendantId);
+        checkNodeExists(descendantId);
+        return store.graph().isDescendant(ascendantId, descendantId);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
-    public Collection<String> search(NodeType type, Map<String, String> properties) throws PMException {
+    public Collection<Node> search(NodeType type, Map<String, String> properties) throws PMException {
         return store.graph().search(type, properties);
     }
 

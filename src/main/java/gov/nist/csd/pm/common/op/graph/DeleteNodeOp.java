@@ -1,14 +1,13 @@
 package gov.nist.csd.pm.common.op.graph;
 
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class DeleteNodeOp extends GraphOp {
 
@@ -18,8 +17,8 @@ public abstract class DeleteNodeOp extends GraphOp {
     public DeleteNodeOp(String name, String reqCap, String descsReqCap) {
         super(
                 name,
-                List.of(NAME_OPERAND, TYPE_OPERAND, DESCENDANTS_OPERAND),
-                List.of(NAME_OPERAND, DESCENDANTS_OPERAND)
+                List.of(ID_OPERAND, TYPE_OPERAND, DESCENDANTS_OPERAND),
+                List.of(ID_OPERAND, DESCENDANTS_OPERAND)
         );
 
         this.reqCap = reqCap;
@@ -28,18 +27,40 @@ public abstract class DeleteNodeOp extends GraphOp {
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, (String) operands.get(NAME_OPERAND), reqCap);
+        privilegeChecker.check(userCtx, (long) operands.get(ID_OPERAND), reqCap);
 
-        Collection<String> descs = (Collection<String>) operands.get(DESCENDANTS_OPERAND);
-        for (String desc : descs) {
+        Collection<Long> descs = (Collection<Long>) operands.get(DESCENDANTS_OPERAND);
+        for (Long desc : descs) {
             privilegeChecker.check(userCtx, desc, descsReqCap);
         }
     }
 
     @Override
     public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        pap.modify().graph().deleteNode((String) operands.get(NAME_OPERAND));
+        pap.modify().graph().deleteNode((long) operands.get(ID_OPERAND));
 
         return null;
+    }
+
+    @Override
+    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        Map<String, Object> operandsWithNames = new HashMap<>();
+
+        long asc = (long) operands.get(ID_OPERAND);
+        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
+        List<String> descNames = new ArrayList<>();
+        for (Long desc : descs) {
+            descNames.add(pap.query().graph().getNodeById(desc).getName());
+        }
+
+        operandsWithNames.put(NAME_OPERAND, pap.query().graph().getNodeById(asc).getName());
+        operandsWithNames.put(DESCENDANTS_OPERAND, descNames);
+
+        return new EventContext(
+                userCtx.getUser(),
+                userCtx.getProcess(),
+                this,
+                operandsWithNames
+        );
     }
 }

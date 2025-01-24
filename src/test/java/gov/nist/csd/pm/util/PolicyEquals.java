@@ -28,8 +28,8 @@ public class PolicyEquals {
         assertEquals(aNodes, bNodes);
 
         for (String nodeName : aNodes) {
-            Node aNode = a.graph().getNode(nodeName);
-            Node bNode = b.graph().getNode(nodeName);
+            Node aNode = a.graph().getNodeByName(nodeName);
+            Node bNode = b.graph().getNodeByName(nodeName);
             assertEquals(aNode, bNode);
 
             Collection<String> aAscendants = new HashSet<>(a.graph().getAdjacentAscendants(nodeName));

@@ -24,7 +24,7 @@ public class CreatePolicyClassOp extends CreateNodeOp{
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), CREATE_POLICY_CLASS);
+        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), CREATE_POLICY_CLASS);
     }
 
     @Override
