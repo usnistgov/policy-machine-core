@@ -19,10 +19,10 @@ public class PolicyModificationAdjudicator extends Adjudicator implements Policy
     public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) throws PMException {
         super(privilegeChecker);
         this.graph = new GraphModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
-        this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
-        this.obligations = new ObligationsModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
-        this.operations = new OperationsModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
-        this.routines = new RoutinesModificationAdjudicator(userCtx, pap, eventPublisher, privilegeChecker);
+        this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap, privilegeChecker);
+        this.obligations = new ObligationsModificationAdjudicator(userCtx, pap, privilegeChecker);
+        this.operations = new OperationsModificationAdjudicator(userCtx, pap, privilegeChecker);
+        this.routines = new RoutinesModificationAdjudicator(userCtx, pap, privilegeChecker);
     }
 
     @Override

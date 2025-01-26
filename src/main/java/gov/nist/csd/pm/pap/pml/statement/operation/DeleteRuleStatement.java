@@ -92,11 +92,16 @@ public class DeleteRuleStatement extends OperationStatement {
         @Override
         public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
             String author = (String) operands.get(AUTHOR_ID_OPERAND);
+            long authorId = pap.query().graph().getNodeId(author);
+
             String name = (String) operands.get(NAME_OPERAND);
             List<Rule> rules = (List<Rule>) operands.get(RULES_OPERAND);
 
+            // delete the obligation
             pap.modify().obligations().deleteObligation(name);
-            pap.modify().obligations().createObligation(author, name, rules);
+
+            // recreate it with updated ruleset
+            pap.modify().obligations().createObligation(authorId, name, rules);
 
             return null;
         }

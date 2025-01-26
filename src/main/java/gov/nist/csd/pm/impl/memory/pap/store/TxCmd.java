@@ -8,7 +8,6 @@ import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.routine.Routine;
 
-import java.util.Collection;
 import java.util.Map;
 
 public abstract class TxCmd implements TxRollbackSupport {
@@ -29,60 +28,42 @@ public abstract class TxCmd implements TxRollbackSupport {
         }
     }
 
-    static class CreatePolicyClassTxCmd extends TxCmd {
-            
-        private String name;
-        private Map<String, String> properties;
-
-        public CreatePolicyClassTxCmd(String name, Map<String, String> properties) {
-            this.name = name;
-            this.properties = properties;
-        }
-
-        @Override
-        public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.graph().deleteNode(name);
-        }
-    }
-
     static class CreateNodeTxCmd extends TxCmd {
 
-        private final String name;
+        private final long id;
 
-        public CreateNodeTxCmd(String name) {
-            this.name = name;
+        public CreateNodeTxCmd(long id) {
+            this.id = id;
         }
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.graph().deleteNode(name);
+            memoryPolicyStore.graph().deleteNode(id);
         }
     }
 
     static class SetNodePropertiesTxCmd extends TxCmd {
-        private final String name;
+        private final long id;
         private final Map<String, String> oldProperties;
-        private final Map<String, String> newProperties;
 
-        public SetNodePropertiesTxCmd(String name, Map<String, String> oldProperties, Map<String, String> newProperties) {
-            this.name = name;
+        public SetNodePropertiesTxCmd(long id, Map<String, String> oldProperties) {
+            this.id = id;
             this.oldProperties = oldProperties;
-            this.newProperties = newProperties;
         }
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.graph().setNodeProperties(name, oldProperties);
+            memoryPolicyStore.graph().setNodeProperties(id, oldProperties);
         }
     }
 
     static class DeleteNodeTxCmd extends TxCmd {
-        private final String name;
+        private final long id;
         private final Node nodeToDelete;
-        private final Collection<String> descendants;
+        private final long[]descendants;
 
-        public DeleteNodeTxCmd(String name, Node nodeToDelete, Collection<String> descendants) {
-            this.name = name;
+        public DeleteNodeTxCmd(long id, Node nodeToDelete, long[] descendants) {
+            this.id = id;
             this.nodeToDelete = nodeToDelete;
             this.descendants = descendants;
         }
@@ -92,19 +73,21 @@ public abstract class TxCmd implements TxRollbackSupport {
             NodeType type = nodeToDelete.getType();
             Map<String, String> properties = nodeToDelete.getProperties();
 
-            memoryPolicyStore.graph().createNode(, name, nodeToDelete.getType());
+            memoryPolicyStore.graph().createNode(id, nodeToDelete.getName(), nodeToDelete.getType());
 
-            for (String descendant : descendants) {
-                memoryPolicyStore.graph().createAssignment(name, descendant);
+            for (long descendant : descendants) {
+                memoryPolicyStore.graph().createAssignment(id, descendant);
             }
+
+            memoryPolicyStore.graph().setNodeProperties(id, properties);
         }
     }
 
     static final class CreateAssignmentTxCmd extends TxCmd {
-        private final String ascendant;
-        private final String descendant;
+        private final long ascendant;
+        private final long descendant;
 
-        public CreateAssignmentTxCmd(String ascendant, String descendant) {
+        public CreateAssignmentTxCmd(long ascendant, long descendant) {
             this.ascendant = ascendant;
             this.descendant = descendant;
         }
@@ -116,10 +99,10 @@ public abstract class TxCmd implements TxRollbackSupport {
     }
 
     static class DeleteAssignmentTxCmd extends TxCmd {
-        private final String ascendant;
-        private final String descendant;
+        private final long ascendant;
+        private final long descendant;
 
-        public DeleteAssignmentTxCmd(String ascendant, String descendant) {
+        public DeleteAssignmentTxCmd(long ascendant, long descendant) {
             this.ascendant = ascendant;
             this.descendant = descendant;
         }
@@ -132,10 +115,10 @@ public abstract class TxCmd implements TxRollbackSupport {
 
     static class CreateAssociationTxCmd extends TxCmd {
 
-        private final String source;
-        private final String target;
+        private final long source;
+        private final long target;
 
-        public CreateAssociationTxCmd(String source, String target) {
+        public CreateAssociationTxCmd(long source, long target) {
             this.source = source;
             this.target = target;
         }
@@ -147,11 +130,11 @@ public abstract class TxCmd implements TxRollbackSupport {
     }
 
     static class DeleteAssociationTxCmd extends TxCmd {
-        private String ua;
-        private String target;
+        private long ua;
+        private long target;
         private AccessRightSet accessRightSet;
 
-        public DeleteAssociationTxCmd(String ua, String target, AccessRightSet accessRightSet) {
+        public DeleteAssociationTxCmd(long ua, long target, AccessRightSet accessRightSet) {
             this.ua = ua;
             this.target = target;
             this.accessRightSet = accessRightSet;

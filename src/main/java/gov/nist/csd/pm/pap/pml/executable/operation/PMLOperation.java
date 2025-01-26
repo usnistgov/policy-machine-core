@@ -77,7 +77,7 @@ public abstract class PMLOperation extends Operation<Value> {
                 getName(),
                 getReturnType(),
                 getOperandNames(),
-                getEventCtxOperandNames(),
+                getNodeOperandNames(),
                 getOperandTypes()
         );
     }
@@ -103,7 +103,7 @@ public abstract class PMLOperation extends Operation<Value> {
     }
 
     @Override
-    public PreparedOperation<Value> withOperands(Map<String, Object> actualOperands) throws OperandsDoNotMatchException {
-        return new PMLPreparedOperation(this, actualOperands);
+    public PreparedOperation<Value> withOperands(Map<String, Object> operandValues) throws OperandsDoNotMatchException {
+        return new PMLPreparedOperation(this, operandValues);
     }
 }

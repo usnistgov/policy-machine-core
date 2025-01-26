@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.SET_NODE_PROPERTIES;
 
-public class SetNodePropertiesOp extends GraphOp {
+public class SetNodePropertiesOp extends GraphOp<Void> {
 
     public SetNodePropertiesOp() {
         super(

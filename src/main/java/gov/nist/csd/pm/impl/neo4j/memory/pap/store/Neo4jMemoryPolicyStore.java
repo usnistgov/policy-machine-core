@@ -11,6 +11,7 @@ public class Neo4jMemoryPolicyStore implements PolicyStore {
 		// create the indexes
 		try (Transaction tx = graphDb.beginTx()) {
 			tx.execute("create index node_name_index if not exists for (n:Node) on (n.name)");
+			tx.execute("create index node_id_index if not exists for (n:Node) on (n.id)");
 			tx.execute("create index prohibition_name_index if not exists for (n:Prohibition) on (n.name)");
 			tx.execute("create index obligation_name_index if not exists for (n:Obligation) on (n.name)");
 			tx.execute("create index operation_name_index if not exists for (n:Operation) on (n.name)");

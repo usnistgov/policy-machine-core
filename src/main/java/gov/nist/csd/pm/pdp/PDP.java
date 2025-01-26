@@ -77,7 +77,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     private boolean isPolicyEmpty() throws PMException {
-        Set<String> nodes = new HashSet<>(pap.query().graph().search(ANY, NO_PROPERTIES));
+        HashSet<Node> nodes = new HashSet<>(pap.query().graph().search(ANY, NO_PROPERTIES));
 
         boolean prohibitionsEmpty = pap.query().prohibitions().getProhibitions().isEmpty();
         boolean obligationsEmpty = pap.query().obligations().getObligations().isEmpty();
@@ -110,24 +110,24 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public AdjudicationResponse adjudicateResourceOperation(UserContext user, String target, String resourceOperation) throws PMException {
+    public AdjudicationResponse adjudicateResourceOperation(UserContext user, long policyElementId, String resourceOperation) throws PMException {
         if (!pap.query().operations().getResourceOperations().contains(resourceOperation)) {
             throw new OperationDoesNotExistException(resourceOperation);
         }
 
         try {
-            privilegeChecker.check(user, target, resourceOperation);
+            privilegeChecker.check(user, policyElementId, resourceOperation);
         } catch (UnauthorizedException e) {
             return new AdjudicationResponse(e);
         }
 
-        Node node = pap.query().graph().getNodeByName(target);
+        Node node = pap.query().graph().getNodeById(policyElementId);
 
         publishEvent(new EventContext(
                 user.getUser(),
                 user.getProcess(),
                 resourceOperation,
-                Map.of("target", target)
+                Map.of("target", node.getName())
         ));
 
         return new AdjudicationResponse(GRANT, node);

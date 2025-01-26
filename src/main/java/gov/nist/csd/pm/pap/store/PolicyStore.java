@@ -4,6 +4,9 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.tx.Transactional;
 
+import java.util.List;
+import java.util.stream.LongStream;
+
 import static gov.nist.csd.pm.common.graph.node.NodeType.OA;
 import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
 
@@ -18,19 +21,23 @@ public interface PolicyStore extends Transactional {
     void reset() throws PMException;
 
     default void verifyAdminPolicy() throws PMException {
-        String pc = AdminPolicyNode.PM_ADMIN_PC.nodeName();
+        long pcId = AdminPolicyNode.PM_ADMIN_PC.nodeId();
+        String pcName = AdminPolicyNode.PM_ADMIN_PC.nodeName();
 
-        if (!graph().nodeExists(pc)) {
-            graph().createNode(, pc, PC);
+        if (!graph().nodeExists(pcId)) {
+            graph().createNode(AdminPolicyNode.PM_ADMIN_PC.nodeId(), pcName, PC);
         }
 
-        String oa = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
-        if (!graph().nodeExists(oa)) {
-            graph().createNode(, oa, OA);
+        long oaId = AdminPolicyNode.PM_ADMIN_OBJECT.nodeId();
+        String oaName = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
+        if (!graph().nodeExists(oaId)) {
+            graph().createNode(oaId, oaName, OA);
         }
 
-        if (!graph().getAdjacentDescendants(oa).contains(pc)) {
-            graph().createAssignment(oa, pc);
+        long[] descendants = graph().getAdjacentDescendants(oaId);
+        List<Long> descList = LongStream.of(descendants).boxed().toList();
+        if (!descList.contains(pcId)) {
+            graph().createAssignment(oaId, pcId);
         }
     }
 }

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
@@ -29,6 +30,10 @@ public class PrivilegeChecker {
 
     public void setExplain(boolean explain) {
         this.explain = explain;
+    }
+
+    public NodeType getNodeType(long id) throws PMException {
+        return pap.query().graph().getNodeById(id).getType();
     }
 
     public void check(UserContext userCtx, long target, Collection<String> toCheck) throws PMException {

@@ -76,10 +76,10 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(String user) throws PMException {
-        privilegeChecker.check(userCtx, user, AdminAccessRights.REVIEW_POLICY);
+    public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
+        privilegeChecker.check(userCtx, userId, AdminAccessRights.REVIEW_POLICY);
 
-        return pap.query().obligations().getObligationsWithAuthor(user);
+        return pap.query().obligations().getObligationsWithAuthor(userId);
     }
 
     private void checkRule(Rule rule) throws PMException {

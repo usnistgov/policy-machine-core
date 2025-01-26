@@ -21,7 +21,7 @@ public class PMLOperationWrapper extends PMLOperation {
                 operation.getName(),
                 Type.any(),
                 operation.getOperandNames(),
-                operation.getEventCtxOperandNames(),
+                operation.getNodeOperandNames(),
                 getTypesFromOperandNames(operation.getOperandNames())
         );
 

@@ -16,16 +16,16 @@ public class Prohibition implements Serializable {
 
     private String name;
     private ProhibitionSubject subject;
-    private Collection<ContainerCondition> containers;
     private AccessRightSet accessRightSet;
     private boolean      intersection;
+    private Collection<ContainerCondition> containers;
 
-    public Prohibition(String name, ProhibitionSubject subject, Collection<ContainerCondition> containers, AccessRightSet accessRightSet, boolean intersection) {
+    public Prohibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containers) {
         this.name = name;
         this.subject = subject;
-        this.containers = containers;
         this.accessRightSet = accessRightSet;
         this.intersection = intersection;
+        this.containers = containers;
     }
 
     public String getName() {

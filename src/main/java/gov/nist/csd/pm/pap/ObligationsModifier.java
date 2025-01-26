@@ -26,12 +26,12 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     }
 
     @Override
-    public void deleteObligation(long id) throws PMException {
-        if(!checkDeleteInput(id)) {
+    public void deleteObligation(String name) throws PMException {
+        if(!checkDeleteInput(name)) {
             return;
         }
 
-        store.obligations().deleteObligation(id);
+        store.obligations().deleteObligation(name);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
      * @param rules  The rules of the obligation.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected void checkCreateInput(String author, String name, Collection<Rule> rules) throws PMException {
+    protected void checkCreateInput(long author, String name, Collection<Rule> rules) throws PMException {
         if (store.obligations().obligationExists(name)) {
             throw new ObligationNameExistsException(name);
         }
@@ -67,7 +67,7 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
         return true;
     }
 
-    private void checkAuthorExists(String author) throws PMException {
+    private void checkAuthorExists(long author) throws PMException {
         if (!store.graph().nodeExists(author)) {
             throw new NodeDoesNotExistException(author);
         }

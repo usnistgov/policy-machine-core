@@ -36,11 +36,11 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(String author) throws PMException {
+    public Collection<Obligation> getObligationsWithAuthor(long author) throws PMException {
         Collection<Obligation> obligations = store.obligations().getObligations();
         List<Obligation> withAuthor = new ArrayList<>();
         for (Obligation obligation : obligations) {
-            if(obligation.getAuthorId().equals(author)) {
+            if(obligation.getAuthorId() == author) {
                 withAuthor.add(obligation);
             }
         }

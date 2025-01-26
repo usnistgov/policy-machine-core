@@ -18,6 +18,13 @@ public class Node implements Serializable {
         this.properties = new HashMap<>();
     }
 
+    public Node(long id, String name, NodeType type, Map<String, String> properties) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.properties = properties;
+    }
+
     public Node(Node node) {
         this.id = node.id;
         this.name = node.name;
@@ -80,6 +87,10 @@ public class Node implements Serializable {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public String getIdAndName() {
+        return id + ":" + name;
     }
 
     /**

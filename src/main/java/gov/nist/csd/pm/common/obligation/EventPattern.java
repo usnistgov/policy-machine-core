@@ -151,6 +151,6 @@ public class EventPattern implements Serializable {
         }
 
         Operation<?> adminOperation = pap.query().operations().getAdminOperation(opName);
-        return adminOperation.getEventCtxOperandNames();
+        return adminOperation.getNodeOperandNames();
     }
 }

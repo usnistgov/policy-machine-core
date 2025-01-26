@@ -13,51 +13,50 @@ public abstract class Operation<T> extends AdminExecutable<T> {
     public static final String NAME_OPERAND = "name";
     public static final String ID_OPERAND = "id";
 
-    // Operands that will be available in an EventContext
-    protected List<String> eventCtxOperandNames;
+    protected List<String> nodeOperandNames;
 
-    public Operation(String name, List<String> allOperands, List<String> eventCtxOperandNames) {
-        super(name, allOperands);
+    public Operation(String name, List<String> allOperandsNames, List<String> nodeOperandNames) {
+        super(name, allOperandsNames);
 
-        validateOperandNames(allOperands, eventCtxOperandNames);
+        validateOperandNames(allOperandsNames, nodeOperandNames);
 
-        this.eventCtxOperandNames = eventCtxOperandNames;
+        this.nodeOperandNames = nodeOperandNames;
     }
 
-    public Operation(String name, List<String> allOperands) {
-        super(name, allOperands);
+    public Operation(String name, List<String> allOperandsNames) {
+        super(name, allOperandsNames);
 
-        validateOperandNames(allOperands, new ArrayList<>());
+        validateOperandNames(allOperandsNames, new ArrayList<>());
 
-        this.eventCtxOperandNames = new ArrayList<>();
+        this.nodeOperandNames = new ArrayList<>();
     }
 
     public Operation(String name) {
         super(name, new ArrayList<>());
 
-        this.eventCtxOperandNames = new ArrayList<>();
+        this.nodeOperandNames = new ArrayList<>();
     }
 
-    private void validateOperandNames(List<String> allOperands, List<String> nodeOperands) {
-        if (!allOperands.containsAll(nodeOperands)) {
+    private void validateOperandNames(List<String> allOperandsNames, List<String> nodeOperandNames) {
+        if (!allOperandsNames.containsAll(nodeOperandNames)) {
             throw new IllegalArgumentException("all nodeOperands must be defined in allOperands");
         }
     }
 
-    public List<String> getEventCtxOperandNames() {
-        return eventCtxOperandNames;
+    public List<String> getNodeOperandNames() {
+        return nodeOperandNames;
     }
 
     public abstract void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException;
 
-    public PreparedOperation<T> withOperands(Map<String, Object> actualOperands) throws OperandsDoNotMatchException {
-        validateOperands(actualOperands);
+    public PreparedOperation<T> withOperands(Map<String, Object> operandValues) throws OperandsDoNotMatchException {
+        validateOperands(operandValues);
 
-        return new PreparedOperation<>(this, actualOperands);
+        return new PreparedOperation<>(this, operandValues);
     }
 
-    public void validateOperands(Map<String, Object> actualOperands) throws OperandsDoNotMatchException {
-        Set<String> actualOperandNames = actualOperands.keySet();
+    public void validateOperands(Map<String, Object> operandValues) throws OperandsDoNotMatchException {
+        Set<String> actualOperandNames = operandValues.keySet();
 
         if (actualOperandNames.size() != operandNames.size()) {
             throw new OperandsDoNotMatchException(name, operandNames, actualOperandNames);
@@ -69,8 +68,8 @@ public abstract class Operation<T> extends AdminExecutable<T> {
             }
         }
 
-        for (String nodeOperandName : eventCtxOperandNames) {
-            Object operandValue = actualOperands.get(nodeOperandName);
+        for (String nodeOperandName : nodeOperandNames) {
+            Object operandValue = operandValues.get(nodeOperandName);
             if (operandValue instanceof String) {
                 continue;
             }
@@ -86,7 +85,7 @@ public abstract class Operation<T> extends AdminExecutable<T> {
                 }
             }
 
-            throw new IllegalArgumentException("eventCtx operand can only be a string or collection of strings");
+            throw new IllegalArgumentException("node operand can only be a string or collection of strings");
         }
     }
 
@@ -96,11 +95,6 @@ public abstract class Operation<T> extends AdminExecutable<T> {
         if (o == null || getClass() != o.getClass()) return false;
         Operation<?> operation = (Operation<?>) o;
         return Objects.equals(name, operation.name) && Objects.equals(operandNames, operation.operandNames);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, operandNames);
     }
 
     @Override

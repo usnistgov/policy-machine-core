@@ -2,7 +2,6 @@ package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.graph.relationship.Association;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.HashMap;
@@ -27,42 +26,42 @@ class VertexPolicyClass extends Vertex {
     }
 
     @Override
-    protected ObjectOpenHashSet<String> getAdjacentDescendants() {
+    protected long[] getAdjacentDescendants() {
         return new ObjectOpenHashSet<>();
     }
 
     @Override
-    protected ObjectOpenHashSet<String> getAdjacentAscendants() {
+    protected long[] getAdjacentAscendants() {
         return new ObjectOpenHashSet<>(ascendants);
     }
 
     @Override
-    protected ObjectOpenHashSet<Association> getOutgoingAssociations() {
+    protected long[] getOutgoingAssociations() {
         return new ObjectOpenHashSet<>();
     }
 
     @Override
-    protected ObjectOpenHashSet<Association> getIncomingAssociations() {
+    protected long[] getIncomingAssociations() {
         return new ObjectOpenHashSet<>();
     }
 
     @Override
-    public void addAssignment(String ascendant, String descendant) {
+    public void addAssignment(long ascendant, long descendant) {
         ascendants.add(ascendant);
     }
 
     @Override
-    public void deleteAssignment(String ascendant, String descendant) {
+    public void deleteAssignment(long ascendant, long descendant) {
         ascendants.remove(ascendant);
     }
 
     @Override
-    public void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
+    public void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
 
     }
 
     @Override
-    public void deleteAssociation(String ua, String target) {
+    public void deleteAssociation(long ua, long target) {
 
     }
 }

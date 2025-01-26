@@ -29,27 +29,27 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    public ObjectOpenHashSet<String> getAdjacentDescendants() {
+    public long[] getAdjacentDescendants() {
         return new ObjectOpenHashSet<>(descendants);
     }
 
     @Override
-    public ObjectOpenHashSet<String> getAdjacentAscendants() {
+    public long[] getAdjacentAscendants() {
         return new ObjectOpenHashSet<>(ascendants);
     }
 
     @Override
-    public ObjectOpenHashSet<Association> getOutgoingAssociations() {
+    public long[] getOutgoingAssociations() {
         return new ObjectOpenHashSet<>(outgoingAssociations);
     }
 
     @Override
-    public ObjectOpenHashSet<Association> getIncomingAssociations() {
+    public long[] getIncomingAssociations() {
         return new ObjectOpenHashSet<>(incomingAssociations);
     }
 
     @Override
-    protected void addAssignment(String ascendant, String descendant) {
+    protected void addAssignment(long ascendant, long descendant) {
         if (ascendant.equals(name)) {
             descendants.add(descendant);
         } else {
@@ -58,7 +58,7 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    protected void deleteAssignment(String ascendant, String descendant) {
+    protected void deleteAssignment(long ascendant, long descendant) {
         if (ascendant.equals(name)) {
             descendants.remove(descendant);
         } else {
@@ -67,7 +67,7 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    public void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
+    public void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
         if (ua.equals(name)) {
             outgoingAssociations.add(new Association(ua, target, accessRightSet));
         } else {
@@ -76,7 +76,7 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    public void deleteAssociation(String ua, String target) {
+    public void deleteAssociation(long ua, long target) {
         if (ua.equals(name)) {
             outgoingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
         } else {

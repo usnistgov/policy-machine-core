@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class GraphOp extends Operation<Void> {
+public abstract class GraphOp<T> extends Operation<T> {
 
     public static final String TYPE_OPERAND = "type";
     public static final String DESCENDANTS_OPERAND = "descendants";

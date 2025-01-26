@@ -10,7 +10,9 @@ import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class GraphQuerier extends Querier implements GraphQuery {
@@ -22,17 +24,29 @@ public class GraphQuerier extends Querier implements GraphQuery {
     @Override
     public Node getNodeByName(String name) throws PMException {
         checkNodeExists(name);
-        return store.graph().getNodeById(name);
+        return store.graph().getNodeByName(name);
     }
 
     @Override
-    public Collection<String> getAdjacentDescendants(long nodeId) throws PMException {
+    public long getNodeId(String name) throws PMException {
+        checkNodeExists(name);
+        return store.graph().getNodeByName(name).getId();
+    }
+
+    @Override
+    public Node getNodeById(long id) throws PMException {
+        checkNodeExists(id);
+        return store.graph().getNodeById(id);
+    }
+
+    @Override
+    public long[] getAdjacentDescendants(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getAdjacentDescendants(nodeId);
     }
 
     @Override
-    public Collection<String> getAdjacentAscendants(long nodeId) throws PMException {
+    public long[] getAdjacentAscendants(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getAdjacentAscendants(nodeId);
     }
@@ -40,13 +54,13 @@ public class GraphQuerier extends Querier implements GraphQuery {
     @Override
     public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
         checkNodeExists(uaId);
-        return store.graph().getAssociationsWithSource(uaId);
+        return List.of(store.graph().getAssociationsWithSource(uaId));
     }
 
     @Override
     public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
         checkNodeExists(targetId);
-        return store.graph().getAssociationsWithTarget(targetId);
+        return List.of(store.graph().getAssociationsWithTarget(targetId));
     }
 
     @Override
@@ -88,18 +102,40 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
+    public boolean nodeExists(long id) throws PMException {
+        return store.graph().nodeExists(id);
+    }
+
+    @Override
     public boolean nodeExists(String name) throws PMException {
         return store.graph().nodeExists(name);
     }
 
     @Override
     public Collection<Node> search(NodeType type, Map<String, String> properties) throws PMException {
-        return store.graph().search(type, properties);
+        long[] search = store.graph().search(type, properties);
+
+        List<Node> nodes = new ArrayList<>();
+        for (long nodeId : search) {
+            nodes.add(store.graph().getNodeById(nodeId));
+        }
+
+        return nodes;
     }
 
     @Override
-    public Collection<String> getPolicyClasses() throws PMException {
+    public long[] getPolicyClasses() throws PMException {
         return store.graph().getPolicyClasses();
+    }
+
+    /**
+     * Check that the given nodes exists.
+     * @param node The node to check.
+     */
+    protected void checkNodeExists(long node) throws PMException {
+        if (!store.graph().nodeExists(node)) {
+            throw new NodeDoesNotExistException(node);
+        }
     }
 
     /**

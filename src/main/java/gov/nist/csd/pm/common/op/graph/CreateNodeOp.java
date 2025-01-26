@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.*;
 
-public abstract class CreateNodeOp extends GraphOp {
+public abstract class CreateNodeOp extends GraphOp<Long> {
 
     private String ar;
 

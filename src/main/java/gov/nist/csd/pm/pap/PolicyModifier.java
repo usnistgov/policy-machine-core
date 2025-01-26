@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.id.IdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
@@ -15,9 +16,9 @@ public class PolicyModifier extends Modifier implements PolicyModification {
     private OperationsModifier operationsModifier;
     private RoutinesModifier routinesModifier;
 
-    public PolicyModifier(PolicyStore store) throws PMException {
+    public PolicyModifier(PolicyStore store, IdGenerator idGenerator) throws PMException {
         super(store);
-        this.graphModifier = new GraphModifier(store);
+        this.graphModifier = new GraphModifier(store, idGenerator);
         this.prohibitionsModifier = new ProhibitionsModifier(store);
         this.obligationsModifier = new ObligationsModifier(store);
         this.operationsModifier = new OperationsModifier(store);

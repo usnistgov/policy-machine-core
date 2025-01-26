@@ -2,8 +2,6 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.modification.RoutinesModification;
-import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp;
@@ -21,30 +19,24 @@ public class RoutinesModificationAdjudicator extends Adjudicator implements Rout
 
     private final UserContext userCtx;
     private final PAP pap;
-    private final EventPublisher eventPublisher;
 
-    public RoutinesModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
+    public RoutinesModificationAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
-        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public void createAdminRoutine(Routine<?> routine) throws PMException {
-        EventContext event = new CreateAdminRoutineOp()
+        new CreateAdminRoutineOp()
                 .withOperands(Map.of(ROUTINE_OPERAND, routine))
                 .execute(pap, userCtx, privilegeChecker);
-
-        eventPublisher.publishEvent(event);
     }
 
     @Override
     public void deleteAdminRoutine(String name) throws PMException {
-        EventContext event = new DeleteAdminRoutineOp()
+        new DeleteAdminRoutineOp()
                 .withOperands(Map.of(NAME_OPERAND, name))
                 .execute(pap, userCtx, privilegeChecker);
-
-        eventPublisher.publishEvent(event);
     }
 }

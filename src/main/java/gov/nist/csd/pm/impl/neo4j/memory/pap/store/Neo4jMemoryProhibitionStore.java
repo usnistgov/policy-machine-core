@@ -32,7 +32,7 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 			prohibitionNode.setProperty(NAME_PROPERTY, name);
 			prohibitionNode.setProperty(ARSET_PROPERTY, accessRightSet.toArray(new String[]{}));
 
-			createSubject(tx, subject.getName(), prohibitionNode);
+			createSubject(tx, subject, prohibitionNode);
 
 			prohibitionNode.setProperty(INTERSECTION_PROPERTY, intersection);
 
@@ -67,7 +67,32 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 	}
 
 	@Override
-	public Map<String, Collection<Prohibition>> getProhibitions() throws PMException {
+	public Map<gov.nist.csd.pm.common.graph.node.Node, Collection<Prohibition>> getNodeProhibitions() throws PMException {
+		Map<gov.nist.csd.pm.common.graph.node.Node, Collection<Prohibition>> all = new HashMap<>();
+
+		txHandler.runTx(tx -> {
+			try(ResourceIterator<Node> proNodes = tx.findNodes(PROHIBITION_LABEL)) {
+				while (proNodes.hasNext()) {
+					Node next = proNodes.next();
+					Prohibition prohibition = getProhibitionFromNode(next);
+					if (!prohibition.getSubject().isNode()) {
+						continue;
+					}
+
+					Neo4jMemoryGraphStore neo4jMemoryGraphStore = new Neo4jMemoryGraphStore(txHandler);
+					gov.nist.csd.pm.common.graph.node.Node node = neo4jMemoryGraphStore.getNodeById(prohibition.getSubject().getNodeId());
+
+					all.computeIfAbsent(node, k -> new ArrayList<>())
+							.add(prohibition);
+				}
+			}
+		});
+
+		return all;
+	}
+
+	@Override
+	public Map<String, Collection<Prohibition>> getProcessProhibitions() throws PMException {
 		Map<String, Collection<Prohibition>> all = new HashMap<>();
 
 		txHandler.runTx(tx -> {
@@ -75,8 +100,11 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 				while (proNodes.hasNext()) {
 					Node next = proNodes.next();
 					Prohibition prohibition = getProhibitionFromNode(next);
+					if (prohibition.getSubject().isNode()) {
+						continue;
+					}
 
-					all.computeIfAbsent(prohibition.getSubject().getName(), k -> new ArrayList<>())
+					all.computeIfAbsent(prohibition.getSubject().getProcess(), k -> new ArrayList<>())
 							.add(prohibition);
 				}
 			}
@@ -136,19 +164,19 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 		}
 	}
 
-	private Node createSubject(Transaction tx, String subject, Node prohibitionNode) throws PMException {
+	private Node createSubject(Transaction tx, ProhibitionSubject subject, Node prohibitionNode) throws PMException {
 		// look for a user or ua node with the subject name
-		Node subjectNode = tx.findNode(U_LABEL, NAME_PROPERTY, subject);
+		Node subjectNode = tx.findNode(U_LABEL, ID_PROPERTY, subject.getNodeId());
 		if (subjectNode == null) {
-			subjectNode = tx.findNode(UA_LABEL, NAME_PROPERTY, subject);
+			subjectNode = tx.findNode(UA_LABEL, ID_PROPERTY, subject.getNodeId());
 		}
 
 		// if still null it's a process, add process subjectNode
 		if (subjectNode == null) {
-			subjectNode = tx.findNode(PROCESS_LABEL, NAME_PROPERTY, subject);
+			subjectNode = tx.findNode(PROCESS_LABEL, NAME_PROPERTY, subject.getProcess());
 			if (subjectNode == null) {
 				subjectNode = tx.createNode(PROCESS_LABEL);
-				subjectNode.setProperty(NAME_PROPERTY, subject);
+				subjectNode.setProperty(NAME_PROPERTY, subject.getProcess());
 			}
 		}
 

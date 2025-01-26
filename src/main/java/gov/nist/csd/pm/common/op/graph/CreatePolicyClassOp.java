@@ -28,11 +28,9 @@ public class CreatePolicyClassOp extends CreateNodeOp{
     }
 
     @Override
-    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        pap.modify().graph().createPolicyClass(
+    public Long execute(PAP pap, Map<String, Object> operands) throws PMException {
+        return pap.modify().graph().createPolicyClass(
                 (String) operands.get(NAME_OPERAND)
         );
-
-        return null;
     }
 }

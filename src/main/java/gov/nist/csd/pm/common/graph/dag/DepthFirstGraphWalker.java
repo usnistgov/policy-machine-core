@@ -116,7 +116,7 @@ public class DepthFirstGraphWalker implements GraphWalker {
     protected static final int CONTINUE = 1;
     protected static final int RETURN = 2;
 
-    protected Collection<String> getNextLevel(long node) throws PMException {
+    protected long[] getNextLevel(long node) throws PMException {
         if (direction == Direction.DESCENDANTS) {
             return graphQuery.getAdjacentDescendants(node);
         } else {

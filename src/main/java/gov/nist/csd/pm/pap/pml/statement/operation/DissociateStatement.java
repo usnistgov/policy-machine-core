@@ -29,7 +29,10 @@ public class DissociateStatement extends OperationStatement {
         String ua = uaExpr.execute(ctx, pap).getStringValue();
         String target = targetExpr.execute(ctx, pap).getStringValue();
 
-        return Map.of(UA_OPERAND, ua, TARGET_OPERAND, target);
+        long uaId = pap.query().graph().getNodeByName(ua).getId();
+        long targetId = pap.query().graph().getNodeByName(target).getId();
+
+        return Map.of(UA_OPERAND, uaId, TARGET_OPERAND, targetId);
     }
 
     @Override

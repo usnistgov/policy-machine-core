@@ -1,10 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
-import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -23,46 +20,41 @@ import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
 
 public class ProhibitionsModificationAdjudicator extends Adjudicator implements ProhibitionsModification {
+
     private final UserContext userCtx;
     private final PAP pap;
-    private final EventPublisher eventPublisher;
 
-    public ProhibitionsModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
+    public ProhibitionsModificationAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
         this.userCtx = userCtx;
         this.pap = pap;
-        this.eventPublisher = eventPublisher;
     }
 
     @Override
-    public void createProhibition(String name, long subjectId, ProhibitionSubjectType subjectType, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
-        EventContext event = new CreateProhibitionOp()
+    public void createProhibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
+        new CreateProhibitionOp()
                 .withOperands(Map.of(
                         NAME_OPERAND, name,
-		                SUBJECT_TYPE_OPERAND, subjectId,
+                        SUBJECT_OPERAND, subject,
                         ARSET_OPERAND, accessRightSet,
                         INTERSECTION_OPERAND, intersection,
                         CONTAINERS_OPERAND, containerConditions
                 ))
                 .execute(pap, userCtx, privilegeChecker);
-
-        eventPublisher.publishEvent(event);
     }
 
     @Override
     public void deleteProhibition(String name) throws PMException {
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
 
-        EventContext event = new DeleteProhibitionOp()
+        new DeleteProhibitionOp()
                 .withOperands(Map.of(
                         NAME_OPERAND, prohibition.getName(),
-		                SUBJECT_TYPE_OPERAND, prohibition.getSubject(),
+                        SUBJECT_OPERAND, prohibition.getSubject(),
                         ARSET_OPERAND, prohibition.getAccessRightSet(),
                         INTERSECTION_OPERAND, prohibition.isIntersection(),
                         CONTAINERS_OPERAND, prohibition.getContainers()
                 ))
                 .execute(pap, userCtx, privilegeChecker);
-
-        eventPublisher.publishEvent(event);
     }
 }

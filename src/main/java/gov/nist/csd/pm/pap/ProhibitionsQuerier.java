@@ -7,6 +7,7 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.exception.ProhibitionDoesNotExistException;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
@@ -27,12 +28,12 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 
     @Override
     public Map<Node, Collection<Prohibition>> getProhibitions() throws PMException {
-        return store.prohibitions().getProhibitions();
+        return store.prohibitions().getNodeProhibitions();
     }
 
     @Override
-    public Collection<Prohibition> getProhibitionsWithSubject(String subject) throws PMException {
-        return store.prohibitions().getProhibitions().getOrDefault(subject, new ArrayList<>());
+    public Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException {
+        return store.prohibitions().getNodeProhibitions().getOrDefault(subject, new ArrayList<>());
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     }
 
     @Override
-    public Collection<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
+    public Collection<Prohibition> getProhibitionsWithContainer(long containerId) throws PMException {
         Collection<Prohibition> pros = new ArrayList<>();
 
         Map<String, Collection<Prohibition>> prohibitions = getProhibitions();
@@ -67,7 +68,7 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
             Collection<Prohibition> subjectProhibitions = prohibitions.get(subject);
             for (Prohibition prohibition : subjectProhibitions) {
                 for (ContainerCondition cc : prohibition.getContainers()) {
-                    if (cc.getId().equals(container)) {
+                    if (cc.getId().equals(containerId)) {
                         pros.add(prohibition);
                     }
                 }

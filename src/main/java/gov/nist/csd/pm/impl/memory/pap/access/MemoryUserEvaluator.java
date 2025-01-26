@@ -62,7 +62,7 @@ public class MemoryUserEvaluator {
 	}
 
 	private Collection<Prohibition> getProhibitionsWithSubject(String node) throws PMException {
-		return policyStore.prohibitions().getProhibitions().getOrDefault(node, new ArrayList<>());
+		return policyStore.prohibitions().getNodeProhibitions().getOrDefault(node, new ArrayList<>());
 	}
 
 	private void collectAssociationsFromBorderTargets(Collection<Association> assocs, Map<String, AccessRightSet> borderTargets) {

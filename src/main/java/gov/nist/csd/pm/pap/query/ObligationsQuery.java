@@ -39,10 +39,10 @@ public interface ObligationsQuery {
     /**
      * Get the obligations created by the given author.
      *
-     * @param user The user context representing the author to search for.
+     * @param userId The user representing the author to search for.
      * @return A list of Obligation objects.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<Obligation> getObligationsWithAuthor(String user) throws PMException;
+    Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException;
     
 }

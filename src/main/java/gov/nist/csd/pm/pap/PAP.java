@@ -3,6 +3,8 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.common.executable.AdminExecutor;
+import gov.nist.csd.pm.pap.id.IdGenerator;
+import gov.nist.csd.pm.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -29,10 +31,13 @@ public abstract class PAP implements AdminExecutor, Transactional {
     private Map<String, PMLOperation> pmlOperations;
     private Map<String, PMLRoutine> pmlRoutines;
     private Map<String, Value> pmlConstants;
+    private IdGenerator idGenerator;
 
     public PAP(PolicyStore policyStore) throws PMException {
+        this.idGenerator = new RandomIdGenerator();
+
         this.policyStore = policyStore;
-        this.modifier = new PolicyModifier(policyStore);
+        this.modifier = new PolicyModifier(policyStore, idGenerator);
         this.pmlOperations = new HashMap<>();
         this.pmlRoutines = new HashMap<>();
         this.pmlConstants = new HashMap<>();
@@ -43,6 +48,11 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     public PAP(PAP pap) throws PMException {
         this(pap.policyStore);
+    }
+
+    public PAP withIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+        return this;
     }
 
     public PolicyStore policyStore() {

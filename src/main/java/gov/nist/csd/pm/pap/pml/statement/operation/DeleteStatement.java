@@ -15,19 +15,15 @@ import java.util.Objects;
 import static gov.nist.csd.pm.common.op.Operation.ID_OPERAND;
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 
-public class DeleteStatement extends OperationStatement {
+public abstract class DeleteStatement extends OperationStatement {
 
     private Type type;
     private Expression expression;
 
-    public DeleteStatement(Type type, Expression expression) {
-        super(getOpFromType(type));
+    public DeleteStatement(Operation<Void> op, Type type, Expression expression) {
+        super(op);
         this.type = type;
         this.expression = expression;
-    }
-
-    public DeleteStatement(Operation<Void> op) {
-        super(op);
     }
 
     public Type getType() {
@@ -47,29 +43,12 @@ public class DeleteStatement extends OperationStatement {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-        String name = expression.execute(ctx, pap).getStringValue();
-
-        if (type == Type.PROHIBITION || type == Type.OBLIGATION) {
-            return Map.of(NAME_OPERAND, name);
-        } else {
-            // delete node by ID not name
-            long nodeId = pap.query().graph().getNodeId(name);
-            return Map.of(ID_OPERAND, nodeId);
-        }
-    }
-
-    @Override
     public String toFormattedString(int indentLevel) {
         String typeStr = "";
         switch (type) {
             case PROHIBITION -> typeStr = "prohibition";
             case OBLIGATION -> typeStr = "obligation";
-            case POLICY_CLASS -> typeStr = "PC";
-            case OBJECT_ATTRIBUTE -> typeStr = "OA";
-            case USER_ATTRIBUTE -> typeStr = "UA";
-            case OBJECT -> typeStr = "O";
-            case USER -> typeStr = "U";
+            case NODE -> typeStr = "node";
         }
 
         return indent(indentLevel) + String.format("delete %s %s", typeStr, expression);
@@ -88,24 +67,8 @@ public class DeleteStatement extends OperationStatement {
     }
 
     public enum Type {
-        POLICY_CLASS,
-        OBJECT_ATTRIBUTE,
-        USER_ATTRIBUTE,
-        OBJECT,
-        USER,
+        NODE,
         PROHIBITION,
         OBLIGATION
-    }
-
-    private static Operation<Void> getOpFromType(Type type) {
-        return switch (type) {
-            case POLICY_CLASS -> new DeletePolicyClassOp();
-            case OBJECT_ATTRIBUTE -> new DeleteObjectAttributeOp();
-            case USER_ATTRIBUTE -> new DeleteUserAttributeOp();
-            case OBJECT -> new DeleteObjectOp();
-            case USER -> new DeleteUserOp();
-            case PROHIBITION -> new DeleteProhibitionOp();
-            case OBLIGATION -> new DeleteObligationOp();
-        };
     }
 }

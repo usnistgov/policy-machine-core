@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp.query;
 
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
@@ -13,6 +14,7 @@ import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,13 +37,30 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public boolean nodeExists(String name) throws PMException {
-        boolean exists = pap.query().graph().nodeExists(name);
+    public boolean nodeExists(long id) throws PMException {
+        boolean exists = pap.query().graph().nodeExists(id);
+        if (!exists) {
+            return false;
+        }
 
         // check user has permissions on the node
-        privilegeChecker.check(userCtx, name);
+        privilegeChecker.check(userCtx, id);
 
         return exists;
+    }
+
+    @Override
+    public boolean nodeExists(String name) throws PMException {
+        try {
+            Node node = pap.query().graph().getNodeByName(name);
+
+            // check user has permissions on the node
+            privilegeChecker.check(userCtx, node.getId());
+        } catch (NodeDoesNotExistException e) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -50,17 +69,33 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         Node node = pap.query().graph().getNodeByName(name);
 
         // check user has permissions on the node
-        privilegeChecker.check(userCtx, name);
+        privilegeChecker.check(userCtx, node.getId());
+
+        return node;
+    }
+
+    @Override
+    public long getNodeId(String name) throws PMException {
+        return getNodeByName(name).getId();
+    }
+
+    @Override
+    public Node getNodeById(long id) throws PMException {
+        // get node
+        Node node = pap.query().graph().getNodeById(id);
+
+        // check user has permissions on the node
+        privilegeChecker.check(userCtx, id);
 
         return node;
     }
 
     @Override
     public Collection<Node> search(NodeType type, Map<String, String> properties) throws PMException {
-        Collection<String> search = pap.query().graph().search(type, properties);
+        Collection<Node> search = pap.query().graph().search(type, properties);
         search.removeIf(node -> {
             try {
-                privilegeChecker.check(userCtx, node);
+                privilegeChecker.check(userCtx, node.getId());
                 return false;
             } catch (PMException e) {
                 return true;
@@ -71,11 +106,11 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public Collection<String> getPolicyClasses() throws PMException {
-        List<String> policyClasses = new ArrayList<>();
-        for (String pc : pap.query().graph().getPolicyClasses()) {
+    public long[] getPolicyClasses() throws PMException {
+        LongArrayList policyClasses = new LongArrayList();
+        for (long pc : pap.query().graph().getPolicyClasses()) {
             try {
-                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName());
+                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId());
             } catch (UnauthorizedException e) {
                 continue;
             }
@@ -83,18 +118,18 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
             policyClasses.add(pc);
         }
 
-        return policyClasses;
+        return policyClasses.toLongArray();
     }
 
     @Override
-    public Collection<String> getAdjacentDescendants(long nodeId) throws PMException {
+    public long[] getAdjacentDescendants(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getAdjacentDescendants(nodeId);
     }
 
     @Override
-    public Collection<String> getAdjacentAscendants(long nodeId) throws PMException {
+    public long[] getAdjacentAscendants(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getAdjacentAscendants(nodeId);

@@ -96,7 +96,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 			attrs = store.graph().getAdjacentDescendants(userCtx.getUser());
 
 			// visit user
-			Collection<Prohibition> prohibitions = store.prohibitions().getProhibitions().getOrDefault(userCtx.getUser(), new ArrayList<>());
+			Collection<Prohibition> prohibitions = store.prohibitions().getNodeProhibitions().getOrDefault(userCtx.getUser(), new ArrayList<>());
 			userPros.addAll(prohibitions);
 		} else {
 			attrs = userCtx.getAttributeIds();

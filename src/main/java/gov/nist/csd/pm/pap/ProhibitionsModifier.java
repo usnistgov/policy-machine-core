@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
@@ -23,14 +22,11 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
     }
 
     @Override
-    public void createProhibition(String name,
-                                  long subjectId,
-                                  ProhibitionSubjectType subjectType, AccessRightSet accessRightSet,
-                                  boolean intersection,
-                                  Collection<ContainerCondition> containerConditions) throws PMException {
-        checkCreateInput(name, subjectId, accessRightSet, new ArrayList<>(containerConditions));
+    public void createProhibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet,
+                                  boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
+        checkCreateInput(name, subject, accessRightSet, new ArrayList<>(containerConditions));
 
-        store.prohibitions().createProhibition(name, subjectId, accessRightSet, intersection, new ArrayList<>(containerConditions));
+        store.prohibitions().createProhibition(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
     }
 
     @Override
@@ -72,18 +68,14 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDeleteInput(String name) throws PMException {
-        if (!store.prohibitions().prohibitionExists(name)) {
-            return false;
-        }
-
-        return true;
+	    return store.prohibitions().prohibitionExists(name);
     }
 
     protected void checkProhibitionSubjectExists(ProhibitionSubject subject)
             throws PMException {
-        if (subject.getType() != ProhibitionSubject.Type.PROCESS) {
-            if (!store.graph().nodeExists(subject.getName())) {
-                throw new ProhibitionSubjectDoesNotExistException(subject.getName());
+        if (subject.isNode()) {
+            if (!store.graph().nodeExists(subject.getNodeId())) {
+                throw new ProhibitionSubjectDoesNotExistException(subject.getNodeId());
             }
         }
     }

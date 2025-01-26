@@ -64,7 +64,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
+    public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
         return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
     }
 

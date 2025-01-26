@@ -87,15 +87,15 @@ public class BreadthFirstGraphWalker implements GraphWalker {
 
     @Override
     public void walk(long[] firstLevel) throws PMException {
-        for (String node : firstLevel) {
+        for (long node : firstLevel) {
             walk(node);
         }
     }
 
-    private boolean walkInternal(String start) throws PMException {
-        Collection<String> nextLevel = getNextLevel(start);
-        Set<String> skip = new HashSet<>();
-        for (String n : nextLevel) {
+    private boolean walkInternal(long start) throws PMException {
+        long[] nextLevel = getNextLevel(start);
+        Set<Long> skip = new HashSet<>();
+        for (long n : nextLevel) {
             visitor.visit(n);
             if (allPathsShortCircuit.evaluate(n)){
                 return true;
@@ -107,10 +107,11 @@ public class BreadthFirstGraphWalker implements GraphWalker {
             propagator.propagate(n, start);
         }
 
-        // remove skipped nodes
-        nextLevel.removeIf(skip::contains);
+        for (long n : nextLevel) {
+            if (skip.contains(n)) {
+                continue;
+            }
 
-        for (String n : nextLevel) {
             if (walkInternal(n)) {
                 return true;
             }
@@ -119,7 +120,7 @@ public class BreadthFirstGraphWalker implements GraphWalker {
         return false;
     }
 
-    protected Collection<String> getNextLevel(String node) throws PMException {
+    protected long[] getNextLevel(long node) throws PMException {
         if (direction == Direction.DESCENDANTS) {
             return graphQuery.getAdjacentDescendants(node);
         } else {

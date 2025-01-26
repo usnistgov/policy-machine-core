@@ -8,6 +8,7 @@ import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
 import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
 import gov.nist.csd.pm.pap.store.GraphStore;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Traverser;
@@ -51,9 +52,9 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public void setNodeProperties(long name, Map<String, String> properties) throws PMException {
+	public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
 
 			Iterable<String> propertyKeys = node.getPropertyKeys();
 			for (String key : propertyKeys) {
@@ -64,7 +65,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 				node.setProperty(entry.getKey(), entry.getValue());
 			}
 
-			node.setProperty(NAME_PROPERTY, name);
+			node.setProperty(NAME_PROPERTY, id);
 		});
 	}
 
@@ -129,24 +130,61 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public Node getNodeById(long name) throws PMException {
+	public Node getNodeById(long id) throws PMException {
 		Map<String, String> properties = new HashMap<>();
+		AtomicReference<String> nameAtomic  = new AtomicReference<>();
 		AtomicReference<NodeType> typeAtomic  = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
+			nameAtomic.set((String) node.getProperty(NAME_PROPERTY));
 			typeAtomic.set(getNodeType(node));
 
 			Map<String, Object> props = node.getAllProperties();
-			props.remove("name");
-
+			props.remove(NAME_PROPERTY);
+			props.remove(ID_PROPERTY);
 
 			for (Map.Entry<String, Object> e : props.entrySet()) {
 				properties.put(e.getKey(), String.valueOf(e.getValue()));
 			}
 		});
 
-		return new Node(name, typeAtomic.get(), properties);
+		return new Node(id, nameAtomic.get(), typeAtomic.get(), properties);
+	}
+
+	@Override
+	public Node getNodeByName(String name) throws PMException {
+		Map<String, String> properties = new HashMap<>();
+		AtomicReference<Long> idAtomic  = new AtomicReference<>();
+		AtomicReference<NodeType> typeAtomic  = new AtomicReference<>();
+
+		txHandler.runTx(tx -> {
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			idAtomic.set((long) node.getProperty(ID_PROPERTY));
+			typeAtomic.set(getNodeType(node));
+
+			Map<String, Object> props = node.getAllProperties();
+			props.remove(NAME_PROPERTY);
+			props.remove(ID_PROPERTY);
+
+			for (Map.Entry<String, Object> e : props.entrySet()) {
+				properties.put(e.getKey(), String.valueOf(e.getValue()));
+			}
+		});
+
+		return new Node(idAtomic.get(), name, typeAtomic.get(), properties);
+	}
+
+	@Override
+	public boolean nodeExists(long id) throws PMException {
+		AtomicBoolean typeAtomic = new AtomicBoolean();
+
+		txHandler.runTx(tx -> {
+			boolean b = tx.findNode(NODE_LABEL, ID_PROPERTY, id) != null;
+			typeAtomic.set(b);
+		});
+
+		return typeAtomic.get();
 	}
 
 	@Override
@@ -163,7 +201,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 
 	@Override
 	public long[] search(NodeType type, Map<String, String> properties) throws PMException {
-		List<String> results = new ArrayList<>();
+		List<Long> results = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
 			Label label;
@@ -183,118 +221,119 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 						continue;
 					}
 
-					results.add(next.getProperty(NAME_PROPERTY).toString());
+					results.add((long) next.getProperty(ID_PROPERTY));
 				}
 			}
 		});
 
-		return results;
+		return results.stream().mapToLong(Long::longValue).toArray();
 	}
 
 	@Override
 	public long[] getPolicyClasses() throws PMException {
-		List<String> pcs = new ArrayList<>();
+		LongArrayList pcs = new LongArrayList();
 
 		txHandler.runTx(tx -> {
 			try(ResourceIterator<org.neo4j.graphdb.Node> iter = tx.findNodes(PC_LABEL)) {
 				while (iter.hasNext()) {
-					pcs.add(iter.next().getProperty(NAME_PROPERTY).toString());
+					pcs.add((long) iter.next().getProperty(ID_PROPERTY));
 				}
 			}
 		});
 
-		return pcs;
+		return pcs.toArray(new long[]{});
 	}
 
 	@Override
-	public long[] getAdjacentDescendants(String name) throws PMException {
-		List<String> children = new ArrayList<>();
+	public long[] getAdjacentDescendants(long id) throws PMException {
+		LongArrayList children = new LongArrayList();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
 			try(ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.OUTGOING,
 					ASSIGNMENT_RELATIONSHIP_TYPE
 			)) {
 				for (Relationship r : iter) {
-					children.add(r.getEndNode().getProperty(NAME_PROPERTY).toString());
+					children.add((long)r.getEndNode().getProperty(ID_PROPERTY));
 				}
 			}
 		});
 
-		return children;
+		return children.toArray(new long[]{});
 	}
 
 	@Override
-	public long[] getAdjacentAscendants(String name) throws PMException {
-		List<String> parents = new ArrayList<>();
+	public long[] getAdjacentAscendants(long id) throws PMException {
+		LongArrayList parents = new LongArrayList();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
 			try(ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.INCOMING,
 					ASSIGNMENT_RELATIONSHIP_TYPE
 			)) {
 				for (Relationship r : iter) {
-					parents.add(r.getStartNode().getProperty(NAME_PROPERTY).toString());
+					parents.add((long)r.getStartNode().getProperty(ID_PROPERTY));
 				}
 			}
 		});
-		return parents;
+
+		return parents.toArray(new long[]{});
 	}
 
 	@Override
-	public Association[] getAssociationsWithSource(String ua) throws PMException {
+	public Association[] getAssociationsWithSource(long uaId) throws PMException {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, ua);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, uaId);
 			try(ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.OUTGOING,
 					ASSOCIATION_RELATIONSHIP_TYPE
 			)) {
 				for (Relationship r : iter) {
 					assocs.add(new Association(
-							ua,
-							r.getEndNode().getProperty(NAME_PROPERTY).toString(),
+							uaId,
+							(Long) r.getEndNode().getProperty(ID_PROPERTY),
 							new AccessRightSet((String[]) r.getProperty(ARSET_PROPERTY))
 					));
 				}
 			}
 		});
 
-		return assocs;
+		return assocs.toArray(new Association[]{});
 	}
 
 	@Override
-	public Collection<Association> getAssociationsWithTarget(String target) throws PMException {
+	public Association[] getAssociationsWithTarget(long targetId) throws PMException {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, target);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, targetId);
 			try (ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.INCOMING,
 					ASSOCIATION_RELATIONSHIP_TYPE
 			)) {
 				for (Relationship relationship : iter) {
 					assocs.add(new Association(
-							relationship.getStartNode().getProperty(NAME_PROPERTY).toString(),
-							target,
+							(long) relationship.getStartNode().getProperty(ID_PROPERTY),
+							targetId,
 							new AccessRightSet((String[])relationship.getProperty(ARSET_PROPERTY))
 					));
 				}
 			}
 		});
 
-		return assocs;
+		return assocs.toArray(new Association[]{});
 	}
 
 	@Override
-	public Collection<String> getPolicyClassDescendants(String node) throws PMException {
-		List<String> pcdescs = new ArrayList<>();
+	public long[] getPolicyClassDescendants(long id) throws PMException {
+		LongArrayList pcdescs = new LongArrayList();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, node);
+			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
 
 			Traverser traverse = tx.traversalDescription()
 					.breadthFirst()
@@ -313,19 +352,18 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 					.traverse(uNode);
 
 			for (Path path : traverse) {
-				pcdescs.add(path.endNode().getProperty(NAME_PROPERTY).toString());
+				pcdescs.add((long)path.endNode().getProperty(ID_PROPERTY));
 			}
 		});
 
-		return pcdescs;
+		return pcdescs.toArray(new long[]{});
 	}
 
 	@Override
-	public Collection<String> getAttributeDescendants(String node) throws PMException {
-		List<String> descs = new ArrayList<>();
-
+	public long[] getAttributeDescendants(long id) throws PMException {
+		LongArrayList descs = new LongArrayList();
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, node);
+			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
 
 			Traverser traverse = tx.traversalDescription()
 					.breadthFirst()
@@ -344,39 +382,39 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 					.traverse(uNode);
 
 			for (org.neo4j.graphdb.Node travNode : traverse.nodes()) {
-				descs.add(travNode.getProperty(NAME_PROPERTY).toString());
+				descs.add((long) travNode.getProperty(ID_PROPERTY));
 			}
 		});
 
-		return descs;
+		return descs.toArray(new long[]{});
 	}
 
 	@Override
-	public DescendantSubgraph getDescendantSubgraph(String node) throws PMException {
+	public DescendantSubgraph getDescendantSubgraph(long id) throws PMException {
 		List<DescendantSubgraph> adjacentSubgraphs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			Collection<String> adjacentDescendants = getAdjacentDescendants(node);
-			for (String adjacent : adjacentDescendants) {
+			long[] adjacentDescendants = getAdjacentDescendants(id);
+			for (long adjacent : adjacentDescendants) {
 				adjacentSubgraphs.add(getDescendantSubgraph(adjacent));
 			}
 		});
 
-		return new DescendantSubgraph(node, adjacentSubgraphs);
+		return new DescendantSubgraph(id, adjacentSubgraphs);
 	}
 
 	@Override
-	public AscendantSubgraph getAscendantSubgraph(String node) throws PMException {
+	public AscendantSubgraph getAscendantSubgraph(long id) throws PMException {
 		List<AscendantSubgraph> adjacentSubgraphs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			Collection<String> adjacentAscendants = getAdjacentAscendants(node);
-			for (String adjacent : adjacentAscendants) {
+			long[] adjacentAscendants = getAdjacentAscendants(id);
+			for (long adjacent : adjacentAscendants) {
 				adjacentSubgraphs.add(getAscendantSubgraph(adjacent));
 			}
 		});
 
-		return new AscendantSubgraph(node, adjacentSubgraphs);
+		return new AscendantSubgraph(id, adjacentSubgraphs);
 	}
 
 	@Override

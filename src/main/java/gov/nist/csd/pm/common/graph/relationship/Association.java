@@ -18,7 +18,7 @@ public class Association extends Relationship implements Serializable {
         super();
     }
 
-    public Association(String source, String target, AccessRightSet ars) {
+    public Association(long source, long target, AccessRightSet ars) {
         super(source, target, ars);
     }
 

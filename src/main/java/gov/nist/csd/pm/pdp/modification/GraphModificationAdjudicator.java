@@ -34,123 +34,148 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
 
     @Override
     public long createPolicyClass(String name) throws PMException {
-        EventContext event = new CreatePolicyClassOp()
-                .withOperands(Map.of(NAME_OPERAND, name))
-                .execute(pap, userCtx, privilegeChecker);
+        CreatePolicyClassOp op = new CreatePolicyClassOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(NAME_OPERAND, name);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        Long id = op.execute(pap, operands);
 
-        return name;
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
+
+        return id;
     }
 
     @Override
     public long createUserAttribute(String name, Collection<Long> descendants) throws PMException {
-        EventContext event = new CreateUserAttributeOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+        CreateUserAttributeOp op = new CreateUserAttributeOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
 
-        return name;
+        op.canExecute(privilegeChecker, userCtx, operands);
+        Long id = op.execute(pap, operands);
+
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
+
+        return id;
     }
 
     @Override
     public long createObjectAttribute(String name, Collection<Long> descendants) throws PMException {
-        EventContext event = new CreateObjectAttributeOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+        CreateObjectAttributeOp op = new CreateObjectAttributeOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        Long id = op.execute(pap, operands);
 
-        return name;
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
+
+        return id;
     }
 
     @Override
     public long createObject(String name, Collection<Long> descendants) throws PMException {
-        EventContext event = new CreateObjectOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+        CreateObjectOp op = new CreateObjectOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        Long id = op.execute(pap, operands);
 
-        return name;
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
+
+        return id;
     }
 
     @Override
     public long createUser(String name, Collection<Long> descendants) throws PMException {
-        EventContext event = new CreateUserOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+        CreateUserOp op = new CreateUserOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        Long id = op.execute(pap, operands);
 
-        return name;
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
+
+        return id;
     }
 
     @Override
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
-        EventContext event = new SetNodePropertiesOp()
-                .withOperands(Map.of(NAME_OPERAND, id, PROPERTIES_OPERAND, properties))
-                .execute(pap, userCtx, privilegeChecker);
+        SetNodePropertiesOp op = new SetNodePropertiesOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(NAME_OPERAND, id, PROPERTIES_OPERAND, properties);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        op.execute(pap, operands);
+
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
     public void deleteNode(long id) throws PMException {
-        NodeType nodeType = pap.query().graph().getNodeByName(id).getType();
-        Collection<String> descendants = pap.query().graph().getAdjacentDescendants(id);
+        NodeType nodeType = pap.query().graph().getNodeById(id).getType();
+        long[] descendants = pap.query().graph().getAdjacentDescendants(id);
 
-        Operation<?> op = new DeletePolicyClassOp();
+        DeleteNodeOp op = new DeleteNodeOp();
 
-        switch (nodeType) {
-            case OA -> op = new DeleteObjectAttributeOp();
-            case UA -> op = new DeleteUserAttributeOp();
-            case O -> op = new DeleteObjectOp();
-            case U -> op = new DeleteUserOp();
-        }
+        Map<String, Object> operands = Map.of(NAME_OPERAND, id, TYPE_OPERAND, nodeType, DESCENDANTS_OPERAND, descendants);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        op.execute(pap, operands);
 
-        EventContext event = op.
-                withOperands(Map.of(NAME_OPERAND, id, TYPE_OPERAND, nodeType, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
-
-        eventPublisher.publishEvent(event);
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
     public void assign(long ascId, Collection<Long> descendants) throws PMException {
-        EventContext event = new AssignOp()
-                .withOperands(Map.of(ASCENDANT_OPERAND, ascId, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+        AssignOp op = new AssignOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(ASCENDANT_OPERAND, ascId, DESCENDANTS_OPERAND, descendants);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        op.execute(pap, operands);
+
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
     public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
-        EventContext event = new DeassignOp()
-                .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+        DeassignOp op = new DeassignOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        op.execute(pap, operands);
+
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
-        EventContext event = new AssociateOp()
-                .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target, ARSET_OPERAND, accessRights))
-                .execute(pap, userCtx, privilegeChecker);
+        AssociateOp op = new AssociateOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(UA_OPERAND, ua, TARGET_OPERAND, target, ARSET_OPERAND, accessRights);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        op.execute(pap, operands);
+
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
     public void dissociate(long ua, long target) throws PMException {
-        EventContext event = new DissociateOp()
-                .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target))
-                .execute(pap, userCtx, privilegeChecker);
+        DissociateOp op = new DissociateOp();
 
-        eventPublisher.publishEvent(event);
+        Map<String, Object> operands = Map.of(UA_OPERAND, ua, TARGET_OPERAND, target);
+        op.canExecute(privilegeChecker, userCtx, operands);
+        op.execute(pap, operands);
+
+        EventContext eventContext = op.toEventContext(pap, userCtx, operands);
+        eventPublisher.publishEvent(eventContext);
 
     }
 }

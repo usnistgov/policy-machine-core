@@ -77,10 +77,10 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     }
 
     @Override
-    public Collection<Prohibition> getProhibitionsWithContainer(String container) throws PMException {
-        privilegeChecker.check(this.userCtx, container, AdminAccessRights.REVIEW_POLICY);
+    public Collection<Prohibition> getProhibitionsWithContainer(long containerId) throws PMException {
+        privilegeChecker.check(this.userCtx, containerId, AdminAccessRights.REVIEW_POLICY);
 
-        return pap.query().prohibitions().getProhibitionsWithContainer(container);
+        return pap.query().prohibitions().getProhibitionsWithContainer(containerId);
     }
 
 

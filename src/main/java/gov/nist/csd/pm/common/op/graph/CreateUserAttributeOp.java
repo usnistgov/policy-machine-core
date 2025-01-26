@@ -16,12 +16,10 @@ public class CreateUserAttributeOp extends CreateNodeOp{
     }
 
     @Override
-    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        pap.modify().graph().createUserAttribute(
+    public Long execute(PAP pap, Map<String, Object> operands) throws PMException {
+        return pap.modify().graph().createUserAttribute(
                 (String) operands.get(NAME_OPERAND),
                 (Collection<Long>) operands.get(DESCENDANTS_OPERAND)
         );
-
-        return null;
     }
 }

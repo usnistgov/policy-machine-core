@@ -36,9 +36,9 @@ public class Neo4jMemoryObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public void deleteObligation(long id) throws PMException {
+	public void deleteObligation(String name) throws PMException {
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(OBLIGATION_LABEL, NAME_PROPERTY, id);
+			Node node = tx.findNode(OBLIGATION_LABEL, NAME_PROPERTY, name);
 			if (node == null) {
 				return;
 			}
@@ -92,9 +92,9 @@ public class Neo4jMemoryObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public Collection<Obligation> getObligationsWithAuthor(String user) throws PMException {
+	public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
 		Collection<Obligation> obligations = new ArrayList<>(getObligations());
-		obligations.removeIf(o -> !o.getAuthorId().equals(user));
+		obligations.removeIf(o -> o.getAuthorId() != userId);
 		return obligations;
 	}
 

@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.graph.relationship.Association;
 
-import java.util.Collection;
 import java.util.Map;
 
 public class VertexWithProps extends Vertex{
@@ -27,42 +25,42 @@ public class VertexWithProps extends Vertex{
     }
 
     @Override
-    protected Collection<String> getAdjacentDescendants() {
+    protected long[] getAdjacentDescendants() {
         return vertex.getAdjacentDescendants();
     }
 
     @Override
-    protected Collection<String> getAdjacentAscendants() {
+    protected long[] getAdjacentAscendants() {
         return vertex.getAdjacentAscendants();
     }
 
     @Override
-    protected Collection<Association> getOutgoingAssociations() {
+    protected long[] getOutgoingAssociations() {
         return vertex.getOutgoingAssociations();
     }
 
     @Override
-    protected Collection<Association> getIncomingAssociations() {
+    protected long[] getIncomingAssociations() {
         return vertex.getIncomingAssociations();
     }
 
     @Override
-    protected void addAssignment(String ascendant, String descendant) {
+    protected void addAssignment(long ascendant, long descendant) {
         vertex.addAssignment(ascendant, descendant);
     }
 
     @Override
-    protected void deleteAssignment(String ascendant, String descendant) {
+    protected void deleteAssignment(long ascendant, long descendant) {
         vertex.deleteAssignment(ascendant, descendant);
     }
 
     @Override
-    protected void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
+    protected void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
         vertex.addAssociation(ua, target, accessRightSet);
     }
 
     @Override
-    protected void deleteAssociation(String ua, String target) {
+    protected void deleteAssociation(long ua, long target) {
         vertex.deleteAssociation(ua, target);
     }
 }

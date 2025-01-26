@@ -21,15 +21,15 @@ public interface ObligationsModification {
      * @param rules    The rules of the obligation.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    long createObligation(long authorId, String name, List<Rule> rules) throws PMException;
+    void createObligation(long authorId, String name, List<Rule> rules) throws PMException;
 
     /**
-     * Delete the obligation with the given ID. If the obligation does not exist, no exception is thrown as this is
+     * Delete the obligation with the given name. If the obligation does not exist, no exception is thrown as this is
      * the desired state. <p>
      *
-     * @param id The id of the obligation to delete.
+     * @param name The name of the obligation to delete.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    void deleteObligation(long id) throws PMException;
+    void deleteObligation(String name) throws PMException;
 
 }

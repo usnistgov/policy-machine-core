@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.common.exception;
 
 public class ProhibitionContainerDoesNotExistException extends PMException {
-    public ProhibitionContainerDoesNotExistException(String name) {
-        super("prohibition container \"" + name + "\" does not exist");
+    public ProhibitionContainerDoesNotExistException(long id) {
+        super("prohibition container \"" + id + "\" does not exist");
     }
 }

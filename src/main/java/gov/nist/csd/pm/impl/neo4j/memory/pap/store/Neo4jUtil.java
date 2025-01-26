@@ -33,6 +33,7 @@ public class Neo4jUtil {
 
 	public static final String ARSET_PROPERTY = "arset";
 	public static final String NAME_PROPERTY = "name";
+	public static final String ID_PROPERTY = "id";
 	public static final String DATA_PROPERTY = "data";
 	public static final String COMPLEMENT_PROPERTY = "complement";
 	public static final String INTERSECTION_PROPERTY = "intersection";
