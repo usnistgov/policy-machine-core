@@ -10,8 +10,7 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -146,14 +145,14 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public AscendantSubgraph getAscendantSubgraph(long nodeId) throws PMException {
+    public Subgraph getAscendantSubgraph(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getAscendantSubgraph(nodeId);
     }
 
     @Override
-    public DescendantSubgraph getDescendantSubgraph(long nodeId) throws PMException {
+    public Subgraph getDescendantSubgraph(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getDescendantSubgraph(nodeId);

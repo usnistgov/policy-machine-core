@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SetNodePropertiesStatementTest {
@@ -26,9 +28,9 @@ class SetNodePropertiesStatementTest {
 
         PAP pap = new MemoryPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        UserContext userContext = new UserContext("u1");
+        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
+        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
+        UserContext userContext = new UserContext(id(pap, "u1"));
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 

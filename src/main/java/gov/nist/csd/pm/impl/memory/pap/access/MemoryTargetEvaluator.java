@@ -9,6 +9,8 @@ import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import java.util.*;
 
@@ -32,11 +34,11 @@ public class MemoryTargetEvaluator {
 	public TargetDagResult evaluate(UserDagResult userCtx, TargetContext targetCtx) throws PMException {
 		targetCtx.checkExists(policyStore.graph());
 
-		Collection<String> policyClasses = policyStore.graph().getPolicyClasses();
-		Map<String, AccessRightSet> borderTargets = userCtx.borderTargets();
-		Set<String> userProhibitionTargets = collectUserProhibitionTargets(userCtx.prohibitions());
-		Map<String, Map<String, AccessRightSet>> visitedNodes = new HashMap<>();
-		Set<String> reachedTargets = new HashSet<>();
+		Set<Long> policyClasses = new LongOpenHashSet(policyStore.graph().getPolicyClasses());
+		Map<Long, AccessRightSet> borderTargets = userCtx.borderTargets();
+		Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userCtx.prohibitions());
+		Map<Long, Map<Long, AccessRightSet>> visitedNodes = new Long2ObjectOpenHashMap<>();
+		Set<Long> reachedTargets = new LongOpenHashSet();
 
 		Visitor visitor = node -> {
 			// mark the node as reached, to be used for resolving prohibitions
@@ -44,7 +46,7 @@ public class MemoryTargetEvaluator {
 				reachedTargets.add(node);
 			}
 
-			Map<String, AccessRightSet> nodeCtx = visitedNodes.getOrDefault(node, new HashMap<>());
+			Map<Long, AccessRightSet> nodeCtx = visitedNodes.getOrDefault(node, new Long2ObjectOpenHashMap<>());
 			if (nodeCtx.isEmpty()) {
 				visitedNodes.put(node, nodeCtx);
 			}
@@ -54,7 +56,7 @@ public class MemoryTargetEvaluator {
 			} else if (borderTargets.containsKey(node)) {
 				Set<String> uaOps = borderTargets.get(node);
 
-				for (String pc : nodeCtx.keySet()) {
+				for (long pc : nodeCtx.keySet()) {
 					AccessRightSet pcOps = nodeCtx.getOrDefault(pc, new AccessRightSet());
 					pcOps.addAll(uaOps);
 					nodeCtx.put(pc, pcOps);
@@ -63,10 +65,10 @@ public class MemoryTargetEvaluator {
 		};
 
 		Propagator propagator = (desc, asc) -> {
-			Map<String, AccessRightSet> descCtx = visitedNodes.get(desc);
-			Map<String, AccessRightSet> ascCtx = visitedNodes.getOrDefault(asc, new HashMap<>());
+			Map<Long, AccessRightSet> descCtx = visitedNodes.get(desc);
+			Map<Long, AccessRightSet> ascCtx = visitedNodes.getOrDefault(asc, new HashMap<>());
 
-			for (String name : descCtx.keySet()) {
+			for (long name : descCtx.keySet()) {
 				AccessRightSet ops = ascCtx.getOrDefault(name, new AccessRightSet());
 				ops.addAll(descCtx.get(name));
 				ascCtx.put(name, ops);
@@ -80,29 +82,29 @@ public class MemoryTargetEvaluator {
 				.withVisitor(visitor)
 				.withPropagator(propagator);
 
-		List<String> targetNodes = new ArrayList<>();
+		long[] targetNodes;
 		if (targetCtx.isNode()) {
-			String target = targetCtx.getTargetId();
+			// if target of decision is a PC, use the PM_ADMIN_OBJECT as the target node
+			long target = targetCtx.getTargetId();
 			Node targetNode = policyStore.graph().getNodeById(target);
 			if (targetNode.getType().equals(PC)) {
-				target = PM_ADMIN_OBJECT.nodeName();
+				target = PM_ADMIN_OBJECT.nodeId();
 			}
 
-			targetNodes.add(target);
+			targetNodes = new long[]{target};
 
 			dfs.walk(target);
 		} else {
-			List<String> attrs = targetCtx.getAttributeIds();
-			targetNodes.addAll(attrs);
+			targetNodes = targetCtx.getAttributeIds();
 
-			dfs.walk(attrs);
+			dfs.walk(targetNodes);
 		}
 
 		return new TargetDagResult(mergeResults(targetNodes, visitedNodes), reachedTargets);
 	}
 
-	private Set<String> collectUserProhibitionTargets(Set<Prohibition> prohibitions) {
-		Set<String> userProhibitionTargets = new HashSet<>();
+	private Set<Long> collectUserProhibitionTargets(Set<Prohibition> prohibitions) {
+		Set<Long> userProhibitionTargets = new HashSet<>();
 		for (Prohibition prohibition : prohibitions) {
 			for (ContainerCondition cc : prohibition.getContainers()) {
 				userProhibitionTargets.add(cc.getId());
@@ -112,14 +114,14 @@ public class MemoryTargetEvaluator {
 		return userProhibitionTargets;
 	}
 
-	private Map<String, AccessRightSet> mergeResults(List<String> targetNodes, Map<String, Map<String, AccessRightSet>> visitedNodes) {
-		HashMap<String, AccessRightSet> merged = new HashMap<>();
+	private Map<Long, AccessRightSet> mergeResults(long[] targetNodes, Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
+		Map<Long, AccessRightSet> merged = new Long2ObjectOpenHashMap<>();
 
-		for (String target : targetNodes) {
-			Map<String, AccessRightSet> pcMap = visitedNodes.getOrDefault(target, new HashMap<>());
+		for (long target : targetNodes) {
+			Map<Long, AccessRightSet> pcMap = visitedNodes.getOrDefault(target, new HashMap<>());
 
-			for (Map.Entry<String, AccessRightSet> entry : pcMap.entrySet()) {
-				String pc = entry.getKey();
+			for (Map.Entry<Long, AccessRightSet> entry : pcMap.entrySet()) {
+				long pc = entry.getKey();
 				AccessRightSet pcArset = entry.getValue();
 
 				if (!merged.containsKey(pc)) {

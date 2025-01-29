@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.exception.PMException;
@@ -44,6 +45,16 @@ public class PrivilegeChecker {
         checkOrThrow(userCtx, targetContext, computed, toCheck);
     }
 
+    public void check(UserContext userCtx, String name, Collection<String> toCheck) throws PMException {
+        Node target = pap.query().graph().getNodeByName(name);
+
+        TargetContext targetContext = new TargetContext(target.getId());
+
+        AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetContext);
+
+        checkOrThrow(userCtx, targetContext, computed, toCheck);
+    }
+
     public void check(UserContext userCtx, UserContext target, Collection<String> toCheck) throws PMException {
         TargetContext targetContext = new TargetContext(target);
 
@@ -76,8 +87,9 @@ public class PrivilegeChecker {
             return;
         }
 
-        for (long entity : referencedNodes.nodes()) {
-            check(userCtx, entity, toCheck);
+        for (String entity : referencedNodes.nodes()) {
+            Node node = pap.query().graph().getNodeByName(entity);
+            check(userCtx, node.getId(), toCheck);
         }
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OperandPatternTest {
@@ -18,15 +19,15 @@ public class OperandPatternTest {
     @Test
     void testOperandPattern() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1", "ua2"));
-        pap.modify().graph().createUser("u2", List.of("ua2"));
-        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-        pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-        pap.modify().graph().createObject("o1", List.of("oa1"));
-        pap.modify().graph().createObject("o2", List.of("oa2"));
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        pap.modify().graph().createUser("u2", List.of(ua2));
+        long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+        pap.modify().graph().createObject("o1", List.of(oa1));
+        pap.modify().graph().createObject("o2", List.of(oa2));
 
         String pml = """
                 create obligation "ob1" {
@@ -142,10 +143,10 @@ public class OperandPatternTest {
     @Test
     void testOnlyNodeOpsInEventContext() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext("u1"), """
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+        assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext(u1), """
                 associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 create obligation "ob1" {
                     create rule "r1"

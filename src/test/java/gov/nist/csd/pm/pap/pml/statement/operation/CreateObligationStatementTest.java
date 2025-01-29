@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,11 +47,11 @@ class CreateObligationStatementTest {
 
         MemoryPAP pap = new MemoryPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-        pap.modify().graph().createUser("u2", List.of("ua2"));
-        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-        pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), pap);
+        pap.modify().graph().createUserAttribute("ua2", ids(pap, "pc1"));
+        pap.modify().graph().createUser("u2", ids(pap, "ua2"));
+        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
+        pap.modify().graph().createObjectAttribute("oa2", ids(pap, "pc1"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u2")), pap);
 
         stmt.execute(execCtx, pap);
 

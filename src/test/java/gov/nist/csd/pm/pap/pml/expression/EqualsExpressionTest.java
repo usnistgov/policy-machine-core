@@ -39,7 +39,7 @@ class EqualsExpressionTest {
 
         MemoryPAP pap = new MemoryPAP();
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), pap), pap);
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), pap), pap);
         assertEquals(
                 new BoolValue(true),
                 value
@@ -63,7 +63,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -87,7 +87,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 value
@@ -108,7 +108,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -132,7 +132,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -156,7 +156,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 value
@@ -177,7 +177,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -201,7 +201,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -225,7 +225,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 value
@@ -246,7 +246,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -270,7 +270,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -302,7 +302,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 value
@@ -331,7 +331,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value
@@ -363,7 +363,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 value

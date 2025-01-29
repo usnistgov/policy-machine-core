@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
@@ -46,7 +45,7 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
     }
 
     @Override
-    public Map<Node, Collection<Prohibition>> getNodeProhibitions() throws PMException {
+    public Map<Long, Collection<Prohibition>> getNodeProhibitions() throws PMException {
         return policy.nodeProhibitions;
     }
 
@@ -57,7 +56,7 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
 
     @Override
     public Prohibition getProhibition(String name) throws PMException {
-        for (Node subject : policy.nodeProhibitions.keySet()) {
+        for (long subject : policy.nodeProhibitions.keySet()) {
             Collection<Prohibition> subjectPros = policy.nodeProhibitions.getOrDefault(subject, new ArrayList<>());
             for (Prohibition p : subjectPros) {
                 if (p.getName().equals(name)) {
@@ -86,5 +85,15 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
         } catch (ProhibitionDoesNotExistException e) {
             return false;
         }
+    }
+
+    @Override
+    public Collection<Prohibition> getProhibitionsWithNode(long subject) throws PMException {
+        return policy.nodeProhibitions.getOrDefault(subject, new ArrayList<>());
+    }
+
+    @Override
+    public Collection<Prohibition> getProhibitionsWithProcess(String subject) throws PMException {
+        return policy.processProhibitions.getOrDefault(subject, new ArrayList<>());
     }
 }

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.pattern.operand;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -24,7 +25,10 @@ public class InOperandPattern extends OperandPatternExpression {
 
     @Override
     public boolean matches(String value, PAP pap) throws PMException {
-        return pap.query().graph().isAscendant(value, container);
+        long valueId = pap.query().graph().getNodeId(value);
+        long contId = pap.query().graph().getNodeId(container);
+
+        return pap.query().graph().isAscendant(valueId, contId);
     }
 
     @Override

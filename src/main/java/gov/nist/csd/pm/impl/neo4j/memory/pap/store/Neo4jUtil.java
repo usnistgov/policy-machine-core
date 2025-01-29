@@ -62,13 +62,11 @@ public class Neo4jUtil {
 		// get subject
 		Relationship subjectRel = prohibitionNode.getSingleRelationship(PROHIBITION_SUBJECT_REL_TYPE, Direction.INCOMING);
 		Node subjectNode = subjectRel.getStartNode();
-		String subject = String.valueOf(subjectNode.getProperty(NAME_PROPERTY));
-
-		String subjectType = "PROCESS";
-		if (subjectNode.hasLabel(UA_LABEL)) {
-			subjectType = "USER_ATTRIBUTE";
-		} else if (subjectNode.hasLabel(U_LABEL)) {
-			subjectType = "USER";
+		ProhibitionSubject subject;
+		if (subjectNode.hasLabel(PROCESS_LABEL)) {
+			subject = new ProhibitionSubject(String.valueOf(subjectNode.getProperty(ID_PROPERTY)));
+		} else {
+			subject = new ProhibitionSubject((Long) subjectNode.getProperty(ID_PROPERTY));
 		}
 
 		AccessRightSet accessRights = new AccessRightSet((String[]) prohibitionNode.getProperty(ARSET_PROPERTY));
@@ -80,14 +78,14 @@ public class Neo4jUtil {
 			for (Relationship relationship : contRels) {
 				Node contNode = relationship.getStartNode();
 				containerConditions.add(new ContainerCondition(
-						contNode.getProperty(NAME_PROPERTY).toString(),
+						(Long) contNode.getProperty(ID_PROPERTY),
 						Boolean.parseBoolean(relationship.getProperty(COMPLEMENT_PROPERTY).toString())
 				));
 			}
 		}
 
 
-		return new Prohibition(label, new ProhibitionSubject(subject, subjectType), accessRights, intersection, containerConditions);
+		return new Prohibition(label, subject, accessRights, intersection, containerConditions);
 	}
 
 	public static Label typeToLabel(NodeType type) {

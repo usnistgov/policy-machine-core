@@ -5,8 +5,7 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.pap.store.GraphStore;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.neo4j.graphdb.*;
@@ -390,8 +389,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public DescendantSubgraph getDescendantSubgraph(long id) throws PMException {
-		List<DescendantSubgraph> adjacentSubgraphs = new ArrayList<>();
+	public Subgraph getDescendantSubgraph(long id) throws PMException {
+		List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
 			long[] adjacentDescendants = getAdjacentDescendants(id);
@@ -400,12 +399,12 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return new DescendantSubgraph(id, adjacentSubgraphs);
+		return new Subgraph(getNodeById(id), adjacentSubgraphs);
 	}
 
 	@Override
-	public AscendantSubgraph getAscendantSubgraph(long id) throws PMException {
-		List<AscendantSubgraph> adjacentSubgraphs = new ArrayList<>();
+	public Subgraph getAscendantSubgraph(long id) throws PMException {
+		List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
 			long[] adjacentAscendants = getAdjacentAscendants(id);
@@ -414,7 +413,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return new AscendantSubgraph(id, adjacentSubgraphs);
+		return new Subgraph(getNodeById(id), adjacentSubgraphs);
 	}
 
 	@Override

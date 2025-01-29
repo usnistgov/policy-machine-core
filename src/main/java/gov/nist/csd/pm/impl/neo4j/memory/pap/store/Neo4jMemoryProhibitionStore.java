@@ -8,10 +8,7 @@ import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.store.ProhibitionsStore;
 import org.neo4j.graphdb.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -67,8 +64,8 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 	}
 
 	@Override
-	public Map<gov.nist.csd.pm.common.graph.node.Node, Collection<Prohibition>> getNodeProhibitions() throws PMException {
-		Map<gov.nist.csd.pm.common.graph.node.Node, Collection<Prohibition>> all = new HashMap<>();
+	public Map<Long, Collection<Prohibition>> getNodeProhibitions() throws PMException {
+		Map<Long, Collection<Prohibition>> all = new HashMap<>();
 
 		txHandler.runTx(tx -> {
 			try(ResourceIterator<Node> proNodes = tx.findNodes(PROHIBITION_LABEL)) {
@@ -79,10 +76,7 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 						continue;
 					}
 
-					Neo4jMemoryGraphStore neo4jMemoryGraphStore = new Neo4jMemoryGraphStore(txHandler);
-					gov.nist.csd.pm.common.graph.node.Node node = neo4jMemoryGraphStore.getNodeById(prohibition.getSubject().getNodeId());
-
-					all.computeIfAbsent(node, k -> new ArrayList<>())
+					all.computeIfAbsent(prohibition.getSubject().getNodeId(), k -> new ArrayList<>())
 							.add(prohibition);
 				}
 			}
@@ -139,6 +133,16 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 		});
 
 		return b.get();
+	}
+
+	@Override
+	public Collection<Prohibition> getProhibitionsWithNode(long subject) throws PMException {
+		return List.of();
+	}
+
+	@Override
+	public Collection<Prohibition> getProhibitionsWithProcess(String subject) throws PMException {
+		return List.of();
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public abstract class CreateNodeOp extends GraphOp<Long> {
     @Override
     public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
         return new EventContext(
-                userCtx.getUser(),
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
                 userCtx.getProcess(),
                 this,
                 operands

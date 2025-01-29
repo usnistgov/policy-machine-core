@@ -14,6 +14,7 @@ import gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
 import static gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OperationsModificationAdjudicatorTest {
@@ -39,7 +41,7 @@ class OperationsModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new MemoryPAP();
 
-        pap.executePML(new UserContext("u1"), """
+        pap.executePML(new TestUserContext("u1", pap), """
                 create pc "pc1"
 
                 create ua "ua1" in ["pc1"]
@@ -61,8 +63,8 @@ class OperationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new OperationsModificationAdjudicator(new UserContext("u1"), pap, pdp.getPrivilegeChecker());
-        fail = new OperationsModificationAdjudicator(new UserContext("u2"), pap, pdp.getPrivilegeChecker());
+        ok = new OperationsModificationAdjudicator(new UserContext(id(pap, "u1")), pap, pdp.getPrivilegeChecker());
+        fail = new OperationsModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
     }
 
 

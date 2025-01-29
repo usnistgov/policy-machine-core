@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
@@ -39,7 +40,7 @@ class CreateProhibitionStmtVisitorTest {
                 new CreateProhibitionStatement(
                         new StringLiteral("test"),
                         new StringLiteral("u1"),
-                        ProhibitionSubject.Type.USER,
+                        ProhibitionSubjectType.USER,
                         buildArrayLiteral("read"),
                         false,
                         new ArrayLiteral(List.of(new NegatedExpression(new StringLiteral("oa1"))), Type.string())

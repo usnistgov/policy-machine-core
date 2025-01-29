@@ -124,7 +124,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         Node node = pap.query().graph().getNodeById(policyElementId);
 
         publishEvent(new EventContext(
-                user.getUser(),
+                pap.query().graph().getNodeById(user.getUser()).getName(),
                 user.getProcess(),
                 resourceOperation,
                 Map.of("target", node.getName())
@@ -145,7 +145,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         Object ret = pdpTx.executeAdminExecutable(operation, operands);
 
         publishEvent(new EventContext(
-                user.getUser(),
+                pap.query().graph().getNodeById(user.getUser()).getName(),
                 user.getProcess(),
                 operation.getName(),
                 operands

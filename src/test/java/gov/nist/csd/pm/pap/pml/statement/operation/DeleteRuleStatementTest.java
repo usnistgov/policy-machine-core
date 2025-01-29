@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteRuleStatementTest {
@@ -27,9 +29,9 @@ class DeleteRuleStatementTest {
 
         PAP pap = new MemoryPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        UserContext userContext = new UserContext("u1");
+        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
+        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
+        UserContext userContext = new UserContext(id(pap, "u1"));
         pap.modify().obligations().createObligation(userContext.getUser(), "obl1", List.of(new Rule(
                 "rule1",
                 new EventPattern(new SubjectPattern(), new OperationPattern()),

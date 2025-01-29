@@ -6,8 +6,7 @@ import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.query.GraphQuery;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.ArrayList;
@@ -64,13 +63,13 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
-    public AscendantSubgraph getAscendantSubgraph(long nodeId) throws PMException {
+    public Subgraph getAscendantSubgraph(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getAscendantSubgraph(nodeId);
     }
 
     @Override
-    public DescendantSubgraph getDescendantSubgraph(long nodeId) throws PMException {
+    public Subgraph getDescendantSubgraph(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getDescendantSubgraph(nodeId);
     }

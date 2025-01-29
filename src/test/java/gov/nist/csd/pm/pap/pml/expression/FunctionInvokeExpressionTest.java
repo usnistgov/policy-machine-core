@@ -87,7 +87,7 @@ class FunctionInvokeExpressionTest {
 
         PAP pap = new MemoryPAP();
         pap.modify().operations().createAdminOperation(voidFunc);
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), pap);
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         Value value = e.execute(executionContext, new MemoryPAP());
         assertEquals(
                 new VoidValue(),
@@ -166,7 +166,7 @@ class FunctionInvokeExpressionTest {
         pap.modify().operations().createAdminOperation(stringFunc);
         ExecutionContext executionContext =
                 new ExecutionContext(
-                        new UserContext(""),
+                        new UserContext(0),
                         pap
                 );
         Value value = e.execute(executionContext, pap);
@@ -202,7 +202,7 @@ class FunctionInvokeExpressionTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
         assertTrue(pap.query().graph().nodeExists("cx"));
         assertTrue(pap.query().graph().nodeExists("cy"));
     }
@@ -218,7 +218,7 @@ class FunctionInvokeExpressionTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("x"));
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -237,7 +237,7 @@ class FunctionInvokeExpressionTest {
                 a()
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
 
@@ -255,6 +255,6 @@ class FunctionInvokeExpressionTest {
                 
                 op1()
                 """;
-        assertDoesNotThrow(() -> new MemoryPAP().executePML(new UserContext("u1"), pml));
+        assertDoesNotThrow(() -> new MemoryPAP().executePML(new UserContext(0), pml));
     }
 }

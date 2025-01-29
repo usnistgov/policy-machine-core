@@ -2,9 +2,9 @@ package gov.nist.csd.pm.integration;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.util.TestMemoryPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -39,12 +39,12 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        TestMemoryPAP pap = new TestMemoryPAP();
+        pap.executePML(new UserContext(pap.id("u1")), pml);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        pdp.runTx(new UserContext("u1"), tx -> {
+        pdp.runTx(new UserContext(pap.id("u1")), tx -> {
             tx.modify().graph().createPolicyClass("test2");
 
             return null;
@@ -79,12 +79,12 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        TestMemoryPAP pap = new TestMemoryPAP();
+        pap.executePML(new UserContext(pap.id("u1")), pml);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        pdp.runTx(new UserContext("u1"), tx -> {
+        pdp.runTx(new UserContext(pap.id("u1")), tx -> {
             tx.modify().graph().createPolicyClass("test2");
             return null;
         });
@@ -121,13 +121,13 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        TestMemoryPAP pap = new TestMemoryPAP();
+        pap.executePML(new UserContext(pap.id("u1")), pml);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        pdp.adjudicateAdminOperation(new UserContext("u1"), "op2", Map.of());
+        pdp.adjudicateAdminOperation(new UserContext(pap.id("u1")), "op2", Map.of());
 
         assertFalse(pap.query().graph().nodeExists("pc3"));
     }
@@ -157,13 +157,13 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        TestMemoryPAP pap = new TestMemoryPAP();
+        pap.executePML(new UserContext(pap.id("u1")), pml);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
 
-        pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1", Map.of());
+        pdp.adjudicateAdminRoutine(new UserContext(pap.id("u1")), "routine1", Map.of());
 
         assertFalse(pap.query().graph().nodeExists("pc3"));
     }

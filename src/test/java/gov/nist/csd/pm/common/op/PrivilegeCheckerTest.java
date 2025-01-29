@@ -5,6 +5,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
+import gov.nist.csd.pm.util.TestMemoryPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,12 +31,12 @@ class PrivilegeCheckerTest {
 				create o "o1" in ["oa1"]
 				""";
 
-		MemoryPAP pap = new MemoryPAP();
-		pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+		TestMemoryPAP pap = new TestMemoryPAP();
+		pap.deserialize(new UserContext(pap.id("u1")), pml, new PMLDeserializer());
 
 		PrivilegeChecker checker = new PrivilegeChecker(pap);
-		assertDoesNotThrow(() -> checker.check(new UserContext("u1"), "o1", List.of()));
-		assertThrows(PMException.class, () -> checker.check(new UserContext("u2"), "o1", List.of()));
+		assertDoesNotThrow(() -> checker.check(new UserContext(pap.id("u1")), "o1", List.of()));
+		assertThrows(PMException.class, () -> checker.check(new UserContext(pap.id("u2")), "o1", List.of()));
 	}
 
 }

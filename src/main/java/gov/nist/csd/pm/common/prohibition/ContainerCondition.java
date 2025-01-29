@@ -52,7 +52,7 @@ public class ContainerCondition implements Serializable {
     @Override
     public String toString() {
         return "ContainerCondition[" +
-                "id=" + id + ", " +
+                "node=" + id + ", " +
                 "complement=" + complement + ']';
     }
 

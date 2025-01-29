@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -17,13 +18,11 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
     public CreateProhibitionStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
         Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
         Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
-        ProhibitionSubject.Type type;
+        ProhibitionSubjectType type = ProhibitionSubjectType.PROCESS;
         if (ctx.USER() != null) {
-            type = ProhibitionSubject.Type.USER;
+            type = ProhibitionSubjectType.USER;
         } else if (ctx.USER_ATTRIBUTE() != null) {
-            type = ProhibitionSubject.Type.USER_ATTRIBUTE;
-        } else {
-            type = ProhibitionSubject.Type.PROCESS;
+            type = ProhibitionSubjectType.USER_ATTRIBUTE;
         }
 
         Expression accessRights = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));

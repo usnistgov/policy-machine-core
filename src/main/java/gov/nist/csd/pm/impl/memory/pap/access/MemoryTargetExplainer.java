@@ -17,74 +17,80 @@ import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
 
 public class MemoryTargetExplainer {
 
-	private PolicyStore policyStore;
+	private final PolicyStore policyStore;
 
 	public MemoryTargetExplainer(PolicyStore policyStore) {
 		this.policyStore = policyStore;
 	}
 
-	public Map<String, Map<Path, List<Association>>> explainTarget(TargetContext targetCtx) throws PMException {
+	public Map<Node, Map<Path, List<Association>>> explainTarget(TargetContext targetCtx) throws PMException {
 		targetCtx.checkExists(policyStore.graph());
 
-		Collection<String> policyClasses = policyStore.graph().getPolicyClasses();
+		long[] policyClasses = policyStore.graph().getPolicyClasses();
 
 		// initialize map with policy classes
-		Map<String, Map<List<String>, List<Association>>> pcPathAssociations = new HashMap<>();
-		for (String pc : policyClasses) {
-			pcPathAssociations.put(pc, new HashMap<>(Map.of(new ArrayList<>(List.of(pc)), new ArrayList<>())));
+		Map<Node, Map<List<Node>, List<Association>>> pcPathAssociations = new HashMap<>();
+		for (long pc : policyClasses) {
+			Node pcNode = policyStore.graph().getNodeById(pc);
+			pcPathAssociations.put(pcNode, new HashMap<>(Map.of(new ArrayList<>(List.of(pcNode)), new ArrayList<>())));
 		}
 
 		Propagator propagator = (src, dst) -> {
-			Map<List<String>, List<Association>> srcPathAssocs = pcPathAssociations.get(src);
-			Map<List<String>, List<Association>> dstPathAssocs = pcPathAssociations.getOrDefault(dst, new HashMap<>());
+			Node srcNode = policyStore.graph().getNodeById(src);
+			Node dstNode =  policyStore.graph().getNodeById(dst);
 
-			for (Map.Entry<List<String>, List<Association>> entry : srcPathAssocs.entrySet()) {
+			Map<List<Node>, List<Association>> srcPathAssocs = pcPathAssociations.get(srcNode);
+			Map<List<Node>, List<Association>> dstPathAssocs = pcPathAssociations.getOrDefault(dstNode, new HashMap<>());
+
+			for (Map.Entry<List<Node>, List<Association>> entry : srcPathAssocs.entrySet()) {
 				// add DST to the path from SRC
-				List<String> targetPath = new ArrayList<>(entry.getKey());
+				List<Node> targetPath = new ArrayList<>(entry.getKey());
 				List<Association> associations = new ArrayList<>(entry.getValue());
-				targetPath.addFirst(dst);
+				targetPath.addFirst(dstNode);
 
 				// collect any associations for the DST node
-				Collection<Association> associationsWithTarget = policyStore.graph().getAssociationsWithTarget(dst);
-				associations.addAll(associationsWithTarget);
+				Association[] associationsWithTarget = policyStore.graph().getAssociationsWithTarget(dst);
+				associations.addAll(List.of(associationsWithTarget));
 				dstPathAssocs.put(targetPath, associations);
 			}
 
 			// update dst entry
-			pcPathAssociations.put(dst, dstPathAssocs);
+			pcPathAssociations.put(dstNode, dstPathAssocs);
 		};
 
 		// DFS from target node
 		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
 				.withPropagator(propagator);
 
-		List<String> nodes = new ArrayList<>();
+		List<Node> nodes = new ArrayList<>();
 		if (targetCtx.isNode()) {
-			String target = targetCtx.getTargetId();
+			long target = targetCtx.getTargetId();
 			Node targetNode = policyStore.graph().getNodeById(target);
 			if (targetNode.getType().equals(PC)) {
-				target = PM_ADMIN_OBJECT.nodeName();
+				target = PM_ADMIN_OBJECT.nodeId();
 			}
 
-			nodes.add(target);
+			nodes.add(targetNode);
 
 			dfs.walk(target);
 		} else {
-			nodes.addAll(targetCtx.getAttributeIds());
+			for (long id : targetCtx.getAttributeIds()) {
+				nodes.add(policyStore.graph().getNodeById(id));
+			}
 
 			dfs.walk(targetCtx.getAttributeIds());
 		}
 
 		// convert the map created above into a map where the policy classes are the keys
-		Map<String, Map<Path, List<Association>>> pcMap = new HashMap<>();
+		Map<Node, Map<Path, List<Association>>> pcMap = new HashMap<>();
 
-		for (String target : nodes) {
-			Map<List<String>, List<Association>> targetPathAssocs = pcPathAssociations.get(target);
-			for (Map.Entry<List<String>, List<Association>> entry : targetPathAssocs.entrySet()) {
+		for (Node target : nodes) {
+			Map<List<Node>, List<Association>> targetPathAssocs = pcPathAssociations.get(target);
+			for (Map.Entry<List<Node>, List<Association>> entry : targetPathAssocs.entrySet()) {
 				Path targetPath = new Path(entry.getKey());
 				List<Association> associations = new ArrayList<>(entry.getValue());
 
-				String pc = targetPath.getLast();
+				Node pc = targetPath.getLast();
 
 				Map<Path, List<Association>> pcPathAssocs = pcMap.getOrDefault(pc, new HashMap<>());
 				pcPathAssocs.put(targetPath, associations);

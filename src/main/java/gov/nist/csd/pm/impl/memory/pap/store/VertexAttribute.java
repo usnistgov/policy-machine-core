@@ -5,22 +5,25 @@ import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 class VertexAttribute extends Vertex {
 
-    private ObjectOpenHashSet<String> descendants;
-    private ObjectOpenHashSet<String> ascendants;
-    private ObjectOpenHashSet<Association> outgoingAssociations;
-    private ObjectOpenHashSet<Association> incomingAssociations;
+    private long[] descendants;
+    private long[] ascendants;
+    private Association[] outgoingAssociations;
+    private Association[] incomingAssociations;
 
-    public VertexAttribute(String name, NodeType type) {
-        super(name, type);
-        this.descendants = new ObjectOpenHashSet<>();
-        this.ascendants = new ObjectOpenHashSet<>();
-        this.outgoingAssociations = new ObjectOpenHashSet<>();
-        this.incomingAssociations = new ObjectOpenHashSet<>();
+    public VertexAttribute(long id, String name, NodeType type) {
+        super(id, name, type);
+        this.descendants = new long[0];
+        this.ascendants = new long[0];
+        this.outgoingAssociations = new Association[0];
+        this.incomingAssociations = new Association[0];
     }
 
     @Override
@@ -30,57 +33,69 @@ class VertexAttribute extends Vertex {
 
     @Override
     public long[] getAdjacentDescendants() {
-        return new ObjectOpenHashSet<>(descendants);
+        return descendants;
     }
 
     @Override
     public long[] getAdjacentAscendants() {
-        return new ObjectOpenHashSet<>(ascendants);
+        return ascendants;
     }
 
     @Override
-    public long[] getOutgoingAssociations() {
-        return new ObjectOpenHashSet<>(outgoingAssociations);
+    public Association[] getOutgoingAssociations() {
+        return outgoingAssociations;
     }
 
     @Override
-    public long[] getIncomingAssociations() {
-        return new ObjectOpenHashSet<>(incomingAssociations);
+    public Association[] getIncomingAssociations() {
+        return incomingAssociations;
     }
 
     @Override
     protected void addAssignment(long ascendant, long descendant) {
-        if (ascendant.equals(name)) {
-            descendants.add(descendant);
+        if (ascendant == id) {
+            descendants = Arrays.copyOf(descendants, descendants.length + 1);
+            descendants[descendants.length - 1] = descendant;
         } else {
-            ascendants.add(ascendant);
+            ascendants = Arrays.copyOf(ascendants, ascendants.length + 1);
+            ascendants[ascendants.length - 1] = descendant;
         }
     }
 
     @Override
     protected void deleteAssignment(long ascendant, long descendant) {
-        if (ascendant.equals(name)) {
-            descendants.remove(descendant);
+        if (ascendant == id) {
+            descendants = LongStream.of(descendants)
+                    .filter(desc -> desc == descendant)
+                    .toArray();
         } else {
-            ascendants.remove(ascendant);
+            ascendants = LongStream.of(ascendants)
+                    .filter(asc -> asc == ascendant)
+                    .toArray();
         }
     }
 
     @Override
     public void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
-        if (ua.equals(name)) {
-            outgoingAssociations.add(new Association(ua, target, accessRightSet));
+        if (ua == id) {
+            outgoingAssociations = Arrays.copyOf(outgoingAssociations, outgoingAssociations.length + 1);
+            outgoingAssociations[outgoingAssociations.length-1] = new Association(ua, target, accessRightSet);
         } else {
-            incomingAssociations.add(new Association(ua, target, accessRightSet));
+            incomingAssociations = Arrays.copyOf(incomingAssociations, incomingAssociations.length + 1);
+            incomingAssociations[incomingAssociations.length-1] = new Association(ua, target, accessRightSet);
         }
     }
 
     @Override
     public void deleteAssociation(long ua, long target) {
-        if (ua.equals(name)) {
-            outgoingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
+        if (ua == id) {
+            outgoingAssociations = Stream.of(outgoingAssociations)
+                    .filter(a -> a.getSource() == ua && a.getTarget() == target)
+                    .toArray(Association[]::new);
         } else {
-            incomingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
+            incomingAssociations = Stream.of(incomingAssociations)
+                    .filter(a -> a.getSource() == ua && a.getTarget() == target)
+                    .toArray(Association[]::new);
         }
     }
 }

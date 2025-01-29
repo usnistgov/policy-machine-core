@@ -50,7 +50,7 @@ class LogicalExpressionTest {
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), pap);
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         Value actual = expression.execute(executionContext, pap);
         assertEquals(
                 new BoolValue(false),
@@ -67,7 +67,7 @@ class LogicalExpressionTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         pap = new MemoryPAP();
-        executionContext = new ExecutionContext(new UserContext(""), pap);
+        executionContext = new ExecutionContext(new UserContext(0), pap);
         actual = expression.execute(executionContext, pap);
         assertEquals(
                 new BoolValue(true),

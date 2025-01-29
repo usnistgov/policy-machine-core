@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PMLOperationWrapperTest {
@@ -53,7 +54,7 @@ class PMLOperationWrapperTest {
 
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                privilegeChecker.check(userCtx, (String) operands.get("a"), "assign");
+                privilegeChecker.check(userCtx, (String) operands.get("a"), List.of("assign"));
             }
         };
 
@@ -65,22 +66,22 @@ class PMLOperationWrapperTest {
                 create u "u1" in ["ua1"]
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
 
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new UserContext("u1"), "op1",
+        pdp.adjudicateAdminOperation(new UserContext(id(pap, "u1")), "op1",
                 Map.of("a", "oa1", "b", "b", "c", "c"));
         assertTrue(pap.query().graph().nodeExists("b"));
 
         // try again using pml
-        pap = new MemoryPAP();
+        pap.reset();
         pdp = new PDP(pap);
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
-        pdp.runTx(new UserContext("u1"), tx -> {
-            tx.executePML(new UserContext("u1"), "op1(\"oa1\", \"b\", \"c\")");
+        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
+            tx.executePML(new UserContext(id(pap, "u1")), "op1(\"oa1\", \"b\", \"c\")");
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("b"));
@@ -97,14 +98,14 @@ class PMLOperationWrapperTest {
 
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                privilegeChecker.check(userCtx, (String) operands.get("a"), "assign");
+                privilegeChecker.check(userCtx, (String) operands.get("a"), List.of("assign"));
             }
         };
 
         MemoryPAP pap = new MemoryPAP();
 
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
-        pap.executePML(new UserContext("u1"), "create policy class op1()");
+        pap.executePML(new UserContext(id(pap, "u1")), "create policy class op1()");
         assertTrue(pap.query().graph().nodeExists("test"));
     }
 }

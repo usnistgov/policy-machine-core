@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 
-public class AssociateOp extends GraphOp {
+public class AssociateOp extends GraphOp<Void> {
 
     public AssociateOp() {
         super("associate",
@@ -51,7 +51,7 @@ public class AssociateOp extends GraphOp {
         operandsWithNames.put(TARGET_OPERAND, pap.query().graph().getNodeById(targetId).getName());
 
         return new EventContext(
-                userCtx.getUser(),
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
                 userCtx.getProcess(),
                 this,
                 operandsWithNames

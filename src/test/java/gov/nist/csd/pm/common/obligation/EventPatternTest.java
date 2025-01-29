@@ -4,6 +4,8 @@ import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
@@ -11,6 +13,8 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.ProcessSubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
+import gov.nist.csd.pm.util.TestMemoryPAP;
+import it.unimi.dsi.fastutil.longs.LongList;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,6 +27,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EventPatternTest {
 
+    private TestMemoryPAP testPAP() throws PMException {
+        TestMemoryPAP pap = new TestMemoryPAP();
+
+        GraphModification graph = pap.modify().graph();
+
+        graph.createPolicyClass("pc1");
+        graph.createUserAttribute("ua1", LongList.of(1));
+        graph.createUser("u1", LongList.of(2));
+
+        return pap;
+    }
+
     @Test
     void testOperationMatches() throws PMException {
         EventPattern eventPattern = new EventPattern(
@@ -31,14 +47,14 @@ class EventPatternTest {
                 Map.of()
         );
 
+        PAP pap = testPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 null,
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertTrue(eventPattern.matches(eventContext, pap));
     }
@@ -51,14 +67,14 @@ class EventPatternTest {
                 Map.of()
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 null,
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertFalse(eventPattern.matches(eventContext, pap));
     }
@@ -71,14 +87,14 @@ class EventPatternTest {
                 Map.of()
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertFalse(eventPattern.matches(eventContext, pap));
     }
@@ -95,14 +111,14 @@ class EventPatternTest {
                 Map.of()
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "p1",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertTrue(eventPattern.matches(eventContext, pap));
     }
@@ -119,14 +135,14 @@ class EventPatternTest {
                 Map.of()
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "p2",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertTrue(eventPattern.matches(eventContext, pap));
     }
@@ -143,14 +159,14 @@ class EventPatternTest {
                 Map.of()
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "p2",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertFalse(eventPattern.matches(eventContext, pap));
     }
@@ -166,14 +182,14 @@ class EventPatternTest {
                 )
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertTrue(eventPattern.matches(eventContext, pap));
     }
@@ -189,14 +205,14 @@ class EventPatternTest {
                 )
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, List.of("b"))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertFalse(eventPattern.matches(eventContext, pap));
     }
@@ -212,14 +228,14 @@ class EventPatternTest {
                 )
         );
 
+        MemoryPAP pap = new MemoryPAP();
+
         EventContext eventContext = new EventContext(
                 "u1",
                 "",
                 new AssignOp(),
                 Map.of(ASCENDANT_OPERAND, "a", DESCENDANTS_OPERAND, Map.of("b", ""))
         );
-
-        MemoryPAP pap = new MemoryPAP();
 
         assertThrows(UnexpectedOperandTypeException.class,
                 () -> eventPattern.matches(eventContext, pap));

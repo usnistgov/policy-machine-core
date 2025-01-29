@@ -6,6 +6,9 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteNodeStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteObligationStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteProhibitionStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import org.junit.jupiter.api.Test;
@@ -26,7 +29,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteStatement(DeleteStatement.Type.OBJECT_ATTRIBUTE, new StringLiteral("oa1")),
+                new DeleteNodeStatement(new StringLiteral("oa1")),
                 stmt
         );
     }
@@ -54,7 +57,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteStatement(DeleteStatement.Type.OBLIGATION, new StringLiteral("test")),
+                new DeleteObligationStatement(new StringLiteral("test")),
                 stmt
         );
     }
@@ -70,7 +73,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteStatement(DeleteStatement.Type.PROHIBITION, new StringLiteral("test")),
+                new DeleteProhibitionStatement(new StringLiteral("test")),
                 stmt
         );
     }

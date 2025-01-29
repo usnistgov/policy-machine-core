@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 
-public class DissociateOp extends GraphOp {
+public class DissociateOp extends GraphOp<Void> {
 
     public DissociateOp() {
         super("dissociate",
@@ -49,6 +49,11 @@ public class DissociateOp extends GraphOp {
         operandsWithNames.put(UA_OPERAND, pap.query().graph().getNodeById(uaId).getName());
         operandsWithNames.put(TARGET_OPERAND, pap.query().graph().getNodeById(targetId).getName());
 
-        return new EventContext(userCtx.getUser(), userCtx.getProcess(), this, operandsWithNames);
+        return new EventContext(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                this,
+                operandsWithNames
+        );
     }
 }

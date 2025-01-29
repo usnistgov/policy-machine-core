@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreateProhibitionStatementTest {
@@ -28,7 +31,7 @@ class CreateProhibitionStatementTest {
         CreateProhibitionStatement stmt = new CreateProhibitionStatement(
                 new StringLiteral("pro1"),
                 new StringLiteral("ua2"),
-                ProhibitionSubject.Type.USER_ATTRIBUTE,
+                ProhibitionSubjectType.USER_ATTRIBUTE,
                 buildArrayLiteral("read"),
                 true,
                 new ArrayLiteral(
@@ -39,12 +42,12 @@ class CreateProhibitionStatementTest {
         PAP pap = new MemoryPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc2");
-        pap.modify().graph().createUserAttribute("ua2", List.of("pc2"));
-        pap.modify().graph().createUser("u2", List.of("ua2"));
-        pap.modify().graph().createObjectAttribute("oa1", List.of("pc2"));
-        pap.modify().graph().createObjectAttribute("oa2", List.of("pc2"));
+        pap.modify().graph().createUserAttribute("ua2", ids(pap, "pc2"));
+        pap.modify().graph().createUser("u2", ids(pap, "ua2"));
+        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc2"));
+        pap.modify().graph().createObjectAttribute("oa2", ids(pap, "pc2"));
 
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u2"), pap);
+        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u2")), pap);
 
         stmt.execute(execCtx, pap);
 
@@ -52,7 +55,7 @@ class CreateProhibitionStatementTest {
 
         Prohibition prohibition = pap.query().prohibitions().getProhibition("pro1");
         assertEquals(
-                new ProhibitionSubject("ua2", ProhibitionSubject.Type.USER_ATTRIBUTE),
+                new ProhibitionSubject(id(pap, "ua2")),
                 prohibition.getSubject()
         );
         assertTrue(prohibition.isIntersection());
@@ -61,7 +64,7 @@ class CreateProhibitionStatementTest {
                 prohibition.getAccessRightSet()
         );
         assertEquals(
-                List.of(new ContainerCondition("oa1", false), new ContainerCondition("oa2", true)),
+                List.of(new ContainerCondition(id(pap, "oa1"), false), new ContainerCondition(id(pap, "oa2"), true)),
                 prohibition.getContainers()
         );
     }
@@ -71,7 +74,7 @@ class CreateProhibitionStatementTest {
         CreateProhibitionStatement stmt = new CreateProhibitionStatement(
                 new StringLiteral("pro1"),
                 new StringLiteral("ua2"),
-                ProhibitionSubject.Type.USER_ATTRIBUTE,
+                ProhibitionSubjectType.USER_ATTRIBUTE,
                 buildArrayLiteral("read"),
                 true,
                 new ArrayLiteral(

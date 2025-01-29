@@ -5,6 +5,7 @@ import gov.nist.csd.pm.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 import java.util.*;
 
@@ -16,8 +17,8 @@ public class AccessRightResolver {
     private AccessRightResolver() {}
 
     public static AccessRightSet resolvePrivileges(UserDagResult userCtx, TargetDagResult targetCtx, AccessRightSet resourceOps) {
-        Map<String, AccessRightSet> resolvedPcMap = new HashMap<>();
-        for (Map.Entry<String, AccessRightSet> pc : targetCtx.pcMap().entrySet()) {
+        Map<Long, AccessRightSet> resolvedPcMap = new HashMap<>();
+        for (Map.Entry<Long, AccessRightSet> pc : targetCtx.pcMap().entrySet()) {
             AccessRightSet pcOps = pc.getValue();
 
             // replace instances of *, *a or *r with the literal access rights
@@ -38,7 +39,7 @@ public class AccessRightResolver {
     public static AccessRightSet resolveDeniedAccessRights(UserDagResult userCtx, TargetDagResult targetCtx) {
         AccessRightSet denied = new AccessRightSet();
         Set<Prohibition> prohibitions = userCtx.prohibitions();
-        Set<String> reachedTargets = targetCtx.reachedTargets();
+        Set<Long> reachedTargets = targetCtx.reachedTargets();
 
         for(Prohibition p : prohibitions) {
             if (isProhibitionSatisfied(p, reachedTargets)) {
@@ -53,7 +54,7 @@ public class AccessRightResolver {
         List<Prohibition> satisfied = new ArrayList<>();
 
         Set<Prohibition> prohibitions = userDagResult.prohibitions();
-        Set<String> reachedTargets = targetDagResult.reachedTargets();
+        Set<Long> reachedTargets = targetDagResult.reachedTargets();
 
         for(Prohibition p : prohibitions) {
             if (isProhibitionSatisfied(p, reachedTargets)) {
@@ -64,7 +65,7 @@ public class AccessRightResolver {
         return satisfied;
     }
 
-    private static AccessRightSet resolvePolicyClassAccessRightSets(Map<String, AccessRightSet> pcMap) {
+    private static AccessRightSet resolvePolicyClassAccessRightSets(Map<Long, AccessRightSet> pcMap) {
         // retain only the ops that the decider knows about
         AccessRightSet allowed = new AccessRightSet();
         boolean first = true;
@@ -105,17 +106,18 @@ public class AccessRightResolver {
         }
     }
 
-    private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<String> reachedTargets) {
+    private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<Long> reachedTargets) {
         boolean inter = prohibition.isIntersection();
         Collection<ContainerCondition> containers = prohibition.getContainers();
         boolean addOps = false;
 
         for (ContainerCondition containerCondition : containers) {
-            String contName = containerCondition.getId();
+            long contId = containerCondition.getId();
             boolean isComplement = containerCondition.isComplement();
+            boolean reached = reachedTargets.contains(contId);
 
-            addOps = !isComplement && reachedTargets.contains(contName) ||
-                    isComplement && !reachedTargets.contains(contName);
+            addOps = !isComplement && reached ||
+                    isComplement && !reached;
 
             if ((addOps && !inter) || (!addOps && inter)) {
                 break;

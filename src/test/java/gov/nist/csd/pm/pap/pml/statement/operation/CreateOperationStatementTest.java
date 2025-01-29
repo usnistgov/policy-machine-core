@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreateOperationStatementTest {
@@ -35,19 +36,19 @@ class CreateOperationStatementTest {
                 }
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new UserContext("u1"), tx -> {
-            tx.executePML(new UserContext("u1"), """
+        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
+            tx.executePML(new UserContext(id(pap, "u1")), """
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext("u2"), tx -> {
-            tx.executePML(new UserContext("u2"), """
+        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id(pap, "u2")), tx -> {
+            tx.executePML(new UserContext(id(pap, "u2")), """
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
@@ -74,19 +75,19 @@ class CreateOperationStatementTest {
                 }
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new UserContext("u1"), tx -> {
-            tx.executePML(new UserContext("u1"), """
+        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
+            tx.executePML(new UserContext(id(pap, "u1")), """
                 op1("test1", ["o2", "o3"])
                 """);
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("test1"));
 
-        pdp.runTx(new UserContext("u2"), tx -> {
-            tx.executePML(new UserContext("u2"), """
+        pdp.runTx(new UserContext(id(pap, "u2")), tx -> {
+            tx.executePML(new UserContext(id(pap, "u2")), """
                 op1("test2", ["o2", "o3"])
                 """);
             return null;

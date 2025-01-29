@@ -13,14 +13,16 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     private final ObligationsQueryAdjudicator obligations;
     private final OperationsQueryAdjudicator operations;
     private final RoutinesQueryAdjudicator routines;
+    private final DiscoveryQueryAdjudicator discovery;
 
     public PolicyQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        this.access = new AccessQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.access = new AccessQueryAdjudicator(pap, privilegeChecker);
         this.graph = new GraphQueryAdjudicator(userCtx, pap, privilegeChecker);
         this.prohibitions = new ProhibitionsQueryAdjudicator(userCtx, pap, privilegeChecker);
         this.obligations = new ObligationsQueryAdjudicator(userCtx, pap, privilegeChecker);
         this.operations = new OperationsQueryAdjudicator(userCtx, pap, privilegeChecker);
         this.routines = new RoutinesQueryAdjudicator(userCtx, pap, privilegeChecker);
+        this.discovery = new DiscoveryQueryAdjudicator(pap, userCtx);
     }
 
     @Override
@@ -51,6 +53,10 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     @Override
     public RoutinesQueryAdjudicator routines() {
         return routines;
+    }
+
+    public DiscoveryQueryAdjudicator discovery() {
+        return discovery;
     }
 
 }

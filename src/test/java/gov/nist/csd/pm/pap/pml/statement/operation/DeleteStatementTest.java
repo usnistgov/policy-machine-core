@@ -17,38 +17,41 @@ import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypher.internal.logical.plans.DeleteNode;
 
 import java.util.Collections;
 import java.util.List;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        DeleteStatement stmt1 = new DeleteStatement(DeleteStatement.Type.OBJECT_ATTRIBUTE, new StringLiteral("oa1"));
-        DeleteStatement stmt2 = new DeleteStatement(DeleteStatement.Type.PROHIBITION, new StringLiteral("p1"));
-        DeleteStatement stmt3 = new DeleteStatement(DeleteStatement.Type.OBLIGATION, new StringLiteral("o1"));
+        DeleteStatement stmt1 = new DeleteNodeStatement(new StringLiteral("oa1"));
+        DeleteStatement stmt2 = new DeleteProhibitionStatement(new StringLiteral("p1"));
+        DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteral("o1"));
 
         PAP pap = new MemoryPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-        pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-        UserContext userContext = new UserContext("u1");
+        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
+        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
+        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
+        pap.modify().graph().createObjectAttribute("oa2", ids(pap, "pc1"));
+        UserContext userContext = new UserContext(id(pap, "u1"));
         pap.modify().obligations().createObligation(userContext.getUser(), "o1", List.of(new Rule(
                 "rule1",
                 new EventPattern(new SubjectPattern(), new OperationPattern("e1")),
                 new Response("e", List.of())
         )));
         pap.modify().prohibitions().createProhibition("p1",
-                                    new ProhibitionSubject("ua1", ProhibitionSubject.Type.USER_ATTRIBUTE), ,
+                                    new ProhibitionSubject(id(pap, "ua1")),
 		        new AccessRightSet("read"),
 		        true,
-		        Collections.singleton(new ContainerCondition("oa1", true)));
+		        Collections.singleton(new ContainerCondition(id(pap, "oa1"), true)));
 
         stmt2.execute(new ExecutionContext(userContext, pap), pap);
         stmt3.execute(new ExecutionContext(userContext, pap), pap);
@@ -61,13 +64,13 @@ class DeleteStatementTest {
 
     @Test
     void testToFormattedString() {
-        DeleteStatement stmt = new DeleteStatement(DeleteStatement.Type.OBJECT_ATTRIBUTE, new StringLiteral("test"));
-        DeleteStatement stmt1 = new DeleteStatement(DeleteStatement.Type.OBLIGATION, new StringLiteral("test"));
-        DeleteStatement stmt2 = new DeleteStatement(DeleteStatement.Type.PROHIBITION, new StringLiteral("test"));
-        DeleteStatement stmt3 = new DeleteStatement(DeleteStatement.Type.OBJECT, new StringLiteral("test"));
-        DeleteStatement stmt4 = new DeleteStatement(DeleteStatement.Type.POLICY_CLASS, new StringLiteral("test"));
-        DeleteStatement stmt5 = new DeleteStatement(DeleteStatement.Type.USER, new StringLiteral("test"));
-        DeleteStatement stmt6 = new DeleteStatement(DeleteStatement.Type.USER_ATTRIBUTE, new StringLiteral("test"));
+        DeleteStatement stmt = new DeleteNodeStatement(new StringLiteral("test"));
+        DeleteStatement stmt1 = new DeleteProhibitionStatement(new StringLiteral("test"));
+        DeleteStatement stmt2 = new DeleteObligationStatement( new StringLiteral("test"));
+        DeleteStatement stmt3 = new DeleteNodeStatement(new StringLiteral("test"));
+        DeleteStatement stmt4 = new DeleteNodeStatement(new StringLiteral("test"));
+        DeleteStatement stmt5 = new DeleteNodeStatement(new StringLiteral("test"));
+        DeleteStatement stmt6 = new DeleteNodeStatement(new StringLiteral("test"));
 
         assertEquals("delete OA \"test\"", stmt.toFormattedString(0));
         assertEquals("delete obligation \"test\"", stmt1.toFormattedString(0));

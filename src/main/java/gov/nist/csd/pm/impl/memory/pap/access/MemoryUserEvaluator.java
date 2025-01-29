@@ -34,16 +34,17 @@ public class MemoryUserEvaluator {
 	protected UserDagResult evaluate(UserContext userCtx) throws PMException {
 		userCtx.checkExists(policyStore.graph());
 
-		final Map<String, AccessRightSet> borderTargets = new HashMap<>();
-		// initialize with the prohibitions or the provided process
-		final Set<Prohibition> reachedProhibitions = new HashSet<>(getProhibitionsWithSubject(userCtx.getProcess()));
+		final Map<Long, AccessRightSet> borderTargets = new HashMap<>();
+		// initialize with the prohibitions for the provided process
+		final Set<Prohibition> reachedProhibitions =
+				new HashSet<>(policyStore.prohibitions().getProhibitionsWithProcess(userCtx.getProcess()));
 
 		Visitor visitor = node -> {
 			// cache prohibitions reached by the user
-			Collection<Prohibition> subjectProhibitions = getProhibitionsWithSubject(node);
+			Collection<Prohibition> subjectProhibitions = policyStore.prohibitions().getProhibitionsWithNode(node);
 			reachedProhibitions.addAll(subjectProhibitions);
 
-			Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
+			Association[] nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
 			collectAssociationsFromBorderTargets(nodeAssociations, borderTargets);
 		};
 
@@ -61,11 +62,7 @@ public class MemoryUserEvaluator {
 		return new UserDagResult(borderTargets, reachedProhibitions);
 	}
 
-	private Collection<Prohibition> getProhibitionsWithSubject(String node) throws PMException {
-		return policyStore.prohibitions().getNodeProhibitions().getOrDefault(node, new ArrayList<>());
-	}
-
-	private void collectAssociationsFromBorderTargets(Collection<Association> assocs, Map<String, AccessRightSet> borderTargets) {
+	private void collectAssociationsFromBorderTargets(Association[] assocs, Map<Long, AccessRightSet> borderTargets) {
 		for (Association association : assocs) {
 			AccessRightSet ops = association.getAccessRightSet();
 			AccessRightSet exOps = borderTargets.getOrDefault(association.getTarget(), new AccessRightSet());

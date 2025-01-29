@@ -9,9 +9,12 @@ import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeassignStatementTest {
@@ -25,15 +28,15 @@ class DeassignStatementTest {
 
         PAP pap = new MemoryPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("ua3", List.of("ua1", "ua2", "pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
+        pap.modify().graph().createUserAttribute("ua2", ids(pap, "pc1"));
+        pap.modify().graph().createUserAttribute("ua3", ids(pap, "ua1", "ua2", "pc1"));
+        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
 
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"), pap);
+        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u1")), pap);
         stmt.execute(execCtx, pap);
 
-        assertTrue(pap.query().graph().getAdjacentDescendants("ua3").contains("pc1"));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "ua3"))).boxed().toList().contains(id(pap, "pc1")));
     }
 
     @Test

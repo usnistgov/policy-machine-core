@@ -15,6 +15,7 @@ import gov.nist.csd.pm.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
+import java.util.stream.LongStream;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.AccessRightResolver.*;
@@ -82,7 +83,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
-        Map<String, AccessRightSet> results = new HashMap<>();
+        Map<Long, AccessRightSet> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no attrs are reachable
         MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
@@ -91,13 +92,13 @@ public class MemoryAccessQuerier extends AccessQuerier {
             return results;
         }
 
-        for(String borderTarget : userDagResult.borderTargets().keySet()) {
+        for(long borderTarget : userDagResult.borderTargets().keySet()) {
             // compute permissions on the border attr
             getAndStorePrivileges(results, userDagResult, borderTarget);
 
             // compute decisions for the subgraph of the border attr
-            Set<String> descendants = getDescendants(borderTarget);
-            for (String descendant : descendants) {
+            Set<Long> descendants = getDescendants(borderTarget);
+            for (long descendant : descendants) {
                 if (results.containsKey(descendant)) {
                     continue;
                 }
@@ -107,9 +108,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
         }
 
         // add policy classes
-        if (results.containsKey(PM_ADMIN_OBJECT.nodeName())) {
-            AccessRightSet arset = results.get(PM_ADMIN_OBJECT.nodeName());
-            for (String pc : store.graph().getPolicyClasses()) {
+        if (results.containsKey(PM_ADMIN_OBJECT.nodeId())) {
+            AccessRightSet arset = results.get(PM_ADMIN_OBJECT.nodeId());
+            for (long pc : store.graph().getPolicyClasses()) {
                 results.put(pc, arset);
             }
         }
@@ -119,9 +120,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
-        Map<String, AccessRightSet> acl = new HashMap<>();
-        Collection<String> search = store.graph().search(U, NO_PROPERTIES);
-        for (String user : search) {
+        Map<Long, AccessRightSet> acl = new HashMap<>();
+        long[] search = store.graph().search(U, NO_PROPERTIES);
+        for (long user : search) {
             AccessRightSet list = this.computePrivileges(new UserContext(user), targetCtx);
             acl.put(user, list);
         }
@@ -130,7 +131,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     @Override
-    public Map<Node, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
         return new MemoryUserEvaluator(store)
                 .evaluate(userCtx)
                 .borderTargets();
@@ -140,33 +141,35 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
         List<SubgraphPrivileges> subgraphs = new ArrayList<>();
 
-        Collection<String> adjacentAscendants = store.graph().getAdjacentAscendants(root);
-        for (String adjacent : adjacentAscendants) {
+        long[] adjacentAscendants = store.graph().getAdjacentAscendants(root);
+        for (long adjacent : adjacentAscendants) {
             subgraphs.add(computeSubgraphPrivileges(userCtx, adjacent));
         }
 
-        return new SubgraphPrivileges(root, computePrivileges(userCtx, new TargetContext(root)), subgraphs);
+        return new SubgraphPrivileges(store.graph().getNodeById(root), computePrivileges(userCtx, new TargetContext(root)), subgraphs);
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
-        Map<String, AccessRightSet> ascendantPrivs = new HashMap<>();
+    public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
+        Map<Node, AccessRightSet> ascendantPrivs = new HashMap<>();
 
-        Collection<String> adjacentAscendants = store.graph().getAdjacentAscendants(root);
-        for (String adjacentAscendant : adjacentAscendants) {
-            ascendantPrivs.put(adjacentAscendant, computePrivileges(userCtx, new TargetContext(adjacentAscendant)));
+        long[] adjacentAscendants = store.graph().getAdjacentAscendants(root);
+        for (long adjacentAscendant : adjacentAscendants) {
+            Node node = store.graph().getNodeById(adjacentAscendant);
+            ascendantPrivs.put(node, computePrivileges(userCtx, new TargetContext(adjacentAscendant)));
         }
 
         return ascendantPrivs;
     }
 
     @Override
-    public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
-        Map<String, AccessRightSet> descendantPrivs = new HashMap<>();
+    public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
+        Map<Node, AccessRightSet> descendantPrivs = new HashMap<>();
 
-        Collection<String> adjacentDescendants = store.graph().getAdjacentDescendants(root);
-        for (String adjacentDescendant : adjacentDescendants) {
-            descendantPrivs.put(adjacentDescendant, computePrivileges(userCtx, new TargetContext(adjacentDescendant)));
+        long[] adjacentDescendants = store.graph().getAdjacentDescendants(root);
+        for (long adjacentDescendant : adjacentDescendants) {
+            Node node = store.graph().getNodeById(adjacentDescendant);
+            descendantPrivs.put(node, computePrivileges(userCtx, new TargetContext(adjacentDescendant)));
         }
 
         return descendantPrivs;
@@ -180,9 +183,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
-        Map<String, AccessRightSet> pos = new HashMap<>();
+        Map<Node, AccessRightSet> pos = new HashMap<>();
 
-        for (String pc : store.graph().getPolicyClasses()) {
+        for (long pc : store.graph().getPolicyClasses()) {
             new GraphStoreBFS(store.graph())
                     .withDirection(Direction.ASCENDANTS)
                     .withVisitor(n -> {
@@ -191,7 +194,8 @@ public class MemoryAccessQuerier extends AccessQuerier {
                             return;
                         }
 
-                        pos.put(n, privs);
+                        Node node = store.graph().getNodeById(n);
+                        pos.put(node, privs);
                     })
                     .withSinglePathShortCircuit(n -> {
                         return pos.containsKey(n);
@@ -201,23 +205,23 @@ public class MemoryAccessQuerier extends AccessQuerier {
         return pos;
     }
 
-    private void getAndStorePrivileges(Map<String, AccessRightSet> arsetMap, UserDagResult userDagResult, String target) throws PMException {
+    private void getAndStorePrivileges(Map<Long, AccessRightSet> arsetMap, UserDagResult userDagResult, long target) throws PMException {
         TargetDagResult result = new MemoryTargetEvaluator(store)
                 .evaluate(userDagResult, new TargetContext(target));
         AccessRightSet privileges = resolvePrivileges(userDagResult, result, store.operations().getResourceOperations());
         arsetMap.put(target, privileges);
     }
 
-    private Set<String> getDescendants(String vNode) throws PMException {
-        Set<String> descendants = new HashSet<>();
+    private Set<Long> getDescendants(long vNode) throws PMException {
+        Set<Long> descendants = new HashSet<>();
 
-        Collection<String> ascendants = store.graph().getAdjacentAscendants(vNode);
-        if (ascendants.isEmpty()) {
+        long[] ascendants = store.graph().getAdjacentAscendants(vNode);
+        if (ascendants.length == 0) {
             return descendants;
         }
 
-        descendants.addAll(ascendants);
-        for (String ascendant : ascendants) {
+        descendants.addAll(LongStream.of(ascendants).boxed().toList());
+        for (long ascendant : ascendants) {
             descendants.add(ascendant);
             descendants.addAll(getDescendants(ascendant));
         }

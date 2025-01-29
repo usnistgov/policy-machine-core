@@ -2,21 +2,24 @@ package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.Association;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.LongStream;
 
 class VertexPolicyClass extends Vertex {
-    private ObjectOpenHashSet<String> ascendants;
+    private long[] ascendants;
 
-    public VertexPolicyClass(String name) {
-        super(name, NodeType.PC);
-        this.ascendants = new ObjectOpenHashSet<>();
+    public VertexPolicyClass(long id, String name) {
+        super(id, name, NodeType.PC);
+        this.ascendants = new long[0];
     }
 
-    public VertexPolicyClass(String name, ObjectOpenHashSet<String> ascendants) {
-        super(name, NodeType.PC);
+    public VertexPolicyClass(long id, String name, long[] ascendants) {
+        super(id, name, NodeType.PC);
         this.ascendants = ascendants;
     }
 
@@ -27,32 +30,35 @@ class VertexPolicyClass extends Vertex {
 
     @Override
     protected long[] getAdjacentDescendants() {
-        return new ObjectOpenHashSet<>();
+        return new long[]{};
     }
 
     @Override
     protected long[] getAdjacentAscendants() {
-        return new ObjectOpenHashSet<>(ascendants);
+        return new long[]{};
     }
 
     @Override
-    protected long[] getOutgoingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Association[] getOutgoingAssociations() {
+        return new Association[]{};
     }
 
     @Override
-    protected long[] getIncomingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Association[] getIncomingAssociations() {
+        return new Association[]{};
     }
 
     @Override
     public void addAssignment(long ascendant, long descendant) {
-        ascendants.add(ascendant);
+        ascendants = Arrays.copyOf(ascendants, ascendants.length + 1);
+        ascendants[ascendants.length-1] = ascendant;
     }
 
     @Override
     public void deleteAssignment(long ascendant, long descendant) {
-        ascendants.remove(ascendant);
+        ascendants = LongStream.of(ascendants)
+                .filter(asc -> asc == ascendant)
+                .toArray();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.graph.relationship.Association;
 
 import java.util.Map;
 
@@ -9,8 +10,8 @@ public class VertexWithProps extends Vertex{
     private Vertex vertex;
     private Map<String, String> properties;
 
-    public VertexWithProps(Vertex vertex, Map<String, String> properties) {
-        super(vertex.name, vertex.type);
+    public VertexWithProps(long id, Vertex vertex, Map<String, String> properties) {
+        super(id, vertex.name, vertex.type);
         this.vertex = vertex;
         this.properties = properties;
     }
@@ -35,12 +36,12 @@ public class VertexWithProps extends Vertex{
     }
 
     @Override
-    protected long[] getOutgoingAssociations() {
+    protected Association[] getOutgoingAssociations() {
         return vertex.getOutgoingAssociations();
     }
 
     @Override
-    protected long[] getIncomingAssociations() {
+    protected Association[] getIncomingAssociations() {
         return vertex.getIncomingAssociations();
     }
 

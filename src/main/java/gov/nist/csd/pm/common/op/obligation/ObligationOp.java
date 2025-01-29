@@ -57,8 +57,8 @@ public abstract class ObligationOp extends Operation<Void> {
             return;
         }
 
-        for (long node : referencedNodes.nodes()) {
-            privilegeChecker.check(userCtx, node, toCheck);
+        for (String node : referencedNodes.nodes()) {
+            privilegeChecker.check(userCtx, node, List.of(toCheck));
         }
     }
 }

@@ -36,7 +36,7 @@ class ParenExpressionTest {
         VisitorContext visitorContext = new VisitorContext(compileGlobalScope);
         Expression e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        Value actual = e.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -49,7 +49,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 actual
@@ -62,7 +62,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -75,7 +75,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -88,7 +88,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(true),
                 actual
@@ -101,7 +101,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileGlobalScope);
         e = Expression.compile(visitorContext, ctx, Type.bool());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new BoolValue(false),
                 actual
@@ -120,7 +120,7 @@ class ParenExpressionTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         PAP pap = new MemoryPAP();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), new MemoryPAP());
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
         Value actual = expression.execute(executionContext, pap);
         assertEquals(
                 new BoolValue(false),

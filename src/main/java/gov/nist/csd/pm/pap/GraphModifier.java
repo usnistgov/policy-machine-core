@@ -214,7 +214,7 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected void checkIfNodeInProhibition(long id) throws PMException {
-        Map<Node, Collection<Prohibition>> allProhibitions = store.prohibitions().getNodeProhibitions();
+        Map<Long, Collection<Prohibition>> allProhibitions = store.prohibitions().getNodeProhibitions();
         for (Collection<Prohibition> subjPros : allProhibitions.values()) {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(id, p)) {

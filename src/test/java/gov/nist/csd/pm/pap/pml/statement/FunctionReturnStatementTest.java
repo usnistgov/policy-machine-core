@@ -23,7 +23,7 @@ class FunctionReturnStatementTest {
                 create policy class f1()
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
     }
 
 }

@@ -40,7 +40,7 @@ class ReferenceByDotIndexTest {
     void testExecute() throws PMException {
         ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
         PAP pap = new MemoryPAP();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), pap);
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), Type.string());
         MapValue mapValue = new MapValue(
                 Map.of(new StringValue("b"), expected), Type.string(), Type.array(Type.string()));
@@ -64,10 +64,10 @@ class ReferenceByDotIndexTest {
                 create policy class a.b.c.d
                 """;
         PAP pap = new MemoryPAP();
-        pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("u1", List.of("ua1"));
-        pap.executePML(new UserContext("u1"), pml);
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        long u1 = pap.modify().graph().createUserAttribute("u1", List.of(ua1));
+        pap.executePML(new UserContext(u1), pml);
 
         assertTrue(pap.query().graph().nodeExists("e"));
     }

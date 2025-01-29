@@ -23,7 +23,7 @@ class BreakStatementTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
@@ -44,7 +44,7 @@ class BreakStatementTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));

@@ -32,7 +32,7 @@ class ReferenceByIDTest {
     @Test
     void testExecute() throws PMException {
         ReferenceByID a = new ReferenceByID("a");
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(""), new MemoryPAP());
+        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
         Value expected = new StringValue("test");
         executionContext.scope().addVariable("a", expected);
 

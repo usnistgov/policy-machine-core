@@ -22,7 +22,7 @@ class SetResourceOperationsStatementTest {
 
         PAP pap = new MemoryPAP();
 
-        stmt.execute(new ExecutionContext(new UserContext(""), pap), pap);
+        stmt.execute(new ExecutionContext(new UserContext(0), pap), pap);
 
         assertEquals(
                 new AccessRightSet("a", "b", "c", "d"),

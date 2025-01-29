@@ -12,6 +12,9 @@ import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Traverser;
@@ -58,7 +61,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	@Override
-	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+	public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
 		return memoryAccessQuerier.computeDestinationAttributes(userCtx);
 	}
 
@@ -68,12 +71,12 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	@Override
-	public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
+	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
 		return memoryAccessQuerier.computeAdjacentAscendantPrivileges(userCtx, root);
 	}
 
 	@Override
-	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+	public Map<gov.nist.csd.pm.common.graph.node.Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
 		return memoryAccessQuerier.computeAdjacentDescendantPrivileges(userCtx, root);
 	}
 
@@ -88,10 +91,10 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	private UserDagResult evaluateUser(Transaction tx, UserContext userCtx) throws PMException {
-		Map<String, AccessRightSet> assocs = new HashMap<>();
+		Long2ObjectOpenHashMap<AccessRightSet> assocs = new Long2ObjectOpenHashMap<>();
 		Set<Prohibition> userPros = new HashSet<>();
 
-		Collection<String> attrs;
+		long[] attrs;
 		if (userCtx.isUserDefined()) {
 			attrs = store.graph().getAdjacentDescendants(userCtx.getUser());
 
@@ -102,13 +105,13 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 			attrs = userCtx.getAttributeIds();
 		}
 
-		for (String userAttr : attrs) {
+		for (long userAttr : attrs) {
 			Traverser traverser = traverseUserAttr(tx, userAttr);
 
 			// process user paths
 			for (org.neo4j.graphdb.Path path : traverser) {
 				Node endNode = path.endNode();
-				String endNodeName = endNode.getProperty(NAME_PROPERTY).toString();
+				long endNodeId = (long) endNode.getProperty(ID_PROPERTY);
 
 				if (endNode.hasLabel(PROHIBITION_LABEL)) {
 					userPros.add(getProhibitionFromNode(endNode));
@@ -116,7 +119,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 					Relationship last = path.lastRelationship();
 					AccessRightSet arset = new AccessRightSet((String[]) last.getProperty(ARSET_PROPERTY));
 
-					assocs.put(endNodeName, arset);
+					assocs.put(endNodeId, arset);
 				}
 			}
 		}
@@ -124,8 +127,8 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 		return new UserDagResult(assocs, userPros);
 	}
 
-	private Traverser traverseUserAttr(Transaction tx, String userAttr) throws PMException {
-		Node uNode = tx.findNode(UA_LABEL, NAME_PROPERTY, userAttr);
+	private Traverser traverseUserAttr(Transaction tx, long userAttr) throws PMException {
+		Node uNode = tx.findNode(UA_LABEL, ID_PROPERTY, userAttr);
 
 		return tx.traversalDescription()
 				.breadthFirst()
@@ -154,11 +157,11 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 	}
 
 	private TargetDagResult evaluateTarget(Transaction tx, TargetContext targetCtx, UserDagResult userDagResult) throws PMException {
-		Map<String, AccessRightSet> pcMap = new HashMap<>();
-		Set<String> reachedContainers = new HashSet<>();
+		Long2ObjectOpenHashMap<AccessRightSet> pcMap = new Long2ObjectOpenHashMap<>();
+		LongOpenHashSet reachedContainers = new LongOpenHashSet();
 
 		AccessRightSet arsetToTarget = new AccessRightSet();
-		Collection<String> attrs;
+		long[] attrs;
 		if (targetCtx.isNode()) {
 			reachedContainers.add(targetCtx.getTargetId());
 
@@ -173,24 +176,24 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 			attrs = targetCtx.getAttributeIds();
 		}
 
-		for (String targetAttr : attrs) {
+		for (long targetAttr : attrs) {
 			Traverser traverser = traverseTarget(tx, targetAttr);
 
 			for (org.neo4j.graphdb.Path path : traverser) {
 				Node endNode = path.endNode();
-				String endNodeName = String.valueOf(endNode.getProperty(NAME_PROPERTY));
+				long endNodeName = (long) endNode.getProperty(ID_PROPERTY);
 
 				if (endNode.hasLabel(PROHIBITION_LABEL)) {
 					Relationship proContRel = path.lastRelationship();
 					Node contNode = proContRel.getStartNode();
-					reachedContainers.add(contNode.getProperty(NAME_PROPERTY).toString());
+					reachedContainers.add((long) contNode.getProperty(ID_PROPERTY));
 				} else {
 					AccessRightSet pcArs = pcMap.getOrDefault(endNodeName, new AccessRightSet());
 
 					for (Node node : path.nodes()) {
-						String nodeName = node.getProperty(NAME_PROPERTY).toString();
+						long nodeId = (long) node.getProperty(ID_PROPERTY);
 
-						AccessRightSet arset = userDagResult.borderTargets().getOrDefault(nodeName, new AccessRightSet());
+						AccessRightSet arset = userDagResult.borderTargets().getOrDefault(nodeId, new AccessRightSet());
 						pcArs.addAll(arset);
 
 						pcMap.put(endNodeName, pcArs);
@@ -199,21 +202,25 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 			}
 		}
 
-		for (Map.Entry<String, AccessRightSet> entry : pcMap.entrySet()) {
-			AccessRightSet pcArset = pcMap.getOrDefault(entry.getKey(), new AccessRightSet());
+		for (Long2ObjectMap.Entry<AccessRightSet> entry : pcMap.long2ObjectEntrySet()) {
+			long nodeId = entry.getLongKey();
+
+			AccessRightSet pcArset = entry.getValue();
+			if (pcArset == null) {
+				pcArset = new AccessRightSet();
+				pcMap.put(nodeId, pcArset);  // Initialize in the map if it wasn't present
+			}
+
 			pcArset.addAll(arsetToTarget);
-			pcMap.computeIfAbsent(entry.getKey(), k -> {
-				AccessRightSet arset = new AccessRightSet(arsetToTarget);
-				arset.addAll(entry.getValue());
-				return arset;
-			});
+
+			pcMap.put(nodeId, new AccessRightSet(pcArset));
 		}
 
 		return new TargetDagResult(pcMap, reachedContainers);
 	}
 
-	private Traverser traverseTarget(Transaction tx, String object) throws PMException {
-		Node oNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, object);
+	private Traverser traverseTarget(Transaction tx, long object) throws PMException {
+		Node oNode = tx.findNode(NODE_LABEL, ID_PROPERTY, object);
 
 		return tx.traversalDescription()
 				.breadthFirst()

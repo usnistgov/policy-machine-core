@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DissociateStatementTest {
@@ -24,16 +26,16 @@ class DissociateStatementTest {
         PAP pap = new MemoryPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-        pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
-        UserContext userContext = new UserContext("u1");
+        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
+        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
+        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
+        pap.modify().graph().associate(id(pap, "ua1"), id(pap, "oa1"), new AccessRightSet("read"));
+        UserContext userContext = new UserContext(id(pap, "u1"));
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
-        assertTrue(pap.query().graph().getAssociationsWithSource("ua1").isEmpty());
-        assertTrue(pap.query().graph().getAssociationsWithTarget("oa1").isEmpty());
+        assertTrue(pap.query().graph().getAssociationsWithSource(id(pap, "ua1")).isEmpty());
+        assertTrue(pap.query().graph().getAssociationsWithTarget(id(pap, "oa1")).isEmpty());
     }
 
     @Test

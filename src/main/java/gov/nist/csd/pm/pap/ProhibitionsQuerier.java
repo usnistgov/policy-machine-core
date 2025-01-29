@@ -27,13 +27,27 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     }
 
     @Override
-    public Map<Node, Collection<Prohibition>> getProhibitions() throws PMException {
-        return store.prohibitions().getNodeProhibitions();
+    public Collection<Prohibition> getProhibitions() throws PMException {
+        List<Prohibition> prohibitions = new ArrayList<>();
+
+        Map<Long, Collection<Prohibition>> nodeProhibitions = store.prohibitions().getNodeProhibitions();
+        nodeProhibitions.values().forEach(prohibitions::addAll);
+
+        Map<String, Collection<Prohibition>> processProhibitions = store.prohibitions().getProcessProhibitions();
+        processProhibitions.values().forEach(prohibitions::addAll);
+
+        return prohibitions;
     }
 
     @Override
     public Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException {
-        return store.prohibitions().getNodeProhibitions().getOrDefault(subject, new ArrayList<>());
+        if (subject.isNode()) {
+            Node node = store.graph().getNodeById(subject.getNodeId());
+            return store.prohibitions().getNodeProhibitions().getOrDefault(node, new ArrayList<>());
+        } else {
+            return store.prohibitions().getProcessProhibitions().getOrDefault(subject.getProcess(), new ArrayList<>());
+        }
+
     }
 
     @Override
@@ -46,15 +60,15 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     }
 
     @Override
-    public Collection<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException {
+    public Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
         new DepthFirstGraphWalker(graphQuerier)
                 .withVisitor((n) -> {
-                    pros.addAll(getProhibitionsWithSubject(n));
+                    pros.addAll(getProhibitionsWithSubject(new ProhibitionSubject(n)));
                 })
                 .withDirection(Direction.DESCENDANTS)
-                .walk(subject);
+                .walk(subjectId);
 
         return pros;
     }
@@ -63,14 +77,11 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     public Collection<Prohibition> getProhibitionsWithContainer(long containerId) throws PMException {
         Collection<Prohibition> pros = new ArrayList<>();
 
-        Map<String, Collection<Prohibition>> prohibitions = getProhibitions();
-        for (String subject : prohibitions.keySet()) {
-            Collection<Prohibition> subjectProhibitions = prohibitions.get(subject);
-            for (Prohibition prohibition : subjectProhibitions) {
-                for (ContainerCondition cc : prohibition.getContainers()) {
-                    if (cc.getId().equals(containerId)) {
-                        pros.add(prohibition);
-                    }
+        Collection<Prohibition> prohibitions = getProhibitions();
+        for (Prohibition prohibition : prohibitions) {
+            for (ContainerCondition cc : prohibition.getContainers()) {
+                if (cc.getId() == (containerId)) {
+                    pros.add(prohibition);
                 }
             }
         }

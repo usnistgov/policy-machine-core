@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PMLRoutineWrapperTest {
@@ -41,9 +42,9 @@ class PMLRoutineWrapperTest {
 
             @Override
             public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                pap.modify().graph().createObjectAttribute((String) operands.get("a"), List.of("pc1"));
-                pap.modify().graph().createObjectAttribute((String) operands.get("b"), List.of("pc1"));
-                pap.modify().graph().createObjectAttribute((String) operands.get("c"), List.of("pc1"));
+                pap.modify().graph().createObjectAttribute((String) operands.get("a"), List.of(id(pap, "pc1")));
+                pap.modify().graph().createObjectAttribute((String) operands.get("b"), List.of(id(pap, "pc1")));
+                pap.modify().graph().createObjectAttribute((String) operands.get("c"), List.of(id(pap, "pc1")));
                 return null;
             }
         };
@@ -57,24 +58,24 @@ class PMLRoutineWrapperTest {
                 create u "u1" in ["ua1"]
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
 
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminRoutine(new UserContext("u1"), "routine1",
+        pdp.adjudicateAdminRoutine(new UserContext(id(pap, "u1")), "routine1",
                 Map.of("a", "a", "b", "b", "c", "c"));
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
         assertTrue(pap.query().graph().nodeExists("c"));
 
         // try again using pml
-        pap = new MemoryPAP();
+        pap.reset();
         pdp = new PDP(pap);
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
-        pdp.runTx(new UserContext("u1"), tx -> {
-            tx.executePML(new UserContext("u1"), "routine1(\"a\", \"b\", \"c\")");
+        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
+            tx.executePML(new UserContext(id(pap, "u1")), "routine1(\"a\", \"b\", \"c\")");
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("a"));
@@ -95,7 +96,7 @@ class PMLRoutineWrapperTest {
         MemoryPAP pap = new MemoryPAP();
 
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
-        pap.executePML(new UserContext("u1"), "create policy class routine1()");
+        pap.executePML(new UserContext(id(pap, "u1")), "create policy class routine1()");
         assertTrue(pap.query().graph().nodeExists("test"));
     }
 

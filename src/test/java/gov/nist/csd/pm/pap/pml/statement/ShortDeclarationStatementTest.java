@@ -18,7 +18,7 @@ class ShortDeclarationStatementTest {
         ShortDeclarationStatement stmt = new ShortDeclarationStatement(
                 "a", new StringLiteral("test"));
 
-        ExecutionContext ctx = new ExecutionContext(new UserContext("u1"), new MemoryPAP());
+        ExecutionContext ctx = new ExecutionContext(new UserContext(0), new MemoryPAP());
         stmt.execute(ctx, new MemoryPAP());
 
         assertEquals(new StringValue("test"), ctx.scope().getVariable("a"));

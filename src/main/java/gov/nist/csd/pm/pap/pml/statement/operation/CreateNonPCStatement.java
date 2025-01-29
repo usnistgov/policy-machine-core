@@ -68,7 +68,7 @@ public class CreateNonPCStatement extends OperationStatement {
         return Objects.hash(name, type, assignTo);
     }
 
-    private static Operation<Void> getOpFromType(NodeType type) {
+    private static Operation<Long> getOpFromType(NodeType type) {
         return switch (type) {
             case OA -> new CreateObjectAttributeOp();
             case O -> new CreateObjectOp();

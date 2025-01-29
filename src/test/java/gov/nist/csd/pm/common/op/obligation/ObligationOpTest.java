@@ -2,6 +2,7 @@ package gov.nist.csd.pm.common.op.obligation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
@@ -9,6 +10,7 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestMemoryPAP;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.checkPatternPrivileges;
@@ -19,9 +21,9 @@ class ObligationOpTest {
 
     @Test
     void testCheckPatternPrivileges() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        PAP pap = new TestMemoryPAP();
 
-        pap.executePML(new UserContext("u1"), """
+        pap.executePML(new UserContext(6), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -39,11 +41,11 @@ class ObligationOpTest {
 
         PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
 
-        checkPatternPrivileges(privilegeChecker, new UserContext("u1"), new SubjectPattern(), CREATE_OBLIGATION);
+        checkPatternPrivileges(privilegeChecker, new UserContext(6), new SubjectPattern(), CREATE_OBLIGATION);
         assertThrows(UnauthorizedException.class,
-                () -> checkPatternPrivileges(privilegeChecker, new UserContext("u2"), new SubjectPattern(), CREATE_OBLIGATION));
+                () -> checkPatternPrivileges(privilegeChecker, new UserContext(7), new SubjectPattern(), CREATE_OBLIGATION));
 
-        checkPatternPrivileges(privilegeChecker, new UserContext("u1"), new LogicalSubjectPatternExpression(
+        checkPatternPrivileges(privilegeChecker, new UserContext(6), new LogicalSubjectPatternExpression(
                 new NodeOperandPattern("oa1"),
                 new InOperandPattern("oa2"),
                 true

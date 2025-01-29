@@ -27,11 +27,7 @@ public class AdminOperations {
             new CreateUserAttributeOp(),
             new CreateUserOp(),
             new DeassignOp(),
-            new DeleteObjectAttributeOp(),
-            new DeleteObjectOp(),
-            new DeletePolicyClassOp(),
-            new DeleteUserAttributeOp(),
-            new DeleteUserOp(),
+            new DeleteNodeOp(),
             new DissociateOp(),
             new SetNodePropertiesOp(),
 

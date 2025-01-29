@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public interface AccessQuery {
      * @return A mapping of the destination attributes to the access rights in the destination association.
      * @throws PMException If there is an error in the PM.
      */
-    Map<Node, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException;
+    Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException;
 
     /**
      * Compute the privileges for all nodes in the subgraph starting at the root node. The returned Subgraph object stores
@@ -113,7 +114,7 @@ public interface AccessQuery {
      * @return A Map of the adjacent descendants of the root node the user has access to and the privileges on each.
      * @throws PMException If there is an error in the PM.
      */
-    Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException;
+    Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException;
 
     /**
      * Explain why a user may or may not have privileges on a target node. The provided User and Target contexts, allow

@@ -2,18 +2,21 @@ package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.Association;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.LongStream;
 
 class VertexLeaf extends Vertex {
 
-    private ObjectOpenHashSet<String> descendants;
+    private long[] descendants;
 
-    public VertexLeaf(String name, NodeType type) {
-        super(name, type);
-        this.descendants = new ObjectOpenHashSet<>();
+    public VertexLeaf(long id, String name, NodeType type) {
+        super(id, name, type);
+        this.descendants = new long[]{};
     }
 
     @Override
@@ -23,32 +26,35 @@ class VertexLeaf extends Vertex {
 
     @Override
     protected long[] getAdjacentDescendants() {
-        return new ObjectOpenHashSet<>(descendants);
+        return descendants;
     }
 
     @Override
     protected long[] getAdjacentAscendants() {
-        return new ObjectOpenHashSet<>();
+        return new long[]{};
     }
 
     @Override
-    protected long[] getOutgoingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Association[] getOutgoingAssociations() {
+        return new Association[]{};
     }
 
     @Override
-    protected long[] getIncomingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Association[] getIncomingAssociations() {
+        return new Association[]{};
     }
 
     @Override
     public void addAssignment(long ascendant, long descendant) {
-        descendants.add(descendant);
+        descendants = Arrays.copyOf(descendants, descendants.length + 1);
+        descendants[descendants.length - 1] = descendant;
     }
 
     @Override
     public void deleteAssignment(long ascendant, long descendant) {
-        descendants.remove(descendant);
+        descendants = LongStream.of(descendants)
+                .filter(desc -> desc == descendant)
+                .toArray();
     }
 
     @Override

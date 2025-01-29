@@ -11,7 +11,7 @@ import java.util.Objects;
 
 import static gov.nist.csd.pm.common.op.graph.GraphOp.NAME_OPERAND;
 
-public class CreatePolicyStatement extends OperationStatement {
+public class CreatePolicyStatement extends OperationStatement<Long> {
 
     private Expression name;
 

@@ -46,7 +46,7 @@ public class SetNodePropertiesOp extends GraphOp<Void> {
         operandsWithNames.put(NAME_OPERAND, pap.query().graph().getNodeById(id).getName());
 
         return new EventContext(
-                userCtx.getUser(),
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
                 userCtx.getProcess(),
                 this,
                 operandsWithNames

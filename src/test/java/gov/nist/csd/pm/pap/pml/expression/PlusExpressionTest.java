@@ -37,7 +37,7 @@ class PlusExpressionTest {
                 plusExpression
         );
 
-        Value value = plusExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = plusExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new StringValue("ab"),
                 value
@@ -61,7 +61,7 @@ class PlusExpressionTest {
                 plusExpression
         );
 
-        Value value = plusExpression.execute(new ExecutionContext(new UserContext(""), new MemoryPAP()), new MemoryPAP());
+        Value value = plusExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 new StringValue("abc"),
                 value

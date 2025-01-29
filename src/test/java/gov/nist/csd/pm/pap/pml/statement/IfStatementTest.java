@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IfStatementTest {
@@ -41,7 +42,7 @@ class IfStatementTest {
                 func1("d")
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        pap.executePML(new UserContext(id(pap, "u1")), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));

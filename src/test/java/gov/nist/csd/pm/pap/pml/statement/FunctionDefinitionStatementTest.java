@@ -135,7 +135,7 @@ class FunctionDefinitionStatementTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));
@@ -156,7 +156,7 @@ class FunctionDefinitionStatementTest {
                 f2()
                 """;
         PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -171,6 +171,6 @@ class FunctionDefinitionStatementTest {
                 }
                 """;
         PAP pap = new MemoryPAP();
-        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(""), pml));
+        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(0), pml));
     }
 }

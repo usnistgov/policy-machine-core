@@ -25,69 +25,69 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         @Test
         void testProhibitionExistsException() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("subject", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("subject", ids("pc1"));
 
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet(), false, List.of());
+            pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(), false, List.of());
 
             assertThrows(
                     ProhibitionExistsException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet(), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(), false, List.of()));
         }
 
         @Test
         void testProhibitionSubjectDoesNotExistException() {
             assertThrows(
                     ProhibitionSubjectDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS), false, List.of()));
         }
 
 
         @Test
         void testUnknownAccessRightException() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("subject", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("subject", ids("pc1"));
 
             assertThrows(
                     UnknownAccessRightException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"), false, List.of()));
         }
 
         @Test
         void testProhibitionContainerDoesNotExistException() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("subject", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("subject", ids("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
             assertThrows(
                     ProhibitionContainerDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
-		                    false,
-		                    Collections.singleton(new ContainerCondition("oa1", true))));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
+                            false,
+                            Collections.singleton(new ContainerCondition(id("oa1"), true))));
         }
 
         @Test
         void testSuccess() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("subject", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("subject", ids("pc1"));
+            pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
+            pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
-		            true,
-		            List.of(
-		            new ContainerCondition("oa1", true),
-		            new ContainerCondition("oa2", false)
-		            ));
+            pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
+                    true,
+                    List.of(
+                            new ContainerCondition(id("oa1"), true),
+                            new ContainerCondition(id("oa2"), false)
+                    ));
 
             Prohibition p = pap.query().prohibitions().getProhibition("pro1");
             assertEquals("pro1", p.getName());
-            assertEquals("subject", p.getSubject().getName());
+            assertEquals(id("subject"), p.getSubject().getNodeId());
             assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
             assertTrue(p.isIntersection());
             assertEquals(2, p.getContainers().size());
             List<ContainerCondition> expected = List.of(
-                    new ContainerCondition("oa1", true),
-                    new ContainerCondition("oa2", false)
+                    new ContainerCondition(id("oa1"), true),
+                    new ContainerCondition(id("oa2"), false)
             );
             assertTrue(expected.containsAll(p.getContainers()) && p.getContainers().containsAll(expected));
         }
@@ -97,7 +97,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
+                tx.executePML(new UserContext(id("u1")), """
                     create prohibition "p1"
                     deny user attribute "ua1"
                     access rights ["read"]
@@ -111,7 +111,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
+                tx.executePML(new UserContext(id("u1")), """
                     create prohibition "p3"
                     deny user attribute "ua1"
                     access rights ["read"]
@@ -146,15 +146,15 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         @Test
         void testSuccess() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("subject", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
+            pap.modify().graph().createUserAttribute("subject", ids("pc1"));
+            pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
+            pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("pro1", ProhibitionSubject.userAttribute("subject"), , new AccessRightSet("read"),
-		            true, List.of(
-		            new ContainerCondition("oa1", true),
-		            new ContainerCondition("oa2", false)));
+            pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
+                    true, List.of(
+                            new ContainerCondition(id("oa1"), true),
+                            new ContainerCondition(id("oa2"), false)));
 
             assertDoesNotThrow(() -> pap.query().prohibitions().getProhibition("pro1"));
 
@@ -169,7 +169,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
+                tx.executePML(new UserContext(id("u1")), """
                     create prohibition "p1"
                     deny user attribute "ua1"
                     access rights ["read"]
@@ -183,7 +183,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.executePML(new UserContext("u1"), """
+                tx.executePML(new UserContext(id("u1")), """
                     delete prohibition "p1"
                     delete prohibition "p2"
                     """);

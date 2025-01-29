@@ -16,11 +16,11 @@ import java.util.*;
 
 public class MemoryPolicy {
 
-    protected Long2ObjectOpenHashMap<Vertex> graph;
-    protected Object2LongOpenHashMap<String> nameToIds;
+    protected Map<Long, Vertex> graph;
+    protected Map<String, Long> nameToIds;
     protected AccessRightSet resourceOperations;
     protected LongArraySet pcs;
-    protected Map<Node, Collection<Prohibition>> nodeProhibitions;
+    protected Map<Long, Collection<Prohibition>> nodeProhibitions;
     protected Map<String, Collection<Prohibition>> processProhibitions;
     protected List<Obligation> obligations;
     protected Map<String, Operation<?>> operations;
@@ -36,6 +36,7 @@ public class MemoryPolicy {
         this.pcs = new LongArraySet();
         this.resourceOperations = new AccessRightSet();
         this.nodeProhibitions = new HashMap<>();
+        this.processProhibitions = new HashMap<>();
         this.obligations = new ArrayList<>();
         this.operations = new HashMap<>();
         this.routines = new HashMap<>();
@@ -54,8 +55,7 @@ public class MemoryPolicy {
         ProhibitionSubject subject = prohibition.getSubject();
 
         if (subject.isNode()) {
-            Node node = vertexToNode(graph.get(subject.getNodeId()));
-            nodeProhibitions.computeIfAbsent(node, k -> new ArrayList<>()).add(prohibition);
+            nodeProhibitions.computeIfAbsent(subject.getNodeId(), k -> new ArrayList<>()).add(prohibition);
         } else {
             processProhibitions.computeIfAbsent(subject.getProcess(), k -> new ArrayList<>()).add(prohibition);
         }
@@ -64,22 +64,17 @@ public class MemoryPolicy {
     public void deleteProhibition(Prohibition prohibition) {
         ProhibitionSubject subject = prohibition.getSubject();
         if (subject.isNode()) {
-            Node node = vertexToNode(graph.get(subject.getNodeId()));
-            removeProhibitionFromMap(nodeProhibitions, node, prohibition);
+            removeProhibitionFromMap(nodeProhibitions, subject.getNodeId(), prohibition);
         } else {
             removeProhibitionFromMap(processProhibitions, subject.getProcess(), prohibition);
         }
     }
 
     private void removeProhibitionFromMap(Map<?, Collection<Prohibition>> map, Object key, Prohibition value) {
-        // Check if the key exists and has a list
         if (map.containsKey(key)) {
             Collection<Prohibition> list = map.get(key);
-
-            // Remove the specific string if it exists in the list
             list.remove(value);
 
-            // Optional: Remove key if list is empty
             if (list.isEmpty()) {
                 map.remove(key);
             }

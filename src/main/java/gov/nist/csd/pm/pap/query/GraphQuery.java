@@ -4,8 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 
 import java.util.Collection;
 import java.util.Map;
@@ -123,7 +122,7 @@ public interface GraphQuery {
      * @return The ascendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    AscendantSubgraph getAscendantSubgraph(long nodeId) throws PMException;
+    Subgraph getAscendantSubgraph(long nodeId) throws PMException;
 
     /**
      * Get the recursive structure of all descendants of the given node.
@@ -132,7 +131,7 @@ public interface GraphQuery {
      * @return The recursive descendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    DescendantSubgraph getDescendantSubgraph(long nodeId) throws PMException;
+    Subgraph getDescendantSubgraph(long nodeId) throws PMException;
 
     /**
      * Get the descendants of the given node that are attributes.

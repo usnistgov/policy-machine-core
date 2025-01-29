@@ -1,12 +1,10 @@
 package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Interface to query prohibitions.
@@ -19,7 +17,7 @@ public interface ProhibitionsQuery {
      * @return All prohibitions.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Map<Node, Collection<Prohibition>> getProhibitions() throws PMException;
+    Collection<Prohibition> getProhibitions() throws PMException;
 
     /**
      * Get prohibitions with the given subject.

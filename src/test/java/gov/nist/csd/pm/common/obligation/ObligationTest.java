@@ -15,6 +15,7 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.util.TestMemoryPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -49,7 +50,25 @@ class ObligationTest {
                 }
                 """;
 
-        MemoryPAP pap = new MemoryPAP();
+        TestMemoryPAP pap = getTestMemoryPAP();
+
+        pap.executePML(new UserContext(4), pml);
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        epp.processEvent(
+                new EventContext(
+                        "u1",
+                        null,
+                        new AssignOp(),
+                        Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa1"))
+                )
+        );
+        assertTrue(pap.query().graph().nodeExists("hello world"));
+    }
+
+    private static TestMemoryPAP getTestMemoryPAP() throws PMException {
+        TestMemoryPAP pap = new TestMemoryPAP();
 
         pap.setPMLConstants(Map.of("x", new StringValue("hello world")));
         pap.setPMLOperations(new PMLOperation("createX", Type.voidType()) {
@@ -66,19 +85,6 @@ class ObligationTest {
                 return new VoidValue();
             }
         });
-
-        pap.executePML(new UserContext("u1"), pml);
-
-        PDP pdp = new PDP(pap);
-        EPP epp = new EPP(pdp, pap);
-        epp.getEventProcessor().processEvent(
-                new EventContext(
-                        "u1",
-                        null,
-                        new AssignOp(),
-                        Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa1"))
-                )
-        );
-        assertTrue(pap.query().graph().nodeExists("hello world"));
+        return pap;
     }
 }

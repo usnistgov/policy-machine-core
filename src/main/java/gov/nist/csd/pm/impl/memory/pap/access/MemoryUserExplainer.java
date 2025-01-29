@@ -3,6 +3,7 @@ package gov.nist.csd.pm.impl.memory.pap.access;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.common.graph.dag.Propagator;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Path;
@@ -10,6 +11,7 @@ import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
+import java.util.stream.LongStream;
 
 public class MemoryUserExplainer {
 
@@ -19,57 +21,61 @@ public class MemoryUserExplainer {
 		this.policyStore = policyStore;
 	}
 
-	public Map<String, Set<Path>> explainIntersectionOfTargetPaths(UserContext userCtx, Map<String, Map<Path, List<Association>>> targetPaths) throws PMException {
+	public Map<Node, Set<Path>> explainIntersectionOfTargetPaths(UserContext userCtx, Map<Node, Map<Path, List<Association>>> targetPaths) throws PMException {
 		userCtx.checkExists(policyStore.graph());
 
 		// initialize map with the UAs of the target path associations
-		Map<String, Set<Path>> associationUAPaths = new HashMap<>();
-		Set<String> uasFromTargetPathAssociations = new HashSet<>(getUAsFromTargetPathAssociations(targetPaths));
-		Map<String, Set<Path>> pathsToUAs = new HashMap<>();
-		for (String ua : uasFromTargetPathAssociations) {
-			pathsToUAs.put(ua, new HashSet<>(Set.of(new Path(ua))));
+		Map<Node, Set<Path>> associationUAPaths = new HashMap<>();
+		Set<Long> uasFromTargetPathAssociations = new HashSet<>(getUAsFromTargetPathAssociations(targetPaths));
+		Map<Node, Set<Path>> pathsToUAs = new HashMap<>();
+		for (long ua : uasFromTargetPathAssociations) {
+			Node node = policyStore.graph().getNodeById(ua);
+			pathsToUAs.put(node, new HashSet<>(Set.of(new Path(node))));
 		}
 
 		Propagator propagator = (src, dst) -> {
+			Node dstNode = policyStore.graph().getNodeById(dst);
+			Node srcNode = policyStore.graph().getNodeById(src);
+			
 			// don't propagate unless the src is a ua in a target path association or an already propagated to dst node
-			if (!uasFromTargetPathAssociations.contains(src) && !pathsToUAs.containsKey(src)) {
+			if (!uasFromTargetPathAssociations.contains(src) && !pathsToUAs.containsKey(srcNode)) {
 				return;
 			}
 
-			Set<Path> srcPaths = pathsToUAs.get(src);
-			Set<Path> dstPaths = pathsToUAs.getOrDefault(dst, new HashSet<>());
+			Set<Path> srcPaths = pathsToUAs.get(srcNode);
+			Set<Path> dstPaths = pathsToUAs.getOrDefault(dstNode, new HashSet<>());
 
 			for (Path srcPath : srcPaths) {
 				Path copy = new Path(srcPath);
-				copy.addFirst(dst);
+				copy.addFirst(dstNode);
 				dstPaths.add(copy);
 			}
 
-			pathsToUAs.put(dst, dstPaths);
+			pathsToUAs.put(dstNode, dstPaths);
 		};
 
 		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
 				.withPropagator(propagator);
 
-		List<String> nodes = new ArrayList<>();
+		List<Long> nodes = new ArrayList<>();
 		if (userCtx.isUserDefined()) {
-			String user = userCtx.getUser();
+			long user = userCtx.getUser();
 			nodes.add(user);
 
 			dfs.walk(user);
 		} else {
-			List<String> attributes = userCtx.getAttributeIds();
-			nodes.addAll(attributes);
+			long[] attributes = userCtx.getAttributeIds();
+			nodes.addAll(LongStream.of(attributes).boxed().toList());
 
 			dfs.walk(attributes);
 		}
 
 		// transform the map so that the key is the last ua in the path pointing to it's paths
-		for (String node : nodes) {
-			Set<Path> userPaths = pathsToUAs.getOrDefault(node, new HashSet<>());
+		for (long node : nodes) {
+			Set<Path> userPaths = pathsToUAs.getOrDefault(policyStore.graph().getNodeById(node), new HashSet<>());
 
 			for (Path userPath : userPaths) {
-				String assocUA = userPath.getLast();
+				Node assocUA = userPath.getLast();
 				Set<Path> assocUAPaths = associationUAPaths.getOrDefault(assocUA, new HashSet<>());
 				assocUAPaths.add(userPath);
 				associationUAPaths.put(assocUA, assocUAPaths);
@@ -79,10 +85,10 @@ public class MemoryUserExplainer {
 		return associationUAPaths;
 	}
 
-	private List<String> getUAsFromTargetPathAssociations(Map<String, Map<Path, List<Association>>> targetPaths) {
-		List<String> uas = new ArrayList<>();
+	private List<Long> getUAsFromTargetPathAssociations(Map<Node, Map<Path, List<Association>>> targetPaths) {
+		List<Long> uas = new ArrayList<>();
 
-		for (Map.Entry<String, Map<Path, List<Association>>> pcPaths : targetPaths.entrySet()) {
+		for (Map.Entry<Node, Map<Path, List<Association>>> pcPaths : targetPaths.entrySet()) {
 			for (Map.Entry<Path, List<Association>> pathAssociations : pcPaths.getValue().entrySet()) {
 				List<Association> associations = pathAssociations.getValue();
 				for (Association association : associations) {

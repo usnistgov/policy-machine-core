@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 import static gov.nist.csd.pm.util.PolicyEquals.assertPolicyEquals;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 
 public class SerializationTest {
 
@@ -27,10 +28,10 @@ public class SerializationTest {
         String pml = pap.serialize(new PMLSerializer());
 
         MemoryPAP jsonPAP = new MemoryPAP();
-        jsonPAP.deserialize(new UserContext("u1"), json, new JSONDeserializer());
+        jsonPAP.deserialize(new UserContext(id(pap, "u1")), json, new JSONDeserializer());
 
         PAP pmlPAP = new MemoryPAP();
-        pmlPAP.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pmlPAP.deserialize(new UserContext(id(pap, "u1")), pml, new PMLDeserializer());
 
         assertPolicyEquals(jsonPAP.query(), pmlPAP.query());
         assertPolicyEquals(pap.query(), pmlPAP.query());
@@ -51,22 +52,22 @@ public class SerializationTest {
         String jsonStr = json.serialize(new JSONSerializer());
 
         pml.reset();
-        pml.deserialize(new UserContext("u1"), pmlStr, new PMLDeserializer());
+        pml.deserialize(new UserContext(id(pml, "u1")), pmlStr, new PMLDeserializer());
         json.reset();
-        json.deserialize(new UserContext("u1"), pmlStr, new PMLDeserializer());
+        json.deserialize(new UserContext(id(json, "u1")), pmlStr, new PMLDeserializer());
         PolicyEquals.assertPolicyEquals(pml.query(), json.query());
 
         pml.reset();
-        pml.deserialize(new UserContext("u1"), jsonStr, new JSONDeserializer());
+        pml.deserialize(new UserContext(id(pml, "u1")), jsonStr, new JSONDeserializer());
         json.reset();
-        json.deserialize(new UserContext("u1"), jsonStr, new JSONDeserializer());
+        json.deserialize(new UserContext(id(json, "u1")), jsonStr, new JSONDeserializer());
         PolicyEquals.assertPolicyEquals(pml.query(), json.query());
     }
 
     @Test
     void testSerializationWithAdminNodes() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+        pap.executePML(new UserContext(id(pap, "u1")), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 associate "ua1" and PM_ADMIN_OBJECT with ["*a"]                
@@ -75,9 +76,9 @@ public class SerializationTest {
         String json = pap.serialize(new JSONSerializer());
 
         MemoryPAP pmlPAP = new MemoryPAP();
-        pmlPAP.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pmlPAP.deserialize(new UserContext(id(pap, "u1")), pml, new PMLDeserializer());
         MemoryPAP jsonPAP = new MemoryPAP();
-        jsonPAP.deserialize(new UserContext("u1"), json, new JSONDeserializer());
+        jsonPAP.deserialize(new UserContext(id(pap, "u1")), json, new JSONDeserializer());
 
         assertPolicyEquals(pmlPAP.query(), jsonPAP.query());
         assertPolicyEquals(pap.query(), pmlPAP.query());
@@ -87,7 +88,7 @@ public class SerializationTest {
     @Test
     void testSerializationNodeProperties() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+        pap.executePML(new UserContext(id(pap, "u1")), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 set properties of "ua1" to {"a": "b"}
@@ -96,9 +97,9 @@ public class SerializationTest {
         String json = pap.serialize(new JSONSerializer());
 
         MemoryPAP pmlPAP = new MemoryPAP();
-        pmlPAP.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pmlPAP.deserialize(new UserContext(id(pap, "u1")), pml, new PMLDeserializer());
         MemoryPAP jsonPAP = new MemoryPAP();
-        jsonPAP.deserialize(new UserContext("u1"), json, new JSONDeserializer());
+        jsonPAP.deserialize(new UserContext(id(pap, "u1")), json, new JSONDeserializer());
 
         assertPolicyEquals(pmlPAP.query(), jsonPAP.query());
     }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PMLBootstrapperTest {
@@ -65,7 +66,7 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap(new PMLBootstrapper(new UserContext("u1"), input,
+        pdp.bootstrap(new PMLBootstrapper(new UserContext(id(pap, "u1")), input,
                 List.of(new PMLOperationWrapper(op1)),
                 List.of(new PMLRoutineWrapper(routine1)),
                 Map.of("TEST_CONST", new StringValue("TEST_PC"))

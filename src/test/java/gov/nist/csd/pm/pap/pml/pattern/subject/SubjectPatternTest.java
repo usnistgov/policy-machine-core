@@ -26,11 +26,11 @@ class SubjectPatternTest {
     @Test
     void testPML() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1", "ua2"));
-        pap.modify().graph().createUser("u2", List.of("ua2"));
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        pap.modify().graph().createUser("u2", List.of(ua2));
 
         String pml = """
                 create obligation "ob1" {

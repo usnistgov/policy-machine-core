@@ -31,7 +31,7 @@ class VariableDeclarationStatementTest {
                 )
         );
 
-        ExecutionContext ctx = new ExecutionContext(new UserContext("u1"), new MemoryPAP());
+        ExecutionContext ctx = new ExecutionContext(new UserContext(0), new MemoryPAP());
         ctx.scope().addVariable("c", new StringValue("123"));
         stmt1.execute(ctx, new MemoryPAP());
         stmt2.execute(ctx, new MemoryPAP());

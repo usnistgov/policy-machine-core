@@ -6,10 +6,10 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.pap.store.GraphStore;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,17 +26,17 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     @Override
     public void createNode(long id, String name, NodeType type) throws PMException {
         if (type == PC) {
-            VertexPolicyClass vertexPolicyClass = new VertexPolicyClass(name);
+            VertexPolicyClass vertexPolicyClass = new VertexPolicyClass(id, name);
             policy.addNode(vertexPolicyClass);
         } else if (type == OA || type == UA) {
-            VertexAttribute vertexAttribute = new VertexAttribute(name, type);
+            VertexAttribute vertexAttribute = new VertexAttribute(id, name, type);
             policy.addNode(vertexAttribute);
         } else if (type == O || type == U) {
-            VertexLeaf vertexLeaf = new VertexLeaf(name, type);
+            VertexLeaf vertexLeaf = new VertexLeaf(id, name, type);
             policy.addNode(vertexLeaf);
         }
 
-        txCmdTracker.trackOp(tx, new TxCmd.CreateNodeTxCmd(name));
+        txCmdTracker.trackOp(tx, new TxCmd.CreateNodeTxCmd(id));
     }
 
     @Override
@@ -99,13 +99,13 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
             if (newProperties.isEmpty()) {
                 policy.graph.put(id, vertexWithProps.getVertex());
             } else {
-                policy.graph.put(id, new VertexWithProps(vertexWithProps.getVertex(), newProperties));
+                policy.graph.put(id, new VertexWithProps(id, vertexWithProps.getVertex(), newProperties));
             }
         } else {
-            policy.graph.put(id, new VertexWithProps(vertex, newProperties));
+            policy.graph.put(id, new VertexWithProps(id, vertex, newProperties));
         }
 
-        txCmdTracker.trackOp(tx, new TxCmd.SetNodePropertiesTxCmd(id, oldProperties, newProperties));
+        txCmdTracker.trackOp(tx, new TxCmd.SetNodePropertiesTxCmd(id, oldProperties));
     }
 
     @Override
@@ -139,7 +139,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Association association : vertex.getOutgoingAssociations()) {
-            if (association.getTarget().equals(target)) {
+            if (association.getTarget() == target) {
                 accessRightSet = association.getAccessRightSet();
             }
         }
@@ -158,28 +158,29 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
     @Override
     public Node getNodeByName(String name) throws PMException {
-        return policy.graph.get();
+        Vertex vertex = policy.graph.get(policy.nameToIds.get(name));
+        return new Node(vertex.getName(), vertex.getType(), vertex.getProperties());
     }
 
     @Override
     public boolean nodeExists(long id) throws PMException {
-        return false;
+        return policy.graph.containsKey(id);
     }
 
     @Override
     public boolean nodeExists(String name) throws PMException {
-        return policy.graph.containsKey(name);
+        return policy.nameToIds.containsKey(name);
     }
 
     @Override
     public long[] search(NodeType type, Map<String, String> properties) throws PMException {
-        List<String> nodes = filterByType(type);
-        return filterByProperties(nodes, properties);
+        LongOpenHashSet nodes = filterByType(type);
+        return filterByProperties(nodes, properties).toArray(new long[]{});
     }
 
     @Override
     public long[] getPolicyClasses() throws PMException {
-        return new ArrayList<>(policy.pcs);
+        return policy.pcs.toArray(new long[policy.pcs.size()]);
     }
 
     @Override
@@ -198,13 +199,13 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     }
 
     @Override
-    public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
+    public Association[] getAssociationsWithTarget(long targetId) throws PMException {
         return policy.graph.get(targetId).getIncomingAssociations();
     }
 
     @Override
-    public Collection<String> getPolicyClassDescendants(long id) throws PMException {
-        Set<String> pcs = new HashSet<>();
+    public long[] getPolicyClassDescendants(long id) throws PMException {
+        LongOpenHashSet pcs = new LongOpenHashSet();
 
         new GraphStoreDFS(this)
                 .withDirection(Direction.DESCENDANTS)
@@ -219,12 +220,12 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         pcs.remove(id);
 
-        return pcs;
+        return pcs.toArray(new long[]{});
     }
 
     @Override
-    public Collection<String> getAttributeDescendants(long id) throws PMException {
-        Set<String> attrs = new HashSet<>();
+    public long[] getAttributeDescendants(long id) throws PMException {
+        LongOpenHashSet attrs = new LongOpenHashSet();
 
         new GraphStoreDFS(this)
                 .withDirection(Direction.DESCENDANTS)
@@ -240,31 +241,31 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         attrs.remove(id);
 
-        return attrs;
+        return attrs.toArray(new long[]{});
     }
 
     @Override
-    public DescendantSubgraph getDescendantSubgraph(long id) throws PMException {
-        List<DescendantSubgraph> adjacentSubgraphs = new ArrayList<>();
+    public Subgraph getDescendantSubgraph(long id) throws PMException {
+        List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
-        Collection<String> adjacentDescendants = getAdjacentDescendants(id);
-        for (String adjacent : adjacentDescendants) {
+        long[] adjacentDescendants = getAdjacentDescendants(id);
+        for (long adjacent : adjacentDescendants) {
             adjacentSubgraphs.add(getDescendantSubgraph(adjacent));
         }
 
-        return new DescendantSubgraph(id, adjacentSubgraphs);
+        return new Subgraph(getNodeById(id), adjacentSubgraphs);
     }
 
     @Override
-    public AscendantSubgraph getAscendantSubgraph(long id) throws PMException {
-        List<AscendantSubgraph> adjacentSubgraphs = new ArrayList<>();
+    public Subgraph getAscendantSubgraph(long id) throws PMException {
+        List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
-        Collection<String> adjacentAscendants = getAdjacentAscendants(id);
-        for (String adjacent : adjacentAscendants) {
+        long[] adjacentAscendants = getAdjacentAscendants(id);
+        for (long adjacent : adjacentAscendants) {
             adjacentSubgraphs.add(getAscendantSubgraph(adjacent));
         }
 
-        return new AscendantSubgraph(id, adjacentSubgraphs);
+        return new Subgraph(getNodeById(id), adjacentSubgraphs);
     }
 
     @Override
@@ -274,11 +275,11 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
         new GraphStoreDFS(this)
                 .withDirection(Direction.ASCENDANTS)
                 .withVisitor((n) -> {
-                    if (n.equals(asc)) {
+                    if (n == asc) {
                         found.set(true);
                     }
                 })
-                .withAllPathShortCircuit(n -> n.equals(asc))
+                .withAllPathShortCircuit(n -> n == asc)
                 .walk(dsc);
 
         return found.get();
@@ -291,22 +292,23 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
         new GraphStoreDFS(this)
                 .withDirection(Direction.DESCENDANTS)
                 .withVisitor((n) -> {
-                    if (n.equals(dsc)) {
+                    if (n == dsc) {
                         found.set(true);
                     }
                 })
-                .withAllPathShortCircuit(n -> n.equals(dsc))
+                .withAllPathShortCircuit(n -> n == dsc)
                 .walk(asc);
 
         return found.get();
     }
 
-    private List<String> filterByProperties(List<String> nodes, Map<String, String> properties) throws PMException {
-        List<String> results = new ArrayList<>();
+    private LongOpenHashSet filterByProperties(LongOpenHashSet nodes, Map<String, String> properties) throws PMException {
+        LongOpenHashSet results = new LongOpenHashSet();
+
         if (properties.isEmpty()) {
             results.addAll(nodes);
         } else {
-            for (String n : nodes) {
+            for (long n : nodes) {
                 Map<String, String> nodeProperties = getNodeById(n).getProperties();
 
                 if (!hasAllKeys(nodeProperties, properties)
@@ -321,13 +323,15 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
         return results;
     }
 
-    private List<String> filterByType(NodeType type) {
-        List<String> nodes = new ArrayList<>();
+    private LongOpenHashSet filterByType(NodeType type) {
+        LongOpenHashSet nodes = new LongOpenHashSet();
 
         // return all nodes if type is ANY
         if (type == ANY) {
-            for (Map.Entry<String, Vertex> node : policy.graph.entrySet()) {
-                nodes.add(node.getKey());
+            Set<Long> ids = policy.graph.keySet();
+
+            for (long id : ids) {
+                nodes.add(id);
             }
 
             return nodes;
@@ -341,10 +345,10 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
         }
 
         // get other node types that match
-        for (Map.Entry<String, Vertex> node : policy.graph.entrySet()) {
+        for (Map.Entry<Long, Vertex> node : policy.graph.entrySet()) {
             Vertex vertex = node.getValue();
             if (vertex.type == type) {
-                nodes.add(node.getKey());
+                nodes.add(node.getKey().longValue());
             }
         }
 

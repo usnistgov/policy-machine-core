@@ -3,6 +3,7 @@ package gov.nist.csd.pm.impl.memory.pap.access;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.common.graph.dag.UserDagResult;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
@@ -46,13 +47,13 @@ public class MemoryExplainer {
 	private List<PolicyClassExplain> resolvePaths(UserContext userCtx, TargetContext targetCtx) throws PMException {
 		MemoryUserExplainer userExplainer = new MemoryUserExplainer(policyStore);
 		MemoryTargetExplainer targetExplainer = new MemoryTargetExplainer(policyStore);
-		Map<String, Map<Path, List<Association>>> targetPaths = targetExplainer.explainTarget(targetCtx);
-		Map<String, Set<Path>> userPaths = userExplainer.explainIntersectionOfTargetPaths(userCtx, targetPaths);
+		Map<Node, Map<Path, List<Association>>> targetPaths = targetExplainer.explainTarget(targetCtx);
+		Map<Node, Set<Path>> userPaths = userExplainer.explainIntersectionOfTargetPaths(userCtx, targetPaths);
 
 		List<PolicyClassExplain> result = new ArrayList<>();
 
-		for (Map.Entry<String, Map<Path, List<Association>>> targetPathEntry : targetPaths.entrySet()) {
-			String pc = targetPathEntry.getKey();
+		for (Map.Entry<Node, Map<Path, List<Association>>> targetPathEntry : targetPaths.entrySet()) {
+			Node pc = targetPathEntry.getKey();
 			Map<Path, List<Association>> targetPathAssociations = targetPathEntry.getValue();
 
 			List<List<ExplainNode>> paths = getExplainNodePaths(targetPathAssociations, userPaths);
@@ -65,7 +66,7 @@ public class MemoryExplainer {
 	}
 
 	private List<List<ExplainNode>> getExplainNodePaths(Map<Path, List<Association>> targetPathAssociations,
-	                                                    Map<String, Set<Path>> userPaths) {
+	                                                    Map<Node, Set<Path>> userPaths) throws PMException {
 		List<List<ExplainNode>> paths = new ArrayList<>();
 
 		for (Map.Entry<Path, List<Association>> targetPathEntry : targetPathAssociations.entrySet()) {
@@ -73,20 +74,20 @@ public class MemoryExplainer {
 			List<Association> pathAssocs = targetPathEntry.getValue();
 
 			List<ExplainNode> explainNodes = new ArrayList<>();
-			for (String node : path) {
+			for (Node node : path) {
 				List<ExplainAssociation> explainAssocs = new ArrayList<>();
 
 				for (Association pathAssoc : pathAssocs) {
-					String ua = pathAssoc.getSource();
-					String target = pathAssoc.getTarget();
-					if (!target.equals(node)) {
+					long ua = pathAssoc.getSource();
+					long target = pathAssoc.getTarget();
+					if (target != node.getId()) {
 						continue;
 					}
 
 					Set<Path> userPathsToAssoc = userPaths.getOrDefault(ua, new HashSet<>());
 
 					explainAssocs.add(new ExplainAssociation(
-							ua,
+							policyStore.graph().getNodeById(ua),
 							pathAssoc.getAccessRightSet(),
 							new ArrayList<>(userPathsToAssoc)
 					));

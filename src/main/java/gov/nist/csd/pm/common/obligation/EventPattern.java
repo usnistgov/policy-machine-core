@@ -2,7 +2,6 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
@@ -57,8 +56,7 @@ public class EventPattern implements Serializable {
     }
 
     public boolean matches(EventContext eventCtx, PAP pap) throws PMException {
-        Node userNode = pap.query().graph().getNodeById(eventCtx.getUserId());
-        boolean userMatches = userMatches(userNode.getName(), pap) || processMatches(eventCtx.getProcess(), pap);
+        boolean userMatches = userMatches(eventCtx.getUser(), pap) || processMatches(eventCtx.getProcess(), pap);
         boolean opMatches = operationMatches(eventCtx.getOpName(), pap);
         if (operationPattern.isAny()) {
             return userMatches;

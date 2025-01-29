@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AssociateStatementTest {
@@ -29,14 +31,20 @@ class AssociateStatementTest {
         PAP pap = new MemoryPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("u1", List.of("pc1"));
-        pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext("u1"), pap);
+        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
+        pap.modify().graph().createUserAttribute("u1", ids(pap, "pc1"));
+        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u1")), pap);
         stmt.execute(execCtx, pap);
 
-        assertTrue(pap.query().graph().getAssociationsWithSource("ua1").iterator().next().equals(new Association("ua1", "oa1", new AccessRightSet("read"))));
-        assertTrue(pap.query().graph().getAssociationsWithTarget("oa1").iterator().next().equals(new Association("ua1", "oa1", new AccessRightSet("read"))));
+	    assertEquals(
+                pap.query().graph().getAssociationsWithSource(id(pap, "ua1")).iterator().next(),
+                new Association(id(pap, "ua1"), id(pap, "oa1"), new AccessRightSet("read"))
+        );
+	    assertEquals(
+                pap.query().graph().getAssociationsWithTarget(id(pap, "oa1")).iterator().next(),
+                new Association(id(pap, "ua1"), id(pap, "oa1"), new AccessRightSet("read"))
+        );
     }
 
     @Test

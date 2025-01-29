@@ -65,7 +65,7 @@ public class DeleteNodeOp extends GraphOp<Void> {
         operandsWithNames.put(DESCENDANTS_OPERAND, descNames);
 
         return new EventContext(
-                userCtx.getUser(),
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
                 userCtx.getProcess(),
                 this,
                 operandsWithNames

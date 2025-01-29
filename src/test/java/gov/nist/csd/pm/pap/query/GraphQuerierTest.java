@@ -8,8 +8,7 @@ import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.query.model.subgraph.AscendantSubgraph;
-import gov.nist.csd.pm.pap.query.model.subgraph.DescendantSubgraph;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,8 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     class NodeExists {
         @Test
         void testSuccess() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
             assertTrue(pap.query().graph().nodeExists("pc1"));
             assertTrue(pap.query().graph().nodeExists("ua1"));
             assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -46,11 +45,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void testSuccessPolicyClass() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().setNodeProperties("pc1", toProperties("k", "v"));
+            long pc1Id = pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().setNodeProperties(pc1Id, toProperties("k", "v"));
 
             Node pc1 = pap.query().graph().getNodeByName("pc1");
-
             assertEquals("pc1", pc1.getName());
             assertEquals(PC, pc1.getType());
             assertEquals("v", pc1.getProperties().get("k"));
@@ -58,9 +56,9 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void testSuccessObjectAttribute() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().setNodeProperties("oa1", Properties.toProperties("k", "v"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long oa1Id = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+            pap.modify().graph().setNodeProperties(oa1Id, Properties.toProperties("k", "v"));
 
             Node oa1 = pap.query().graph().getNodeByName("oa1");
 
@@ -74,15 +72,15 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     class Search {
         @Test
         void testSearch() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().setNodeProperties("oa1", toProperties("namespace", "test"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-            pap.modify().graph().setNodeProperties("oa2", toProperties("key1", "value1"));
-            pap.modify().graph().createObjectAttribute("oa3", List.of("pc1"));
-            pap.modify().graph().setNodeProperties("oa3", toProperties("key1", "value1", "key2", "value2"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+            pap.modify().graph().setNodeProperties(oa1, toProperties("namespace", "test"));
+            long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+            pap.modify().graph().setNodeProperties(oa2, toProperties("key1", "value1"));
+            long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
+            pap.modify().graph().setNodeProperties(oa3, toProperties("key1", "value1", "key2", "value2"));
 
-            Collection<String> nodes = pap.query().graph().search(OA, NO_PROPERTIES);
+            Collection<Node> nodes = pap.query().graph().search(OA, NO_PROPERTIES);
             assertEquals(4, nodes.size());
 
             nodes = pap.query().graph().search(ANY, toProperties("key1", "value1"));
@@ -113,11 +111,11 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     class GetPolicyClasses {
         @Test
         void testSuccess() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createPolicyClass("pc2");
-            pap.modify().graph().createPolicyClass("pc3");
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long pc2 = pap.modify().graph().createPolicyClass("pc2");
+            long pc3 = pap.modify().graph().createPolicyClass("pc3");
 
-            assertTrue(pap.query().graph().getPolicyClasses().containsAll(Arrays.asList("pc1", "pc2", "pc3")));
+            assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().containsAll(Arrays.asList(pc1, pc2, pc3)));
         }
     }
 
@@ -127,18 +125,17 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void NodeDoesNotExist() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAdjacentAscendants("oa1"));
+                    () -> pap.query().graph().getAdjacentAscendants(-1));
         }
 
         @Test
         void Success() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa3", List.of("pc1"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+            long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+            long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
 
-
-            assertTrue(pap.query().graph().getAdjacentAscendants("pc1").containsAll(List.of("oa1", "oa2", "oa3")));
+            assertTrue(Arrays.stream(pap.query().graph().getAdjacentAscendants(pc1)).boxed().toList().containsAll(List.of(oa1, oa2, oa3)));
         }
     }
 
@@ -148,20 +145,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void NodeDoesNotExist() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAdjacentDescendants("oa1"));
+                    () -> pap.query().graph().getAdjacentDescendants(-1));
         }
 
         @Test
         void Success() throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa3", List.of("pc1"));
-            pap.modify().graph().createObject("o1", List.of("oa1"));
-            pap.modify().graph().assign("o1", List.of("oa2"));
-            pap.modify().graph().assign("o1", List.of("oa3"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+            long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+            long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
+            long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+            pap.modify().graph().assign(o1, List.of(oa2));
+            pap.modify().graph().assign(o1, List.of(oa3));
 
-            assertTrue(pap.query().graph().getAdjacentDescendants("o1").containsAll(List.of("oa1", "oa2", "oa3")));
+            assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(o1)).boxed().toList().containsAll(List.of(oa1, oa2, oa3)));
         }
     }
 
@@ -171,20 +168,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void testNodeDoesNotExistException() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAssociationsWithSource("ua1"));
+                    () -> pap.query().graph().getAssociationsWithSource(-1));
         }
 
         @Test
         void testSuccess() throws PMException {
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", List.of("pc1"));
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
-            pap.modify().graph().associate("ua1", "oa2", new AccessRightSet("read", "write"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+            long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
+            long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.modify().graph().associate(ua1, oa2, new AccessRightSet("read", "write"));
 
-            Collection<Association> assocs = pap.query().graph().getAssociationsWithSource("ua1");
+            Collection<Association> assocs = pap.query().graph().getAssociationsWithSource(ua1);
 
             assertEquals(2, assocs.size());
 
@@ -193,10 +190,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             }
         }
 
-        private void checkAssociation(Association association) {
-            if (association.getTarget().equals("oa1")) {
+        private void checkAssociation(Association association) throws PMException {
+            if (association.getTarget() == id("oa1")) {
                 assertEquals(new AccessRightSet("read"), association.getAccessRightSet());
-            } else if (association.getTarget().equals("oa2")) {
+            } else if (association.getTarget() == id("oa2")) {
                 assertEquals(new AccessRightSet("read", "write"), association.getAccessRightSet());
             }
         }
@@ -208,20 +205,20 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void testNodeDoesNotExistException() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAssociationsWithTarget("oa1"));
+                    () -> pap.query().graph().getAssociationsWithTarget(0));
         }
 
         @Test
         void Success() throws PMException {
             pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", List.of("pc1"));
-            pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-            pap.modify().graph().associate("ua1", "oa1", new AccessRightSet("read"));
-            pap.modify().graph().associate("ua2", "oa1", new AccessRightSet("read", "write"));
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+            long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+            long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+            pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
+            pap.modify().graph().associate(ua2, oa1, new AccessRightSet("read", "write"));
 
-            Collection<Association> assocs = pap.query().graph().getAssociationsWithTarget("oa1");
+            Collection<Association> assocs = pap.query().graph().getAssociationsWithTarget(oa1);
 
             assertEquals(2, assocs.size());
 
@@ -230,10 +227,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             }
         }
 
-        private void checkAssociation(Association association) {
-            if (association.getSource().equals("ua1")) {
+        private void checkAssociation(Association association) throws PMException {
+            if (association.getSource() == id("ua1")) {
                 assertEquals(new AccessRightSet("read"), association.getAccessRightSet());
-            } else if (association.getSource().equals("ua2")) {
+            } else if (association.getSource() == id("ua2")) {
                 assertEquals(new AccessRightSet("read", "write"), association.getAccessRightSet());
             }
         }
@@ -258,12 +255,12 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                 
                 create o "o1" in ["oa3", "oa6"]
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
-        Collection<String> conts = pap.query().graph().getAttributeDescendants("o1");
-        List<String> expected = List.of("oa3", "oa2", "oa1", "oa6", "oa5");
-        assertTrue(conts.containsAll(expected));
-        assertTrue(expected.containsAll(conts));
+        long[] conts = pap.query().graph().getAttributeDescendants(id("o1"));
+        List<Long> expected = ids("oa3", "oa2", "oa1", "oa6", "oa5");
+        assertTrue(Arrays.stream(conts).boxed().toList().containsAll(expected));
+        assertTrue(expected.containsAll(Arrays.stream(conts).boxed().toList()));
     }
 
     @Test
@@ -284,12 +281,12 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                       
                       create o "o1" in ["oa3", "oa6"]
                       """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
-        Collection<String> pcs = pap.query().graph().getPolicyClassDescendants("o1");
-        List<String> expected = List.of("pc1", "pc2");
-        assertTrue(pcs.containsAll(expected));
-        assertTrue(expected.containsAll(pcs));
+        long[] pcs = pap.query().graph().getPolicyClassDescendants(id("o1"));
+        List<Long> expected = ids("pc1", "pc2");
+        assertTrue(Arrays.stream(pcs).boxed().toList().containsAll(expected));
+        assertTrue(expected.containsAll(Arrays.stream(pcs).boxed().toList()));
     }
 
     @Test
@@ -310,14 +307,15 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                       
                       create o "o1" in ["oa3", "oa6"]
                       """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
-        assertTrue(pap.query().graph().isAscendant("o1", "oa1"));
-        assertTrue(pap.query().graph().isAscendant("o1", "oa2"));
-        assertTrue(pap.query().graph().isAscendant("o1", "oa3"));
-        assertTrue(pap.query().graph().isAscendant("o1", "pc1"));
-        assertTrue(pap.query().graph().isAscendant("o1", "pc2"));
-        assertFalse(pap.query().graph().isAscendant("o1", "pc3"));
+        long o1 = id("o1");
+        assertTrue(pap.query().graph().isAscendant(o1, id("oa1")));
+        assertTrue(pap.query().graph().isAscendant(o1, id("oa2")));
+        assertTrue(pap.query().graph().isAscendant(o1, id("oa3")));
+        assertTrue(pap.query().graph().isAscendant(o1, id("pc1")));
+        assertTrue(pap.query().graph().isAscendant(o1, id("pc2")));
+        assertFalse(pap.query().graph().isAscendant(o1, id("pc3")));
     }
 
     @Test
@@ -338,14 +336,15 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                       
                       create o "o1" in ["oa3", "oa6"]
                       """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
-        assertTrue(pap.query().graph().isDescendant("o1", "oa1"));
-        assertTrue(pap.query().graph().isDescendant("o1", "oa2"));
-        assertTrue(pap.query().graph().isDescendant("o1", "oa3"));
-        assertTrue(pap.query().graph().isDescendant("o1", "pc1"));
-        assertTrue(pap.query().graph().isDescendant("o1", "pc2"));
-        assertFalse(pap.query().graph().isDescendant("o1", "pc3"));
+        long o1 = id("o1");
+        assertTrue(pap.query().graph().isDescendant(o1, id("oa1")));
+        assertTrue(pap.query().graph().isDescendant(o1, id("oa2")));
+        assertTrue(pap.query().graph().isDescendant(o1, id("oa3")));
+        assertTrue(pap.query().graph().isDescendant(o1, id("pc1")));
+        assertTrue(pap.query().graph().isDescendant(o1, id("pc2")));
+        assertFalse(pap.query().graph().isDescendant(o1, id("pc3")));
     }
 
     @Test
@@ -367,42 +366,25 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
                 create o "o1" in ["oa3", "oa6"]
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
-        AscendantSubgraph actual = pap.query().graph().getAscendantSubgraph("pc1");
-        assertSubgraphEquals(new AscendantSubgraph(
-                "pc1", Set.of(
-                new AscendantSubgraph(
-                        "oa1", Set.of(
-                        new AscendantSubgraph(
-                                "oa2", Set.of(
-                                new AscendantSubgraph(
-                                        "oa3", Set.of(
-                                        new AscendantSubgraph(
-                                                "o1", Set.of()
+        Subgraph actual = pap.query().graph().getAscendantSubgraph(id("pc1"));
+        assertSubgraphEquals(new Subgraph(
+                node("pc1"), Set.of(
+                new Subgraph(
+                        node("oa1"), Set.of(
+                        new Subgraph(
+                                node("oa2"), Set.of(
+                                new Subgraph(
+                                        node("oa3"), Set.of(
+                                        new Subgraph(
+                                                node("o1"), Set.of()
                                         ))
                                 ))
                         ))
                 ),
-                new AscendantSubgraph("oa4", Set.of()))
+                new Subgraph(node("oa4"), Set.of()))
         ), actual);
-    }
-
-    private boolean assertSubgraphEquals(AscendantSubgraph expected, AscendantSubgraph actual) {
-        if (!expected.name().equals(actual.name())) {
-            return false;
-        }
-
-        int ok = 0;
-        for (AscendantSubgraph expectedSubgraph : expected.ascendantIds()) {
-            for (AscendantSubgraph actualSubgraph : actual.ascendantIds()) {
-                if (assertSubgraphEquals(expectedSubgraph, actualSubgraph)) {
-                    ok++;
-                }
-            }
-        }
-
-        return ok == expected.ascendantIds().size();
     }
 
     @Test
@@ -424,42 +406,42 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
                 create o "o1" in ["oa3", "oa6"]
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
-        DescendantSubgraph actual = pap.query().graph().getDescendantSubgraph("o1");
-        assertSubgraphEquals(new DescendantSubgraph(
-                "oa3", Set.of(
-                new DescendantSubgraph(
-                        "oa2", Set.of(
-                        new DescendantSubgraph(
-                                "oa1", Set.of(
-                                new DescendantSubgraph(
-                                        "pc1", Set.of()
+        Subgraph actual = pap.query().graph().getDescendantSubgraph(id("o1"));
+        assertSubgraphEquals(new Subgraph(
+                node("oa3"), Set.of(
+                new Subgraph(
+                        node("oa2"), Set.of(
+                        new Subgraph(
+                                node("oa1"), Set.of(
+                                new Subgraph(
+                                        node("pc1"), Set.of()
                                 ))
                         ))
                 ),
-                new DescendantSubgraph("oa6", Set.of(
-                        new DescendantSubgraph("oa5", Set.of(
-                                new DescendantSubgraph("pc2", Set.of())
+                new Subgraph(node("oa6"), Set.of(
+                        new Subgraph(node("oa5"), Set.of(
+                                new Subgraph(node("pc2"), Set.of())
                         ))
                 )))
         ), actual);
     }
 
-    private boolean assertSubgraphEquals(DescendantSubgraph expected, DescendantSubgraph actual) {
-        if (!expected.name().equals(actual.name())) {
+    private boolean assertSubgraphEquals(Subgraph expected, Subgraph actual) {
+        if (!expected.node().equals(actual.node())) {
             return false;
         }
 
         int ok = 0;
-        for (DescendantSubgraph expectedSubgraph : expected.descendants()) {
-            for (DescendantSubgraph actualSubgraph : actual.descendants()) {
+        for (Subgraph expectedSubgraph : expected.subgraphs()) {
+            for (Subgraph actualSubgraph : actual.subgraphs()) {
                 if (assertSubgraphEquals(expectedSubgraph, actualSubgraph)) {
                     ok++;
                 }
             }
         }
 
-        return ok == expected.descendants().size();
+        return ok == expected.subgraphs().size();
     }
 }

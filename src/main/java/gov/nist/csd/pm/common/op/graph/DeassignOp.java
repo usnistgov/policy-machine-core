@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 
-public class DeassignOp extends GraphOp {
+public class DeassignOp extends GraphOp<Void> {
 
     public DeassignOp() {
         super(
@@ -54,6 +54,11 @@ public class DeassignOp extends GraphOp {
         operandsWithNames.put(ASCENDANT_OPERAND, pap.query().graph().getNodeById(asc).getName());
         operandsWithNames.put(DESCENDANTS_OPERAND, descNames);
 
-        return new EventContext(userCtx.getUser(), userCtx.getProcess(), this, operandsWithNames);
+        return new EventContext(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                this,
+                operandsWithNames
+        );
     }
 }

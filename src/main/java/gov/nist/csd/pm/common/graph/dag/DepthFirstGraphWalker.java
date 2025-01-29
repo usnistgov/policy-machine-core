@@ -93,9 +93,9 @@ public class DepthFirstGraphWalker implements GraphWalker {
             return CONTINUE;
         }
 
-        Collection<String> nodes = getNextLevel(start);
+        long[] nodes = getNextLevel(start);
         int ret = WALK;
-        for(String n : nodes) {
+        for(long n : nodes) {
             int i = walkInternal(n);
 
             // propagate to the next level

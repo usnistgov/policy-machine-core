@@ -19,7 +19,7 @@ class VariableAssignmentStatementTest {
                 "a", false, new StringLiteral("test")
         );
 
-        ExecutionContext ctx = new ExecutionContext(new UserContext("u1"), new MemoryPAP());
+        ExecutionContext ctx = new ExecutionContext(new UserContext(0), new MemoryPAP());
         ctx.scope().addVariable("a", new StringValue("a"));
         stmt.execute(ctx, new MemoryPAP());
 

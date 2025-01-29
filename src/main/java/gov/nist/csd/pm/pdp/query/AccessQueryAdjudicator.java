@@ -17,13 +17,10 @@ import java.util.Map;
 
 public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
-    private final UserContext adjUserContext;
     private final PAP pap;
-    private final PrivilegeChecker privilegeChecker;
 
-    public AccessQueryAdjudicator(UserContext adjUserContext, PAP pap, PrivilegeChecker privilegeChecker) {
+    public AccessQueryAdjudicator(PAP pap, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
-        this.adjUserContext = adjUserContext;
         this.pap = pap;
         this.privilegeChecker = privilegeChecker;
     }
@@ -54,7 +51,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<Node, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
         return pap.query().access().computeDestinationAttributes(userCtx);
     }
 
@@ -69,7 +66,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+    public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
         return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
     }
 

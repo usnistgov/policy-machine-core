@@ -82,11 +82,9 @@ public class JSONSerializer implements PolicySerializer {
 
     private List<String> buildProhibitionsJSON(PolicyQuery policyQuery) throws PMException {
         List<String> prohibitions = new ArrayList<>();
-        Map<Node, Collection<Prohibition>> all = policyQuery.prohibitions().getProhibitions();
-        for (Collection<Prohibition> value : all.values()) {
-            for (Prohibition prohibition : value) {
-                prohibitions.add(CreateProhibitionStatement.fromProhibition(policyQuery, prohibition).toString());
-            }
+        Collection<Prohibition> all = policyQuery.prohibitions().getProhibitions();
+        for (Prohibition prohibition : all) {
+            prohibitions.add(CreateProhibitionStatement.fromProhibition(policyQuery, prohibition).toString());
         }
 
         return prohibitions;
@@ -105,17 +103,17 @@ public class JSONSerializer implements PolicySerializer {
     private List<JSONNode> buildNonUANodes(PolicyQuery policyQuery, NodeType type) throws PMException {
         List<JSONNode> nodes = new ArrayList<>();
 
-        long[] search = policyQuery.graph().search(type, new HashMap<>());
-        for (long node : search) {
-            if (isUnmodifiedAdminNodeOrTarget(policyQuery, node)) {
+        Collection<Node> search = policyQuery.graph().search(type, new HashMap<>());
+        for (Node node : search) {
+            if (isUnmodifiedAdminNodeOrTarget(policyQuery, node.getId())) {
                 continue;
             }
 
-            Node n = policyQuery.graph().getNodeById(node);
+            Node n = policyQuery.graph().getNodeById(node.getId());
             String name = n.getName();
             List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
 
-            long[] descendants = policyQuery.graph().getAdjacentDescendants(node);
+            long[] descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
             List<String> descendantNames = LongStream.of(descendants)
                     .mapToObj(m -> {
                         try {
@@ -158,11 +156,11 @@ public class JSONSerializer implements PolicySerializer {
     private List<JSONNode> buildUserAttributes(PolicyQuery policyQuery) throws PMException {
         List<JSONNode> userAttributes = new ArrayList<>();
 
-        long[] search = policyQuery.graph().search(UA, new HashMap<>());
-        for (long node : search) {
-            Node n = policyQuery.graph().getNodeById(node);
+        Collection<Node> search = policyQuery.graph().search(UA, new HashMap<>());
+        for (Node node : search) {
+            Node n = policyQuery.graph().getNodeById(node.getId());
 
-            long[] descendants = policyQuery.graph().getAdjacentDescendants(node);
+            long[] descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
             List<String> descendantNames = LongStream.of(descendants)
                     .mapToObj(m -> {
                         try {
@@ -173,7 +171,7 @@ public class JSONSerializer implements PolicySerializer {
                     })
                     .toList();
 
-            Collection<Association> assocList = policyQuery.graph().getAssociationsWithSource(node);
+            Collection<Association> assocList = policyQuery.graph().getAssociationsWithSource(node.getId());
             List<JSONAssociation> jsonAssociations = new ArrayList<>();
             for (Association assoc : assocList) {
                 jsonAssociations.add(new JSONAssociation(

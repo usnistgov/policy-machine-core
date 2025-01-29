@@ -10,9 +10,9 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
 import java.util.*;
 
-public abstract class OperationStatement extends PreparedOperation<Void> implements PMLStatement {
+public abstract class OperationStatement<T> extends PreparedOperation<T> implements PMLStatement {
 
-    public OperationStatement(Operation<Void> op) {
+    public OperationStatement(Operation<T> op) {
         super(op, new HashMap<>());
     }
 
@@ -29,7 +29,7 @@ public abstract class OperationStatement extends PreparedOperation<Void> impleme
     }
 
     @Override
-    public final Void execute(PAP pap) throws PMException  {
+    public final T execute(PAP pap) throws PMException  {
         return super.execute(pap);
     }
 
