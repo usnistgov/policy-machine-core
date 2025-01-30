@@ -5,7 +5,7 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 
 import java.util.*;
 
-public record PolicyClassExplain(Node pc, AccessRightSet arset, List<List<ExplainNode>> paths) {
+public record PolicyClassExplain(Node pc, AccessRightSet arset, Collection<List<ExplainNode>> paths) {
 
     @Override
     public boolean equals(Object o) {

@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -58,12 +59,12 @@ class PMLRoutineWrapperTest {
                 create u "u1" in ["ua1"]
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
 
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminRoutine(new UserContext(id(pap, "u1")), "routine1",
+        pdp.adjudicateAdminRoutine(new TestUserContext("u1", pap), "routine1",
                 Map.of("a", "a", "b", "b", "c", "c"));
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
@@ -72,10 +73,10 @@ class PMLRoutineWrapperTest {
         // try again using pml
         pap.reset();
         pdp = new PDP(pap);
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
-        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
-            tx.executePML(new UserContext(id(pap, "u1")), "routine1(\"a\", \"b\", \"c\")");
+        pdp.runTx(new TestUserContext("u1", pap), tx -> {
+            tx.executePML(new TestUserContext("u1", pap), "routine1(\"a\", \"b\", \"c\")");
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("a"));
@@ -96,7 +97,7 @@ class PMLRoutineWrapperTest {
         MemoryPAP pap = new MemoryPAP();
 
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
-        pap.executePML(new UserContext(id(pap, "u1")), "create policy class routine1()");
+        pap.executePML(new TestUserContext("u1", pap), "create policy class routine1()");
         assertTrue(pap.query().graph().nodeExists("test"));
     }
 

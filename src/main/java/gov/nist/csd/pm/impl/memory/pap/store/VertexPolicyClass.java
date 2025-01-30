@@ -35,7 +35,7 @@ class VertexPolicyClass extends Vertex {
 
     @Override
     protected long[] getAdjacentAscendants() {
-        return new long[]{};
+        return ascendants;
     }
 
     @Override
@@ -57,7 +57,7 @@ class VertexPolicyClass extends Vertex {
     @Override
     public void deleteAssignment(long ascendant, long descendant) {
         ascendants = LongStream.of(ascendants)
-                .filter(asc -> asc == ascendant)
+                .filter(asc -> asc != ascendant)
                 .toArray();
     }
 

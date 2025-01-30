@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.util.TestMemoryPAP.id;
@@ -21,7 +22,7 @@ class CreateRoutineStatementTest {
                 }
                 """;
         MemoryPAP pap = new MemoryPAP();
-        assertDoesNotThrow(() -> pap.executePML(new UserContext(id(pap, "u1")), pml));
+        assertDoesNotThrow(() -> pap.executePML(new TestUserContext("u1", pap), pml));
     }
 
     @Test
@@ -32,7 +33,7 @@ class CreateRoutineStatementTest {
                     create OA "oa1" in [a]
                 }""";
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
         Routine<?> routine1 = pap.query().routines().getAdminRoutine("routine1");
         assertEquals(pml, routine1.toString());
     }

@@ -65,11 +65,11 @@ public class TargetContext {
 
 	@Override
 	public String toString() {
-		String s = "%s";
+		String s = "{%s}";
 		if (isNode()) {
-			return String.format(s, "target=" + targetId);
+			return String.format(s, "target: " + targetId);
 		} else {
-			return String.format(s, "attributes=" + Arrays.toString(attributeIds));
+			return String.format(s, "attributes: " + Arrays.toString(attributeIds));
 		}
 	}
 

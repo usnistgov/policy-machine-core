@@ -74,6 +74,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
         }
 
         policy.graph.remove(id);
+        policy.nameToIds.remove(vertex.getName());
 
         if (vertex.getType() == PC) {
             policy.pcs.remove(id);
@@ -81,7 +82,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         txCmdTracker.trackOp(tx, new TxCmd.DeleteNodeTxCmd(
                 id,
-                new Node(vertex.name, vertex.type, vertex.getProperties()),
+                new Node(id, vertex.name, vertex.type, vertex.getProperties()),
                 vertex.getAdjacentDescendants()
         ));
     }
@@ -153,13 +154,13 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     @Override
     public Node getNodeById(long id) throws PMException {
         Vertex vertex = policy.graph.get(id);
-        return new Node(vertex.getName(), vertex.getType(), vertex.getProperties());
+        return new Node(vertex.getId(), vertex.getName(), vertex.getType(), vertex.getProperties());
     }
 
     @Override
     public Node getNodeByName(String name) throws PMException {
         Vertex vertex = policy.graph.get(policy.nameToIds.get(name));
-        return new Node(vertex.getName(), vertex.getType(), vertex.getProperties());
+        return new Node(vertex.getId(), vertex.getName(), vertex.getType(), vertex.getProperties());
     }
 
     @Override

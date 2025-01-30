@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.common.op.graph;
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
@@ -38,23 +39,5 @@ public class AssociateOp extends GraphOp<Void> {
         privilegeChecker.check(userCtx, (long) operands.get(UA_OPERAND), ASSOCIATE);
         privilegeChecker.check(userCtx, (long) operands.get(TARGET_OPERAND), ASSOCIATE_TO);
 
-    }
-
-    @Override
-    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        Map<String, Object> operandsWithNames = new HashMap<>();
-
-        long uaId = (long) operands.get(UA_OPERAND);
-        long targetId = (long) operands.get(TARGET_OPERAND);
-
-        operandsWithNames.put(UA_OPERAND, pap.query().graph().getNodeById(uaId).getName());
-        operandsWithNames.put(TARGET_OPERAND, pap.query().graph().getNodeById(targetId).getName());
-
-        return new EventContext(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                this,
-                operandsWithNames
-        );
     }
 }

@@ -9,6 +9,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -34,7 +35,7 @@ class AssociateStatementTest {
         pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
         pap.modify().graph().createUserAttribute("u1", ids(pap, "pc1"));
         pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u1")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new TestUserContext("u1", pap), pap);
         stmt.execute(execCtx, pap);
 
 	    assertEquals(

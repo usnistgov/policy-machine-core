@@ -183,7 +183,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
-        Map<Node, AccessRightSet> pos = new HashMap<>();
+        Map<Long, AccessRightSet> pos = new HashMap<>();
 
         for (long pc : store.graph().getPolicyClasses()) {
             new GraphStoreBFS(store.graph())
@@ -194,15 +194,20 @@ public class MemoryAccessQuerier extends AccessQuerier {
                             return;
                         }
 
-                        Node node = store.graph().getNodeById(n);
-                        pos.put(node, privs);
+                        pos.put(n, privs);
                     })
                     .withSinglePathShortCircuit(n -> {
                         return pos.containsKey(n);
                     })
                     .walk(pc);
         }
-        return pos;
+
+        Map<Node, AccessRightSet> posWithNodes = new HashMap<>();
+        for (Map.Entry<Long, AccessRightSet> entry : pos.entrySet()) {
+            posWithNodes.put(store.graph().getNodeById(entry.getKey()), entry.getValue());
+        }
+
+        return posWithNodes;
     }
 
     private void getAndStorePrivileges(Map<Long, AccessRightSet> arsetMap, UserDagResult userDagResult, long target) throws PMException {

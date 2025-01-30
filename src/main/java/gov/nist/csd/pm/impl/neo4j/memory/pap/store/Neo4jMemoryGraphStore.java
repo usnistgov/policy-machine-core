@@ -32,13 +32,14 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node node = tx.createNode(NODE_LABEL, typeToLabel(type));
 			node.setProperty(NAME_PROPERTY, name);
+			node.setProperty(ID_PROPERTY, id);
 		});
 	}
 
 	@Override
 	public void deleteNode(long id) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
 
 			// delete edges
 			for (Relationship relationship : node.getRelationships()) {
@@ -53,7 +54,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	@Override
 	public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
 
 			Iterable<String> propertyKeys = node.getPropertyKeys();
 			for (String key : propertyKeys) {
@@ -64,25 +65,25 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 				node.setProperty(entry.getKey(), entry.getValue());
 			}
 
-			node.setProperty(NAME_PROPERTY, id);
+			node.setProperty(ID_PROPERTY, id);
 		});
 	}
 
 	@Override
 	public void createAssignment(long start, long end) throws PMException {
 		txHandler.runTx(tx -> {
-			tx.findNode(NODE_LABEL, NAME_PROPERTY, start)
-					.createRelationshipTo(tx.findNode(NODE_LABEL, NAME_PROPERTY, end), ASSIGNMENT_RELATIONSHIP_TYPE);
+			tx.findNode(NODE_LABEL, ID_PROPERTY, start)
+					.createRelationshipTo(tx.findNode(NODE_LABEL, ID_PROPERTY, end), ASSIGNMENT_RELATIONSHIP_TYPE);
 		});
 	}
 
 	@Override
 	public void deleteAssignment(long start, long end) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node childNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, start);
+			org.neo4j.graphdb.Node childNode = tx.findNode(NODE_LABEL, ID_PROPERTY, start);
 			try(ResourceIterable<Relationship> relationships = childNode.getRelationships(Direction.OUTGOING, ASSIGNMENT_RELATIONSHIP_TYPE)) {
 				for (Relationship relationship : relationships) {
-					if (relationship.getEndNode().getProperty(NAME_PROPERTY).equals(end)) {
+					if (relationship.getEndNode().getProperty(ID_PROPERTY).equals(end)) {
 						relationship.delete();
 					}
 				}
@@ -93,8 +94,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	@Override
 	public void createAssociation(long ua, long target, AccessRightSet arset) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node uaNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, ua);
-			org.neo4j.graphdb.Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, target);
+			org.neo4j.graphdb.Node uaNode = tx.findNode(NODE_LABEL, ID_PROPERTY, ua);
+			org.neo4j.graphdb.Node targetNode = tx.findNode(NODE_LABEL, ID_PROPERTY, target);
 
 			String[] arsetArr = arset.toArray(String[]::new);
 
@@ -117,10 +118,10 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	@Override
 	public void deleteAssociation(long ua, long target) throws PMException {
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node uaNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, ua);
+			org.neo4j.graphdb.Node uaNode = tx.findNode(NODE_LABEL, ID_PROPERTY, ua);
 			try(ResourceIterable<Relationship> relationships = uaNode.getRelationships(Direction.OUTGOING, ASSOCIATION_RELATIONSHIP_TYPE)) {
 				for (Relationship relationship : relationships) {
-					if (relationship.getEndNode().getProperty(NAME_PROPERTY).equals(target)) {
+					if (relationship.getEndNode().getProperty(ID_PROPERTY).equals(target)) {
 						relationship.delete();
 					}
 				}
@@ -248,7 +249,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		LongArrayList children = new LongArrayList();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
 			try(ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.OUTGOING,
 					ASSIGNMENT_RELATIONSHIP_TYPE
@@ -267,7 +268,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		LongArrayList parents = new LongArrayList();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
 			try(ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.INCOMING,
 					ASSIGNMENT_RELATIONSHIP_TYPE
@@ -286,7 +287,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, uaId);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, uaId);
 			try(ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.OUTGOING,
 					ASSOCIATION_RELATIONSHIP_TYPE
@@ -309,7 +310,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, targetId);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, targetId);
 			try (ResourceIterable<Relationship> iter = node.getRelationships(
 					Direction.INCOMING,
 					ASSOCIATION_RELATIONSHIP_TYPE
@@ -332,7 +333,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		LongArrayList pcdescs = new LongArrayList();
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
+			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
 
 			Traverser traverse = tx.traversalDescription()
 					.breadthFirst()
@@ -362,7 +363,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	public long[] getAttributeDescendants(long id) throws PMException {
 		LongArrayList descs = new LongArrayList();
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, id);
+			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
 
 			Traverser traverse = tx.traversalDescription()
 					.breadthFirst()
@@ -421,8 +422,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		AtomicBoolean b = new AtomicBoolean(false);
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node ascNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, asc);
-			org.neo4j.graphdb.Node descNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, dsc);
+			org.neo4j.graphdb.Node ascNode = tx.findNode(NODE_LABEL, ID_PROPERTY, asc);
+			org.neo4j.graphdb.Node descNode = tx.findNode(NODE_LABEL, ID_PROPERTY, dsc);
 
 			Traverser traverse = tx.traversalDescription()
 					.breadthFirst()
@@ -450,8 +451,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		AtomicBoolean b = new AtomicBoolean(false);
 
 		txHandler.runTx(tx -> {
-			org.neo4j.graphdb.Node ascNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, asc);
-			org.neo4j.graphdb.Node descNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, dsc);
+			org.neo4j.graphdb.Node ascNode = tx.findNode(NODE_LABEL, ID_PROPERTY, asc);
+			org.neo4j.graphdb.Node descNode = tx.findNode(NODE_LABEL, ID_PROPERTY, dsc);
 
 			Traverser traverse = tx.traversalDescription()
 					.breadthFirst()
@@ -504,8 +505,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 
 	private boolean hasAllKeys(Map<String, Object> nodeProperties, Map<String, String> searchProperties) {
 		for (String key : searchProperties.keySet()) {
-			// ignore the name property
-			if (key.equals(NAME_PROPERTY)) {
+			// ignore the name and id property
+			if (key.equals(NAME_PROPERTY) || key.equals(ID_PROPERTY)) {
 				continue;
 			}
 

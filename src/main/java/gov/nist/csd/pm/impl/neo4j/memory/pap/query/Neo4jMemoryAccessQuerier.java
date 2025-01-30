@@ -167,7 +167,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 
 			attrs = store.graph().getAdjacentDescendants(targetCtx.getTargetId());
 
-			Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, targetCtx.getTargetId());
+			Node targetNode = tx.findNode(NODE_LABEL, ID_PROPERTY, targetCtx.getTargetId());
 			ResourceIterable<Relationship> relationships = targetNode.getRelationships(Direction.INCOMING, ASSOCIATION_RELATIONSHIP_TYPE);
 			for (Relationship relationship : relationships) {
 				arsetToTarget.addAll(Arrays.asList((String[]) relationship.getProperty(ARSET_PROPERTY)));

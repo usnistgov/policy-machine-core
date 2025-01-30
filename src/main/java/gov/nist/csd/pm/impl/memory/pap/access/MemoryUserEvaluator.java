@@ -36,8 +36,10 @@ public class MemoryUserEvaluator {
 
 		final Map<Long, AccessRightSet> borderTargets = new HashMap<>();
 		// initialize with the prohibitions for the provided process
-		final Set<Prohibition> reachedProhibitions =
-				new HashSet<>(policyStore.prohibitions().getProhibitionsWithProcess(userCtx.getProcess()));
+		final Set<Prohibition> reachedProhibitions = new HashSet<>();
+		if (userCtx.getProcess() != null) {
+			reachedProhibitions.addAll(policyStore.prohibitions().getProhibitionsWithProcess(userCtx.getProcess()));
+		}
 
 		Visitor visitor = node -> {
 			// cache prohibitions reached by the user

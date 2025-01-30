@@ -53,7 +53,7 @@ class VertexLeaf extends Vertex {
     @Override
     public void deleteAssignment(long ascendant, long descendant) {
         descendants = LongStream.of(descendants)
-                .filter(desc -> desc == descendant)
+                .filter(desc -> desc != descendant)
                 .toArray();
     }
 

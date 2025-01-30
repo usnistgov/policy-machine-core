@@ -17,7 +17,7 @@ import java.util.*;
 import static gov.nist.csd.pm.common.op.graph.CreateNodeOp.*;
 
 
-public class CreateNonPCStatement extends OperationStatement {
+public class CreateNonPCStatement extends OperationStatement<Long> {
     private Expression name;
     private NodeType type;
     private Expression assignTo;
@@ -34,10 +34,10 @@ public class CreateNonPCStatement extends OperationStatement {
         Value nameValue = name.execute(ctx, pap);
         Value assignToValue = assignTo.execute(ctx, pap);
 
-        List<String> descendants = new ArrayList<>();
+        List<Long> descendants = new ArrayList<>();
         List<Value> arrayValue = assignToValue.getArrayValue();
         for (Value descValue : arrayValue) {
-            descendants.add(descValue.getStringValue());
+            descendants.add(pap.query().graph().getNodeByName(descValue.getStringValue()).getId());
         }
 
         return Map.of(

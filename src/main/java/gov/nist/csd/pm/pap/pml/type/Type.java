@@ -7,10 +7,6 @@ import java.util.Objects;
 
 public class Type implements Serializable {
 
-    public static void main(String[] args) {
-        System.out.println(Type.class.getSimpleName());
-    }
-
     private boolean isVoid;
     private boolean isAny;
     private boolean isString;

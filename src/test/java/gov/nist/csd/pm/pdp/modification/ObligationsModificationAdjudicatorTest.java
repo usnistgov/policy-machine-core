@@ -59,7 +59,7 @@ class ObligationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ObligationsModificationAdjudicator(new UserContext(id(pap, "u1")), pap, pdp.getPrivilegeChecker());
+        ok = new ObligationsModificationAdjudicator(new TestUserContext("u1", pap), pap, pdp.getPrivilegeChecker());
         fail = new ObligationsModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
     }
 

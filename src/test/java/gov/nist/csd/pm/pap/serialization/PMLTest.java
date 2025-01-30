@@ -54,7 +54,7 @@ class PMLTest {
         PMLDeserializer pmlDeserializer = new PMLDeserializer();
 
         MemoryPAP pap = new MemoryPAP();
-        assertThrows(PMException.class, () -> pap.deserialize(new UserContext(id(pap, "u1")), pml, pmlDeserializer));
+        assertThrows(PMException.class, () -> pap.deserialize(new TestUserContext("u1", pap), pml, pmlDeserializer));
 
         pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of("name")) {
             @Override

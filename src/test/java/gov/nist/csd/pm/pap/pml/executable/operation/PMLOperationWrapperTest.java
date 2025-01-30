@@ -9,6 +9,7 @@ import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -66,22 +67,22 @@ class PMLOperationWrapperTest {
                 create u "u1" in ["ua1"]
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
 
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new UserContext(id(pap, "u1")), "op1",
+        pdp.adjudicateAdminOperation(new TestUserContext("u1", pap), "op1",
                 Map.of("a", "oa1", "b", "b", "c", "c"));
         assertTrue(pap.query().graph().nodeExists("b"));
 
         // try again using pml
         pap.reset();
         pdp = new PDP(pap);
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
-        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
-            tx.executePML(new UserContext(id(pap, "u1")), "op1(\"oa1\", \"b\", \"c\")");
+        pdp.runTx(new TestUserContext("u1", pap), tx -> {
+            tx.executePML(new TestUserContext("u1", pap), "op1(\"oa1\", \"b\", \"c\")");
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("b"));
@@ -105,7 +106,7 @@ class PMLOperationWrapperTest {
         MemoryPAP pap = new MemoryPAP();
 
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
-        pap.executePML(new UserContext(id(pap, "u1")), "create policy class op1()");
+        pap.executePML(new TestUserContext("u1", pap), "create policy class op1()");
         assertTrue(pap.query().graph().nodeExists("test"));
     }
 }

@@ -18,7 +18,7 @@ public abstract class Vertex {
         this.type = type;
     }
 
-    protected long gteId() {
+    protected long getId() {
         return id;
     }
 

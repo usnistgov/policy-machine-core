@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.common.op.graph;
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -41,7 +42,7 @@ public abstract class CreateNodeOp extends GraphOp<Long> {
     }
 
     @Override
-    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
+    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, OperandValue> operands) throws PMException {
         return new EventContext(
                 pap.query().graph().getNodeById(userCtx.getUser()).getName(),
                 userCtx.getProcess(),

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.obligation.Obligation;
@@ -43,11 +42,11 @@ public class MemoryPolicy {
     }
 
     public void addNode(Vertex vertex) {
-        graph.put(vertex.gteId(), vertex);
-        nameToIds.put(vertex.getName(), vertex.gteId());
+        graph.put(vertex.getId(), vertex);
+        nameToIds.put(vertex.getName(), vertex.getId());
 
         if (vertex.getType() == NodeType.PC) {
-            pcs.add(vertex.gteId());
+            pcs.add(vertex.getId());
         }
     }
 
@@ -79,9 +78,5 @@ public class MemoryPolicy {
                 map.remove(key);
             }
         }
-    }
-
-    private Node vertexToNode(Vertex vertex) {
-        return new Node(vertex.getName(), vertex.getType(), vertex.getProperties());
     }
 }

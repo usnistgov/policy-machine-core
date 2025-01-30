@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.pdp;
 
+import gov.nist.csd.pm.common.event.EventPublishable;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
+import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
@@ -25,6 +28,7 @@ import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
 
+import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
@@ -88,7 +92,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
         boolean routinesEmpty = pap.query().routines().getAdminRoutineNames().isEmpty();
 
-        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODE_NAMES))) &&
+        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&
                 prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
     }
 
@@ -127,13 +131,13 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 pap.query().graph().getNodeById(user.getUser()).getName(),
                 user.getProcess(),
                 resourceOperation,
-                Map.of("target", node.getName())
+                Map.of("target", new StringOperandValue(node.getName()))
         ));
 
         return new AdjudicationResponse(GRANT, node);
     }
 
-    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
+    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, OperandValue> operands) throws PMException {
         Operation<?> operation = pap.query()
                 .operations()
                 .getAdminOperation(name);
@@ -144,12 +148,9 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
         Object ret = pdpTx.executeAdminExecutable(operation, operands);
 
-        publishEvent(new EventContext(
-                pap.query().graph().getNodeById(user.getUser()).getName(),
-                user.getProcess(),
-                operation.getName(),
-                operands
-        ));
+        if (operation instanceof EventPublishable eventPublishable) {
+            publishEvent(eventPublishable.toEventContext(pap, user, operation, operands));
+        }
 
         if (ret instanceof Value value) {
             return value.toObject();

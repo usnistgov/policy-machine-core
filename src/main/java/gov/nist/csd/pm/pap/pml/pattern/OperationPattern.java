@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.pattern;
 
+import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 
@@ -29,7 +30,7 @@ public class OperationPattern extends Pattern {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matches(StringOperandValue value, PAP pap) throws PMException {
         return isAny || value.equals(this.value);
     }
 

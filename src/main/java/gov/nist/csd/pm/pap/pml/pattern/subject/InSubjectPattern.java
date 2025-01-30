@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.pattern.subject;
 
+import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.PAP;
@@ -23,8 +24,8 @@ public class InSubjectPattern extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
-        long valueId = pap.query().graph().getNodeId(value);
+    public boolean matches(StringOperandValue value, PAP pap) throws PMException {
+        long valueId = pap.query().graph().getNodeId(value.getValue());
         long contId = pap.query().graph().getNodeId(container);
 
         return pap.query().graph().isAscendant(valueId, contId);

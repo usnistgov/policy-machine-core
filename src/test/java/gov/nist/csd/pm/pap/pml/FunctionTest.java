@@ -4,6 +4,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.util.TestMemoryPAP.id;
@@ -25,7 +26,7 @@ public class FunctionTest {
 
         PMLCompilationException e = assertThrows(PMLCompilationException.class, () -> {
             PAP pap = new MemoryPAP();
-            pap.executePML(new UserContext(id(pap, "u1")), pml);
+            pap.executePML(new TestUserContext("u1", pap), pml);
         });
         assertEquals("not all conditional paths return", e.getErrors().get(0).errorMessage());
     }
@@ -46,7 +47,7 @@ public class FunctionTest {
 
         assertDoesNotThrow(() -> {
             PAP pap = new MemoryPAP();
-            pap.executePML(new UserContext(id(pap, "u1")), pml2);
+            pap.executePML(new TestUserContext("u1", pap), pml2);
         });
     }
 
@@ -64,7 +65,7 @@ public class FunctionTest {
 
         assertDoesNotThrow(() -> {
             PAP pap = new MemoryPAP();
-            pap.executePML(new UserContext(id(pap, "u1")), pml2);
+            pap.executePML(new TestUserContext("u1", pap), pml2);
         });
     }
 

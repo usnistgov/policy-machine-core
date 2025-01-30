@@ -6,6 +6,8 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.store.ProhibitionsStore;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.checkerframework.checker.units.qual.A;
 import org.neo4j.graphdb.*;
 
 import java.util.*;
@@ -137,12 +139,41 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 
 	@Override
 	public Collection<Prohibition> getProhibitionsWithNode(long subject) throws PMException {
-		return List.of();
+		ObjectArrayList<Prohibition> prohibitions = new ObjectArrayList<>();
+
+		txHandler.runTx(tx -> {
+			Node node = tx.findNode(NODE_LABEL, ID_PROPERTY, subject);
+
+			ResourceIterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING, PROHIBITION_SUBJECT_REL_TYPE);
+			for (Relationship relationship : relationships) {
+				Node next = relationship.getEndNode();
+				Prohibition prohibition = getProhibitionFromNode(next);
+				prohibitions.add(prohibition);
+			}
+		});
+
+		return prohibitions;
 	}
 
 	@Override
 	public Collection<Prohibition> getProhibitionsWithProcess(String subject) throws PMException {
-		return List.of();
+		ObjectArrayList<Prohibition> prohibitions = new ObjectArrayList<>();
+
+		txHandler.runTx(tx -> {
+			Node node = tx.findNode(PROCESS_LABEL, ID_PROPERTY, subject);
+			if (node == null) {
+				return;
+			}
+
+			ResourceIterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING, PROHIBITION_SUBJECT_REL_TYPE);
+			for (Relationship relationship : relationships) {
+				Node next = relationship.getEndNode();
+				Prohibition prohibition = getProhibitionFromNode(next);
+				prohibitions.add(prohibition);
+			}
+		});
+
+		return prohibitions;
 	}
 
 	@Override
@@ -162,25 +193,26 @@ public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
 
 	private void createContainers(Transaction tx, Collection<ContainerCondition> containerConditions, Node prohibitionNode) throws PMException {
 		for (ContainerCondition cc : containerConditions) {
-			Node targetNode = tx.findNode(NODE_LABEL, NAME_PROPERTY, cc.getId());
+			Node targetNode = tx.findNode(NODE_LABEL, ID_PROPERTY, cc.getId());
 			targetNode.createRelationshipTo(prohibitionNode, PROHIBITION_CONTAINER_REL_TYPE)
 					.setProperty(COMPLEMENT_PROPERTY, cc.isComplement());
 		}
 	}
 
 	private Node createSubject(Transaction tx, ProhibitionSubject subject, Node prohibitionNode) throws PMException {
-		// look for a user or ua node with the subject name
-		Node subjectNode = tx.findNode(U_LABEL, ID_PROPERTY, subject.getNodeId());
-		if (subjectNode == null) {
-			subjectNode = tx.findNode(UA_LABEL, ID_PROPERTY, subject.getNodeId());
-		}
-
-		// if still null it's a process, add process subjectNode
-		if (subjectNode == null) {
-			subjectNode = tx.findNode(PROCESS_LABEL, NAME_PROPERTY, subject.getProcess());
+		Node subjectNode;
+		if (subject.isNode()) {
+			// look for a user or ua node with the subject name
+			subjectNode = tx.findNode(U_LABEL, ID_PROPERTY, subject.getNodeId());
+			if (subjectNode == null) {
+				subjectNode = tx.findNode(UA_LABEL, ID_PROPERTY, subject.getNodeId());
+			}
+		} else {
+			// if still null it's a process, add process subjectNode
+			subjectNode = tx.findNode(PROCESS_LABEL, ID_PROPERTY, subject.getProcess());
 			if (subjectNode == null) {
 				subjectNode = tx.createNode(PROCESS_LABEL);
-				subjectNode.setProperty(NAME_PROPERTY, subject.getProcess());
+				subjectNode.setProperty(ID_PROPERTY, subject.getProcess());
 			}
 		}
 

@@ -57,12 +57,12 @@ class PrivilegeCheckerTest {
 
     @Test
     void testCheckNodeIsPC() {
-        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext(id(pap, "u1")), "pc1", List.of("read")));
+        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new TestUserContext("u1", pap), "pc1", List.of("read")));
     }
 
     @Test
     void testAuthorize() {
-        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext(id(pap, "u1")), "o1", List.of("read")));
+        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new TestUserContext("u1", pap), "o1", List.of("read")));
     }
 
     @Test
@@ -73,7 +73,7 @@ class PrivilegeCheckerTest {
 
     @Test
     void testEmptyAccessRights() {
-        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext(id(pap, "u1")), "o1", List.of()));
+        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new TestUserContext("u1", pap), "o1", List.of()));
     }
 
 }

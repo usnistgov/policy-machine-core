@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.*;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.common.graph.relationship.InvalidAssignmentException;
@@ -97,20 +98,6 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
         }
 
         @Test
-        void testAssignmentCausesLoopException()
-                throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
-            pap.modify().graph().createObjectAttribute("oa2", ids("oa1"));
-
-            assertThrows(
-                    AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createObjectAttribute("oa3", ids("oa3")));
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createObjectAttribute("oa3", ids("oa2", "oa3")));
-        }
-
-        @Test
         void Success() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
@@ -130,7 +117,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
         @Test
         void testNoAssignments() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
-            assertThrows(DisconnectedNodeException.class, () -> pap.modify().graph().createObjectAttribute("oa1", ids("pc1")));
+            assertThrows(DisconnectedNodeException.class, () -> pap.modify().graph().createObjectAttribute("oa1", ids()));
         }
 
         @Test
@@ -181,19 +168,6 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             assertThrows(InvalidAssignmentException.class,
                     () -> pap.modify().graph().createUserAttribute("ua1", ids("oa1")));
-        }
-
-        @Test
-        void testAssignmentCausesLoopException()
-                throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
-            pap.modify().graph().createUserAttribute("ua2", ids("ua1"));
-
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createUserAttribute("ua3", ids("ua3")));
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createUserAttribute("ua3", ids("ua2", "ua3")));
         }
 
         @Test
@@ -266,18 +240,6 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
         }
 
         @Test
-        void testAssignmentCausesLoopException()
-                throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
-
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createObject("o1", ids("o1")));
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createObject("o1", ids("oa1", "o1")));
-        }
-
-        @Test
         void Success() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
@@ -344,18 +306,6 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             assertThrows(InvalidAssignmentException.class,
                     () -> pap.modify().graph().createUser("u1", ids("oa1")));
-        }
-
-        @Test
-        void testAssignmentCausesLoopException()
-                throws PMException {
-            pap.modify().graph().createPolicyClass("pc1");
-            pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
-
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createUser("u1", ids("u1")));
-            assertThrows(AssignmentCausesLoopException.class,
-                    () -> pap.modify().graph().createUser("u1", ids("ua1", "u1")));
         }
 
         @Test
@@ -440,7 +390,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
         @Test
         void testNodeDoesNotExistDoesNotThrowException() {
-            assertDoesNotThrow(() -> pap.modify().graph().deleteNode(id("pc1")));
+            assertDoesNotThrow(() -> pap.modify().graph().deleteNode(0));
         }
 
         @Test
@@ -673,8 +623,8 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1", "pc2"));
             pap.modify().graph().deassign(id("oa1"), ids("pc1"));
             assertIdOfNameInLongArray(pap.query().graph().getAdjacentDescendants(id("oa1")), "pc2");
-            assertIdOfNameInLongArray(pap.query().graph().getAdjacentDescendants(id("oa1")), "pc1");
-            assertIdOfNameInLongArray(pap.query().graph().getAdjacentAscendants(id("pc1")), "oa1");
+            assertIdOfNameNotInLongArray(pap.query().graph().getAdjacentDescendants(id("oa1")), "pc1");
+            assertIdOfNameNotInLongArray(pap.query().graph().getAdjacentAscendants(id("pc1")), "oa1");
         }
 
         @Test
@@ -708,8 +658,8 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             pap.modify().graph().deassign(id("ua3"), ids("pc1", "ua1"));
 
-            assertIdOfNameInLongArray(pap.query().graph().getAdjacentDescendants(id("ua3")), "pc1");
-            assertIdOfNameInLongArray(pap.query().graph().getAdjacentDescendants(id("ua3")), "ua1");
+            assertIdOfNameNotInLongArray(pap.query().graph().getAdjacentDescendants(id("ua3")), "pc1");
+            assertIdOfNameNotInLongArray(pap.query().graph().getAdjacentDescendants(id("ua3")), "ua1");
         }
     }
 
@@ -800,16 +750,16 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             Collection<Association> assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));
             Association assoc = assocs.iterator().next();
-            assertEquals("ua1", assoc.getSource());
-            assertEquals("oa1", assoc.getTarget());
+            assertEquals(id("ua1"), assoc.getSource());
+            assertEquals(id("oa1"), assoc.getTarget());
             assertEquals(new AccessRightSet("read"), assoc.getAccessRightSet());
 
             pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read", "write"));
 
             assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));
             assoc = assocs.iterator().next();
-            assertEquals("ua1", assoc.getSource());
-            assertEquals("oa1", assoc.getTarget());
+            assertEquals(id("ua1"), assoc.getSource());
+            assertEquals(id("oa1"), assoc.getTarget());
             assertEquals(new AccessRightSet("read", "write"), assoc.getAccessRightSet());
         }
 

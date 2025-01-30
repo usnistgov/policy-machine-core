@@ -11,6 +11,7 @@ import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -66,7 +67,7 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap(new PMLBootstrapper(new UserContext(id(pap, "u1")), input,
+        pdp.bootstrap(new PMLBootstrapper(new TestUserContext("u1", pap), input,
                 List.of(new PMLOperationWrapper(op1)),
                 List.of(new PMLRoutineWrapper(routine1)),
                 Map.of("TEST_CONST", new StringValue("TEST_PC"))

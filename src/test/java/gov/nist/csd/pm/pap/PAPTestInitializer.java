@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.LongStream;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class PAPTestInitializer {
@@ -44,5 +45,9 @@ public abstract class PAPTestInitializer {
 
     protected void assertIdOfNameInLongArray(long[] ids, String name) throws PMException {
         assertTrue(Arrays.stream(ids).boxed().toList().contains(id(name)));
+    }
+
+    protected void assertIdOfNameNotInLongArray(long[] ids, String name) throws PMException {
+        assertFalse(Arrays.stream(ids).boxed().toList().contains(id(name)));
     }
 }

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp.adjudication;
 
+import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public abstract class Adjudicator {
     public Adjudicator(PrivilegeChecker privilegeChecker) {
         this.privilegeChecker = privilegeChecker;
     }
+
 }

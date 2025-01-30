@@ -2,6 +2,7 @@ package gov.nist.csd.pm.common.op.graph;
 
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
@@ -48,28 +49,6 @@ public class DeleteNodeOp extends GraphOp<Void> {
         pap.modify().graph().deleteNode((long) operands.get(ID_OPERAND));
 
         return null;
-    }
-
-    @Override
-    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        long asc = (long) operands.get(ID_OPERAND);
-
-        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
-        List<String> descNames = new ArrayList<>();
-        for (Long desc : descs) {
-            descNames.add(pap.query().graph().getNodeById(desc).getName());
-        }
-
-        Map<String, Object> operandsWithNames = new HashMap<>();
-        operandsWithNames.put(NAME_OPERAND, pap.query().graph().getNodeById(asc).getName());
-        operandsWithNames.put(DESCENDANTS_OPERAND, descNames);
-
-        return new EventContext(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                this,
-                operandsWithNames
-        );
     }
 
     private ReqCaps getReqCap(NodeType type) {

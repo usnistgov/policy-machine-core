@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.common.prohibition;
 
+import java.util.Objects;
+
 public class ProhibitionSubject {
 
 	private long nodeId;
@@ -31,5 +33,25 @@ public class ProhibitionSubject {
 
 	public boolean isNode() {
 		return nodeId != 0;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ProhibitionSubject that)) return false;
+		return nodeId == that.nodeId && Objects.equals(process, that.process);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(nodeId, process);
+	}
+
+	@Override
+	public String toString() {
+		return "ProhibitionSubject{" +
+				"nodeId=" + nodeId +
+				", process='" + process + '\'' +
+				'}';
 	}
 }

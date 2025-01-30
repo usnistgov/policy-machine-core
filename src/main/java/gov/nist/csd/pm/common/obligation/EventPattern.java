@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.operand.ListStringOperandValue;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
+import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.op.Operation;
@@ -88,18 +91,18 @@ public class EventPattern implements Serializable {
     }
 
     private boolean userMatches(String user, PAP pap) throws PMException {
-        return subjectPattern.matches(user, pap);
+        return subjectPattern.matches(new StringOperandValue(user), pap);
     }
 
     private boolean processMatches(String process, PAP pap) throws PMException {
-        return subjectPattern.matches(process, pap);
+        return subjectPattern.matches(new StringOperandValue(process), pap);
     }
 
     private boolean operationMatches(String opName, PAP pap) throws PMException {
-        return operationPattern.matches(opName, pap);
+        return operationPattern.matches(new StringOperandValue(opName), pap);
     }
 
-    private boolean operandsMatch(String opName, Map<String, Object> operands, PAP pap) throws PMException {
+    private boolean operandsMatch(String opName, Map<String, OperandValue> operands, PAP pap) throws PMException {
         // get the operands of the operation that represent nodes
         List<String> nodeOperands = getOperationNodeOperands(opName, pap);
 
@@ -118,20 +121,20 @@ public class EventPattern implements Serializable {
                 return false;
             }
 
-            Object operandValue = operands.get(nodeOperand);
+            OperandValue operandValue = operands.get(nodeOperand);
             List<OperandPatternExpression> expressions = operandPatterns.get(nodeOperand);
 
             // needs to match each expression in pattern list
             for (OperandPatternExpression operandPatternExpression : expressions) {
                 switch (operandValue) {
                     case null -> {}
-                    case String operandValueStr -> {
-                        if (!operandPatternExpression.matches(operandValueStr, pap)) {
+                    case StringOperandValue stringOperandValue -> {
+                        if (!operandPatternExpression.matches(stringOperandValue, pap)) {
                             return false;
                         }
                     }
-                    case Collection<?> operandValueCollection -> {
-                        if (!operandPatternExpression.matches((Collection<String>) operandValueCollection, pap)) {
+                    case ListStringOperandValue listStringOperandValue -> {
+                        if (!operandPatternExpression.matches(listStringOperandValue, pap)) {
                             return false;
                         }
                     }

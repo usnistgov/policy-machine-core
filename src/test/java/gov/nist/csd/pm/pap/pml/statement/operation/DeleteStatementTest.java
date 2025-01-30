@@ -16,6 +16,7 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypher.internal.logical.plans.DeleteNode;
 
@@ -41,7 +42,7 @@ class DeleteStatementTest {
         pap.modify().graph().createUser("u1", ids(pap, "ua1"));
         pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids(pap, "pc1"));
-        UserContext userContext = new UserContext(id(pap, "u1"));
+        UserContext userContext = new TestUserContext("u1", pap);
         pap.modify().obligations().createObligation(userContext.getUser(), "o1", List.of(new Rule(
                 "rule1",
                 new EventPattern(new SubjectPattern(), new OperationPattern("e1")),

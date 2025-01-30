@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,7 +31,7 @@ class DissociateStatementTest {
         pap.modify().graph().createUser("u1", ids(pap, "ua1"));
         pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
         pap.modify().graph().associate(id(pap, "ua1"), id(pap, "oa1"), new AccessRightSet("read"));
-        UserContext userContext = new UserContext(id(pap, "u1"));
+        UserContext userContext = new TestUserContext("u1", pap);
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 

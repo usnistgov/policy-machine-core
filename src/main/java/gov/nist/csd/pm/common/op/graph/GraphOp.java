@@ -1,8 +1,11 @@
 package gov.nist.csd.pm.common.op.graph;
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.EventPublishable;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.common.op.PreparedOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
@@ -10,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class GraphOp<T> extends Operation<T> {
+public abstract class GraphOp<T> extends Operation<T> implements EventPublishable {
 
     public static final String TYPE_OPERAND = "type";
     public static final String DESCENDANTS_OPERAND = "descendants";
@@ -42,5 +45,14 @@ public abstract class GraphOp<T> extends Operation<T> {
      * @return The EventContext representing the operation.
      * @throws PMException If there is an exception building the EventContext.
      */
-    public abstract EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException;
+    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, OperandValue> operands) throws PMException {
+        return new EventContext(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                this,
+                operands
+        );
+    }
+
+    public abstract PreparedOp prepare();
 }

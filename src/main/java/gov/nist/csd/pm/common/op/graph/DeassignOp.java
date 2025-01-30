@@ -2,6 +2,7 @@ package gov.nist.csd.pm.common.op.graph;
 
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -38,27 +39,5 @@ public class DeassignOp extends GraphOp<Void> {
         pap.modify().graph().deassign(asc, descs);
 
         return null;
-    }
-
-    @Override
-    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        Map<String, Object> operandsWithNames = new HashMap<>();
-
-        long asc = (long) operands.get(ASCENDANT_OPERAND);
-        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
-        List<String> descNames = new ArrayList<>();
-        for (Long desc : descs) {
-            descNames.add(pap.query().graph().getNodeById(desc).getName());
-        }
-
-        operandsWithNames.put(ASCENDANT_OPERAND, pap.query().graph().getNodeById(asc).getName());
-        operandsWithNames.put(DESCENDANTS_OPERAND, descNames);
-
-        return new EventContext(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                this,
-                operandsWithNames
-        );
     }
 }

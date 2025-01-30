@@ -5,6 +5,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.util.TestMemoryPAP.id;
@@ -36,11 +37,11 @@ class CreateOperationStatementTest {
                 }
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
-            tx.executePML(new UserContext(id(pap, "u1")), """
+        pdp.runTx(new TestUserContext("u1", pap), tx -> {
+            tx.executePML(new TestUserContext("u1", pap), """
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
@@ -75,11 +76,11 @@ class CreateOperationStatementTest {
                 }
                 """;
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(id(pap, "u1")), pml);
+        pap.executePML(new TestUserContext("u1", pap), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new UserContext(id(pap, "u1")), tx -> {
-            tx.executePML(new UserContext(id(pap, "u1")), """
+        pdp.runTx(new TestUserContext("u1", pap), tx -> {
+            tx.executePML(new TestUserContext("u1", pap), """
                 op1("test1", ["o2", "o3"])
                 """);
             return null;

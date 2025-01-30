@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -33,7 +34,7 @@ class DeassignStatementTest {
         pap.modify().graph().createUserAttribute("ua3", ids(pap, "ua1", "ua2", "pc1"));
         pap.modify().graph().createUser("u1", ids(pap, "ua1"));
 
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u1")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new TestUserContext("u1", pap), pap);
         stmt.execute(execCtx, pap);
 
         assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "ua3"))).boxed().toList().contains(id(pap, "pc1")));

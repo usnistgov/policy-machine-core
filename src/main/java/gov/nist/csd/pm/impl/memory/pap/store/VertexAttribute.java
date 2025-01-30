@@ -58,7 +58,7 @@ class VertexAttribute extends Vertex {
             descendants[descendants.length - 1] = descendant;
         } else {
             ascendants = Arrays.copyOf(ascendants, ascendants.length + 1);
-            ascendants[ascendants.length - 1] = descendant;
+            ascendants[ascendants.length - 1] = ascendant;
         }
     }
 
@@ -66,11 +66,11 @@ class VertexAttribute extends Vertex {
     protected void deleteAssignment(long ascendant, long descendant) {
         if (ascendant == id) {
             descendants = LongStream.of(descendants)
-                    .filter(desc -> desc == descendant)
+                    .filter(desc -> desc != descendant)
                     .toArray();
         } else {
             ascendants = LongStream.of(ascendants)
-                    .filter(asc -> asc == ascendant)
+                    .filter(asc -> asc != ascendant)
                     .toArray();
         }
     }
@@ -90,11 +90,11 @@ class VertexAttribute extends Vertex {
     public void deleteAssociation(long ua, long target) {
         if (ua == id) {
             outgoingAssociations = Stream.of(outgoingAssociations)
-                    .filter(a -> a.getSource() == ua && a.getTarget() == target)
+                    .filter(a -> !(a.getSource() == ua && a.getTarget() == target))
                     .toArray(Association[]::new);
         } else {
             incomingAssociations = Stream.of(incomingAssociations)
-                    .filter(a -> a.getSource() == ua && a.getTarget() == target)
+                    .filter(a -> !(a.getSource() == ua && a.getTarget() == target))
                     .toArray(Association[]::new);
         }
     }

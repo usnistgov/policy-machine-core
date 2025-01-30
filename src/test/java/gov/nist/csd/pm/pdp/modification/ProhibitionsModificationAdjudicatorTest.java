@@ -62,7 +62,7 @@ class ProhibitionsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ProhibitionsModificationAdjudicator(new UserContext(id(pap, "u1")), pap, pdp.getPrivilegeChecker());
+        ok = new ProhibitionsModificationAdjudicator(new TestUserContext("u1", pap), pap, pdp.getPrivilegeChecker());
         fail = new ProhibitionsModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
     }
 

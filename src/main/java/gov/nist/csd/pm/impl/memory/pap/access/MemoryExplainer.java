@@ -56,7 +56,7 @@ public class MemoryExplainer {
 			Node pc = targetPathEntry.getKey();
 			Map<Path, List<Association>> targetPathAssociations = targetPathEntry.getValue();
 
-			List<List<ExplainNode>> paths = getExplainNodePaths(targetPathAssociations, userPaths);
+			Collection<List<ExplainNode>> paths = getExplainNodePaths(targetPathAssociations, userPaths);
 			AccessRightSet arset = getArsetFromPaths(paths);
 
 			result.add(new PolicyClassExplain(pc, arset, paths));
@@ -65,9 +65,9 @@ public class MemoryExplainer {
 		return result;
 	}
 
-	private List<List<ExplainNode>> getExplainNodePaths(Map<Path, List<Association>> targetPathAssociations,
+	private Collection<List<ExplainNode>> getExplainNodePaths(Map<Path, List<Association>> targetPathAssociations,
 	                                                    Map<Node, Set<Path>> userPaths) throws PMException {
-		List<List<ExplainNode>> paths = new ArrayList<>();
+		Collection<List<ExplainNode>> paths = new ArrayList<>();
 
 		for (Map.Entry<Path, List<Association>> targetPathEntry : targetPathAssociations.entrySet()) {
 			Path path = targetPathEntry.getKey();
@@ -78,16 +78,16 @@ public class MemoryExplainer {
 				List<ExplainAssociation> explainAssocs = new ArrayList<>();
 
 				for (Association pathAssoc : pathAssocs) {
-					long ua = pathAssoc.getSource();
 					long target = pathAssoc.getTarget();
 					if (target != node.getId()) {
 						continue;
 					}
 
-					Set<Path> userPathsToAssoc = userPaths.getOrDefault(ua, new HashSet<>());
+					Node uaNode = policyStore.graph().getNodeById(pathAssoc.getSource());
+					Set<Path> userPathsToAssoc = userPaths.getOrDefault(uaNode, new HashSet<>());
 
 					explainAssocs.add(new ExplainAssociation(
-							policyStore.graph().getNodeById(ua),
+							uaNode,
 							pathAssoc.getAccessRightSet(),
 							new ArrayList<>(userPathsToAssoc)
 					));
@@ -102,12 +102,11 @@ public class MemoryExplainer {
 		return paths;
 	}
 
-	private AccessRightSet getArsetFromPaths(List<List<ExplainNode>> paths) {
+	private AccessRightSet getArsetFromPaths(Collection<List<ExplainNode>> paths) {
 		AccessRightSet accessRightSet = new AccessRightSet();
-		for (List<ExplainNode> path : paths) {
+		for (Collection<ExplainNode> path : paths) {
 			for (ExplainNode explainNode : path) {
-				List<ExplainAssociation> associations = explainNode.associations();
-				for (ExplainAssociation association : associations) {
+				for (ExplainAssociation association : explainNode.associations()) {
 					if (association.userPaths().isEmpty()) {
 						continue;
 					}

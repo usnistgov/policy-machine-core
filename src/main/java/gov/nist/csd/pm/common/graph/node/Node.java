@@ -3,6 +3,7 @@ package gov.nist.csd.pm.common.graph.node;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Stores information needed for a node.
@@ -32,20 +33,11 @@ public class Node implements Serializable {
         this.properties = node.properties == null ? new HashMap<>() : new HashMap<>(node.properties);
     }
 
-    public Node(String name, NodeType type, Map<String, String> properties) {
-        this.name = name;
-        this.type = type;
-        this.properties = properties == null ? new HashMap<>() : properties;
-    }
-
-    public Node(String name, NodeType type) {
+    public Node(long id, String name, NodeType type) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.properties = new HashMap<>();
-    }
-
-    public Node(String name) {
-        this.name = name;
     }
 
     public Node addProperty(String key, String value) {
@@ -93,31 +85,21 @@ public class Node implements Serializable {
         return id + ":" + name;
     }
 
-    /**
-     * Two nodes are equal if their IDs are the same.
-     *
-     * @param o The object to check for equality.
-     * @return true if the two objects are the same, false otherwise.
-     */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Node n)) {
-            return false;
-        }
-
-        return this.name.equals(n.name)
-                && this.type.equals(n.type)
-                && this.properties.equals(n.properties);
+        if (this == o) return true;
+        if (!(o instanceof Node node)) return false;
+	    return id == node.id && Objects.equals(name, node.name) && type == node.type && Objects.equals(properties, node.properties);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(id, name, type, properties);
     }
 
     @Override
     public String toString() {
-        return name + ":" + type + ":" + properties;
+        return name + ":" + id + ":" + type + ":" + properties;
     }
 
 }

@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.pap.pml.pattern;
 
+import gov.nist.csd.pm.common.event.operand.ListStringOperandValue;
+import gov.nist.csd.pm.common.event.operand.OperandValue;
+import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
@@ -7,11 +10,10 @@ import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.store.GraphStore;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 public abstract class Pattern implements Serializable, PMLStatementSerializable {
 
-    public abstract boolean matches(String value, PAP pap) throws PMException;
+    public abstract boolean matches(StringOperandValue value, PAP pap) throws PMException;
     public abstract ReferencedNodes getReferencedNodes();
 
     @Override
@@ -25,9 +27,9 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
         return toFormattedString(0);
     }
 
-    public boolean matches(Collection<String> value, PAP pap) throws PMException {
-        for (String s : value) {
-            if (matches(s, pap)) {
+    public boolean matches(ListStringOperandValue value, PAP pap) throws PMException {
+        for (StringOperandValue opValue : value.getValues()) {
+            if (matches(opValue, pap)) {
                 return true;
             }
         }
