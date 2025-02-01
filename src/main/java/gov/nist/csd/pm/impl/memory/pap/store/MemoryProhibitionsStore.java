@@ -51,7 +51,7 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
 
     @Override
     public Map<String, Collection<Prohibition>> getProcessProhibitions() throws PMException {
-        return Map.of();
+        return policy.processProhibitions;
     }
 
     @Override

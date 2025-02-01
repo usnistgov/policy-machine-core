@@ -10,18 +10,21 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
-import gov.nist.csd.pm.util.TestMemoryPAP;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.checkPatternPrivileges;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBLIGATION;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ObligationOpTest {
 
     @Test
     void testCheckPatternPrivileges() throws PMException {
-        PAP pap = new TestMemoryPAP();
+        PAP pap = new TestPAP();
 
         pap.executePML(new UserContext(6), """
                 create pc "pc1"
@@ -41,11 +44,11 @@ class ObligationOpTest {
 
         PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
 
-        checkPatternPrivileges(privilegeChecker, new UserContext(6), new SubjectPattern(), CREATE_OBLIGATION);
+        checkPatternPrivileges(privilegeChecker, new TestUserContext("u1"), new SubjectPattern(), CREATE_OBLIGATION);
         assertThrows(UnauthorizedException.class,
-                () -> checkPatternPrivileges(privilegeChecker, new UserContext(7), new SubjectPattern(), CREATE_OBLIGATION));
+                () -> checkPatternPrivileges(privilegeChecker, new TestUserContext("u2"), new SubjectPattern(), CREATE_OBLIGATION));
 
-        checkPatternPrivileges(privilegeChecker, new UserContext(6), new LogicalSubjectPatternExpression(
+        checkPatternPrivileges(privilegeChecker, new TestUserContext("u1"), new LogicalSubjectPatternExpression(
                 new NodeOperandPattern("oa1"),
                 new InOperandPattern("oa2"),
                 true

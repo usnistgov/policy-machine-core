@@ -30,22 +30,16 @@ import static gov.nist.csd.pm.pap.AdminAccessRights.wildcardAccessRights;
 
 public class GraphModifier extends Modifier implements GraphModification {
 
-    private IdGenerator idGenerator;
-
     public GraphModifier(PolicyStore store, IdGenerator idGenerator) {
-        super(store);
-
-        this.idGenerator = idGenerator;
+        super(store, idGenerator);
     }
 
     @Override
     public long createPolicyClass(String name) throws PMException {
-        long id = idGenerator.generateId();
+        long id = idGenerator.generateId(name, PC);
 
         if (name.equals(AdminPolicyNode.PM_ADMIN_PC.nodeName())) {
             return AdminPolicyNode.PM_ADMIN_PC.nodeId();
-        } else if (store.graph().nodeExists(id)) {
-            throw new NodeIdExistsException(id);
         } else if (store.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
         }
@@ -418,7 +412,7 @@ public class GraphModifier extends Modifier implements GraphModification {
 
     private long createNonPolicyClassNode(String name, NodeType type, Collection<Long> descendants)
             throws PMException {
-        long id = idGenerator.generateId();
+        long id = idGenerator.generateId(name, type);
 
         if (name.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName())) {
             return AdminPolicyNode.PM_ADMIN_OBJECT.nodeId();

@@ -1,8 +1,5 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.event.operand.ListStringOperandValue;
-import gov.nist.csd.pm.common.event.operand.MapStringStringOperandValue;
-import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.op.graph.*;
 import gov.nist.csd.pm.pap.modification.GraphModification;
@@ -11,14 +8,15 @@ import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
+import org.neo4j.cypher.internal.ast.CreateUser;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.LongStream;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
@@ -44,8 +42,11 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         long id = op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(NAME_OPERAND, new StringOperandValue(name)));
-        eventPublisher.publishEvent(eventContext);
+        eventPublisher.publishEvent(new CreatePolicyClassOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                name
+        ));
 
         return id;
     }
@@ -58,13 +59,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         long id = op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx,
-                Map.of(
-                        NAME_OPERAND, new StringOperandValue(name),
-                        DESCENDANTS_OPERAND, ListStringOperandValue.fromIds(pap, descendants)
-                )
-        );
-        eventPublisher.publishEvent(eventContext);
+        eventPublisher.publishEvent(new CreateUserAttributeOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                name,
+                descendants.stream().map(descId -> {
+                    try {
+                        return pap.query().graph().getNodeById(descId).getName();
+                    } catch (PMException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList()
+        ));
 
         return id;
     }
@@ -77,13 +83,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         long id = op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx,
-                Map.of(
-                        NAME_OPERAND, new StringOperandValue(name),
-                        DESCENDANTS_OPERAND, ListStringOperandValue.fromIds(pap, descendants)
-                )
-        );
-        eventPublisher.publishEvent(eventContext);
+        eventPublisher.publishEvent(new CreateObjectAttributeOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                name,
+                descendants.stream().map(descId -> {
+                    try {
+                        return pap.query().graph().getNodeById(descId).getName();
+                    } catch (PMException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList()
+        ));
 
         return id;
     }
@@ -96,13 +107,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         long id = op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx,
-                Map.of(
-                        NAME_OPERAND, new StringOperandValue(name),
-                        DESCENDANTS_OPERAND, ListStringOperandValue.fromIds(pap, descendants)
-                )
-        );
-        eventPublisher.publishEvent(eventContext);
+        eventPublisher.publishEvent(new CreateObjectOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                name,
+                descendants.stream().map(descId -> {
+                    try {
+                        return pap.query().graph().getNodeById(descId).getName();
+                    } catch (PMException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList()
+        ));
 
         return id;
     }
@@ -115,13 +131,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         long id = op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx,
-                Map.of(
-                        NAME_OPERAND, new StringOperandValue(name),
-                        DESCENDANTS_OPERAND, ListStringOperandValue.fromIds(pap, descendants)
-                )
-        );
-        eventPublisher.publishEvent(eventContext);
+        eventPublisher.publishEvent(new CreateUserOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                name,
+                descendants.stream().map(descId -> {
+                    try {
+                        return pap.query().graph().getNodeById(descId).getName();
+                    } catch (PMException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList()
+        ));
 
         return id;
     }
@@ -130,32 +151,40 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         SetNodePropertiesOp op = new SetNodePropertiesOp();
 
-        Map<String, Object> operands = Map.of(ID_OPERAND, id, PROPERTIES_OPERAND, properties);
+        Map<String, Object> operands = Map.of(NODE_OPERAND, id, PROPERTIES_OPERAND, properties);
         op.canExecute(privilegeChecker, userCtx, operands);
         op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(
-                NAME_OPERAND, new StringOperandValue(pap.query().graph().getNodeById(id).getName()),
-                PROPERTIES_OPERAND, new MapStringStringOperandValue(properties)
+        eventPublisher.publishEvent(new SetNodePropertiesOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                pap.query().graph().getNodeById(id).getName()
         ));
-        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
     public void deleteNode(long id) throws PMException {
         Node node = pap.query().graph().getNodeById(id);
-        long[] descendants = pap.query().graph().getAdjacentDescendants(id);
+        List<Long> descendants = LongStream.of(pap.query().graph().getAdjacentDescendants(id)).boxed().toList();
 
         DeleteNodeOp op = new DeleteNodeOp();
 
-        Map<String, Object> operands = Map.of(ID_OPERAND, id, TYPE_OPERAND, node.getType(), DESCENDANTS_OPERAND, descendants);
+        Map<String, Object> operands = Map.of(NODE_OPERAND, id, TYPE_OPERAND, node.getType(), DESCENDANTS_OPERAND, descendants);
         op.canExecute(privilegeChecker, userCtx, operands);
         op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(
-                NAME_OPERAND, new StringOperandValue(node.getName())
+        eventPublisher.publishEvent(new DeleteNodeOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                node.getName(),
+                descendants.stream().map(descId -> {
+                    try {
+                        return pap.query().graph().getNodeById(descId).getName();
+                    } catch (PMException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList()
         ));
-        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
@@ -166,11 +195,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(
-                ASCENDANT_OPERAND, new StringOperandValue(pap.query().graph().getNodeById(ascId).getName()),
-                DESCENDANTS_OPERAND, ListStringOperandValue.fromIds(pap, descendants)
+        eventPublisher.publishEvent(new AssignOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                pap.query().graph().getNodeById(ascId).getName(),
+                descendants.stream().map(id -> {
+	                try {
+		                return pap.query().graph().getNodeById(id).getName();
+	                } catch (PMException e) {
+		                throw new RuntimeException(e);
+	                }
+                }).toList()
         ));
-        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
@@ -181,11 +217,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(
-                ASCENDANT_OPERAND, new StringOperandValue(pap.query().graph().getNodeById(ascendant).getName()),
-                DESCENDANTS_OPERAND, ListStringOperandValue.fromIds(pap, descendants)
+        eventPublisher.publishEvent(new DeassignOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                pap.query().graph().getNodeById(ascendant).getName(),
+                descendants.stream().map(id -> {
+                    try {
+                        return pap.query().graph().getNodeById(id).getName();
+                    } catch (PMException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList()
         ));
-        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
@@ -196,12 +239,12 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(
-                UA_OPERAND, StringOperandValue.fromId(pap, ua),
-                TARGET_OPERAND, StringOperandValue.fromId(pap, target),
-                ARSET_OPERAND, new ListStringOperandValue(accessRights)
+        eventPublisher.publishEvent(new AssociateOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                pap.query().graph().getNodeById(ua).getName(),
+                pap.query().graph().getNodeById(target).getName()
         ));
-        eventPublisher.publishEvent(eventContext);
     }
 
     @Override
@@ -212,11 +255,12 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(privilegeChecker, userCtx, operands);
         op.execute(pap, operands);
 
-        EventContext eventContext = op.toEventContext(pap, userCtx, Map.of(
-                UA_OPERAND, StringOperandValue.fromId(pap, ua),
-                TARGET_OPERAND, StringOperandValue.fromId(pap, target)
+        eventPublisher.publishEvent(new DissociateOp.EventCtx(
+                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
+                userCtx.getProcess(),
+                pap.query().graph().getNodeById(ua).getName(),
+                pap.query().graph().getNodeById(target).getName()
         ));
-        eventPublisher.publishEvent(eventContext);
 
     }
 }

@@ -21,6 +21,7 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -85,7 +86,7 @@ class FunctionInvokeExpressionTest {
                 e.getType(visitorContext.scope())
         );
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.modify().operations().createAdminOperation(voidFunc);
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         Value value = e.execute(executionContext, new MemoryPAP());
@@ -162,7 +163,7 @@ class FunctionInvokeExpressionTest {
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.modify().operations().createAdminOperation(stringFunc);
         ExecutionContext executionContext =
                 new ExecutionContext(
@@ -201,7 +202,7 @@ class FunctionInvokeExpressionTest {
                     b(x, y)
                 }
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
         assertTrue(pap.query().graph().nodeExists("cx"));
         assertTrue(pap.query().graph().nodeExists("cy"));
@@ -217,7 +218,7 @@ class FunctionInvokeExpressionTest {
                     x = "x"
                 }
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("x"));
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -236,7 +237,7 @@ class FunctionInvokeExpressionTest {
                 
                 a()
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }

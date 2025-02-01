@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.event.EventPublishable;
-import gov.nist.csd.pm.common.event.operand.OperandValue;
-import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
@@ -131,26 +129,35 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 pap.query().graph().getNodeById(user.getUser()).getName(),
                 user.getProcess(),
                 resourceOperation,
-                Map.of("target", new StringOperandValue(node.getName()))
+                Map.of("target", node.getName())
         ));
 
         return new AdjudicationResponse(GRANT, node);
     }
 
-    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, OperandValue> operands) throws PMException {
+    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
         Operation<?> operation = pap.query()
                 .operations()
                 .getAdminOperation(name);
+
+        if (AdminOperations.ADMIN_OP_NAMES.contains(operation.getName())) {
+            throw new PMException("policy machine admin ops should be called directly through the runTx method");
+        }
 
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(ctx);
         }
 
+        // execute operation
         Object ret = pdpTx.executeAdminExecutable(operation, operands);
 
-        if (operation instanceof EventPublishable eventPublishable) {
-            publishEvent(eventPublishable.toEventContext(pap, user, operation, operands));
-        }
+        // send to EPP
+        publishEvent(new EventContext(
+                pap.query().graph().getNodeById(user.getUser()).getName(),
+                user.getProcess(),
+                operation,
+                operands
+        ));
 
         if (ret instanceof Value value) {
             return value.toObject();
@@ -206,7 +213,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
 
                 for (OperationRequest request : operationRequests) {
-                   executeOperation(user, ctx, tx, request.name(), request.operands());
+                    executeOperation(user, ctx, tx, request.name(), request.operands());
                 }
 
                 return null;

@@ -22,7 +22,7 @@ class DeleteStmtVisitorTest {
     void testDeleteNode() throws PMException {
         PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
                 """
-                delete object attribute "oa1"
+                delete node "oa1"
                 """,
                 PMLParser.DeleteStatementContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
@@ -40,7 +40,7 @@ class DeleteStmtVisitorTest {
 
         testCompilationError(
                 """
-                delete object attribute ["oa1"]
+                delete node ["oa1"]
                 """, visitorCtx, 1,
                 "expected expression type(s) [string], got []string"
         );

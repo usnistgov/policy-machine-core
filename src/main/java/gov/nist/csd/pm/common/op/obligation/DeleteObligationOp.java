@@ -11,7 +11,7 @@ import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_OBLIGATION;
 public class DeleteObligationOp extends ObligationOp {
 
     public DeleteObligationOp() {
-        super("delete_obligation", List.of(NAME_OPERAND), DELETE_OBLIGATION);
+        super("delete_obligation", DELETE_OBLIGATION);
     }
 
     @Override

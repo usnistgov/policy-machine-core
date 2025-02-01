@@ -13,6 +13,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +45,7 @@ class LogicalExpressionTest {
                 true && false
                 """,
                 PMLParser.LogicalExpressionContext.class);
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
 
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
@@ -66,7 +67,7 @@ class LogicalExpressionTest {
         expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         executionContext = new ExecutionContext(new UserContext(0), pap);
         actual = expression.execute(executionContext, pap);
         assertEquals(

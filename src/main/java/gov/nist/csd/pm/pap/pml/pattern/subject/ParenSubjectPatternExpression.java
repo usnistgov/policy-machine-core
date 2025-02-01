@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.pml.pattern.subject;
 
-import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
@@ -21,7 +20,7 @@ public class ParenSubjectPatternExpression extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matches(StringOperandValue value, PAP pap) throws PMException {
+    public boolean matches(String value, PAP pap) throws PMException {
         return expression.matches(value, pap);
     }
 

@@ -1,19 +1,19 @@
 package gov.nist.csd.pm.pap.pml.pattern.operand;
 
-import gov.nist.csd.pm.common.event.operand.ListStringOperandValue;
-import gov.nist.csd.pm.common.event.operand.StringOperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.PAP;
 
+import java.util.Collection;
+
 public class AnyOperandPattern extends OperandPatternExpression {
     @Override
-    public boolean matches(StringOperandValue value, PAP pap) throws PMException {
+    public boolean matches(String value, PAP pap) throws PMException {
         return true;
     }
 
     @Override
-    public boolean matches(ListStringOperandValue value, PAP pap) throws PMException {
+    public boolean matches(Collection<String> value, PAP pap) throws PMException {
         return true;
     }
 

@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.common.op.graph;
 
 import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
@@ -39,5 +38,15 @@ public class AssociateOp extends GraphOp<Void> {
         privilegeChecker.check(userCtx, (long) operands.get(UA_OPERAND), ASSOCIATE);
         privilegeChecker.check(userCtx, (long) operands.get(TARGET_OPERAND), ASSOCIATE_TO);
 
+    }
+
+    public static class EventCtx extends EventContext {
+
+        public EventCtx(String user, String process, String ua, String target) {
+            super(user, process, "associate", Map.of(
+                    UA_OPERAND, ua,
+                    TARGET_OPERAND, target
+            ));
+        }
     }
 }

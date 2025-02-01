@@ -43,7 +43,7 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     public Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException {
         if (subject.isNode()) {
             Node node = store.graph().getNodeById(subject.getNodeId());
-            return store.prohibitions().getNodeProhibitions().getOrDefault(node, new ArrayList<>());
+            return store.prohibitions().getNodeProhibitions().getOrDefault(node.getId(), new ArrayList<>());
         } else {
             return store.prohibitions().getProcessProhibitions().getOrDefault(subject.getProcess(), new ArrayList<>());
         }

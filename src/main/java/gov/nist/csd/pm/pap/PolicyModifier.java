@@ -25,6 +25,10 @@ public class PolicyModifier extends Modifier implements PolicyModification {
         this.routinesModifier = new RoutinesModifier(store);
     }
 
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.graphModifier.setIdGenerator(idGenerator);
+    }
+
     @Override
     public GraphModifier graph() {
         return graphModifier;

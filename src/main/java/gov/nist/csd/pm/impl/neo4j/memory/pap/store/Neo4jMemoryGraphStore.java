@@ -58,11 +58,19 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 
 			Iterable<String> propertyKeys = node.getPropertyKeys();
 			for (String key : propertyKeys) {
+				if (key.equals(ID_PROPERTY) || key.equals(NAME_PROPERTY)) {
+					continue;
+				}
+
 				node.removeProperty(key);
 			}
 
-			for (Map.Entry<String, String> entry : properties.entrySet()) {
-				node.setProperty(entry.getKey(), entry.getValue());
+			for (Map.Entry<String, String> e : properties.entrySet()) {
+				if (e.getKey().equals(ID_PROPERTY) || e.getKey().equals(NAME_PROPERTY)) {
+					continue;
+				}
+
+				node.setProperty(e.getKey(), e.getValue());
 			}
 
 			node.setProperty(ID_PROPERTY, id);
@@ -141,10 +149,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			typeAtomic.set(getNodeType(node));
 
 			Map<String, Object> props = node.getAllProperties();
-			props.remove(NAME_PROPERTY);
-			props.remove(ID_PROPERTY);
-
 			for (Map.Entry<String, Object> e : props.entrySet()) {
+				if (e.getKey().equals(ID_PROPERTY) || e.getKey().equals(NAME_PROPERTY)) {
+					continue;
+				}
+
 				properties.put(e.getKey(), String.valueOf(e.getValue()));
 			}
 		});
@@ -164,10 +173,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			typeAtomic.set(getNodeType(node));
 
 			Map<String, Object> props = node.getAllProperties();
-			props.remove(NAME_PROPERTY);
-			props.remove(ID_PROPERTY);
-
 			for (Map.Entry<String, Object> e : props.entrySet()) {
+				if (e.getKey().equals(ID_PROPERTY) || e.getKey().equals(NAME_PROPERTY)) {
+					continue;
+				}
+
 				properties.put(e.getKey(), String.valueOf(e.getValue()));
 			}
 		});
@@ -192,8 +202,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		AtomicBoolean typeAtomic = new AtomicBoolean();
 
 		txHandler.runTx(tx -> {
-			boolean b = tx.findNode(NODE_LABEL, NAME_PROPERTY, name) != null;
-			typeAtomic.set(b);
+			org.neo4j.graphdb.Node node = tx.findNode(NODE_LABEL, NAME_PROPERTY, name);
+			typeAtomic.set(node != null);
 		});
 
 		return typeAtomic.get();

@@ -1,19 +1,10 @@
 package gov.nist.csd.pm.common.op.graph;
 
-import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.event.EventPublishable;
-import gov.nist.csd.pm.common.event.operand.OperandValue;
-import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.common.op.PreparedOp;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public abstract class GraphOp<T> extends Operation<T> implements EventPublishable {
+public abstract class GraphOp<T> extends Operation<T> {
 
     public static final String TYPE_OPERAND = "type";
     public static final String DESCENDANTS_OPERAND = "descendants";
@@ -35,24 +26,4 @@ public abstract class GraphOp<T> extends Operation<T> implements EventPublishabl
         super(name);
     }
 
-    /**
-     * Convert the given operation and operands to an event context to be sent to the EPP. If the operation uses node IDs
-     * as operands in execute(), those IDs are changed to the node names. If an operation uses the ID_OPERAND key, the
-     * returned event context will change that to the NAME_OPERAND key.
-     * @param pap The PAP object.
-     * @param userCtx The user who initiated the event.
-     * @param operands The operands of the operation.
-     * @return The EventContext representing the operation.
-     * @throws PMException If there is an exception building the EventContext.
-     */
-    public EventContext toEventContext(PAP pap, UserContext userCtx, Map<String, OperandValue> operands) throws PMException {
-        return new EventContext(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                this,
-                operands
-        );
-    }
-
-    public abstract PreparedOp prepare();
 }

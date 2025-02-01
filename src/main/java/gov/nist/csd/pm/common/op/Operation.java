@@ -11,7 +11,7 @@ import java.util.*;
 public abstract class Operation<T> extends AdminExecutable<T> {
 
     public static final String NAME_OPERAND = "name";
-    public static final String ID_OPERAND = "id";
+    public static final String NODE_OPERAND = "node";
 
     protected List<String> nodeOperandNames;
 

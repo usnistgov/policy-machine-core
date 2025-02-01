@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.common.event;
 
-import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.op.Operation;
 
 import java.util.Map;
@@ -11,16 +10,16 @@ public class EventContext {
     private final String user;
     private final String process;
     private final String opName;
-    private final Map<String, OperandValue> operands;
+    private final Map<String, Object> operands;
 
-    public EventContext(String user, String process, String opName, Map<String, OperandValue> operands) {
+    public EventContext(String user, String process, String opName, Map<String, Object> operands) {
         this.user = user;
         this.process = process;
         this.opName = opName;
         this.operands = operands;
     }
 
-    public EventContext(String user, String process, Operation<?> op, Map<String, OperandValue> operands) {
+    public EventContext(String user, String process, Operation<?> op, Map<String, Object> operands) {
         this.user = user;
         this.process = process;
         this.opName = op.getName();
@@ -39,7 +38,7 @@ public class EventContext {
         return opName;
     }
 
-    public Map<String, OperandValue> getOperands() {
+    public Map<String, Object> getOperands() {
         return operands;
     }
 

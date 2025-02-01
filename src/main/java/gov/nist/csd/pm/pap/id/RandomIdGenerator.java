@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.pap.id;
 
+import gov.nist.csd.pm.common.graph.node.NodeType;
+
 import java.security.SecureRandom;
 
 public class RandomIdGenerator implements IdGenerator {
@@ -11,7 +13,7 @@ public class RandomIdGenerator implements IdGenerator {
 	}
 
 	@Override
-	public long generateId() {
-		return this.secureRandom.nextLong();
+	public long generateId(String name, NodeType type) {
+		return Math.abs(this.secureRandom.nextLong());
 	}
 }

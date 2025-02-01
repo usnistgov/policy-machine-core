@@ -46,7 +46,7 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
 		                    new ContainerCondition(id("oa4"), false)));
 
             Collection<Prohibition> prohibitions = pap.query().prohibitions().getProhibitions();
-            assertEquals(1, prohibitions.size());
+            assertEquals(2, prohibitions.size());
             checkProhibitions(prohibitions);
         }
 

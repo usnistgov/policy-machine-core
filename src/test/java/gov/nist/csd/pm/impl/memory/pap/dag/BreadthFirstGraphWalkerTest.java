@@ -5,6 +5,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.Direction;
 import gov.nist.csd.pm.common.graph.dag.BreadthFirstGraphWalker;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class BreadthFirstGraphWalkerTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         pc1 = pap.modify().graph().createPolicyClass("pc1");
         oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
 

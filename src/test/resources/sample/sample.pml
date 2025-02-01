@@ -43,13 +43,13 @@ routine deleteAllProjects(string locProjectOA) {
 operation deleteReadme(nodeop string projectReadme) {
     check "delete_readme" on projectReadme
 } {
-    delete object projectReadme
+    delete node projectReadme
 }
 
 operation deleteProject(nodeop string projectName) {
     check "delete_project" on projectName
 } {
-    delete oa projectName
+    delete node projectName
 }
 
 operation createProject(string projectName, nodeop string locProjectAttr) {

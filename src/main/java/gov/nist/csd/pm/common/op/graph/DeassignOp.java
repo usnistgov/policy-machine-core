@@ -2,16 +2,12 @@ package gov.nist.csd.pm.common.op.graph;
 
 
 import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 
@@ -39,5 +35,15 @@ public class DeassignOp extends GraphOp<Void> {
         pap.modify().graph().deassign(asc, descs);
 
         return null;
+    }
+
+    public static class EventCtx extends EventContext {
+
+        public EventCtx(String user, String process, String ascendantName, List<String> descendantNames) {
+            super(user, process, "deassign", Map.of(
+                    ASCENDANT_OPERAND, ascendantName,
+                    DESCENDANTS_OPERAND, descendantNames
+            ));
+        }
     }
 }

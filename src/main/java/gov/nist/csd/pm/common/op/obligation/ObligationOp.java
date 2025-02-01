@@ -16,15 +16,15 @@ import java.util.Map;
 
 public abstract class ObligationOp extends Operation<Void> {
 
-    public static final String AUTHOR_ID_OPERAND = "authorId";
+    public static final String AUTHOR_OPERAND = "author";
     public static final String RULES_OPERAND = "rules";
 
     private String reqCap;
 
-    public ObligationOp(String opName, List<String> allOperands, String reqCap) {
+    public ObligationOp(String opName, String reqCap) {
         super(
                 opName,
-                allOperands
+                List.of(AUTHOR_OPERAND, NAME_OPERAND,  RULES_OPERAND)
         );
 
         this.reqCap = reqCap;

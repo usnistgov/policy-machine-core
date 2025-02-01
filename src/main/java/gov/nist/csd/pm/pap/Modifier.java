@@ -2,18 +2,29 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.tx.Transactional;
+import gov.nist.csd.pm.pap.id.IdGenerator;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 public abstract class Modifier implements Transactional {
 
     protected PolicyStore store;
+    protected IdGenerator idGenerator;
 
     public Modifier(PolicyStore store) {
         this.store = store;
     }
 
-    public Modifier(Modifier modifier) {
-        this(modifier.store);
+    public Modifier(PolicyStore store, IdGenerator idGenerator) {
+        this.store = store;
+        this.idGenerator = idGenerator;
+    }
+
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
     }
 
     protected <T> T runTx(Runner<T> txRunner) throws PMException {

@@ -6,12 +6,11 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
-import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreatePolicyStatementTest {
@@ -19,11 +18,11 @@ class CreatePolicyStatementTest {
     @Test
     void testSuccess() throws PMException {
         CreatePolicyStatement stmt = new CreatePolicyStatement(new StringLiteral("pc1"));
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc2");
-        pap.modify().graph().createUserAttribute("ua2", ids(pap, "pc2"));
-        pap.modify().graph().createUser("u2", ids(pap, "ua2"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id(pap, "u2")), pap);
+        pap.modify().graph().createUserAttribute("ua2", ids("pc2"));
+        pap.modify().graph().createUser("u2", ids("ua2"));
+        ExecutionContext execCtx = new ExecutionContext(new UserContext(id("u2")), pap);
 
         stmt.execute(execCtx, pap);
 

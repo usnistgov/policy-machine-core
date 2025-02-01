@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
@@ -37,7 +38,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), pap), pap);
         assertEquals(

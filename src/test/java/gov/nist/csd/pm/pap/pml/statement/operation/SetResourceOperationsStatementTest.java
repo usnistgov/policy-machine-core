@@ -7,6 +7,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
@@ -20,7 +21,7 @@ class SetResourceOperationsStatementTest {
                 buildArrayLiteral("a", "b", "c", "d")
         );
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
 
         stmt.execute(new ExecutionContext(new UserContext(0), pap), pap);
 

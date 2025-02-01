@@ -5,10 +5,12 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreateOperationStatementTest {
@@ -36,20 +38,20 @@ class CreateOperationStatementTest {
                     create policy class "test"
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new TestUserContext("u1", pap), pml);
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new TestUserContext("u1", pap), tx -> {
-            tx.executePML(new TestUserContext("u1", pap), """
+        pdp.runTx(new TestUserContext("u1"), tx -> {
+            tx.executePML(new TestUserContext("u1"), """
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id(pap, "u2")), tx -> {
-            tx.executePML(new UserContext(id(pap, "u2")), """
+        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id("u2")), tx -> {
+            tx.executePML(new UserContext(id("u2")), """
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
@@ -75,20 +77,20 @@ class CreateOperationStatementTest {
                     create policy class a
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new TestUserContext("u1", pap), pml);
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new TestUserContext("u1", pap), tx -> {
-            tx.executePML(new TestUserContext("u1", pap), """
+        pdp.runTx(new TestUserContext("u1"), tx -> {
+            tx.executePML(new TestUserContext("u1"), """
                 op1("test1", ["o2", "o3"])
                 """);
             return null;
         });
         assertTrue(pap.query().graph().nodeExists("test1"));
 
-        pdp.runTx(new UserContext(id(pap, "u2")), tx -> {
-            tx.executePML(new UserContext(id(pap, "u2")), """
+        pdp.runTx(new UserContext(id("u2")), tx -> {
+            tx.executePML(new UserContext(id("u2")), """
                 op1("test2", ["o2", "o3"])
                 """);
             return null;

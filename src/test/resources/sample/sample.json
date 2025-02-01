@@ -101,9 +101,9 @@
         "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.operands.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.operands.projectName)\n    }\n\n}"
     ],
     "operations": [
-        "operation deleteProject(nodeop string projectName) {\n    check \"delete_project\" on projectName\n} {\n    delete OA projectName\n}",
+        "operation deleteProject(nodeop string projectName) {\n    check \"delete_project\" on projectName\n} {\n    delete node projectName\n}",
         "operation createProject(string projectName, nodeop string locProjectAttr) {\n    check \"assign_to\" on \"project\"\n    check \"assign_to\" on locProjectAttr\n} {\n    create OA projectName in [\"project\", locProjectAttr]\n    create O projectName + \" README\" in [projectName]\n}",
-        "operation deleteReadme(nodeop string projectReadme) {\n    check \"delete_readme\" on projectReadme\n} {\n    delete O projectReadme\n}",
+        "operation deleteReadme(nodeop string projectReadme) {\n    check \"delete_readme\" on projectReadme\n} {\n    delete node projectReadme\n}",
         "operation createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName and projectName with [\"*\"]\n    create prohibition \"deny admin delete README\"\n      deny UA uaName\n      access rights [\"delete_readme\"]\n      on union of [projectName]\n}"
     ],
     "routines": [

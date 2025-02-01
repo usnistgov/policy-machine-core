@@ -7,23 +7,22 @@ import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
-import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExecutionTest {
     
     @Test
     void testGraphPML() throws PMException {
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
 
         String input =
                 """
@@ -52,7 +51,7 @@ public class ExecutionTest {
                 associate "ua2" and "oa2" with ["read", "write"]
                 associate "ua3" and "oa3" with ["read", "write"]
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -66,71 +65,71 @@ public class ExecutionTest {
 
         assertEquals("v", pap.query().graph().getNodeByName("pc1").getProperties().get("k"));
 
-        long[] ascendants = pap.query().graph().getAdjacentAscendants(id(pap, "pc1"));
-        assertTrue(Arrays.stream(ascendants).boxed().toList().containsAll(ids(pap, "ua1", "ua2", "ua3")));
-        ascendants = pap.query().graph().getAdjacentAscendants(id(pap, "pc1"));
-        assertTrue(Arrays.stream(ascendants).boxed().toList().containsAll(ids(pap, "oa1", "oa2", "oa3")));
+        long[] ascendants = pap.query().graph().getAdjacentAscendants(id("pc1"));
+        assertTrue(Arrays.stream(ascendants).boxed().toList().containsAll(ids("ua1", "ua2", "ua3")));
+        ascendants = pap.query().graph().getAdjacentAscendants(id("pc1"));
+        assertTrue(Arrays.stream(ascendants).boxed().toList().containsAll(ids("oa1", "oa2", "oa3")));
 
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "ua1"))).boxed().toList().contains(id(pap, "pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "ua2"))).boxed().toList().contains(id(pap, "pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "ua3"))).boxed().toList().contains(id(pap, "pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "oa1"))).boxed().toList().contains(id(pap, "pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "oa2"))).boxed().toList().contains(id(pap, "pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "oa3"))).boxed().toList().contains(id(pap, "pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "u1"))).boxed().toList().containsAll(ids(pap, "ua1", "ua2", "ua3")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "o1"))).boxed().toList().containsAll(ids(pap, "oa1", "oa2", "oa3")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua1"))).boxed().toList().contains(id("pc1")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua2"))).boxed().toList().contains(id("pc1")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua3"))).boxed().toList().contains(id("pc1")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa1"))).boxed().toList().contains(id("pc1")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa2"))).boxed().toList().contains(id("pc1")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa3"))).boxed().toList().contains(id("pc1")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("u1"))).boxed().toList().containsAll(ids("ua1", "ua2", "ua3")));
+        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("o1"))).boxed().toList().containsAll(ids("oa1", "oa2", "oa3")));
 
-        assertEquals(new Association(id(pap, "ua1"), id(pap, "oa1"), new AccessRightSet("read", "write")),
-                pap.query().graph().getAssociationsWithSource(id(pap, "ua1")).iterator().next());
-        assertEquals(new Association(id(pap, "ua2"), id(pap, "oa2"), new AccessRightSet("read", "write")),
-                pap.query().graph().getAssociationsWithSource(id(pap, "ua2")).iterator().next());
-        assertEquals(new Association(id(pap, "ua3"), id(pap, "oa3"), new AccessRightSet("read", "write")),
-                pap.query().graph().getAssociationsWithSource(id(pap, "ua3")).iterator().next());
+        assertEquals(new Association(id("ua1"), id("oa1"), new AccessRightSet("read", "write")),
+                pap.query().graph().getAssociationsWithSource(id("ua1")).iterator().next());
+        assertEquals(new Association(id("ua2"), id("oa2"), new AccessRightSet("read", "write")),
+                pap.query().graph().getAssociationsWithSource(id("ua2")).iterator().next());
+        assertEquals(new Association(id("ua3"), id("oa3"), new AccessRightSet("read", "write")),
+                pap.query().graph().getAssociationsWithSource(id("ua3")).iterator().next());
 
         input = """
                 dissociate "ua1" and "oa1"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
-        assertTrue(pap.query().graph().getAssociationsWithSource(id(pap, "ua1")).isEmpty());
+        pap.executePML(new TestUserContext("u1"), input);
+        assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1")).isEmpty());
 
         input =
                 """
                 deassign "u1" from ["ua1", "ua2"]
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "u1"))).boxed().toList().containsAll(ids(pap, "ua1", "ua2")));
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id(pap, "ua1"))).boxed().toList().contains(id(pap, "u1")));
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id(pap, "ua2"))).boxed().toList().contains(id(pap, "u1")));
+        pap.executePML(new TestUserContext("u1"), input);
+        assertFalse(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("u1"))).boxed().toList().containsAll(ids("ua1", "ua2")));
+        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("ua1"))).boxed().toList().contains(id("u1")));
+        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("ua2"))).boxed().toList().contains(id("u1")));
 
         input =
                 """
-                delete user "u1"
+                delete node "u1"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertFalse(pap.query().graph().nodeExists("u1"));
 
         input =
                 """
                 deassign "o1" from ["oa1"]
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentDescendants(id(pap, "oa1"))).boxed().toList().contains(id(pap, "oa1")));
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id(pap, "oa1"))).boxed().toList().contains(id(pap, "o1")));
+        pap.executePML(new TestUserContext("u1"), input);
+        assertFalse(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa1"))).boxed().toList().contains(id("oa1")));
+        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("oa1"))).boxed().toList().contains(id("o1")));
 
         input =
                 """
-                delete object "o1"
+                delete node "o1"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertFalse(pap.query().graph().nodeExists("o1"));
 
         input =
                 """
-                delete user attribute "ua1"
-                delete user attribute "ua2"
-                delete user attribute "ua3"
+                delete node "ua1"
+                delete node "ua2"
+                delete node "ua3"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertFalse(pap.query().graph().nodeExists("ua1"));
         assertFalse(pap.query().graph().nodeExists("ua2"));
         assertFalse(pap.query().graph().nodeExists("ua3"));
@@ -138,26 +137,26 @@ public class ExecutionTest {
 
         input =
                 """
-                delete object attribute "oa1"
-                delete object attribute "oa2"
-                delete object attribute "oa3"
+                delete node "oa1"
+                delete node "oa2"
+                delete node "oa3"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertFalse(pap.query().graph().nodeExists("oa1"));
         assertFalse(pap.query().graph().nodeExists("oa2"));
         assertFalse(pap.query().graph().nodeExists("oa3"));
 
         input =
                 """
-                delete policy class "pc1"
+                delete node "pc1"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
 
     @Test
     void testIf() throws PMException {
-         PAP pap = new MemoryPAP();
+         PAP pap = new TestPAP();
         String input = """
                 var x = "test"
                 var y = "test"
@@ -165,7 +164,7 @@ public class ExecutionTest {
                     create policy class "pc1"
                 }
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertTrue(pap.query().graph().nodeExists("pc1"));
 
         input = """
@@ -178,8 +177,8 @@ public class ExecutionTest {
                     create policy class "pc2"
                 }
                 """;
-        pap = new MemoryPAP();
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertFalse(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("pc2"));
@@ -196,9 +195,9 @@ public class ExecutionTest {
                     create policy class "pc3"
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertFalse(pap.query().graph().nodeExists("pc1"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -214,9 +213,9 @@ public class ExecutionTest {
                     create policy class "pc2"
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertFalse(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("pc2"));
@@ -231,9 +230,9 @@ public class ExecutionTest {
                     create policy class "pc2"
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -241,14 +240,14 @@ public class ExecutionTest {
 
     @Test
     void testForeach() throws PMException {
-         PAP pap = new MemoryPAP();
+         PAP pap = new TestPAP();
         
         String input = """
                 foreach x in ["pc1", "pc2", "pc3"] {
                     create policy class x
                 }
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("pc2"));
@@ -260,9 +259,9 @@ public class ExecutionTest {
                     create policy class y
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("pc2"));
@@ -275,9 +274,9 @@ public class ExecutionTest {
                     }
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("pc2"));
@@ -291,9 +290,9 @@ public class ExecutionTest {
                     }
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -307,9 +306,9 @@ public class ExecutionTest {
                     }
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertFalse(pap.query().graph().nodeExists("pc1"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -327,9 +326,9 @@ public class ExecutionTest {
                     create policy class x
                 }
                 """;
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertFalse(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("pc2"));
@@ -345,9 +344,9 @@ public class ExecutionTest {
                 
                 testFunc("pc1")
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
 
@@ -360,10 +359,10 @@ public class ExecutionTest {
                 """;
 
         
-        PAP pap1 = new MemoryPAP();
-        assertThrows(ClassCastException.class, () -> pap1.executePML(new TestUserContext("u1", pap), input1));
+        PAP pap1 = new TestPAP();
+        assertThrows(ClassCastException.class, () -> pap1.executePML(new TestUserContext("u1"), input1));
 
-        PAP pap2 = new MemoryPAP();
+        PAP pap2 = new TestPAP();
         String input2 = """
                 x := "hello"
                 operation testFunc() {
@@ -375,7 +374,7 @@ public class ExecutionTest {
 
         PMLCompilationException e = assertThrows(
                 PMLCompilationException.class,
-                () -> pap2.executePML(new TestUserContext("u1", pap), input2)
+                () -> pap2.executePML(new TestUserContext("u1"), input2)
         );
         assertEquals(1, e.getErrors().size());
         assertEquals("unknown variable 'x' in scope", e.getErrors().getFirst().errorMessage());
@@ -388,10 +387,10 @@ public class ExecutionTest {
                 var x = m["k1"]["k1-1"]["k1-1-1"]
                 create policy class x
                 """;
-         PAP pap = new MemoryPAP();
+         PAP pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
-        assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().contains(id(pap, "v1")));
+        pap.executePML(new TestUserContext("u1"), input);
+        assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().contains(id("v1")));
     }
 
     @Test
@@ -399,49 +398,54 @@ public class ExecutionTest {
         String input = """
                 set resource operations ["read", "write"]
                 """;
-         PAP pap = new MemoryPAP();
+         PAP pap = new TestPAP();
         
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
         assertTrue(pap.query().operations().getResourceOperations().contains("read"));
 
         String input1 = """
                 set resource operations [["read", "write"], ["exec"]]
                 """;
-        assertThrows(PMException.class, () -> pap.executePML(new TestUserContext("u1", pap), input1));
+        assertThrows(PMException.class, () -> pap.executePML(new TestUserContext("u1"), input1));
     }
 
     @Test
     void testDeleteNonExistentNode() throws PMException {
         String input = """
-                delete pc "pc1"
+                delete node "pc1"
                 """;
-         PAP pap = new MemoryPAP();
+         PAP pap = new TestPAP();
         
-        assertDoesNotThrow(() -> pap.executePML(new TestUserContext("u1", pap), input));
+        assertDoesNotThrow(() -> pap.executePML(new TestUserContext("u1"), input));
     }
 
     @Test
     void testDeleteProhibition() throws PMException {
-         PAP pap = new MemoryPAP();
+         PAP pap = new TestPAP();
         
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
-        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
 
         String input = """
                 create prohibition "p1"
                 deny user attribute "ua1"
                 access rights ["read"]
                 on union of ["oa1"]
+                
+                create prohibition "p2"
+                deny user attribute "ua1"
+                access rights ["read"]
+                on union of ["oa1"]
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
+        pap.executePML(new TestUserContext("u1"), input);
 
         input = """
                 delete prohibition "p1"
                 """;
-        pap.executePML(new TestUserContext("u1", pap), input);
-        assertFalse(pap.query().prohibitions().getProhibitions().stream().filter(p -> !p.getName().equals("p1")).toList().isEmpty());
+        pap.executePML(new TestUserContext("u1"), input);
+        assertTrue(pap.query().prohibitions().getProhibitions().stream().filter(p -> p.getName().equals("p1")).toList().isEmpty());
     }
 
     @Test
@@ -454,8 +458,8 @@ public class ExecutionTest {
                 create policy class testFunc("test")
                 """;
 
-         PAP pap = new MemoryPAP();
-        pap.deserialize(new TestUserContext("u1", pap), pml, new PMLDeserializer());
+         PAP pap = new TestPAP();
+        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
 
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -471,8 +475,8 @@ public class ExecutionTest {
                 create policy class testFunc("test")
                 """;
 
-         PAP pap = new MemoryPAP();
-        pap.deserialize(new TestUserContext("u1", pap), pml, new PMLDeserializer());
+         PAP pap = new TestPAP();
+        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
 
         assertFalse(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));

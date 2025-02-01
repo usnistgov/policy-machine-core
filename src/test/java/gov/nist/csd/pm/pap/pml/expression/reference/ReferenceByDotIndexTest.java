@@ -14,6 +14,7 @@ import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -39,7 +40,7 @@ class ReferenceByDotIndexTest {
     @Test
     void testExecute() throws PMException {
         ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), Type.string());
         MapValue mapValue = new MapValue(
@@ -63,7 +64,7 @@ class ReferenceByDotIndexTest {
                 
                 create policy class a.b.c.d
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUserAttribute("u1", List.of(ua1));

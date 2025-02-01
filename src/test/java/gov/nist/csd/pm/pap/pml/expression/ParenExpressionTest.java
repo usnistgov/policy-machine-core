@@ -13,6 +13,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -119,7 +120,7 @@ class ParenExpressionTest {
         Expression expression = ParenExpression.compileParenExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
         Value actual = expression.execute(executionContext, pap);
         assertEquals(

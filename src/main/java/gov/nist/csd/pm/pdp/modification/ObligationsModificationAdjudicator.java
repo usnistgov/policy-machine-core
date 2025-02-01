@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_ID_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_OPERAND;
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.RULES_OPERAND;
 
 public class ObligationsModificationAdjudicator extends Adjudicator implements ObligationsModification {
@@ -32,7 +32,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
     @Override
     public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
         new CreateObligationOp()
-                .withOperands(Map.of(AUTHOR_ID_OPERAND, authorId, NAME_OPERAND, name, RULES_OPERAND, rules))
+                .withOperands(Map.of(AUTHOR_OPERAND, authorId, NAME_OPERAND, name, RULES_OPERAND, rules))
                 .execute(pap, userCtx, privilegeChecker);
     }
 
@@ -42,7 +42,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
 
         new DeleteObligationOp()
                 .withOperands(Map.of(
-                        AUTHOR_ID_OPERAND, obligation.getAuthorId(),
+                        AUTHOR_OPERAND, obligation.getAuthorId(),
                         NAME_OPERAND, obligation.getName(),
                         RULES_OPERAND, obligation.getRules()
                 ))

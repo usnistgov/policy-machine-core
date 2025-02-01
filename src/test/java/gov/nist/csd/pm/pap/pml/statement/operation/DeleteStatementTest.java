@@ -16,15 +16,16 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypher.internal.logical.plans.DeleteNode;
 
 import java.util.Collections;
 import java.util.List;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
-import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteStatementTest {
@@ -35,24 +36,24 @@ class DeleteStatementTest {
         DeleteStatement stmt2 = new DeleteProhibitionStatement(new StringLiteral("p1"));
         DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteral("o1"));
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
-        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
-        pap.modify().graph().createObjectAttribute("oa1", ids(pap, "pc1"));
-        pap.modify().graph().createObjectAttribute("oa2", ids(pap, "pc1"));
-        UserContext userContext = new TestUserContext("u1", pap);
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createUser("u1", ids("ua1"));
+        pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
+        pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
+        UserContext userContext = new TestUserContext("u1");
         pap.modify().obligations().createObligation(userContext.getUser(), "o1", List.of(new Rule(
                 "rule1",
                 new EventPattern(new SubjectPattern(), new OperationPattern("e1")),
                 new Response("e", List.of())
         )));
         pap.modify().prohibitions().createProhibition("p1",
-                                    new ProhibitionSubject(id(pap, "ua1")),
+                                    new ProhibitionSubject(id("ua1")),
 		        new AccessRightSet("read"),
 		        true,
-		        Collections.singleton(new ContainerCondition(id(pap, "oa1"), true)));
+		        Collections.singleton(new ContainerCondition(id("oa1"), true)));
 
         stmt2.execute(new ExecutionContext(userContext, pap), pap);
         stmt3.execute(new ExecutionContext(userContext, pap), pap);
@@ -73,16 +74,16 @@ class DeleteStatementTest {
         DeleteStatement stmt5 = new DeleteNodeStatement(new StringLiteral("test"));
         DeleteStatement stmt6 = new DeleteNodeStatement(new StringLiteral("test"));
 
-        assertEquals("delete OA \"test\"", stmt.toFormattedString(0));
-        assertEquals("delete obligation \"test\"", stmt1.toFormattedString(0));
-        assertEquals("delete prohibition \"test\"", stmt2.toFormattedString(0));
-        assertEquals("delete O \"test\"", stmt3.toFormattedString(0));
-        assertEquals("delete PC \"test\"", stmt4.toFormattedString(0));
-        assertEquals("delete U \"test\"", stmt5.toFormattedString(0));
-        assertEquals("delete UA \"test\"", stmt6.toFormattedString(0));
+        assertEquals("delete node \"test\"", stmt.toFormattedString(0));
+        assertEquals("delete prohibition \"test\"", stmt1.toFormattedString(0));
+        assertEquals("delete obligation \"test\"", stmt2.toFormattedString(0));
+        assertEquals("delete node \"test\"", stmt3.toFormattedString(0));
+        assertEquals("delete node \"test\"", stmt4.toFormattedString(0));
+        assertEquals("delete node \"test\"", stmt5.toFormattedString(0));
+        assertEquals("delete node \"test\"", stmt6.toFormattedString(0));
         assertEquals(
                 """
-                            delete OA "test"
+                            delete node "test"
                         """,
                 stmt.toFormattedString(1) + "\n"
         );

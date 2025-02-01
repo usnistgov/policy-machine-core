@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pap.pml.statement.operation.*;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -134,7 +135,7 @@ class FunctionDefinitionStatementTest {
                     create policy class b
                 }
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -155,7 +156,7 @@ class FunctionDefinitionStatementTest {
                 
                 f2()
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -170,7 +171,7 @@ class FunctionDefinitionStatementTest {
                     create policy class x
                 }
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(0), pml));
     }
 }

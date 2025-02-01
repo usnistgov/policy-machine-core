@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.Operation.ID_OPERAND;
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.Operation.NODE_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.PROPERTIES_OPERAND;
 
 
@@ -38,7 +37,7 @@ public class SetNodePropertiesStatement extends OperationStatement {
 
         long id = pap.query().graph().getNodeId(name);
         
-        return Map.of(ID_OPERAND, id, PROPERTIES_OPERAND, properties);
+        return Map.of(NODE_OPERAND, id, PROPERTIES_OPERAND, properties);
     }
 
     @Override

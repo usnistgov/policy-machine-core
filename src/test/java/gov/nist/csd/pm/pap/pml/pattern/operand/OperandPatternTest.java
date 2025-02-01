@@ -5,20 +5,21 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OperandPatternTest {
 
     @Test
     void testOperandPattern() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
@@ -142,7 +143,7 @@ public class OperandPatternTest {
 
     @Test
     void testOnlyNodeOpsInEventContext() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));

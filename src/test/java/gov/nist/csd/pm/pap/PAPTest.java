@@ -11,14 +11,15 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
-import gov.nist.csd.pm.util.TestMemoryPAP;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.*;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
-import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
+
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest extends PAPTestInitializer {
@@ -117,10 +118,10 @@ public abstract class PAPTest extends PAPTestInitializer {
                     create pc a + "_PC"
                 }
                 """;
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(id("u1")), pml);
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), pml);
 
-        pap.executePML(new UserContext(id("u1")), "op1(PM_ADMIN_OBJECT)");
+        pap.executePML(new TestUserContext("u1"), "op1(PM_ADMIN_OBJECT)");
         assertTrue(pap.query().graph().nodeExists("ua2_PC"));
         assertTrue(pap.query().graph().nodeExists("PM_ADMIN:object_PC"));
     }

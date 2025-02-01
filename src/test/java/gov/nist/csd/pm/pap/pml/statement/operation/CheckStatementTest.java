@@ -10,21 +10,23 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CheckStatementTest {
 
     @Test
     void test() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new TestUserContext("u1", pap), """
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -41,7 +43,7 @@ class CheckStatementTest {
                 create u "u2" in ["ua2"]
                 """);
 
-        ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1", pap), pap);
+        ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
 
         testCheck(ctx, pap, new CheckStatement(
                 new StringLiteral("assign"),
@@ -63,7 +65,7 @@ class CheckStatementTest {
                 new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
         ), false);
 
-        ctx = new ExecutionContext(new UserContext(id(pap, "u2")), pap);
+        ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
                 new StringLiteral("assign"),
                 new StringLiteral("o1")
@@ -113,11 +115,11 @@ class CheckStatementTest {
                 
                 create u "u1" in ["ua1"]                
                 """;
-        PAP pap = new MemoryPAP();
-        pap.executePML(new TestUserContext("u1", pap), pml);
+        PAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1", pap), "op1", Map.of());
+        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
     }

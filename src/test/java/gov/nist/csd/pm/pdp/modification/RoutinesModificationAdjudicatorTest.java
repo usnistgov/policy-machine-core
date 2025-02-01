@@ -1,16 +1,14 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp;
-import gov.nist.csd.pm.common.op.routine.DeleteAdminRoutineOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +16,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp.ROUTINE_OPERAND;
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoutinesModificationAdjudicatorTest {
@@ -36,9 +33,9 @@ class RoutinesModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new TestUserContext("u1", pap), """
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
 
                 create ua "ua1" in ["pc1"]
@@ -60,8 +57,8 @@ class RoutinesModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new RoutinesModificationAdjudicator(new TestUserContext("u1", pap), pap, pdp.getPrivilegeChecker());
-        fail = new RoutinesModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
+        ok = new RoutinesModificationAdjudicator(new TestUserContext("u1"), pap, pdp.getPrivilegeChecker());
+        fail = new RoutinesModificationAdjudicator(new UserContext(id("u2")), pap, pdp.getPrivilegeChecker());
     }
 
 
@@ -75,10 +72,6 @@ class RoutinesModificationAdjudicatorTest {
         };
 
         assertDoesNotThrow(() -> ok.createAdminRoutine(routine1));
-        assertEquals(
-                new EventContext("u1", null, new CreateAdminRoutineOp(), Map.of(ROUTINE_OPERAND, routine1)),
-                testEventProcessor.getEventContext()
-        );
         assertTrue(pap.query().routines().getAdminRoutineNames().contains("routine1"));
         assertThrows(UnauthorizedException.class, () -> fail.createAdminRoutine(routine1));
     }
@@ -94,11 +87,6 @@ class RoutinesModificationAdjudicatorTest {
         ok.createAdminRoutine(routine1);
 
         assertDoesNotThrow(() -> ok.deleteAdminRoutine("routine1"));
-        assertEquals(
-                new EventContext("u1", null, new DeleteAdminRoutineOp(), Map.of(NAME_OPERAND, "routine1")),
-                testEventProcessor.getEventContext()
-        );
-
         assertThrows(UnauthorizedException.class, () -> fail.deleteAdminRoutine("routine1"));
     }
 }

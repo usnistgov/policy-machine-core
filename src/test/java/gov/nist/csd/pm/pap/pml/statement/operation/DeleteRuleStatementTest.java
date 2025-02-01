@@ -12,13 +12,13 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
-import static gov.nist.csd.pm.util.TestMemoryPAP.ids;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteRuleStatementTest {
@@ -28,11 +28,11 @@ class DeleteRuleStatementTest {
         DeleteRuleStatement stmt = new DeleteRuleStatement(
                 new StringLiteral("rule1"), new StringLiteral("obl1"));
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", ids(pap, "pc1"));
-        pap.modify().graph().createUser("u1", ids(pap, "ua1"));
-        UserContext userContext = new TestUserContext("u1", pap);
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createUser("u1", ids("ua1"));
+        UserContext userContext = new TestUserContext("u1");
         pap.modify().obligations().createObligation(userContext.getUser(), "obl1", List.of(new Rule(
                 "rule1",
                 new EventPattern(new SubjectPattern(), new OperationPattern()),

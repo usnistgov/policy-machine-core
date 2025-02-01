@@ -24,10 +24,6 @@ public class ProhibitionSubject {
 	}
 
 	public String getProcess() {
-		if (process == null) {
-			throw new IllegalStateException("process not set");
-		}
-
 		return process;
 	}
 

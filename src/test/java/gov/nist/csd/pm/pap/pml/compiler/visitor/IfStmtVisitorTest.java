@@ -14,6 +14,7 @@ import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -81,7 +82,7 @@ class IfStmtVisitorTest {
                 
                 f1()
                 """;
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }

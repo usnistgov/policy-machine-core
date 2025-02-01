@@ -11,6 +11,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
 import gov.nist.csd.pm.util.PolicyEquals;
 import gov.nist.csd.pm.util.SamplePolicy;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,16 +32,16 @@ class PMLTest {
 
         PMLDeserializer pmlDeserializer = new PMLDeserializer();
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("test_pc");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", Collections.singleton(pc1));
         pap.modify().graph().createUser("u1", Collections.singleton(ua1));
 
-        pap.deserialize(new TestUserContext("u1", pap), pml, pmlDeserializer);
+        pap.deserialize(new TestUserContext("u1"), pml, pmlDeserializer);
 
         String serialize = pap.serialize(new PMLSerializer());
-        MemoryPAP pap2 = new MemoryPAP();
-        pap2.deserialize(new TestUserContext("u1", pap), serialize, pmlDeserializer);
+        MemoryPAP pap2 = new TestPAP();
+        pap2.deserialize(new TestUserContext("u1"), serialize, pmlDeserializer);
 
         PolicyEquals.assertPolicyEquals(pap.query(), pap2.query());
     }
@@ -53,8 +54,8 @@ class PMLTest {
 
         PMLDeserializer pmlDeserializer = new PMLDeserializer();
 
-        MemoryPAP pap = new MemoryPAP();
-        assertThrows(PMException.class, () -> pap.deserialize(new TestUserContext("u1", pap), pml, pmlDeserializer));
+        MemoryPAP pap = new TestPAP();
+        assertThrows(PMException.class, () -> pap.deserialize(new TestUserContext("u1"), pml, pmlDeserializer));
 
         pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of("name")) {
             @Override
@@ -70,7 +71,7 @@ class PMLTest {
         }));
 
         PMLDeserializer pmlDeserializer2 = new PMLDeserializer();
-        pap.deserialize(new TestUserContext("u1", pap), pml, pmlDeserializer2);
+        pap.deserialize(new TestUserContext("u1"), pml, pmlDeserializer2);
         assertTrue(pap.query().graph().nodeExists("hello world"));
     }
 

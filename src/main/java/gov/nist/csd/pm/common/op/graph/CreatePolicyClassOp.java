@@ -1,11 +1,13 @@
 package gov.nist.csd.pm.common.op.graph;
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -32,5 +34,14 @@ public class CreatePolicyClassOp extends CreateNodeOp{
         return pap.modify().graph().createPolicyClass(
                 (String) operands.get(NAME_OPERAND)
         );
+    }
+
+    public static class EventCtx extends EventContext {
+
+        public EventCtx(String user, String process, String name) {
+            super(user, process, "create_policy_class", Map.of(
+                    NAME_OPERAND, name
+            ));
+        }
     }
 }

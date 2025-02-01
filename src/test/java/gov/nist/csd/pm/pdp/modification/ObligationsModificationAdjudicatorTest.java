@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ObligationsModificationAdjudicatorTest {
@@ -35,9 +37,9 @@ class ObligationsModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new TestUserContext("u1", pap), """
+        pap.executePML(new TestUserContext("u1"), """
                create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -59,21 +61,21 @@ class ObligationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ObligationsModificationAdjudicator(new TestUserContext("u1", pap), pap, pdp.getPrivilegeChecker());
-        fail = new ObligationsModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
+        ok = new ObligationsModificationAdjudicator(new TestUserContext("u1"), pap, pdp.getPrivilegeChecker());
+        fail = new ObligationsModificationAdjudicator(new UserContext(id("u2")), pap, pdp.getPrivilegeChecker());
     }
 
 
     @Test
     void createObligation() {
-        assertDoesNotThrow(() -> ok.createObligation(0, "name", List.of(
+        assertDoesNotThrow(() -> ok.createObligation(id("u1"), "name", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
                         new Response("e", List.of())
                 )
         )));
-        assertThrows(UnauthorizedException.class, () -> fail.createObligation(0, "name", List.of(
+        assertThrows(UnauthorizedException.class, () -> fail.createObligation(id("u1"), "name", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
@@ -84,14 +86,14 @@ class ObligationsModificationAdjudicatorTest {
 
     @Test
     void deleteObligation() throws PMException {
-        ok.createObligation(0, "test", List.of(
+        ok.createObligation(id("u1"), "test", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
                         new Response("e", List.of())
                 )
         ));
-        ok.createObligation(0, "test2", List.of(
+        ok.createObligation(id("u1"), "test2", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),

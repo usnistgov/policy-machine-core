@@ -2,8 +2,8 @@ package gov.nist.csd.pm.common.op.graph;
 
 
 import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.event.operand.OperandValue;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -18,14 +18,14 @@ public class DeleteNodeOp extends GraphOp<Void> {
     public DeleteNodeOp() {
         super(
                 "delete_node",
-                List.of(ID_OPERAND, TYPE_OPERAND, DESCENDANTS_OPERAND),
-                List.of(ID_OPERAND, DESCENDANTS_OPERAND)
+                List.of(NODE_OPERAND, TYPE_OPERAND, DESCENDANTS_OPERAND),
+                List.of(NODE_OPERAND, DESCENDANTS_OPERAND)
         );
     }
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        long nodeId =  (long) operands.get(ID_OPERAND);
+        long nodeId =  (long) operands.get(NODE_OPERAND);
         NodeType type = privilegeChecker.getNodeType(nodeId);
         ReqCaps reqCaps = getReqCap(type);
 
@@ -46,7 +46,7 @@ public class DeleteNodeOp extends GraphOp<Void> {
 
     @Override
     public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        pap.modify().graph().deleteNode((long) operands.get(ID_OPERAND));
+        pap.modify().graph().deleteNode((long) operands.get(NODE_OPERAND));
 
         return null;
     }
@@ -63,4 +63,24 @@ public class DeleteNodeOp extends GraphOp<Void> {
     }
 
     private record ReqCaps(String ascReqCap, String descsReqCap) {}
+
+    public static class EventCtx extends EventContext {
+
+        public EventCtx(String user, String process, String nodeName, List<String> descendantNames) {
+            super(user, process, "delete_node", Map.of(
+                    NODE_OPERAND, nodeName,
+                    DESCENDANTS_OPERAND, descendantNames
+            ));
+        }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return super.equals(o);
+        }
+    }
 }

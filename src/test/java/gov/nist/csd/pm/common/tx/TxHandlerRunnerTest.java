@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.common.tx;
 
 import gov.nist.csd.pm.common.exception.NodeNameExistsException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.util.TestMemoryPAP;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.common.tx.TxRunner.runTx;
@@ -14,7 +14,7 @@ class TxHandlerRunnerTest {
 
     @Test
     void testRunTx() throws PMException {
-        PAP pap = new TestMemoryPAP();
+        PAP pap = new TestPAP();
 
         runTx(pap, () -> {
             pap.modify().graph().createPolicyClass("pc1");

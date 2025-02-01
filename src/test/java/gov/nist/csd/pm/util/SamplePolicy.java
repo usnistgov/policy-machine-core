@@ -6,14 +6,14 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+
 
 public class SamplePolicy {
 
@@ -23,9 +23,9 @@ public class SamplePolicy {
         long testPc = pap.modify().graph().createPolicyClass("test_pc");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", Collections.singleton(testPc));
         long u1 = pap.modify().graph().createUser("u1", Collections.singleton(ua1));
-        pap.modify().graph().associate(id(pap, "ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
 
-        pap.deserialize(new TestUserContext("u1", pap), s, new PMLDeserializer());
+        pap.deserialize(new TestUserContext("u1"), s, new PMLDeserializer());
     }
 
     public static void loadSamplePolicyFromJSON(PAP pap) throws IOException, PMException {
@@ -33,9 +33,9 @@ public class SamplePolicy {
         long testPc = pap.modify().graph().createPolicyClass("test_pc");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", Collections.singleton(testPc));
         long u1 = pap.modify().graph().createUser("u1", Collections.singleton(ua1));
-        pap.modify().graph().associate(id(pap, "ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
 
-        pap.deserialize(new TestUserContext("u1", pap), s, new JSONDeserializer());
+        pap.deserialize(new TestUserContext("u1"), s, new JSONDeserializer());
     }
 
     public static String loadSamplePolicyPML() throws IOException {

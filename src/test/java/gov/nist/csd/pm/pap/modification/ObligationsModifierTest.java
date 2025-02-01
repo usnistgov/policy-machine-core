@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Response;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -299,6 +301,10 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testDeleteNonExistingObligationDoesNOtThrowExcpetion() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+            pap.modify().graph().createUser("u1", ids("ua1"));
+
             Obligation obligation1 = obligation1();
 
             assertDoesNotThrow(() -> pap.modify().obligations().deleteObligation(obligation1.getName()));

@@ -37,7 +37,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         @Test
         void testProhibitionSubjectDoesNotExistException() {
             assertThrows(
-                    ProhibitionSubjectDoesNotExistException.class,
+                    NodeDoesNotExistException.class,
                     () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS), false, List.of()));
         }
 
@@ -58,7 +58,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
             pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
             assertThrows(
-                    ProhibitionContainerDoesNotExistException.class,
+                    NodeDoesNotExistException.class,
                     () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
                             false,
                             Collections.singleton(new ContainerCondition(id("oa1"), true))));

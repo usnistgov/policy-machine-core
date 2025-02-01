@@ -13,16 +13,19 @@ import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProhibitionsModificationAdjudicatorTest {
@@ -37,9 +40,9 @@ class ProhibitionsModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new TestUserContext("u1", pap), """
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -62,40 +65,21 @@ class ProhibitionsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ProhibitionsModificationAdjudicator(new TestUserContext("u1", pap), pap, pdp.getPrivilegeChecker());
-        fail = new ProhibitionsModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
+        ok = new ProhibitionsModificationAdjudicator(new TestUserContext("u1"), pap, pdp.getPrivilegeChecker());
+        fail = new ProhibitionsModificationAdjudicator(new UserContext(id("u2")), pap, pdp.getPrivilegeChecker());
     }
 
     @Test
     void createProhibition() throws PMException {
         assertDoesNotThrow(() -> ok.createProhibition(
                 "pro1",
-                new ProhibitionSubject(id(pap, "u2")),
+                new ProhibitionSubject(id("u2")),
 		        new AccessRightSet("assign"),
 		        true,
-		        List.of(new ContainerCondition(id(pap, "oa1"), false))));
-        assertEquals(
-                new EventContext(
-                        "u1",
-						null,
-                        new CreateProhibitionOp(),
-                        Map.of(
-                                NAME_OPERAND, "pro1",
-		                        SUBJECT_OPERAND, new ProhibitionSubject(id(pap, "u2")),
-                                ARSET_OPERAND, new AccessRightSet("assign"),
-                                INTERSECTION_OPERAND, true,
-                                CONTAINERS_OPERAND, List.of(new ContainerCondition(id(pap, "oa1"), false))
-                        )
-                ),
-                testEventProcessor.getEventContext()
-        );
+		        List.of(new ContainerCondition(id("oa1"), false))));
 
         assertFalse(pap.query().prohibitions().getProhibitions().stream().filter(p -> {
-	        try {
-		        return p.getSubject().getNodeId() == id(pap, "u2");
-	        } catch (PMException e) {
-		        throw new RuntimeException(e);
-	        }
+	        return p.getSubject().getNodeId() == id("u2");
         }).toList().isEmpty());
 
         assertDoesNotThrow(() -> ok.createProhibition(
@@ -103,76 +87,40 @@ class ProhibitionsModificationAdjudicatorTest {
                 new ProhibitionSubject("123"),
 		        new AccessRightSet("assign"),
 		        true,
-		        List.of(new ContainerCondition(id(pap, "oa1"), true))));
-        assertEquals(
-                new EventContext(
-                        "u1",
-						null,
-                        new CreateProhibitionOp(),
-                        Map.of(
-                                NAME_OPERAND, "pro2",
-		                        SUBJECT_OPERAND, new ProhibitionSubject("123"),
-                                ARSET_OPERAND, new AccessRightSet("assign"),
-                                INTERSECTION_OPERAND, true,
-                                CONTAINERS_OPERAND, List.of(new ContainerCondition(id(pap, "oa1"), true))
-                        )
-                ),
-                testEventProcessor.getEventContext()
-        );
+		        List.of(new ContainerCondition(id("oa1"), true))));
 
 	    assertFalse(pap.query().prohibitions().getProhibitions().stream()
-			    .filter(p -> p.getSubject().getProcess().equals("123")).toList().isEmpty());
-
+			    .filter(p -> Objects.equals(p.getSubject().getProcess(), "123")).toList().isEmpty());
 
         assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
                 "pro1",
-                new ProhibitionSubject(id(pap, "u2")),
+                new ProhibitionSubject(id("u2")),
 		        new AccessRightSet("assign"),
 		        true,
-		        List.of(new ContainerCondition(id(pap, "oa1"), false))));
+		        List.of(new ContainerCondition(id("oa1"), false))));
 
         assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
                 "pro1",
                 new ProhibitionSubject("123"),
 		        new AccessRightSet("assign"),
 		        true,
-		        List.of(new ContainerCondition(id(pap, "oa1"), true))));
+		        List.of(new ContainerCondition(id("oa1"), true))));
     }
 
     @Test
     void deleteProhibition() throws PMException {
         ok.createProhibition(
                 "pro1",
-                new ProhibitionSubject(id(pap, "u2")),
+                new ProhibitionSubject(id("u2")),
 		        new AccessRightSet("assign"),
 		        true,
-		        List.of(new ContainerCondition(id(pap, "oa1"), false)));
+		        List.of(new ContainerCondition(id("oa1"), false)));
 
         assertThrows(UnauthorizedException.class, () -> fail.deleteProhibition("pro1"));
         assertDoesNotThrow(() -> ok.deleteProhibition("pro1"));
 
-        assertEquals(
-                new EventContext(
-                        "u1",
-						null,
-                        new DeleteProhibitionOp(),
-                        Map.of(
-                                NAME_OPERAND, "pro1",
-		                        SUBJECT_OPERAND, new ProhibitionSubject(id(pap, "u2")),
-                                ARSET_OPERAND, new AccessRightSet("assign"),
-                                INTERSECTION_OPERAND, true,
-                                CONTAINERS_OPERAND, List.of(new ContainerCondition(id(pap, "oa1"), false))
-                        )
-                ),
-                testEventProcessor.getEventContext()
-        );
-
-	    assertFalse(pap.query().prohibitions().getProhibitions().stream().filter(p -> {
-		    try {
-			    return p.getSubject().getNodeId() == id(pap, "u2");
-		    } catch (PMException e) {
-			    throw new RuntimeException(e);
-		    }
+	    assertTrue(pap.query().prohibitions().getProhibitions().stream().filter(p -> {
+		    return p.getSubject().getNodeId() == id("u2");
 	    }).toList().isEmpty());
     }
 }

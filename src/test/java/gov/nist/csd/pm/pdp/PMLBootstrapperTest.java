@@ -11,20 +11,21 @@ import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PMLBootstrapperTest {
 
     @Test
     void test() throws PMException {
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
 
         String input = """
@@ -67,7 +68,7 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap(new PMLBootstrapper(new TestUserContext("u1", pap), input,
+        pdp.bootstrap(new PMLBootstrapper(new TestUserContext("u1"), input,
                 List.of(new PMLOperationWrapper(op1)),
                 List.of(new PMLRoutineWrapper(routine1)),
                 Map.of("TEST_CONST", new StringValue("TEST_PC"))

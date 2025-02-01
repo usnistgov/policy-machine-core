@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.ProcessSubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
-import gov.nist.csd.pm.util.TestMemoryPAP;
+import gov.nist.csd.pm.util.TestPAP;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.junit.jupiter.api.Test;
 
@@ -27,14 +27,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EventPatternTest {
 
-    private TestMemoryPAP testPAP() throws PMException {
-        TestMemoryPAP pap = new TestMemoryPAP();
+    private MemoryPAP testPAP() throws PMException {
+        MemoryPAP pap = new TestPAP();
 
         GraphModification graph = pap.modify().graph();
 
-        graph.createPolicyClass("pc1");
-        graph.createUserAttribute("ua1", LongList.of(1));
-        graph.createUser("u1", LongList.of(2));
+        long pc1 = graph.createPolicyClass("pc1");
+        long ua1 = graph.createUserAttribute("ua1", LongList.of(pc1));
+        graph.createUser("u1", LongList.of(ua1));
 
         return pap;
     }
@@ -67,7 +67,7 @@ class EventPatternTest {
                 Map.of()
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -87,7 +87,7 @@ class EventPatternTest {
                 Map.of()
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -111,7 +111,7 @@ class EventPatternTest {
                 Map.of()
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -135,7 +135,7 @@ class EventPatternTest {
                 Map.of()
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -159,7 +159,7 @@ class EventPatternTest {
                 Map.of()
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -182,7 +182,7 @@ class EventPatternTest {
                 )
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -205,7 +205,7 @@ class EventPatternTest {
                 )
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",
@@ -228,7 +228,7 @@ class EventPatternTest {
                 )
         );
 
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
                 "u1",

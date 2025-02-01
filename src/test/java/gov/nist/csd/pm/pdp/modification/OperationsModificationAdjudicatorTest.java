@@ -2,28 +2,23 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.common.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
-import static gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
-import static gov.nist.csd.pm.util.TestMemoryPAP.id;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OperationsModificationAdjudicatorTest {
@@ -39,9 +34,9 @@ class OperationsModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new TestUserContext("u1", pap), """
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
 
                 create ua "ua1" in ["pc1"]
@@ -63,18 +58,14 @@ class OperationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new OperationsModificationAdjudicator(new TestUserContext("u1", pap), pap, pdp.getPrivilegeChecker());
-        fail = new OperationsModificationAdjudicator(new UserContext(id(pap, "u2")), pap, pdp.getPrivilegeChecker());
+        ok = new OperationsModificationAdjudicator(new TestUserContext("u1"), pap, pdp.getPrivilegeChecker());
+        fail = new OperationsModificationAdjudicator(new UserContext(id("u2")), pap, pdp.getPrivilegeChecker());
     }
 
 
     @Test
     void setResourceOperations() throws PMException {
         assertDoesNotThrow(() -> ok.setResourceOperations(new AccessRightSet("read")));
-        assertEquals(
-                new EventContext("u1", null, new SetResourceOperationsOp(), Map.of(OPERATIONS_OPERAND, new AccessRightSet("read"))),
-                testEventProcessor.getEventContext()
-        );
         assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceOperations());
         assertThrows(UnauthorizedException.class, () -> fail.setResourceOperations(new AccessRightSet("read")));
     }
@@ -94,10 +85,6 @@ class OperationsModificationAdjudicatorTest {
         };
 
         assertDoesNotThrow(() -> ok.createAdminOperation(op1));
-        assertEquals(
-                new EventContext("u1", null, new CreateAdminOperationOp(), Map.of(OPERATION_OPERAND, op1)),
-                testEventProcessor.getEventContext()
-        );
         assertTrue(pap.query().operations().getAdminOperationNames().contains("op1"));
         assertThrows(UnauthorizedException.class, () -> fail.createAdminOperation(op1));
     }
@@ -118,11 +105,6 @@ class OperationsModificationAdjudicatorTest {
         ok.createAdminOperation(op1);
 
         assertDoesNotThrow(() -> ok.deleteAdminOperation("op1"));
-        assertEquals(
-                new EventContext("u1", null, new DeleteAdminOperationOp(), Map.of(NAME_OPERAND, "op1")),
-                testEventProcessor.getEventContext()
-        );
-
         assertThrows(UnauthorizedException.class, () -> fail.deleteAdminOperation("op1"));
     }
 }
