@@ -3,20 +3,22 @@ package gov.nist.csd.pm.impl.memory.pap.store;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.LongStream;
 
 class VertexLeaf extends Vertex {
 
-    private long[] descendants;
+    private LongArrayList descendants;
 
     public VertexLeaf(long id, String name, NodeType type) {
         super(id, name, type);
-        this.descendants = new long[]{};
+        this.descendants = new LongArrayList();
     }
 
     @Override
@@ -25,36 +27,33 @@ class VertexLeaf extends Vertex {
     }
 
     @Override
-    protected long[] getAdjacentDescendants() {
+    protected Collection<Long> getAdjacentDescendants() {
         return descendants;
     }
 
     @Override
-    protected long[] getAdjacentAscendants() {
-        return new long[]{};
+    protected Collection<Long> getAdjacentAscendants() {
+        return new LongArrayList();
     }
 
     @Override
-    protected Association[] getOutgoingAssociations() {
-        return new Association[]{};
+    protected Collection<Association> getOutgoingAssociations() {
+        return new ObjectArrayList<>();
     }
 
     @Override
-    protected Association[] getIncomingAssociations() {
-        return new Association[]{};
+    protected Collection<Association> getIncomingAssociations() {
+        return new ObjectArrayList<>();
     }
 
     @Override
     public void addAssignment(long ascendant, long descendant) {
-        descendants = Arrays.copyOf(descendants, descendants.length + 1);
-        descendants[descendants.length - 1] = descendant;
+        descendants.add(descendant);
     }
 
     @Override
     public void deleteAssignment(long ascendant, long descendant) {
-        descendants = LongStream.of(descendants)
-                .filter(desc -> desc != descendant)
-                .toArray();
+        descendants.removeLong(descendants.indexOf(descendant));
     }
 
     @Override

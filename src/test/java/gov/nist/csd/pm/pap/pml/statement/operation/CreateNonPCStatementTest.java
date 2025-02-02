@@ -46,10 +46,10 @@ class CreateNonPCStatementTest {
         assertTrue(pap.query().graph().nodeExists("u1"));
         assertTrue(pap.query().graph().nodeExists("o1"));
         
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua1"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa1"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("u1"))).boxed().toList().contains(id("ua1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("o1"))).boxed().toList().contains(id("oa1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("ua1")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("oa1")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("u1")).contains(id("ua1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("o1")).contains(id("oa1")));
     }
 
     @Test

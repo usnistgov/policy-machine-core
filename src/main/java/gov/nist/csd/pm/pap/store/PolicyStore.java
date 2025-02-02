@@ -4,6 +4,7 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.tx.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.LongStream;
 
@@ -34,9 +35,8 @@ public interface PolicyStore extends Transactional {
             graph().createNode(oaId, oaName, OA);
         }
 
-        long[] descendants = graph().getAdjacentDescendants(oaId);
-        List<Long> descList = LongStream.of(descendants).boxed().toList();
-        if (!descList.contains(pcId)) {
+        Collection<Long> descendants = graph().getAdjacentDescendants(oaId);
+        if (!descendants.contains(pcId)) {
             graph().createAssignment(oaId, pcId);
         }
     }

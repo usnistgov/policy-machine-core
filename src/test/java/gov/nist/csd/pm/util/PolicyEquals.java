@@ -33,11 +33,11 @@ public class PolicyEquals {
             Node bNode = b.graph().getNodeByName(node.getName());
             assertEquals(aNode, bNode);
 
-            Collection<Long> aAscendants = new HashSet<>(Arrays.stream(a.graph().getAdjacentAscendants(node.getId())).boxed().toList());
-            Collection<Long> aDescendants = new HashSet<>(Arrays.stream(a.graph().getAdjacentDescendants(node.getId())).boxed().toList());
+            Collection<Long> aAscendants = new HashSet<>(a.graph().getAdjacentAscendants(node.getId()));
+            Collection<Long> aDescendants = new HashSet<>(a.graph().getAdjacentDescendants(node.getId()));
 
-            Collection<Long> bAscendants = new HashSet<>(Arrays.stream(b.graph().getAdjacentAscendants(node.getId())).boxed().toList());
-            Collection<Long> bDescendants = new HashSet<>(Arrays.stream(b.graph().getAdjacentDescendants(node.getId())).boxed().toList());
+            Collection<Long> bAscendants = new HashSet<>(b.graph().getAdjacentAscendants(node.getId()));
+            Collection<Long> bDescendants = new HashSet<>(b.graph().getAdjacentDescendants(node.getId()));
 
             assertEquals(aAscendants, bAscendants);
             assertEquals(aDescendants, bDescendants);

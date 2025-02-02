@@ -113,9 +113,9 @@ public class JSONSerializer implements PolicySerializer {
             String name = n.getName();
             List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
 
-            long[] descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
-            List<String> descendantNames = LongStream.of(descendants)
-                    .mapToObj(m -> {
+            Collection<Long> descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
+            List<String> descendantNames = descendants.stream()
+                    .map(m -> {
                         try {
                             return policyQuery.graph().getNodeById(m).getName();
                         } catch (PMException e) {
@@ -145,12 +145,9 @@ public class JSONSerializer implements PolicySerializer {
     }
 
     private boolean isUnmodifiedAdminNodeOrTarget(PolicyQuery policyQuery, long node) throws PMException {
-        long[] descendants = policyQuery.graph().getAdjacentDescendants(node);
+        Collection<Long> descendants = policyQuery.graph().getAdjacentDescendants(node);
 
-        return LongStream.of(descendants)
-                .boxed()
-                .toList()
-                .contains(AdminPolicyNode.PM_ADMIN_PC.nodeId()) && descendants.length == 1;
+        return descendants.contains(AdminPolicyNode.PM_ADMIN_PC.nodeId()) && descendants.size() == 1;
     }
 
     private List<JSONNode> buildUserAttributes(PolicyQuery policyQuery) throws PMException {
@@ -160,9 +157,9 @@ public class JSONSerializer implements PolicySerializer {
         for (Node node : search) {
             Node n = policyQuery.graph().getNodeById(node.getId());
 
-            long[] descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
-            List<String> descendantNames = LongStream.of(descendants)
-                    .mapToObj(m -> {
+            Collection<Long> descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
+            List<String> descendantNames = descendants.stream()
+                    .map(m -> {
                         try {
                             return policyQuery.graph().getNodeById(m).getName();
                         } catch (PMException e) {
@@ -198,7 +195,7 @@ public class JSONSerializer implements PolicySerializer {
     private List<JSONNode> buildPolicyClasses(PolicyQuery policyQuery) throws PMException {
         List<JSONNode> policyClassesList = new ArrayList<>();
 
-        long[] policyClasses = policyQuery.graph().getPolicyClasses();
+        Collection<Long> policyClasses = policyQuery.graph().getPolicyClasses();
         for (long pc : policyClasses) {
             if (AdminPolicy.isAdminPolicyId(pc)) {
                 continue;

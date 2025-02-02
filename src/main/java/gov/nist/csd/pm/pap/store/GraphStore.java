@@ -8,6 +8,7 @@ import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.common.tx.Transactional;
 
+import java.util.Collection;
 import java.util.Map;
 
 public interface GraphStore extends Transactional {
@@ -24,14 +25,14 @@ public interface GraphStore extends Transactional {
     Node getNodeByName(String name) throws PMException;
     boolean nodeExists(long id) throws PMException;
     boolean nodeExists(String name) throws PMException;
-    long[] search(NodeType type, Map<String, String> properties) throws PMException;
-    long[] getPolicyClasses() throws PMException;
-    long[] getAdjacentDescendants(long id) throws PMException;
-    long[] getAdjacentAscendants(long id) throws PMException;
-    Association[] getAssociationsWithSource(long uaId) throws PMException;
-    Association[] getAssociationsWithTarget(long targetId) throws PMException;
-    long[] getPolicyClassDescendants(long id) throws PMException;
-    long[] getAttributeDescendants(long id) throws PMException;
+    Collection<Long> search(NodeType type, Map<String, String> properties) throws PMException;
+    Collection<Long> getPolicyClasses() throws PMException;
+    Collection<Long> getAdjacentDescendants(long id) throws PMException;
+    Collection<Long> getAdjacentAscendants(long id) throws PMException;
+    Collection<Association> getAssociationsWithSource(long uaId) throws PMException;
+    Collection<Association> getAssociationsWithTarget(long targetId) throws PMException;
+    Collection<Long> getPolicyClassDescendants(long id) throws PMException;
+    Collection<Long> getAttributeDescendants(long id) throws PMException;
     Subgraph getDescendantSubgraph(long id) throws PMException;
     Subgraph getAscendantSubgraph(long id) throws PMException;
     boolean isAscendant(long asc, long dsc) throws PMException;

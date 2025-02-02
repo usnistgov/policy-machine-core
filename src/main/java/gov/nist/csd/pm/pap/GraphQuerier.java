@@ -39,13 +39,13 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
-    public long[] getAdjacentDescendants(long nodeId) throws PMException {
+    public Collection<Long> getAdjacentDescendants(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getAdjacentDescendants(nodeId);
     }
 
     @Override
-    public long[] getAdjacentAscendants(long nodeId) throws PMException {
+    public Collection<Long> getAdjacentAscendants(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getAdjacentAscendants(nodeId);
     }
@@ -53,13 +53,13 @@ public class GraphQuerier extends Querier implements GraphQuery {
     @Override
     public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
         checkNodeExists(uaId);
-        return List.of(store.graph().getAssociationsWithSource(uaId));
+        return store.graph().getAssociationsWithSource(uaId);
     }
 
     @Override
     public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
         checkNodeExists(targetId);
-        return List.of(store.graph().getAssociationsWithTarget(targetId));
+        return store.graph().getAssociationsWithTarget(targetId);
     }
 
     @Override
@@ -75,13 +75,13 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
-    public long[] getAttributeDescendants(long nodeId) throws PMException {
+    public Collection<Long> getAttributeDescendants(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getAttributeDescendants(nodeId);
     }
 
     @Override
-    public long[] getPolicyClassDescendants(long nodeId) throws PMException {
+    public Collection<Long> getPolicyClassDescendants(long nodeId) throws PMException {
         checkNodeExists(nodeId);
         return store.graph().getPolicyClassDescendants(nodeId);
     }
@@ -112,7 +112,7 @@ public class GraphQuerier extends Querier implements GraphQuery {
 
     @Override
     public Collection<Node> search(NodeType type, Map<String, String> properties) throws PMException {
-        long[] search = store.graph().search(type, properties);
+        Collection<Long> search = store.graph().search(type, properties);
 
         List<Node> nodes = new ArrayList<>();
         for (long nodeId : search) {
@@ -123,7 +123,7 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     @Override
-    public long[] getPolicyClasses() throws PMException {
+    public Collection<Long> getPolicyClasses() throws PMException {
         return store.graph().getPolicyClasses();
     }
 

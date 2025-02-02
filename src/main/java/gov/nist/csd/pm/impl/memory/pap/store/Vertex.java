@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 
+import java.util.Collection;
 import java.util.Map;
 
 public abstract class Vertex {
@@ -32,10 +33,10 @@ public abstract class Vertex {
 
     protected abstract Map<String, String> getProperties();
 
-    protected abstract long[] getAdjacentDescendants();
-    protected abstract long[] getAdjacentAscendants();
-    protected abstract Association[] getOutgoingAssociations();
-    protected abstract Association[] getIncomingAssociations();
+    protected abstract Collection<Long> getAdjacentDescendants();
+    protected abstract Collection<Long> getAdjacentAscendants();
+    protected abstract Collection<Association> getOutgoingAssociations();
+    protected abstract Collection<Association> getIncomingAssociations();
 
     protected abstract void addAssignment(long ascendant, long descendant);
     protected abstract void deleteAssignment(long ascendant, long descendant);

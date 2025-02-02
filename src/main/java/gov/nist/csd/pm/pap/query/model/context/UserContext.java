@@ -5,13 +5,14 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.store.GraphStore;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 public class UserContext implements Serializable {
 
     private long userId;
-    private long[] attributeIds;
+    private Collection<Long> attributeIds;
     private String process;
 
     public UserContext(long userId, String process) {
@@ -23,12 +24,12 @@ public class UserContext implements Serializable {
         this.userId = userId;
     }
 
-    public UserContext(long[] attributeIds, String process) {
+    public UserContext(Collection<Long> attributeIds, String process) {
         this.attributeIds = attributeIds;
         this.process = process;
     }
 
-    public UserContext(long[] attributeIds) {
+    public UserContext(Collection<Long> attributeIds) {
         this.attributeIds = attributeIds;
     }
 
@@ -40,11 +41,11 @@ public class UserContext implements Serializable {
         this.userId = userId;
     }
 
-    public long[] getAttributeIds() {
+    public Collection<Long> getAttributeIds() {
         return attributeIds;
     }
 
-    public void setAttributeIds(long[] attributeIds) {
+    public void setAttributeIds(Collection<Long> attributeIds) {
         this.attributeIds = attributeIds;
     }
 

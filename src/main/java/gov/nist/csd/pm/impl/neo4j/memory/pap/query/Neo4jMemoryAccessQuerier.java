@@ -94,7 +94,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 		Long2ObjectOpenHashMap<AccessRightSet> assocs = new Long2ObjectOpenHashMap<>();
 		Set<Prohibition> userPros = new HashSet<>();
 
-		long[] attrs;
+		Collection<Long> attrs;
 		if (userCtx.isUserDefined()) {
 			attrs = store.graph().getAdjacentDescendants(userCtx.getUser());
 
@@ -161,7 +161,7 @@ public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 		LongOpenHashSet reachedContainers = new LongOpenHashSet();
 
 		AccessRightSet arsetToTarget = new AccessRightSet();
-		long[] attrs;
+		Collection<Long> attrs;
 		if (targetCtx.isNode()) {
 			reachedContainers.add(targetCtx.getTargetId());
 

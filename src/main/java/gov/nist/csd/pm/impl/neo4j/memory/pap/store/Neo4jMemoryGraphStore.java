@@ -210,8 +210,8 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 	}
 
 	@Override
-	public long[] search(NodeType type, Map<String, String> properties) throws PMException {
-		List<Long> results = new ArrayList<>();
+	public Collection<Long> search(NodeType type, Map<String, String> properties) throws PMException {
+		List<Long> results = new LongArrayList();
 
 		txHandler.runTx(tx -> {
 			Label label;
@@ -236,11 +236,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return results.stream().mapToLong(Long::longValue).toArray();
+		return results;
 	}
 
 	@Override
-	public long[] getPolicyClasses() throws PMException {
+	public Collection<Long> getPolicyClasses() throws PMException {
 		LongArrayList pcs = new LongArrayList();
 
 		txHandler.runTx(tx -> {
@@ -251,11 +251,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return pcs.toArray(new long[]{});
+		return pcs;
 	}
 
 	@Override
-	public long[] getAdjacentDescendants(long id) throws PMException {
+	public Collection<Long> getAdjacentDescendants(long id) throws PMException {
 		LongArrayList children = new LongArrayList();
 
 		txHandler.runTx(tx -> {
@@ -270,11 +270,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return children.toArray(new long[]{});
+		return children;
 	}
 
 	@Override
-	public long[] getAdjacentAscendants(long id) throws PMException {
+	public Collection<Long> getAdjacentAscendants(long id) throws PMException {
 		LongArrayList parents = new LongArrayList();
 
 		txHandler.runTx(tx -> {
@@ -289,11 +289,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return parents.toArray(new long[]{});
+		return parents;
 	}
 
 	@Override
-	public Association[] getAssociationsWithSource(long uaId) throws PMException {
+	public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -312,11 +312,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return assocs.toArray(new Association[]{});
+		return assocs;
 	}
 
 	@Override
-	public Association[] getAssociationsWithTarget(long targetId) throws PMException {
+	public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
 		List<Association> assocs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
@@ -335,11 +335,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return assocs.toArray(new Association[]{});
+		return assocs;
 	}
 
 	@Override
-	public long[] getPolicyClassDescendants(long id) throws PMException {
+	public Collection<Long> getPolicyClassDescendants(long id) throws PMException {
 		LongArrayList pcdescs = new LongArrayList();
 
 		txHandler.runTx(tx -> {
@@ -366,11 +366,11 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return pcdescs.toArray(new long[]{});
+		return pcdescs;
 	}
 
 	@Override
-	public long[] getAttributeDescendants(long id) throws PMException {
+	public Collection<Long> getAttributeDescendants(long id) throws PMException {
 		LongArrayList descs = new LongArrayList();
 		txHandler.runTx(tx -> {
 			org.neo4j.graphdb.Node uNode = tx.findNode(NODE_LABEL, ID_PROPERTY, id);
@@ -396,7 +396,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 			}
 		});
 
-		return descs.toArray(new long[]{});
+		return descs;
 	}
 
 	@Override
@@ -404,7 +404,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			long[] adjacentDescendants = getAdjacentDescendants(id);
+			Collection<Long> adjacentDescendants = getAdjacentDescendants(id);
 			for (long adjacent : adjacentDescendants) {
 				adjacentSubgraphs.add(getDescendantSubgraph(adjacent));
 			}
@@ -418,7 +418,7 @@ public class Neo4jMemoryGraphStore implements GraphStore {
 		List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			long[] adjacentAscendants = getAdjacentAscendants(id);
+			Collection<Long> adjacentAscendants = getAdjacentAscendants(id);
 			for (long adjacent : adjacentAscendants) {
 				adjacentSubgraphs.add(getAscendantSubgraph(adjacent));
 			}

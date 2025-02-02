@@ -4,6 +4,8 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.common.graph.dag.Direction;
 
+import java.util.Collection;
+
 public class GraphStoreDFS extends DepthFirstGraphWalker {
 
     private GraphStore graphStore;
@@ -14,7 +16,7 @@ public class GraphStoreDFS extends DepthFirstGraphWalker {
     }
 
     @Override
-    protected long[] getNextLevel(long node) throws PMException {
+    protected Collection<Long> getNextLevel(long node) throws PMException {
         if (getDirection() == Direction.DESCENDANTS) {
             return graphStore.getAdjacentDescendants(node);
         } else {

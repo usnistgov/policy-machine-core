@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.*;
-import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.common.graph.relationship.InvalidAssignmentException;
@@ -108,7 +107,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             assertTrue(pap.query().graph().nodeExists("oa2"));
             assertEquals("v", pap.query().graph().getNodeByName("oa2").getProperties().get("k"));
 
-            assertTrue(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("pc1"))).boxed().toList().contains(id("oa1")));
+            assertTrue(pap.query().graph().getAdjacentAscendants(id("pc1")).contains(id("oa1")));
             assertIdOfNameInLongArray(pap.query().graph().getAdjacentAscendants(id("oa1")), "oa2");
             assertIdOfNameInLongArray(pap.query().graph().getAdjacentDescendants(id("oa1")), "pc1");
             assertIdOfNameInLongArray(pap.query().graph().getAdjacentDescendants(id("oa2")), "oa1");

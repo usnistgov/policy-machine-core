@@ -10,6 +10,8 @@ import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import java.util.*;
@@ -82,7 +84,7 @@ public class MemoryTargetEvaluator {
 				.withVisitor(visitor)
 				.withPropagator(propagator);
 
-		long[] targetNodes;
+		Collection<Long> targetNodes;
 		if (targetCtx.isNode()) {
 			// if target of decision is a PC, use the PM_ADMIN_OBJECT as the target node
 			long target = targetCtx.getTargetId();
@@ -91,7 +93,7 @@ public class MemoryTargetEvaluator {
 				target = PM_ADMIN_OBJECT.nodeId();
 			}
 
-			targetNodes = new long[]{target};
+			targetNodes = new LongArrayList(LongList.of(target));
 
 			dfs.walk(target);
 		} else {
@@ -114,7 +116,7 @@ public class MemoryTargetEvaluator {
 		return userProhibitionTargets;
 	}
 
-	private Map<Long, AccessRightSet> mergeResults(long[] targetNodes, Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
+	private Map<Long, AccessRightSet> mergeResults(Collection<Long> targetNodes, Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
 		Map<Long, AccessRightSet> merged = new Long2ObjectOpenHashMap<>();
 
 		for (long target : targetNodes) {

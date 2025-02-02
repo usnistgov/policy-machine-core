@@ -46,7 +46,7 @@ public class MemoryUserEvaluator {
 			Collection<Prohibition> subjectProhibitions = policyStore.prohibitions().getProhibitionsWithNode(node);
 			reachedProhibitions.addAll(subjectProhibitions);
 
-			Association[] nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
+			Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
 			collectAssociationsFromBorderTargets(nodeAssociations, borderTargets);
 		};
 
@@ -64,7 +64,7 @@ public class MemoryUserEvaluator {
 		return new UserDagResult(borderTargets, reachedProhibitions);
 	}
 
-	private void collectAssociationsFromBorderTargets(Association[] assocs, Map<Long, AccessRightSet> borderTargets) {
+	private void collectAssociationsFromBorderTargets(Collection<Association> assocs, Map<Long, AccessRightSet> borderTargets) {
 		for (Association association : assocs) {
 			AccessRightSet ops = association.getAccessRightSet();
 			AccessRightSet exOps = borderTargets.getOrDefault(association.getTarget(), new AccessRightSet());

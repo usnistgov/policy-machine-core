@@ -8,6 +8,7 @@ import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.routine.Routine;
 
+import java.util.Collection;
 import java.util.Map;
 
 public abstract class TxCmd implements TxRollbackSupport {
@@ -60,9 +61,9 @@ public abstract class TxCmd implements TxRollbackSupport {
     static class DeleteNodeTxCmd extends TxCmd {
         private final long id;
         private final Node nodeToDelete;
-        private final long[]descendants;
+        private final Collection<Long> descendants;
 
-        public DeleteNodeTxCmd(long id, Node nodeToDelete, long[] descendants) {
+        public DeleteNodeTxCmd(long id, Node nodeToDelete, Collection<Long> descendants) {
             this.id = id;
             this.nodeToDelete = nodeToDelete;
             this.descendants = descendants;

@@ -2,6 +2,8 @@ package gov.nist.csd.pm.common.graph.dag;
 
 import gov.nist.csd.pm.common.exception.PMException;
 
+import java.util.Collection;
+
 public interface GraphWalker {
 
     /**
@@ -16,6 +18,6 @@ public interface GraphWalker {
      * @param firstLevel The node to start traversing at.
      * @throws PMException If there is an exception in the PM.
      */
-    void walk(long[] firstLevel) throws PMException;
+    void walk(Collection<Long> firstLevel) throws PMException;
 
 }

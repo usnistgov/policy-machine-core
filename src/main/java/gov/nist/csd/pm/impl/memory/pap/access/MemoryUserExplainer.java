@@ -64,8 +64,8 @@ public class MemoryUserExplainer {
 
 			dfs.walk(user);
 		} else {
-			long[] attributes = userCtx.getAttributeIds();
-			nodes.addAll(LongStream.of(attributes).boxed().toList());
+			Collection<Long> attributes = userCtx.getAttributeIds();
+			nodes.addAll(attributes);
 
 			dfs.walk(attributes);
 		}

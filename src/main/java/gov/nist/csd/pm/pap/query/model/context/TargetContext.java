@@ -5,13 +5,14 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.store.GraphStore;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 public class TargetContext {
 
 	private long targetId;
-	private long[] attributeIds;
+	private Collection<Long> attributeIds;
 
 	public TargetContext(long targetId) {
 		this.targetId = targetId;
@@ -25,7 +26,7 @@ public class TargetContext {
 		}
 	}
 
-	public TargetContext(long[] attributeIds) {
+	public TargetContext(Collection<Long> attributeIds) {
 		this.attributeIds = attributeIds;
 	}
 
@@ -37,11 +38,11 @@ public class TargetContext {
 		this.targetId = targetId;
 	}
 
-	public long[] getAttributeIds() {
+	public Collection<Long> getAttributeIds() {
 		return attributeIds;
 	}
 
-	public void setAttributeIds(long[] attributeIds) {
+	public void setAttributeIds(Collection<Long> attributeIds) {
 		this.attributeIds = attributeIds;
 	}
 
@@ -69,7 +70,7 @@ public class TargetContext {
 		if (isNode()) {
 			return String.format(s, "target: " + targetId);
 		} else {
-			return String.format(s, "attributes: " + Arrays.toString(attributeIds));
+			return String.format(s, "attributes: " + attributeIds);
 		}
 	}
 
@@ -82,6 +83,6 @@ public class TargetContext {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(targetId, Arrays.hashCode(attributeIds));
+		return Objects.hash(targetId, attributeIds);
 	}
 }

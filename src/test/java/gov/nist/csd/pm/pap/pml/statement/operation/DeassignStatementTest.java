@@ -38,7 +38,7 @@ class DeassignStatementTest {
         ExecutionContext execCtx = new ExecutionContext(new TestUserContext("u1"), pap);
         stmt.execute(execCtx, pap);
 
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua3"))).boxed().toList().contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("ua3")).contains(id("pc1")));
     }
 
     @Test

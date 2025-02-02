@@ -77,7 +77,7 @@ public interface GraphQuery {
      * @return The IDs of all policy classes.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    long[] getPolicyClasses() throws PMException;
+    Collection<Long> getPolicyClasses() throws PMException;
 
     /**
      * Get the adjacent descendants of the given node.
@@ -86,7 +86,7 @@ public interface GraphQuery {
      * @return The IDs of the descendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    long[] getAdjacentDescendants(long nodeId) throws PMException;
+    Collection<Long> getAdjacentDescendants(long nodeId) throws PMException;
 
     /**
      * Get the adjacent ascendants of the given node.
@@ -95,7 +95,7 @@ public interface GraphQuery {
      * @return The IDs of the ascendants of the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    long[] getAdjacentAscendants(long nodeId) throws PMException;
+    Collection<Long> getAdjacentAscendants(long nodeId) throws PMException;
 
     /**
      * Get the associations in which the given user attribute is the source.
@@ -140,7 +140,7 @@ public interface GraphQuery {
      * @return A Collection of attribute IDs.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    long[] getAttributeDescendants(long nodeId) throws PMException;
+    Collection<Long> getAttributeDescendants(long nodeId) throws PMException;
 
     /**
      * Get the descendants of the given node that are policy classes.
@@ -149,7 +149,7 @@ public interface GraphQuery {
      * @return A Collection of policy class IDs.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    long[] getPolicyClassDescendants(long nodeId) throws PMException;
+    Collection<Long> getPolicyClassDescendants(long nodeId) throws PMException;
 
     /**
      * Return true if the ascendant is an ascendant of the descendant.

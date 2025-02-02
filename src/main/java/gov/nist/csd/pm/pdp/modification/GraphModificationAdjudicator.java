@@ -11,6 +11,7 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.neo4j.cypher.internal.ast.CreateUser;
 
 import java.util.Collection;
@@ -165,7 +166,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void deleteNode(long id) throws PMException {
         Node node = pap.query().graph().getNodeById(id);
-        List<Long> descendants = LongStream.of(pap.query().graph().getAdjacentDescendants(id)).boxed().toList();
+        Collection<Long> descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
 
         DeleteNodeOp op = new DeleteNodeOp();
 

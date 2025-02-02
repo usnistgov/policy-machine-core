@@ -17,7 +17,7 @@ import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.*;
 
 
-public class CreateObligationStatement extends OperationStatement {
+public class CreateObligationStatement extends OperationStatement<Void> {
 
     private Expression name;
     private List<CreateRuleStatement> ruleStmts;

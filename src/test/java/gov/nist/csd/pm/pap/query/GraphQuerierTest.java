@@ -115,7 +115,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             long pc2 = pap.modify().graph().createPolicyClass("pc2");
             long pc3 = pap.modify().graph().createPolicyClass("pc3");
 
-            assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().containsAll(Arrays.asList(pc1, pc2, pc3)));
+            assertTrue(pap.query().graph().getPolicyClasses().containsAll(Arrays.asList(pc1, pc2, pc3)));
         }
     }
 
@@ -135,7 +135,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
             long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
 
-            assertTrue(Arrays.stream(pap.query().graph().getAdjacentAscendants(pc1)).boxed().toList().containsAll(List.of(oa1, oa2, oa3)));
+            assertTrue(pap.query().graph().getAdjacentAscendants(pc1).containsAll(List.of(oa1, oa2, oa3)));
         }
     }
 
@@ -158,7 +158,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             pap.modify().graph().assign(o1, List.of(oa2));
             pap.modify().graph().assign(o1, List.of(oa3));
 
-            assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(o1)).boxed().toList().containsAll(List.of(oa1, oa2, oa3)));
+            assertTrue(pap.query().graph().getAdjacentDescendants(o1).containsAll(List.of(oa1, oa2, oa3)));
         }
     }
 
@@ -257,10 +257,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                 """;
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
 
-        long[] conts = pap.query().graph().getAttributeDescendants(id("o1"));
+        Collection<Long> conts = pap.query().graph().getAttributeDescendants(id("o1"));
         List<Long> expected = ids("oa3", "oa2", "oa1", "oa6", "oa5");
-        assertTrue(Arrays.stream(conts).boxed().toList().containsAll(expected));
-        assertTrue(expected.containsAll(Arrays.stream(conts).boxed().toList()));
+        assertTrue(conts.containsAll(expected));
+        assertTrue(expected.containsAll(conts));
     }
 
     @Test
@@ -283,10 +283,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                       """;
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
 
-        long[] pcs = pap.query().graph().getPolicyClassDescendants(id("o1"));
+        Collection<Long> pcs = pap.query().graph().getPolicyClassDescendants(id("o1"));
         List<Long> expected = ids("pc1", "pc2");
-        assertTrue(Arrays.stream(pcs).boxed().toList().containsAll(expected));
-        assertTrue(expected.containsAll(Arrays.stream(pcs).boxed().toList()));
+        assertTrue(pcs.containsAll(expected));
+        assertTrue(expected.containsAll(pcs));
     }
 
     @Test

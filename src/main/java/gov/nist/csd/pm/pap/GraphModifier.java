@@ -181,7 +181,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             return false;
         }
 
-        long[] ascendants;
+        Collection<Long> ascendants;
         try {
             ascendants = store.graph().getAdjacentAscendants(id);
         } catch (NodeDoesNotExistException e) {
@@ -189,7 +189,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             return false;
         }
 
-        if (ascendants.length != 0) {
+        if (!ascendants.isEmpty()) {
             Node node = store.graph().getNodeById(id);
             throw new NodeHasAscendantsException(node.getIdAndName());
         }
@@ -282,8 +282,8 @@ public class GraphModifier extends Modifier implements GraphModification {
         }
 
         // ignore if assignment already exists
-        long[] descendants = store.graph().getAdjacentDescendants(ascendant);
-        if (new HashSet<>(LongStream.of(descendants).boxed().toList()).contains(descendant)) {
+        Collection<Long> descendants = store.graph().getAdjacentDescendants(ascendant);
+        if (new HashSet<>(descendants).contains(descendant)) {
             return false;
         }
 
@@ -319,12 +319,12 @@ public class GraphModifier extends Modifier implements GraphModification {
             throw new CannotDeleteAdminPolicyConfigException();
         }
 
-        long[] descs = store.graph().getAdjacentDescendants(ascendant);
-        if (!new HashSet<>(LongStream.of(descs).boxed().toList()).contains(descendant)) {
+        Collection<Long> descs = store.graph().getAdjacentDescendants(ascendant);
+        if (!new HashSet<>(descs).contains(descendant)) {
             return false;
         }
 
-        if (descs.length == 1) {
+        if (descs.size() == 1) {
             Node aNode = store.graph().getNodeById(ascendant);
             Node dNode = store.graph().getNodeById(descendant);
             throw new DisconnectedNodeException(aNode.getIdAndName(), dNode.getIdAndName());
@@ -376,7 +376,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             throw new NodeDoesNotExistException(target);
         }
 
-        Association[] associations = store.graph().getAssociationsWithSource(ua);
+        Collection<Association> associations = store.graph().getAssociationsWithSource(ua);
         for (Association a : associations) {
             if (a.getSource() == ua && a.getTarget() == target) {
                 return true;

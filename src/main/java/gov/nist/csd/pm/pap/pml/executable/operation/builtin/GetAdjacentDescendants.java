@@ -40,8 +40,8 @@ public class GetAdjacentDescendants extends PMLOperation {
         Value nodeName = (Value) operands.get("nodeName");
 
         long id = pap.query().graph().getNodeId(nodeName.getStringValue());
-        long[] descendants = pap.query().graph().getAdjacentDescendants(id);
-        List<Value> descValues = new ArrayList<>(descendants.length);
+        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(id);
+        List<Value> descValues = new ArrayList<>(descendants.size());
 
         for (long desc : descendants) {
             Node node = pap.query().graph().getNodeById(desc);

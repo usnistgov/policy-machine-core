@@ -47,9 +47,9 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
             return;
         }
 
-        long[] descs = vertex.getAdjacentDescendants();
-        Association[] incomingAssociations = vertex.getIncomingAssociations();
-        Association[] outgoingAssociations = vertex.getOutgoingAssociations();
+        Collection<Long> descs = new ArrayList<>(vertex.getAdjacentDescendants());
+        Collection<Association> incomingAssociations = new ArrayList<>(vertex.getIncomingAssociations());
+        Collection<Association> outgoingAssociations = new ArrayList<>(vertex.getOutgoingAssociations());
 
         for (long desc : descs) {
             deleteAssignment(id, desc);
@@ -174,38 +174,38 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     }
 
     @Override
-    public long[] search(NodeType type, Map<String, String> properties) throws PMException {
+    public Collection<Long> search(NodeType type, Map<String, String> properties) throws PMException {
         LongOpenHashSet nodes = filterByType(type);
-        return filterByProperties(nodes, properties).toArray(new long[]{});
+        return filterByProperties(nodes, properties);
     }
 
     @Override
-    public long[] getPolicyClasses() throws PMException {
-        return policy.pcs.toArray(new long[policy.pcs.size()]);
+    public Collection<Long> getPolicyClasses() throws PMException {
+        return policy.pcs;
     }
 
     @Override
-    public long[] getAdjacentDescendants(long id) throws PMException {
+    public Collection<Long> getAdjacentDescendants(long id) throws PMException {
         return policy.graph.get(id).getAdjacentDescendants();
     }
 
     @Override
-    public long[] getAdjacentAscendants(long id) throws PMException {
+    public Collection<Long> getAdjacentAscendants(long id) throws PMException {
         return policy.graph.get(id).getAdjacentAscendants();
     }
 
     @Override
-    public Association[] getAssociationsWithSource(long uaId) throws PMException {
+    public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
         return policy.graph.get(uaId).getOutgoingAssociations();
     }
 
     @Override
-    public Association[] getAssociationsWithTarget(long targetId) throws PMException {
+    public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
         return policy.graph.get(targetId).getIncomingAssociations();
     }
 
     @Override
-    public long[] getPolicyClassDescendants(long id) throws PMException {
+    public Collection<Long> getPolicyClassDescendants(long id) throws PMException {
         LongOpenHashSet pcs = new LongOpenHashSet();
 
         new GraphStoreDFS(this)
@@ -221,11 +221,11 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         pcs.remove(id);
 
-        return pcs.toArray(new long[]{});
+        return pcs;
     }
 
     @Override
-    public long[] getAttributeDescendants(long id) throws PMException {
+    public Collection<Long> getAttributeDescendants(long id) throws PMException {
         LongOpenHashSet attrs = new LongOpenHashSet();
 
         new GraphStoreDFS(this)
@@ -242,14 +242,14 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         attrs.remove(id);
 
-        return attrs.toArray(new long[]{});
+        return attrs;
     }
 
     @Override
     public Subgraph getDescendantSubgraph(long id) throws PMException {
         List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
-        long[] adjacentDescendants = getAdjacentDescendants(id);
+        Collection<Long> adjacentDescendants = getAdjacentDescendants(id);
         for (long adjacent : adjacentDescendants) {
             adjacentSubgraphs.add(getDescendantSubgraph(adjacent));
         }
@@ -261,7 +261,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     public Subgraph getAscendantSubgraph(long id) throws PMException {
         List<Subgraph> adjacentSubgraphs = new ArrayList<>();
 
-        long[] adjacentAscendants = getAdjacentAscendants(id);
+        Collection<Long> adjacentAscendants = getAdjacentAscendants(id);
         for (long adjacent : adjacentAscendants) {
             adjacentSubgraphs.add(getAscendantSubgraph(adjacent));
         }

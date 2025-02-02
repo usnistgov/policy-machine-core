@@ -41,8 +41,8 @@ class ForeachStatementTest {
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
-        assertEquals(5, pap.query().graph().getPolicyClasses().length);
-        assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().containsAll(ids("a", "b", "c")));
+        assertEquals(5, pap.query().graph().getPolicyClasses().size());
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids("a", "b", "c")));
 
         // map with key and value vars
         stmt = new ForeachStatement("x", "y", buildMapLiteral("a", "b", "c", "d"), List.of(
@@ -57,8 +57,8 @@ class ForeachStatementTest {
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
-        assertEquals(6, pap.query().graph().getPolicyClasses().length);
-        assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().containsAll(ids("a", "b", "c", "d")));
+        assertEquals(6, pap.query().graph().getPolicyClasses().size());
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids("a", "b", "c", "d")));
 
         // map with key only
         stmt = new ForeachStatement("x", null, buildMapLiteral("a", "b", "c", "d"), List.of(
@@ -72,8 +72,8 @@ class ForeachStatementTest {
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
-        assertEquals(4, pap.query().graph().getPolicyClasses().length);
-        assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().containsAll(ids("a", "c")));
+        assertEquals(4, pap.query().graph().getPolicyClasses().size());
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids("a", "c")));
     }
 
     @Test

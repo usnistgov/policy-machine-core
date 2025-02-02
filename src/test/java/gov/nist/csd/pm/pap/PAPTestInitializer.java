@@ -5,6 +5,7 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.LongStream;
 
@@ -43,11 +44,11 @@ public abstract class PAPTestInitializer {
                 .toList();
     }
 
-    protected void assertIdOfNameInLongArray(long[] ids, String name) throws PMException {
-        assertTrue(Arrays.stream(ids).boxed().toList().contains(id(name)));
+    protected void assertIdOfNameInLongArray(Collection<Long> ids, String name) throws PMException {
+        assertTrue(ids.contains(id(name)));
     }
 
-    protected void assertIdOfNameNotInLongArray(long[] ids, String name) throws PMException {
-        assertFalse(Arrays.stream(ids).boxed().toList().contains(id(name)));
+    protected void assertIdOfNameNotInLongArray(Collection<Long> ids, String name) throws PMException {
+        assertFalse(ids.contains(id(name)));
     }
 }

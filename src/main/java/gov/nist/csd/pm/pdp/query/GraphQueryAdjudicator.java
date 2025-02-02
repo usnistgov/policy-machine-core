@@ -105,7 +105,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public long[] getPolicyClasses() throws PMException {
+    public Collection<Long> getPolicyClasses() throws PMException {
         LongArrayList policyClasses = new LongArrayList();
         for (long pc : pap.query().graph().getPolicyClasses()) {
             try {
@@ -117,18 +117,18 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
             policyClasses.add(pc);
         }
 
-        return policyClasses.toLongArray();
+        return policyClasses;
     }
 
     @Override
-    public long[] getAdjacentDescendants(long nodeId) throws PMException {
+    public Collection<Long> getAdjacentDescendants(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getAdjacentDescendants(nodeId);
     }
 
     @Override
-    public long[] getAdjacentAscendants(long nodeId) throws PMException {
+    public Collection<Long> getAdjacentAscendants(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getAdjacentAscendants(nodeId);
@@ -159,14 +159,14 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
     }
 
     @Override
-    public long[] getAttributeDescendants(long nodeId) throws PMException {
+    public Collection<Long> getAttributeDescendants(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getAttributeDescendants(nodeId);
     }
 
     @Override
-    public long[] getPolicyClassDescendants(long nodeId) throws PMException {
+    public Collection<Long> getPolicyClassDescendants(long nodeId) throws PMException {
         privilegeChecker.check(userCtx, nodeId, REVIEW_POLICY);
 
         return pap.query().graph().getPolicyClassDescendants(nodeId);

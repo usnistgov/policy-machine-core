@@ -78,7 +78,7 @@ public class DepthFirstGraphWalker implements GraphWalker {
     }
 
     @Override
-    public void walk(long[] firstLevel) throws PMException {
+    public void walk(Collection<Long> firstLevel) throws PMException {
         for (long node : firstLevel) {
             walkInternal(node);
         }
@@ -93,7 +93,7 @@ public class DepthFirstGraphWalker implements GraphWalker {
             return CONTINUE;
         }
 
-        long[] nodes = getNextLevel(start);
+        Collection<Long> nodes = getNextLevel(start);
         int ret = WALK;
         for(long n : nodes) {
             int i = walkInternal(n);
@@ -116,7 +116,7 @@ public class DepthFirstGraphWalker implements GraphWalker {
     protected static final int CONTINUE = 1;
     protected static final int RETURN = 2;
 
-    protected long[] getNextLevel(long node) throws PMException {
+    protected Collection<Long> getNextLevel(long node) throws PMException {
         if (direction == Direction.DESCENDANTS) {
             return graphQuery.getAdjacentDescendants(node);
         } else {

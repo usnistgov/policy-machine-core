@@ -12,6 +12,7 @@ import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
@@ -19,7 +20,7 @@ import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExecutionTest {
-    
+
     @Test
     void testGraphPML() throws PMException {
         PAP pap = new TestPAP();
@@ -65,19 +66,19 @@ public class ExecutionTest {
 
         assertEquals("v", pap.query().graph().getNodeByName("pc1").getProperties().get("k"));
 
-        long[] ascendants = pap.query().graph().getAdjacentAscendants(id("pc1"));
-        assertTrue(Arrays.stream(ascendants).boxed().toList().containsAll(ids("ua1", "ua2", "ua3")));
+        Collection<Long> ascendants = pap.query().graph().getAdjacentAscendants(id("pc1"));
+        assertTrue(ascendants.containsAll(ids("ua1", "ua2", "ua3")));
         ascendants = pap.query().graph().getAdjacentAscendants(id("pc1"));
-        assertTrue(Arrays.stream(ascendants).boxed().toList().containsAll(ids("oa1", "oa2", "oa3")));
+        assertTrue(ascendants.containsAll(ids("oa1", "oa2", "oa3")));
 
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua1"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua2"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("ua3"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa1"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa2"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa3"))).boxed().toList().contains(id("pc1")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("u1"))).boxed().toList().containsAll(ids("ua1", "ua2", "ua3")));
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("o1"))).boxed().toList().containsAll(ids("oa1", "oa2", "oa3")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("ua1")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("ua2")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("ua3")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("oa1")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("oa2")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("oa3")).contains(id("pc1")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("u1")).containsAll(ids("ua1", "ua2", "ua3")));
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("o1")).containsAll(ids("oa1", "oa2", "oa3")));
 
         assertEquals(new Association(id("ua1"), id("oa1"), new AccessRightSet("read", "write")),
                 pap.query().graph().getAssociationsWithSource(id("ua1")).iterator().next());
@@ -97,9 +98,9 @@ public class ExecutionTest {
                 deassign "u1" from ["ua1", "ua2"]
                 """;
         pap.executePML(new TestUserContext("u1"), input);
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("u1"))).boxed().toList().containsAll(ids("ua1", "ua2")));
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("ua1"))).boxed().toList().contains(id("u1")));
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("ua2"))).boxed().toList().contains(id("u1")));
+        assertFalse(pap.query().graph().getAdjacentDescendants(id("u1")).containsAll(ids("ua1", "ua2")));
+        assertFalse(pap.query().graph().getAdjacentAscendants(id("ua1")).contains(id("u1")));
+        assertFalse(pap.query().graph().getAdjacentAscendants(id("ua2")).contains(id("u1")));
 
         input =
                 """
@@ -113,8 +114,8 @@ public class ExecutionTest {
                 deassign "o1" from ["oa1"]
                 """;
         pap.executePML(new TestUserContext("u1"), input);
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("oa1"))).boxed().toList().contains(id("oa1")));
-        assertFalse(Arrays.stream(pap.query().graph().getAdjacentAscendants(id("oa1"))).boxed().toList().contains(id("o1")));
+        assertFalse(pap.query().graph().getAdjacentDescendants(id("oa1")).contains(id("oa1")));
+        assertFalse(pap.query().graph().getAdjacentAscendants(id("oa1")).contains(id("o1")));
 
         input =
                 """
@@ -390,7 +391,7 @@ public class ExecutionTest {
          PAP pap = new TestPAP();
         
         pap.executePML(new TestUserContext("u1"), input);
-        assertTrue(Arrays.stream(pap.query().graph().getPolicyClasses()).boxed().toList().contains(id("v1")));
+        assertTrue(pap.query().graph().getPolicyClasses().contains(id("v1")));
     }
 
     @Test

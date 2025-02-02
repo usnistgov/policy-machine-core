@@ -293,7 +293,7 @@ class EPPTest {
         pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
                 ids("oa1")));
 
-        assertTrue(LongList.of(pap.query().graph().getPolicyClasses()).containsAll(ids(
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids(
                 "pc1", "create_object_attribute", "oa2_test", "u1_test"
         )));
     }

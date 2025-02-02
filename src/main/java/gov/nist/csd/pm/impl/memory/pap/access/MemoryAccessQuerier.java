@@ -97,7 +97,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
             getAndStorePrivileges(results, userDagResult, borderTarget);
 
             // compute decisions for the subgraph of the border attr
-            Set<Long> descendants = getDescendants(borderTarget);
+            Set<Long> descendants = getAscendants(borderTarget);
             for (long descendant : descendants) {
                 if (results.containsKey(descendant)) {
                     continue;
@@ -121,7 +121,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     @Override
     public Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
         Map<Long, AccessRightSet> acl = new HashMap<>();
-        long[] search = store.graph().search(U, NO_PROPERTIES);
+        Collection<Long> search = store.graph().search(U, NO_PROPERTIES);
         for (long user : search) {
             AccessRightSet list = this.computePrivileges(new UserContext(user), targetCtx);
             acl.put(user, list);
@@ -141,7 +141,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
         List<SubgraphPrivileges> subgraphs = new ArrayList<>();
 
-        long[] adjacentAscendants = store.graph().getAdjacentAscendants(root);
+        Collection<Long> adjacentAscendants = store.graph().getAdjacentAscendants(root);
         for (long adjacent : adjacentAscendants) {
             subgraphs.add(computeSubgraphPrivileges(userCtx, adjacent));
         }
@@ -153,7 +153,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
         Map<Node, AccessRightSet> ascendantPrivs = new HashMap<>();
 
-        long[] adjacentAscendants = store.graph().getAdjacentAscendants(root);
+        Collection<Long> adjacentAscendants = store.graph().getAdjacentAscendants(root);
         for (long adjacentAscendant : adjacentAscendants) {
             Node node = store.graph().getNodeById(adjacentAscendant);
             ascendantPrivs.put(node, computePrivileges(userCtx, new TargetContext(adjacentAscendant)));
@@ -166,7 +166,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
     public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
         Map<Node, AccessRightSet> descendantPrivs = new HashMap<>();
 
-        long[] adjacentDescendants = store.graph().getAdjacentDescendants(root);
+        Collection<Long> adjacentDescendants = store.graph().getAdjacentDescendants(root);
         for (long adjacentDescendant : adjacentDescendants) {
             Node node = store.graph().getNodeById(adjacentDescendant);
             descendantPrivs.put(node, computePrivileges(userCtx, new TargetContext(adjacentDescendant)));
@@ -217,20 +217,20 @@ public class MemoryAccessQuerier extends AccessQuerier {
         arsetMap.put(target, privileges);
     }
 
-    private Set<Long> getDescendants(long vNode) throws PMException {
-        Set<Long> descendants = new HashSet<>();
+    private Set<Long> getAscendants(long vNode) throws PMException {
+        Set<Long> ret = new HashSet<>();
 
-        long[] ascendants = store.graph().getAdjacentAscendants(vNode);
-        if (ascendants.length == 0) {
-            return descendants;
+        Collection<Long> ascendants = store.graph().getAdjacentAscendants(vNode);
+        if (ascendants.isEmpty()) {
+            return ret;
         }
 
-        descendants.addAll(LongStream.of(ascendants).boxed().toList());
+        ret.addAll(ascendants);
         for (long ascendant : ascendants) {
-            descendants.add(ascendant);
-            descendants.addAll(getDescendants(ascendant));
+            ret.add(ascendant);
+            ret.addAll(getAscendants(ascendant));
         }
 
-        return descendants;
+        return ret;
     }
 }

@@ -87,14 +87,14 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     public static void testAdminPolicy(PAP pap) throws PMException {
         assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_PC.nodeId()));
-        long[] ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.PM_ADMIN_PC.nodeId());
-        assertEquals(1, ascendants.length);
-	    assertEquals(ascendants[0], (AdminPolicyNode.PM_ADMIN_OBJECT.nodeId()));
+        Collection<Long> ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.PM_ADMIN_PC.nodeId());
+        assertEquals(1, ascendants.size());
+	    assertEquals(ascendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_OBJECT.nodeId()));
 
         assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_OBJECT.nodeId()));
-        long[] descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.PM_ADMIN_OBJECT.nodeId());
-        assertEquals(1, descendants.length);
-	    assertEquals(descendants[0], (AdminPolicyNode.PM_ADMIN_PC.nodeId()));
+        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.PM_ADMIN_OBJECT.nodeId());
+        assertEquals(1, descendants.size());
+	    assertEquals(descendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_PC.nodeId()));
     }
 
     @Test

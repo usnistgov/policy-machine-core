@@ -14,6 +14,7 @@ import gov.nist.csd.pm.pap.query.model.explain.*;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestUserContext;
+import it.unimi.dsi.fastutil.longs.LongList;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -1613,13 +1614,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         AccessRightSet actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertEquals(new AccessRightSet("read"), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(new long[]{id("ua1"), id("ua2")}), new TargetContext(id("o1")));
+        actual = pap.query().access().computePrivileges(new UserContext(LongList.of(id("ua1"), id("ua2"))), new TargetContext(id("o1")));
         assertEquals(new AccessRightSet("read"), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(new long[]{id("oa1"), id("oa2")}));
+        actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet("read"), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(new long[]{id("ua1"), id("ua2")}), new TargetContext(new long[]{id("oa1"), id("oa2")}));
+        actual = pap.query().access().computePrivileges(new UserContext(LongList.of(id("ua1"), id("ua2"))), new TargetContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet("read"), actual);
 
         // create a prohibition for the user on the object
@@ -1634,13 +1635,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertEquals(new AccessRightSet(), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(new long[]{id("ua1"), id("ua2")}), new TargetContext(id("o1")));
+        actual = pap.query().access().computePrivileges(new UserContext(LongList.of(id("ua1"), id("ua2"))), new TargetContext(id("o1")));
         assertEquals(new AccessRightSet("read"), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(new long[]{id("oa1"), id("oa2")}));
+        actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet("read"), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(new long[]{id("ua1"), id("ua2")}), new TargetContext(new long[]{id("oa1"), id("oa2")}));
+        actual = pap.query().access().computePrivileges(new UserContext(LongList.of(id("ua1"), id("ua2"))), new TargetContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet("read"), actual);
 
         pml = """
@@ -1656,13 +1657,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertEquals(new AccessRightSet(), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(new long[]{id("ua1"), id("ua2")}), new TargetContext(id("o1")));
+        actual = pap.query().access().computePrivileges(new UserContext(LongList.of(id("ua1"), id("ua2"))), new TargetContext(id("o1")));
         assertEquals(new AccessRightSet("read"), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(new long[]{id("oa1"), id("oa2")}));
+        actual = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet(), actual);
 
-        actual = pap.query().access().computePrivileges(new UserContext(new long[]{id("ua1"), id("ua2")}), new TargetContext(new long[]{id("oa1"), id("oa2")}));
+        actual = pap.query().access().computePrivileges(new UserContext(LongList.of(id("ua1"), id("ua2"))), new TargetContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet("read"), actual);
 
     }

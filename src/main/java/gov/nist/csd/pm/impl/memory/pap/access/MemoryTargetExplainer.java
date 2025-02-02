@@ -26,7 +26,7 @@ public class MemoryTargetExplainer {
 	public Map<Node, Map<Path, List<Association>>> explainTarget(TargetContext targetCtx) throws PMException {
 		targetCtx.checkExists(policyStore.graph());
 
-		long[] policyClasses = policyStore.graph().getPolicyClasses();
+		Collection<Long> policyClasses = policyStore.graph().getPolicyClasses();
 
 		// initialize map with policy classes
 		Map<Node, Map<List<Node>, List<Association>>> pcPathAssociations = new HashMap<>();
@@ -49,7 +49,7 @@ public class MemoryTargetExplainer {
 				targetPath.addFirst(dstNode);
 
 				// collect any associations for the DST node
-				Association[] associationsWithTarget = policyStore.graph().getAssociationsWithTarget(dst);
+				Association[] associationsWithTarget = policyStore.graph().getAssociationsWithTarget(dst).toArray(new Association[0]);
 				associations.addAll(List.of(associationsWithTarget));
 				dstPathAssocs.put(targetPath, associations);
 			}

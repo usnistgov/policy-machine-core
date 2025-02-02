@@ -3,6 +3,7 @@ package gov.nist.csd.pm.impl.memory.pap.store;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class VertexWithProps extends Vertex{
@@ -26,22 +27,22 @@ public class VertexWithProps extends Vertex{
     }
 
     @Override
-    protected long[] getAdjacentDescendants() {
+    protected Collection<Long> getAdjacentDescendants() {
         return vertex.getAdjacentDescendants();
     }
 
     @Override
-    protected long[] getAdjacentAscendants() {
+    protected Collection<Long> getAdjacentAscendants() {
         return vertex.getAdjacentAscendants();
     }
 
     @Override
-    protected Association[] getOutgoingAssociations() {
+    protected Collection<Association> getOutgoingAssociations() {
         return vertex.getOutgoingAssociations();
     }
 
     @Override
-    protected Association[] getIncomingAssociations() {
+    protected Collection<Association> getIncomingAssociations() {
         return vertex.getIncomingAssociations();
     }
 

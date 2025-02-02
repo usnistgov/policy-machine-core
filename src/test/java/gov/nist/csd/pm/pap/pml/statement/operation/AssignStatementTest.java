@@ -34,8 +34,7 @@ class AssignStatementTest {
         ExecutionContext execCtx = new ExecutionContext(new TestUserContext("u1"), pap);
         stmt.execute(execCtx, pap);
 
-        assertTrue(Arrays.stream(pap.query().graph().getAdjacentDescendants(id("u1")))
-                .boxed().toList()
+        assertTrue(pap.query().graph().getAdjacentDescendants(id("u1"))
                 .containsAll(ids("ua1", "ua2", "ua3")));
     }
 
