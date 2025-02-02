@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.pml.expression.Expression;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.graph.GraphOp.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 
 public class CreatePolicyStatement extends OperationStatement<Long> {
 
