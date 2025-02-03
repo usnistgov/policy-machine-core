@@ -151,9 +151,7 @@ public class Type implements Serializable {
             } else if (isMap && type.isMap) {
                 return this.mapKeyType.equals(type.mapKeyType) &&
                         this.mapValueType.equals(type.mapValueType);
-            } else if (isPattern && type.isPattern) {
-                return true;
-            }
+            } else return isPattern && type.isPattern;
         }
 
         return false;

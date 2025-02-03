@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class GraphStoreDFS extends DepthFirstGraphWalker {
 
-    private GraphStore graphStore;
+    private final GraphStore graphStore;
 
     public GraphStoreDFS(GraphStore graphStore) {
         super(null);

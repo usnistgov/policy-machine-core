@@ -24,7 +24,7 @@ class ArrayLiteralTest {
 
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = Literal.compileLiteral(visitorContext, ctx);
-        assertTrue(expression instanceof ArrayLiteral);
+	    assertInstanceOf(ArrayLiteral.class, expression);
 
         ArrayLiteral a = (ArrayLiteral) expression;
         assertEquals(

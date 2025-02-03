@@ -19,9 +19,9 @@ import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.ARSET_OPERAND;
 
 public class AssociateStatement extends OperationStatement {
 
-    private Expression ua;
-    private Expression target;
-    private Expression accessRights;
+    private final Expression ua;
+    private final Expression target;
+    private final Expression accessRights;
 
     public AssociateStatement(Expression ua, Expression target, Expression accessRights) {
         super(new AssociateOp());

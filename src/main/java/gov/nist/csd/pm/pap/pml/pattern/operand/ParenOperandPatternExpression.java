@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class ParenOperandPatternExpression extends OperandPatternExpression {
 
-    private Pattern expression;
+    private final Pattern expression;
 
     public ParenOperandPatternExpression(Pattern expression) {
         this.expression = expression;

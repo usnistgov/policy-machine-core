@@ -60,11 +60,7 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDeleteInput(String name) throws PMException {
-        if (!store.obligations().obligationExists(name)) {
-            return false;
-        }
-
-        return true;
+	    return store.obligations().obligationExists(name);
     }
 
     private void checkAuthorExists(long author) throws PMException {

@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class UsernamePattern extends SubjectPatternExpression {
 
-    private String user;
+    private final String user;
 
     public UsernamePattern(StringLiteral user) {
         this.user = user.getValue();

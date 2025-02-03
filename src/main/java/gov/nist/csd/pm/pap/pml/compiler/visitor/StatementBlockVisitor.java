@@ -16,7 +16,7 @@ import java.util.List;
 
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
-    private Type returnType;
+    private final Type returnType;
 
     public StatementBlockVisitor(VisitorContext visitorCtx, Type returnType) {
         super(visitorCtx);

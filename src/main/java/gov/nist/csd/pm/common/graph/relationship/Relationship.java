@@ -69,11 +69,10 @@ public class Relationship implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Relationship)) {
+        if (!(o instanceof Relationship that)) {
             return false;
         }
-        Relationship that = (Relationship) o;
-        return Objects.equals(source, that.source) && Objects.equals(
+	    return Objects.equals(source, that.source) && Objects.equals(
                 target, that.target) && Objects.equals(accessRightSet, that.accessRightSet);
     }
 

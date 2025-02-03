@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class NodeOperandPattern extends OperandPatternExpression {
 
-    private String node;
+    private final String node;
 
     public NodeOperandPattern(StringLiteral node) {
         this.node = node.getValue();

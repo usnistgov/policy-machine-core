@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class PMLOperationWrapper extends PMLOperation {
 
-    private Operation<?> operation;
+    private final Operation<?> operation;
 
     public PMLOperationWrapper(Operation<?> operation) {
         super(

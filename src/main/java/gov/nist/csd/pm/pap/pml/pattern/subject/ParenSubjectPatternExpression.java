@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class ParenSubjectPatternExpression extends SubjectPatternExpression {
 
-    private Pattern expression;
+    private final Pattern expression;
 
     public ParenSubjectPatternExpression(Pattern expression) {
         this.expression = expression;

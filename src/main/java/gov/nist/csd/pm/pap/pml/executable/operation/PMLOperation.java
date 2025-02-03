@@ -15,8 +15,8 @@ import java.util.Map;
 
 public abstract class PMLOperation extends Operation<Value> {
 
-    private Type returnType;
-    private Map<String, Type> operandTypes;
+    private final Type returnType;
+    private final Map<String, Type> operandTypes;
     protected ExecutionContext ctx;
 
     public PMLOperation(String name,

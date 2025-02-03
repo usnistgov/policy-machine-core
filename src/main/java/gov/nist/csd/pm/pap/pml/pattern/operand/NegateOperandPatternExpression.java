@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class NegateOperandPatternExpression extends OperandPatternExpression {
 
-    private Pattern operandPatternExpression;
+    private final Pattern operandPatternExpression;
 
     public NegateOperandPatternExpression(Pattern operandPatternExpression) {
         this.operandPatternExpression = operandPatternExpression;

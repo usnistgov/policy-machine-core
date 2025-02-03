@@ -18,8 +18,8 @@ public abstract class ProhibitionOp extends Operation<Void> {
     public static final String INTERSECTION_OPERAND = "intersection";
     public static final String CONTAINERS_OPERAND = "containers";
 
-    private String processReqCap;
-    private String reqCap;
+    private final String processReqCap;
+    private final String reqCap;
 
     public ProhibitionOp(String opName, String processReqCap, String reqCap) {
         super(

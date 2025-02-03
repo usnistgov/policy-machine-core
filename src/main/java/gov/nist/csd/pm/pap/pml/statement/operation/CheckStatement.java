@@ -15,8 +15,8 @@ import java.util.Objects;
 
 public class CheckStatement implements PMLStatement {
 
-    private Expression arsExpr;
-    private Expression targetExpr;
+    private final Expression arsExpr;
+    private final Expression targetExpr;
 
     public CheckStatement(Expression arsExpr, Expression targetExpr) {
         this.arsExpr = arsExpr;

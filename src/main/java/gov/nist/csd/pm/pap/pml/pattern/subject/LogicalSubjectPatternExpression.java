@@ -9,9 +9,9 @@ import java.util.Objects;
 
 public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
 
-    private Pattern left;
-    private Pattern right;
-    private boolean isAnd;
+    private final Pattern left;
+    private final Pattern right;
+    private final boolean isAnd;
 
     public LogicalSubjectPatternExpression(Pattern left, Pattern right, boolean isAnd) {
         this.left = left;

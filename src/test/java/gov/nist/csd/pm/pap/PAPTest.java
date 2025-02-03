@@ -49,8 +49,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
         assertTrue(pap.query().graph().nodeExists("ua1"));
-        assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1")).iterator().next()
-                      .equals(new Association(id("ua1"), id("oa1"), new AccessRightSet())));
+	    assertEquals(pap.query().graph().getAssociationsWithSource(id("ua1")).iterator().next(), new Association(id("ua1"), id("oa1"), new AccessRightSet()));
 
         pap.beginTx();
         pap.modify().graph().deleteNode(id("ua1"));

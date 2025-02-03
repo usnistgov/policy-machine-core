@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class GraphStoreBFS extends BreadthFirstGraphWalker {
 
-    private GraphStore graphStore;
+    private final GraphStore graphStore;
 
     public GraphStoreBFS(GraphStore graphStore) {
         super(null);

@@ -34,12 +34,12 @@ import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
 
 public class CreateProhibitionStatement extends OperationStatement {
 
-    private Expression name;
-    private Expression subject;
-    private ProhibitionSubjectType subjectType;
-    private Expression accessRights;
-    private boolean isIntersection;
-    private Expression containers;
+    private final Expression name;
+    private final Expression subject;
+    private final ProhibitionSubjectType subjectType;
+    private final Expression accessRights;
+    private final boolean isIntersection;
+    private final Expression containers;
 
     public CreateProhibitionStatement(Expression name, Expression subject, ProhibitionSubjectType subjectType, Expression accessRights,
                                       boolean isIntersection, Expression containers) {

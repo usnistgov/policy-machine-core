@@ -12,11 +12,11 @@ import java.util.Map;
 
 public class PMLBootstrapper implements PolicyBootstrapper {
 
-    private UserContext boostrapper;
-    private String pml;
-    private List<PMLOperation> pmlOperations;
-    private List<PMLRoutine> pmlRoutines;
-    private Map<String, Value> pmlConstants;
+    private final UserContext boostrapper;
+    private final String pml;
+    private final List<PMLOperation> pmlOperations;
+    private final List<PMLRoutine> pmlRoutines;
+    private final Map<String, Value> pmlConstants;
 
     public PMLBootstrapper(UserContext boostrapper, String pml, List<PMLOperation> pmlOperations, List<PMLRoutine> pmlRoutines, Map<String, Value> pmlConstants) {
         this.boostrapper = boostrapper;

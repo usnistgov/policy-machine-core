@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class PMLStmtsOperation extends PMLOperation implements PMLStatementSerializable {
 
-    private PMLStmtsOperationBody body;
+    private final PMLStmtsOperationBody body;
 
     public PMLStmtsOperation(String name,
                              Type returnType,

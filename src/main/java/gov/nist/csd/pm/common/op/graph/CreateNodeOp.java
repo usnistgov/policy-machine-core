@@ -8,7 +8,7 @@ import java.util.*;
 
 public abstract class CreateNodeOp extends GraphOp<Long> {
 
-    private String ar;
+    private final String ar;
 
     public CreateNodeOp(String name, String ar) {
         super(

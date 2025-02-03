@@ -24,7 +24,7 @@ public class NegatedExpression extends Expression {
         return new NegatedExpression(expression);
     }
 
-    private Expression expression;
+    private final Expression expression;
 
     public NegatedExpression(Expression expression) {
         this.expression = expression;

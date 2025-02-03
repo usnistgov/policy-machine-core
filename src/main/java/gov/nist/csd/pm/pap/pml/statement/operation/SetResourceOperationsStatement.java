@@ -16,7 +16,7 @@ import static gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp.OPERAT
 
 public class SetResourceOperationsStatement extends OperationStatement {
 
-    private Expression ops;
+    private final Expression ops;
 
     public SetResourceOperationsStatement(Expression ops) {
         super(new SetResourceOperationsOp());

@@ -15,7 +15,7 @@ import java.util.stream.LongStream;
 
 public class MemoryUserExplainer {
 
-	private PolicyStore policyStore;
+	private final PolicyStore policyStore;
 
 	public MemoryUserExplainer(PolicyStore policyStore) {
 		this.policyStore = policyStore;

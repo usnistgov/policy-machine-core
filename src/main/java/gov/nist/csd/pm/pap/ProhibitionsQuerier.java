@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 
-    private GraphQuerier graphQuerier;
+    private final GraphQuerier graphQuerier;
 
     public ProhibitionsQuerier(PolicyStore store, GraphQuerier graphQuerier) {
         super(store);

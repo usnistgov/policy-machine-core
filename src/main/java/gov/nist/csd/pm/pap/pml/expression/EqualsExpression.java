@@ -24,9 +24,9 @@ public class EqualsExpression extends Expression {
         return new EqualsExpression(left, right, equalsExpressionContext.EQUALS() != null);
     }
 
-    private Expression left;
-    private Expression right;
-    private boolean isEquals;
+    private final Expression left;
+    private final Expression right;
+    private final boolean isEquals;
 
     public EqualsExpression(Expression left, Expression right, boolean isEquals) {
         this.left = left;

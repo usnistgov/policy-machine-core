@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class BreadthFirstGraphWalker implements GraphWalker {
 
-    private GraphQuery graphQuery;
+    private final GraphQuery graphQuery;
     private Direction direction;
     private Visitor visitor;
     private Propagator propagator;

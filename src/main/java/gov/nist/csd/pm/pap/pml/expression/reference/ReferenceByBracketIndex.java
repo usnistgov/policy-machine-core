@@ -16,8 +16,8 @@ import java.util.Objects;
 
 public class ReferenceByBracketIndex extends ReferenceByIndex{
 
-    private VariableReference varRef;
-    private Expression index;
+    private final VariableReference varRef;
+    private final Expression index;
 
     public ReferenceByBracketIndex(VariableReference varRef, Expression index) {
         this.varRef = varRef;

@@ -24,9 +24,9 @@ public class LogicalExpression extends Expression {
         return new LogicalExpression(left, right, logicalExpressionsContext.LOGICAL_AND() != null);
     }
 
-    private Expression left;
-    private Expression right;
-    private boolean isAnd;
+    private final Expression left;
+    private final Expression right;
+    private final boolean isAnd;
 
     public LogicalExpression(Expression left, Expression right, boolean isAnd) {
         this.left = left;

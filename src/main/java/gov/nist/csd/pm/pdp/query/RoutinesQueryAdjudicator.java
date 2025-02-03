@@ -14,8 +14,8 @@ import java.util.Collection;
 
 public class RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQuery {
 
-    private PAP pap;
-    private UserContext userCtx;
+    private final PAP pap;
+    private final UserContext userCtx;
     private final PrivilegeChecker privilegeChecker;
 
     public RoutinesQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {

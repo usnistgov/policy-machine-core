@@ -24,7 +24,7 @@ public class PMLCompilationException extends PMException {
 
     public PMLCompilationException(CompileError error) {
         super(error.errorMessage());
-        this.errors = Arrays.asList(error);
+        this.errors = List.of(error);
     }
 
     public List<CompileError> getErrors() {

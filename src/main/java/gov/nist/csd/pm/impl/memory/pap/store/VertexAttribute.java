@@ -14,10 +14,10 @@ import java.util.stream.Stream;
 
 class VertexAttribute extends Vertex {
 
-    private LongArrayList descendants;
-    private LongArrayList ascendants;
-    private ObjectArrayList<Association> outgoingAssociations;
-    private ObjectArrayList<Association> incomingAssociations;
+    private final LongArrayList descendants;
+    private final LongArrayList ascendants;
+    private final ObjectArrayList<Association> outgoingAssociations;
+    private final ObjectArrayList<Association> incomingAssociations;
 
     public VertexAttribute(long id, String name, NodeType type) {
         super(id, name, type);

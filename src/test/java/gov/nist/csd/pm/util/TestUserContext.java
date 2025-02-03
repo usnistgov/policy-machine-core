@@ -7,7 +7,7 @@ import static gov.nist.csd.pm.util.TestIdGenerator.id;
 
 public class TestUserContext extends UserContext {
 
-	private String userName;
+	private final String userName;
 
 	public TestUserContext(String userName) {
 		super(userName.hashCode(), null);

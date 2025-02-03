@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class InSubjectPattern extends SubjectPatternExpression {
 
-    private String container;
+    private final String container;
 
     public InSubjectPattern(StringLiteral container) {
         this.container = container.getValue();

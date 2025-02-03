@@ -71,9 +71,9 @@ public class FunctionInvokeExpression extends Expression {
         return new FunctionInvokeExpression(signature, operands);
     }
 
-    private PMLExecutableSignature signature;
-    private List<Expression> actualArgsList;
-    private Map<String, Expression> operands;
+    private final PMLExecutableSignature signature;
+    private final List<Expression> actualArgsList;
+    private final Map<String, Expression> operands;
 
     public FunctionInvokeExpression(PMLExecutableSignature signature, Map<String, Expression> actualOperands) {
         this.signature = signature;

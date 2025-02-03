@@ -15,8 +15,8 @@ public abstract class TxCmd implements TxRollbackSupport {
     
     static class SetResourceOperationsTxCmd extends TxCmd {
 
-        private AccessRightSet oldAccessRights;
-        private AccessRightSet newAccessRights;
+        private final AccessRightSet oldAccessRights;
+        private final AccessRightSet newAccessRights;
 
         public SetResourceOperationsTxCmd(AccessRightSet oldAccessRights, AccessRightSet newAccessRights) {
             this.oldAccessRights = oldAccessRights;
@@ -131,9 +131,9 @@ public abstract class TxCmd implements TxRollbackSupport {
     }
 
     static class DeleteAssociationTxCmd extends TxCmd {
-        private long ua;
-        private long target;
-        private AccessRightSet accessRightSet;
+        private final long ua;
+        private final long target;
+        private final AccessRightSet accessRightSet;
 
         public DeleteAssociationTxCmd(long ua, long target, AccessRightSet accessRightSet) {
             this.ua = ua;
@@ -210,7 +210,7 @@ public abstract class TxCmd implements TxRollbackSupport {
 
     static class CreateAdminRoutine extends TxCmd {
 
-        private Routine<?> routine;
+        private final Routine<?> routine;
 
         public CreateAdminRoutine(Routine<?> routine) {
             this.routine = routine;
@@ -224,7 +224,7 @@ public abstract class TxCmd implements TxRollbackSupport {
 
     static class DeleteAdminRoutine extends TxCmd {
 
-        private Routine<?> routine;
+        private final Routine<?> routine;
 
         public DeleteAdminRoutine(Routine<?> routine) {
             this.routine = routine;

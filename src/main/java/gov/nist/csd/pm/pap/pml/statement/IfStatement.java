@@ -13,9 +13,9 @@ import java.util.Objects;
 
 public class IfStatement extends ControlStatement {
 
-    private ConditionalBlock ifBlock;
-    private List<ConditionalBlock> ifElseBlocks;
-    private PMLStatementBlock elseBlockStatements;
+    private final ConditionalBlock ifBlock;
+    private final List<ConditionalBlock> ifElseBlocks;
+    private final PMLStatementBlock elseBlockStatements;
 
     public IfStatement(ConditionalBlock ifBlock, List<ConditionalBlock> ifElseBlocks, PMLStatementBlock elseBlock) {
         this.ifBlock = ifBlock;

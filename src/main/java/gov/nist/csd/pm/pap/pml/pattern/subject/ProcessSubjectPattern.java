@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class ProcessSubjectPattern extends SubjectPatternExpression {
 
-    private String process;
+    private final String process;
 
     public ProcessSubjectPattern(StringLiteral process) {
         this.process = process.getValue();

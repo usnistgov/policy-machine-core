@@ -13,7 +13,7 @@ import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 
 public class CreatePolicyStatement extends OperationStatement<Long> {
 
-    private Expression name;
+    private final Expression name;
 
     public CreatePolicyStatement(Expression name) {
         super(new CreatePolicyClassOp());

@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public class Scope<V, F> implements Serializable {
 
-    private GlobalScope<V, F> global;
-    private LocalScope<V> local;
+    private final GlobalScope<V, F> global;
+    private final LocalScope<V> local;
 
     public Scope(GlobalScope<V, F> global) {
         this.global = global;

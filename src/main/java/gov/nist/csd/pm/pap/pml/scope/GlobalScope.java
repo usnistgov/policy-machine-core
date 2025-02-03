@@ -7,8 +7,8 @@ import java.util.Objects;
 
 public abstract class GlobalScope<V, F> implements Serializable {
 
-    private Map<String, V> constants;
-    private Map<String, F> executables;
+    private final Map<String, V> constants;
+    private final Map<String, F> executables;
 
     protected GlobalScope() {
         constants = new HashMap<>();

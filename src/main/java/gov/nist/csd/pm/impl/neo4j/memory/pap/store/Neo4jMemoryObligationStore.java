@@ -17,7 +17,7 @@ import static gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jUtil.*;
 
 public class Neo4jMemoryObligationStore implements ObligationsStore {
 
-	private TxHandler txHandler;
+	private final TxHandler txHandler;
 
 	public Neo4jMemoryObligationStore(TxHandler txHandler) {
 		this.txHandler = txHandler;

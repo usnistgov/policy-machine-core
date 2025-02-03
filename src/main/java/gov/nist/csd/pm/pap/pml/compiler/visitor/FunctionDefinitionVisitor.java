@@ -92,7 +92,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<CreateFunctionStat
 
     public static class FunctionSignatureVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
 
-        private boolean isOp;
+        private final boolean isOp;
 
         public FunctionSignatureVisitor(VisitorContext visitorCtx, boolean isOp) {
             super(visitorCtx);

@@ -26,8 +26,8 @@ import static gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jUtil.*;
 
 public class Neo4jMemoryAccessQuerier extends AccessQuerier {
 
-	private Neo4jMemoryPolicyStore store;
-	private MemoryAccessQuerier memoryAccessQuerier;
+	private final Neo4jMemoryPolicyStore store;
+	private final MemoryAccessQuerier memoryAccessQuerier;
 
 	public Neo4jMemoryAccessQuerier(Neo4jMemoryPolicyStore store) {
 		super(store);

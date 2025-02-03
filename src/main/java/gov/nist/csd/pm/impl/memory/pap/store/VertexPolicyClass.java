@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.LongStream;
 
 class VertexPolicyClass extends Vertex {
-    private LongArrayList ascendants;
+    private final LongArrayList ascendants;
 
     public VertexPolicyClass(long id, String name) {
         super(id, name, NodeType.PC);

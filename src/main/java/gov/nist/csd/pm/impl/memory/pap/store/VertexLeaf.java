@@ -14,7 +14,7 @@ import java.util.stream.LongStream;
 
 class VertexLeaf extends Vertex {
 
-    private LongArrayList descendants;
+    private final LongArrayList descendants;
 
     public VertexLeaf(long id, String name, NodeType type) {
         super(id, name, type);

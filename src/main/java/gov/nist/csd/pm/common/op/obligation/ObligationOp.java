@@ -19,7 +19,7 @@ public abstract class ObligationOp extends Operation<Void> {
     public static final String AUTHOR_OPERAND = "author";
     public static final String RULES_OPERAND = "rules";
 
-    private String reqCap;
+    private final String reqCap;
 
     public ObligationOp(String opName, String reqCap) {
         super(

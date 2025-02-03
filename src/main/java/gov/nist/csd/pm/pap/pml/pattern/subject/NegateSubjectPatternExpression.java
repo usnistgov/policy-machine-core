@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class NegateSubjectPatternExpression extends SubjectPatternExpression {
 
-    private Pattern subjectPatternExpression;
+    private final Pattern subjectPatternExpression;
 
     public NegateSubjectPatternExpression(Pattern subjectPatternExpression) {
         this.subjectPatternExpression = subjectPatternExpression;

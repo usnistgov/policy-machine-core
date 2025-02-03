@@ -16,7 +16,7 @@ import java.util.*;
 
 public class MemoryUserEvaluator {
 
-	private PolicyStore policyStore;
+	private final PolicyStore policyStore;
 
 	public MemoryUserEvaluator(PolicyStore policyStore) {
 		this.policyStore = policyStore;

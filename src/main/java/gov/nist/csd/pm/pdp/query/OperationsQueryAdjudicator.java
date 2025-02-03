@@ -15,8 +15,8 @@ import java.util.Collection;
 
 public class OperationsQueryAdjudicator extends Adjudicator implements OperationsQuery {
 
-    private UserContext userCtx;
-    private PAP pap;
+    private final UserContext userCtx;
+    private final PAP pap;
     private final PrivilegeChecker privilegeChecker;
 
     public OperationsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {

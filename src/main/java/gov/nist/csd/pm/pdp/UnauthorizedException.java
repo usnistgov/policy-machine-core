@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public class UnauthorizedException extends PMException {
 
-    private Explain explain;
+    private final Explain explain;
 
     public UnauthorizedException(Explain explain, UserContext user, String target, Collection<String> missingAccessRights) {
         super(userString(user) + " does not have access right " + missingAccessRights + " on " + target);

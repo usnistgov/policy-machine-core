@@ -29,7 +29,7 @@ class BoolLiteralTest {
 
         VisitorContext visitorContext = new VisitorContext(globalScope);
         Expression expression = Literal.compileLiteral(visitorContext, ctx);
-        assertTrue(expression instanceof BoolLiteral);
+	    assertInstanceOf(BoolLiteral.class, expression);
 
         BoolLiteral a = (BoolLiteral) expression;
         assertEquals(

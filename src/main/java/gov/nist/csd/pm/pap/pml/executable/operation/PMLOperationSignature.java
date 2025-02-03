@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class PMLOperationSignature extends PMLExecutableSignature {
 
-    private List<String> nodeOperands;
+    private final List<String> nodeOperands;
 
     public PMLOperationSignature(String functionName, Type returnType, List<String> allOperands,
                                  List<String> nodeOperands, Map<String, Type> operandTypes) {

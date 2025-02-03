@@ -17,8 +17,8 @@ import static gov.nist.csd.pm.common.op.graph.GraphOp.PROPERTIES_OPERAND;
 
 public class SetNodePropertiesStatement extends OperationStatement {
 
-    private Expression nameExpr;
-    private Expression propertiesExpr;
+    private final Expression nameExpr;
+    private final Expression propertiesExpr;
 
     public SetNodePropertiesStatement(Expression nameExpr, Expression propertiesExpr) {
         super(new SetNodePropertiesOp());

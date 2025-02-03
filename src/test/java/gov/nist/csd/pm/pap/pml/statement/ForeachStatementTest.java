@@ -77,7 +77,7 @@ class ForeachStatementTest {
     }
 
     @Test
-    void testOverwriteValues() throws PMException, UnknownVariableInScopeException {
+    void testOverwriteValues() throws PMException {
         ForeachStatement stmt = new ForeachStatement("x", null, buildArrayLiteral("a", "b", "c"), List.of(
                 new VariableAssignmentStatement("test", false, new ReferenceByID("x"))
         ));

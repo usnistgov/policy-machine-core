@@ -10,8 +10,8 @@ import java.util.Map;
 
 public abstract class PMLRoutine extends Routine<Value> {
 
-    private Type returnType;
-    private Map<String, Type> operandTypes;
+    private final Type returnType;
+    private final Map<String, Type> operandTypes;
     protected ExecutionContext ctx;
 
     public PMLRoutine(String name, Type returnType, List<String> operandNames, Map<String, Type> operandTypes) {

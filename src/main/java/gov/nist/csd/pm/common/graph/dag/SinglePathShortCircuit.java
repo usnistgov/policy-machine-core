@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 
 public class SinglePathShortCircuit implements ShortCircuit {
 
-    private ShortCircuit shortCircuit;
+    private final ShortCircuit shortCircuit;
 
     public SinglePathShortCircuit(ShortCircuit shortCircuit) {
         this.shortCircuit = shortCircuit;

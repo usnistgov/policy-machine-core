@@ -15,8 +15,8 @@ import static gov.nist.csd.pm.common.op.graph.GraphOp.UA_OPERAND;
 
 public class DissociateStatement extends OperationStatement {
 
-    private Expression uaExpr;
-    private Expression targetExpr;
+    private final Expression uaExpr;
+    private final Expression targetExpr;
 
     public DissociateStatement(Expression uaExpr, Expression targetExpr) {
         super(new DissociateOp());

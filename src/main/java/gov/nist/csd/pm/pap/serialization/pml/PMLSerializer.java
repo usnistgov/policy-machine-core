@@ -90,15 +90,14 @@ public class PMLSerializer implements PolicySerializer {
     }
 
     private String jsonGraphToPML(List<JSONNode> pcs, Map<String, JSONNode> uaMap, Map<String, JSONNode> oaMap, Map<String, JSONNode> uMap, Map<String, JSONNode> oMap) {
-        StringBuilder pml = new StringBuilder();
 
-        pml.append(buildPolicyClassesPML(pcs));
-        pml.append(buildAttributesPML(pcs, uaMap, UA));
-        pml.append(buildAttributesPML(pcs, oaMap, OA));
-        pml.append(buildAssociations(uaMap));
-        pml.append(buildUsersAndObjectsPML(uMap, oMap));
+	    String pml = buildPolicyClassesPML(pcs) +
+			    buildAttributesPML(pcs, uaMap, UA) +
+			    buildAttributesPML(pcs, oaMap, OA) +
+			    buildAssociations(uaMap) +
+			    buildUsersAndObjectsPML(uMap, oMap);
 
-        return pml.toString();
+        return pml;
     }
 
     private String buildAssociations(Map<String, JSONNode> uas) {

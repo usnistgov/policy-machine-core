@@ -31,8 +31,8 @@ public class EPP implements EventSubscriber {
 
     private static class EPPEventSubscriber implements EventSubscriber {
 
-        private PDP pdp;
-        private PAP pap;
+        private final PDP pdp;
+        private final PAP pap;
 
         public EPPEventSubscriber(PDP pdp, PAP pap) {
             this.pdp = pdp;

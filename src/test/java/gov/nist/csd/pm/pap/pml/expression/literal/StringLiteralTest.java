@@ -24,7 +24,7 @@ class StringLiteralTest {
 
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = Literal.compileLiteral(visitorContext, ctx);
-        assertTrue(expression instanceof StringLiteral);
+	    assertInstanceOf(StringLiteral.class, expression);
 
         StringLiteral a = (StringLiteral) expression;
         assertEquals(
