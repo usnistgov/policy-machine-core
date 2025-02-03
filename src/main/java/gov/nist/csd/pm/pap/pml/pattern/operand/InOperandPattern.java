@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class InOperandPattern extends OperandPatternExpression {
 
-    private String container;
+    private final String container;
 
     public InOperandPattern(StringLiteral container) {
         this.container = container.getValue();

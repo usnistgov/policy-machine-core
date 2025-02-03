@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 
 public class RandomIdGenerator implements IdGenerator {
 
-	private SecureRandom secureRandom;
+	private final SecureRandom secureRandom;
 
 	public RandomIdGenerator() {
 		this.secureRandom = new SecureRandom();

@@ -936,7 +936,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(List.of("read")));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
     }
 
     @Test
@@ -956,7 +956,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
 
-        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(List.of("read")));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
     }
 
     @Test
@@ -1205,7 +1205,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
         pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
-        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(List.of("read")));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
     }
 
     @Test

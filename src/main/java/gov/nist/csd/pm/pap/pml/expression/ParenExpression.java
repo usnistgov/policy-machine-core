@@ -21,7 +21,7 @@ public class ParenExpression extends Expression{
         return new ParenExpression(Expression.compile(visitorCtx, expressionCtx, Type.any()));
     }
 
-    private Expression expression;
+    private final Expression expression;
 
     public ParenExpression(Expression expression) {
         this.expression = expression;

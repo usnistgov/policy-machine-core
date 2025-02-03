@@ -21,7 +21,7 @@ import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
 
 public class MemoryTargetEvaluator {
 
-	private PolicyStore policyStore;
+	private final PolicyStore policyStore;
 
 	public MemoryTargetEvaluator(PolicyStore policyStore) {
 		this.policyStore = policyStore;

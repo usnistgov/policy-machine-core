@@ -9,9 +9,9 @@ import java.util.Objects;
 
 public class LogicalOperandPatternExpression extends OperandPatternExpression {
 
-    private Pattern left;
-    private Pattern right;
-    private boolean isAnd;
+    private final Pattern left;
+    private final Pattern right;
+    private final boolean isAnd;
 
     public LogicalOperandPatternExpression(Pattern left, Pattern right, boolean isAnd) {
         this.left = left;

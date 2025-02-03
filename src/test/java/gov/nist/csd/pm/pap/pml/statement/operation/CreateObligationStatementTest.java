@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CreateObligationStatementTest {
 
     @Test
-    void testSuccess() throws PMException, PMException {
+    void testSuccess() throws PMException {
         CreateObligationStatement stmt = new CreateObligationStatement(new StringLiteral("o1"), List.of(
                 new CreateRuleStatement(
                         new StringLiteral("rule1"),

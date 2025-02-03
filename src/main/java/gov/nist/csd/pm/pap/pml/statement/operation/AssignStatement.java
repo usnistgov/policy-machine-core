@@ -18,8 +18,8 @@ import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
 
 public class AssignStatement extends OperationStatement {
 
-    private Expression ascendant;
-    private Expression descendants;
+    private final Expression ascendant;
+    private final Expression descendants;
 
     public AssignStatement(Expression ascendant, Expression descendants) {
         super(new AssignOp());

@@ -16,8 +16,8 @@ import java.util.Objects;
 
 public class DeassignStatement extends OperationStatement {
 
-    private Expression ascendant;
-    private Expression deassignFrom;
+    private final Expression ascendant;
+    private final Expression deassignFrom;
 
     public DeassignStatement(Expression ascendant, Expression deassignFrom) {
         super(new DeassignOp());

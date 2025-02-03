@@ -12,8 +12,8 @@ import java.util.Objects;
 
 public class PMLStmtsOperationBody extends ControlStatement {
 
-	private PMLStatementBlock checks;
-	private PMLStatementBlock statements;
+	private final PMLStatementBlock checks;
+	private final PMLStatementBlock statements;
 
 	public PMLStmtsOperationBody(PMLStatementBlock checks, PMLStatementBlock statements) {
 		this.checks = checks;

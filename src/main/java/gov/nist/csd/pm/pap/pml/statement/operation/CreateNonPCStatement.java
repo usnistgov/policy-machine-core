@@ -18,9 +18,9 @@ import static gov.nist.csd.pm.common.op.graph.CreateNodeOp.*;
 
 
 public class CreateNonPCStatement extends OperationStatement<Long> {
-    private Expression name;
-    private NodeType type;
-    private Expression assignTo;
+    private final Expression name;
+    private final NodeType type;
+    private final Expression assignTo;
 
     public CreateNonPCStatement(Expression name, NodeType type, Expression assignTo) {
         super(getOpFromType(type));

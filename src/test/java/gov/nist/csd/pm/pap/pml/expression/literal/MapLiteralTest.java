@@ -29,7 +29,7 @@ class MapLiteralTest {
 
         VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
         Expression expression = Literal.compileLiteral(visitorContext, ctx);
-        assertTrue(expression instanceof MapLiteral);
+	    assertInstanceOf(MapLiteral.class, expression);
 
         MapLiteral a = (MapLiteral) expression;
         assertEquals(

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class PrivilegeChecker {
 
-    private PAP pap;
+    private final PAP pap;
     private boolean explain;
 
     public PrivilegeChecker(PAP pap) {

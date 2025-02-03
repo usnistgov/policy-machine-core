@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class PMLRoutineWrapper extends PMLRoutine {
 
-    private Routine<?> routine;
+    private final Routine<?> routine;
 
     public PMLRoutineWrapper(Routine<?> routine) {
         super(

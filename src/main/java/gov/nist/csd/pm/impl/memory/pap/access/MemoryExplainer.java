@@ -18,7 +18,7 @@ import static gov.nist.csd.pm.pap.AccessRightResolver.*;
 
 public class MemoryExplainer {
 
-	private PolicyStore policyStore;
+	private final PolicyStore policyStore;
 
 	public MemoryExplainer(PolicyStore policyStore) {
 		this.policyStore = policyStore;

@@ -7,8 +7,8 @@ import gov.nist.csd.pm.pap.query.PolicyQuery;
 
 public class Neo4jMemoryPAP extends PAP {
 
-	private Neo4jMemoryPolicyStore policyStore;
-	private Neo4jMemoryPolicyQuerier policyQuerier;
+	private final Neo4jMemoryPolicyStore policyStore;
+	private final Neo4jMemoryPolicyQuerier policyQuerier;
 
 	public Neo4jMemoryPAP(Neo4jMemoryPolicyStore policyStore) throws PMException {
 		super(policyStore);

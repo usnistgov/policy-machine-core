@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PDPEventPublisher implements EventPublisher {
 
-    private List<EventSubscriber> epps;
+    private final List<EventSubscriber> epps;
 
     public PDPEventPublisher(List<EventSubscriber> epps) {
         this.epps = epps;

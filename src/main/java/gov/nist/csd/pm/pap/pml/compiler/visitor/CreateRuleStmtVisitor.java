@@ -46,8 +46,8 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
     static class SubjectPatternVisitor extends PMLBaseVisitor<SubjectPattern> {
 
-        private LiteralVisitor literalVisitor;
-        private SubjectPatternExpressionVisitor subjectPatternExpressionVisitor;
+        private final LiteralVisitor literalVisitor;
+        private final SubjectPatternExpressionVisitor subjectPatternExpressionVisitor;
 
         public SubjectPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
@@ -69,7 +69,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     static class SubjectPatternExpressionVisitor extends PMLBaseVisitor<SubjectPatternExpression> {
-        private LiteralVisitor literalVisitor;
+        private final LiteralVisitor literalVisitor;
         public SubjectPatternExpressionVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
             this.literalVisitor = new LiteralVisitor(visitorCtx);
@@ -117,7 +117,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
     static class OperationPatternVisitor extends PMLBaseVisitor<OperationPattern> {
 
-        private LiteralVisitor literalVisitor;
+        private final LiteralVisitor literalVisitor;
 
         public OperationPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
@@ -138,7 +138,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
     static class OperandPatternVisitor extends PMLBaseVisitor<OperandPatternExpression> {
 
-        private LiteralVisitor literalVisitor;
+        private final LiteralVisitor literalVisitor;
 
         public OperandPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);

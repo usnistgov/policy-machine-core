@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class PDPExecutionContext extends ExecutionContext {
 
-    private PDPTx pdpTx;
+    private final PDPTx pdpTx;
 
     public PDPExecutionContext(UserContext author, PDPTx pdpTx) throws PMException {
         super(author, pdpTx.pap);

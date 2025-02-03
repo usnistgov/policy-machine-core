@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class VertexWithProps extends Vertex{
 
-    private Vertex vertex;
-    private Map<String, String> properties;
+    private final Vertex vertex;
+    private final Map<String, String> properties;
 
     public VertexWithProps(long id, Vertex vertex, Map<String, String> properties) {
         super(id, vertex.name, vertex.type);

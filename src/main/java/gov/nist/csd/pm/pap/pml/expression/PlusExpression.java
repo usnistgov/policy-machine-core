@@ -24,8 +24,8 @@ public class PlusExpression extends Expression{
         );
     }
 
-    private Expression left;
-    private Expression right;
+    private final Expression left;
+    private final Expression right;
 
     public PlusExpression(Expression left, Expression right) {
         this.left = left;

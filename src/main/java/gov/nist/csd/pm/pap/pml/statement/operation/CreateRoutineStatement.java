@@ -18,7 +18,7 @@ import static gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp.ROUTINE_OPE
 
 public class CreateRoutineStatement extends PreparedOperation<Void> implements CreateFunctionStatement {
 
-    private PMLStmtsRoutine routine;
+    private final PMLStmtsRoutine routine;
 
     public CreateRoutineStatement(PMLStmtsRoutine routine) {
         super(new CreateAdminRoutineOp(), Map.of(ROUTINE_OPERAND, routine));

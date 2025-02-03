@@ -16,8 +16,8 @@ import java.util.Objects;
 
 public class ReferenceByDotIndex extends ReferenceByIndex{
 
-    private VariableReference varRef;
-    private String index;
+    private final VariableReference varRef;
+    private final String index;
 
     public ReferenceByDotIndex(VariableReference varRef, String index) {
         this.varRef = varRef;

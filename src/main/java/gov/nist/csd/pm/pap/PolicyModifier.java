@@ -10,11 +10,11 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
  */
 public class PolicyModifier extends Modifier implements PolicyModification {
 
-    private GraphModifier graphModifier;
-    private ProhibitionsModifier prohibitionsModifier;
-    private ObligationsModifier obligationsModifier;
-    private OperationsModifier operationsModifier;
-    private RoutinesModifier routinesModifier;
+    private final GraphModifier graphModifier;
+    private final ProhibitionsModifier prohibitionsModifier;
+    private final ObligationsModifier obligationsModifier;
+    private final OperationsModifier operationsModifier;
+    private final RoutinesModifier routinesModifier;
 
     public PolicyModifier(PolicyStore store, IdGenerator idGenerator) throws PMException {
         super(store);
