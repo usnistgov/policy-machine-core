@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.pml.pattern.operand;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 
 import java.util.Collection;
 

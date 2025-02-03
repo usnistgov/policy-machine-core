@@ -1,15 +1,14 @@
 package gov.nist.csd.pm.pap.modification;
 
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.common.exception.ObligationDoesNotExistException;
+import gov.nist.csd.pm.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Response;
 import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.common.exception.ObligationDoesNotExistException;
-import gov.nist.csd.pm.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

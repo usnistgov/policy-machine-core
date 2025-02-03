@@ -5,17 +5,18 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.expression.reference.VariableReference.compileVariableReference;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class VariableReferenceTest {
 

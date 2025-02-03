@@ -3,9 +3,12 @@ package gov.nist.csd.pm.pap.admin;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.*;
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
 
 public class AdminPolicy {
 

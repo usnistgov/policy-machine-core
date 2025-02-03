@@ -16,8 +16,8 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 
 public class MemoryTargetEvaluator {
 

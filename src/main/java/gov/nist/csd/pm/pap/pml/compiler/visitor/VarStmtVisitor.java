@@ -2,14 +2,11 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.statement.*;
-import gov.nist.csd.pm.pap.pml.statement.ShortDeclarationStatement;
-import gov.nist.csd.pm.pap.pml.statement.VariableAssignmentStatement;
-import gov.nist.csd.pm.pap.pml.statement.VariableDeclarationStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;

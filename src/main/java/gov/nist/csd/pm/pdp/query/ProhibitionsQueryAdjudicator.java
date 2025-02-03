@@ -2,17 +2,17 @@ package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.AdminAccessRights;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
-import java.util.*;
+import java.util.Collection;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.GET_PROCESS_PROHIBITIONS;
 import static gov.nist.csd.pm.pap.AdminAccessRights.GET_PROHIBITIONS;

@@ -5,7 +5,8 @@ import gov.nist.csd.pm.pap.PAP;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_PROCESS_PROHIBITION;
+import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_PROHIBITION;
 
 public class DeleteProhibitionOp extends ProhibitionOp {
 

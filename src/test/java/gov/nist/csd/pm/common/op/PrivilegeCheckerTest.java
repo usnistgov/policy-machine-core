@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.common.op;
 
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestPAP;
@@ -11,7 +11,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PrivilegeCheckerTest {
 

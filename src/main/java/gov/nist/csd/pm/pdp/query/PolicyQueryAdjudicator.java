@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.query.*;
+import gov.nist.csd.pm.pap.query.PolicyQuery;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 public class PolicyQueryAdjudicator implements PolicyQuery {
 

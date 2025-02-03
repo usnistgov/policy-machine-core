@@ -17,14 +17,13 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.common.graph.node.Properties.toProperties;
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
-import static gov.nist.csd.pm.pap.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
-
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class GraphModifierTest extends PAPTestInitializer {

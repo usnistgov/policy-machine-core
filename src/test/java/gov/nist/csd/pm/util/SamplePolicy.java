@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.util;
 
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.common.exception.PMException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

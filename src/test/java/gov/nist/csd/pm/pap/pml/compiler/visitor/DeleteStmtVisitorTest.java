@@ -3,14 +3,13 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteNodeStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteObligationStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteProhibitionStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.DeleteStatement;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;

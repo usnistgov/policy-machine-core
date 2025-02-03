@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.pap.pml.compiler.error.ErrorLog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PMLCompilationException extends PMException {

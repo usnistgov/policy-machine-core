@@ -1,16 +1,16 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;

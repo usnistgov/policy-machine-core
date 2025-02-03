@@ -7,9 +7,11 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.AdminAccessRights.DEASSIGN;
+import static gov.nist.csd.pm.pap.AdminAccessRights.DEASSIGN_FROM;
 
 public class DeassignOp extends GraphOp<Void> {
 

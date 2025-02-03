@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pdp;
 
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 
 import java.util.Collection;

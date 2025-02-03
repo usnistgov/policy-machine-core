@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.pap.query;
 
+import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
-import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
@@ -13,7 +13,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 

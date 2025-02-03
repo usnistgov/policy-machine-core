@@ -2,25 +2,20 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
+import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
-
-
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 

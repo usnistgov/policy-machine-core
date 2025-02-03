@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.routine.Routine;

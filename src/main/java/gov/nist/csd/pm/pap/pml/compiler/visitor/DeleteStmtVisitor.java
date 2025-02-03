@@ -1,9 +1,12 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.statement.operation.*;
+import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteNodeStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteObligationStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteProhibitionStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.DeleteStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 

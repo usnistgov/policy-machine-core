@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.common.op;
 
-import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.OperandsDoNotMatchException;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;

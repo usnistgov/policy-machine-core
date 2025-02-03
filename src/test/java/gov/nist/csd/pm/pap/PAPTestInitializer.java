@@ -4,7 +4,6 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.LongStream;

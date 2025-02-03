@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.pdp.modification;
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.op.graph.*;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pdp.PDP;
@@ -21,8 +20,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
-
-
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;

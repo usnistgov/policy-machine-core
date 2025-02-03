@@ -6,9 +6,11 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAP;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_PROCESS_PROHIBITION;
+import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_PROHIBITION;
 
 public class CreateProhibitionOp extends ProhibitionOp {
 

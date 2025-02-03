@@ -1,17 +1,10 @@
 package gov.nist.csd.pm.pap.pml.executable.operation;
 
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class PMLOperationSignature extends PMLExecutableSignature {
 

@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.common.exception.OperationExistsException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.common.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PAPTestInitializer;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

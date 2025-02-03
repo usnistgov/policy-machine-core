@@ -4,11 +4,11 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
+import gov.nist.csd.pm.pap.pml.statement.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateFunctionStatement;
-import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
-import gov.nist.csd.pm.pap.pml.statement.IfStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;

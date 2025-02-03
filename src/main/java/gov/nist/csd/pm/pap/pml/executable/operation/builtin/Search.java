@@ -9,7 +9,6 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 

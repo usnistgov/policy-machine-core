@@ -1,16 +1,14 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.LongStream;
 
 class VertexPolicyClass extends Vertex {
     private final LongArrayList ascendants;

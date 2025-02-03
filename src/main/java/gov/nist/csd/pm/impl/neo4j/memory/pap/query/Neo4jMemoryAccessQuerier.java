@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.impl.neo4j.memory.pap.query;
 
-import gov.nist.csd.pm.impl.memory.pap.access.MemoryAccessQuerier;
-import gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jMemoryPolicyStore;
-import gov.nist.csd.pm.pap.AccessQuerier;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.impl.memory.pap.access.MemoryAccessQuerier;
+import gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jMemoryPolicyStore;
+import gov.nist.csd.pm.pap.AccessQuerier;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;

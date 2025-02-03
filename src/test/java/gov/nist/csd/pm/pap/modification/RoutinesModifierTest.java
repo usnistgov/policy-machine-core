@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.common.exception.RoutineExistsException;
 import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static org.junit.jupiter.api.Assertions.*;

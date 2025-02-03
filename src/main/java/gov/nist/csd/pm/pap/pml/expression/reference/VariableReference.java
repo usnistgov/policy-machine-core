@@ -1,16 +1,12 @@
 package gov.nist.csd.pm.pap.pml.expression.reference;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.pap.pml.type.Type;
-
-import java.util.Map;
 
 public abstract class VariableReference extends Expression {
 

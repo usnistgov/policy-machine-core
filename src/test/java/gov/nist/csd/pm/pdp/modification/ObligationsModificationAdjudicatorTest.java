@@ -5,7 +5,6 @@ import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Response;
 import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
@@ -20,9 +19,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ObligationsModificationAdjudicatorTest {
 

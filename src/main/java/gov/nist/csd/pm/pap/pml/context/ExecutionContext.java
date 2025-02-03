@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.pap.pml.context;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.*;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
 
 import java.io.Serializable;
 import java.util.List;

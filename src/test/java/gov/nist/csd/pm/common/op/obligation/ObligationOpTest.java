@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.common.op.obligation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
@@ -16,9 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.common.op.obligation.ObligationOp.checkPatternPrivileges;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBLIGATION;
-
-import static gov.nist.csd.pm.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ObligationOpTest {
 

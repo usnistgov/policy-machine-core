@@ -8,7 +8,8 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.*;
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
 import static gov.nist.csd.pm.pap.pml.executable.operation.PMLBuiltinOperations.builtinFunctions;
 
 public class CompileGlobalScope extends GlobalScope<Variable, PMLExecutableSignature> {

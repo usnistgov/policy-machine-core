@@ -5,19 +5,17 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateProhibitionStatement;
-import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
+import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
 

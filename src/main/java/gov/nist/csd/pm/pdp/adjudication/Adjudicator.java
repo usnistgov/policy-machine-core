@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp.adjudication;
 
-import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 
 import java.util.List;

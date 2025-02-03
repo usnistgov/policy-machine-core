@@ -4,8 +4,6 @@ import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.id.IdGenerator;
 import it.unimi.dsi.fastutil.longs.LongList;
 
-import java.util.List;
-
 public class TestIdGenerator implements IdGenerator {
 	@Override
 	public long generateId(String name, NodeType type) {

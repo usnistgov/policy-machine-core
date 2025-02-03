@@ -2,14 +2,10 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
@@ -19,11 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;

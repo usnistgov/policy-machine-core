@@ -1,13 +1,16 @@
 package gov.nist.csd.pm.pap.pml;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLVisitor;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
@@ -17,16 +20,16 @@ import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.common.routine.Routine;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PMLCompiler {
 

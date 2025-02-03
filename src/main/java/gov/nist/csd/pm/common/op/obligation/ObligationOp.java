@@ -3,11 +3,11 @@ package gov.nist.csd.pm.common.op.obligation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pap.pml.pattern.Pattern;
-import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.pml.pattern.Pattern;
+import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 

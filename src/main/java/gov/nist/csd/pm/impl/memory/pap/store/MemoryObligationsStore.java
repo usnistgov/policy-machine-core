@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
+import gov.nist.csd.pm.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.pap.store.ObligationsStore;
 
 import java.util.ArrayList;

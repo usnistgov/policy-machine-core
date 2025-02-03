@@ -1,20 +1,18 @@
 package gov.nist.csd.pm.pdp;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.AdminAccessRights;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.AdminAccessRights;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PrivilegeCheckerTest {
 

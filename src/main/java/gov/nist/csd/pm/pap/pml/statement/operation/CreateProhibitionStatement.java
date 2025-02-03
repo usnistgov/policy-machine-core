@@ -4,12 +4,12 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
@@ -18,7 +18,6 @@ import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ComplementedValue;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 
@@ -27,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.ARSET_OPERAND;
 import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
+import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
 
 public class CreateProhibitionStatement extends OperationStatement {
 

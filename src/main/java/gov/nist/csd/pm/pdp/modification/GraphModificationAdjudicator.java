@@ -1,23 +1,19 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.op.graph.*;
-import gov.nist.csd.pm.pap.modification.GraphModification;
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.op.graph.*;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import org.neo4j.cypher.internal.ast.CreateUser;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.LongStream;
 
 import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.*;

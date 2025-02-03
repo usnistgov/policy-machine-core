@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.pap.pml.PMLErrorHandler;
-import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.expression.literal.Literal;
 import gov.nist.csd.pm.pap.pml.expression.reference.VariableReference;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -17,8 +17,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 public abstract class Expression implements PMLStatement {
 

@@ -2,8 +2,8 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.op.graph.AssignOp;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.common.op.graph.GraphOp.ASCENDANT_OPERAND;
-
 import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static org.junit.jupiter.api.Assertions.*;
 

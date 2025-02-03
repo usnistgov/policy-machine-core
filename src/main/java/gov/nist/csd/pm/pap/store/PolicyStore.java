@@ -1,12 +1,10 @@
 package gov.nist.csd.pm.pap.store;
 
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.tx.Transactional;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.LongStream;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.OA;
 import static gov.nist.csd.pm.common.graph.node.NodeType.PC;

@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.pml.pattern;
 
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.store.GraphStore;
 

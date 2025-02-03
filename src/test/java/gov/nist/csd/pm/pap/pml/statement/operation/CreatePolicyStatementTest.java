@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CreatePolicyStatementTest {
 

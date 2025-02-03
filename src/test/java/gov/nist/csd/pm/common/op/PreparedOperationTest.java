@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.common.op;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +12,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.common.op.graph.GraphOp.ASCENDANT_OPERAND;
 import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PreparedOperationTest {
 

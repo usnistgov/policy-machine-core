@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.common.op.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;

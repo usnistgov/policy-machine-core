@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
-import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
-
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.type.Type;
 

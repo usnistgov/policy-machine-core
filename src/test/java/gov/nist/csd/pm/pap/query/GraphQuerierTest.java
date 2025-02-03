@@ -1,25 +1,27 @@
 package gov.nist.csd.pm.pap.query;
 
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.common.graph.node.Properties.toProperties;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class GraphQuerierTest extends PAPTestInitializer {
 

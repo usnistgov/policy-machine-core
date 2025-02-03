@@ -9,9 +9,9 @@ import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CreateOperationStatementTest {
 

@@ -3,15 +3,15 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CreatePolicyStmtVisitorTest {
 

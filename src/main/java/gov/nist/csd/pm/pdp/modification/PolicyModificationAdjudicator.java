@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.event.EventPublisher;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.modification.*;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 

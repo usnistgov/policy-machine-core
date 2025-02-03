@@ -1,15 +1,16 @@
 package gov.nist.csd.pm.common.op.prohibition;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public abstract class ProhibitionOp extends Operation<Void> {
 

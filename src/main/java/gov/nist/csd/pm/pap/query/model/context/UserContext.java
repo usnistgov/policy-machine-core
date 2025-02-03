@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pap.store.GraphStore;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 public class UserContext implements Serializable {

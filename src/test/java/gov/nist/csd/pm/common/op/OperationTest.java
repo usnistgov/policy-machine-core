@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.common.op.graph.GraphOp.ASCENDANT_OPERAND;
-
 import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OperationTest {
 

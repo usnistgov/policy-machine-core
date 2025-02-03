@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.pap;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
+import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import gov.nist.csd.pm.util.TestPAP;
@@ -16,9 +16,8 @@ import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.*;
-
-
+import java.util.Collection;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 

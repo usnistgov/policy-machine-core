@@ -1,13 +1,11 @@
 package gov.nist.csd.pm.common.op;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 

@@ -9,14 +9,11 @@ import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PolicyEquals {
 

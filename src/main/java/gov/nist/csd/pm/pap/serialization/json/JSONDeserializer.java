@@ -2,14 +2,14 @@ package gov.nist.csd.pm.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.query.GraphQuery;
-import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.query.GraphQuery;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 
 import java.util.*;
 import java.util.stream.Collectors;

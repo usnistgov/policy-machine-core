@@ -1,26 +1,26 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.statement.IfStatement;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.ShortDeclarationStatement;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class IfStmtVisitorTest {
 

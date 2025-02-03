@@ -1,20 +1,24 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.UnknownPatternException;
-import gov.nist.csd.pm.common.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.common.op.obligation.CreateObligationOp;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
-import static gov.nist.csd.pm.common.op.obligation.ObligationOp.*;
+import static gov.nist.csd.pm.common.op.graph.GraphOp.NAME_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_OPERAND;
+import static gov.nist.csd.pm.common.op.obligation.ObligationOp.RULES_OPERAND;
 
 
 public class CreateObligationStatement extends OperationStatement<Void> {

@@ -2,10 +2,10 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
 import java.io.Serializable;
 import java.util.List;

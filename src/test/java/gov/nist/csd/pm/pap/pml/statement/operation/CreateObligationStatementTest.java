@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.assertEquals;

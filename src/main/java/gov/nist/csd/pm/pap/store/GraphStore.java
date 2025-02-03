@@ -5,8 +5,8 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.common.tx.Transactional;
+import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
 
 import java.util.Collection;
 import java.util.Map;

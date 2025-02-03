@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap.pml.context;
 import gov.nist.csd.pm.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.error.ErrorLog;
-import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
