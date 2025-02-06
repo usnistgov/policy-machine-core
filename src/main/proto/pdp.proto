@@ -21,13 +21,19 @@ message AdjudicationResponse {
 }
 
 // resource
-message ResourceOperationRequest {
+message ResourceOperationRequestByName {
   string operation = 1;
   string target = 2;
 }
 
+message ResourceOperationRequestById {
+  string operation = 1;
+  int64 target = 2;
+}
+
 service ResourcePDP {
-  rpc AdjudicateResourceOperation(ResourceOperationRequest) returns (AdjudicationResponse) {}
+  rpc AdjudicateResourceOperationByName(ResourceOperationRequestByName) returns (AdjudicationResponse) {}
+  rpc AdjudicateResourceOperationById(ResourceOperationRequestById) returns (AdjudicationResponse) {}
 }
 
 // admin

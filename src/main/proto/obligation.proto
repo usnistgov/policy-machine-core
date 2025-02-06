@@ -8,7 +8,7 @@ package gov.nist.csd.pm.proto.obligation;
 
 message CreateObligationOp {
   string name = 1;
-  string author = 2;
+  int64 author = 2;
   string pml = 3;
 }
 

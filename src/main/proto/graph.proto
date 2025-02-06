@@ -7,55 +7,59 @@ option java_outer_classname = "GraphProto";
 package gov.nist.csd.pm.proto.graph;
 
 message AssignOp {
-  string ascendant = 1;
-  repeated string descendants = 2;
+  int64 ascendant = 1;
+  repeated int64 descendants = 2;
 }
 
 message AssociateOp {
-  string ua = 1;
-  string target = 2;
+  int64 ua = 1;
+  int64 target = 2;
   repeated string arset = 3;
 }
 
 message CreatePolicyClassOp {
-  string name = 1;
+  int64 id = 1;
 }
 
 message CreateUserAttributeOp {
-  string name = 1;
-  repeated string descendants = 2;
+  int64 id = 1;
+  string name = 2;
+  repeated string descendants = 3;
 }
 
 message CreateObjectAttributeOp {
-  string name = 1;
-  repeated string descendants = 2;
+  int64 id = 1;
+  string name = 2;
+  repeated string descendants = 3;
 }
 
 message CreateUserOp {
-  string name = 1;
-  repeated string descendants = 2;
+  int64 id = 1;
+  string name = 2;
+  repeated string descendants = 3;
 }
 
 message CreateObjectOp {
-  string name = 1;
-  repeated string descendants = 2;
+  int64 id = 1;
+  string name = 2;
+  repeated string descendants = 3;
 }
 
 message DeassignOp {
-  string ascendant = 1;
-  repeated string descendants = 2;
+  int64 ascendant = 1;
+  repeated int64 descendants = 2;
 }
 
 message DeleteNodeOp {
-  string name = 1;
+  int64 id = 1;
 }
 
 message DissociateOp {
-  string ua = 1;
-  string target = 2;
+  int64 ua = 1;
+  int64 target = 2;
 }
 
 message SetNodePropertiesOp {
-  string name = 1;
+  int64 id = 1;
   map<string, string> properties = 2;
 }
