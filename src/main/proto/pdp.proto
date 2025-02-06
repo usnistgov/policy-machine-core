@@ -51,8 +51,13 @@ message NamedAdminRoutineRequest {
   repeated gov.nist.csd.pm.proto.epp.OperandEntry operands = 2;
 }
 
+message ExecutePmlRequest {
+  string pml = 1;
+}
+
 service AdminPDP {
   rpc AdjudicateAdminOperation(AdminOperationRequest) returns (AdjudicationResponse) {}
   rpc AdjudicateAdminRoutine(AdminRoutineRequest) returns (AdjudicationResponse) {}
   rpc AdjudicateNamedAdminRoutine(NamedAdminRoutineRequest) returns (AdjudicationResponse) {}
+  rpc ExecutePml(ExecutePmlRequest) returns (AdjudicationResponse) {}
 }
