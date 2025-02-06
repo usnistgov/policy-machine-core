@@ -81,8 +81,8 @@ public class Node implements Serializable {
         this.properties = properties;
     }
 
-    public String getIdAndName() {
-        return id + ":" + name;
+    public String nameAndId() {
+        return name + ":" + id;
     }
 
     @Override

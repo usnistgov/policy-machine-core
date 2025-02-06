@@ -66,18 +66,29 @@ class PDPTest {
         assertTrue(pap.query().graph().nodeExists("oa1"));
     }
 
-
     @Test
     void testBootstrapWithAdminPolicyOnly() throws PMException {
         PAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
 
-        pdp.bootstrap(p -> {
-            p.modify().graph().createPolicyClass("pc1");
+        pdp.bootstrap("u1", (u, p) -> {
+            long pc1 = p.modify().graph().createPolicyClass("pc1");
+            long ua1 = p.modify().graph().createUserAttribute("ua1", List.of(pc1));
+            p.modify().graph().assign(u.getUser(), List.of(ua1));
         });
 
         testAdminPolicy(pap);
         assertTrue(pap.query().graph().nodeExists("pc1"));
+    }
+
+    @Test
+    void testBootstrapThrowsExceptionWhenUserNotAssigned() throws PMException {
+        PAP pap = new TestPAP();
+        PDP pdp = new PDP(pap);
+
+        assertThrows(DisconnectedNodeException.class, () -> pdp.bootstrap("u1", (u, p) -> {
+            long pc1 = p.modify().graph().createPolicyClass("pc1");
+        }));
     }
 
     @Test
@@ -86,7 +97,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pap.modify().graph().createPolicyClass("pc1");
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap((policy) -> {});
+            pdp.bootstrap("u1", (user, policy) -> {});
         });
 
         pap.reset();
@@ -104,13 +115,13 @@ class PDPTest {
                 Collections.singleton(new ContainerCondition(id("oa1"), false)));
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap((policy) -> {});
+            pdp.bootstrap("u1", (user, policy) -> {});
         });
 
         pap.modify().obligations().createObligation(id("u1"), "obl1", List.of());
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap((policy) -> {});
+            pdp.bootstrap("u1", (u, policy) -> {});
         });
     }
 

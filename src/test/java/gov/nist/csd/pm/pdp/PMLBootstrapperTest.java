@@ -11,7 +11,6 @@ import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.util.TestPAP;
-import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,7 +34,7 @@ class PMLBootstrapperTest {
                 
                 associate "ua1" and "oa1" with ["read"]
                 
-                create user "u1" in ["ua1"]
+                assign "u1" to ["ua1"]
                 
                 op1()
                 
@@ -66,10 +65,10 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap(new PMLBootstrapper(new TestUserContext("u1"), input,
-                List.of(new PMLOperationWrapper(op1)),
-                List.of(new PMLRoutineWrapper(routine1)),
-                Map.of("TEST_CONST", new StringValue("TEST_PC"))
+        pdp.bootstrap("u1", new PMLBootstrapper(input,
+                                          List.of(new PMLOperationWrapper(op1)),
+                                          List.of(new PMLRoutineWrapper(routine1)),
+                                          Map.of("TEST_CONST", new StringValue("TEST_PC"))
         ));
 
         assertTrue(pap.query().graph().nodeExists("pc1"));

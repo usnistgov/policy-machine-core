@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
+import gov.nist.csd.pm.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
@@ -26,6 +27,7 @@ import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 import java.util.*;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.common.graph.node.NodeType.U;
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
@@ -55,6 +57,13 @@ public class PDP implements EventPublisher, AccessAdjudication {
         return privilegeChecker.isExplain();
     }
 
+    /**
+     * Run a transaction as the given user.
+     * @param userCtx The user.
+     * @param txRunner The tx runner to execute the transaction.
+     * @return an Object if the tx runner returns something.
+     * @throws PMException if there is an error executing the transaction.
+     */
     public Object runTx(UserContext userCtx, PDPTxRunner txRunner) throws PMException {
         return TxRunner.runTx(pap, () -> {
             PDPTx pdpTx = new PDPTx(userCtx, privilegeChecker, pap, eventSubscribers);
@@ -62,6 +71,12 @@ public class PDP implements EventPublisher, AccessAdjudication {
         });
     }
 
+    /**
+     * Execute PML on behalf of the user. The entire PML string will be executed in a transaction.
+     * @param userCtx the user.
+     * @param pml the PML.
+     * @throws PMException tf there is an error executing the PML.
+     */
     public void executePML(UserContext userCtx, String pml) throws PMException {
         runTx(userCtx, tx -> {
             tx.executePML(userCtx, pml);
@@ -69,28 +84,37 @@ public class PDP implements EventPublisher, AccessAdjudication {
         });
     }
 
-    public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
+    /**
+     * Bootstrap the policy with the given PolicyBootstrapper object. The bootstrapping user is the user that will
+     * go no record as being the author of any obligations created by the bootstrapper. This user will be created outside
+     * the PolicyBootstrapper and already exists when the bootstrapper is executed. The bootstrap user must be assigned
+     * to attributes within the PolicyBootstrapper or an exception will be thrown.
+     * @param bootstrapUser the name of the user bootstrapping the policy.
+     * @param bootstrapper the PolicyBootstrapper that will build the custom bootstrap policy.
+     * @throws PMException if there is an error bootstrapping.
+     */
+    public void bootstrap(String bootstrapUser, PolicyBootstrapper bootstrapper) throws PMException {
         if(!isPolicyEmpty()) {
             throw new BootstrapExistingPolicyException();
         }
 
-        bootstrapper.bootstrap(pap);
-    }
+        // create bootstrap policy and user
+        long pc = pap.modify().graph().createPolicyClass("bootstrap");
+        long ua = pap.modify().graph().createUserAttribute("bootstrapper", List.of(pc));
+        long bootstrapUserId = pap.modify().graph().createUserAttribute(bootstrapUser, List.of(ua));
 
-    private boolean isPolicyEmpty() throws PMException {
-        HashSet<Node> nodes = new HashSet<>(pap.query().graph().search(ANY, NO_PROPERTIES));
+        // execute the bootstrapper to build the policy
+        bootstrapper.bootstrap(new UserContext(bootstrapUserId), pap);
 
-        boolean prohibitionsEmpty = pap.query().prohibitions().getProhibitions().isEmpty();
-        boolean obligationsEmpty = pap.query().obligations().getObligations().isEmpty();
-        boolean resOpsEmpty = pap.query().operations().getResourceOperations().isEmpty();
+        // clean up bootstrap policy
+        pap.modify().graph().deassign(bootstrapUserId, List.of(ua));
+        pap.modify().graph().deleteNode(ua);
+        pap.modify().graph().deleteNode(pc);
 
-        Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
-        boolean adminOpsEmpty = adminOperationNames.size() == AdminOperations.ADMIN_OP_NAMES.size()
-                && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
-        boolean routinesEmpty = pap.query().routines().getAdminRoutineNames().isEmpty();
-
-        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&
-                prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
+        // verify bootstrap user is assigned to at least one attribute
+        if (pap.query().graph().getAdjacentDescendants(bootstrapUserId).isEmpty()) {
+            throw new DisconnectedNodeException(bootstrapUser, U);
+        }
     }
 
     @Override
@@ -132,37 +156,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
         ));
 
         return new AdjudicationResponse(GRANT, node);
-    }
-
-    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
-        Operation<?> operation = pap.query()
-                .operations()
-                .getAdminOperation(name);
-
-        if (AdminOperations.ADMIN_OP_NAMES.contains(operation.getName())) {
-            throw new PMException("policy machine admin ops should be called directly through the runTx method");
-        }
-
-        if (operation instanceof PMLOperation) {
-            ((PMLOperation)operation).setCtx(ctx);
-        }
-
-        // execute operation
-        Object ret = pdpTx.executeAdminExecutable(operation, operands);
-
-        // send to EPP
-        publishEvent(new EventContext(
-                pap.query().graph().getNodeById(user.getUser()).getName(),
-                user.getProcess(),
-                operation,
-                operands
-        ));
-
-        if (ret instanceof Value value) {
-            return value.toObject();
-        }
-
-        return ret;
     }
 
     @Override
@@ -223,4 +216,52 @@ public class PDP implements EventPublisher, AccessAdjudication {
             return new AdjudicationResponse(e);
         }
     }
+
+    private boolean isPolicyEmpty() throws PMException {
+        HashSet<Node> nodes = new HashSet<>(pap.query().graph().search(ANY, NO_PROPERTIES));
+
+        boolean prohibitionsEmpty = pap.query().prohibitions().getProhibitions().isEmpty();
+        boolean obligationsEmpty = pap.query().obligations().getObligations().isEmpty();
+        boolean resOpsEmpty = pap.query().operations().getResourceOperations().isEmpty();
+
+        Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
+        boolean adminOpsEmpty = adminOperationNames.size() == AdminOperations.ADMIN_OP_NAMES.size()
+                && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
+        boolean routinesEmpty = pap.query().routines().getAdminRoutineNames().isEmpty();
+
+        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&
+                prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
+    }
+
+    private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
+        Operation<?> operation = pap.query()
+                .operations()
+                .getAdminOperation(name);
+
+        if (AdminOperations.ADMIN_OP_NAMES.contains(operation.getName())) {
+            throw new PMException("policy machine admin ops should be called directly through the runTx method");
+        }
+
+        if (operation instanceof PMLOperation) {
+            ((PMLOperation)operation).setCtx(ctx);
+        }
+
+        // execute operation
+        Object ret = pdpTx.executeAdminExecutable(operation, operands);
+
+        // send to EPP
+        publishEvent(new EventContext(
+                pap.query().graph().getNodeById(user.getUser()).getName(),
+                user.getProcess(),
+                operation,
+                operands
+        ));
+
+        if (ret instanceof Value value) {
+            return value.toObject();
+        }
+
+        return ret;
+    }
+
 }

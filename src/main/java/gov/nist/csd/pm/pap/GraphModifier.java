@@ -193,7 +193,7 @@ public class GraphModifier extends Modifier implements GraphModification {
 
         if (!ascendants.isEmpty()) {
             Node node = store.graph().getNodeById(id);
-            throw new NodeHasAscendantsException(node.getIdAndName());
+            throw new NodeHasAscendantsException(node.nameAndId());
         }
 
         checkIfNodeInProhibition(id);
@@ -215,7 +215,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(id, p)) {
                     Node node = store.graph().getNodeById(id);
-                    throw new NodeReferencedInProhibitionException(node.getIdAndName(), p.getName());
+                    throw new NodeReferencedInProhibitionException(node.nameAndId(), p.getName());
                 }
             }
         }
@@ -235,7 +235,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         for (Obligation obligation : obligations) {
             // if the node is the author of the obligation or referenced in any rules throw an exception
             if (obligation.getAuthorId() == id) {
-                throw new NodeReferencedInObligationException(node.getIdAndName(), obligation.getName());
+                throw new NodeReferencedInObligationException(node.nameAndId(), obligation.getName());
             }
 
             // check if node referenced in pattern
@@ -255,7 +255,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                 }
 
                 if (referenced) {
-                    throw new NodeReferencedInObligationException(node.getIdAndName(), obligation.getName());
+                    throw new NodeReferencedInObligationException(node.nameAndId(), obligation.getName());
                 }
             }
         }
@@ -329,7 +329,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         if (descs.size() == 1) {
             Node aNode = store.graph().getNodeById(ascendant);
             Node dNode = store.graph().getNodeById(descendant);
-            throw new DisconnectedNodeException(aNode.getIdAndName(), dNode.getIdAndName());
+            throw new DisconnectedNodeException(aNode.nameAndId(), dNode.nameAndId());
         }
 
         return true;

@@ -12,14 +12,12 @@ import java.util.Map;
 
 public class PMLBootstrapper implements PolicyBootstrapper {
 
-    private final UserContext boostrapper;
     private final String pml;
     private final List<PMLOperation> pmlOperations;
     private final List<PMLRoutine> pmlRoutines;
     private final Map<String, Value> pmlConstants;
 
-    public PMLBootstrapper(UserContext boostrapper, String pml, List<PMLOperation> pmlOperations, List<PMLRoutine> pmlRoutines, Map<String, Value> pmlConstants) {
-        this.boostrapper = boostrapper;
+    public PMLBootstrapper(String pml, List<PMLOperation> pmlOperations, List<PMLRoutine> pmlRoutines, Map<String, Value> pmlConstants) {
         this.pml = pml;
         this.pmlOperations = pmlOperations;
         this.pmlRoutines = pmlRoutines;
@@ -27,10 +25,10 @@ public class PMLBootstrapper implements PolicyBootstrapper {
     }
 
     @Override
-    public void bootstrap(PAP pap) throws PMException {
+    public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
         pap.setPMLOperations(pmlOperations.toArray(PMLOperation[]::new));
         pap.setPMLRoutines(pmlRoutines.toArray(PMLRoutine[]::new));
         pap.setPMLConstants(pmlConstants);
-        pap.executePML(boostrapper, pml);
+        pap.executePML(bootstrapUser, pml);
     }
 }
