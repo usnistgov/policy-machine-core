@@ -45,6 +45,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     public PAP(PAP pap) throws PMException {
         this(pap.policyStore);
+        this.modifier.setIdGenerator(pap.idGenerator());
     }
 
     public PAP withIdGenerator(IdGenerator idGenerator) {
@@ -54,6 +55,10 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     public PolicyStore policyStore() {
         return policyStore;
+    }
+
+    public IdGenerator idGenerator() {
+        return modifier.getIdGenerator();
     }
 
     public abstract PolicyQuery query();
