@@ -62,7 +62,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
     }
 
     public IdGenerator idGenerator() {
-        return modifier.getIdGenerator();
+        return this.idGenerator;
     }
 
     public abstract PolicyQuery query();
