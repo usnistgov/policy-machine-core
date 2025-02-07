@@ -31,10 +31,13 @@ public abstract class PAP implements AdminExecutor, Transactional {
     private Map<String, PMLOperation> pmlOperations;
     private Map<String, PMLRoutine> pmlRoutines;
     private Map<String, Value> pmlConstants;
+    private IdGenerator idGenerator;
 
     public PAP(PolicyStore policyStore) throws PMException {
+        this.idGenerator = new RandomIdGenerator();
+
         this.policyStore = policyStore;
-        this.modifier = new PolicyModifier(policyStore, new RandomIdGenerator());
+        this.modifier = new PolicyModifier(policyStore, idGenerator);
         this.pmlOperations = new HashMap<>();
         this.pmlRoutines = new HashMap<>();
         this.pmlConstants = new HashMap<>();
@@ -45,10 +48,11 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     public PAP(PAP pap) throws PMException {
         this(pap.policyStore);
-        this.modifier.setIdGenerator(pap.idGenerator());
+        this.withIdGenerator(pap.idGenerator);
     }
 
     public PAP withIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
         this.modifier.setIdGenerator(idGenerator);
         return this;
     }
