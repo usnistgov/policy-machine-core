@@ -20,7 +20,7 @@ public class EPP implements EventSubscriber {
     private final PAP pap;
     private final PDP pdp;
 
-    public EPP(PDP pdp, PAP pap) throws PMException {
+    public EPP(PDP pdp, PAP pap) {
         this.pap = pap;
         this.pdp = pdp;
     }
