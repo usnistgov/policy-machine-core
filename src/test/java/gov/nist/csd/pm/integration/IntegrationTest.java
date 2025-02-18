@@ -47,6 +47,8 @@ class IntegrationTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
+
         pdp.runTx(new UserContext(id("u1")), tx -> {
             tx.modify().graph().createPolicyClass("test2");
 
@@ -87,6 +89,7 @@ class IntegrationTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
         pdp.runTx(new UserContext(id("u1")), tx -> {
             tx.modify().graph().createPolicyClass("test2");
             return null;
@@ -129,6 +132,7 @@ class IntegrationTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         pdp.adjudicateAdminOperation(new UserContext(id("u1")), "op2", Map.of());
 
@@ -165,6 +169,7 @@ class IntegrationTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
 

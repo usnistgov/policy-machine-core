@@ -152,6 +152,7 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         AdjudicationResponse response = pdp.adjudicateAdminOperation(
                 new UserContext(id("u1")),
@@ -210,6 +211,8 @@ class EPPTest {
                 """);
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
+
         AdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext(id("u1")), id("oa1"), "read");
         assertEquals(GRANT, response.getDecision());
 
@@ -221,6 +224,7 @@ class EPPTest {
         MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """
                 create pc "pc1"
@@ -257,6 +261,7 @@ class EPPTest {
         MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """                
                 create pc "pc1"
@@ -302,6 +307,7 @@ class EPPTest {
         MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         pap.runTx((txPAP) -> {
             txPAP.modify().graph().createPolicyClass("pc1");
@@ -379,6 +385,7 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """                
                 create pc "pc1"
@@ -418,6 +425,7 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """                
                 create pc "pc1"
@@ -487,6 +495,7 @@ class EPPTest {
         MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
         pap.executePML(new TestUserContext("u1"), pml);
         pdp.runTx(new TestUserContext("u1"), (txPDP) -> txPDP.modify().graph().createPolicyClass("u1_pc"));
         assertTrue(pap.query().graph().nodeExists("test_pc"));
@@ -497,6 +506,7 @@ class EPPTest {
         pap.reset();
         PDP pdp2 = new PDP(pap);
         epp = new EPP(pdp2, pap);
+        epp.subscribeTo(pdp2);
 
         pap.executePML(new TestUserContext("u2"), pml);
         assertThrows(UnauthorizedException.class, () -> pdp2.runTx(new UserContext(id("u2")), (txPDP) -> txPDP.modify().graph().createPolicyClass("u2_pc")));

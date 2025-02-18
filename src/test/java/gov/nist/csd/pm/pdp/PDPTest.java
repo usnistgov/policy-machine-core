@@ -425,6 +425,7 @@ class PDPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
         pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
         assertFalse(pap.query().graph().nodeExists("test"));
     }
@@ -458,6 +459,7 @@ class PDPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), List.of(
                 new OperationRequest("op1", Map.of("name", "pc2")),

@@ -53,6 +53,7 @@ class ProhibitionsModificationAdjudicatorTest {
 
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
+	    epp.subscribeTo(pdp);
 
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
