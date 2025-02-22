@@ -31,7 +31,7 @@ public class MemoryUserEvaluator {
 	 *
 	 * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
 	 */
-	protected UserDagResult evaluate(UserContext userCtx) throws PMException {
+	public UserDagResult evaluate(UserContext userCtx) throws PMException {
 		userCtx.checkExists(policyStore.graph());
 
 		final Map<Long, AccessRightSet> borderTargets = new HashMap<>();
