@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.pap.pml.statement.VariableAssignmentStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;

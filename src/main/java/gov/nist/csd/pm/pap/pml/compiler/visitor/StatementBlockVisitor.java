@@ -4,11 +4,10 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
-import gov.nist.csd.pm.pap.pml.statement.IfStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateFunctionStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
@@ -24,16 +23,28 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     }
 
     @Override
+    public Result visitBasicStatementBlock(PMLParser.BasicStatementBlockContext ctx) {
+        List<PMLStatement> stmts = new ArrayList<>();
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
+        for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
+            PMLStatement pmlStatement = statementVisitor.visitBasicStatement(statementContext);
+            stmts.add(pmlStatement);
+        }
+
+        try {
+            boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
+            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
+        } catch (PMException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+    }
+
+    @Override
     public Result visitStatementBlock(PMLParser.StatementBlockContext ctx) {
         List<PMLStatement> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
         for (PMLParser.StatementContext statementContext : ctx.statement()) {
             PMLStatement pmlStatement = statementVisitor.visitStatement(statementContext);
-
-            if (pmlStatement instanceof CreateFunctionStatement) {
-                throw new PMLCompilationRuntimeException(statementContext, "operations are not allowed inside statement blocks");
-            }
-
             stmts.add(pmlStatement);
         }
 

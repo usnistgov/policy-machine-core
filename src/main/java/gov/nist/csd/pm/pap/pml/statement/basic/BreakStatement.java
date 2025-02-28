@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.statement;
+package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.value.BreakValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
 
-public class BreakStatement extends ControlStatement {
+public class BreakStatement extends BasicStatement {
 
     @Override
     public String toFormattedString(int indentLevel) {

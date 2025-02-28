@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
+import gov.nist.csd.pm.pap.pml.statement.CreateExecutableStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 import static gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp.ROUTINE_OPERAND;
 
-public class CreateRoutineStatement extends PreparedOperation<Void> implements CreateFunctionStatement {
+public class CreateRoutineStatement extends PreparedOperation<Void> implements CreateExecutableStatement {
 
     private final PMLStmtsRoutine routine;
 

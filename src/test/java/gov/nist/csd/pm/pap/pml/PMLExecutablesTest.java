@@ -1,8 +1,9 @@
-package gov.nist.csd.pm.integration;
+package gov.nist.csd.pm.pap.pml;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
@@ -12,14 +13,13 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class IntegrationTest {
+public class PMLExecutablesTest {
 
-    @Test
-    void testCallOperationInObligationResponse() throws PMException {
-        String pml = """
+	@Test
+	void testCallOperationInObligationResponse() throws PMException {
+		String pml = """
                 create PC "pc1"
                 create UA "ua1" in ["pc1"]
                 create U "u1" in ["ua1"]
@@ -42,26 +42,26 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+		MemoryPAP pap = new TestPAP();
+		pap.executePML(new TestUserContext("u1"), pml);
 
-        PDP pdp = new PDP(pap);
-        EPP epp = new EPP(pdp, pap);
-        epp.subscribeTo(pdp);
+		PDP pdp = new PDP(pap);
+		EPP epp = new EPP(pdp, pap);
+		epp.subscribeTo(pdp);
 
-        pdp.runTx(new UserContext(id("u1")), tx -> {
-            tx.modify().graph().createPolicyClass("test2");
+		pdp.runTx(new UserContext(id("u1")), tx -> {
+			tx.modify().graph().createPolicyClass("test2");
 
-            return null;
-        });
+			return null;
+		});
 
-        assertTrue(pap.query().graph().nodeExists("test"));
-        assertTrue(pap.query().graph().nodeExists("test2"));
-    }
+		assertTrue(pap.query().graph().nodeExists("test"));
+		assertTrue(pap.query().graph().nodeExists("test2"));
+	}
 
-    @Test
-    void testCallRoutineInObligationResponse() throws PMException {
-        String pml = """
+	@Test
+	void testCallRoutineInObligationResponse() throws PMException {
+		String pml = """
                 create PC "pc1"
                 create UA "ua1" in ["pc1"]
                 create U "u1" in ["ua1"]
@@ -84,24 +84,24 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+		MemoryPAP pap = new TestPAP();
+		pap.executePML(new TestUserContext("u1"), pml);
 
-        PDP pdp = new PDP(pap);
-        EPP epp = new EPP(pdp, pap);
-        epp.subscribeTo(pdp);
-        pdp.runTx(new UserContext(id("u1")), tx -> {
-            tx.modify().graph().createPolicyClass("test2");
-            return null;
-        });
+		PDP pdp = new PDP(pap);
+		EPP epp = new EPP(pdp, pap);
+		epp.subscribeTo(pdp);
+		pdp.runTx(new UserContext(id("u1")), tx -> {
+			tx.modify().graph().createPolicyClass("test2");
+			return null;
+		});
 
-        assertTrue(pap.query().graph().nodeExists("test"));
-        assertTrue(pap.query().graph().nodeExists("test2"));
-    }
+		assertTrue(pap.query().graph().nodeExists("test"));
+		assertTrue(pap.query().graph().nodeExists("test2"));
+	}
 
-    @Test
-    void testCallRoutineInOperationDoesNotTriggerObligationResponse() throws PMException {
-        String pml = """
+	@Test
+	void testCallRoutineInOperationDoesNotTriggerObligationResponse() throws PMException {
+		String pml = """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -127,22 +127,22 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+		MemoryPAP pap = new TestPAP();
+		pap.executePML(new TestUserContext("u1"), pml);
 
-        PDP pdp = new PDP(pap);
-        EPP epp = new EPP(pdp, pap);
-        epp.subscribeTo(pdp);
+		PDP pdp = new PDP(pap);
+		EPP epp = new EPP(pdp, pap);
+		epp.subscribeTo(pdp);
 
-        pdp.adjudicateAdminOperation(new UserContext(id("u1")), "op2", Map.of());
+		pdp.adjudicateAdminOperation(new UserContext(id("u1")), "op2", Map.of());
 
-        assertFalse(pap.query().graph().nodeExists("pc3"));
-    }
+		assertFalse(pap.query().graph().nodeExists("pc3"));
+	}
 
-    @Test
-    void testCallCustomOperationInRoutineDoesTriggerObligationResponse() throws PMException {
-        // call custom operation in a routine should trigger an obligation response
-        String pml = """
+	@Test
+	void testCallCustomOperationInRoutineDoesTriggerObligationResponse() throws PMException {
+		// call custom operation in a routine should trigger an obligation response
+		String pml = """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -164,15 +164,62 @@ class IntegrationTest {
                     }
                 }
                 """;
-        MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+		MemoryPAP pap = new TestPAP();
+		pap.executePML(new TestUserContext("u1"), pml);
 
-        PDP pdp = new PDP(pap);
-        EPP epp = new EPP(pdp, pap);
-        epp.subscribeTo(pdp);
+		PDP pdp = new PDP(pap);
+		EPP epp = new EPP(pdp, pap);
+		epp.subscribeTo(pdp);
 
-        pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
+		pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
 
-        assertFalse(pap.query().graph().nodeExists("pc3"));
-    }
+		assertFalse(pap.query().graph().nodeExists("pc3"));
+	}
+
+	@Test
+	void testFunctionOnlyAllowsBasicStatements() throws PMException {
+		String pml = """
+		function fail() {
+			create pc "pc1"
+		}
+		""";
+
+		PAP pap = new TestPAP();
+		assertThrows(PMException.class, () -> pap.executePML(new TestUserContext("u1"), pml));
+	}
+
+	@Test
+	void testFunctionOnlyAllowsFunctionInvokesOnly() throws PMException {
+		String pml = """
+		operation op1() {}
+		
+		function fail() {
+			op1()
+		}
+		""";
+
+		PAP pap = new TestPAP();
+		assertThrows(PMException.class, () -> pap.executePML(new TestUserContext("u1"), pml));
+	}
+
+	@Test
+	void testFunctionInFunctionOk() throws PMException {
+		String pml = """
+		function ok1() string {
+			function ok2(string a) string {
+				return a
+			}
+			
+			return ok2("a") + ok2("b")
+		}
+		
+		create pc ok1()
+		""";
+
+		PAP pap = new TestPAP();
+		pap.executePML(new TestUserContext("u1"), pml);
+
+		assertTrue(pap.query().graph().nodeExists("ab"));
+	}
+
 }

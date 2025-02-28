@@ -14,8 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.PMLContextVisitor.toStatementBlockCtx;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class StatementBlockVisitorTest {
 
@@ -28,7 +27,7 @@ class StatementBlockVisitorTest {
     }
 
     @Test
-    void testFunctionInBlock() {
+    void testFunctionInBlockOk() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
                 """
                 {
@@ -37,14 +36,10 @@ class StatementBlockVisitorTest {
                 """
         );
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
-        PMLCompilationRuntimeException e = assertThrows(
-                PMLCompilationRuntimeException.class,
+        assertDoesNotThrow(
                 () -> new StatementBlockVisitor(visitorContext, Type.string())
                         .visitStatementBlock(ctx)
         );
-        assertEquals(1, e.getErrors().size(), visitorContext.errorLog().toString());
-        assertEquals("operations are not allowed inside statement blocks",
-                     e.getErrors().get(0).errorMessage());
     }
 
 

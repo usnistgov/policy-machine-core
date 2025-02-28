@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.statement;
+package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -16,7 +16,7 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.Objects;
 
 
-public class FunctionReturnStatement extends ControlStatement {
+public class FunctionReturnStatement extends BasicStatement {
 
     private Expression expr;
 

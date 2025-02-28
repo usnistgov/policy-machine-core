@@ -4,7 +4,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -40,6 +40,8 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStat
 
     private ParserRuleContext getEnclosingContext(ParserRuleContext ctx) {
         if (ctx instanceof PMLParser.FunctionDefinitionStatementContext ||
+                ctx instanceof PMLParser.OperationDefinitionStatementContext ||
+                ctx instanceof PMLParser.RoutineDefinitionStatementContext ||
                 ctx instanceof PMLParser.ResponseContext) {
             return ctx;
         } else if (ctx == null) {

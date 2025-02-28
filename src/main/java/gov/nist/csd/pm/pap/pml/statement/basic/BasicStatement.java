@@ -1,6 +1,8 @@
-package gov.nist.csd.pm.pap.pml.statement;
+package gov.nist.csd.pm.pap.pml.statement.basic;
 
-public abstract class ControlStatement implements PMLStatement{
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+
+public abstract class BasicStatement implements PMLStatement {
 
     @Override
     public final String toString() {

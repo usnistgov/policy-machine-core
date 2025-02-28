@@ -6,7 +6,11 @@ options {
 
 pml: (statement)* EOF ;
 
-statement: (
+statement:
+    basicStatement
+    | operationStatement ;
+
+basicStatement: (
     variableAssignmentStatement
     | variableDeclarationStatement
     | foreachStatement
@@ -15,7 +19,11 @@ statement: (
     | continueStatement
     | functionInvokeStatement
     | ifStatement
-    | createPolicyStatement
+    | functionDefinitionStatement
+) ;
+
+operationStatement: (
+    createPolicyStatement
     | createNonPCStatement
     | createObligationStatement
     | createProhibitionStatement
@@ -27,7 +35,8 @@ statement: (
     | setResourceOperationsStatement
     | deleteStatement
     | deleteRuleStatement
-    | functionDefinitionStatement
+    | operationDefinitionStatement
+    | routineDefinitionStatement
 ) ;
 
 statementBlock: OPEN_CURLY statement* CLOSE_CURLY ;
@@ -146,16 +155,23 @@ varSpec: ID ASSIGN_EQUALS expression;
 
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
-functionDefinitionStatement: functionSignature checkStatementBlock? statementBlock ;
-functionSignature:
-    (ROUTINE | OPERATION) ID OPEN_PAREN formalArgList CLOSE_PAREN
-    returnType=variableType? ;
+operationDefinitionStatement: operationSignature checkStatementBlock? statementBlock ;
+routineDefinitionStatement: routineSignature checkStatementBlock? statementBlock ;
+functionDefinitionStatement: functionSignature basicStatementBlock ;
+
+operationSignature: OPERATION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
+routineSignature: ROUTINE ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
+functionSignature: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
+
 formalArgList: (formalArg (COMMA formalArg)*)? ;
 formalArg: NODEOP? variableType ID;
+
 returnStatement: RETURN expression?;
 
 checkStatement: CHECK ar=expression ON target=expression ;
 checkStatementBlock: OPEN_CURLY checkStatement* CLOSE_CURLY ;
+
+basicStatementBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 
 idArr: OPEN_BRACKET (ID (COMMA ID)*)? CLOSE_BRACKET ;
 functionInvokeStatement: functionInvoke;
@@ -173,7 +189,6 @@ elseIfStatement:
 elseStatement:
     ELSE statementBlock ;
 
-// basic elements
 variableType:
     STRING_TYPE #StringType
     | BOOL_TYPE #BooleanType

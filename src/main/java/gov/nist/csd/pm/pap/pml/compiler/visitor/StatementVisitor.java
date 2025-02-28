@@ -87,7 +87,17 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement> {
 
     @Override
     public PMLStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx).visitFunctionDefinitionStatement(ctx);
+        return new ExecutableDefinitionVisitor(visitorCtx).visitFunctionDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
+        return new ExecutableDefinitionVisitor(visitorCtx).visitOperationDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
+        return new ExecutableDefinitionVisitor(visitorCtx).visitRoutineDefinitionStatement(ctx);
     }
 
     @Override

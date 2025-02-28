@@ -5,8 +5,8 @@ import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.statement.BreakStatement;
-import gov.nist.csd.pm.pap.pml.statement.ForeachStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.BreakStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import org.junit.jupiter.api.Test;
 

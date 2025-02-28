@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.pml.pattern.operand.*;
 import gov.nist.csd.pm.pap.pml.pattern.subject.*;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateFunctionStatement;
+import gov.nist.csd.pm.pap.pml.statement.CreateExecutableStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
@@ -268,10 +268,6 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
                     stmt = createRuleStmtVisitor.visitCreateRuleStatement(responseStmtCtx.createRuleStatement());
                 } else if (responseStmtCtx.deleteRuleStatement() != null) {
                     stmt = deleteRuleStmtVisitor.visitDeleteRuleStatement(responseStmtCtx.deleteRuleStatement());
-                }
-
-                if (stmt instanceof CreateFunctionStatement) {
-                    throw new PMLCompilationRuntimeException(responseStmtCtx, "operations/routines are not allowed inside response blocks");
                 }
 
                 stmts.add(stmt);

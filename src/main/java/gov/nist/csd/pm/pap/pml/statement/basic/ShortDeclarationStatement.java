@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.statement;
+package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.Objects;
 
 
-public class ShortDeclarationStatement extends ControlStatement {
+public class ShortDeclarationStatement extends BasicStatement {
 
     private String id;
     private Expression expression;

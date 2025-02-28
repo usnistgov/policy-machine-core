@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.statement.BreakStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.BreakStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class BreakStmtVisitor extends PMLBaseVisitor<BreakStatement> {

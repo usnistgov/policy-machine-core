@@ -36,7 +36,7 @@ public class FunctionInvokeExpression extends Expression {
 
         PMLExecutableSignature signature;
         try {
-            signature = visitorCtx.scope().getFunction(funcName);
+            signature = visitorCtx.scope().getExecutable(funcName);
         } catch (UnknownFunctionInScopeException e) {
             throw new PMLCompilationRuntimeException(functionInvokeContext, e.getMessage());
         }
@@ -96,7 +96,7 @@ public class FunctionInvokeExpression extends Expression {
         Map<String, Value> operandValues = prepareOperandExpressions(ctx, pap);
 
         // set the execution context if exec is a PML exec
-        AdminExecutable<?> executable = funcInvokeCtx.scope().getFunction(name);
+        AdminExecutable<?> executable = funcInvokeCtx.scope().getExecutable(name);
         if (executable instanceof PMLRoutine pmlRoutine) {
             pmlRoutine.setCtx(funcInvokeCtx);
         } else if (executable instanceof PMLOperation pmlOperation) {

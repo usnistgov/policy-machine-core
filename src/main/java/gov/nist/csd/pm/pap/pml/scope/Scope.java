@@ -3,35 +3,35 @@ package gov.nist.csd.pm.pap.pml.scope;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Scope<V, F> implements Serializable {
+public class Scope<V, E> implements Serializable {
 
-    private final GlobalScope<V, F> global;
-    private final LocalScope<V> local;
+    private final GlobalScope<V, E> global;
+    private final LocalScope<V, E> local;
 
-    public Scope(GlobalScope<V, F> global) {
+    public Scope(GlobalScope<V, E> global) {
         this.global = global;
         this.local = new LocalScope<>();
     }
 
-    public Scope(GlobalScope<V, F> global, LocalScope<V> localScope) {
+    public Scope(GlobalScope<V, E> global, LocalScope<V, E> localScope) {
         this.global = global;
         this.local = localScope;
     }
 
-    public Scope<V, F> copy() {
+    public Scope<V, E> copy() {
         return new Scope<>(global, local.copy());
     }
 
-    public GlobalScope<V, F> global() {
+    public GlobalScope<V, E> global() {
         return global;
     }
 
-    public LocalScope<V> local() {
+    public LocalScope<V, E> local() {
         return local;
     }
 
-    public F getFunction(String name) throws UnknownFunctionInScopeException {
-        F function = global.getExecutable(name);
+    public E getExecutable(String name) throws UnknownFunctionInScopeException {
+        E function = global.getExecutable(name);
         if (function == null) {
             throw new UnknownFunctionInScopeException(name);
         }
@@ -39,25 +39,13 @@ public class Scope<V, F> implements Serializable {
         return function;
     }
 
-    public boolean functionExists(String name) {
+    public boolean executableExists(String name) {
         try {
-            getFunction(name);
+            getExecutable(name);
             return true;
         } catch (UnknownFunctionInScopeException e) {
             return false;
         }
-    }
-
-    public void addVariable(String name, V v) throws VariableAlreadyDefinedInScopeException {
-        if (variableExists(name)) {
-            throw new VariableAlreadyDefinedInScopeException(name);
-        }
-
-        this.local.addVariable(name, v);
-    }
-
-    public void addOrOverwriteVariable(String name, V v) {
-        this.local.addOrOverwriteVariable(name, v);
     }
 
     public V getVariable(String name) throws UnknownVariableInScopeException {

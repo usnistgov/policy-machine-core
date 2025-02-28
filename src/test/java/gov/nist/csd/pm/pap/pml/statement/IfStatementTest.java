@@ -5,6 +5,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;

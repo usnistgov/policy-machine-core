@@ -1,9 +1,10 @@
-package gov.nist.csd.pm.pap.pml.statement;
+package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class IfStatement extends ControlStatement {
+public class IfStatement extends BasicStatement {
 
     private final ConditionalBlock ifBlock;
     private final List<ConditionalBlock> ifElseBlocks;

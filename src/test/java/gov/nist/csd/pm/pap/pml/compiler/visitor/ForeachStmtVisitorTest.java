@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.pml.executable.operation.builtin.Equals;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.pap.pml.statement.ForeachStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.BeforeAll;

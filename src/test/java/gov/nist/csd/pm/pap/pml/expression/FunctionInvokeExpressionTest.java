@@ -8,13 +8,13 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
+import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.statement.VariableAssignmentStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
@@ -38,7 +38,7 @@ class FunctionInvokeExpressionTest {
             List.of("a", "b"),
             List.of(),
             Map.of("a", Type.string(), "b", Type.string()),
-            new PMLStmtsOperationBody(
+            new CheckAndStatementsBlock(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                             new CreatePolicyStatement(new ReferenceByID("a")),
@@ -52,7 +52,7 @@ class FunctionInvokeExpressionTest {
                     "a", Type.string(),
                     "b", Type.string()
             ),
-            new PMLStmtsOperationBody(
+            new CheckAndStatementsBlock(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                     new VariableAssignmentStatement("x", false, new StringLiteral("test")),

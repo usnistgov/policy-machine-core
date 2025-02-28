@@ -4,6 +4,7 @@ OPERATION: 'operation';
 NODEOP: 'nodeop';
 CHECK: 'check';
 ROUTINE: 'routine';
+FUNCTION: 'function';
 
 CREATE      : 'create' ;
 DELETE      : 'delete' ;

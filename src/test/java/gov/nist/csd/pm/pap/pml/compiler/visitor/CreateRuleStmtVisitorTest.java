@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CreateRuleStmtVisitorTest {
 
@@ -220,7 +219,7 @@ class CreateRuleStmtVisitorTest {
     }
 
     @Test
-    void testFunctionInResponseReturnsError() throws PMException {
+    void testFunctionInResponseOk() throws PMException {
         String pml = """
                     create obligation "obligation1" {
                         create rule "e1 and e2"
@@ -231,14 +230,7 @@ class CreateRuleStmtVisitorTest {
                         }
                     }
                     """;
-        PMLCompilationException e = assertThrows(
-                PMLCompilationException.class,
-                () -> pmlCompiler.compilePML(pml)
-        );
-        assertEquals(
-                "operations/routines are not allowed inside response blocks",
-                e.getErrors().getFirst().errorMessage()
-        );
+        assertDoesNotThrow(() -> pmlCompiler.compilePML(pml));
     }
 
     @Test

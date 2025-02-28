@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.statement;
+package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class VariableDeclarationStatement extends ControlStatement {
+public class VariableDeclarationStatement extends BasicStatement {
 
     private List<Declaration> declarations;
 

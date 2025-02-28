@@ -4,10 +4,11 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperationBody;
+import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
+import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.*;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -23,13 +24,13 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testOperationFormattedString() {
-        CreateFunctionStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
+        CreateExecutableStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
                 "op1",
                 Type.string(),
                 List.of("a", "b", "c"),
                 List.of("a"),
                 Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
-                new PMLStmtsOperationBody(
+                new CheckAndStatementsBlock(
                         new PMLStatementBlock(
                                 new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
                                 new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
@@ -64,7 +65,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testRoutineFormattedString() {
-        CreateFunctionStatement stmt = new CreateRoutineStatement(new PMLStmtsRoutine(
+        CreateExecutableStatement stmt = new CreateRoutineStatement(new PMLStmtsRoutine(
                 "rou1",
                 Type.voidType(),
                 List.of("a", "b", "c"),
@@ -92,13 +93,13 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testToFormattedStringVoidReturn() {
-        CreateFunctionStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
+        CreateExecutableStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
                 "func1",
                 Type.voidType(),
                 List.of("a", "b", "c"),
                 List.of("a"),
                 Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
-                new PMLStmtsOperationBody(
+                new CheckAndStatementsBlock(
                         new PMLStatementBlock(
                                 new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
                                 new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))

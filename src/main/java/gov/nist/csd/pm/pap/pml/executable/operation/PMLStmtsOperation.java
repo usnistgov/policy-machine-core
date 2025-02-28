@@ -16,19 +16,19 @@ import java.util.Objects;
 
 public class PMLStmtsOperation extends PMLOperation implements PMLStatementSerializable {
 
-    private final PMLStmtsOperationBody body;
+    private final CheckAndStatementsBlock body;
 
     public PMLStmtsOperation(String name,
                              Type returnType,
                              List<String> allOperands,
                              List<String> nodeOperands,
                              Map<String, Type> operandTypes,
-                             PMLStmtsOperationBody body) {
+                             CheckAndStatementsBlock body) {
         super(name, returnType, allOperands, nodeOperands, operandTypes);
         this.body = body;
     }
 
-    public PMLStmtsOperationBody getBody() {
+    public CheckAndStatementsBlock getBody() {
         return body;
     }
 

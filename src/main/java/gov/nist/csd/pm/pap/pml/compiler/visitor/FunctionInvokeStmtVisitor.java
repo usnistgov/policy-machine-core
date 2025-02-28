@@ -50,7 +50,7 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
         // check the function is in scope and the args are correct
         PMLExecutableSignature signature;
         try {
-            signature = visitorCtx.scope().getFunction(funcName);
+            signature = visitorCtx.scope().getExecutable(funcName);
         } catch (UnknownFunctionInScopeException e) {
             throw new PMLCompilationRuntimeException(funcCallCtx, e.getMessage());
         }

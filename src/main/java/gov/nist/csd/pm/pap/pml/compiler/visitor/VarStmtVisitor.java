@@ -7,6 +7,9 @@ import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.statement.*;
+import gov.nist.csd.pm.pap.pml.statement.basic.ShortDeclarationStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableDeclarationStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
