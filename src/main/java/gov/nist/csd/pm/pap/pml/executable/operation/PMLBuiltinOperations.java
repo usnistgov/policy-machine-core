@@ -12,6 +12,7 @@ public class PMLBuiltinOperations {
     private static final Equals equals = new Equals();
     private static final Contains contains = new Contains();
     private static final ContainsKey containsKey = new ContainsKey();
+    private static final Env env = new Env();
 
     // policy operations
     private static final GetAssociationsWithSource getAssociationsWithSource = new GetAssociationsWithSource();
@@ -37,6 +38,7 @@ public class PMLBuiltinOperations {
         BUILTIN_FUNCTIONS.put(containsKey.getName(), containsKey);
         BUILTIN_FUNCTIONS.put(appendAll.getName(), appendAll);
         BUILTIN_FUNCTIONS.put(append.getName(), append);
+        BUILTIN_FUNCTIONS.put(env.getName(), env);
 
         BUILTIN_FUNCTIONS.put(getAssociationsWithSource.getName(), getAssociationsWithSource);
         BUILTIN_FUNCTIONS.put(getAssociationsWithTarget.getName(), getAssociationsWithTarget);
