@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateProhibitionStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
@@ -32,7 +32,7 @@ class CreateProhibitionStmtVisitorTest {
                 on union of [!"oa1"]
                 """,
                 PMLParser.CreateProhibitionStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new CreateProhibitionStmtVisitor(visitorCtx).visitCreateProhibitionStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -50,7 +50,7 @@ class CreateProhibitionStmtVisitorTest {
 
     @Test
     void testInvalidExpressions() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(
                 """

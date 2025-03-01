@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.pap.pml.scope.UnknownExecutableInScopeException;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
         PMLExecutableSignature signature;
         try {
             signature = visitorCtx.scope().getExecutable(funcName);
-        } catch (UnknownFunctionInScopeException e) {
+        } catch (UnknownExecutableInScopeException e) {
             throw new PMLCompilationRuntimeException(funcCallCtx, e.getMessage());
         }
 

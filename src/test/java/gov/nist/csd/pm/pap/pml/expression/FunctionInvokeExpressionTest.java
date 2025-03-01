@@ -1,17 +1,22 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
+import gov.nist.csd.pm.pap.pml.scope.ExecutableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
@@ -32,9 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionInvokeExpressionTest {
 
-    static CompileGlobalScope scope = new CompileGlobalScope();
-
-    static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", Type.voidType(),
+	static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", Type.voidType(),
             List.of("a", "b"),
             List.of(),
             Map.of("a", Type.string(), "b", Type.string()),
@@ -59,9 +62,13 @@ class FunctionInvokeExpressionTest {
                     new FunctionReturnStatement(new StringLiteral("test_ret"))
             ))));
 
-    static {
+    private Scope<Variable, PMLExecutableSignature> testScope() throws ExecutableAlreadyDefinedInScopeException {
+        Scope<Variable, PMLExecutableSignature> scope = new Scope<>();
+
         scope.addExecutable(voidFunc.getName(), voidFunc.getSignature());
         scope.addExecutable(stringFunc.getName(), stringFunc.getSignature());
+
+        return scope;
     }
 
     @Test
@@ -70,7 +77,9 @@ class FunctionInvokeExpressionTest {
                 """
                 voidFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(scope);
+
+
+        VisitorContext visitorContext = new VisitorContext(testScope());
 
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
@@ -102,8 +111,8 @@ class FunctionInvokeExpressionTest {
     }
 
     @Test
-    void testFunctionNotInScope() {
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+    void testFunctionNotInScope() throws ExecutableAlreadyDefinedInScopeException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(
                 """
@@ -115,7 +124,7 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testWrongNumberOfArgs() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(scope);
+        VisitorContext visitorCtx = new VisitorContext(testScope());
 
         testCompilationError(
                 """
@@ -127,7 +136,7 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testWrongArgType() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(scope);
+        VisitorContext visitorCtx = new VisitorContext(testScope());
 
         testCompilationError(
                 """
@@ -143,7 +152,7 @@ class FunctionInvokeExpressionTest {
                 """
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(scope);
+        VisitorContext visitorContext = new VisitorContext(testScope());
 
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
@@ -159,7 +168,7 @@ class FunctionInvokeExpressionTest {
                 """
                 stringFunc("a", "b")
                 """, PMLParser.FunctionInvokeExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(scope);
+        VisitorContext visitorContext = new VisitorContext(testScope());
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 

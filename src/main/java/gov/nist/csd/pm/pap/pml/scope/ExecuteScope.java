@@ -6,10 +6,8 @@ import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLBuiltinOperations;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
@@ -22,36 +20,23 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
 
-public class ExecuteGlobalScope extends GlobalScope<Value, AdminExecutable<?>> {
+public class ExecuteScope extends Scope<Value, AdminExecutable<?>> {
 
-    private ExecuteGlobalScope() {
-        // buitin variables
-        Map<String, Value> builtinConstants = new HashMap<>();
+    public ExecuteScope(PAP pap) throws PMException {
+        // add constants
+        Map<String, Value> constants = new HashMap<>(pap.getPMLConstants());
+        constants.put(PM_ADMIN_PC.constantName(), new StringValue(PM_ADMIN_PC.nodeName()));
+        constants.put(PM_ADMIN_OBJECT.constantName(), new StringValue(PM_ADMIN_OBJECT.nodeName()));
+        setConstants(constants);
 
-        builtinConstants.put(PM_ADMIN_PC.constantName(), new StringValue(PM_ADMIN_PC.nodeName()));
-        builtinConstants.put(PM_ADMIN_OBJECT.constantName(), new StringValue(PM_ADMIN_OBJECT.nodeName()));
+        // add pml operations and routines stored in PAP
+        Map<String, AdminExecutable<?>> executables = new HashMap<>();
+        executables.putAll(new HashMap<>(PMLBuiltinOperations.builtinFunctions()));
+        executables.putAll(pap.getPMLOperations());
+        executables.putAll(pap.getPMLRoutines());
+        setExecutables(executables);
 
-        addConstants(builtinConstants);
-
-        // add builtin operations
-        Map<String, PMLOperation> funcs = PMLBuiltinOperations.builtinFunctions();
-        for (Map.Entry<String, PMLOperation> entry : funcs.entrySet()) {
-            addExecutable(entry.getKey(), entry.getValue());
-        }
-    }
-
-    public ExecuteGlobalScope(PAP pap) throws PMException {
-        this();
-
-        Map<String, Value> pmlConstants = pap.getPMLConstants();
-        addConstants(pmlConstants);
-
-        Map<String, PMLOperation> operations = pap.getPMLOperations();
-        addExecutables(new HashMap<>(operations));
-
-        Map<String, PMLRoutine> routines = pap.getPMLRoutines();
-        addExecutables(new HashMap<>(routines));
-
+        // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
@@ -62,6 +47,7 @@ public class ExecuteGlobalScope extends GlobalScope<Value, AdminExecutable<?>> {
             }
         }
 
+        // same for routines
         Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
         for (String routineName : routineNames) {
             Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);

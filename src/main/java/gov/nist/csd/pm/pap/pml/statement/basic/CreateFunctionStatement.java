@@ -40,7 +40,7 @@ public class CreateFunctionStatement implements CreateExecutableStatement {
 
 	@Override
 	public VoidValue execute(ExecutionContext ctx, PAP pap) throws PMException {
-		ctx.scope().global().addExecutable(routine.getName(), routine);
+		ctx.scope().addExecutable(routine.getName(), routine);
 
 		return new VoidValue();
 	}

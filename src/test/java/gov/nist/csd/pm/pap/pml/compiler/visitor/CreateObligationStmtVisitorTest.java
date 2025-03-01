@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateObligationStatement;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class CreateObligationStmtVisitorTest {
                 create obligation "test" {}
                 """,
                 PMLParser.CreateObligationStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -35,7 +35,7 @@ class CreateObligationStmtVisitorTest {
 
     @Test
     void testInvalidNameExpression() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(
                 """

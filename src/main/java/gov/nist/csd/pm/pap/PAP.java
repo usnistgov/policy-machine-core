@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.common.executable.AdminExecutor;
 import gov.nist.csd.pm.common.tx.Transactional;
@@ -10,8 +11,11 @@ import gov.nist.csd.pm.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
+import gov.nist.csd.pm.pap.pml.scope.ExecutableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
@@ -20,9 +24,8 @@ import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class PAP implements AdminExecutor, Transactional {
 
@@ -119,20 +122,24 @@ public abstract class PAP implements AdminExecutor, Transactional {
     }
 
     public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
+        checkExecutableNames(pmlOperations.keySet());
         this.pmlOperations = pmlOperations;
     }
 
     public void setPMLOperations(PMLOperation... operations) throws PMException {
+        checkExecutableNames(Arrays.stream(operations).map(PMLOperation::getName).collect(Collectors.toSet()));
         for (PMLOperation operation : operations) {
             this.pmlOperations.put(operation.getName(), operation);
         }
     }
 
     public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
+        checkExecutableNames(pmlRoutines.keySet());
         this.pmlRoutines = pmlRoutines;
     }
 
     public void setPMLRoutines(PMLRoutine... routines) throws PMException {
+        checkExecutableNames(Arrays.stream(routines).map(PMLRoutine::getName).collect(Collectors.toSet()));
         for (PMLRoutine routine : routines) {
             this.pmlRoutines.put(routine.getName(), routine);
         }
@@ -146,6 +153,21 @@ public abstract class PAP implements AdminExecutor, Transactional {
         return pmlRoutines;
     }
 
+    private void checkExecutableNames(Collection<String> names) {
+        // check no operations conflict with existing operations in the PAP
+        pmlOperations.keySet().forEach(name -> {
+            if (!names.contains(name)) {
+                return;
+            }
+
+            try {
+                throw new ExecutableAlreadyDefinedInScopeException(name);
+            } catch (ExecutableAlreadyDefinedInScopeException e) {
+                throw new PMRuntimeException(e);
+            }
+        });
+    }
+
     public void setPMLConstants(Map<String, Value> pmlConstants) throws PMException {
         this.pmlConstants = pmlConstants;
     }
@@ -155,9 +177,9 @@ public abstract class PAP implements AdminExecutor, Transactional {
     }
 
     public void executePML(UserContext author, String input) throws PMException {
-        PMLCompiler pmlCompiler = new PMLCompiler(this);
+        PMLCompiler pmlCompiler = new PMLCompiler();
 
-        List<PMLStatement> compiledPML = pmlCompiler.compilePML(input);
+        List<PMLStatement> compiledPML = pmlCompiler.compilePML(this, input);
 
         // execute other statements
         ExecutionContext ctx = new ExecutionContext(author, this);

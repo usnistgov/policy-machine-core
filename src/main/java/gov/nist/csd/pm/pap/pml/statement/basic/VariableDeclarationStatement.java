@@ -33,7 +33,7 @@ public class VariableDeclarationStatement extends BasicStatement {
         for (Declaration declaration : declarations) {
             Value value = declaration.expression.execute(ctx, pap);
 
-            ctx.scope().local().addOrOverwriteVariable(declaration.id, value);
+            ctx.scope().updateVariable(declaration.id, value);
         }
 
         return new VoidValue();

@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.basic.ContinueStatement;
 import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -27,7 +27,7 @@ class ContinueStmtVisitorTest {
                 }
                 """,
                 PMLParser.ForeachStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -40,7 +40,7 @@ class ContinueStmtVisitorTest {
 
     @Test
     void testNotInForLoop() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(
                 """

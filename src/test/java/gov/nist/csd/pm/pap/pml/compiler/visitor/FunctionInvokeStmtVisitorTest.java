@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
@@ -51,10 +51,10 @@ class FunctionInvokeStmtVisitorTest {
 
 
 
-        CompileGlobalScope compileGlobalScope = new CompileGlobalScope();
-        compileGlobalScope.addExecutable("func1", signature);
+        CompileScope compileScope = new CompileScope();
+        compileScope.addExecutable("func1", signature);
 
-        VisitorContext visitorCtx = new VisitorContext(compileGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
 
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
                 .visitFunctionInvokeStatement(ctx);
@@ -65,7 +65,7 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testFunctionDoesNotExist() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(
                 """
@@ -77,10 +77,10 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testWrongNumberOfArgs() throws PMException {
-        CompileGlobalScope compileGlobalScope = new CompileGlobalScope();
-        compileGlobalScope.addExecutable("func1", signature);
+        CompileScope compileScope = new CompileScope();
+        compileScope.addExecutable("func1", signature);
 
-        VisitorContext visitorCtx = new VisitorContext(compileGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
 
         testCompilationError(
                 """
@@ -92,9 +92,9 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testWrongArgType() throws PMException {
-        CompileGlobalScope compileGlobalScope = new CompileGlobalScope();
-        compileGlobalScope.addExecutable("func1", signature);
-        VisitorContext visitorCtx = new VisitorContext(compileGlobalScope);
+        CompileScope compileScope = new CompileScope();
+        compileScope.addExecutable("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
 
         testCompilationError(
                 """
@@ -119,10 +119,10 @@ class FunctionInvokeStmtVisitorTest {
                 Map.of()
         );
 
-        CompileGlobalScope compileGlobalScope = new CompileGlobalScope();
-        compileGlobalScope.addExecutable("func1", signature);
+        CompileScope compileScope = new CompileScope();
+        compileScope.addExecutable("func1", signature);
 
-        VisitorContext visitorCtx = new VisitorContext(compileGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
                 .visitFunctionInvokeStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());

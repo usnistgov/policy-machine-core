@@ -35,7 +35,7 @@ public class CreateOperationStatement extends PreparedOperation<Void> implements
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
         super.execute(pap);
 
-        ctx.scope().global().addExecutable(op.getName(), op);
+        ctx.scope().addExecutable(op.getName(), op);
 
         return new VoidValue();
     }

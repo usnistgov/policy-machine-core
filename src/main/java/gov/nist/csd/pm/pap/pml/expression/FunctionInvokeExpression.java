@@ -16,7 +16,7 @@ import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.pap.pml.scope.UnknownExecutableInScopeException;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ReturnValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -37,7 +37,7 @@ public class FunctionInvokeExpression extends Expression {
         PMLExecutableSignature signature;
         try {
             signature = visitorCtx.scope().getExecutable(funcName);
-        } catch (UnknownFunctionInScopeException e) {
+        } catch (UnknownExecutableInScopeException e) {
             throw new PMLCompilationRuntimeException(functionInvokeContext, e.getMessage());
         }
 
@@ -92,15 +92,15 @@ public class FunctionInvokeExpression extends Expression {
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
         String name = signature.getFunctionName();
-        ExecutionContext funcInvokeCtx = ctx.copyWithoutScope();
-        Map<String, Value> operandValues = prepareOperandExpressions(ctx, pap);
+        ExecutionContext funcInvokeCtx = ctx.copy();
+        Map<String, Value> operandValues = prepareOperandExpressions(funcInvokeCtx, pap);
 
         // set the execution context if exec is a PML exec
         AdminExecutable<?> executable = funcInvokeCtx.scope().getExecutable(name);
         if (executable instanceof PMLRoutine pmlRoutine) {
-            pmlRoutine.setCtx(funcInvokeCtx);
+            pmlRoutine.setCtx(funcInvokeCtx.copyWithParentScope());
         } else if (executable instanceof PMLOperation pmlOperation) {
-            pmlOperation.setCtx(funcInvokeCtx);
+            pmlOperation.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
         // PMLWrappers dont need Values, just objects

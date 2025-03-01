@@ -59,7 +59,7 @@ public class VariableAssignmentStatement extends BasicStatement {
             value = new StringValue(strValue + exprValue);
         }
 
-        ctx.scope().local().addOrOverwriteVariable(id, value);
+        ctx.scope().updateVariable(id, value);
 
         return new VoidValue();
     }

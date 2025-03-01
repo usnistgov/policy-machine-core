@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.context;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.scope.ExecuteGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.*;
@@ -23,7 +23,7 @@ public class ExecutionContext implements Serializable {
 
     public ExecutionContext(UserContext author, PAP pap) throws PMException {
         this.author = author;
-        this.scope = new Scope<>(new ExecuteGlobalScope(pap));
+        this.scope = new ExecuteScope(pap);
         this.pap = pap;
         this.isExplain = false;
     }
@@ -55,17 +55,20 @@ public class ExecutionContext implements Serializable {
         return new ExecutionContext(author, pap, scope.copy());
     }
 
-    public ExecutionContext copyWithoutScope() throws PMException {
-        return new ExecutionContext(author, pap);
+    public ExecutionContext copyWithParentScope() throws PMException {
+        return new ExecutionContext(
+                author,
+                pap,
+                scope.getParentScope() == null ? new ExecuteScope(pap) : scope.getParentScope().copy()
+        );
     }
-
     public Value executeStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
         ExecutionContext copy = writeOperandsToScope(operands);
 
         for (PMLStatement statement : stmts) {
             Value value = statement.execute(copy, pap);
 
-            scope.local().overwriteFromLocalScope(copy.scope.local());
+            scope.overwriteFromScope(copy.scope);
 
             if (value instanceof ReturnValue || value instanceof BreakValue || value instanceof ContinueValue) {
                 return value;
@@ -97,7 +100,7 @@ public class ExecutionContext implements Serializable {
                 value = Value.fromObject(o);
             }
 
-            copy.scope.local().addOrOverwriteVariable(key, value);
+            copy.scope.updateVariable(key, value);
         }
 
         return copy;

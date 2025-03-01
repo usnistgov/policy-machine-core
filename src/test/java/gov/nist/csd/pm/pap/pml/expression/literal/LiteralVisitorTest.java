@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class LiteralVisitorTest {
                 "test"
                 """,
                 PMLParser.StringLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         StringLiteral literal = new LiteralVisitor(visitorContext)
                 .visitStringLiteral(ctx);
 
@@ -51,7 +51,7 @@ class LiteralVisitorTest {
                 true
                 """,
                 PMLParser.BoolLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         BoolLiteral literal = new LiteralVisitor(visitorContext)
                 .visitBoolLiteral(ctx);
 
@@ -74,7 +74,7 @@ class LiteralVisitorTest {
                 ["a", ["b"]]
                 """,
                 PMLParser.ArrayLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression literal = new LiteralVisitor(visitorContext)
                 .visitArrayLiteral(ctx);
 
@@ -95,7 +95,7 @@ class LiteralVisitorTest {
                 ["a", "b"]
                 """,
                 PMLParser.ArrayLiteralContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         literal = new LiteralVisitor(visitorContext)
                 .visitArrayLiteral(ctx);
 
@@ -119,7 +119,7 @@ class LiteralVisitorTest {
                 ["a", b]
                 """,
                 PMLParser.ArrayLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
 
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
@@ -144,7 +144,7 @@ class LiteralVisitorTest {
                 }
                 """,
                 PMLParser.MapLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression literal = new LiteralVisitor(visitorContext)
                 .visitMapLiteral(ctx);
 
@@ -171,7 +171,7 @@ class LiteralVisitorTest {
                 }
                 """,
                 PMLParser.MapLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression literal = new LiteralVisitor(visitorContext)
                 .visitMapLiteral(ctx);
 
@@ -201,7 +201,7 @@ class LiteralVisitorTest {
                 }
                 """,
                 PMLParser.MapLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression literal = new LiteralVisitor(visitorContext)
                 .visitMapLiteral(ctx);
 
@@ -225,7 +225,7 @@ class LiteralVisitorTest {
         PMLParser.StringLiteralContext stringCtx = PMLContextVisitor.toLiteralCtx(
                 "\"\"",
                 PMLParser.StringLiteralContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         StringLiteral literal = new LiteralVisitor(visitorContext)
                 .visitStringLiteral(stringCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -237,7 +237,7 @@ class LiteralVisitorTest {
         PMLParser.ArrayLiteralContext arrayCtx = PMLContextVisitor.toLiteralCtx(
                 "[]",
                 PMLParser.ArrayLiteralContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         Expression arrayLiteral = new LiteralVisitor(visitorContext)
                 .visitArrayLiteral(arrayCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -249,7 +249,7 @@ class LiteralVisitorTest {
         PMLParser.MapLiteralContext mapCtx = PMLContextVisitor.toLiteralCtx(
                 "{}",
                 PMLParser.MapLiteralContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         Expression mapLiteral = new LiteralVisitor(visitorContext)
                 .visitMapLiteral(mapCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());

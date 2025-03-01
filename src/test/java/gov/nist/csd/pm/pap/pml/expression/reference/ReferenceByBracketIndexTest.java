@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
@@ -29,7 +29,7 @@ class ReferenceByBracketIndexTest {
     @Test
     void testGetType() throws PMException {
         ReferenceByBracketIndex a = new ReferenceByBracketIndex(new ReferenceByID("a"), new StringLiteral("b"));
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Type expected =  Type.array(Type.string());
         visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), expected), false));
 

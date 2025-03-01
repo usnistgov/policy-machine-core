@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -27,7 +27,7 @@ class PlusExpressionTest {
                 "a" + "b"
                 """,
                 PMLParser.PlusExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = PlusExpression.compilePlusExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -51,7 +51,7 @@ class PlusExpressionTest {
                 "a" + "b" + "c"
                 """,
                 PMLParser.PlusExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = PlusExpression.compilePlusExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -75,7 +75,7 @@ class PlusExpressionTest {
                 "a" + "b" + ["c"]
                 """,
                 PMLParser.PlusExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
                 () -> PlusExpression.compilePlusExpression(visitorContext, ctx)

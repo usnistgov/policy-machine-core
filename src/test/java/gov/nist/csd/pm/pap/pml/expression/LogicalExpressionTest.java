@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -25,7 +25,7 @@ class LogicalExpressionTest {
                 true && false
                 """,
                 PMLParser.LogicalExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -45,7 +45,7 @@ class LogicalExpressionTest {
                 PMLParser.LogicalExpressionContext.class);
         PAP pap = new TestPAP();
 
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -61,7 +61,7 @@ class LogicalExpressionTest {
                 false || true
                 """,
                 PMLParser.LogicalExpressionContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         expression = LogicalExpression.compileLogicalExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 

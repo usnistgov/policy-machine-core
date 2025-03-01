@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -28,7 +28,7 @@ class EqualsExpressionTest {
                 "a" == "a"
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -54,7 +54,7 @@ class EqualsExpressionTest {
                 "a" != "a"
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -78,7 +78,7 @@ class EqualsExpressionTest {
                 ["a", "b"] == ["a", "b"]
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -99,7 +99,7 @@ class EqualsExpressionTest {
                 ["a", "b"] == ["b", "a"]
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -123,7 +123,7 @@ class EqualsExpressionTest {
                 ["a", "b"] != ["a", "b"]
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -147,7 +147,7 @@ class EqualsExpressionTest {
                 true == true
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -168,7 +168,7 @@ class EqualsExpressionTest {
                 true == false
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -192,7 +192,7 @@ class EqualsExpressionTest {
                 true != true
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -216,7 +216,7 @@ class EqualsExpressionTest {
                 {"a": "a", "b": "b"} == {"a": "a", "b": "b"}
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -237,7 +237,7 @@ class EqualsExpressionTest {
                 {"a": "a", "b": "b"} == {"a": "a", "b": "c"}
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -261,7 +261,7 @@ class EqualsExpressionTest {
                 {"a": "a", "b": "b"} != {"a": "a", "b": "b"}
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -285,7 +285,7 @@ class EqualsExpressionTest {
                 ("a" + "b") == ("a" + "b")
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -314,7 +314,7 @@ class EqualsExpressionTest {
                 ("a" + "b") == ("a" + "c")
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        visitorContext = new VisitorContext(new CompileGlobalScope());
+        visitorContext = new VisitorContext(new CompileScope());
         expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -346,7 +346,7 @@ class EqualsExpressionTest {
                 ("a" + "b") == (true)
                 """,
                 PMLParser.EqualsExpressionContext.class);
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 

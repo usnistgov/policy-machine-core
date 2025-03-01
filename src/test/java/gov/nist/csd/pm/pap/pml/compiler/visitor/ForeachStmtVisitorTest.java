@@ -7,8 +7,8 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.builtin.Equals;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
+import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
@@ -26,12 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ForeachStmtVisitorTest {
 
-    private static GlobalScope<Variable, PMLExecutableSignature> testGlobalScope;
+    private static Scope<Variable, PMLExecutableSignature> testScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testGlobalScope = new CompileGlobalScope();
-        testGlobalScope.addExecutables(Map.of("equals", new Equals().getSignature()));
+        testScope = new CompileScope();
     }
 
     @Test
@@ -41,7 +39,7 @@ class ForeachStmtVisitorTest {
                 foreach x in ["a", "b"] {}
                 """,
                 PMLParser.ForeachStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope);
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -54,7 +52,7 @@ class ForeachStmtVisitorTest {
                 foreach x, y in {"a": "b"} {}
                 """,
                 PMLParser.ForeachStatementContext.class);
-        visitorCtx = new VisitorContext(testGlobalScope);
+        visitorCtx = new VisitorContext(testScope);
         stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -65,7 +63,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testInvalidExpressions() {
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope);
 
         testCompilationError(
                 """
@@ -86,7 +84,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testKeyValueOnArray() {
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope);
 
         testCompilationError(
                 """
@@ -99,7 +97,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testIterVarDoesNotExists() throws VariableAlreadyDefinedInScopeException {
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope);
 
         testCompilationError(
                 """
@@ -112,7 +110,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testKeyValueVarsAlreadyExist() throws VariableAlreadyDefinedInScopeException {
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope.copy());
         visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
 
         testCompilationError(
@@ -123,7 +121,7 @@ class ForeachStmtVisitorTest {
 
         );
 
-        visitorCtx = new VisitorContext(testGlobalScope);
+        visitorCtx = new VisitorContext(testScope.copy());
         visitorCtx.scope().addVariable("y", new Variable("y", Type.string(), false));
 
         testCompilationError(
@@ -137,7 +135,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testKeyOnlyOnMapReturnsError() throws VariableAlreadyDefinedInScopeException {
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope);
 
         testCompilationError(
                 """
@@ -150,7 +148,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testKeyValueOnArrayReturnsError() throws VariableAlreadyDefinedInScopeException {
-        VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
+        VisitorContext visitorCtx = new VisitorContext(testScope);
 
         testCompilationError(
                 """

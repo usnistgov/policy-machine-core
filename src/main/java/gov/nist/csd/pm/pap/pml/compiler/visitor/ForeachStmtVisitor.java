@@ -69,7 +69,7 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
                     .visitStatement(stmtCtx);
             block.add(statement);
 
-            visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
+            visitorCtx.scope().overwriteFromScope(localVisitorCtx.scope());
         }
 
         return new ForeachStatement(varName, mapValueVarName, iter, block);

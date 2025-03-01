@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pdp;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.*;
@@ -31,8 +32,12 @@ public class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
-    public ExecutionContext copyWithoutScope() throws PMException {
-        return new PDPExecutionContext(author, pdpTx);
+    public ExecutionContext copyWithParentScope() throws PMException {
+        return new PDPExecutionContext(
+                author,
+                pdpTx,
+                scope.getParentScope() == null ? new ExecuteScope(pap) : scope.getParentScope().copy()
+        );
     }
 
     @Override

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
@@ -27,7 +27,7 @@ class ReferenceByDotIndexTest {
     @Test
     void testGetType() throws PMException {
         ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Type expected =  Type.array(Type.string());
         visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), expected), false));
 

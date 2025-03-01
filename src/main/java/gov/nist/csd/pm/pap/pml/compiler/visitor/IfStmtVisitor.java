@@ -31,7 +31,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
         }
 
         // update outer scoped variables
-        visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
+        visitorCtx.scope().overwriteFromScope(localVisitorCtx.scope());
 
         IfStatement.ConditionalBlock ifBlock = new IfStatement.ConditionalBlock(condition, new PMLStatementBlock(block));
 
@@ -49,7 +49,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
             elseIfs.add(new IfStatement.ConditionalBlock(condition, new PMLStatementBlock(block)));
 
             // update outer scoped variables
-            visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
+            visitorCtx.scope().overwriteFromScope(localVisitorCtx.scope());
         }
 
         // else
@@ -63,7 +63,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
             }
 
             // update outer scoped variables
-            visitorCtx.scope().local().overwriteFromLocalScope(localVisitorCtx.scope().local());
+            visitorCtx.scope().overwriteFromScope(localVisitorCtx.scope());
         }
 
         return new IfStatement(ifBlock, elseIfs, new PMLStatementBlock(block));

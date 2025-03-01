@@ -144,8 +144,8 @@ public class PDPTx extends PAP {
     }
 
     public void executePML(UserContext author, String input) throws PMException {
-        PMLCompiler pmlCompiler = new PMLCompiler(pap);
-        List<PMLStatement> stmts = pmlCompiler.compilePML(input);
+        PMLCompiler pmlCompiler = new PMLCompiler();
+        List<PMLStatement> stmts = pmlCompiler.compilePML(pap, input);
 
         ExecutionContext ctx = new PDPExecutionContext(author, this);
         ctx.executeStatements(stmts, Map.of());

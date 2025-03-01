@@ -4,7 +4,6 @@ import gov.nist.csd.pm.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ListTokenSource;
@@ -16,10 +15,6 @@ public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLExecut
 
     public VisitorContext(Scope<Variable, PMLExecutableSignature> scope) {
         this(new CommonTokenStream(new ListTokenSource(List.of())), scope, new ErrorLog(), new PMLErrorHandler());
-    }
-
-    public VisitorContext(GlobalScope<Variable, PMLExecutableSignature> globalScope) {
-        this(new CommonTokenStream(new ListTokenSource(List.of())), new Scope<>(globalScope), new ErrorLog(), new PMLErrorHandler());
     }
 
     public VisitorContext copy() {

@@ -18,17 +18,22 @@ import gov.nist.csd.pm.pap.pml.statement.basic.CreateFunctionStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateOperationStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRoutineStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.*;
 
 public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutableStatement> {
-	public ExecutableDefinitionVisitor(VisitorContext visitorCtx) {
+
+	private boolean addToCtx;
+
+	public ExecutableDefinitionVisitor(VisitorContext visitorCtx, boolean addToCtx) {
 		super(visitorCtx);
+		this.addToCtx = addToCtx;
 	}
 
 	@Override
 	public CreateOperationStatement visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
-		PMLOperationSignature signature = new SignatureVisitor(visitorCtx)
+		PMLOperationSignature signature = new SignatureVisitor(visitorCtx, addToCtx)
 				.visitOperationSignature(ctx.operationSignature());
 
 		CheckAndStatementsBlock body = parseBody(
@@ -51,7 +56,7 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 
 	@Override
 	public CreateRoutineStatement visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
-		PMLRoutineSignature signature = new SignatureVisitor(visitorCtx)
+		PMLRoutineSignature signature = new SignatureVisitor(visitorCtx, addToCtx)
 				.visitRoutineSignature(ctx.routineSignature());
 
 		CheckAndStatementsBlock body = parseBody(
@@ -73,7 +78,7 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 
 	@Override
 	public CreateFunctionStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
-		PMLFunctionSignature signature = new SignatureVisitor(visitorCtx)
+		PMLFunctionSignature signature = new SignatureVisitor(visitorCtx, addToCtx)
 				.visitFunctionSignature(ctx.functionSignature());
 
 		CheckAndStatementsBlock body = parseBody(
@@ -82,13 +87,6 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 				signature.getOperandTypes(),
 				signature.getReturnType()
 		);
-
-		// add to visitor context
-		try {
-			visitorCtx.scope().local().addExecutable(signature.getFunctionName(), signature);
-		} catch (ExecutableAlreadyDefinedInScopeException e) {
-			throw new PMLCompilationRuntimeException(ctx, e.getMessage());
-		}
 
 		return new CreateFunctionStatement(new PMLStmtsRoutine(
 				signature.getFunctionName(),
@@ -149,7 +147,7 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 			String name = operandNames.get(i);
 			Type type = operandTypes.get(name);
 
-			localVisitorCtx.scope().addOrOverwriteVariable(
+			localVisitorCtx.scope().updateVariable(
 					name,
 					new Variable(name, type, false)
 			);
@@ -160,8 +158,11 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 
 	static class SignatureVisitor extends PMLBaseVisitor<PMLExecutableSignature> {
 
-		public SignatureVisitor(VisitorContext visitorCtx) {
+		private boolean addToCtx;
+
+		public SignatureVisitor(VisitorContext visitorCtx, boolean addToCtx) {
 			super(visitorCtx);
+			this.addToCtx = addToCtx;
 		}
 
 		@Override
@@ -184,13 +185,17 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 
 			writeOperandsToScope(operandNames, operandTypes);
 
-			return new PMLOperationSignature(
+			PMLOperationSignature pmlOperationSignature = new PMLOperationSignature(
 					funcName,
 					returnType,
 					operandNames,
 					nodeops,
 					operandTypes
 			);
+
+			addSignatureToCtx(ctx, funcName, pmlOperationSignature);
+
+			return pmlOperationSignature;
 		}
 
 		@Override
@@ -208,12 +213,16 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 
 			writeOperandsToScope(operandNames, operandTypes);
 
-			return new PMLRoutineSignature(
+			PMLRoutineSignature pmlRoutineSignature = new PMLRoutineSignature(
 					funcName,
 					returnType,
 					operandNames,
 					operandTypes
 			);
+
+			addSignatureToCtx(ctx, funcName, pmlRoutineSignature);
+
+			return pmlRoutineSignature;
 		}
 
 		@Override
@@ -231,12 +240,28 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 
 			writeOperandsToScope(operandNames, operandTypes);
 
-			return new PMLFunctionSignature(
+			PMLFunctionSignature pmlFunctionSignature = new PMLFunctionSignature(
 					funcName,
 					returnType,
 					operandNames,
 					operandTypes
 			);
+
+			addSignatureToCtx(ctx, funcName, pmlFunctionSignature);
+
+			return pmlFunctionSignature;
+		}
+
+		private <T extends ParserRuleContext> void addSignatureToCtx(T ctx, String funcName, PMLExecutableSignature signature) {
+			if (!addToCtx) {
+				return;
+			}
+
+			try {
+				visitorCtx.scope().addExecutable(funcName, signature);
+			} catch (ExecutableAlreadyDefinedInScopeException e) {
+				visitorCtx.errorLog().addError(ctx, e.getMessage());
+			}
 		}
 
 		private void writeOperandsToScope(List<String> operandNames, Map<String, Type> operandTypes) {
@@ -246,7 +271,7 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 				String name = operandNames.get(i);
 				Type type = operandTypes.get(name);
 
-				copy.scope().addOrOverwriteVariable(
+				copy.scope().updateVariable(
 						name,
 						new Variable(name, type, false)
 				);

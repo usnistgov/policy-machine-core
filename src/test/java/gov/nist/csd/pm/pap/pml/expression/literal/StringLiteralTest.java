@@ -5,8 +5,7 @@ import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +21,7 @@ class StringLiteralTest {
                 """,
                 PMLParser.LiteralExpressionContext.class);
 
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression expression = Literal.compileLiteral(visitorContext, ctx);
 	    assertInstanceOf(StringLiteral.class, expression);
 
@@ -33,9 +32,8 @@ class StringLiteralTest {
         );
         assertEquals(
                 Type.string(),
-                a.getType(new Scope<>(new CompileGlobalScope()))
+                a.getType(new CompileScope())
         );
-
     }
 
 }

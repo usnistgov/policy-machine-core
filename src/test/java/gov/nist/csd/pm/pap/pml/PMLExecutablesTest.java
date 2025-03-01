@@ -222,4 +222,28 @@ public class PMLExecutablesTest {
 		assertTrue(pap.query().graph().nodeExists("ab"));
 	}
 
+	@Test
+	void testRecursiveCall() throws PMException {
+		String pml = """
+		operation op1(string x) {
+			create pc x
+			
+			if x == "end" {
+				return
+			}
+			
+			
+			op1("end")
+		}
+		
+		op1("start")
+		""";
+
+		PAP pap = new TestPAP();
+		pap.executePML(new TestUserContext("u1"), pml);
+
+		assertTrue(pap.query().graph().nodeExists("start"));
+		assertTrue(pap.query().graph().nodeExists("end"));
+	}
+
 }

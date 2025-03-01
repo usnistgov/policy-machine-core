@@ -7,8 +7,7 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.scope.GlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ class BoolLiteralTest {
                 """,
                 PMLParser.LiteralExpressionContext.class);
 
-        GlobalScope<Variable, PMLExecutableSignature> globalScope = new CompileGlobalScope();
+        Scope<Variable, PMLExecutableSignature> globalScope = new CompileScope();
 
         VisitorContext visitorContext = new VisitorContext(globalScope);
         Expression expression = Literal.compileLiteral(visitorContext, ctx);
@@ -38,7 +37,7 @@ class BoolLiteralTest {
         );
         assertEquals(
                 Type.bool(),
-                a.getType(new Scope<>(globalScope))
+                a.getType(globalScope)
         );
 
     }

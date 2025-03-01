@@ -7,13 +7,11 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.operation.builtin.Equals;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
@@ -21,12 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CreateNonPCStmtVisitorTest {
 
-    private static CompileGlobalScope testGlobalScope;
+    private static CompileScope testGlobalScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testGlobalScope = new CompileGlobalScope();
-        testGlobalScope.addExecutables(Map.of("equals", new Equals().getSignature()));
+        testGlobalScope = new CompileScope();
     }
 
     @Test

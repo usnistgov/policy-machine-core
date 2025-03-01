@@ -41,7 +41,7 @@ public class CreateRoutineStatement extends PreparedOperation<Void> implements C
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
         super.execute(pap);
 
-        ctx.scope().global().addExecutable(routine.getName(), routine);
+        ctx.scope().addExecutable(routine.getName(), routine);
 
         return new VoidValue();
     }
