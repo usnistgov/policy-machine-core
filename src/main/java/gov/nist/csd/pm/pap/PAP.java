@@ -252,9 +252,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
         boolean obligationsEmpty = query().obligations().getObligations().isEmpty();
         boolean resOpsEmpty = query().operations().getResourceOperations().isEmpty();
 
-        Collection<String> adminOperationNames = query().operations().getAdminOperationNames();
-        boolean adminOpsEmpty = adminOperationNames.size() == AdminOperations.ADMIN_OP_NAMES.size()
-                && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
+        boolean adminOpsEmpty =  query().operations().getAdminOperationNames().isEmpty();
         boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
 
         return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&

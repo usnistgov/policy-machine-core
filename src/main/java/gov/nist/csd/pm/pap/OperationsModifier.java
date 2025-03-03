@@ -15,7 +15,6 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     public OperationsModifier(PolicyStore store) throws PMException {
         super(store);
-        // AdminOperations.init(store.operations());
     }
 
     @Override
@@ -27,7 +26,8 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     @Override
     public void createAdminOperation(Operation<?> operation) throws PMException {
-        if (store.operations().getAdminOperationNames().contains(operation.getName())) {
+        if (AdminOperations.isAdminOperation(operation.getName())
+                || store.operations().getAdminOperationNames().contains(operation.getName())) {
             throw new OperationExistsException(operation.getName());
         }
 
@@ -37,8 +37,8 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
         // return without error if the operation does not exist or is a built in admin op such as assign
-        if (!store.operations().getAdminOperationNames().contains(operation) ||
-                AdminOperations.ADMIN_OP_NAMES.contains(operation)) {
+        if (AdminOperations.ADMIN_OP_NAMES.contains(operation)
+                || !store.operations().getAdminOperationNames().contains(operation)) {
             return;
         }
 

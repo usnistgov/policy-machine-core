@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.AdminAccessRightExistsException;
+import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.OperationExistsException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
@@ -56,7 +57,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testSuccess() throws PMException {
             pap.modify().operations().createAdminOperation(testOp);
 
-            assertDoesNotThrow(() -> pap.query().operations().getAdminOperation("assign"));
+            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation("assign"));
         }
 
         @Test
@@ -85,7 +86,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testCannotDeleteBuiltinOperation() {
             assertDoesNotThrow(() -> pap.modify().operations().deleteAdminOperation("assign"));
-            assertDoesNotThrow(() -> pap.query().operations().getAdminOperation("assign"));
+            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation("assign"));
         }
     }
 

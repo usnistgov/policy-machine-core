@@ -1,8 +1,10 @@
 package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.exception.AdminOperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.AdminOperations;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
@@ -154,7 +156,14 @@ public class EventPattern implements Serializable {
             return List.of("target");
         }
 
-        Operation<?> adminOperation = pap.query().operations().getAdminOperation(opName);
-        return adminOperation.getNodeOperandNames();
+        // check if operation is PM admin op or custom admin op
+        Operation<?> adminOp;
+        try {
+            adminOp = AdminOperations.get(opName);
+        } catch (AdminOperationDoesNotExistException e) {
+            adminOp = pap.query().operations().getAdminOperation(opName);
+        }
+
+        return adminOp.getNodeOperandNames();
     }
 }

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.common.exception.AdminOperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.op.Operation;
 import gov.nist.csd.pm.common.op.graph.*;
@@ -49,17 +50,18 @@ public class AdminOperations {
 
     public static Set<String> ADMIN_OP_NAMES = new HashSet<>(adminOperationNames());
 
-    public static void init(OperationsStore operationsStore) throws PMException {
-        Set<String> adminOperationNames = new HashSet<>(operationsStore.getAdminOperationNames());
+    public static boolean isAdminOperation(String opName) {
+        return ADMIN_OP_NAMES.contains(opName);
+    }
 
+    public static Operation<?> get(String opName) throws AdminOperationDoesNotExistException {
         for (Operation<?> op : ADMIN_OPERATIONS) {
-            if (adminOperationNames.contains(op.getName())) {
-                continue;
+            if (op.getName().equals(opName)) {
+                return op;
             }
-
-            operationsStore.createAdminOperation(op);
-            adminOperationNames.add(op.getName());
         }
+
+        throw new AdminOperationDoesNotExistException(opName);
     }
 
     private static Set<String> adminOperationNames() {

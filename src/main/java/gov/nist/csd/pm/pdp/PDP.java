@@ -193,10 +193,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 .operations()
                 .getAdminOperation(name);
 
-        if (AdminOperations.ADMIN_OP_NAMES.contains(operation.getName())) {
-            throw new PMException("policy machine admin ops should be called directly through the runTx method");
-        }
-
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(ctx);
         }

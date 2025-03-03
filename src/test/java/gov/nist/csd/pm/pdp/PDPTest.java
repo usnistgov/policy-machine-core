@@ -225,14 +225,6 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
 
-        // builtin operation
-        assertThrows(PMException.class, () -> {
-            pdp.adjudicateAdminOperation(
-                    new TestUserContext("u1"),
-                    "assign", Map.of(ASCENDANT_OPERAND, id("o1"), DESCENDANTS_OPERAND, ids("oa2"))
-            );
-        });
-
         // custom operation
         AdjudicationResponse resp = pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
         assertEquals(GRANT, resp.getDecision());
