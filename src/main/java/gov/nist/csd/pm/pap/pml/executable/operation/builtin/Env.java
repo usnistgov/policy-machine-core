@@ -30,6 +30,7 @@ public class Env extends PMLOperation {
 
 	@Override
 	public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
-		return new StringValue(System.getenv(operands.get("key").toString()));
+		String value = System.getenv(((Value) operands.get("key")).getStringValue());
+		return new StringValue(value);
 	}
 }
