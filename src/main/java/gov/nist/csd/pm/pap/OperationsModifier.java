@@ -15,7 +15,7 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     public OperationsModifier(PolicyStore store) throws PMException {
         super(store);
-        AdminOperations.init(store.operations());
+        // AdminOperations.init(store.operations());
     }
 
     @Override

@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.pap;
 
+import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.common.executable.AdminExecutable;
 import gov.nist.csd.pm.common.executable.AdminExecutor;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.tx.Transactional;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.id.IdGenerator;
@@ -23,9 +25,16 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pap.store.PolicyStore;
+import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODES;
+import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 
 public abstract class PAP implements AdminExecutor, Transactional {
 
@@ -78,6 +87,38 @@ public abstract class PAP implements AdminExecutor, Transactional {
         policyStore.reset();
 
         policyStore.verifyAdminPolicy();
+    }
+
+    /**
+     * Bootstrap the policy with the given PolicyBootstrapper object. The bootstrapping user is the user that will
+     * go no record as being the author of any obligations created by the bootstrapper. This user will be created outside
+     * the PolicyBootstrapper and already exists when the bootstrapper is executed. The bootstrap user must be assigned
+     * to attributes within the PolicyBootstrapper or an exception will be thrown.
+     * @param bootstrapUser the name of the user bootstrapping the policy.
+     * @param bootstrapper the PolicyBootstrapper that will build the custom bootstrap policy.
+     * @throws PMException if there is an error bootstrapping.
+     */
+    public void bootstrap(String bootstrapUser, PolicyBootstrapper bootstrapper) throws PMException {
+        if(!isPolicyEmpty()) {
+            throw new BootstrapExistingPolicyException();
+        }
+
+        runTx(tx -> {
+            // create bootstrap policy and user
+            long pc = tx.modify().graph().createPolicyClass("bootstrap");
+            long ua = tx.modify().graph().createUserAttribute("bootstrapper", List.of(pc));
+            long bootstrapUserId = tx.modify().graph().createUserAttribute(bootstrapUser, List.of(ua));
+
+            // execute the bootstrapper
+            bootstrapper.bootstrap(new UserContext(bootstrapUserId), tx);
+
+            // clean up bootstrap policy
+            tx.modify().graph().deassign(bootstrapUserId, List.of(ua));
+            tx.modify().graph().deleteNode(ua);
+            tx.modify().graph().deleteNode(pc);
+        });
+
+
     }
 
     @Override
@@ -187,11 +228,11 @@ public abstract class PAP implements AdminExecutor, Transactional {
         ctx.executeStatements(compiledPML, Map.of());
     }
 
-    public void runTx(TxRunner txRunner) throws PMException {
+    public void runTx(TxRunner tx) throws PMException {
         beginTx();
 
         try {
-            txRunner.runTx(this);
+            tx.runTx(this);
 
             commit();
         } catch (PMException e) {
@@ -202,5 +243,21 @@ public abstract class PAP implements AdminExecutor, Transactional {
 
     public interface TxRunner {
         void runTx(PAP pap) throws PMException;
+    }
+
+    private boolean isPolicyEmpty() throws PMException {
+        HashSet<Node> nodes = new HashSet<>(query().graph().search(ANY, NO_PROPERTIES));
+
+        boolean prohibitionsEmpty = query().prohibitions().getProhibitions().isEmpty();
+        boolean obligationsEmpty = query().obligations().getObligations().isEmpty();
+        boolean resOpsEmpty = query().operations().getResourceOperations().isEmpty();
+
+        Collection<String> adminOperationNames = query().operations().getAdminOperationNames();
+        boolean adminOpsEmpty = adminOperationNames.size() == AdminOperations.ADMIN_OP_NAMES.size()
+                && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
+        boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
+
+        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&
+                prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
     }
 }

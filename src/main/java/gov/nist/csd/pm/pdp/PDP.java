@@ -84,37 +84,8 @@ public class PDP implements EventPublisher, AccessAdjudication {
         });
     }
 
-    /**
-     * Bootstrap the policy with the given PolicyBootstrapper object. The bootstrapping user is the user that will
-     * go no record as being the author of any obligations created by the bootstrapper. This user will be created outside
-     * the PolicyBootstrapper and already exists when the bootstrapper is executed. The bootstrap user must be assigned
-     * to attributes within the PolicyBootstrapper or an exception will be thrown.
-     * @param bootstrapUser the name of the user bootstrapping the policy.
-     * @param bootstrapper the PolicyBootstrapper that will build the custom bootstrap policy.
-     * @throws PMException if there is an error bootstrapping.
-     */
     public void bootstrap(String bootstrapUser, PolicyBootstrapper bootstrapper) throws PMException {
-        if(!isPolicyEmpty()) {
-            throw new BootstrapExistingPolicyException();
-        }
-
-        // create bootstrap policy and user
-        long pc = pap.modify().graph().createPolicyClass("bootstrap");
-        long ua = pap.modify().graph().createUserAttribute("bootstrapper", List.of(pc));
-        long bootstrapUserId = pap.modify().graph().createUserAttribute(bootstrapUser, List.of(ua));
-
-        // execute the bootstrapper to build the policy
-        bootstrapper.bootstrap(new UserContext(bootstrapUserId), pap);
-
-        // clean up bootstrap policy
-        pap.modify().graph().deassign(bootstrapUserId, List.of(ua));
-        pap.modify().graph().deleteNode(ua);
-        pap.modify().graph().deleteNode(pc);
-
-        // verify bootstrap user is assigned to at least one attribute
-        if (pap.query().graph().getAdjacentDescendants(bootstrapUserId).isEmpty()) {
-            throw new DisconnectedNodeException(bootstrapUser, U);
-        }
+        pap.bootstrap(bootstrapUser, bootstrapper);
     }
 
     @Override
@@ -215,22 +186,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
         } catch(UnauthorizedException e){
             return new AdjudicationResponse(e);
         }
-    }
-
-    private boolean isPolicyEmpty() throws PMException {
-        HashSet<Node> nodes = new HashSet<>(pap.query().graph().search(ANY, NO_PROPERTIES));
-
-        boolean prohibitionsEmpty = pap.query().prohibitions().getProhibitions().isEmpty();
-        boolean obligationsEmpty = pap.query().obligations().getObligations().isEmpty();
-        boolean resOpsEmpty = pap.query().operations().getResourceOperations().isEmpty();
-
-        Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
-        boolean adminOpsEmpty = adminOperationNames.size() == AdminOperations.ADMIN_OP_NAMES.size()
-                && adminOperationNames.containsAll(AdminOperations.ADMIN_OP_NAMES);
-        boolean routinesEmpty = pap.query().routines().getAdminRoutineNames().isEmpty();
-
-        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&
-                prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
     }
 
     private Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, String name, Map<String, Object> operands) throws PMException {
