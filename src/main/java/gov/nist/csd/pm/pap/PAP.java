@@ -13,10 +13,8 @@ import gov.nist.csd.pm.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.ExecutableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -28,7 +26,6 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
@@ -226,6 +223,12 @@ public abstract class PAP implements AdminExecutor, Transactional {
         ExecutionContext ctx = new ExecutionContext(author, this);
 
         ctx.executeStatements(compiledPML, Map.of());
+    }
+
+    public List<PMLStatement> compilePML(String input) throws PMException {
+        PMLCompiler pmlCompiler = new PMLCompiler();
+
+        return pmlCompiler.compilePML(this, input);
     }
 
     public void runTx(TxRunner tx) throws PMException {
