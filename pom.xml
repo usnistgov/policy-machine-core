@@ -19,7 +19,6 @@
         </extensions>
 
         <plugins>
-            <!-- grpc plugins -->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
@@ -27,14 +26,11 @@
                 <configuration>
                     <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                     <clearOutputDirectory>false</clearOutputDirectory>
-                    <!-- Protobuf Compiler -->
                     <protocArtifact>com.google.protobuf:protoc:3.25.5:exe:${os.detected.classifier}</protocArtifact>
-                    <!-- gRPC Compiler -->
                     <pluginId>grpc-java</pluginId>
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.61.1:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
-                    <!-- Execution for Message Classes -->
                     <execution>
                         <id>generate-protobuf-messages</id>
                         <phase>generate-sources</phase>
@@ -204,6 +200,27 @@
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
             <version>5.25.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-slf4j-provider</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.7</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

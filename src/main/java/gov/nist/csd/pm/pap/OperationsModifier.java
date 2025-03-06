@@ -13,7 +13,7 @@ import static gov.nist.csd.pm.pap.AdminAccessRights.isWildcardAccessRight;
 
 public class OperationsModifier extends Modifier implements OperationsModification {
 
-    public OperationsModifier(PolicyStore store) throws PMException {
+    public OperationsModifier(PolicyStore store) {
         super(store);
     }
 
