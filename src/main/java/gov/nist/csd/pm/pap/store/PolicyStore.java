@@ -11,11 +11,11 @@ import static gov.nist.csd.pm.common.graph.node.NodeType.PC;
 
 public interface PolicyStore extends Transactional {
 
-    GraphStore graph() throws PMException;
-    ProhibitionsStore prohibitions() throws PMException;
-    ObligationsStore obligations() throws PMException;
-    OperationsStore operations() throws PMException;
-    RoutinesStore routines() throws PMException;
+    GraphStore graph();
+    ProhibitionsStore prohibitions();
+    ObligationsStore obligations();
+    OperationsStore operations();
+    RoutinesStore routines();
 
     void reset() throws PMException;
 

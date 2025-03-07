@@ -24,6 +24,8 @@ import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;

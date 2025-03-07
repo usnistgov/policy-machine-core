@@ -40,27 +40,27 @@ public class Neo4jMemoryPolicyStore implements PolicyStore {
 	}
 
 	@Override
-	public GraphStore graph() throws PMException {
+	public GraphStore graph() {
 		return new Neo4jMemoryGraphStore(txHandler);
 	}
 
 	@Override
-	public ProhibitionsStore prohibitions() throws PMException {
+	public ProhibitionsStore prohibitions() {
 		return new Neo4jMemoryProhibitionStore(txHandler);
 	}
 
 	@Override
-	public ObligationsStore obligations() throws PMException {
+	public ObligationsStore obligations() {
 		return new Neo4jMemoryObligationStore(txHandler);
 	}
 
 	@Override
-	public OperationsStore operations() throws PMException {
+	public OperationsStore operations() {
 		return new Neo4jMemoryOperationsStore(txHandler);
 	}
 
 	@Override
-	public RoutinesStore routines() throws PMException {
+	public RoutinesStore routines() {
 		return new Neo4jMemoryRoutinesStore(txHandler);
 	}
 
