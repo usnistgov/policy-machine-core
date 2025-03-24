@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.op.obligation;
+package gov.nist.csd.pm.pap.executable.op.obligation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;

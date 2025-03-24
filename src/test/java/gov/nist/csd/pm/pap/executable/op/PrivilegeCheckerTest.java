@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.op;
+package gov.nist.csd.pm.pap.executable.op;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
