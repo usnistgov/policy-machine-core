@@ -29,6 +29,7 @@ import java.util.Objects;
 import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ARSET_OPERAND;
 import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.pap.executable.op.prohibition.ProhibitionOp.*;
 
 public class CreateProhibitionStatement extends OperationStatement {
 

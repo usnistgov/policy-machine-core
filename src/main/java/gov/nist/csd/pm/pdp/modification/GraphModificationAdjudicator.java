@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.executable.op.Operation.NODE_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.*;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 

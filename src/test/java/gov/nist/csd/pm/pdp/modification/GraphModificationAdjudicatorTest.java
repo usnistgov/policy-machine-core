@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.executable.op.Operation.NODE_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.*;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;

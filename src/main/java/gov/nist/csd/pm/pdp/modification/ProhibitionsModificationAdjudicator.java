@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ARSET_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.prohibition.ProhibitionOp.*;
 
 public class ProhibitionsModificationAdjudicator extends Adjudicator implements ProhibitionsModification {
 
