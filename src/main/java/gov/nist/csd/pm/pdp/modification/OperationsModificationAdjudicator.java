@@ -2,10 +2,10 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.pap.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.pap.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.pap.executable.op.operation.DeleteAdminOperationOp;
+import gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
@@ -14,9 +14,9 @@ import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
-import static gov.nist.csd.pm.pap.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
 
 public class OperationsModificationAdjudicator extends Adjudicator implements OperationsModification {
 

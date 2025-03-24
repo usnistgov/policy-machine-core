@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.op.graph.DissociateOp;
+import gov.nist.csd.pm.pap.executable.op.graph.DissociateOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -9,8 +9,8 @@ import gov.nist.csd.pm.pap.pml.expression.Expression;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.TARGET_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.UA_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.TARGET_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.UA_OPERAND;
 
 
 public class DissociateStatement extends OperationStatement {

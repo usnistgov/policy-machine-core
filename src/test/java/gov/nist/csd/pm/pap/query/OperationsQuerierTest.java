@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.query;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.PrivilegeChecker;

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.serialization;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;

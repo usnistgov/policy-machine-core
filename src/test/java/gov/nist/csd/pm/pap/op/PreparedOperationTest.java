@@ -4,16 +4,16 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.PreparedOperation;
+import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.PreparedOperation;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ASCENDANT_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_OPERAND;
 
 class PreparedOperationTest {
 

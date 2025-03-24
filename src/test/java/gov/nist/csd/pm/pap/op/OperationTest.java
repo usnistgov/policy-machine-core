@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.pap.op;
 
 import gov.nist.csd.pm.common.exception.OperandsDoNotMatchException;
-import gov.nist.csd.pm.pap.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.executable.op.graph.AssignOp;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.ASCENDANT_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ASCENDANT_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

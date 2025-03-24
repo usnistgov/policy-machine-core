@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.*;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;

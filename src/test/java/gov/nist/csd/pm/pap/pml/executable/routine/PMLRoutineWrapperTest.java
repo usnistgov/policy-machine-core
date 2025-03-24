@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.executable.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
 import java.util.Objects;

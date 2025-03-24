@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.executable.routine;
 
-import gov.nist.csd.pm.pap.routine.Routine;
+import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;

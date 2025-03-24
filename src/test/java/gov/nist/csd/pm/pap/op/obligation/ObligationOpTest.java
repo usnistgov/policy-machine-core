@@ -13,7 +13,7 @@ import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.op.obligation.ObligationOp.checkPatternPrivileges;
+import static gov.nist.csd.pm.pap.executable.op.obligation.ObligationOp.checkPatternPrivileges;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBLIGATION;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

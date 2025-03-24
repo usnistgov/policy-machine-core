@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.pap.executable.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
@@ -26,10 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.graph.GraphOp.ARSET_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ARSET_OPERAND;
 import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.pap.op.prohibition.ProhibitionOp.*;
 
 public class CreateProhibitionStatement extends OperationStatement {
 

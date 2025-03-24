@@ -3,9 +3,9 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pap.op.Operation;
-import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.obligation.CreateObligationOp;
+import gov.nist.csd.pm.pap.executable.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.op.obligation.ObligationOp.AUTHOR_OPERAND;
-import static gov.nist.csd.pm.pap.op.obligation.ObligationOp.RULES_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.obligation.ObligationOp.AUTHOR_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.obligation.ObligationOp.RULES_OPERAND;
 
 
 public class DeleteRuleStatement extends OperationStatement {
