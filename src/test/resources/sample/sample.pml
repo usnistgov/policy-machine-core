@@ -40,19 +40,19 @@ routine deleteAllProjects(string locProjectOA) {
     }
 }
 
-operation deleteReadme(nodeop string projectReadme) {
+operation deleteReadme(@node string projectReadme) {
     check "delete_readme" on projectReadme
 } {
     delete node projectReadme
 }
 
-operation deleteProject(nodeop string projectName) {
+operation deleteProject(@node string projectName) {
     check "delete_project" on projectName
 } {
     delete node projectName
 }
 
-operation createProject(string projectName, nodeop string locProjectAttr) {
+operation createProject(string projectName, @node string locProjectAttr) {
    check "assign_to" on "project"
    check "assign_to" on locProjectAttr
 } {

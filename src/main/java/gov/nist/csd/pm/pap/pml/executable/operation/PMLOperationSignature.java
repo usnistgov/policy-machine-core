@@ -46,7 +46,7 @@ public class PMLOperationSignature extends PMLExecutableSignature {
                 pml += ", ";
             }
 
-            pml += (nodeOperands.contains(operand) ? "nodeop " : "") +  operandType.toString() + " " + operand;
+            pml += (nodeOperands.contains(operand) ? "@node " : "") +  operandType.toString() + " " + operand;
         }
         return pml;
     }

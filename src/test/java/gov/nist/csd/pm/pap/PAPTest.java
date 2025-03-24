@@ -106,7 +106,7 @@ public abstract class PAPTest extends PAPTestInitializer {
                 associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
                 associate "ua1" and "ua2" with ["assign"]
                 
-                operation op1(nodeop string a) {
+                operation op1(@node string a) {
                     check "assign" on a
                 } {
                     if a == PM_ADMIN_OBJECT {

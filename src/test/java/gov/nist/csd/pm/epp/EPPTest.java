@@ -101,7 +101,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                operation op1(nodeop string a, nodeop []string b) {
+                operation op1(@node string a, @node []string b) {
                     
                 }
                 

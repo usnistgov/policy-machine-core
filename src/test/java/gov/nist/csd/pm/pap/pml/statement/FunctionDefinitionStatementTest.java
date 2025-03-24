@@ -44,7 +44,7 @@ class FunctionDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             operation op1(nodeop string a, bool b, []string c) string {
+                             operation op1(@node string a, bool b, []string c) string {
                                  check "ar1" on a
                                  check "ar2" on "node"
                              } {
@@ -53,7 +53,7 @@ class FunctionDefinitionStatementTest {
                 stmt.toFormattedString(0));
 
         assertEquals("""
-                                 operation op1(nodeop string a, bool b, []string c) string {
+                                 operation op1(@node string a, bool b, []string c) string {
                                      check "ar1" on a
                                      check "ar2" on "node"
                                  } {
@@ -113,7 +113,7 @@ class FunctionDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             operation func1(nodeop string a, bool b, []string c) {
+                             operation func1(@node string a, bool b, []string c) {
                                  check "ar1" on a
                                  check "ar2" on "node"
                              } {

@@ -164,7 +164,7 @@ routineSignature: ROUTINE ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=var
 functionSignature: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
 
 formalArgList: (formalArg (COMMA formalArg)*)? ;
-formalArg: NODEOP? variableType ID;
+formalArg: NODE_ARG? variableType ID;
 
 returnStatement: RETURN expression?;
 

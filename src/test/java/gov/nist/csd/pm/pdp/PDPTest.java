@@ -479,7 +479,7 @@ class PDPTest {
                 
                 create u "u1" in ["ua1"]
                
-                operation op1(nodeop string name) {
+                operation op1(@node string name) {
                     check "create_policy_class" on name
                 } {}
                

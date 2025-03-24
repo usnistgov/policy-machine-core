@@ -22,7 +22,7 @@ class PMLOperationSignatureTest {
 
         String actual = signature.toFormattedString(0);
         assertEquals(
-                "operation op1(nodeop string a, string b, string c) []string ",
+                "operation op1(@node string a, string b, string c) []string ",
                 actual
         );
     }

@@ -1,7 +1,7 @@
 lexer grammar PMLLexer;
 
 OPERATION: 'operation';
-NODEOP: 'nodeop';
+NODE_ARG: '@node';
 CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';

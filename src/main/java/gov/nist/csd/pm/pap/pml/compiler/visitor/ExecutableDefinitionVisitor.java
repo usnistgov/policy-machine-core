@@ -300,7 +300,7 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 			for (int i = 0; i < ctx.formalArg().size(); i++) {
 				PMLParser.FormalArgContext formalArgCtx = ctx.formalArg().get(i);
 				String name = formalArgCtx.ID().getText();
-				boolean isNodeop = formalArgCtx.NODEOP() != null;
+				boolean isNodeop = formalArgCtx.NODE_ARG() != null;
 
 				// check that two formal args dont have the same name and that there are no constants with the same name
 				if (argNames.contains(name)) {

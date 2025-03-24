@@ -15,7 +15,7 @@ class CreateRoutineStatementTest {
     @Test
     void testOperationSignatureDoesNotThrowExceptionButIsIgnored() throws PMException {
         String pml = """
-                routine routine1(nodeop string a) {
+                routine routine1(@node string a) {
                     check "assign" on a
                 } {
                 
