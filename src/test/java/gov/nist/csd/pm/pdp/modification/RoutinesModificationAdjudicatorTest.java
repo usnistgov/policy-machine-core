@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;

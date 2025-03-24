@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.context;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;

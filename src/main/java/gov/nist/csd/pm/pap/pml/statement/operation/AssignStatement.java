@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.graph.AssignOp.ASCENDANT_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.AssignOp.ASCENDANT_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.GraphOp.DESCENDANTS_OPERAND;
 
 
 public class AssignStatement extends OperationStatement {

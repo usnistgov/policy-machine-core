@@ -2,9 +2,9 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.executable.AdminExecutable;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;

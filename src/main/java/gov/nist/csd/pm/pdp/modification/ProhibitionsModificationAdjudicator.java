@@ -2,8 +2,8 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
@@ -16,8 +16,9 @@ import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import java.util.Collection;
 import java.util.Map;
 
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
+import static gov.nist.csd.pm.pap.op.Operation.NAME_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.GraphOp.ARSET_OPERAND;
+import static gov.nist.csd.pm.pap.op.prohibition.ProhibitionOp.*;
 
 public class ProhibitionsModificationAdjudicator extends Adjudicator implements ProhibitionsModification {
 

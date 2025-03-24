@@ -3,7 +3,7 @@ package gov.nist.csd.pm.common.obligation;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.AdminOperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.op.Operation;
 import gov.nist.csd.pm.pap.AdminOperations;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;

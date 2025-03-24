@@ -2,14 +2,14 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.op.graph.DeleteNodeOp;
+import gov.nist.csd.pm.pap.op.graph.DeleteNodeOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
 import java.util.Map;
 
-import static gov.nist.csd.pm.common.op.Operation.NODE_OPERAND;
+import static gov.nist.csd.pm.pap.op.Operation.NODE_OPERAND;
 
 public class DeleteNodeStatement extends DeleteStatement {
 

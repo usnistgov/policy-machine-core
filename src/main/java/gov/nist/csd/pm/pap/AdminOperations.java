@@ -1,19 +1,17 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.AdminOperationDoesNotExistException;
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.common.op.graph.*;
-import gov.nist.csd.pm.common.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.common.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.common.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp;
-import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
-import gov.nist.csd.pm.common.op.routine.CreateAdminRoutineOp;
-import gov.nist.csd.pm.common.op.routine.DeleteAdminRoutineOp;
-import gov.nist.csd.pm.pap.store.OperationsStore;
+import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.graph.*;
+import gov.nist.csd.pm.pap.op.obligation.CreateObligationOp;
+import gov.nist.csd.pm.pap.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.pap.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.pap.op.operation.DeleteAdminOperationOp;
+import gov.nist.csd.pm.pap.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.pap.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.pap.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.pap.op.routine.CreateAdminRoutineOp;
+import gov.nist.csd.pm.pap.op.routine.DeleteAdminRoutineOp;
 
 import java.util.HashSet;
 import java.util.List;

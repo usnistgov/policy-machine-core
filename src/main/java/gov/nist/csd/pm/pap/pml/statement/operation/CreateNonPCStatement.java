@@ -2,11 +2,11 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.common.op.graph.CreateObjectAttributeOp;
-import gov.nist.csd.pm.common.op.graph.CreateObjectOp;
-import gov.nist.csd.pm.common.op.graph.CreateUserAttributeOp;
-import gov.nist.csd.pm.common.op.graph.CreateUserOp;
+import gov.nist.csd.pm.pap.op.Operation;
+import gov.nist.csd.pm.pap.op.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.pap.op.graph.CreateObjectOp;
+import gov.nist.csd.pm.pap.op.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.pap.op.graph.CreateUserOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.graph.CreateNodeOp.DESCENDANTS_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.CreateNodeOp.NAME_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.CreateNodeOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.CreateNodeOp.NAME_OPERAND;
 
 
 public class CreateNonPCStatement extends OperationStatement<Long> {

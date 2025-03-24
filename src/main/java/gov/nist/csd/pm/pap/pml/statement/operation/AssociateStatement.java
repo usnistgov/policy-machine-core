@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.op.graph.AssociateOp;
+import gov.nist.csd.pm.pap.op.graph.AssociateOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -12,9 +12,9 @@ import gov.nist.csd.pm.pap.query.GraphQuery;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.graph.AssociateOp.TARGET_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.AssociateOp.UA_OPERAND;
-import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.ARSET_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.AssociateOp.TARGET_OPERAND;
+import static gov.nist.csd.pm.pap.op.graph.AssociateOp.UA_OPERAND;
+import static gov.nist.csd.pm.pap.op.prohibition.ProhibitionOp.ARSET_OPERAND;
 
 
 public class AssociateStatement extends OperationStatement {

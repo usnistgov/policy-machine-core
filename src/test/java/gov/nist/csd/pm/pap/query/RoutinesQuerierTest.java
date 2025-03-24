@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
-import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.util.SamplePolicy;
