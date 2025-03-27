@@ -1,11 +1,20 @@
 package gov.nist.csd.pm.pdp.modification;
 
+import static gov.nist.csd.pm.pdp.event.EventContextUtil.buildEventContext;
+
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.arg.IdNodeFormalArg;
+import gov.nist.csd.pm.pap.executable.op.arg.ListIdNodeFormalArg;
+import gov.nist.csd.pm.pap.executable.op.arg.NodeFormalArg;
 import gov.nist.csd.pm.pap.executable.op.graph.*;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -13,11 +22,11 @@ import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.Operation.NODE_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
@@ -35,230 +44,100 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public long createPolicyClass(String name) throws PMException {
         CreatePolicyClassOp op = new CreatePolicyClassOp();
+        ActualArgs actualArgs = op.actualArgs(name);
 
-        Map<String, Object> operands = Map.of(NAME_OPERAND, name);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        long id = op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new CreatePolicyClassOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                name
-        ));
-
-        return id;
+        return executeOp(op, actualArgs);
     }
 
     @Override
     public long createUserAttribute(String name, Collection<Long> descendants) throws PMException {
         CreateUserAttributeOp op = new CreateUserAttributeOp();
+        ActualArgs actualArgs = op.actualArgs(name, new LongArrayList(descendants));
 
-        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        long id = op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new CreateUserAttributeOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                name,
-                descendants.stream().map(descId -> {
-                    try {
-                        return pap.query().graph().getNodeById(descId).getName();
-                    } catch (PMException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList()
-        ));
-
-        return id;
+        return executeOp(op, actualArgs);
     }
 
     @Override
     public long createObjectAttribute(String name, Collection<Long> descendants) throws PMException {
         CreateObjectAttributeOp op = new CreateObjectAttributeOp();
+        ActualArgs actualArgs = op.actualArgs(name, new LongArrayList(descendants));
 
-        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        long id = op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new CreateObjectAttributeOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                name,
-                descendants.stream().map(descId -> {
-                    try {
-                        return pap.query().graph().getNodeById(descId).getName();
-                    } catch (PMException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList()
-        ));
-
-        return id;
+        return executeOp(op, actualArgs);
     }
 
     @Override
     public long createObject(String name, Collection<Long> descendants) throws PMException {
         CreateObjectOp op = new CreateObjectOp();
+        ActualArgs actualArgs = op.actualArgs(name, new LongArrayList(descendants));
 
-        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        long id = op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new CreateObjectOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                name,
-                descendants.stream().map(descId -> {
-                    try {
-                        return pap.query().graph().getNodeById(descId).getName();
-                    } catch (PMException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList()
-        ));
-
-        return id;
+        return executeOp(op, actualArgs);
     }
 
     @Override
     public long createUser(String name, Collection<Long> descendants) throws PMException {
         CreateUserOp op = new CreateUserOp();
+        ActualArgs actualArgs = op.actualArgs(name, new LongArrayList(descendants));
 
-        Map<String, Object> operands = Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        long id = op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new CreateUserOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                name,
-                descendants.stream().map(descId -> {
-                    try {
-                        return pap.query().graph().getNodeById(descId).getName();
-                    } catch (PMException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList()
-        ));
-
-        return id;
+        return executeOp(op, actualArgs);
     }
 
     @Override
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         SetNodePropertiesOp op = new SetNodePropertiesOp();
+        ActualArgs actualArgs = op.actualArgs(id, new Properties(properties));
 
-        Map<String, Object> operands = Map.of(NODE_OPERAND, id, PROPERTIES_OPERAND, properties);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new SetNodePropertiesOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                pap.query().graph().getNodeById(id).getName()
-        ));
+        executeOp(op, actualArgs);
     }
 
     @Override
     public void deleteNode(long id) throws PMException {
         Node node = pap.query().graph().getNodeById(id);
-        Collection<Long> descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
+        LongArrayList descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
 
         DeleteNodeOp op = new DeleteNodeOp();
+        ActualArgs actualArgs = op.actualArgs(id, node.getType(), descendants);
 
-        Map<String, Object> operands = Map.of(NODE_OPERAND, id, TYPE_OPERAND, node.getType(), DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new DeleteNodeOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                node.getName(),
-                descendants.stream().map(descId -> {
-                    try {
-                        return pap.query().graph().getNodeById(descId).getName();
-                    } catch (PMException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList()
-        ));
+        executeOp(op, actualArgs);
     }
 
     @Override
     public void assign(long ascId, Collection<Long> descendants) throws PMException {
         AssignOp op = new AssignOp();
+        ActualArgs actualArgs = op.actualArgs(ascId, new LongArrayList(descendants));
 
-        Map<String, Object> operands = Map.of(ASCENDANT_OPERAND, ascId, DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new AssignOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                pap.query().graph().getNodeById(ascId).getName(),
-                descendants.stream().map(id -> {
-	                try {
-		                return pap.query().graph().getNodeById(id).getName();
-	                } catch (PMException e) {
-		                throw new RuntimeException(e);
-	                }
-                }).toList()
-        ));
+        executeOp(op, actualArgs);
     }
 
     @Override
     public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         DeassignOp op = new DeassignOp();
+        ActualArgs actualArgs = op.actualArgs(ascendant, new LongArrayList(descendants));
 
-        Map<String, Object> operands = Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new DeassignOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                pap.query().graph().getNodeById(ascendant).getName(),
-                descendants.stream().map(id -> {
-                    try {
-                        return pap.query().graph().getNodeById(id).getName();
-                    } catch (PMException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList()
-        ));
+        executeOp(op, actualArgs);
     }
 
     @Override
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         AssociateOp op = new AssociateOp();
+        ActualArgs actualArgs = op.actualArgs(ua, target, accessRights);
 
-        Map<String, Object> operands = Map.of(UA_OPERAND, ua, TARGET_OPERAND, target, ARSET_OPERAND, accessRights);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        op.execute(pap, operands);
-
-        eventPublisher.publishEvent(new AssociateOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                pap.query().graph().getNodeById(ua).getName(),
-                pap.query().graph().getNodeById(target).getName()
-        ));
+        executeOp(op, actualArgs);
     }
 
     @Override
     public void dissociate(long ua, long target) throws PMException {
         DissociateOp op = new DissociateOp();
+        ActualArgs actualArgs = op.actualArgs(ua, target);
 
-        Map<String, Object> operands = Map.of(UA_OPERAND, ua, TARGET_OPERAND, target);
-        op.canExecute(privilegeChecker, userCtx, operands);
-        op.execute(pap, operands);
+        executeOp(op, actualArgs);
+    }
 
-        eventPublisher.publishEvent(new DissociateOp.EventCtx(
-                pap.query().graph().getNodeById(userCtx.getUser()).getName(),
-                userCtx.getProcess(),
-                pap.query().graph().getNodeById(ua).getName(),
-                pap.query().graph().getNodeById(target).getName()
-        ));
+    private <T> T executeOp(Operation<T> op, ActualArgs args) throws PMException {
+        op.canExecute(privilegeChecker, userCtx, args);
+        T ret = op.execute(pap, args);
 
+        eventPublisher.publishEvent(buildEventContext(pap, userCtx, op.getName(), args));
+
+        return ret;
     }
 }

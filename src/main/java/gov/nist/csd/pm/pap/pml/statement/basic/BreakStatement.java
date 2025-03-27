@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.value.BreakValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
-
 public class BreakStatement extends BasicStatement {
 
     @Override
@@ -28,4 +27,4 @@ public class BreakStatement extends BasicStatement {
     public boolean equals(Object obj) {
         return obj instanceof BreakStatement;
     }
-}
+} 

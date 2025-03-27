@@ -2,6 +2,8 @@ package gov.nist.csd.pm.pap.pml.value;
 
 import gov.nist.csd.pm.pap.pml.type.Type;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +14,11 @@ public class ArrayValue extends Value {
     public ArrayValue(List<Value> value, Type elementType) {
         super(Type.array(elementType));
         this.value = value;
+    }
+
+    public ArrayValue(Type elementType, Value ... values) {
+        super(Type.array(elementType));
+        this.value = new ArrayList<>(Arrays.asList(values));
     }
 
     public List<Value> getValue() {

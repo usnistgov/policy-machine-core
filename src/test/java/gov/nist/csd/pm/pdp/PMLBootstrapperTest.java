@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
@@ -43,14 +44,14 @@ class PMLBootstrapperTest {
                 create pc TEST_CONST
                 """;
 
-        Operation<?> op1 = new Operation<>("op1") {
+        Operation<?> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Map operands) throws PMException {
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("op1");
 
                 return null;
@@ -59,7 +60,7 @@ class PMLBootstrapperTest {
 
         Routine<Object> routine1 = new Routine<>("routine1", List.of()) {
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("routine1");
                 return null;
             }

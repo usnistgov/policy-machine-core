@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.RoutineExistsException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
@@ -11,48 +12,51 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
+import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
+import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class RoutinesModifierTest extends PAPTestInitializer {
 
-    static Routine routine1 = new Routine<Void>(
+
+
+    static Routine<Void> routine1 = new Routine<>(
             "routine1",
-            List.of("a", "b")
+            List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Void execute(PAP pap, ActualArgs operands) throws PMException {
             return null;
         }
     };
 
-    static Routine routine2 = new Routine<Void>(
+    static Routine<Void> routine2 = new Routine<>(
             "routine2",
-            List.of("a", "b")
+            List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Void execute(PAP pap, ActualArgs operands) throws PMException {
             return null;
         }
     };
 
-    static Routine routine3 = new Routine<Void>(
+    static Routine<Void> routine3 = new Routine<>(
             "routine3",
-            List.of("a", "b")
+            List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Void execute(PAP pap, ActualArgs operands) throws PMException {
             return null;
         }
     };
 
-    static Routine routine4 = new Routine<Void>(
+    static Routine<Void> routine4 = new Routine<>(
             "routine4",
-            List.of("a", "b")
+            List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Void execute(PAP pap, ActualArgs operands) throws PMException {
             return null;
         }
     };

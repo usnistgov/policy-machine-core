@@ -4,6 +4,9 @@ import gov.nist.csd.pm.common.exception.*;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
+import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -23,9 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
+import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_ARG;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
@@ -223,12 +226,16 @@ class PDPTest {
         pdp.setExplain(true);
 
         // custom operation
-        AdjudicationResponse resp = pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
+        AdjudicationResponse<?> resp = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+            pap.query().operations().getAdminOperation("op1"),
+            new ActualArgs());
         assertEquals(GRANT, resp.getDecision());
         assertEquals("test", resp.getValue());
 
         // denied
-        resp = pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1", Map.of());
+        resp = pdp.adjudicateAdminOperation(new UserContext(id("u2")),
+            pap.query().operations().getAdminOperation("op1"),
+            new ActualArgs());
         assertEquals(Decision.DENY, resp.getDecision());
         assertEquals(new Explain(
                 new AccessRightSet(),
@@ -262,7 +269,9 @@ class PDPTest {
                 """);
         PDP pdp = new PDP(pap);
         assertThrows(OperationDoesNotExistException.class,
-                () -> pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of()));
+                () -> pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+                    pap.query().operations().getAdminOperation("op1"),
+                    new ActualArgs()));
         assertThrows(NodeDoesNotExistException.class,
                 () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), id("oa1"), "read"));
         assertThrows(OperationDoesNotExistException.class,
@@ -279,10 +288,12 @@ class PDPTest {
         pap.modify().graph().createUser("u2", List.of(ua2));
         pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
 
-        pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of("a")) {
+        FormalArg<String> a = new FormalArg<>("a", String.class);
+
+        pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of(a)) {
             @Override
-            public String execute(PAP pap, Map<String, Object> operands) throws PMException {
-                pap.modify().graph().createPolicyClass((String) operands.get("a"));
+            public String execute(PAP pap, ActualArgs operands) throws PMException {
+                pap.modify().graph().createPolicyClass(operands.get(a));
                 return "test1";
             }
         });
@@ -296,17 +307,22 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
 
-        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), "routine1", Map.of("a", "test"));
+        AdjudicationResponse<?> response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"),
+            pap.query().routines().getAdminRoutine("routine1"),
+            new ActualArgs().put(a, "test"));
         assertEquals(GRANT, response.getDecision());
         assertEquals("test1", response.getValue());
-        response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), "routine2", Map.of());
+        response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"),
+            pap.query().routines().getAdminRoutine("routine2"), new ActualArgs());
         assertEquals(GRANT, response.getDecision());
         assertEquals(Map.of("test2", "test2"), response.getValue());
 
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));
 
-        response = pdp.adjudicateAdminRoutine(new UserContext(id("u2")), "routine1", Map.of("a", "test3"));
+        response = pdp.adjudicateAdminRoutine(new UserContext(id("u2")),
+            pap.query().routines().getAdminRoutine("routine1"),
+            new ActualArgs().put(a, "test3"));
         assertEquals(DENY, response.getDecision());
         assertEquals(new Explain(
                 new AccessRightSet(),
@@ -350,7 +366,8 @@ class PDPTest {
         pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), "routine1", Map.of());
+        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"),
+            pap.query().routines().getAdminRoutine("routine1"), new ActualArgs());
         assertEquals(DENY, response.getDecision());
     }
 
@@ -415,7 +432,8 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
+        pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+            pap.query().operations().getAdminOperation("op1"), new ActualArgs());
         assertFalse(pap.query().graph().nodeExists("test"));
     }
 
@@ -450,9 +468,11 @@ class PDPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), List.of(
-                new OperationRequest("op1", Map.of("name", "pc2")),
-                new OperationRequest("op1", Map.of("name", "pc3"))
+        Operation<?> op1 = pap.query().operations().getAdminOperation("op1");
+
+        AdjudicationResponse<?> response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), List.of(
+                new OperationRequest(op1, new ActualArgs().put(NAME_ARG, "pc2")),
+                new OperationRequest(op1, new ActualArgs().put(NAME_ARG, "pc3"))
         ));
 
         assertNull(response.getValue());
@@ -483,7 +503,9 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdjudicationResponse response = pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of(NAME_OPERAND, "test"));
+        AdjudicationResponse<?> response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+            pap.query().operations().getAdminOperation("op1"),
+            new ActualArgs().put(NAME_ARG, "test"));
         assertEquals(response.getDecision(), DENY);
         assertNull(response.getExplain());
     }

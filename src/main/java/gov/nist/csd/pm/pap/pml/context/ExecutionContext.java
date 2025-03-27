@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.context;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -62,8 +63,9 @@ public class ExecutionContext implements Serializable {
                 scope.getParentScope() == null ? new ExecuteScope(pap) : scope.getParentScope().copy()
         );
     }
-    public Value executeStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        ExecutionContext copy = writeOperandsToScope(operands);
+
+    public Value executeStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+        ExecutionContext copy = writeArgsToScope(args);
 
         for (PMLStatement statement : stmts) {
             Value value = statement.execute(copy, pap);
@@ -78,20 +80,20 @@ public class ExecutionContext implements Serializable {
         return new VoidValue();
     }
 
-    public Value executeOperationStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        return executeStatements(stmts, operands);
+    public Value executeOperationStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+        return executeStatements(stmts, args);
     }
 
-    public Value executeRoutineStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        return executeStatements(stmts, operands);
+    public Value executeRoutineStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+        return executeStatements(stmts, args);
     }
 
-    protected ExecutionContext writeOperandsToScope(Map<String, Object> operands) throws PMException {
+    protected ExecutionContext writeArgsToScope(ActualArgs args) throws PMException {
         ExecutionContext copy = this.copy();
 
-        for (Map.Entry<String, Object> entry : operands.entrySet()) {
-            String key = entry.getKey();
-            Object o = entry.getValue();
+        args.foreach(arg -> {
+            String key = arg.getName();
+            Object o = args.get(arg);
 
             Value value;
             if (o instanceof Value) {
@@ -101,7 +103,7 @@ public class ExecutionContext implements Serializable {
             }
 
             copy.scope.updateVariable(key, value);
-        }
+        });
 
         return copy;
     }

@@ -1,24 +1,26 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.pap.executable.op.obligation.RuleList;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import java.util.Map;
+public class DeleteObligationStatement extends DeleteStatement<DeleteObligationOp> {
 
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
+    public DeleteObligationStatement(Expression expression) {
+        super(new DeleteObligationOp(), Type.OBLIGATION, expression);
+    }
 
-public class DeleteObligationStatement extends DeleteStatement{
-	public DeleteObligationStatement(Expression expression) {
-		super(new DeleteObligationOp(), Type.OBLIGATION, expression);
-	}
+    @Override
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+        String name = expression.execute(ctx, pap).getStringValue();
 
-	@Override
-	public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-		// prepare for execution by replacing the name operand with the ID operand
-		String name = getExpression().execute(ctx, pap).getStringValue();
-		return Map.of(NAME_OPERAND, name);
-	}
+        Obligation obligation = pap.query().obligations().getObligation(name);
+
+        return op.actualArgs(obligation.getAuthorId(), obligation.getName(), new RuleList(obligation.getRules()));
+    }
 }

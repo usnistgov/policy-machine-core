@@ -1,20 +1,20 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.op.graph.DeassignOp;
-import gov.nist.csd.pm.pap.executable.op.graph.GraphOp;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.graph.DeassignOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-
-public class DeassignStatement extends OperationStatement {
+public class DeassignStatement extends OperationStatement<DeassignOp> {
 
     private final Expression ascendant;
     private final Expression deassignFrom;
@@ -26,8 +26,7 @@ public class DeassignStatement extends OperationStatement {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap)
-            throws PMException {
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String asc = ascendant.execute(ctx, pap).getStringValue();
         List<Value> deassignFromValue = deassignFrom.execute(ctx, pap).getArrayValue();
         List<String> descs = new ArrayList<>();
@@ -36,12 +35,19 @@ public class DeassignStatement extends OperationStatement {
         }
 
         long ascId = pap.query().graph().getNodeId(asc);
-        List<Long> descIds = new ArrayList<>();
+        LongArrayList descIds = new LongArrayList();
         for (String desc : descs) {
             descIds.add(pap.query().graph().getNodeId(desc));
         }
 
-        return Map.of(GraphOp.ASCENDANT_OPERAND, ascId, GraphOp.DESCENDANTS_OPERAND, descIds);
+        return op.actualArgs(ascId, descIds);
+    }
+    
+    @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        ActualArgs actualArgs = prepareOperands(ctx, pap);
+        op.execute(pap, actualArgs);
+        return new VoidValue();
     }
 
     @Override
@@ -60,4 +66,4 @@ public class DeassignStatement extends OperationStatement {
     public int hashCode() {
         return Objects.hash(ascendant, deassignFrom);
     }
-}
+} 

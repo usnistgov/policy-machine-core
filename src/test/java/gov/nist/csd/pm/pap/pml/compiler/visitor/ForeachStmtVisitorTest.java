@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.operation.builtin.Equals;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;

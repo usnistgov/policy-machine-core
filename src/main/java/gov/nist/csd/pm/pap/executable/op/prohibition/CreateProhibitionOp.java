@@ -5,12 +5,13 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 
 import java.util.Collection;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_PROCESS_PROHIBITION;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_PROHIBITION;
+import static gov.nist.csd.pm.pap.executable.op.prohibition.ProhibitionOp.*;
 
 public class CreateProhibitionOp extends ProhibitionOp {
 
@@ -19,15 +20,14 @@ public class CreateProhibitionOp extends ProhibitionOp {
     }
 
     @Override
-    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+    public Void execute(PAP pap, ActualArgs operands) throws PMException {
         pap.modify().prohibitions().createProhibition(
-                (String) operands.get(NAME_OPERAND),
-                (ProhibitionSubject) operands.get(SUBJECT_OPERAND),
-                (AccessRightSet) operands.get(ARSET_OPERAND),
-                (Boolean) operands.get(INTERSECTION_OPERAND),
-                (Collection<ContainerCondition>) operands.get(CONTAINERS_OPERAND)
+                operands.get(NAME_ARG),
+                operands.get(SUBJECT_ARG),
+                operands.get(ARSET_ARG),
+                operands.get(INTERSECTION_ARG),
+                operands.get(CONTAINERS_ARG)
         );
-
         return null;
     }
 }

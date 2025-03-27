@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
@@ -10,6 +9,7 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -17,10 +17,10 @@ import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.ExecutableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -30,36 +30,31 @@ import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionInvokeExpressionTest {
 
+    private static final PMLFormalArg a = new PMLFormalArg("a", Type.string());
+    private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
+
 	static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", Type.voidType(),
-            List.of("a", "b"),
-            List.of(),
-            Map.of("a", Type.string(), "b", Type.string()),
+            List.of(a, b),
             new CheckAndStatementsBlock(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
-                            new CreatePolicyStatement(new ReferenceByID("a")),
-                            new CreatePolicyStatement(new ReferenceByID("b"))
+                            new CreatePolicyClassStatement(new ReferenceByID("a")),
+                            new CreatePolicyClassStatement(new ReferenceByID("b"))
             ))));
     static PMLStmtsOperation stringFunc = new PMLStmtsOperation("stringFunc",
             Type.string(),
-            List.of("a", "b"),
-            List.of(),
-            Map.of(
-                    "a", Type.string(),
-                    "b", Type.string()
-            ),
+            List.of(a, b),
             new CheckAndStatementsBlock(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                     new VariableAssignmentStatement("x", false, new StringLiteral("test")),
-                    new FunctionReturnStatement(new StringLiteral("test_ret"))
+                    new ReturnStatement(new StringLiteral("test_ret"))
             ))));
 
     private Scope<Variable, PMLExecutableSignature> testScope() throws ExecutableAlreadyDefinedInScopeException {
@@ -84,9 +79,9 @@ class FunctionInvokeExpressionTest {
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
-                new FunctionInvokeExpression(voidFunc.getSignature(), Map.of(
-                        "a", new StringLiteral("a"),
-                        "b", new StringLiteral("b")
+                new FunctionInvokeExpression(voidFunc.getSignature().getName(), List.of(
+                        new StringLiteral("a"),
+                        new StringLiteral("b")
                 )),
                 e
         );

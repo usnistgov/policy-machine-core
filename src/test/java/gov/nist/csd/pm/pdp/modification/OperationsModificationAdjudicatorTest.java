@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
@@ -11,10 +12,9 @@ import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,14 +71,14 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void createAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1") {
+        Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
         };
@@ -90,14 +90,14 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1") {
+        Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
         };

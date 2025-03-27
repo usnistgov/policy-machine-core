@@ -8,13 +8,11 @@ import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CheckStatement implements PMLStatement {
-
     private final Expression arsExpr;
     private final Expression targetExpr;
 
@@ -58,8 +56,8 @@ public class CheckStatement implements PMLStatement {
     @Override
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) +
-                "check " + arsExpr.toFormattedString(0) +
-                " on " + targetExpr.toFormattedString(0);
+            "check " + arsExpr.toFormattedString(0) +
+            " on " + targetExpr.toFormattedString(0);
     }
 
     @Override

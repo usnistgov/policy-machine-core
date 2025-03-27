@@ -78,7 +78,7 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
             pattern.checkReferencedNodesExist(store.graph());
 
             // check operand patterns
-            for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : event.getOperandPatterns().entrySet()) {
+            for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : event.getArgPatterns().entrySet()) {
                 for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
                     operandPatternExpression.checkReferencedNodesExist(store.graph());
                 }

@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
@@ -27,7 +27,7 @@ class ForeachStatementTest {
     void testSuccess() throws PMException {
         // array
         ForeachStatement stmt = new ForeachStatement("x", null, buildArrayLiteral("a", "b", "c"),
-                                                     List.of(new CreatePolicyStatement(new ReferenceByID("x")))
+                                                     List.of(new CreatePolicyClassStatement(new ReferenceByID("x")))
         );
 
         PAP pap = new TestPAP();
@@ -43,8 +43,8 @@ class ForeachStatementTest {
 
         // map with key and value vars
         stmt = new ForeachStatement("x", "y", buildMapLiteral("a", "b", "c", "d"), List.of(
-                new CreatePolicyStatement(new ReferenceByID("x")),
-                new CreatePolicyStatement(new ReferenceByID("y"))
+                new CreatePolicyClassStatement(new ReferenceByID("x")),
+                new CreatePolicyClassStatement(new ReferenceByID("y"))
         ));
 
         pap = new TestPAP();
@@ -59,7 +59,7 @@ class ForeachStatementTest {
 
         // map with key only
         stmt = new ForeachStatement("x", null, buildMapLiteral("a", "b", "c", "d"), List.of(
-                new CreatePolicyStatement(new ReferenceByID("x"))
+                new CreatePolicyClassStatement(new ReferenceByID("x"))
         ));
 
         pap = new TestPAP();
@@ -99,7 +99,7 @@ class ForeachStatementTest {
     void testArrayToFormattedString() {
         ForeachStatement stmt = new ForeachStatement("x", null, buildArrayLiteral("a", "b", "c"),
                                                      List.of(
-                                                             new CreatePolicyStatement(new ReferenceByID("x"))
+                                                             new CreatePolicyClassStatement(new ReferenceByID("x"))
                                                      )
         );
 
@@ -121,7 +121,7 @@ class ForeachStatementTest {
     void testMapToFormattedString() {
         ForeachStatement stmt = new ForeachStatement("x", "y", buildMapLiteral("a", "b", "c", "d"),
                                                      List.of(
-                                                             new CreatePolicyStatement(new ReferenceByID("x"))
+                                                             new CreatePolicyClassStatement(new ReferenceByID("x"))
                                                      )
         );
 

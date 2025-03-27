@@ -22,7 +22,6 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     public AccessQueryAdjudicator(PAP pap, PrivilegeChecker privilegeChecker) {
         super(privilegeChecker);
         this.pap = pap;
-        this.privilegeChecker = privilegeChecker;
     }
 
     @Override

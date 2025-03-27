@@ -1,24 +1,30 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.prohibition.ContainerConditionsList;
+import gov.nist.csd.pm.pap.executable.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import java.util.Map;
+public class DeleteProhibitionStatement extends DeleteStatement<DeleteProhibitionOp> {
 
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
+    public DeleteProhibitionStatement(Expression expression) {
+        super(new DeleteProhibitionOp(), Type.PROHIBITION, expression);
+    }
 
-public class DeleteProhibitionStatement extends DeleteStatement{
-	public DeleteProhibitionStatement(Expression expression) {
-		super(new DeleteProhibitionOp(), Type.PROHIBITION, expression);
-	}
+    @Override
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+        String name = expression.execute(ctx, pap).getStringValue();
 
-	@Override
-	public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-		// prepare for execution by replacing the name operand with the ID operand
-		String name = getExpression().execute(ctx, pap).getStringValue();
-		return Map.of(NAME_OPERAND, name);
-	}
+        Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
+
+        return op.actualArgs(prohibition.getName(),
+            prohibition.getSubject(),
+            prohibition.getAccessRightSet(),
+            prohibition.isIntersection(),
+            new ContainerConditionsList(prohibition.getContainers()));
+    }
 }

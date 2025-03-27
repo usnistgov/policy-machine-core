@@ -2,6 +2,7 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.graph.AssignOp;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -22,8 +23,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ASCENDANT_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ASCENDANT_ARG;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_ARG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ObligationTest {
@@ -62,8 +63,8 @@ class ObligationTest {
                 new EventContext(
                         "u1",
                         null,
-                        new AssignOp(),
-                        Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa1"))
+                        new AssignOp().getName(),
+                        Map.of(ASCENDANT_ARG.getName(), "o1", DESCENDANTS_ARG.getName(), List.of("oa1"))
                 )
         );
         assertTrue(pap.query().graph().nodeExists("hello world"));
@@ -75,12 +76,12 @@ class ObligationTest {
         pap.setPMLConstants(Map.of("x", new StringValue("hello world")));
         pap.setPMLOperations(new PMLOperation("createX", Type.voidType()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) {
 
             }
 
             @Override
-            public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 ExecutionContext ctx = getCtx();
                 pap.executePML(ctx.author(), "create pc x");
 

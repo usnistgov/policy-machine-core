@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
@@ -14,7 +15,6 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -88,18 +88,17 @@ class ExpressionTest {
     @Test
     void testCompileStringExpression_FuncInvoke() throws PMException {
         CompileScope compileScope = new CompileScope();
-        PMLExecutableSignature signature = new PMLExecutableSignature(
+        PMLExecutableSignature signature = new PMLFunctionSignature(
                 "test",
                 Type.string(),
-                List.of(),
-                Map.of()
+                List.of()
         );
         compileScope.addExecutable("test", signature);
         VisitorContext visitorContext = new VisitorContext(compileScope);
 
         Expression expression = Expression.fromString(visitorContext, "test()", Type.string());
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new FunctionInvokeExpression(signature, Map.of()), expression);
+        assertEquals(new FunctionInvokeExpression(signature.getName(), List.of()), expression);
     }
 
     @Test

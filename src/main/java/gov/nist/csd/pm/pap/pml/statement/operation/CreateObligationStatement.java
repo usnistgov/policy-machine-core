@@ -5,23 +5,19 @@ import gov.nist.csd.pm.common.exception.UnknownPatternException;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pap.executable.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.obligation.CreateObligationOp;
+import gov.nist.csd.pm.pap.executable.op.obligation.RuleList;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-
+import gov.nist.csd.pm.pap.pml.value.Value;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.obligation.ObligationOp.AUTHOR_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.obligation.ObligationOp.RULES_OPERAND;
-
-
-public class CreateObligationStatement extends OperationStatement<Void> {
+public class CreateObligationStatement extends OperationStatement<CreateObligationOp> {
 
     private final Expression name;
     private final List<CreateRuleStatement> ruleStmts;
@@ -41,8 +37,7 @@ public class CreateObligationStatement extends OperationStatement<Void> {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap)
-            throws PMException {
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap).getStringValue();
 
         // execute the create rule statements and add to obligation
@@ -52,7 +47,26 @@ public class CreateObligationStatement extends OperationStatement<Void> {
             rules.add(rule);
         }
 
-        return Map.of(AUTHOR_OPERAND, ctx.author().getUser(), NAME_OPERAND, nameStr, RULES_OPERAND, rules);
+        return op.actualArgs(ctx.author().getUser(), nameStr, new RuleList(rules));
+    }
+
+    @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof CreateObligationStatement that))
+            return false;
+        return Objects.equals(name, that.name) && Objects.equals(ruleStmts, that.ruleStmts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, ruleStmts);
     }
 
     @Override
@@ -64,28 +78,16 @@ public class CreateObligationStatement extends OperationStatement<Void> {
 
         String indent = indent(indentLevel);
         return String.format(
-                """
-                %screate obligation %s {
-                %s%s}""", indent, name, sb, indent);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CreateObligationStatement that)) return false;
-        return Objects.equals(name, that.name) && Objects.equals(ruleStmts, that.ruleStmts);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, ruleStmts);
+            """
+            %screate obligation %s {
+            %s%s}""", indent, name, sb, indent);
     }
 
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         try {
             return new CreateObligationStatement(
-                    new StringLiteral(obligation.getName()),
-                    createRuleStatementsFromObligation(obligation.getRules())
+                new StringLiteral(obligation.getName()),
+                createRuleStatementsFromObligation(obligation.getRules())
             );
         } catch (UnknownPatternException e) {
             throw new RuntimeException(e);
@@ -99,14 +101,14 @@ public class CreateObligationStatement extends OperationStatement<Void> {
             EventPattern event = rule.getEventPattern();
 
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                    new StringLiteral(rule.getName()),
-                    event.getSubjectPattern(),
-                    event.getOperationPattern(),
-                    event.getOperandPatterns(),
-                    new CreateRuleStatement.ResponseBlock(
-                            rule.getResponse().getEventCtxVariable(),
-                            rule.getResponse().getStatements()
-                    )
+                new StringLiteral(rule.getName()),
+                event.getSubjectPattern(),
+                event.getOperationPattern(),
+                event.getArgPatterns(),
+                new CreateRuleStatement.ResponseBlock(
+                    rule.getResponse().getEventCtxVariable(),
+                    rule.getResponse().getStatements()
+                )
             );
 
             createRuleStatements.add(createRuleStatement);

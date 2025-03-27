@@ -246,7 +246,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                 boolean referenced = checkPatternForNode(node.getName(), eventPattern.getSubjectPattern());
 
                 // check operand patterns
-                for (List<OperandPatternExpression> pattern : eventPattern.getOperandPatterns().values()) {
+                for (List<OperandPatternExpression> pattern : eventPattern.getArgPatterns().values()) {
                     for (OperandPatternExpression operandPatternExpression : pattern) {
                         if (checkPatternForNode(node.getName(), operandPatternExpression)) {
                             referenced = true;

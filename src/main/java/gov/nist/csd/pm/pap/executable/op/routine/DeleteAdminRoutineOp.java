@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pap.executable.op.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -8,7 +10,6 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_ADMIN_ROUTINE;
 
@@ -17,13 +18,19 @@ public class DeleteAdminRoutineOp extends Operation<Void> {
     public DeleteAdminRoutineOp() {
         super(
                 "delete_admin_routine",
-                List.of(NAME_OPERAND)
+                List.of(NAME_ARG)
         );
     }
 
+    public ActualArgs actualArgs(String name) {
+        ActualArgs args = new ActualArgs();
+        args.put(NAME_ARG, name);
+        return args;
+    }
+
     @Override
-    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        String name = (String) operands.get(NAME_OPERAND);
+    public Void execute(PAP pap, ActualArgs operands) throws PMException {
+        String name = operands.get(NAME_ARG);
 
         pap.modify().routines().deleteAdminRoutine(name);
 
@@ -31,7 +38,7 @@ public class DeleteAdminRoutineOp extends Operation<Void> {
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_ROUTINE);
     }
 }

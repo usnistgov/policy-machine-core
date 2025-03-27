@@ -118,7 +118,7 @@ createProhibitionStatement:
     CREATE PROHIBITION name=expression
     DENY subject=expression
     (ACCESS_RIGHTS accessRights=expression ON containers=expression) #Arset
-    | (OPERATION op=expression ON operandPatterns=patternMap) #Operation ;*/
+    | (OPERATION op=expression ON argPatterns=patternMap) #Operation ;*/
 
 setNodePropertiesStatement:
     SET_PROPERTIES OF name=expression TO properties=expression ;

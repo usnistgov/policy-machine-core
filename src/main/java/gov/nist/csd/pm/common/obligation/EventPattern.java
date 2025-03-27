@@ -17,20 +17,20 @@ public class EventPattern implements Serializable {
 
     protected SubjectPattern subjectPattern;
     protected OperationPattern operationPattern;
-    protected Map<String, List<OperandPatternExpression>> operandPatterns;
+    protected Map<String, List<OperandPatternExpression>> argPatterns;
 
     public EventPattern(SubjectPattern subjectPattern,
                         OperationPattern operationPattern,
-                        Map<String, List<OperandPatternExpression>> operandPatterns) {
+                        Map<String, List<OperandPatternExpression>> argPatterns) {
         this.subjectPattern = subjectPattern;
         this.operationPattern = operationPattern;
-        this.operandPatterns = operandPatterns;
+        this.argPatterns = argPatterns;
     }
 
     public EventPattern(SubjectPattern subjectPattern, OperationPattern operationPattern) {
         this.subjectPattern = subjectPattern;
         this.operationPattern = operationPattern;
-        this.operandPatterns = new HashMap<>();
+        this.argPatterns = new HashMap<>();
     }
 
     public SubjectPattern getSubjectPattern() {
@@ -49,12 +49,12 @@ public class EventPattern implements Serializable {
         this.operationPattern = operationPattern;
     }
 
-    public Map<String, List<OperandPatternExpression>> getOperandPatterns() {
-        return operandPatterns;
+    public Map<String, List<OperandPatternExpression>> getArgPatterns() {
+        return argPatterns;
     }
 
-    public void setOperandPatterns(Map<String, List<OperandPatternExpression>> operandPatterns) {
-        this.operandPatterns = operandPatterns;
+    public void setArgPatterns(Map<String, List<OperandPatternExpression>> argPatterns) {
+        this.argPatterns = argPatterns;
     }
 
     public boolean matches(EventContext eventCtx, PAP pap) throws PMException {
@@ -64,7 +64,7 @@ public class EventPattern implements Serializable {
             return userMatches;
         }
 
-        boolean operandsMatch = operandsMatch(eventCtx.getOpName(), eventCtx.getOperands(), pap);
+        boolean operandsMatch = operandsMatch(eventCtx.getArgs(), pap);
 
         return userMatches && opMatches && operandsMatch;
     }
@@ -73,12 +73,13 @@ public class EventPattern implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EventPattern that)) return false;
-        return Objects.equals(subjectPattern, that.subjectPattern) && Objects.equals(operationPattern, that.operationPattern) && Objects.equals(operandPatterns, that.operandPatterns);
+        return Objects.equals(subjectPattern, that.subjectPattern) && Objects.equals(operationPattern, that.operationPattern) && Objects.equals(
+            argPatterns, that.argPatterns);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subjectPattern, operationPattern, operandPatterns);
+        return Objects.hash(subjectPattern, operationPattern, argPatterns);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class EventPattern implements Serializable {
         return "EventPattern[" +
                 "subjectPattern=" + subjectPattern + ", " +
                 "operationPattern=" + operationPattern + ", " +
-                "operandPatterns=" + operandPatterns + ']';
+                "argPatterns=" + argPatterns + ']';
     }
 
     private boolean userMatches(String user, PAP pap) throws PMException {
@@ -101,37 +102,22 @@ public class EventPattern implements Serializable {
         return operationPattern.matches(opName, pap);
     }
 
-    private boolean operandsMatch(String opName, Map<String, Object> operands, PAP pap) throws PMException {
-        // get the operands of the operation that represent nodes
-        List<String> nodeOperands = getOperationNodeOperands(opName, pap);
-
-        // remove the non node operands from the operands map as they are not available in the pattern
-        Map<String, Object> nodeOperandValues = new HashMap<>();
-        for (String nodeOperand : nodeOperands) {
-            nodeOperandValues.put(nodeOperand, operands.get(nodeOperand));
-        }
-
-        // if more patterns than operands - false
-        // if no patterns - true (match everything)
-        if (operandPatterns.size() > nodeOperandValues.size()) {
+    private boolean operandsMatch(Map<String, Object> args, PAP pap) throws PMException {
+        if (!args.keySet().containsAll(argPatterns.keySet())) {
             return false;
-        } else if (operandPatterns.isEmpty()) {
-            return true;
         }
 
-        for (String nodeOperand : nodeOperands) {
-            if (!operandPatterns.containsKey(nodeOperand)) {
+        for (Map.Entry<String, Object> arg : args.entrySet()) {
+            if (!argPatterns.containsKey(arg.getKey())) {
                 continue;
-            } else if (!nodeOperandValues.containsKey(nodeOperand)) {
-                return false;
             }
 
-            Object operandValue = nodeOperandValues.get(nodeOperand);
-            List<OperandPatternExpression> expressions = operandPatterns.get(nodeOperand);
+            Object argValue = arg.getValue();
+            List<OperandPatternExpression> expressions = argPatterns.get(arg.getKey());
 
             // needs to match each expression in pattern list
             for (OperandPatternExpression operandPatternExpression : expressions) {
-                switch (operandValue) {
+                switch (argValue) {
                     case null -> {}
                     case String operandValueStr -> {
                         if (!operandPatternExpression.matches(operandValueStr, pap)) {
@@ -143,27 +129,11 @@ public class EventPattern implements Serializable {
                             return false;
                         }
                     }
-                    default -> throw new UnexpectedOperandTypeException(operandValue.getClass());
+                    default -> throw new UnexpectedOperandTypeException(argValue.getClass());
                 }
             }
         }
 
         return true;
-    }
-
-    private List<String> getOperationNodeOperands(String opName, PAP pap) throws PMException {
-        if (pap.query().operations().getResourceOperations().contains(opName)) {
-            return List.of("target");
-        }
-
-        // check if operation is PM admin op or custom admin op
-        Operation<?> adminOp;
-        try {
-            adminOp = AdminOperations.get(opName);
-        } catch (AdminOperationDoesNotExistException e) {
-            adminOp = pap.query().operations().getAdminOperation(opName);
-        }
-
-        return adminOp.getNodeOperandNames();
     }
 }

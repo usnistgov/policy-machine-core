@@ -2,21 +2,22 @@ package gov.nist.csd.pm.pap.pml.executable.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializable {
     private PMLStatementBlock statements;
 
-    public PMLStmtsRoutine(String name, Type returnType, List<String> operandNames, Map<String, Type> operandTypes, PMLStatementBlock statements) {
-        super(name, returnType, operandNames, operandTypes);
+    public PMLStmtsRoutine(String name, Type returnType, List<PMLFormalArg> formalArgs, PMLStatementBlock statements) {
+        super(name, returnType, formalArgs);
         this.statements = statements;
     }
 
@@ -29,10 +30,10 @@ public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializa
     }
 
     @Override
-    public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
+    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeRoutineStatements(statements.getStmts(), operands);
+        return ctx.executeRoutineStatements(statements.getStmts(), actualArgs);
     }
 
 

@@ -1,16 +1,12 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.operation.builtin.Equals;
 import gov.nist.csd.pm.pap.pml.scope.*;
 import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

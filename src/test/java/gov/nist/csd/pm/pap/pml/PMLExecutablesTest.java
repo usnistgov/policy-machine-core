@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
@@ -134,14 +135,16 @@ public class PMLExecutablesTest {
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateAdminOperation(new UserContext(id("u1")), "op2", Map.of());
+		pdp.adjudicateAdminOperation(new UserContext(id("u1")),
+			pap.query().operations().getAdminOperation("op2"),
+			new ActualArgs());
 
 		assertFalse(pap.query().graph().nodeExists("pc3"));
 	}
 
 	@Test
 	void testCallCustomOperationInRoutineDoesTriggerObligationResponse() throws PMException {
-		// call custom operation in a routine should trigger an obligation response
+		// call custom operation in a function should trigger an obligation response
 		String pml = """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -171,7 +174,8 @@ public class PMLExecutablesTest {
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
+		pdp.adjudicateAdminRoutine(new UserContext(id("u1")),
+			pap.query().routines().getAdminRoutine("routine1"), new ActualArgs());
 
 		assertFalse(pap.query().graph().nodeExists("pc3"));
 	}

@@ -1,16 +1,21 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
+import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.Objects;
 
-public abstract class DeleteStatement extends OperationStatement {
+public abstract class DeleteStatement<T extends Operation<?>> extends OperationStatement<T> {
 
-    private Type type;
-    private Expression expression;
+    protected Type type;
+    protected Expression expression;
 
-    public DeleteStatement(Operation<Void> op, Type type, Expression expression) {
+    public DeleteStatement(T op, Type type, Expression expression) {
         super(op);
         this.type = type;
         this.expression = expression;
@@ -33,6 +38,13 @@ public abstract class DeleteStatement extends OperationStatement {
     }
 
     @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        op.execute(pap, prepareOperands(ctx, pap));
+
+        return new VoidValue();
+    }
+
+    @Override
     public String toFormattedString(int indentLevel) {
         String typeStr = "";
         switch (type) {
@@ -47,7 +59,7 @@ public abstract class DeleteStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeleteStatement that)) return false;
+        if (!(o instanceof DeleteStatement<?> that)) return false;
         return type == that.type && Objects.equals(expression, that.expression);
     }
 

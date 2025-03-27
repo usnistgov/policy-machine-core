@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateObligationStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import org.junit.jupiter.api.Test;
 
@@ -209,8 +209,8 @@ class CreateRuleStmtVisitorTest {
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", List.of(
-                                        new CreatePolicyStatement(new StringLiteral("pc1")),
-                                        new CreatePolicyStatement(new StringLiteral("pc2"))
+                                        new CreatePolicyClassStatement(new StringLiteral("pc1")),
+                                        new CreatePolicyClassStatement(new StringLiteral("pc2"))
                                 ))
                         )
                 )

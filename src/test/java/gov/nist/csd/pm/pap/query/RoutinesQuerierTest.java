@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
@@ -19,13 +20,13 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
     static Routine<Object> r1 = new Routine<>("r1", List.of()) {
         @Override
-        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
             return null;
         }
     };
     static Routine<Object> r2 = new Routine<>("r2", List.of()) {
         @Override
-        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
             return null;
         }
     };

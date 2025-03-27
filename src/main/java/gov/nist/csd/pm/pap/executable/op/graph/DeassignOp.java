@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.pap.executable.op.graph;
 
 
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.DEASSIGN;
 import static gov.nist.csd.pm.pap.AdminAccessRights.DEASSIGN_FROM;
@@ -18,34 +18,30 @@ public class DeassignOp extends GraphOp<Void> {
     public DeassignOp() {
         super(
                 "deassign",
-                List.of(ASCENDANT_OPERAND, DESCENDANTS_OPERAND),
-                List.of(ASCENDANT_OPERAND, DESCENDANTS_OPERAND)
+                List.of(ASCENDANT_ARG, DESCENDANTS_ARG)
         );
     }
-
-    @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, (Long) operands.get(ASCENDANT_OPERAND), DEASSIGN);
-        privilegeChecker.check(userCtx, (List<Long>) operands.get(DESCENDANTS_OPERAND), DEASSIGN_FROM);
+    
+    public ActualArgs actualArgs(long ascendant, LongArrayList descendants) {
+        ActualArgs actualArgs = new ActualArgs();
+        actualArgs.put(ASCENDANT_ARG, ascendant);
+        actualArgs.put(DESCENDANTS_ARG, descendants);
+        return actualArgs;
     }
 
     @Override
-    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        long asc = (Long) operands.get(ASCENDANT_OPERAND);
-        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+        privilegeChecker.check(userCtx, operands.get(ASCENDANT_ARG), DEASSIGN);
+        privilegeChecker.check(userCtx, operands.get(DESCENDANTS_ARG), DEASSIGN_FROM);
+    }
+
+    @Override
+    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+        long asc = actualArgs.get(ASCENDANT_ARG);
+        List<Long> descs = actualArgs.get(DESCENDANTS_ARG);
 
         pap.modify().graph().deassign(asc, descs);
 
         return null;
-    }
-
-    public static class EventCtx extends EventContext {
-
-        public EventCtx(String user, String process, String ascendantName, List<String> descendantNames) {
-            super(user, process, "deassign", Map.of(
-                    ASCENDANT_OPERAND, ascendantName,
-                    DESCENDANTS_OPERAND, descendantNames
-            ));
-        }
     }
 }

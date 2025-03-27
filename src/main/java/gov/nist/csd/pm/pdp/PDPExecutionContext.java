@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
@@ -41,8 +42,8 @@ public class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
-    public Value executeStatements(List<PMLStatement> statements, Map<String, Object> operands) throws PMException {
-        ExecutionContext copy = writeOperandsToScope(operands);
+    public Value executeStatements(List<PMLStatement> statements, ActualArgs args) throws PMException {
+        ExecutionContext copy = writeArgsToScope(args);
 
         for (PMLStatement statement : statements) {
             Value value = statement.execute(copy, pdpTx);
@@ -55,8 +56,8 @@ public class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
-    public Value executeOperationStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        ExecutionContext copy = writeOperandsToScope(operands);
+    public Value executeOperationStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+        ExecutionContext copy = writeArgsToScope(args);
 
         // for operations, we don't want to use the PDPEC, just the normal one
         // to avoid having access checks inside for loops when they call
@@ -75,7 +76,7 @@ public class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
-    public Value executeRoutineStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        return executeStatements(stmts, operands);
+    public Value executeRoutineStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+        return executeStatements(stmts, args);
     }
 }

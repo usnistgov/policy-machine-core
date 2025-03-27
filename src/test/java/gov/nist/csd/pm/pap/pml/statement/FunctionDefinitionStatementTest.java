@@ -2,13 +2,16 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLNodeFormalArg;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.pap.pml.statement.basic.FunctionReturnStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.*;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -22,14 +25,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionStatementTest {
 
+    private static final PMLNodeFormalArg a = new PMLNodeFormalArg("a", Type.string());
+    private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
+
     @Test
     void testOperationFormattedString() {
         CreateExecutableStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
                 "op1",
                 Type.string(),
-                List.of("a", "b", "c"),
-                List.of("a"),
-                Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
+                List.of(a, b),
                 new CheckAndStatementsBlock(
                         new PMLStatementBlock(
                                 new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
@@ -37,14 +41,14 @@ class FunctionDefinitionStatementTest {
                         ),
                         new PMLStatementBlock(
                                 List.of(
-                                        new FunctionReturnStatement(new StringLiteral("test"))
+                                        new ReturnStatement(new StringLiteral("test"))
                                 )
                         )
                 )
         ));
 
         assertEquals("""
-                             operation op1(@node string a, bool b, []string c) string {
+                             operation op1(@node string a, string b) string {
                                  check "ar1" on a
                                  check "ar2" on "node"
                              } {
@@ -53,7 +57,7 @@ class FunctionDefinitionStatementTest {
                 stmt.toFormattedString(0));
 
         assertEquals("""
-                                 operation op1(@node string a, bool b, []string c) string {
+                                 operation op1(@node string a, string b) string {
                                      check "ar1" on a
                                      check "ar2" on "node"
                                  } {
@@ -68,23 +72,22 @@ class FunctionDefinitionStatementTest {
         CreateExecutableStatement stmt = new CreateRoutineStatement(new PMLStmtsRoutine(
                 "rou1",
                 Type.voidType(),
-                List.of("a", "b", "c"),
-                Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
+                List.of(a, b),
                 new PMLStatementBlock(
                         List.of(
-                                new CreatePolicyStatement(new StringLiteral("test"))
+                                new CreatePolicyClassStatement(new StringLiteral("test"))
                         )
                 )
         ));
 
         assertEquals("""
-                             routine rou1(string a, bool b, []string c) {
+                             routine rou1(string a, string b) {
                                  create PC "test"
                              }""",
                 stmt.toFormattedString(0));
 
         assertEquals("""
-                                 routine rou1(string a, bool b, []string c) {
+                                 routine rou1(string a, string b) {
                                      create PC "test"
                                  }
                              """,
@@ -96,9 +99,7 @@ class FunctionDefinitionStatementTest {
         CreateExecutableStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
                 "func1",
                 Type.voidType(),
-                List.of("a", "b", "c"),
-                List.of("a"),
-                Map.of("a", Type.string(), "b", Type.bool(), "c", Type.array(Type.string())),
+                List.of(a, b),
                 new CheckAndStatementsBlock(
                         new PMLStatementBlock(
                                 new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
@@ -106,14 +107,14 @@ class FunctionDefinitionStatementTest {
                         ),
                         new PMLStatementBlock(
                                 List.of(
-                                        new FunctionReturnStatement()
+                                        new ReturnStatement()
                                 )
                         )
                 )
         ));
 
         assertEquals("""
-                             operation func1(@node string a, bool b, []string c) {
+                             operation func1(@node string a, string b) {
                                  check "ar1" on a
                                  check "ar2" on "node"
                              } {

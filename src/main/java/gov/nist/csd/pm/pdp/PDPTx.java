@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
@@ -110,10 +111,10 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public Object executeAdminExecutable(AdminExecutable<?> adminExecutable, Map<String, Object> operands) throws PMException {
-        if (adminExecutable instanceof Routine<?> routine) {
+    public <T> T executeAdminExecutable(AdminExecutable<T> adminExecutable, ActualArgs operands) throws PMException {
+        if (adminExecutable instanceof Routine<T> routine) {
             return routine.execute(this, operands);
-        } else if (adminExecutable instanceof Operation<?> operation) {
+        } else if (adminExecutable instanceof Operation<T> operation) {
             operation.canExecute(privilegeChecker, userCtx, operands);
             return operation.execute(pap, operands);
         }
@@ -148,7 +149,7 @@ public class PDPTx extends PAP {
         List<PMLStatement> stmts = pmlCompiler.compilePML(pap, input);
 
         ExecutionContext ctx = new PDPExecutionContext(author, this);
-        ctx.executeStatements(stmts, Map.of());
+        ctx.executeStatements(stmts, new ActualArgs());
     }
 
     @Override

@@ -184,7 +184,7 @@ public class PMLSerializer implements PolicySerializer {
                 continue;
             }
 
-            sb.append(new CreatePolicyStatement(
+            sb.append(new CreatePolicyClassStatement(
                     buildNameExpression(pc.getName())
             )).append("\n");
 

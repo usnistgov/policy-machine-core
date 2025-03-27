@@ -2,11 +2,12 @@ package gov.nist.csd.pm.pap.executable.op.graph;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public abstract class CreateNodeOp extends GraphOp<Long> {
 
@@ -15,29 +16,39 @@ public abstract class CreateNodeOp extends GraphOp<Long> {
     public CreateNodeOp(String name, String ar) {
         super(
                 name,
-                List.of(NAME_OPERAND, DESCENDANTS_OPERAND),
-                List.of(DESCENDANTS_OPERAND)
+                List.of(NAME_ARG, DESCENDANTS_ARG)
         );
 
         this.ar = ar;
     }
 
-    public CreateNodeOp(String name, List<String> nodeOperands, List<String> otherOperands, String ar) {
+    public CreateNodeOp(String name, List<FormalArg<?>> formalArgs, String ar) {
         super(
                 name,
-                nodeOperands,
-                otherOperands
+                formalArgs
         );
 
         this.ar = ar;
+    }
+    
+    public ActualArgs actualArgs(String name) {
+        ActualArgs actualArgs = new ActualArgs();
+        actualArgs.put(NAME_ARG, name);
+        return actualArgs;
+    }
+
+    public ActualArgs actualArgs(String name, LongArrayList descendants) {
+        ActualArgs actualArgs = new ActualArgs();
+        actualArgs.put(NAME_ARG, name);
+        actualArgs.put(DESCENDANTS_ARG, descendants);
+        return actualArgs;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        Collection<Long> coll = (Collection<Long>) operands.get(DESCENDANTS_OPERAND);
-        for (Long l : coll) {
-            privilegeChecker.check(userCtx, l, ar);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actualArgs) throws PMException {
+        LongArrayList descendants = actualArgs.get(DESCENDANTS_ARG);
+        for (Long nodeId : descendants) {
+            privilegeChecker.check(userCtx, nodeId, ar);
         }
     }
-
 }

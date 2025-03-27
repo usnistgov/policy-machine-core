@@ -10,10 +10,9 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.List;
 import java.util.Objects;
 
-
 public class VariableDeclarationStatement extends BasicStatement {
 
-    private List<Declaration> declarations;
+    private final List<Declaration> declarations;
 
     public VariableDeclarationStatement(List<Declaration> declarations) {
         this.declarations = declarations;
@@ -23,17 +22,11 @@ public class VariableDeclarationStatement extends BasicStatement {
         return declarations;
     }
 
-    public void setDeclarations(
-            List<Declaration> declarations) {
-        this.declarations = declarations;
-    }
-
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
         for (Declaration declaration : declarations) {
-            Value value = declaration.expression.execute(ctx, pap);
-
-            ctx.scope().updateVariable(declaration.id, value);
+            Value value = declaration.expression().execute(ctx, pap);
+            ctx.scope().updateVariable(declaration.id(), value);
         }
 
         return new VoidValue();
@@ -59,7 +52,7 @@ public class VariableDeclarationStatement extends BasicStatement {
         sb.append(indent).append("var (\n");
 
         for (Declaration declaration : declarations) {
-            sb.append(indent(indentLevel+1)).append(declaration.id).append(" = ").append(declaration.expression).append("\n");
+            sb.append(indent(indentLevel+1)).append(declaration.id()).append(" = ").append(declaration.expression()).append("\n");
         }
 
         sb.append(indent).append(")");
@@ -86,4 +79,4 @@ public class VariableDeclarationStatement extends BasicStatement {
             return Objects.hash(id, expression);
         }
     }
-}
+} 

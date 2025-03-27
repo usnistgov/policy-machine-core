@@ -2,21 +2,14 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.pap.executable.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.pap.executable.op.operation.*;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
-
-import java.util.Map;
-
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
 
 public class OperationsModificationAdjudicator extends Adjudicator implements OperationsModification {
 
@@ -31,22 +24,28 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
 
     @Override
     public void setResourceOperations(AccessRightSet accessRightSet) throws PMException {
-        new SetResourceOperationsOp()
-                .withOperands(Map.of(OPERATIONS_OPERAND, accessRightSet))
-                .execute(pap, userCtx, privilegeChecker);
+        SetResourceOperationsOp op = new SetResourceOperationsOp();
+        ActualArgs args = op.actualArgs(accessRightSet);
+
+        op.canExecute(privilegeChecker, userCtx, args);
+        op.execute(pap, args);
     }
 
     @Override
     public void createAdminOperation(Operation<?> operation) throws PMException {
-        new CreateAdminOperationOp()
-                .withOperands(Map.of(OPERATION_OPERAND, operation))
-                .execute(pap, userCtx, privilegeChecker);
+        CreateAdminOperationOp op = new CreateAdminOperationOp();
+        ActualArgs args = op.actualArgs(operation);
+
+        op.canExecute(privilegeChecker, userCtx, args);
+        op.execute(pap, args);
     }
 
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
-        new DeleteAdminOperationOp()
-                .withOperands(Map.of(NAME_OPERAND, operation))
-                .execute(pap, userCtx, privilegeChecker);
+        DeleteAdminOperationOp op = new DeleteAdminOperationOp();
+        ActualArgs args = op.actualArgs(operation);
+
+        op.canExecute(privilegeChecker, userCtx, args);
+        op.execute(pap, args);
     }
 }

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,7 +66,7 @@ class RoutinesModificationAdjudicatorTest {
     void createAdminRoutine() throws PMException {
         Routine<Void> routine1 = new Routine<>("routine1", List.of()) {
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
         };
@@ -80,7 +80,7 @@ class RoutinesModificationAdjudicatorTest {
     void deleteAdminRoutine() throws PMException {
         Routine<Void> routine1 = new Routine<>("routine1", List.of()) {
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
         };

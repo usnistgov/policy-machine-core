@@ -95,19 +95,19 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
         // operations
         for (PMLParser.OperationDefinitionStatementContext operationCtx : operationCtxs) {
             PMLExecutableSignature signature = signatureVisitor.visitOperationSignature(operationCtx.operationSignature());
-            processSignature(visitorCtx, operationCtx, signature, executables, (ctx) -> validOperationDefs.put(signature.getFunctionName(), operationCtx));
+            processSignature(visitorCtx, operationCtx, signature, executables, (ctx) -> validOperationDefs.put(signature.getName(), operationCtx));
         }
 
         // routines
         for (PMLParser.RoutineDefinitionStatementContext routineCtx : routineCtxs) {
             PMLExecutableSignature signature = signatureVisitor.visitRoutineSignature(routineCtx.routineSignature());
-            processSignature(visitorCtx, routineCtx, signature, executables, (ctx) -> validRoutineDefs.put(signature.getFunctionName(), routineCtx));
+            processSignature(visitorCtx, routineCtx, signature, executables, (ctx) -> validRoutineDefs.put(signature.getName(), routineCtx));
         }
 
         // functions
         for (PMLParser.FunctionDefinitionStatementContext functionCtx : functionCtxs) {
             PMLExecutableSignature signature = signatureVisitor.visitFunctionSignature(functionCtx.functionSignature());
-            processSignature(visitorCtx, functionCtx, signature, executables, (ctx) -> validFunctionDefs.put(signature.getFunctionName(), functionCtx));
+            processSignature(visitorCtx, functionCtx, signature, executables, (ctx) -> validFunctionDefs.put(signature.getName(), functionCtx));
         }
 
         // compile all executable bodies now that all signatures are compiled
@@ -140,17 +140,17 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
         // visit the signature which will add to the scope, if an error occurs, log it and continue
         try {
             // check that the function isn't already defined in the pml or global scope
-            if (executables.containsKey(signature.getFunctionName())) {
+            if (executables.containsKey(signature.getName())) {
                 visitorCtx.errorLog().addError(
                         statementCtx,
-                        "executable '" + signature.getFunctionName() + "' already defined in scope"
+                        "executable '" + signature.getName() + "' already defined in scope"
                 );
 
                 return;
             }
 
 
-            executables.put(signature.getFunctionName(), signature);
+            executables.put(signature.getName(), signature);
             consumer.accept(statementCtx);
         } catch (PMLCompilationRuntimeException e) {
             visitorCtx.errorLog().addErrors(e.getErrors());

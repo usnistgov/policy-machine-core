@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.pap.executable.op.prohibition;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
@@ -10,14 +13,16 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import static gov.nist.csd.pm.pap.executable.op.prohibition.CreateProhibitionOp.CONTAINERS_ARG;
+import static gov.nist.csd.pm.pap.executable.op.prohibition.CreateProhibitionOp.SUBJECT_ARG;
 
 public abstract class ProhibitionOp extends Operation<Void> {
 
-    public static final String SUBJECT_OPERAND = "subject";
-    public static final String ARSET_OPERAND = "arset";
-    public static final String INTERSECTION_OPERAND = "intersection";
-    public static final String CONTAINERS_OPERAND = "containers";
+    public static final FormalArg<ProhibitionSubject> SUBJECT_ARG = new FormalArg<>("subject", ProhibitionSubject.class);
+    public static final FormalArg<AccessRightSet> ARSET_ARG = new FormalArg<>("arset", AccessRightSet.class);
+    public static final FormalArg<Boolean> INTERSECTION_ARG = new FormalArg<>("intersection", Boolean.class);
+    public static final FormalArg<ContainerConditionsList> CONTAINERS_ARG = new FormalArg<>("containers", ContainerConditionsList.class);
 
     private final String processReqCap;
     private final String reqCap;
@@ -25,16 +30,33 @@ public abstract class ProhibitionOp extends Operation<Void> {
     public ProhibitionOp(String opName, String processReqCap, String reqCap) {
         super(
                 opName,
-                List.of(NAME_OPERAND, SUBJECT_OPERAND, ARSET_OPERAND, INTERSECTION_OPERAND, CONTAINERS_OPERAND)
+                List.of(
+                        NAME_ARG,
+                        SUBJECT_ARG,
+                        ARSET_ARG,
+                        INTERSECTION_ARG,
+                        CONTAINERS_ARG
+                )
         );
 
         this.processReqCap = processReqCap;
         this.reqCap = reqCap;
     }
 
+    public ActualArgs actualArgs(String name, ProhibitionSubject subject, AccessRightSet arset,
+                                 Boolean intersection, ContainerConditionsList containers) {
+        ActualArgs actualArgs = new ActualArgs();
+        actualArgs.put(NAME_ARG, name);
+        actualArgs.put(SUBJECT_ARG, subject);
+        actualArgs.put(ARSET_ARG, arset);
+        actualArgs.put(INTERSECTION_ARG, intersection);
+        actualArgs.put(CONTAINERS_ARG, containers);
+        return actualArgs;
+    }
+
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        ProhibitionSubject subject = (ProhibitionSubject) operands.get(SUBJECT_OPERAND);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+        ProhibitionSubject subject = operands.get(SUBJECT_ARG);
 
         if (subject.isNode()) {
             privilegeChecker.check(userCtx, subject.getNodeId(), reqCap);
@@ -43,7 +65,7 @@ public abstract class ProhibitionOp extends Operation<Void> {
         }
 
         // check that the user can create a prohibition for each container in the condition
-        Collection<ContainerCondition> containers = (Collection<ContainerCondition>) operands.get(CONTAINERS_OPERAND);
+        Collection<ContainerCondition> containers = operands.get(CONTAINERS_ARG);
         for (ContainerCondition contCond : containers) {
             privilegeChecker.check(userCtx, contCond.getId(), reqCap);
 

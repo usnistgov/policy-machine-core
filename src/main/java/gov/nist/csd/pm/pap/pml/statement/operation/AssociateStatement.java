@@ -2,22 +2,18 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.executable.op.graph.AssociateOp;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.graph.AssociateOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.executable.op.graph.AssociateOp.TARGET_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.AssociateOp.UA_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.prohibition.ProhibitionOp.ARSET_OPERAND;
-
-
-public class AssociateStatement extends OperationStatement {
+public class AssociateStatement extends OperationStatement<AssociateOp> {
 
     private final Expression ua;
     private final Expression target;
@@ -32,7 +28,7 @@ public class AssociateStatement extends OperationStatement {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         Value uaValue = ua.execute(ctx, pap);
         Value targetValue = target.execute(ctx, pap);
         Value accessRightsValue = accessRights.execute(ctx, pap);
@@ -47,7 +43,14 @@ public class AssociateStatement extends OperationStatement {
         long uaId = graph.getNodeByName(uaValue.getStringValue()).getId();
         long targetId = graph.getNodeByName(targetValue.getStringValue()).getId();
 
-        return Map.of(UA_OPERAND, uaId, TARGET_OPERAND, targetId, ARSET_OPERAND, accessRightSet);
+        return op.actualArgs(uaId, targetId, accessRightSet);
+    }
+
+    @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        ActualArgs actualArgs = prepareOperands(ctx, pap);
+        op.execute(pap, actualArgs);
+        return new VoidValue();
     }
 
     @Override
@@ -67,4 +70,4 @@ public class AssociateStatement extends OperationStatement {
     public int hashCode() {
         return Objects.hash(ua, target, accessRights);
     }
-}
+} 

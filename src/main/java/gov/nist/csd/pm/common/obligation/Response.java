@@ -2,8 +2,11 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
@@ -36,7 +39,10 @@ public class Response implements Serializable {
     }
 
     public Value execute(ExecutionContext executionCtx, EventContext eventCtx) throws PMException {
-        executionCtx.executeStatements(stmts, Map.of(eventCtxVariable, eventCtx));
+        ActualArgs actualArgs = new ActualArgs();
+        actualArgs.put(new PMLFormalArg(eventCtxVariable, Type.map(Type.string(), Type.any())), Value.fromObject(eventCtx));
+
+        executionCtx.executeStatements(stmts, actualArgs);
 
         return new VoidValue();
     }

@@ -11,16 +11,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-
 public class IfStatement extends BasicStatement {
 
     private final ConditionalBlock ifBlock;
-    private final List<ConditionalBlock> ifElseBlocks;
+    private final List<ConditionalBlock> elseIfBlocks;
     private final PMLStatementBlock elseBlockStatements;
 
-    public IfStatement(ConditionalBlock ifBlock, List<ConditionalBlock> ifElseBlocks, PMLStatementBlock elseBlock) {
+    public IfStatement(ConditionalBlock ifBlock, List<ConditionalBlock> elseIfBlocks, PMLStatementBlock elseBlock) {
         this.ifBlock = ifBlock;
-        this.ifElseBlocks = ifElseBlocks;
+        this.elseIfBlocks = elseIfBlocks;
         this.elseBlockStatements = elseBlock;
     }
 
@@ -28,8 +27,8 @@ public class IfStatement extends BasicStatement {
         return ifBlock;
     }
 
-    public List<ConditionalBlock> getIfElseBlocks() {
-        return ifElseBlocks;
+    public List<ConditionalBlock> getElseIfBlocks() {
+        return elseIfBlocks;
     }
 
     public PMLStatementBlock getElseBlock() {
@@ -45,7 +44,7 @@ public class IfStatement extends BasicStatement {
         }
 
         // check else ifs
-        for (ConditionalBlock conditionalBlock : ifElseBlocks) {
+        for (ConditionalBlock conditionalBlock : elseIfBlocks) {
             condition = conditionalBlock.condition.execute(ctx, pap).getBooleanValue();
             if (condition) {
                 return conditionalBlock.block.execute(ctx, pap);
@@ -75,7 +74,7 @@ public class IfStatement extends BasicStatement {
 
     private String elseIfBlockToString(int indentLevel) {
         StringBuilder s = new StringBuilder();
-        for (ConditionalBlock b : ifElseBlocks) {
+        for (ConditionalBlock b : elseIfBlocks) {
             s.append(String.format(" else if %s %s", b.condition, b.block.toFormattedString(indentLevel)));
         }
 
@@ -91,13 +90,14 @@ public class IfStatement extends BasicStatement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IfStatement ifStmt = (IfStatement) o;
-        return Objects.equals(ifBlock, ifStmt.ifBlock) && Objects.equals(ifElseBlocks, ifStmt.ifElseBlocks) && Objects.equals(elseBlockStatements, ifStmt.elseBlockStatements);
+        return Objects.equals(ifBlock, ifStmt.ifBlock) && Objects.equals(
+            elseIfBlocks, ifStmt.elseIfBlocks) && Objects.equals(elseBlockStatements, ifStmt.elseBlockStatements);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ifBlock, ifElseBlocks, elseBlockStatements);
+        return Objects.hash(ifBlock, elseIfBlocks, elseBlockStatements);
     }
 
     public record ConditionalBlock(Expression condition, PMLStatementBlock block) implements Serializable { }
-}
+} 

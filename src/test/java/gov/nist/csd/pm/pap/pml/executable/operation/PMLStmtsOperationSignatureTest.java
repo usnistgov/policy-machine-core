@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.executable.operation;
 
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
@@ -16,9 +17,11 @@ class PMLStmtsOperationSignatureTest {
         PMLOperationSignature pmlStmtsOperationSignature = new PMLOperationSignature(
                 "op1",
                 Type.string(),
-                List.of("a", "b", "c"),
-                List.of("a"),
-                Map.of("a", Type.array(Type.string()), "b", Type.string(), "c", Type.string())
+            List.of(
+                new PMLNodeFormalArg("a", Type.string()),
+                new PMLFormalArg("b", Type.string()),
+                new PMLFormalArg("c", Type.string())
+            )
         );
 
         assertEquals(

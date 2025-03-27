@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.pap.executable.op.routine.DeleteAdminRoutineOp;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
@@ -9,11 +10,6 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.modification.RoutinesModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
-
-import java.util.Map;
-
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.routine.CreateAdminRoutineOp.ROUTINE_OPERAND;
 
 public class RoutinesModificationAdjudicator extends Adjudicator implements RoutinesModification {
 
@@ -28,15 +24,19 @@ public class RoutinesModificationAdjudicator extends Adjudicator implements Rout
 
     @Override
     public void createAdminRoutine(Routine<?> routine) throws PMException {
-        new CreateAdminRoutineOp()
-                .withOperands(Map.of(ROUTINE_OPERAND, routine))
-                .execute(pap, userCtx, privilegeChecker);
+        CreateAdminRoutineOp op = new CreateAdminRoutineOp();
+        ActualArgs args = op.actualArgs(routine);
+
+        op.canExecute(privilegeChecker, userCtx, args);
+        op.execute(pap, args);
     }
 
     @Override
     public void deleteAdminRoutine(String name) throws PMException {
-        new DeleteAdminRoutineOp()
-                .withOperands(Map.of(NAME_OPERAND, name))
-                .execute(pap, userCtx, privilegeChecker);
+        DeleteAdminRoutineOp op = new DeleteAdminRoutineOp();
+        ActualArgs args = op.actualArgs(name);
+
+        op.canExecute(privilegeChecker, userCtx, args);
+        op.execute(pap, args);
     }
 }

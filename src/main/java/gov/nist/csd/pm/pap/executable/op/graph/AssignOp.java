@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.pap.executable.op.graph;
 
-import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.ASSIGN;
 import static gov.nist.csd.pm.pap.AdminAccessRights.ASSIGN_TO;
@@ -17,34 +17,27 @@ public class AssignOp extends GraphOp<Void> {
     public AssignOp() {
         super(
                 "assign",
-                List.of(ASCENDANT_OPERAND, DESCENDANTS_OPERAND),
-                List.of(ASCENDANT_OPERAND, DESCENDANTS_OPERAND)
+                List.of(ASCENDANT_ARG, DESCENDANTS_ARG)
         );
     }
 
+    public ActualArgs actualArgs(long ascendant, LongArrayList descendants) {
+        ActualArgs actualArgs = new ActualArgs();
+        actualArgs.put(ASCENDANT_ARG, ascendant);
+        actualArgs.put(DESCENDANTS_ARG, descendants);
+        return actualArgs;
+    }
+
     @Override
-    public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-        long asc = (long) operands.get(ASCENDANT_OPERAND);
-        List<Long> descs = (List<Long>) operands.get(DESCENDANTS_OPERAND);
-
-        pap.modify().graph().assign(asc, descs);
-
+    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+        pap.modify().graph().assign(actualArgs.get(ASCENDANT_ARG), actualArgs.get(DESCENDANTS_ARG));
         return null;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        privilegeChecker.check(userCtx, (long) operands.get(ASCENDANT_OPERAND), ASSIGN);
-        privilegeChecker.check(userCtx, (List<Long>) operands.get(DESCENDANTS_OPERAND), ASSIGN_TO);
-    }
-
-    public static class EventCtx extends EventContext {
-
-        public EventCtx(String user, String process, String ascendantName, List<String> descendantNames) {
-            super(user, process, "assign", Map.of(
-                    ASCENDANT_OPERAND, ascendantName,
-                    DESCENDANTS_OPERAND, descendantNames
-            ));
-        }
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actualArgs) throws PMException {
+        privilegeChecker.check(userCtx, actualArgs.get(ASCENDANT_ARG), ASSIGN);
+        privilegeChecker.check(userCtx, actualArgs.get(DESCENDANTS_ARG), ASSIGN_TO);
     }
 }
+

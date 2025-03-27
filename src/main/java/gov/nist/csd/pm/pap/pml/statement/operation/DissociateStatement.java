@@ -1,19 +1,18 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.op.graph.DissociateOp;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.graph.DissociateOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.query.GraphQuery;
 
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.TARGET_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.UA_OPERAND;
-
-
-public class DissociateStatement extends OperationStatement {
+public class DissociateStatement extends OperationStatement<DissociateOp> {
 
     private final Expression uaExpr;
     private final Expression targetExpr;
@@ -25,14 +24,22 @@ public class DissociateStatement extends OperationStatement {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String ua = uaExpr.execute(ctx, pap).getStringValue();
         String target = targetExpr.execute(ctx, pap).getStringValue();
 
-        long uaId = pap.query().graph().getNodeByName(ua).getId();
-        long targetId = pap.query().graph().getNodeByName(target).getId();
+        GraphQuery graph = pap.query().graph();
+        long uaId = graph.getNodeByName(ua).getId();
+        long targetId = graph.getNodeByName(target).getId();
 
-        return Map.of(UA_OPERAND, uaId, TARGET_OPERAND, targetId);
+        return op.actualArgs(uaId, targetId);
+    }
+    
+    @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        ActualArgs actualArgs = prepareOperands(ctx, pap);
+        op.execute(pap, actualArgs);
+        return new VoidValue();
     }
 
     @Override
@@ -51,4 +58,4 @@ public class DissociateStatement extends OperationStatement {
     public int hashCode() {
         return Objects.hash(uaExpr, targetExpr);
     }
-}
+} 

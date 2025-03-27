@@ -1,52 +1,33 @@
 package gov.nist.csd.pm.pap.pml.executable.operation;
 
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.List;
-import java.util.Map;
 
 public class PMLOperationSignature extends PMLExecutableSignature {
 
-    private final List<String> nodeOperands;
-
-    public PMLOperationSignature(String functionName, Type returnType, List<String> allOperands,
-                                 List<String> nodeOperands, Map<String, Type> operandTypes) {
-        super(functionName, returnType, allOperands, operandTypes);
-
-        this.nodeOperands = nodeOperands;
-    }
-
-    public List<String> getNodeOperands() {
-        return nodeOperands;
+    public PMLOperationSignature(String functionName,
+                                 Type returnType,
+                                 List<PMLFormalArg> formalArgs) {
+        super(functionName, returnType, formalArgs);
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        String argsStr = serializeFormalArgs();
-        String indent = indent(indentLevel);
-        return String.format(
-                "%s%s %s(%s) %s",
-                indent,
-                "operation",
-                functionName,
-                argsStr,
-                returnType.isVoid() ? "" : returnType.toString() + " "
-        );
+        return toString("operation", indentLevel);
     }
 
     @Override
     protected String serializeFormalArgs() {
         String pml = "";
-        for (int i = 0; i < operands.size(); i++) {
-            String operand = operands.get(i);
-            Type operandType = operandTypes.get(operand);
-
+        for (PMLFormalArg formalArg : getFormalArgs()) {
             if (!pml.isEmpty()) {
                 pml += ", ";
             }
 
-            pml += (nodeOperands.contains(operand) ? "@node " : "") +  operandType.toString() + " " + operand;
+            pml += ((formalArg instanceof PMLNodeFormalArg) ? "@node " : "") +  formalArg.getPmlType().toString() + " " + formalArg.getName();
         }
         return pml;
     }

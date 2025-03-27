@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.PROPERTIES_OPERAND;
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,8 +57,8 @@ class ValueTest {
         EventContext testEventCtx = new EventContext(
                 "testUser",
                 "",
-                new CreateObjectAttributeOp(),
-                Map.of(NAME_OPERAND, "testOA", PROPERTIES_OPERAND, NO_PROPERTIES, DESCENDANTS_OPERAND, List.of("pc1"))
+                new CreateObjectAttributeOp().getName(),
+                Map.of("name", "testOA", "properties", NO_PROPERTIES, "descendants", List.of("pc1"))
         );
 
         Value objectToValue = Value.fromObject(testEventCtx);

@@ -10,12 +10,11 @@ import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
 import java.util.Objects;
 
-
 public class VariableAssignmentStatement extends BasicStatement {
 
-    private String id;
-    private boolean isPlus;
-    private Expression expression;
+    private final String id;
+    private final boolean isPlus;
+    private final Expression expression;
 
     public VariableAssignmentStatement(String id, boolean isPlus, Expression expression) {
         this.id = id;
@@ -27,24 +26,12 @@ public class VariableAssignmentStatement extends BasicStatement {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public boolean isPlus() {
         return isPlus;
     }
 
-    public void setPlus(boolean plus) {
-        isPlus = plus;
-    }
-
     public Expression getExpression() {
         return expression;
-    }
-
-    public void setExpression(Expression expression) {
-        this.expression = expression;
     }
 
     @Override
@@ -86,4 +73,4 @@ public class VariableAssignmentStatement extends BasicStatement {
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) + id + (isPlus ? " +": " ") + "= " + expression;
     }
-}
+} 

@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.executable.AdminExecutable;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLBuiltinOperations;
+import gov.nist.csd.pm.pap.pml.executable.builtin.PMLBuiltinExecutables;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
@@ -31,7 +31,7 @@ public class ExecuteScope extends Scope<Value, AdminExecutable<?>> {
 
         // add pml operations and routines stored in PAP
         Map<String, AdminExecutable<?>> executables = new HashMap<>();
-        executables.putAll(new HashMap<>(PMLBuiltinOperations.builtinFunctions()));
+        executables.putAll(new HashMap<>(PMLBuiltinExecutables.builtinFunctions()));
         executables.putAll(pap.getPMLOperations());
         executables.putAll(pap.getPMLRoutines());
         setExecutables(executables);

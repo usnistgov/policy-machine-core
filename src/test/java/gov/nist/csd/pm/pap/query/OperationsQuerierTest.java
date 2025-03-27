@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.query;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,24 +24,24 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
     static Operation<Object> op1 = new Operation<Object>("op1", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
         }
 
         @Override
-        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
             return null;
         }
     };
 
     static Operation<Object> op2 = new Operation<Object>("op2", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
         }
 
         @Override
-        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
             return null;
         }
     };
@@ -72,12 +72,12 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
         static Operation<Object> operation = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
         };

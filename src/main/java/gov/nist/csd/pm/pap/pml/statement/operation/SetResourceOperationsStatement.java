@@ -2,54 +2,58 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.executable.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
+public class SetResourceOperationsStatement extends OperationStatement<SetResourceOperationsOp> {
 
+    private final Expression operationsExpr;
 
-public class SetResourceOperationsStatement extends OperationStatement {
-
-    private final Expression ops;
-
-    public SetResourceOperationsStatement(Expression ops) {
+    public SetResourceOperationsStatement(Expression operationsExpr) {
         super(new SetResourceOperationsOp());
-
-        this.ops = ops;
+        this.operationsExpr = operationsExpr;
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap)
-            throws PMException {
-        Value arValue = ops.execute(ctx, pap);
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+        List<Value> opValues = operationsExpr.execute(ctx, pap).getArrayValue();
         AccessRightSet accessRightSet = new AccessRightSet();
-        for (Value v : arValue.getArrayValue()) {
-            accessRightSet.add(v.getStringValue());
+        for (Value opValue : opValues) {
+            accessRightSet.add(opValue.getStringValue());
         }
+        
+        return op.actualArgs(accessRightSet);
+    }
 
-        return Map.of(OPERATIONS_OPERAND, accessRightSet);
+    @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        ActualArgs actualArgs = prepareOperands(ctx, pap);
+        op.execute(pap, actualArgs);
+        return new VoidValue();
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + String.format("set resource operations %s", ops);
+        return indent(indentLevel) + "set resource operations " + operationsExpr;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SetResourceOperationsStatement that)) return false;
-        return Objects.equals(ops, that.ops);
+        return Objects.equals(operationsExpr, that.operationsExpr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(ops);
+        return Objects.hash(operationsExpr);
     }
-}
+} 

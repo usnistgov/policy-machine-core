@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
@@ -47,7 +49,7 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
             }
         }
 
-        // check the function is in scope and the args are correct
+        // check the executable is in scope and the args are correct
         PMLExecutableSignature signature;
         try {
             signature = visitorCtx.scope().getExecutable(funcName);
@@ -58,7 +60,7 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
         // check that the actual args are correct type only if the function is not a pattern function
         // pattern operations are handled differently because we do not want to invoke them now, just
         // prepare them to be invoked during the event processing flow
-        List<String> formalArgs = signature.getOperands();
+        List<PMLFormalArg> formalArgs = signature.getFormalArgs();
         if (formalArgs.size() != actualArgs.size()) {
             throw new PMLCompilationRuntimeException(
                     funcCallCtx,
@@ -70,8 +72,8 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
                 try {
                     Expression actual = actualArgs.get(i);
                     Type actualType = actual.getType(visitorCtx.scope());
-                    String operand = formalArgs.get(i);
-                    Type formalType = signature.getOperandTypes().get(operand);
+                    PMLFormalArg operand = formalArgs.get(i);
+                    Type formalType = operand.getPmlType();
 
                     if (!actual.getType(visitorCtx.scope()).equals(formalType)) {
                         throw new PMLCompilationRuntimeException(
@@ -86,12 +88,6 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
             }
         }
 
-        Map<String, Expression> operands = new HashMap<>();
-        for (int i = 0; i < actualArgs.size(); i++) {
-            String operand = formalArgs.get(i);
-            operands.put(operand, actualArgs.get(i));
-        }
-
-        return new FunctionInvokeExpression(signature, operands);
+        return new FunctionInvokeExpression(funcName, actualArgs);
     }
 }

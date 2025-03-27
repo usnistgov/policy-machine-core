@@ -41,7 +41,7 @@ class CreateObligationStatementTest {
                                 ))
                         ),
                         new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                new CreatePolicyStatement(new StringLiteral("pc2"))
+                                new CreatePolicyClassStatement(new StringLiteral("pc2"))
                         ))
                 )
         ));
@@ -93,7 +93,7 @@ class CreateObligationStatementTest {
                                         ))
                                 ),
                                 new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                        new CreatePolicyStatement(new StringLiteral("pc2"))
+                                        new CreatePolicyClassStatement(new StringLiteral("pc2"))
                                 ))
                         ),
                         new CreateRuleStatement(
@@ -108,7 +108,7 @@ class CreateObligationStatementTest {
                                         ))
                                 ),
                                 new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                        new CreatePolicyStatement(new StringLiteral("pc3"))
+                                        new CreatePolicyClassStatement(new StringLiteral("pc3"))
                                 ))
                         )
                 )

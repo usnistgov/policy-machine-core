@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
@@ -26,7 +26,7 @@ class CreatePolicyStmtVisitorTest {
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new CreatePolicyStatement(new StringLiteral("test")),
+                new CreatePolicyClassStatement(new StringLiteral("test")),
                 stmt
         );
     }
@@ -43,7 +43,7 @@ class CreatePolicyStmtVisitorTest {
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new CreatePolicyStatement(new StringLiteral("test")),
+                new CreatePolicyClassStatement(new StringLiteral("test")),
                 stmt
         );
     }

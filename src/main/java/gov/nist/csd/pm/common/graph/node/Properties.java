@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Common properties used for nodes
  */
-public class Properties {
+public class Properties extends HashMap<String, String> {
     public static final String WILDCARD = "*";
     public static final String REP_PROPERTY = "rep";
     public static final Map<String, String> NO_PROPERTIES = Collections.unmodifiableMap(new HashMap<>());
@@ -28,5 +28,13 @@ public class Properties {
             props.put(pairs[i], pairs[++i]);
         }
         return props;
+    }
+
+    public Properties(String... pairs) {
+        super(toProperties(pairs));
+    }
+
+    public Properties(Map<String, String> properties) {
+        super(properties);
     }
 }

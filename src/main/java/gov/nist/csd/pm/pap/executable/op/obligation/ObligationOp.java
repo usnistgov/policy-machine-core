@@ -3,36 +3,47 @@ package gov.nist.csd.pm.pap.executable.op.obligation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.executable.op.arg.IdNodeFormalArg;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
 public abstract class ObligationOp extends Operation<Void> {
 
-    public static final String AUTHOR_OPERAND = "author";
-    public static final String RULES_OPERAND = "rules";
+    public static final IdNodeFormalArg AUTHOR_ARG = new IdNodeFormalArg("author");
+    public static final FormalArg<String> NAME_ARG = new FormalArg<>("name", String.class);
+    public static final FormalArg<RuleList> RULES_ARG = new FormalArg<>("rules", RuleList.class);
 
     private final String reqCap;
 
     public ObligationOp(String opName, String reqCap) {
         super(
                 opName,
-                List.of(AUTHOR_OPERAND, NAME_OPERAND,  RULES_OPERAND)
+                List.of(AUTHOR_ARG, NAME_ARG, RULES_ARG)
         );
 
         this.reqCap = reqCap;
     }
 
+    public ActualArgs actualArgs(long author, String name, RuleList rules) {
+        ActualArgs args = new ActualArgs();
+        args.put(AUTHOR_ARG, author);
+        args.put(NAME_ARG, name);
+        args.put(RULES_ARG, rules);
+        return args;
+    }
+
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-        List<Rule> rules = (List<Rule>) operands.get(RULES_OPERAND);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actulArgs) throws PMException {
+        List<Rule> rules = actulArgs.get(RULES_ARG);
         for (Rule rule : rules) {
             EventPattern eventPattern = rule.getEventPattern();
 
@@ -41,7 +52,7 @@ public abstract class ObligationOp extends Operation<Void> {
             checkPatternPrivileges(privilegeChecker, userCtx, pattern, reqCap);
 
             // check operand patterns
-            for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : eventPattern.getOperandPatterns().entrySet()) {
+            for (var operandPattern : eventPattern.getArgPatterns().entrySet()) {
                 for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
                     checkPatternPrivileges(privilegeChecker, userCtx, operandPatternExpression, reqCap);
                 }

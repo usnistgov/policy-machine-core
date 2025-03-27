@@ -5,7 +5,10 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.executable.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.executable.function.PMLStmtsFunction;
+import gov.nist.csd.pm.pap.pml.executable.operation.PMLNodeFormalArg;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
@@ -34,75 +37,67 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 	@Override
 	public CreateOperationStatement visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
 		PMLOperationSignature signature = new SignatureVisitor(visitorCtx, addToCtx)
-				.visitOperationSignature(ctx.operationSignature());
+			.visitOperationSignature(ctx.operationSignature());
 
 		CheckAndStatementsBlock body = parseBody(
-				ctx.checkStatementBlock(),
-				ctx.statementBlock(),
-				signature.getOperands(),
-				signature.getOperandTypes(),
-				signature.getReturnType()
+			ctx.checkStatementBlock(),
+			ctx.statementBlock(),
+			signature.getReturnType(),
+			signature.getFormalArgs()
 		);
 
 		return new CreateOperationStatement(new PMLStmtsOperation(
-				signature.getFunctionName(),
-				signature.getReturnType(),
-				signature.getOperands(),
-				signature.getNodeOperands(),
-				signature.getOperandTypes(),
-				body
+			signature.getName(),
+			signature.getReturnType(),
+			signature.getFormalArgs(),
+			body
 		));
 	}
 
 	@Override
 	public CreateRoutineStatement visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
 		PMLRoutineSignature signature = new SignatureVisitor(visitorCtx, addToCtx)
-				.visitRoutineSignature(ctx.routineSignature());
+			.visitRoutineSignature(ctx.routineSignature());
 
 		CheckAndStatementsBlock body = parseBody(
-				null,
-				ctx.statementBlock(),
-				signature.getOperands(),
-				signature.getOperandTypes(),
-				signature.getReturnType()
+			null,
+			ctx.statementBlock(),
+			signature.getReturnType(),
+			signature.getFormalArgs()
 		);
 
 		return new CreateRoutineStatement(new PMLStmtsRoutine(
-				signature.getFunctionName(),
-				signature.getReturnType(),
-				signature.getOperands(),
-				signature.getOperandTypes(),
-				body.getStatements()
+			signature.getName(),
+			signature.getReturnType(),
+			signature.getFormalArgs(),
+			body.getStatements()
 		));
 	}
 
 	@Override
 	public CreateFunctionStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
 		PMLFunctionSignature signature = new SignatureVisitor(visitorCtx, addToCtx)
-				.visitFunctionSignature(ctx.functionSignature());
+			.visitFunctionSignature(ctx.functionSignature());
 
 		CheckAndStatementsBlock body = parseBody(
-				ctx.basicStatementBlock(),
-				signature.getOperands(),
-				signature.getOperandTypes(),
-				signature.getReturnType()
+			ctx.basicStatementBlock(),
+			signature.getReturnType(),
+			signature.getFormalArgs()
 		);
 
-		return new CreateFunctionStatement(new PMLStmtsRoutine(
-				signature.getFunctionName(),
-				signature.getReturnType(),
-				signature.getOperands(),
-				signature.getOperandTypes(),
-				body.getStatements()
+		return new CreateFunctionStatement(new PMLStmtsFunction(
+			signature.getName(),
+			signature.getReturnType(),
+			signature.getFormalArgs(),
+			body.getStatements()
 		));
 	}
 
 	private CheckAndStatementsBlock parseBody(PMLParser.BasicStatementBlockContext ctx,
-	                                          List<String> operandNames,
-	                                          Map<String, Type> operandTypes,
-	                                          Type returnType) {
+											  Type returnType,
+											  List<PMLFormalArg> formalArgs) {
 		// create a new scope for the function body
-		VisitorContext localVisitorCtx = initLocalVisitorCtx(operandNames, operandTypes);
+		VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
 
 		StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
 		StatementBlockVisitor.Result result = statementBlockVisitor.visitBasicStatementBlock(ctx);
@@ -115,11 +110,10 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 	}
 
 	private CheckAndStatementsBlock parseBody(PMLParser.CheckStatementBlockContext checkStatementBlockCtx,
-	                                          PMLParser.StatementBlockContext statementBlockCtx,
-	                                          List<String> operandNames,
-	                                          Map<String, Type> operandTypes,
-	                                          Type returnType) {
-		VisitorContext localVisitorCtx = initLocalVisitorCtx(operandNames, operandTypes);
+											  PMLParser.StatementBlockContext statementBlockCtx,
+											  Type returnType,
+											  List<PMLFormalArg> formalArgs) {
+		VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
 		StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
 		StatementBlockVisitor.Result result = statementBlockVisitor.visitStatementBlock(statementBlockCtx);
 
@@ -137,19 +131,15 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 		return new CheckAndStatementsBlock(checks, result.stmts());
 	}
 
-	private VisitorContext initLocalVisitorCtx(List<String> operandNames,
-	                                           Map<String, Type> operandTypes) {
+	private VisitorContext initLocalVisitorCtx(List<PMLFormalArg> formalArgs) {
 		// create a new scope for the function body
 		VisitorContext localVisitorCtx = visitorCtx.copy();
 
 		// add the args to the local scope, overwriting any variables with the same ID as the formal args
-		for (int i = 0; i < operandNames.size(); i++) {
-			String name = operandNames.get(i);
-			Type type = operandTypes.get(name);
-
+		for (PMLFormalArg formalArg : formalArgs) {
 			localVisitorCtx.scope().updateVariable(
-					name,
-					new Variable(name, type, false)
+				formalArg.getName(),
+				new Variable(formalArg.getName(), formalArg.getPmlType(), false)
 			);
 		}
 
@@ -169,28 +159,14 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 		public PMLOperationSignature visitOperationSignature(PMLParser.OperationSignatureContext ctx) {
 			String funcName = ctx.ID().getText();
 			Type returnType = parseReturnType(ctx.returnType);
-			List<FormalOperand> args = new FormalArgListVisitor(visitorCtx).visitFormalArgList(ctx.formalArgList());
-			List<String> operandNames = new ArrayList<>();
-			Map<String, Type> operandTypes = new HashMap<>();
-			List<String> nodeops = new ArrayList<>();
+			List<PMLFormalArg> args = new FormalArgListVisitor(visitorCtx).visitFormalArgList(ctx.formalArgList());
 
-			for (FormalOperand operand : args) {
-				operandNames.add(operand.name);
-				operandTypes.put(operand.name, operand.type);
-
-				if (operand.isNodeop) {
-					nodeops.add(operand.name);
-				}
-			}
-
-			writeOperandsToScope(operandNames, operandTypes);
+			writeArgsToScope(args);
 
 			PMLOperationSignature pmlOperationSignature = new PMLOperationSignature(
-					funcName,
-					returnType,
-					operandNames,
-					nodeops,
-					operandTypes
+				funcName,
+				returnType,
+				args
 			);
 
 			addSignatureToCtx(ctx, funcName, pmlOperationSignature);
@@ -202,22 +178,14 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 		public PMLRoutineSignature visitRoutineSignature(PMLParser.RoutineSignatureContext ctx) {
 			String funcName = ctx.ID().getText();
 			Type returnType = parseReturnType(ctx.returnType);
-			List<FormalOperand> args = new FormalArgListVisitor(visitorCtx).visitFormalArgList(ctx.formalArgList());
-			List<String> operandNames = new ArrayList<>();
-			Map<String, Type> operandTypes = new HashMap<>();
+			List<PMLFormalArg> args = new FormalArgListVisitor(visitorCtx).visitFormalArgList(ctx.formalArgList());
 
-			for (FormalOperand operand : args) {
-				operandNames.add(operand.name);
-				operandTypes.put(operand.name, operand.type);
-			}
-
-			writeOperandsToScope(operandNames, operandTypes);
+			writeArgsToScope(args);
 
 			PMLRoutineSignature pmlRoutineSignature = new PMLRoutineSignature(
-					funcName,
-					returnType,
-					operandNames,
-					operandTypes
+				funcName,
+				returnType,
+				args
 			);
 
 			addSignatureToCtx(ctx, funcName, pmlRoutineSignature);
@@ -229,22 +197,14 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 		public PMLFunctionSignature visitFunctionSignature(PMLParser.FunctionSignatureContext ctx) {
 			String funcName = ctx.ID().getText();
 			Type returnType = parseReturnType(ctx.returnType);
-			List<FormalOperand> args = new FormalArgListVisitor(visitorCtx).visitFormalArgList(ctx.formalArgList());
-			List<String> operandNames = new ArrayList<>();
-			Map<String, Type> operandTypes = new HashMap<>();
+			List<PMLFormalArg> args = new FormalArgListVisitor(visitorCtx).visitFormalArgList(ctx.formalArgList());
 
-			for (FormalOperand operand : args) {
-				operandNames.add(operand.name);
-				operandTypes.put(operand.name, operand.type);
-			}
-
-			writeOperandsToScope(operandNames, operandTypes);
+			writeArgsToScope(args);
 
 			PMLFunctionSignature pmlFunctionSignature = new PMLFunctionSignature(
-					funcName,
-					returnType,
-					operandNames,
-					operandTypes
+				funcName,
+				returnType,
+				args
 			);
 
 			addSignatureToCtx(ctx, funcName, pmlFunctionSignature);
@@ -264,18 +224,15 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 			}
 		}
 
-		private void writeOperandsToScope(List<String> operandNames, Map<String, Type> operandTypes) {
+		private void writeArgsToScope(List<PMLFormalArg> args) {
 			// write operands to scope for compiling check block
 			VisitorContext copy = visitorCtx.copy();
-			for (int i = 0; i < operandNames.size(); i++) {
-				String name = operandNames.get(i);
-				Type type = operandTypes.get(name);
-
-				copy.scope().updateVariable(
-						name,
-						new Variable(name, type, false)
-				);
-			}
+            for (PMLFormalArg formalArg : args) {
+                copy.scope().updateVariable(
+                    formalArg.getName(),
+                    new Variable(formalArg.getName(), formalArg.getPmlType(), false)
+                );
+            }
 		}
 
 		private Type parseReturnType(PMLParser.VariableTypeContext variableTypeContext) {
@@ -287,15 +244,15 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 		}
 	}
 
-	static class FormalArgListVisitor extends PMLBaseVisitor<List<FormalOperand>> {
+	static class FormalArgListVisitor extends PMLBaseVisitor<List<PMLFormalArg>> {
 
 		public FormalArgListVisitor(VisitorContext visitorCtx) {
 			super(visitorCtx);
 		}
 
 		@Override
-		public List<FormalOperand> visitFormalArgList(PMLParser.FormalArgListContext ctx) {
-			List<FormalOperand> formalArgs = new ArrayList<>();
+		public List<PMLFormalArg> visitFormalArgList(PMLParser.FormalArgListContext ctx) {
+			List<PMLFormalArg> formalArgs = new ArrayList<>();
 			Set<String> argNames = new HashSet<>();
 			for (int i = 0; i < ctx.formalArg().size(); i++) {
 				PMLParser.FormalArgContext formalArgCtx = ctx.formalArg().get(i);
@@ -305,8 +262,8 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 				// check that two formal args dont have the same name and that there are no constants with the same name
 				if (argNames.contains(name)) {
 					throw new PMLCompilationRuntimeException(
-							formalArgCtx,
-							String.format("formal arg '%s' already defined in signature", name)
+						formalArgCtx,
+						String.format("formal arg '%s' already defined in signature", name)
 					);
 				}
 
@@ -314,8 +271,11 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 				PMLParser.VariableTypeContext varTypeContext = formalArgCtx.variableType();
 				Type type = Type.toType(varTypeContext);
 
-				// req cap if operation
-				formalArgs.add(new FormalOperand(name, type, isNodeop));
+				if (isNodeop) {
+					formalArgs.add(new PMLNodeFormalArg(name, type));
+				} else {
+					formalArgs.add(new PMLFormalArg(name, type));
+				}
 
 				argNames.add(name);
 			}
@@ -323,7 +283,4 @@ public class ExecutableDefinitionVisitor extends PMLBaseVisitor<CreateExecutable
 			return formalArgs;
 		}
 	}
-
-	record FormalOperand(String name, Type type, boolean isNodeop) {}
-
 }

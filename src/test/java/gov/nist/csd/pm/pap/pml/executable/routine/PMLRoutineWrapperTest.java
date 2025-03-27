@@ -1,10 +1,14 @@
 package gov.nist.csd.pm.pap.pml.executable.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
+import gov.nist.csd.pm.pap.executable.op.arg.IdNodeFormalArg;
 import gov.nist.csd.pm.pap.executable.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
@@ -20,33 +24,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PMLRoutineWrapperTest {
 
+    private static final FormalArg<String> a = new FormalArg<>("a", String.class);
+    private static final FormalArg<String> b = new FormalArg<>("b", String.class);
+
     @Test
     void testConstructor() {
-        Routine<?> op = new Routine<>("routine1", List.of("a", "b", "c")) {
+        Routine<?> op = new Routine<>("routine1", List.of(a, b)) {
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
         };
 
         PMLRoutine pmlRoutineWrapper = new PMLRoutineWrapper(op);
         assertEquals(
-                pmlRoutineWrapper.getSignature(),
-                new PMLExecutableSignature("routine1", Type.any(), List.of("a", "b", "c"),
-                        Map.of("a", Type.any(), "b", Type.any(), "c", Type.any()))
+            pmlRoutineWrapper.getSignature(),
+            new PMLRoutineSignature("routine1", Type.any(), List.of(
+                new PMLFormalArg("a", Type.any()), new PMLFormalArg("b", Type.any())
+            ))
         );
     }
-    
+
     @Test
     void testExecuteWithPDP() throws PMException {
-        Routine<?> op = new Routine<Object>("routine1", List.of("a", "b", "c")) {
+        Routine<?> op = new Routine<>("routine1", List.of(a, b)) {
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                pap.modify().graph().createObjectAttribute((String) operands.get("a"), List.of(id("pc1")));
-                pap.modify().graph().createObjectAttribute((String) operands.get("b"), List.of(id("pc1")));
-                pap.modify().graph().createObjectAttribute((String) operands.get("c"), List.of(id("pc1")));
+            public Object execute(PAP pap, ActualArgs operands) throws PMException {
+                pap.modify().graph().createObjectAttribute(operands.get(a), List.of(id("pc1")));
+                pap.modify().graph().createObjectAttribute(operands.get(b), List.of(id("pc1")));
                 return null;
             }
         };
@@ -65,8 +72,11 @@ class PMLRoutineWrapperTest {
         pap.modify().routines().createAdminRoutine(new PMLRoutineWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminRoutine(new TestUserContext("u1"), "routine1",
-                Map.of("a", "a", "b", "b", "c", "c"));
+        pdp.adjudicateAdminRoutine(
+            new TestUserContext("u1"),
+            pap.query().routines().getAdminRoutine("routine1"),
+            new ActualArgs().put(a, "a").put(b, "b")
+        );
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
         assertTrue(pap.query().graph().nodeExists("c"));
@@ -90,7 +100,7 @@ class PMLRoutineWrapperTest {
         Routine<?> op = new Routine<>("routine1", List.of()) {
 
             @Override
-            public String execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public String execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return "test";
             }
         };

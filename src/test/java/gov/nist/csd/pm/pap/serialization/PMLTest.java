@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.serialization;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
@@ -18,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -56,15 +57,15 @@ class PMLTest {
         MemoryPAP pap = new TestPAP();
         assertThrows(PMException.class, () -> pap.deserialize(new TestUserContext("u1"), pml, pmlDeserializer));
 
-        pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of("name")) {
+        pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of(ARG_A)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                pap.modify().graph().createPolicyClass((String) operands.get("name"));
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
+                pap.modify().graph().createPolicyClass(actualArgs.get(ARG_A));
                 return null;
             }
         }));

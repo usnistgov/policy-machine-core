@@ -10,14 +10,14 @@ import gov.nist.csd.pm.pap.pml.statement.operation.DeleteStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 
-public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
+public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement<?>> {
 
     public DeleteStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public DeleteStatement visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
+    public DeleteStatement<?> visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
         Expression nameExpr = Expression.compile(visitorCtx, ctx.expression(), Type.string());
 
         PMLParser.DeleteTypeContext deleteTypeCtx = ctx.deleteType();

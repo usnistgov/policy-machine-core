@@ -5,6 +5,8 @@ import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.executable.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
@@ -13,7 +15,6 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
@@ -21,23 +22,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FunctionInvokeStmtVisitorTest {
 
-    PMLExecutableSignature signature = new PMLExecutableSignature(
+    private static final PMLFormalArg a = new PMLFormalArg("a", Type.string());
+    private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
+    private static final PMLFormalArg c = new PMLFormalArg("c", Type.array(Type.string()));
+
+    PMLExecutableSignature signature = new PMLFunctionSignature(
             "func1",
             Type.string(),
-            List.of("a", "b", "c"),
-            Map.of(
-                    "a", Type.string(),
-                    "b", Type.string(),
-                    "c", Type.array(Type.string())
-            )
+            List.of(a, b, c)
     );
 
     FunctionInvokeExpression expected = new FunctionInvokeExpression(
-            signature,
-            Map.of(
-                    "a", new StringLiteral("a"),
-                    "b", new StringLiteral("b"),
-                    "c", buildArrayLiteral("c", "d")
+            signature.getName(),
+            List.of(
+                    new StringLiteral("a"),
+                    new StringLiteral("b"),
+                    buildArrayLiteral("c", "d")
             )
     );
 
@@ -112,11 +112,10 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
 
-        PMLExecutableSignature signature = new PMLExecutableSignature(
+        PMLExecutableSignature signature = new PMLFunctionSignature(
                 "func1",
                 Type.string(),
-                List.of(),
-                Map.of()
+                List.of()
         );
 
         CompileScope compileScope = new CompileScope();
@@ -128,8 +127,8 @@ class FunctionInvokeStmtVisitorTest {
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
 
         FunctionInvokeExpression expected = new FunctionInvokeExpression(
-                signature,
-                Map.of()
+                signature.getName(),
+                List.of()
         );
 
         assertEquals(expected, stmt);

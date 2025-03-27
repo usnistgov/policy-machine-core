@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -57,25 +57,25 @@ class IfStatementTest {
                 new IfStatement.ConditionalBlock(
                         new BoolLiteral(true),
                         new PMLStatementBlock(
-                                new CreatePolicyStatement(new StringLiteral("a"))
+                                new CreatePolicyClassStatement(new StringLiteral("a"))
                         )
                 ),
                 List.of(
                         new IfStatement.ConditionalBlock(
                                 new BoolLiteral(true),
                                 new PMLStatementBlock(
-                                        new CreatePolicyStatement(new StringLiteral("b"))
+                                        new CreatePolicyClassStatement(new StringLiteral("b"))
                                 )
                         ),
                         new IfStatement.ConditionalBlock(
                                 new BoolLiteral(true),
                                 new PMLStatementBlock(
-                                        new CreatePolicyStatement(new StringLiteral("c"))
+                                        new CreatePolicyClassStatement(new StringLiteral("c"))
                                 )
                         )
                 ),
                 new PMLStatementBlock(
-                        new CreatePolicyStatement(new StringLiteral("d"))
+                        new CreatePolicyClassStatement(new StringLiteral("d"))
                 )
         );
 

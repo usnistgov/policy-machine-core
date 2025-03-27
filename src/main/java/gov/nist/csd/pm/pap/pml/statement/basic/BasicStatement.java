@@ -14,4 +14,4 @@ public abstract class BasicStatement implements PMLStatement {
 
     @Override
     public abstract boolean equals(Object obj);
-}
+} 

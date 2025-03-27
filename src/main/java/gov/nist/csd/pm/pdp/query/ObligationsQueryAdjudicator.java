@@ -91,7 +91,7 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
         // cannot check operation as it is not a node
 
         // check operands
-        for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : eventPattern.getOperandPatterns().entrySet()) {
+        for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : eventPattern.getArgPatterns().entrySet()) {
             for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
                 privilegeChecker.checkPattern(userCtx, operandPatternExpression, GET_OBLIGATION);
             }

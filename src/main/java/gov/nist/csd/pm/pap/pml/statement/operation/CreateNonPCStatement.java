@@ -2,77 +2,92 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.op.graph.CreateObjectAttributeOp;
-import gov.nist.csd.pm.pap.executable.op.graph.CreateObjectOp;
-import gov.nist.csd.pm.pap.executable.op.graph.CreateUserAttributeOp;
-import gov.nist.csd.pm.pap.executable.op.graph.CreateUserOp;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.executable.op.graph.*;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.executable.op.graph.CreateNodeOp.DESCENDANTS_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.CreateNodeOp.NAME_OPERAND;
+public class CreateNonPCStatement extends OperationStatement<Operation<Long>> {
 
+    private final NodeType nodeType;
+    private final Expression nameExpr;
+    private final Expression inExpr;
 
-public class CreateNonPCStatement extends OperationStatement<Long> {
-    private final Expression name;
-    private final NodeType type;
-    private final Expression assignTo;
-
-    public CreateNonPCStatement(Expression name, NodeType type, Expression assignTo) {
-        super(getOpFromType(type));
-        this.name = name;
-        this.type = type;
-        this.assignTo = assignTo;
+    public CreateNonPCStatement(Expression nameExpr, NodeType nodeType, Expression inExpr) {
+        super(getOpFromType(nodeType));
+        this.nodeType = nodeType;
+        this.nameExpr = nameExpr;
+        this.inExpr = inExpr;
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-        Value nameValue = name.execute(ctx, pap);
-        Value assignToValue = assignTo.execute(ctx, pap);
-
-        List<Long> descendants = new ArrayList<>();
-        List<Value> arrayValue = assignToValue.getArrayValue();
-        for (Value descValue : arrayValue) {
-            descendants.add(pap.query().graph().getNodeByName(descValue.getStringValue()).getId());
+    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+        String name = nameExpr.execute(ctx, pap).getStringValue();
+        
+        List<Value> inList = inExpr.execute(ctx, pap).getArrayValue();
+        List<String> parentNames = new ArrayList<>();
+        for (Value value : inList) {
+            parentNames.add(value.getStringValue());
         }
 
-        return Map.of(
-                NAME_OPERAND, nameValue.getStringValue(),
-                DESCENDANTS_OPERAND, descendants
-        );
+        // convert parent node names to IDs
+        LongArrayList parentIds = new LongArrayList();
+        for (String parentName : parentNames) {
+            parentIds.add(pap.query().graph().getNodeByName(parentName).getId());
+        }
+
+        return ((CreateNodeOp) op).actualArgs(name, parentIds);
     }
-    
+
+    @Override
+    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+        ActualArgs actualArgs = prepareOperands(ctx, pap);
+        op.execute(pap, actualArgs);
+        return new VoidValue();
+    }
+
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + String.format(
-                "create %s %s in %s",
-                type.toString(),
-                name,
-                assignTo
-        );
+        String nodeTypeStr;
+        if (nodeType == NodeType.OA) {
+            nodeTypeStr = "OA";
+        } else if (nodeType == NodeType.UA) {
+            nodeTypeStr = "UA";
+        } else if (nodeType == NodeType.O) {
+            nodeTypeStr = "O";
+        } else if (nodeType == NodeType.U) {
+            nodeTypeStr = "U";
+        } else {
+            nodeTypeStr = nodeType.toString();
+        }
+
+        return indent(indentLevel) + String.format("create %s %s in %s", nodeTypeStr, nameExpr, inExpr);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CreateNonPCStatement that)) return false;
-        return Objects.equals(name, that.name) && type == that.type && Objects.equals(assignTo, that.assignTo);
+        return nodeType == that.nodeType && 
+               Objects.equals(nameExpr, that.nameExpr) && 
+               Objects.equals(inExpr, that.inExpr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, assignTo);
+        return Objects.hash(nodeType, nameExpr, inExpr);
     }
 
-    private static Operation<Long> getOpFromType(NodeType type) {
+    private static CreateNodeOp getOpFromType(NodeType type) {
         return switch (type) {
             case OA -> new CreateObjectAttributeOp();
             case O -> new CreateObjectOp();
@@ -80,4 +95,4 @@ public class CreateNonPCStatement extends OperationStatement<Long> {
             default -> new CreateUserOp();
         };
     }
-}
+} 

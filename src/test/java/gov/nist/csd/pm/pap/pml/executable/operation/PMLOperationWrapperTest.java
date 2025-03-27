@@ -3,9 +3,14 @@ package gov.nist.csd.pm.pap.pml.executable.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.executable.op.arg.IdNodeFormalArg;
+import gov.nist.csd.pm.pap.executable.op.arg.NodeFormalArg;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
@@ -17,46 +22,52 @@ import java.util.List;
 import java.util.Map;
 
 
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PMLOperationWrapperTest {
 
+    private static final IdNodeFormalArg a = new IdNodeFormalArg("a");
+    private static final FormalArg<String> b = new FormalArg<>("b", String.class);
+
     @Test
     void testConstructor() {
-        Operation<?> op = new Operation<>("op1", List.of("a", "b", "c"), List.of("a")) {
+        Operation<?> op = new Operation<>("op1", List.of(a, b)) {
 
             @Override
-            public Object execute(PAP pap, Map operands) throws PMException {
+            public Object execute(PAP pap, ActualArgs actualArgs) {
                 return null;
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) {
 
             }
         };
 
         PMLOperationWrapper pmlOperationWrapper = new PMLOperationWrapper(op);
         assertEquals(
-                pmlOperationWrapper.getSignature(),
-                new PMLExecutableSignature("op1", Type.any(), List.of("a", "b", "c"),
-                        Map.of("a", Type.any(), "b", Type.any(), "c", Type.any()))
+            pmlOperationWrapper.getSignature(),
+            new PMLOperationSignature(
+                "op1",
+                Type.any(),
+                List.of(new PMLNodeFormalArg("a", Type.any()), new PMLFormalArg("b", Type.any())))
         );
     }
 
     @Test
     void testExecuteWithPDP() throws PMException {
-        Operation<?> op = new Operation<>("op1", List.of("a", "b", "c"), List.of("a")) {
+        Operation<Object> op = new Operation<>("op1", List.of(a, b)) {
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                pap.modify().graph().createPolicyClass((String) operands.get("b"));
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
+                pap.modify().graph().createPolicyClass(actualArgs.get(b));
                 return null;
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                privilegeChecker.check(userCtx, (String) operands.get("a"), List.of("assign"));
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+                privilegeChecker.check(userCtx, operands.get(a), List.of("assign"));
             }
         };
 
@@ -73,8 +84,10 @@ class PMLOperationWrapperTest {
         pap.modify().operations().createAdminOperation(new PMLOperationWrapper(op));
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1",
-                Map.of("a", "oa1", "b", "b", "c", "c"));
+        pdp.adjudicateAdminOperation(
+            new TestUserContext("u1"),
+            op,
+            new ActualArgs().put(a, id("oa1")).put(b, "b"));
         assertTrue(pap.query().graph().nodeExists("b"));
 
         // try again using pml
@@ -91,16 +104,16 @@ class PMLOperationWrapperTest {
 
     @Test
     void testPMLOperationWrapperWithReturnValue() throws PMException {
-        Operation<?> op = new Operation<>("op1", List.of(), List.of()) {
+        Operation<?> op = new Operation<>("op1", List.of()) {
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return "test";
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                privilegeChecker.check(userCtx, (String) operands.get("a"), List.of("assign"));
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+                privilegeChecker.check(userCtx, operands.get(a), List.of("assign"));
             }
         };
 

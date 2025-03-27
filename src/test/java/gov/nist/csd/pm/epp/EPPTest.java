@@ -7,6 +7,8 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Response;
 import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.executable.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
@@ -19,7 +21,7 @@ import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
@@ -37,58 +39,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_OPERAND;
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
+import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EPPTest {
-
-    public static void main(String[] args) throws PMException {
-        // Trigger garbage collection for a cleaner measurement
-        System.gc();
-
-        // Get the Java runtime
-        Runtime runtime = Runtime.getRuntime();
-
-        // Memory before execution
-        long beforeUsedMem = runtime.totalMemory() - runtime.freeMemory();
-
-        MemoryPAP memoryPAP = new TestPAP();
-
-        long pc1 = memoryPAP.modify().graph().createPolicyClass("pc1");
-        long pc2 = memoryPAP.modify().graph().createPolicyClass("pc2");
-        long pc3 = memoryPAP.modify().graph().createPolicyClass("pc3");
-
-        List<Long> l1 = List.of(pc1);
-        List<Long> l2 = List.of(pc2);
-        List<Long> l3 = List.of(pc3);
-
-        for (int i = 0; i < 1000000; i++) {
-            memoryPAP.modify().graph().createObjectAttribute("oa1" + i, l1);
-        }
-        System.out.println(1);
-        for (int i = 0; i < 100000; i++) {
-            memoryPAP.modify().graph().createObjectAttribute("oa2" + i, l2);
-        }
-        System.out.println(1);
-        for (int i = 0; i < 100000; i++) {
-            memoryPAP.modify().graph().createObjectAttribute("oa3" + i, l3);
-        }
-
-        System.out.println(memoryPAP.query().graph().search(NodeType.ANY, new HashMap<>()).size());
-
-        // Memory after execution
-        long afterUsedMem = runtime.totalMemory() - runtime.freeMemory();
-
-        // Memory usage calculation
-        long actualMemUsed = afterUsedMem - beforeUsedMem;
-
-        System.out.println("Memory Used (MB): " + (actualMemUsed / (1024 * 1024)) + " MB");
-    }
 
     @Test
     void testCustomOperationEvent() throws PMException {
@@ -138,39 +97,52 @@ class EPPTest {
                 }
                 """);
 
-        pap.modify().operations().createAdminOperation(new Operation<>("op2", List.of("a", "b"), List.of("a", "b")) {
+        Operation<String> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
+
             @Override
-            public Object execute(PAP pap, Map operands) throws PMException {
+            public String execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 return null;
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker,
+                                   UserContext userCtx,
+                                   ActualArgs actualArgs) throws PMException {
 
             }
-        });
+        };
+
+        pap.modify().operations().createAdminOperation(op2);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        AdjudicationResponse response = pdp.adjudicateAdminOperation(
-                new UserContext(id("u1")),
-                "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
+        AdjudicationResponse<?> response = pdp.adjudicateAdminOperation(
+            new TestUserContext("u1"),
+            pap.query().operations().getAdminOperation("op1"),
+            new ActualArgs()
+                .put("a", String.class, "oa1")
+                .put("b", List.class, List.of("oa1", "oa2"))
         );
         assertEquals(Decision.DENY, response.getDecision());
 
         pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*a"));
 
         response = pdp.adjudicateAdminOperation(
-                new UserContext(id("u1")),
-                "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
+            new TestUserContext("u1"),
+            pap.query().operations().getAdminOperation("op1"),
+            new ActualArgs()
+                .put("a", String.class, "oa1")
+                .put("b", List.class, List.of("oa1", "oa2"))
         );
         assertEquals(GRANT, response.getDecision());
 
         response = pdp.adjudicateAdminOperation(
-                new UserContext(id("u1")),
-                "op2", Map.of("a", "oa2", "b", "oa2")
+            new TestUserContext("u1"),
+            pap.query().operations().getAdminOperation("op1"),
+            new ActualArgs().put(ARG_A, "oa2").put(ARG_B, "oa2")
+            // "op2", Map.of("a", "oa2", "b", "oa2")
         );
         assertEquals(GRANT, response.getDecision());
 
@@ -295,10 +267,10 @@ class EPPTest {
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
 
         pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
-                ids("oa1")));
+            ids("oa1")));
 
         assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids(
-                "pc1", "create_object_attribute", "oa2_test", "u1_test"
+            "pc1", "create_object_attribute", "oa2_test", "u1_test"
         )));
     }
 
@@ -319,40 +291,40 @@ class EPPTest {
             txPAP.modify().graph().createUser("u1",  ids("ua1", "ua2"));
             txPAP.modify().graph().createObject("o1",  ids("oa1"));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(),
-                    new AccessRightSet(CREATE_OBLIGATION));
+                new AccessRightSet(CREATE_OBLIGATION));
             txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
             policy.modify().obligations().createObligation(id("u1"), "test",
-                    List.of(new Rule(
-                            "rule1",
-                            new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
-                            new Response("evtCtx", List.of(
-                                    new CreateNonPCStatement(
-                                            new StringLiteral("o2"),
-                                            NodeType.O,
-                                            new ArrayLiteral(new Expression[]{new StringLiteral("oa1")}, Type.string())
-                                    ),
+                List.of(new Rule(
+                    "rule1",
+                    new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
+                    new Response("evtCtx", List.of(
+                        new CreateNonPCStatement(
+                            new StringLiteral("o2"),
+                            NodeType.O,
+                            new ArrayLiteral(new Expression[]{new StringLiteral("oa1")}, Type.string())
+                        ),
 
-                                    // expect error for node already exists
-                                    new CreatePolicyStatement(new StringLiteral("pc1"))
-                            ))
+                        // expect error for node already exists
+                        new CreatePolicyClassStatement(new StringLiteral("pc1"))
                     ))
+                ))
             );
 
             return null;
         });
 
         EventContext eventCtx = new EventContext(
-                "u1",
-                null,
-                CREATE_OBJECT_ATTRIBUTE,
-                Map.of(
-                        NAME_OPERAND, "oa2",
-                        DESCENDANTS_OPERAND, List.of("pc1")
-                )
+            "u1",
+            null,
+            CREATE_OBJECT_ATTRIBUTE,
+            Map.of(
+                "name", "oa2",
+                "descendants", List.of("pc1")
+            )
         );
 
         assertThrows(PMException.class, () -> {
@@ -369,12 +341,12 @@ class EPPTest {
 
         PMLOperation pmlOperation = new PMLOperation("testFunc", Type.voidType()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
 
             }
 
             @Override
-            public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
                 return new VoidValue();

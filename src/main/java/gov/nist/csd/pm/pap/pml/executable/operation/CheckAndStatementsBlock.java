@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.executable.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.basic.BasicStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
@@ -35,8 +36,9 @@ public class CheckAndStatementsBlock extends BasicStatement {
 
 	@Override
 	public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-		ctx.executeOperationStatements(checks.getStmts(), Map.of());
-		return ctx.executeStatements(statements.getStmts(), Map.of());
+		ctx.executeOperationStatements(checks.getStmts(), new ActualArgs());
+
+		return ctx.executeStatements(statements.getStmts(), new ActualArgs());
 	}
 
 	@Override
