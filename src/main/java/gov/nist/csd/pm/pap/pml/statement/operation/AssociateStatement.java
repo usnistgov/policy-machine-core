@@ -47,13 +47,6 @@ public class AssociateStatement extends OperationStatement<AssociateOp> {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        ActualArgs actualArgs = prepareOperands(ctx, pap);
-        op.execute(pap, actualArgs);
-        return new VoidValue();
-    }
-
-    @Override
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) + String.format("associate %s and %s with %s",
                 ua, target, accessRights);

@@ -82,13 +82,6 @@ public class CreateProhibitionStatement extends OperationStatement<CreateProhibi
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareOperands(ctx, pap));
-
-        return new VoidValue();
-    }
-
-    @Override
     public String toFormattedString(int indentLevel) {
         String subjectStr = getSubjectStr();
         String indent = indent(indentLevel);

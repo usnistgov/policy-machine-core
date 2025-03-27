@@ -28,13 +28,6 @@ public class CreatePolicyClassStatement extends OperationStatement<CreatePolicyC
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        ActualArgs actualArgs = prepareOperands(ctx, pap);
-        op.execute(pap, actualArgs);
-        return new VoidValue();
-    }
-
-    @Override
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) + String.format("create PC %s", name);
     }

@@ -13,6 +13,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,11 +49,6 @@ public class CreateObligationStatement extends OperationStatement<CreateObligati
         }
 
         return op.actualArgs(ctx.author().getUser(), nameStr, new RuleList(rules));
-    }
-
-    @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        return null;
     }
 
     @Override

@@ -34,11 +34,11 @@ public class CreateRoutineStatement extends OperationStatement<CreateAdminRoutin
 
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareOperands(ctx, pap));
+        Value value = super.execute(ctx, pap);
 
         ctx.scope().addExecutable(pmlStmtsRoutine.getName(), pmlStmtsRoutine);
 
-        return new VoidValue();
+        return value;
     }
 
     @Override

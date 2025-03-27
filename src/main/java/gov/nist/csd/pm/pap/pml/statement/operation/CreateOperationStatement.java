@@ -34,11 +34,11 @@ public class CreateOperationStatement extends OperationStatement<CreateAdminOper
 
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareOperands(ctx, pap));
+        Value value = super.execute(ctx, pap);
 
         ctx.scope().addExecutable(pmlStmtsOperation.getName(), pmlStmtsOperation);
 
-        return new VoidValue();
+        return value;
     }
 
     @Override

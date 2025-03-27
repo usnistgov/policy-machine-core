@@ -42,13 +42,6 @@ public class DeassignStatement extends OperationStatement<DeassignOp> {
 
         return op.actualArgs(ascId, descIds);
     }
-    
-    @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        ActualArgs actualArgs = prepareOperands(ctx, pap);
-        op.execute(pap, actualArgs);
-        return new VoidValue();
-    }
 
     @Override
     public String toFormattedString(int indentLevel) {

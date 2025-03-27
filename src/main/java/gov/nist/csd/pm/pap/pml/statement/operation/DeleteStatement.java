@@ -38,13 +38,6 @@ public abstract class DeleteStatement<T extends Operation<?>> extends OperationS
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareOperands(ctx, pap));
-
-        return new VoidValue();
-    }
-
-    @Override
     public String toFormattedString(int indentLevel) {
         String typeStr = "";
         switch (type) {

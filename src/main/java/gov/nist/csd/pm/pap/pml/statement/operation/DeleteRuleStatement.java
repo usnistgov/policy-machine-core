@@ -53,13 +53,6 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareOperands(ctx, pap));
-
-        return new VoidValue();
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DeleteRuleStatement that)) return false;
