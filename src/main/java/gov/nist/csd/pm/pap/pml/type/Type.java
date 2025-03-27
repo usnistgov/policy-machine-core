@@ -16,7 +16,6 @@ public class Type implements Serializable {
     private boolean isMap;
     private Type mapKeyType;
     private Type mapValueType;
-    private boolean isPattern;
 
     public static Type any() {
         Type type = new Type();
@@ -57,30 +56,18 @@ public class Type implements Serializable {
         return type;
     }
 
-    public static Type pattern() {
-        Type type = new Type();
-        type.isPattern = true;
-        return type;
-    }
-
     public static Type toType(PMLParser.VariableTypeContext varTypeContext) {
-        Type type;
-        if (varTypeContext instanceof PMLParser.StringTypeContext) {
-            type = Type.string();
-        } else if (varTypeContext instanceof PMLParser.BooleanTypeContext) {
-            type = Type.bool();
-        } else if (varTypeContext instanceof PMLParser.ArrayVarTypeContext arrayVarTypeCtx) {
-            type = Type.array(toType(arrayVarTypeCtx.arrayType().variableType()));
-        } else if (varTypeContext instanceof PMLParser.MapVarTypeContext mapVarTypeContext) {
-            type = Type.map(
-                    toType(mapVarTypeContext.mapType().keyType),
-                    toType(mapVarTypeContext.mapType().valueType)
+        return switch (varTypeContext) {
+            case PMLParser.StringTypeContext stringTypeContext -> Type.string();
+            case PMLParser.BooleanTypeContext booleanTypeContext -> Type.bool();
+            case PMLParser.ArrayVarTypeContext arrayVarTypeCtx ->
+                Type.array(toType(arrayVarTypeCtx.arrayType().variableType()));
+            case PMLParser.MapVarTypeContext mapVarTypeContext -> Type.map(
+                toType(mapVarTypeContext.mapType().keyType),
+                toType(mapVarTypeContext.mapType().valueType)
             );
-        } else {
-            type = Type.any();
-        }
-
-        return type;
+            case null, default -> Type.any();
+        };
     }
 
     public boolean isAny() {
@@ -105,10 +92,6 @@ public class Type implements Serializable {
 
     public boolean isVoid() {
         return isVoid;
-    }
-
-    public boolean isPattern() {
-        return isPattern || isAny;
     }
 
     public Type getArrayElementType() {
@@ -151,7 +134,7 @@ public class Type implements Serializable {
             } else if (isMap && type.isMap) {
                 return this.mapKeyType.equals(type.mapKeyType) &&
                         this.mapValueType.equals(type.mapValueType);
-            } else return isPattern && type.isPattern;
+            }
         }
 
         return false;
@@ -168,8 +151,6 @@ public class Type implements Serializable {
             return "void";
         } else if (isString) {
             return "string";
-        } else if (isPattern) {
-            return "pattern";
         } else if (isBoolean) {
             return "bool";
         } else if (isArray) {

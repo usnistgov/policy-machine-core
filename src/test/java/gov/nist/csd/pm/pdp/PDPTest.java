@@ -226,7 +226,7 @@ class PDPTest {
         pdp.setExplain(true);
 
         // custom operation
-        AdjudicationResponse<?> resp = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+        AdjudicationResponse resp = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
             pap.query().operations().getAdminOperation("op1"),
             new ActualArgs());
         assertEquals(GRANT, resp.getDecision());
@@ -307,7 +307,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pdp.setExplain(true);
 
-        AdjudicationResponse<?> response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"),
+        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"),
             pap.query().routines().getAdminRoutine("routine1"),
             new ActualArgs().put(a, "test"));
         assertEquals(GRANT, response.getDecision());
@@ -459,7 +459,7 @@ class PDPTest {
                     when any user
                     performs "op1"
                     do(ctx) {
-                        create oa "oa_" + ctx.operands.name in [ctx.operands.name]
+                        create oa "oa_" + ctx.args.name in [ctx.args.name]
                     }
                 }
                 """);
@@ -470,7 +470,7 @@ class PDPTest {
 
         Operation<?> op1 = pap.query().operations().getAdminOperation("op1");
 
-        AdjudicationResponse<?> response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), List.of(
+        AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), List.of(
                 new OperationRequest(op1, new ActualArgs().put(NAME_ARG, "pc2")),
                 new OperationRequest(op1, new ActualArgs().put(NAME_ARG, "pc3"))
         ));
@@ -503,7 +503,7 @@ class PDPTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdjudicationResponse<?> response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+        AdjudicationResponse response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
             pap.query().operations().getAdminOperation("op1"),
             new ActualArgs().put(NAME_ARG, "test"));
         assertEquals(response.getDecision(), DENY);

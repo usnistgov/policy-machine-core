@@ -97,7 +97,11 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         DeleteNodeOp op = new DeleteNodeOp();
         ActualArgs actualArgs = op.actualArgs(id, node.getType(), descendants);
 
-        executeOp(op, actualArgs);
+        // build event context before executing or else the node will not exist when the util
+        // tries to convert the id to the name
+        EventContext eventContext = buildEventContext(pap, userCtx, op.getName(), actualArgs);
+
+        executeOp(op, actualArgs, eventContext);
     }
 
     @Override
@@ -130,6 +134,13 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         ActualArgs actualArgs = op.actualArgs(ua, target);
 
         executeOp(op, actualArgs);
+    }
+
+    private <T> void executeOp(Operation<T> op, ActualArgs args, EventContext eventContext) throws PMException {
+        op.canExecute(privilegeChecker, userCtx, args);
+        op.execute(pap, args);
+
+        eventPublisher.publishEvent(eventContext);
     }
 
     private <T> T executeOp(Operation<T> op, ActualArgs args) throws PMException {

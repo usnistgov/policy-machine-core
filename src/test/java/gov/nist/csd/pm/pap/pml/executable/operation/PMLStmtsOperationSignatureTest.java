@@ -25,7 +25,7 @@ class PMLStmtsOperationSignatureTest {
         );
 
         assertEquals(
-                "operation op1(@node []string a, string b, string c) string ",
+                "operation op1(@node string a, string b, string c) string ",
                 pmlStmtsOperationSignature.toFormattedString(0)
         );
     }

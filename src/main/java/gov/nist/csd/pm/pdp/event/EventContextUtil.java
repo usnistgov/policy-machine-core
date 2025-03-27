@@ -28,12 +28,14 @@ public class EventContextUtil {
         Map<String, Object> args = new HashMap<>();
 
         actualArgs.foreach(f -> {
+            // if the arg is a normal arg, it can be added to the args without any extra processing
             if (!(f instanceof NodeFormalArg)) {
+                args.put(f.getName(), actualArgs.get(f));
+
                 return;
             }
 
-            // arg is id or list id
-            // convert the ids to names
+            // if the arg is a node arg than we need to convert the node IDs to names for the EPP
             switch (f) {
                 case IdNodeFormalArg idNodeFormalArg ->
                     args.put(idNodeFormalArg.getName(), resolveNodeArgName(pap, actualArgs.get(idNodeFormalArg)));
@@ -44,8 +46,7 @@ public class EventContextUtil {
                         .collect(Collectors.toList());
                     args.put(listIdNodeFormalArg.getName(), names);
                 }
-                default -> {
-                }
+                default -> throw new IllegalStateException("Unexpected arg type: " + f.getClass().getName());
             }
         });
 

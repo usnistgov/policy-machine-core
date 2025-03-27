@@ -5,17 +5,17 @@ import gov.nist.csd.pm.pdp.UnauthorizedException;
 
 import java.util.Objects;
 
-public class AdjudicationResponse<T> {
+public class AdjudicationResponse {
 
     private Decision decision;
-    private T value;
+    private Object value;
     private Explain explain;
 
     public AdjudicationResponse(Decision decision) {
         this.decision = decision;
     }
 
-    public AdjudicationResponse(Decision decision, T value) {
+    public AdjudicationResponse(Decision decision, Object value) {
         this.decision = decision;
         this.value = value;
     }
@@ -41,18 +41,18 @@ public class AdjudicationResponse<T> {
         this.explain = explain;
     }
 
-    public T getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AdjudicationResponse<?> response)) return false;
+        if (!(o instanceof AdjudicationResponse response)) return false;
 	    return decision == response.decision && Objects.equals(value, response.value) && Objects.equals(explain, response.explain);
     }
 

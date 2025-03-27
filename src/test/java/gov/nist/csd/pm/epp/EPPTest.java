@@ -35,7 +35,6 @@ import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,9 +72,9 @@ class EPPTest {
                         b: "oa1"
                     }
                     do(ctx) {
-                        create pc ctx.operands.a + "pc1"
+                        create pc ctx.args.a + "pc1"
                         
-                        foreach x in ctx.operands.b {
+                        foreach x in ctx.args.b {
                             create pc x + "pc2"
                         }
                     }
@@ -88,9 +87,9 @@ class EPPTest {
                         b: "oa2"
                     }
                     do(ctx) {
-                        create pc ctx.operands.a + "pc1"
+                        create pc ctx.args.a + "pc1"
                         
-                        foreach x in ctx.operands.b {
+                        foreach x in ctx.args.b {
                             create pc x + "pc2"
                         }
                     }
@@ -118,12 +117,12 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        AdjudicationResponse<?> response = pdp.adjudicateAdminOperation(
+        AdjudicationResponse response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             pap.query().operations().getAdminOperation("op1"),
             new ActualArgs()
-                .put("a", String.class, "oa1")
-                .put("b", List.class, List.of("oa1", "oa2"))
+                .put(new FormalArg<>("a", String.class), "oa1")
+                .put(new FormalArg<>("b", List.class), List.of("oa1", "oa2"))
         );
         assertEquals(Decision.DENY, response.getDecision());
 
@@ -133,8 +132,8 @@ class EPPTest {
             new TestUserContext("u1"),
             pap.query().operations().getAdminOperation("op1"),
             new ActualArgs()
-                .put("a", String.class, "oa1")
-                .put("b", List.class, List.of("oa1", "oa2"))
+                .put(new FormalArg<>("a", String.class), "oa1")
+                .put(new FormalArg<>("b", List.class), List.of("oa1", "oa2"))
         );
         assertEquals(GRANT, response.getDecision());
 
@@ -177,7 +176,7 @@ class EPPTest {
                         target: "oa1"
                     }
                     do(ctx) {
-                        create pc ctx.operands.target + "pc1"
+                        create pc ctx.args.target + "pc1"
                     }
                 }
                 """);
@@ -255,7 +254,7 @@ class EPPTest {
                         name := ctx.opName
                         create policy class name
 
-                        name = ctx.operands.name
+                        name = ctx.args.name
                         create policy class name + "_test"
                         set properties of name + "_test" to {"key": name}
 

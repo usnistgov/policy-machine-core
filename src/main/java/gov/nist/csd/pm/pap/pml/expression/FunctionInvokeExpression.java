@@ -12,6 +12,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
 import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.executable.arg.PMLActualArgs;
 import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.executable.function.PMLFunction;
 import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
@@ -105,16 +106,17 @@ public class FunctionInvokeExpression extends Expression {
             pmlOperation.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
-        // PMLWrappers dont need Values, just objects
-        Map<String, Object> args;
+        ActualArgs args;
         if ((executable instanceof PMLOperationWrapper) || (executable instanceof PMLRoutineWrapper)) {
-            args = valuesMapToObjects(actualOperandValues);
+            // PMLWrappers do not need PML Values as input, just regular objects
+            args = new ActualArgs(valuesMapToObjects(actualOperandValues));
         } else {
-            args = new HashMap<>(actualOperandValues);
+            // PML functions do expect Values as input
+            args = new PMLActualArgs(actualOperandValues);
         }
 
         // execute the executable
-        Object o = pap.executeAdminExecutable(executable, new ActualArgs(args));
+        Object o = pap.executeAdminExecutable(executable, args);
 
         // return the value
         Value value = Value.fromObject(o);

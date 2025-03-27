@@ -79,7 +79,7 @@ create obligation "create us project admin" {
         locProjectAttr: "US project"
     }
     do(ctx) {
-        createProjectAdmin(ctx.operands.projectName)
+        createProjectAdmin(ctx.args.projectName)
     }
 
     create rule "eu project"
@@ -89,6 +89,6 @@ create obligation "create us project admin" {
         locProjectAttr: "EU project"
     }
     do(ctx) {
-        createProjectAdmin(ctx.operands.projectName)
+        createProjectAdmin(ctx.args.projectName)
     }
 }

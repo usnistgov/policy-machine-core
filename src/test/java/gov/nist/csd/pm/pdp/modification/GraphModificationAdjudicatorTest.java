@@ -2,16 +2,20 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.executable.op.graph.*;
+import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +24,12 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.executable.op.Operation.NAME_ARG;
 import static gov.nist.csd.pm.pap.executable.op.Operation.NODE_ARG;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ARSET_ARG;
 import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.ASCENDANT_ARG;
 import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.DESCENDANTS_ARG;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.PROPERTIES_ARG;
 import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.TARGET_ARG;
+import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.TYPE_ARG;
 import static gov.nist.csd.pm.pap.executable.op.graph.GraphOp.UA_ARG;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
@@ -142,7 +149,7 @@ class GraphModificationAdjudicatorTest {
     void setNodeProperties() throws PMException {
         assertDoesNotThrow(() -> ok.setNodeProperties(id("o1"), Map.of("a", "b")));
         assertEquals(
-                new EventContext("u1", null, new SetNodePropertiesOp().getName(), Map.of(NODE_ARG.getName(), "o1")),
+                new EventContext("u1", null, new SetNodePropertiesOp().getName(), Map.of(NODE_ARG.getName(), "o1", PROPERTIES_ARG.getName(), Map.of("a", "b"))),
                 testEventProcessor.getEventContext()
         );
 	    assertEquals(pap.query().graph().getNodeByName("o1").getProperties(), Map.of("a", "b"));
@@ -154,8 +161,14 @@ class GraphModificationAdjudicatorTest {
     void deleteNodeOk() throws PMException {
         assertDoesNotThrow(() -> ok.deleteNode(id("o1")));
         assertEquals(
-                new EventContext("u1", null, new DeleteNodeOp().getName(), Map.of(NODE_ARG.getName(), "o1", DESCENDANTS_ARG.getName(), List.of("oa1"))),
-                testEventProcessor.getEventContext()
+            new EventContext("u1", null, new DeleteNodeOp().getName(),
+                Map.of(
+                    NODE_ARG.getName(), "o1",
+                    TYPE_ARG.getName(), NodeType.O,
+                    DESCENDANTS_ARG.getName(), new ArrayList<>(List.of("oa1"))
+                )
+            ),
+            testEventProcessor.getEventContext()
         );
 
         assertFalse(pap.query().graph().nodeExists("o1"));
@@ -194,7 +207,7 @@ class GraphModificationAdjudicatorTest {
     void associate() throws PMException {
         assertDoesNotThrow(() -> ok.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
         assertEquals(
-                new EventContext("u1", null, new AssociateOp().getName(), Map.of(UA_ARG.getName(), "ua1", TARGET_ARG.getName(), "ua3")),
+                new EventContext("u1", null, new AssociateOp().getName(), Map.of(UA_ARG.getName(), "ua1", TARGET_ARG.getName(), "ua3", ARSET_ARG.getName(), new AccessRightSet("assign"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1"))

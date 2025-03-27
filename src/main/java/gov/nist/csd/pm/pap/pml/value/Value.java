@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.value;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import gov.nist.csd.pm.common.exception.PMRuntimeException;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.type.Type;
@@ -88,8 +89,6 @@ public abstract class Value implements Serializable {
             return map;
         } else if (type.isVoid()){
             return null;
-        } else if (type.isPattern()) {
-            return getPatternValue();
         }
 
         throw new PMRuntimeException("cannot convert value of type " + type + " to an object");
@@ -112,6 +111,7 @@ public abstract class Value implements Serializable {
             case List list -> toListValue(list);
             case Boolean b -> new BoolValue(b);
             case Map m -> toMapValue(m);
+            case NodeType t -> new StringValue(t.toString());
             default -> objToValue(o);
         };
     }

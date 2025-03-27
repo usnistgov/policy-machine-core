@@ -2,14 +2,17 @@ package gov.nist.csd.pm.pap.executable.arg;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ActualArgs {
 
 	private Map<FormalArg<?>, Object> map;
+	private Map<String, FormalArg<?>> argIndex;
 
 	public ActualArgs() {
 		map = new HashMap<>();
+		argIndex = new HashMap<>();
 	}
 
 	public ActualArgs(Map<String, Object> map) {
@@ -18,22 +21,30 @@ public class ActualArgs {
 		}
 
 		this.map = new HashMap<>();
-		map.forEach((k, v) -> this.map.put(new FormalArg<>(k, v.getClass()), v));
+		this.argIndex = new HashMap<>();
+
+		map.forEach((k, v) -> {
+			FormalArg<?> formalArg = new FormalArg<>(k, v.getClass());
+			this.map.put(formalArg, v);
+			this.argIndex.put(k, formalArg);
+		});
+
 	}
 
 	public <T> ActualArgs put(FormalArg<T> arg, T value) {
 		map.put(arg, value);
-		return this;
-	}
-
-	public <T> ActualArgs put(String name, Class<T> clazz, T value) {
-		map.put(new FormalArg<>(name, clazz), value);
+		argIndex.put(arg.getName(), arg);
 		return this;
 	}
 
 	public <T> T get(FormalArg<T> arg) {
 		Object o = map.get(arg);
 		return arg.getType().cast(o);
+	}
+
+	public Object get(String arg) {
+		FormalArg<?> formalArg = argIndex.get(arg);
+		return map.get(formalArg);
 	}
 
 	public void foreach(Consumer<FormalArg<?>> consumer) {

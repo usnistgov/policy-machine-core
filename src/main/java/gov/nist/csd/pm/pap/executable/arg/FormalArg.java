@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.pap.executable.arg;
 
-public class FormalArg<T> {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class FormalArg<T> implements Serializable {
 
 	private final String name;
 	private final Class<T> type;
@@ -16,5 +19,19 @@ public class FormalArg<T> {
 
 	public Class<T> getType() {
 		return type;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof FormalArg<?> formalArg))
+			return false;
+        return Objects.equals(name, formalArg.name) && Objects.equals(type, formalArg.type);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, type);
 	}
 }
