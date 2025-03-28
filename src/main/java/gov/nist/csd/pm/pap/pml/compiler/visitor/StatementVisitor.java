@@ -1,6 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.function.CheckStatementVisitor;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.function.FunctionDefinitionVisitor;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.function.FunctionSignatureVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 
@@ -86,18 +90,18 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement> {
     }
 
     @Override
-    public PMLStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, true).visitFunctionDefinitionStatement(ctx);
-    }
-
-    @Override
     public PMLStatement visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, true).visitOperationDefinitionStatement(ctx);
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitOperationDefinitionStatement(ctx);
     }
 
     @Override
     public PMLStatement visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, true).visitRoutineDefinitionStatement(ctx);
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitRoutineDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement visitBasicFunctionDefinitionStatement(BasicFunctionDefinitionStatementContext ctx) {
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitBasicFunctionDefinitionStatement(ctx);
     }
 
     @Override

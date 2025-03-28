@@ -1,10 +1,10 @@
-package gov.nist.csd.pm.pap.pml.function.builtin;
+package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.ActualArgs;
-import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GetNodeProperties extends PMLFunction {
+public class GetNodeProperties extends PMLBasicFunction {
 
     private static final Type returnType = Type.map(Type.string(), Type.string());
 

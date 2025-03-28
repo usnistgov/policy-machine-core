@@ -1,22 +1,24 @@
 package gov.nist.csd.pm.pap.pml.statement.basic;
 
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.PMLStmtsFunction;
+
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLStmtsBasicFunction;
 import gov.nist.csd.pm.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.Objects;
 
 public class BasicFunctionDefinitionStatement implements FunctionDefinitionStatement {
 
-    private final PMLStmtsFunction function;
+    private final PMLStmtsBasicFunction function;
     private final PMLFunctionSignature signature;
 
-    public BasicFunctionDefinitionStatement(PMLStmtsFunction function) {
+    public BasicFunctionDefinitionStatement(PMLStmtsBasicFunction function) {
         this.function = function;
-        this.signature = new PMLFunctionSignature(
+        this.signature = new PMLBasicFunctionSignature(
             function.getName(),
             function.getReturnType(),
             function.getPmlFormalArgs()

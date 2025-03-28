@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.function.builtin;
+package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
@@ -7,14 +7,14 @@ import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.*;
 
-public class Search extends PMLFunction {
+public class Search extends PMLBasicFunction {
 
     public static final PMLFormalArg TYPE_ARG = new PMLFormalArg("type", Type.string());
     public static final PMLFormalArg PROPERTIES_ARG = new PMLFormalArg("properties", Type.map(Type.string(), Type.string()));

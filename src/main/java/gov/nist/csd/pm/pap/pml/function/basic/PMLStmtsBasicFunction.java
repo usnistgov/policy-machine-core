@@ -1,25 +1,21 @@
-package gov.nist.csd.pm.pap.pml.function;
+package gov.nist.csd.pm.pap.pml.function.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
-public class PMLStmtsFunction extends PMLFunction implements PMLStatementSerializable {
+public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatementSerializable {
     private PMLStatementBlock statements;
 
-    public PMLStmtsFunction(String name, Type returnType, List<PMLFormalArg> formalArgs, PMLStatementBlock statements) {
+    public PMLStmtsBasicFunction(String name, Type returnType, List<PMLFormalArg> formalArgs, PMLStatementBlock statements) {
         super(name, returnType, formalArgs);
         this.statements = statements;
     }
@@ -57,7 +53,7 @@ public class PMLStmtsFunction extends PMLFunction implements PMLStatementSeriali
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLStmtsFunction that)) return false;
+        if (!(o instanceof PMLStmtsBasicFunction that)) return false;
         return Objects.equals(statements, that.statements);
     }
 

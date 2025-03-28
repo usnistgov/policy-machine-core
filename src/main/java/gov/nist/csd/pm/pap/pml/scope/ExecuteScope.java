@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.function.builtin.PMLBuiltinFunctions;
+import gov.nist.csd.pm.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;

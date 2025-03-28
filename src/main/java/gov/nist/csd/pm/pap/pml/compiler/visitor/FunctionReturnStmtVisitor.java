@@ -39,7 +39,7 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
     }
 
     private ParserRuleContext getEnclosingContext(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.FunctionDefinitionStatementContext ||
+        if (ctx instanceof PMLParser.BasicFunctionDefinitionStatementContext ||
                 ctx instanceof PMLParser.OperationDefinitionStatementContext ||
                 ctx instanceof PMLParser.RoutineDefinitionStatementContext ||
                 ctx instanceof PMLParser.ResponseContext) {

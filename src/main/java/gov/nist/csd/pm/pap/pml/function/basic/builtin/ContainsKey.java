@@ -1,11 +1,11 @@
-package gov.nist.csd.pm.pap.pml.function.builtin;
+package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.value.Value;
 import java.util.List;
 import java.util.Map;
 
-public class ContainsKey extends PMLFunction {
+public class ContainsKey extends PMLBasicFunction {
 
     public static final PMLFormalArg MAP_ARG = new PMLFormalArg("map", Type.map(Type.any(), Type.any()));
     public static final PMLFormalArg KEY_ARG = new PMLFormalArg("key", Type.any());

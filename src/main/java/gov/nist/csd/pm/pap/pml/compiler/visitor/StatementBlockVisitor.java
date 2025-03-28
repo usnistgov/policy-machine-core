@@ -5,6 +5,8 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
+
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
@@ -31,6 +33,21 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
             PMLStatement pmlStatement = statementVisitor.visitBasicStatement(statementContext);
+
+            if (pmlStatement instanceof FunctionInvokeExpression functionInvokeExpression) {
+                String functionName = functionInvokeExpression.getFuncName();
+
+	            try {
+                    PMLFunctionSignature executable = visitorCtx.scope().getFunction(functionName);
+
+                    if (!(executable instanceof PMLBasicFunctionSignature)){
+                        visitorCtx.errorLog().addError(statementContext, "only PML basic functions (defined as 'function') allowed in basic statement block");
+                    }
+                } catch (UnknownFunctionInScopeException e) {
+                    visitorCtx.errorLog().addError(statementContext, e.getMessage());
+	            }
+            }
+
             stmts.add(pmlStatement);
         }
 

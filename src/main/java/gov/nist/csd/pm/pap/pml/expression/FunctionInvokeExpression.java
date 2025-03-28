@@ -11,10 +11,11 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
+
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLActualArgs;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
@@ -148,7 +149,7 @@ public class FunctionInvokeExpression extends Expression {
 
         List<PMLFormalArg> pmlFormalArgs = switch (function) {
             case PMLRoutine pmlRoutine -> pmlRoutine.getPmlFormalArgs();
-            case PMLFunction pmlFunction -> pmlFunction.getPmlFormalArgs();
+            case PMLBasicFunction pmlFunction -> pmlFunction.getPmlFormalArgs();
             case PMLOperation pmlOperation -> pmlOperation.getPmlFormalArgs();
             default -> throw new PMException("unknown function type " + function.getClass().getName());
         };

@@ -1,13 +1,13 @@
-package gov.nist.csd.pm.pap.pml.function.builtin;
+package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
-import static gov.nist.csd.pm.pap.pml.function.builtin.Env.KEY_ARG;
+import static gov.nist.csd.pm.pap.pml.function.basic.builtin.Env.KEY_ARG;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.ActualArgs;
-import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -15,7 +15,7 @@ import gov.nist.csd.pm.pap.pml.value.Value;
 import java.util.List;
 
 
-public class HasPropertyKey extends PMLFunction {
+public class HasPropertyKey extends PMLBasicFunction {
 
     public HasPropertyKey() {
         super("hasPropertyKey",

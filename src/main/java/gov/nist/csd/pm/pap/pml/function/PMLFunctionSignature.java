@@ -2,12 +2,13 @@ package gov.nist.csd.pm.pap.pml.function;
 
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.pap.pml.type.Type;
 
+import gov.nist.csd.pm.pap.pml.type.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-public class PMLFunctionSignature implements PMLStatementSerializable {
+public abstract class PMLFunctionSignature implements PMLStatementSerializable {
 
     protected String name;
     protected Type returnType;
@@ -56,11 +57,6 @@ public class PMLFunctionSignature implements PMLStatementSerializable {
             argsStr,
             returnType.isVoid() ? "" : returnType.toString() + " "
         );
-    }
-
-    @Override
-    public String toFormattedString(int indentLevel) {
-        return toString("function", indentLevel);
     }
 
     @Override

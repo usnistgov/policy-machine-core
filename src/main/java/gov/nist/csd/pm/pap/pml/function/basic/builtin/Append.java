@@ -1,36 +1,35 @@
-package gov.nist.csd.pm.pap.pml.function.builtin;
-
-import static gov.nist.csd.pm.pap.pml.function.builtin.Append.DST_ARG;
+package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.List;
 
-public class AppendAll extends PMLFunction {
+public class Append extends PMLBasicFunction {
 
-    public static final PMLFormalArg SRC_LIST_ARG = new PMLFormalArg("src", Type.array(Type.any()));
+    public static final PMLFormalArg DST_ARG = new PMLFormalArg("dst", Type.array(Type.any()));
+    public static final PMLFormalArg SRC_ARG = new PMLFormalArg("src", Type.any());
 
-    public AppendAll() {
+    public Append() {
         super(
-                "appendAll",
+                "append",
                 Type.array(Type.any()),
-                List.of(DST_ARG, SRC_LIST_ARG)
+                List.of(DST_ARG, SRC_ARG)
         );
     }
 
     @Override
     public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
         List<Value> valueArr = actualArgs.get(DST_ARG).getArrayValue();
-        List<Value> srcValue = actualArgs.get(SRC_LIST_ARG).getArrayValue();
+        Value srcValue = actualArgs.get(SRC_ARG);
 
-        valueArr.addAll(srcValue);
+        valueArr.add(srcValue);
 
         return new ArrayValue(valueArr, Type.array(Type.any()));
     }

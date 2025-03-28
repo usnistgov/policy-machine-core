@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PMLFunctionsTest {
+public class PMLBasicFunctionsTest {
 
 	@Test
 	void testCallOperationInObligationResponse() throws PMException {

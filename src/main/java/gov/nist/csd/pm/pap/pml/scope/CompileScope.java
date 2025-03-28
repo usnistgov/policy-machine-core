@@ -5,7 +5,9 @@ import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
@@ -21,7 +23,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
-import static gov.nist.csd.pm.pap.pml.function.builtin.PMLBuiltinFunctions.builtinFunctions;
+import static gov.nist.csd.pm.pap.pml.function.basic.builtin.PMLBuiltinFunctions.builtinFunctions;
 
 public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
 
@@ -35,8 +37,8 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
 
         // add builtin operations
         Map<String, PMLFunctionSignature> functions = new HashMap<>();
-        Map<String, PMLOperation> funcs = builtinFunctions();
-        for (Map.Entry<String, PMLOperation> func : funcs.entrySet()) {
+        Map<String, PMLBasicFunction> funcs = builtinFunctions();
+        for (Map.Entry<String, PMLBasicFunction> func : funcs.entrySet()) {
             functions.put(func.getKey(), func.getValue().getSignature());
         }
         setFunctions(functions);
@@ -58,7 +60,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
 
         // add pml operations and routines stored in PAP
         Map<String, PMLFunctionSignature> functions = new HashMap<>();
-        for (Map.Entry<String, PMLOperation> e : builtinFunctions().entrySet()) {
+        for (Map.Entry<String, PMLBasicFunction> e : builtinFunctions().entrySet()) {
             functions.put(e.getKey(), e.getValue().getSignature());
         }
         for (Map.Entry<String, PMLOperation> pmlOp : pap.getPMLOperations().entrySet()) {

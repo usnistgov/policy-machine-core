@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.pml.function.operation;
 
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -16,7 +15,7 @@ public abstract class PMLOperation extends Operation<Value> {
 
     private final Type returnType;
     private final List<PMLFormalArg> pmlFormalArgs;
-    private final PMLFunctionSignature signature;
+    private final PMLOperationSignature signature;
     protected ExecutionContext ctx;
 
     public PMLOperation(String name, Type returnType, List<PMLFormalArg> formalArgs) {
@@ -39,7 +38,7 @@ public abstract class PMLOperation extends Operation<Value> {
         return pmlFormalArgs;
     }
 
-    public PMLFunctionSignature getSignature() {
+    public PMLOperationSignature getSignature() {
         return signature;
     }
 

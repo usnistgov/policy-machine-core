@@ -19,7 +19,7 @@ basicStatement: (
     | continueStatement
     | functionInvokeStatement
     | ifStatement
-    | functionDefinitionStatement
+    | basicFunctionDefinitionStatement
 ) ;
 
 operationStatement: (
@@ -157,11 +157,11 @@ variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
 operationDefinitionStatement: operationSignature checkStatementBlock? statementBlock ;
 routineDefinitionStatement: routineSignature checkStatementBlock? statementBlock ;
-functionDefinitionStatement: functionSignature basicStatementBlock ;
+basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
 
 operationSignature: OPERATION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
 routineSignature: ROUTINE ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
-functionSignature: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
+basicFunctionSignature: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
 
 formalArgList: (formalArg (COMMA formalArg)*)? ;
 formalArg: NODE_ARG? variableType ID;
