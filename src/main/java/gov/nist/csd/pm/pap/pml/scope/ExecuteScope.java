@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.pap.pml.scope;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.executable.builtin.PMLBuiltinExecutables;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
+import gov.nist.csd.pm.pap.pml.function.builtin.PMLBuiltinFunctions;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
@@ -20,7 +20,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
 
-public class ExecuteScope extends Scope<Value, AdminExecutable<?>> {
+public class ExecuteScope extends Scope<Value, AdminFunction<?>> {
 
     public ExecuteScope(PAP pap) throws PMException {
         // add constants
@@ -30,20 +30,20 @@ public class ExecuteScope extends Scope<Value, AdminExecutable<?>> {
         setConstants(constants);
 
         // add pml operations and routines stored in PAP
-        Map<String, AdminExecutable<?>> executables = new HashMap<>();
-        executables.putAll(new HashMap<>(PMLBuiltinExecutables.builtinFunctions()));
-        executables.putAll(pap.getPMLOperations());
-        executables.putAll(pap.getPMLRoutines());
-        setExecutables(executables);
+        Map<String, AdminFunction<?>> functions = new HashMap<>();
+        functions.putAll(new HashMap<>(PMLBuiltinFunctions.builtinFunctions()));
+        functions.putAll(pap.getPMLOperations());
+        functions.putAll(pap.getPMLRoutines());
+        setFunctions(functions);
 
         // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
             if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
-                addExecutable(opName, pmlStmtsOperation);
+                addFunction(opName, pmlStmtsOperation);
             } else {
-                addExecutable(opName, new PMLOperationWrapper(operation));
+                addFunction(opName, new PMLOperationWrapper(operation));
             }
         }
 
@@ -52,9 +52,9 @@ public class ExecuteScope extends Scope<Value, AdminExecutable<?>> {
         for (String routineName : routineNames) {
             Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
             if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
-                addExecutable(routineName, pmlStmtsRoutine);
+                addFunction(routineName, pmlStmtsRoutine);
             } else {
-                addExecutable(routineName, new PMLRoutineWrapper(routine));
+                addFunction(routineName, new PMLRoutineWrapper(routine));
             }
         }
     }

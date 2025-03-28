@@ -3,9 +3,9 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.PMRuntimeException;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.executable.AdminExecutor;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.AdminFunctionExecutor;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.tx.Transactional;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
@@ -14,9 +14,9 @@ import gov.nist.csd.pm.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.scope.ExecutableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
@@ -34,7 +34,7 @@ import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 
-public abstract class PAP implements AdminExecutor, Transactional {
+public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
     protected final PolicyStore policyStore;
     private final PolicyModifier modifier;
@@ -120,8 +120,8 @@ public abstract class PAP implements AdminExecutor, Transactional {
     }
 
     @Override
-    public <T> T executeAdminExecutable(AdminExecutable<T> adminExecutable, ActualArgs args) throws PMException {
-        return adminExecutable.execute(this, args);
+    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, ActualArgs args) throws PMException {
+        return adminFunction.execute(this, args);
     }
 
     /**
@@ -161,24 +161,24 @@ public abstract class PAP implements AdminExecutor, Transactional {
     }
 
     public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
-        checkExecutableNames(pmlOperations.keySet());
+        checkFunctionNames(pmlOperations.keySet());
         this.pmlOperations = pmlOperations;
     }
 
     public void setPMLOperations(PMLOperation... operations) throws PMException {
-        checkExecutableNames(Arrays.stream(operations).map(PMLOperation::getName).collect(Collectors.toSet()));
+        checkFunctionNames(Arrays.stream(operations).map(PMLOperation::getName).collect(Collectors.toSet()));
         for (PMLOperation operation : operations) {
             this.pmlOperations.put(operation.getName(), operation);
         }
     }
 
     public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
-        checkExecutableNames(pmlRoutines.keySet());
+        checkFunctionNames(pmlRoutines.keySet());
         this.pmlRoutines = pmlRoutines;
     }
 
     public void setPMLRoutines(PMLRoutine... routines) throws PMException {
-        checkExecutableNames(Arrays.stream(routines).map(PMLRoutine::getName).collect(Collectors.toSet()));
+        checkFunctionNames(Arrays.stream(routines).map(PMLRoutine::getName).collect(Collectors.toSet()));
         for (PMLRoutine routine : routines) {
             this.pmlRoutines.put(routine.getName(), routine);
         }
@@ -192,7 +192,7 @@ public abstract class PAP implements AdminExecutor, Transactional {
         return pmlRoutines;
     }
 
-    private void checkExecutableNames(Collection<String> names) {
+    private void checkFunctionNames(Collection<String> names) {
         // check no operations conflict with existing operations in the PAP
         pmlOperations.keySet().forEach(name -> {
             if (!names.contains(name)) {
@@ -200,8 +200,8 @@ public abstract class PAP implements AdminExecutor, Transactional {
             }
 
             try {
-                throw new ExecutableAlreadyDefinedInScopeException(name);
-            } catch (ExecutableAlreadyDefinedInScopeException e) {
+                throw new FunctionAlreadyDefinedInScopeException(name);
+            } catch (FunctionAlreadyDefinedInScopeException e) {
                 throw new PMRuntimeException(e);
             }
         });

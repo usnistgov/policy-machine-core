@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.AdminAccessRights;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;

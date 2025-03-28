@@ -2,8 +2,8 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.util.SamplePolicy;

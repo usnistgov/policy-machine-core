@@ -3,12 +3,11 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.op.graph.AssociateOp;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.op.graph.AssociateOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 
 import java.util.Objects;

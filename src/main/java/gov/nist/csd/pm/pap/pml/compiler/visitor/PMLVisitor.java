@@ -3,11 +3,11 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.statement.basic.CreateFunctionStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateOperationStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateRoutineStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.OperationDefinitionStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.RoutineDefinitionStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
@@ -27,16 +27,16 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
     public List<PMLStatement> visitPml(PMLParser.PmlContext ctx) {
         SortedStatements sortedStatements = sortStatements(ctx);
 
-        CompiledExecutables executables = compileExecutables(
+        CompiledFunctions functions = compileFunctions(
                 sortedStatements.operationCtxs,
                 sortedStatements.routineCtxs,
                 sortedStatements.functionCtxs
         );
 
         List<PMLStatement> stmts = new ArrayList<>();
-        stmts.addAll(executables.operations);
-        stmts.addAll(executables.routines);
-        stmts.addAll(executables.functions);
+        stmts.addAll(functions.operations);
+        stmts.addAll(functions.routines);
+        stmts.addAll(functions.functions);
         stmts.addAll(compileStatements(sortedStatements.statementCtxs));
 
         return stmts;
@@ -77,10 +77,10 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
                                     List<PMLParser.FunctionDefinitionStatementContext> functionCtxs,
                                     List<PMLParser.StatementContext> statementCtxs) {}
 
-    private CompiledExecutables compileExecutables(List<PMLParser.OperationDefinitionStatementContext> operationCtxs,
-                                                   List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
-                                                   List<PMLParser.FunctionDefinitionStatementContext> functionCtxs) {
-        Map<String, PMLExecutableSignature> executables = new HashMap<>(visitorCtx.scope().getExecutables());
+    private CompiledFunctions compileFunctions(List<PMLParser.OperationDefinitionStatementContext> operationCtxs,
+                                               List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
+                                               List<PMLParser.FunctionDefinitionStatementContext> functionCtxs) {
+        Map<String, PMLFunctionSignature> functions = new HashMap<>(visitorCtx.scope().getFunctions());
 
         // track the function definitions statements to be processed,
         // function signatures are compiled first in the event that one function calls another
@@ -89,37 +89,37 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
         Map<String, PMLParser.RoutineDefinitionStatementContext> validRoutineDefs = new HashMap<>();
         Map<String, PMLParser.FunctionDefinitionStatementContext> validFunctionDefs = new HashMap<>();
 
-        ExecutableDefinitionVisitor.SignatureVisitor signatureVisitor =
-                new ExecutableDefinitionVisitor.SignatureVisitor(visitorCtx, true);
+        FunctionDefinitionVisitor.SignatureVisitor signatureVisitor =
+                new FunctionDefinitionVisitor.SignatureVisitor(visitorCtx, true);
 
         // operations
         for (PMLParser.OperationDefinitionStatementContext operationCtx : operationCtxs) {
-            PMLExecutableSignature signature = signatureVisitor.visitOperationSignature(operationCtx.operationSignature());
-            processSignature(visitorCtx, operationCtx, signature, executables, (ctx) -> validOperationDefs.put(signature.getName(), operationCtx));
+            PMLFunctionSignature signature = signatureVisitor.visitOperationSignature(operationCtx.operationSignature());
+            processSignature(visitorCtx, operationCtx, signature, functions, (ctx) -> validOperationDefs.put(signature.getName(), operationCtx));
         }
 
         // routines
         for (PMLParser.RoutineDefinitionStatementContext routineCtx : routineCtxs) {
-            PMLExecutableSignature signature = signatureVisitor.visitRoutineSignature(routineCtx.routineSignature());
-            processSignature(visitorCtx, routineCtx, signature, executables, (ctx) -> validRoutineDefs.put(signature.getName(), routineCtx));
+            PMLFunctionSignature signature = signatureVisitor.visitRoutineSignature(routineCtx.routineSignature());
+            processSignature(visitorCtx, routineCtx, signature, functions, (ctx) -> validRoutineDefs.put(signature.getName(), routineCtx));
         }
 
         // functions
         for (PMLParser.FunctionDefinitionStatementContext functionCtx : functionCtxs) {
-            PMLExecutableSignature signature = signatureVisitor.visitFunctionSignature(functionCtx.functionSignature());
-            processSignature(visitorCtx, functionCtx, signature, executables, (ctx) -> validFunctionDefs.put(signature.getName(), functionCtx));
+            PMLFunctionSignature signature = signatureVisitor.visitFunctionSignature(functionCtx.functionSignature());
+            processSignature(visitorCtx, functionCtx, signature, functions, (ctx) -> validFunctionDefs.put(signature.getName(), functionCtx));
         }
 
-        // compile all executable bodies now that all signatures are compiled
-        ExecutableDefinitionVisitor executableDefinitionVisitor = new ExecutableDefinitionVisitor(visitorCtx, false);
-        List<CreateOperationStatement> operations = compileExecutables(operationCtxs, executableDefinitionVisitor::visitOperationDefinitionStatement);
-        List<CreateRoutineStatement> routines = compileExecutables(routineCtxs, executableDefinitionVisitor::visitRoutineDefinitionStatement);
-        List<CreateFunctionStatement> functions = compileExecutables(functionCtxs, executableDefinitionVisitor::visitFunctionDefinitionStatement);
+        // compile all function bodies now that all signatures are compiled
+        FunctionDefinitionVisitor functionDefinitionVisitor = new FunctionDefinitionVisitor(visitorCtx, false);
+        List<OperationDefinitionStatement> operations = compileFunctions(operationCtxs, functionDefinitionVisitor::visitOperationDefinitionStatement);
+        List<RoutineDefinitionStatement> routines = compileFunctions(routineCtxs, functionDefinitionVisitor::visitRoutineDefinitionStatement);
+        List<BasicFunctionDefinitionStatement> basicFunctions = compileFunctions(functionCtxs, functionDefinitionVisitor::visitFunctionDefinitionStatement);
 
-        return new CompiledExecutables(operations, routines, functions);
+        return new CompiledFunctions(operations, routines, basicFunctions);
     }
 
-    private <T, R> List<R> compileExecutables(List<T> contexts, Function<T, R> visitor) {
+    private <T, R> List<R> compileFunctions(List<T> contexts, Function<T, R> visitor) {
         List<R> results = new ArrayList<>();
         for (T context : contexts) {
             try {
@@ -134,32 +134,32 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
 
     private void processSignature(VisitorContext vistorCtx,
                                   ParserRuleContext statementCtx,
-                                  PMLExecutableSignature signature,
-                                  Map<String, PMLExecutableSignature> executables,
+                                  PMLFunctionSignature signature,
+                                  Map<String, PMLFunctionSignature> functions,
                                   Consumer<ParserRuleContext> consumer) {
         // visit the signature which will add to the scope, if an error occurs, log it and continue
         try {
             // check that the function isn't already defined in the pml or global scope
-            if (executables.containsKey(signature.getName())) {
+            if (functions.containsKey(signature.getName())) {
                 visitorCtx.errorLog().addError(
                         statementCtx,
-                        "executable '" + signature.getName() + "' already defined in scope"
+                        "function '" + signature.getName() + "' already defined in scope"
                 );
 
                 return;
             }
 
 
-            executables.put(signature.getName(), signature);
+            functions.put(signature.getName(), signature);
             consumer.accept(statementCtx);
         } catch (PMLCompilationRuntimeException e) {
             visitorCtx.errorLog().addErrors(e.getErrors());
         }
     }
 
-    private record CompiledExecutables(List<CreateOperationStatement> operations,
-                                       List<CreateRoutineStatement> routines,
-                                       List<CreateFunctionStatement> functions) {}
+    private record CompiledFunctions(List<OperationDefinitionStatement> operations,
+                                     List<RoutineDefinitionStatement> routines,
+                                     List<BasicFunctionDefinitionStatement> functions) {}
 
     private List<PMLStatement> compileStatements(List<PMLParser.StatementContext> statementCtxs) {
         List<PMLStatement> statements = new ArrayList<>();

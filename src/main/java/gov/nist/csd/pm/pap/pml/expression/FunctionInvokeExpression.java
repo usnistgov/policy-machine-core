@@ -1,27 +1,27 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.FormalArg;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLActualArgs;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.executable.function.PMLFunction;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLActualArgs;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.scope.UnknownExecutableInScopeException;
+import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ReturnValue;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -39,10 +39,10 @@ public class FunctionInvokeExpression extends Expression {
     public static Expression compileFunctionInvoke(VisitorContext visitorCtx, PMLParser.FunctionInvokeContext functionInvokeContext) {
         String funcName = functionInvokeContext.ID().getText();
 
-        PMLExecutableSignature signature;
+        PMLFunctionSignature signature;
         try {
-            signature = visitorCtx.scope().getExecutable(funcName);
-        } catch (UnknownExecutableInScopeException e) {
+            signature = visitorCtx.scope().getFunction(funcName);
+        } catch (UnknownFunctionInScopeException e) {
             throw new PMLCompilationRuntimeException(functionInvokeContext, e.getMessage());
         }
 
@@ -95,19 +95,20 @@ public class FunctionInvokeExpression extends Expression {
         ExecutionContext funcInvokeCtx = ctx.copy();
 
         // set the execution context if exec is a PML exec
-        AdminExecutable<?> executable = funcInvokeCtx.scope().getExecutable(funcName);
+        AdminFunction<?> function = funcInvokeCtx.scope().getFunction(funcName);
 
-        Map<String, Value> actualOperandValues = prepareOperandExpressions(funcInvokeCtx, pap, executable);
+        Map<String, Value> actualOperandValues = prepareOperandExpressions(funcInvokeCtx, pap,
+            function);
 
-        // set the ctx if PML executable
-        if (executable instanceof PMLRoutine pmlRoutine) {
+        // set the ctx if PML function
+        if (function instanceof PMLRoutine pmlRoutine) {
             pmlRoutine.setCtx(funcInvokeCtx.copyWithParentScope());
-        } else if (executable instanceof PMLOperation pmlOperation) {
+        } else if (function instanceof PMLOperation pmlOperation) {
             pmlOperation.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
         ActualArgs args;
-        if ((executable instanceof PMLOperationWrapper) || (executable instanceof PMLRoutineWrapper)) {
+        if ((function instanceof PMLOperationWrapper) || (function instanceof PMLRoutineWrapper)) {
             // PMLWrappers do not need PML Values as input, just regular objects
             args = new ActualArgs(valuesMapToObjects(actualOperandValues));
         } else {
@@ -115,8 +116,8 @@ public class FunctionInvokeExpression extends Expression {
             args = new PMLActualArgs(actualOperandValues);
         }
 
-        // execute the executable
-        Object o = pap.executeAdminExecutable(executable, args);
+        // execute the function
+        Object o = pap.executeAdminFunction(function, args);
 
         // return the value
         Value value = Value.fromObject(o);
@@ -136,20 +137,20 @@ public class FunctionInvokeExpression extends Expression {
         return objectMap;
     }
 
-    private Map<String, Value> prepareOperandExpressions(ExecutionContext ctx, PAP pap, AdminExecutable<?> executable)
+    private Map<String, Value> prepareOperandExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?> function)
     throws PMException {
-        List<FormalArg<?>> formalArgs = executable.getFormalArgs();
+        List<FormalArg<?>> formalArgs = function.getFormalArgs();
 
         if (actualArgsList.size() != formalArgs.size()) {
             throw new PMLExecutionException("expected " + formalArgs.size() + " args for function \""
                 + funcName + "\", got " + formalArgs.size());
         }
 
-        List<PMLFormalArg> pmlFormalArgs = switch (executable) {
+        List<PMLFormalArg> pmlFormalArgs = switch (function) {
             case PMLRoutine pmlRoutine -> pmlRoutine.getPmlFormalArgs();
             case PMLFunction pmlFunction -> pmlFunction.getPmlFormalArgs();
             case PMLOperation pmlOperation -> pmlOperation.getPmlFormalArgs();
-            default -> throw new PMException("unknown executable type " + executable.getClass().getName());
+            default -> throw new PMException("unknown function type " + function.getClass().getName());
         };
 
         Map<String, Value> values = new HashMap<>();
@@ -201,7 +202,7 @@ public class FunctionInvokeExpression extends Expression {
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException {
-        return scope.getExecutable(funcName).getReturnType();
+    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
+        return scope.getFunction(funcName).getReturnType();
     }
 }

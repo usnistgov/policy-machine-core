@@ -11,7 +11,6 @@ import gov.nist.csd.pm.pap.pml.pattern.operand.*;
 import gov.nist.csd.pm.pap.pml.pattern.subject.*;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.statement.CreateExecutableStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
 

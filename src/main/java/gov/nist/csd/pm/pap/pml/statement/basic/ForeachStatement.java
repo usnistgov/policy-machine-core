@@ -2,17 +2,15 @@ package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.value.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class ForeachStatement extends BasicStatement {

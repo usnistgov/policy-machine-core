@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -24,16 +24,16 @@ public class PMLCompiler {
     }
 
     public List<PMLStatement> compilePML(String input) throws PMException {
-        Scope<Variable, PMLExecutableSignature> scope = new CompileScope();
+        Scope<Variable, PMLFunctionSignature> scope = new CompileScope();
         return compilePMLWithScope(scope, input);
     }
 
     public List<PMLStatement> compilePML(PAP pap, String input) throws PMException {
-        Scope<Variable, PMLExecutableSignature> scope = new CompileScope(pap);
+        Scope<Variable, PMLFunctionSignature> scope = new CompileScope(pap);
         return compilePMLWithScope(scope, input);
     }
 
-    private List<PMLStatement> compilePMLWithScope(Scope<Variable, PMLExecutableSignature> scope, String input) throws PMException {
+    private List<PMLStatement> compilePMLWithScope(Scope<Variable, PMLFunctionSignature> scope, String input) throws PMException {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 
         PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));

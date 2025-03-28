@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.op.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.pap.function.op.graph.CreateObjectAttributeOp;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;

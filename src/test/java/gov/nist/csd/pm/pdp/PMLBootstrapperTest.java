@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;

@@ -1,21 +1,18 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.UnknownExecutableInScopeException;
+import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpression> {
 
@@ -49,11 +46,11 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
             }
         }
 
-        // check the executable is in scope and the args are correct
-        PMLExecutableSignature signature;
+        // check the function is in scope and the args are correct
+        PMLFunctionSignature signature;
         try {
-            signature = visitorCtx.scope().getExecutable(funcName);
-        } catch (UnknownExecutableInScopeException e) {
+            signature = visitorCtx.scope().getFunction(funcName);
+        } catch (UnknownFunctionInScopeException e) {
             throw new PMLCompilationRuntimeException(funcCallCtx, e.getMessage());
         }
 

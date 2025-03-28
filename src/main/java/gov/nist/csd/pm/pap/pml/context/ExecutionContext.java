@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap.pml.context;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
+import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -12,13 +12,12 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class ExecutionContext implements Serializable {
 
     protected final UserContext author;
-    protected final Scope<Value, AdminExecutable<?>> scope;
+    protected final Scope<Value, AdminFunction<?>> scope;
     protected final PAP pap;
     private boolean isExplain;
 
@@ -29,7 +28,7 @@ public class ExecutionContext implements Serializable {
         this.isExplain = false;
     }
 
-    public ExecutionContext(UserContext author, PAP pap, Scope<Value, AdminExecutable<?>> scope) throws PMException {
+    public ExecutionContext(UserContext author, PAP pap, Scope<Value, AdminFunction<?>> scope) throws PMException {
         this.author = author;
         this.scope = scope;
         this.pap = pap;
@@ -40,7 +39,7 @@ public class ExecutionContext implements Serializable {
         return author;
     }
 
-    public Scope<Value, AdminExecutable<?>> scope() {
+    public Scope<Value, AdminFunction<?>> scope() {
         return scope;
     }
 

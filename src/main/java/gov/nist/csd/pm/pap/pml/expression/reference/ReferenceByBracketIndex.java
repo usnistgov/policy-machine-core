@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
@@ -30,7 +30,7 @@ public class ReferenceByBracketIndex extends ReferenceByIndex{
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException {
+    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
         return varRef.getType(scope).getMapValueType();
     }
 

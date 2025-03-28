@@ -2,17 +2,17 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -111,15 +111,15 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public <T> T executeAdminExecutable(AdminExecutable<T> adminExecutable, ActualArgs operands) throws PMException {
-        if (adminExecutable instanceof Routine<T> routine) {
+    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, ActualArgs operands) throws PMException {
+        if (adminFunction instanceof Routine<T> routine) {
             return routine.execute(this, operands);
-        } else if (adminExecutable instanceof Operation<T> operation) {
+        } else if (adminFunction instanceof Operation<T> operation) {
             operation.canExecute(privilegeChecker, userCtx, operands);
             return operation.execute(pap, operands);
         }
 
-        return adminExecutable.execute(pap, operands);
+        return adminFunction.execute(pap, operands);
     }
 
     @Override

@@ -2,8 +2,8 @@ package gov.nist.csd.pm.pdp.bootstrap;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 

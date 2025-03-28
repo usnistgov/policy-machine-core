@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
@@ -23,7 +23,7 @@ public class ReferenceByID extends VariableReference{
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException {
+    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
         return scope.getVariable(id).type();
     }
 

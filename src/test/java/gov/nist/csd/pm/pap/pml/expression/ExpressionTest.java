@@ -6,8 +6,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
@@ -88,12 +87,12 @@ class ExpressionTest {
     @Test
     void testCompileStringExpression_FuncInvoke() throws PMException {
         CompileScope compileScope = new CompileScope();
-        PMLExecutableSignature signature = new PMLFunctionSignature(
+        PMLFunctionSignature signature = new PMLFunctionSignature(
                 "test",
                 Type.string(),
                 List.of()
         );
-        compileScope.addExecutable("test", signature);
+        compileScope.addFunction("test", signature);
         VisitorContext visitorContext = new VisitorContext(compileScope);
 
         Expression expression = Expression.fromString(visitorContext, "test()", Type.string());

@@ -3,9 +3,9 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.pap.executable.op.obligation.RuleList;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.pap.function.op.obligation.RuleList;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 

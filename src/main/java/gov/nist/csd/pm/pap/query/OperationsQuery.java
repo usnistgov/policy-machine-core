@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.function.op.Operation;
 
 import java.util.Collection;
 

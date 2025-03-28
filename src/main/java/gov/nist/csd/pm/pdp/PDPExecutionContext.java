@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
@@ -11,7 +11,6 @@ import gov.nist.csd.pm.pap.pml.value.*;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
 public class PDPExecutionContext extends ExecutionContext {
 
@@ -22,7 +21,7 @@ public class PDPExecutionContext extends ExecutionContext {
         this.pdpTx = pdpTx;
     }
 
-    public PDPExecutionContext(UserContext author, PDPTx pdpTx, Scope<Value, AdminExecutable<?>> scope) throws PMException {
+    public PDPExecutionContext(UserContext author, PDPTx pdpTx, Scope<Value, AdminFunction<?>> scope) throws PMException {
         super(author, pdpTx.pap, scope);
         this.pdpTx = pdpTx;
     }

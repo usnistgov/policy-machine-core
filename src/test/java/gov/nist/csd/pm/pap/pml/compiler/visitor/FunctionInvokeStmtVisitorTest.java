@@ -4,9 +4,8 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.executable.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
@@ -26,7 +25,7 @@ class FunctionInvokeStmtVisitorTest {
     private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
     private static final PMLFormalArg c = new PMLFormalArg("c", Type.array(Type.string()));
 
-    PMLExecutableSignature signature = new PMLFunctionSignature(
+    PMLFunctionSignature signature = new PMLFunctionSignature(
             "func1",
             Type.string(),
             List.of(a, b, c)
@@ -52,7 +51,7 @@ class FunctionInvokeStmtVisitorTest {
 
 
         CompileScope compileScope = new CompileScope();
-        compileScope.addExecutable("func1", signature);
+        compileScope.addFunction("func1", signature);
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
 
@@ -78,7 +77,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testWrongNumberOfArgs() throws PMException {
         CompileScope compileScope = new CompileScope();
-        compileScope.addExecutable("func1", signature);
+        compileScope.addFunction("func1", signature);
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
 
@@ -93,7 +92,7 @@ class FunctionInvokeStmtVisitorTest {
     @Test
     void testWrongArgType() throws PMException {
         CompileScope compileScope = new CompileScope();
-        compileScope.addExecutable("func1", signature);
+        compileScope.addFunction("func1", signature);
         VisitorContext visitorCtx = new VisitorContext(compileScope);
 
         testCompilationError(
@@ -112,14 +111,14 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
 
-        PMLExecutableSignature signature = new PMLFunctionSignature(
+        PMLFunctionSignature signature = new PMLFunctionSignature(
                 "func1",
                 Type.string(),
                 List.of()
         );
 
         CompileScope compileScope = new CompileScope();
-        compileScope.addExecutable("func1", signature);
+        compileScope.addFunction("func1", signature);
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)

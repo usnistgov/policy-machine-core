@@ -5,7 +5,7 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.common.exception.OperationExistsException;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
-import gov.nist.csd.pm.pap.executable.op.Operation;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;

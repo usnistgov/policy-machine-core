@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.pap.pml.scope;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
@@ -21,9 +21,9 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
-import static gov.nist.csd.pm.pap.pml.executable.builtin.PMLBuiltinExecutables.builtinFunctions;
+import static gov.nist.csd.pm.pap.pml.function.builtin.PMLBuiltinFunctions.builtinFunctions;
 
-public class CompileScope extends Scope<Variable, PMLExecutableSignature> {
+public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
 
     public CompileScope() {
         Map<String, Variable> constants = new HashMap<>();
@@ -34,12 +34,12 @@ public class CompileScope extends Scope<Variable, PMLExecutableSignature> {
         setConstants(constants);
 
         // add builtin operations
-        Map<String, PMLExecutableSignature> executables = new HashMap<>();
+        Map<String, PMLFunctionSignature> functions = new HashMap<>();
         Map<String, PMLOperation> funcs = builtinFunctions();
         for (Map.Entry<String, PMLOperation> func : funcs.entrySet()) {
-            executables.put(func.getKey(), func.getValue().getSignature());
+            functions.put(func.getKey(), func.getValue().getSignature());
         }
-        setExecutables(executables);
+        setFunctions(functions);
     }
 
     public CompileScope(PAP pap) throws PMException {
@@ -57,30 +57,30 @@ public class CompileScope extends Scope<Variable, PMLExecutableSignature> {
         setConstants(constants);
 
         // add pml operations and routines stored in PAP
-        Map<String, PMLExecutableSignature> executables = new HashMap<>();
+        Map<String, PMLFunctionSignature> functions = new HashMap<>();
         for (Map.Entry<String, PMLOperation> e : builtinFunctions().entrySet()) {
-            executables.put(e.getKey(), e.getValue().getSignature());
+            functions.put(e.getKey(), e.getValue().getSignature());
         }
         for (Map.Entry<String, PMLOperation> pmlOp : pap.getPMLOperations().entrySet()) {
             String key = pmlOp.getKey();
             PMLOperation value = pmlOp.getValue();
-            executables.put(key, value.getSignature());
+            functions.put(key, value.getSignature());
         }
         for (Map.Entry<String, PMLRoutine> pmlRoutine : pap.getPMLRoutines().entrySet()) {
             String key = pmlRoutine.getKey();
             PMLRoutine value = pmlRoutine.getValue();
-            executables.put(key, value.getSignature());
+            functions.put(key, value.getSignature());
         }
-        setExecutables(executables);
+        setFunctions(functions);
 
         // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
             if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
-                addExecutable(opName, pmlStmtsOperation.getSignature());
+                addFunction(opName, pmlStmtsOperation.getSignature());
             } else {
-                addExecutable(opName, new PMLOperationWrapper(operation).getSignature());
+                addFunction(opName, new PMLOperationWrapper(operation).getSignature());
             }
         }
 
@@ -89,9 +89,9 @@ public class CompileScope extends Scope<Variable, PMLExecutableSignature> {
         for (String routineName : routineNames) {
             Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
             if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
-                addExecutable(routineName, pmlStmtsRoutine.getSignature());
+                addFunction(routineName, pmlStmtsRoutine.getSignature());
             } else {
-                addExecutable(routineName, new PMLRoutineWrapper(routine).getSignature());
+                addFunction(routineName, new PMLRoutineWrapper(routine).getSignature());
             }
         }
     }

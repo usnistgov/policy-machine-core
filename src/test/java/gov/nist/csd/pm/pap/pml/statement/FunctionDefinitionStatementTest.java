@@ -2,13 +2,12 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.arg.FormalArg;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLNodeFormalArg;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLStmtsRoutine;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLNodeFormalArg;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.pap.pml.function.operation.CheckAndStatementsBlock;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
@@ -19,7 +18,6 @@ import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +28,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testOperationFormattedString() {
-        CreateExecutableStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
+        FunctionDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
                 "op1",
                 Type.string(),
                 List.of(a, b),
@@ -69,7 +67,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testRoutineFormattedString() {
-        CreateExecutableStatement stmt = new CreateRoutineStatement(new PMLStmtsRoutine(
+        FunctionDefinitionStatement stmt = new RoutineDefinitionStatement(new PMLStmtsRoutine(
                 "rou1",
                 Type.voidType(),
                 List.of(a, b),
@@ -96,7 +94,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testToFormattedStringVoidReturn() {
-        CreateExecutableStatement stmt = new CreateOperationStatement(new PMLStmtsOperation(
+        FunctionDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
                 "func1",
                 Type.voidType(),
                 List.of(a, b),

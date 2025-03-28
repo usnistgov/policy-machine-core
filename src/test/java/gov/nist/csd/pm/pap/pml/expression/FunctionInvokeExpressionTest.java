@@ -8,14 +8,14 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.CheckAndStatementsBlock;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.pap.pml.function.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.scope.ExecutableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
@@ -57,11 +57,12 @@ class FunctionInvokeExpressionTest {
                     new ReturnStatement(new StringLiteral("test_ret"))
             ))));
 
-    private Scope<Variable, PMLExecutableSignature> testScope() throws ExecutableAlreadyDefinedInScopeException {
-        Scope<Variable, PMLExecutableSignature> scope = new Scope<>();
+    private Scope<Variable, PMLFunctionSignature> testScope() throws
+                                                              FunctionAlreadyDefinedInScopeException {
+        Scope<Variable, PMLFunctionSignature> scope = new Scope<>();
 
-        scope.addExecutable(voidFunc.getName(), voidFunc.getSignature());
-        scope.addExecutable(stringFunc.getName(), stringFunc.getSignature());
+        scope.addFunction(voidFunc.getName(), voidFunc.getSignature());
+        scope.addFunction(stringFunc.getName(), stringFunc.getSignature());
 
         return scope;
     }
@@ -106,7 +107,7 @@ class FunctionInvokeExpressionTest {
     }
 
     @Test
-    void testFunctionNotInScope() throws ExecutableAlreadyDefinedInScopeException {
+    void testFunctionNotInScope() throws FunctionAlreadyDefinedInScopeException {
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(

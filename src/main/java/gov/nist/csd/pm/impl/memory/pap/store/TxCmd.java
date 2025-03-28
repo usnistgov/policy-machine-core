@@ -6,7 +6,7 @@ import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 
 import java.util.Collection;
 import java.util.Map;

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.type.Type;
@@ -47,7 +47,7 @@ public class LogicalExpression extends Expression {
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException {
+    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
         return Type.bool();
     }
 

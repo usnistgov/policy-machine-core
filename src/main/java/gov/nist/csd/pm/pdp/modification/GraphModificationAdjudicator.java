@@ -10,23 +10,16 @@ import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.op.arg.IdNodeFormalArg;
-import gov.nist.csd.pm.pap.executable.op.arg.ListIdNodeFormalArg;
-import gov.nist.csd.pm.pap.executable.op.arg.NodeFormalArg;
-import gov.nist.csd.pm.pap.executable.op.graph.*;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.op.graph.*;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 

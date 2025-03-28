@@ -6,15 +6,15 @@ import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.pap.executable.arg.ActualArgs;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.executable.routine.Routine;
+import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.common.tx.TxRunner;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.AccessAdjudication;
@@ -160,7 +160,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                     ((PMLRoutine) routine).setCtx(ctx);
                 }
 
-                Object ret = tx.executeAdminExecutable(routine, args);
+                Object ret = tx.executeAdminFunction(routine, args);
 
                 // if the returned object is a value, convert it to an object
                 if (ret instanceof Value value) {
@@ -203,7 +203,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
 
         // execute operation
-        Object ret = pdpTx.executeAdminExecutable(operation, args);
+        Object ret = pdpTx.executeAdminFunction(operation, args);
 
         // send to EPP
         publishEvent(EventContextUtil.buildEventContext(

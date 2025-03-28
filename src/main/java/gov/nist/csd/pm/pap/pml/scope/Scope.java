@@ -5,31 +5,31 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Scope<V, E> implements Serializable {
+public class Scope<V, F> implements Serializable {
 
     private Map<String, V> constants;
     private Map<String, V> variables;
-    private Map<String, E> executables;
-    private Scope<V, E> parentScope;
+    private Map<String, F> functions;
+    private Scope<V, F> parentScope;
 
-    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, E> executables, Scope<V, E> parentScope) {
+    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, F> functions, Scope<V, F> parentScope) {
         this.constants = constants;
         this.variables = variables;
-        this.executables = executables;
+        this.functions = functions;
         this.parentScope = parentScope;
     }
 
-    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, E> executables) {
+    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, F> functions) {
         this.constants = constants;
         this.variables = variables;
-        this.executables = executables;
+        this.functions = functions;
         this.parentScope = null;
     }
 
     public Scope() {
         this.constants = new HashMap<>();
         this.variables = new HashMap<>();
-        this.executables = new HashMap<>();
+        this.functions = new HashMap<>();
         this.parentScope = null;
     }
 
@@ -49,50 +49,50 @@ public class Scope<V, E> implements Serializable {
         this.variables = variables;
     }
 
-    public Map<String, E> getExecutables() {
-        return executables;
+    public Map<String, F> getFunctions() {
+        return functions;
     }
 
-    public void setExecutables(Map<String, E> executables) {
-        this.executables = executables;
+    public void setFunctions(Map<String, F> functions) {
+        this.functions = functions;
     }
 
-    public Scope<V, E> getParentScope() {
+    public Scope<V, F> getParentScope() {
         return parentScope;
     }
 
-    public void setParentScope(Scope<V, E> parentScope) {
+    public void setParentScope(Scope<V, F> parentScope) {
         this.parentScope = parentScope;
     }
 
-    public Scope<V, E> copy() {
+    public Scope<V, F> copy() {
         return new Scope<>(
                 new HashMap<>(this.constants),
                 new HashMap<>(this.variables),
-                new HashMap<>(this.executables),
+                new HashMap<>(this.functions),
                 this.parentScope != null ? this.parentScope.copy() : null
         );
     }
 
-    public E getExecutable(String name) throws UnknownExecutableInScopeException {
-        E function = executables.get(name);
+    public F getFunction(String name) throws UnknownFunctionInScopeException {
+        F function = functions.get(name);
         if (function == null) {
-            throw new UnknownExecutableInScopeException(name);
+            throw new UnknownFunctionInScopeException(name);
         }
 
         return function;
     }
 
-    public boolean executableExists(String name) {
-        return executables.containsKey(name);
+    public boolean functionExists(String name) {
+        return functions.containsKey(name);
     }
 
-    public void addExecutable(String name, E e) throws ExecutableAlreadyDefinedInScopeException {
-        if (parentHasExecutables(name) || executables.containsKey(name)) {
-            throw new ExecutableAlreadyDefinedInScopeException(name);
+    public void addFunction(String name, F f) throws FunctionAlreadyDefinedInScopeException {
+        if (parentHasFunction(name) || functions.containsKey(name)) {
+            throw new FunctionAlreadyDefinedInScopeException(name);
         }
 
-        executables.put(name, e);
+        functions.put(name, f);
     }
 
     public V getVariable(String name) throws UnknownVariableInScopeException {
@@ -125,7 +125,7 @@ public class Scope<V, E> implements Serializable {
         variables.put(name, value);
     }
 
-    public void overwriteFromScope(Scope<V, E> scope) {
+    public void overwriteFromScope(Scope<V, F> scope) {
         for (String varName : scope.variables.keySet()) {
             if (!this.variables.containsKey(varName)) {
                 continue;
@@ -139,8 +139,8 @@ public class Scope<V, E> implements Serializable {
         return parentScope != null && parentScope.variables.containsKey(name);
     }
 
-    private boolean parentHasExecutables(String name) {
-        return parentScope != null && parentScope.executables.containsKey(name);
+    private boolean parentHasFunction(String name) {
+        return parentScope != null && parentScope.functions.containsKey(name);
     }
 
     @Override
@@ -150,11 +150,11 @@ public class Scope<V, E> implements Serializable {
 	    return Objects.equals(constants, scope.constants) && Objects.equals(
                 variables,
                 scope.variables
-        ) && Objects.equals(executables, scope.executables) && Objects.equals(parentScope, scope.parentScope);
+        ) && Objects.equals(functions, scope.functions) && Objects.equals(parentScope, scope.parentScope);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(constants, variables, executables, parentScope);
+        return Objects.hash(constants, variables, functions, parentScope);
     }
 }

@@ -1,13 +1,8 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.executable.op.Operation;
-import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import java.util.Objects;
 
 public abstract class DeleteStatement<T extends Operation<?>> extends OperationStatement<T> {

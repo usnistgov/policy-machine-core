@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.expression.literal.Literal;
 import gov.nist.csd.pm.pap.pml.expression.reference.VariableReference;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
@@ -103,7 +103,7 @@ public abstract class Expression implements PMLStatement {
         return expression;
     }
 
-    public abstract Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException;
+    public abstract Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException;
 
     @Override
     public final String toString() {
