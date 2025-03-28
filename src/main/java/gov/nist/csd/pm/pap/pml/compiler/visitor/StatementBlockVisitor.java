@@ -38,9 +38,9 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
                 String functionName = functionInvokeExpression.getFuncName();
 
 	            try {
-                    PMLFunctionSignature executable = visitorCtx.scope().getFunction(functionName);
+                    PMLFunctionSignature signature = visitorCtx.scope().getFunction(functionName);
 
-                    if (!(executable instanceof PMLBasicFunctionSignature)){
+                    if (!(signature instanceof PMLBasicFunctionSignature)){
                         visitorCtx.errorLog().addError(statementContext, "only PML basic functions (defined as 'function') allowed in basic statement block");
                     }
                 } catch (UnknownFunctionInScopeException e) {
