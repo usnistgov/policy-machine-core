@@ -4,10 +4,11 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.function.basic.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.type.Type;
@@ -25,7 +26,7 @@ class FunctionInvokeStmtVisitorTest {
     private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
     private static final PMLFormalArg c = new PMLFormalArg("c", Type.array(Type.string()));
 
-    PMLFunctionSignature signature = new PMLFunctionSignature(
+    PMLFunctionSignature signature = new PMLBasicFunctionSignature(
             "func1",
             Type.string(),
             List.of(a, b, c)
@@ -111,7 +112,7 @@ class FunctionInvokeStmtVisitorTest {
                 """,
                 PMLParser.FunctionInvokeStatementContext.class);
 
-        PMLFunctionSignature signature = new PMLFunctionSignature(
+        PMLFunctionSignature signature = new PMLBasicFunctionSignature(
                 "func1",
                 Type.string(),
                 List.of()

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParserBaseVisitor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -157,7 +158,7 @@ public class PMLContextVisitor extends PMLParserBaseVisitor<RuleContext> {
     }
 
     @Override
-    public RuleContext visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+    public RuleContext visitBasicFunctionDefinitionStatement(BasicFunctionDefinitionStatementContext ctx) {
         return ctx;
     }
 

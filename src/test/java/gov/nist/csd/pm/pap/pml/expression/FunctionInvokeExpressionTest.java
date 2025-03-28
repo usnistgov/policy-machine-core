@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.function.basic.PMLFunctionSignature;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.CheckAndStatementsBlock;
