@@ -1,5 +1,9 @@
 parser grammar PMLParser;
 
+@header {
+package gov.nist.csd.pm.pap.pml.antlr;
+}
+
 options {
 	tokenVocab = PMLLexer;
 }

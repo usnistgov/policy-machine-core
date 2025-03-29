@@ -1,5 +1,9 @@
 lexer grammar PMLLexer;
 
+@header {
+package gov.nist.csd.pm.pap.pml.antlr;
+}
+
 OPERATION: 'operation';
 NODE_ARG: '@node';
 CHECK: 'check';
