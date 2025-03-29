@@ -109,7 +109,7 @@
                         </goals>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/antlr4</sourceDirectory>
+                            <sourceDirectory>${project.basedir}/src/main/java/gov/nist/csd/pm/pap/pml/antlr4</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
                             <visitor>true</visitor>
                         </configuration>
