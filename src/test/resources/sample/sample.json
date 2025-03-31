@@ -173,7 +173,7 @@
   },
   "prohibitions": [],
   "obligations": [
-    "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.operands.projectName)\n    }\n\n}"
+    "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n}"
   ],
   "operations": [
     "operation deleteProject(@node string projectName) {\n    check \"delete_project\" on projectName\n} {\n    delete node projectName\n}",

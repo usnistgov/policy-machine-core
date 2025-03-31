@@ -18,7 +18,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.Arrays;
 
-public abstract class Expression implements PMLStatement {
+public abstract class Expression extends PMLStatement {
 
     public static Expression fromString(VisitorContext visitorCtx, String input, Type expectedType) {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
@@ -104,11 +104,6 @@ public abstract class Expression implements PMLStatement {
     }
 
     public abstract Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException;
-
-    @Override
-    public final String toString() {
-        return toFormattedString(0);
-    }
 
     @Override
     public abstract int hashCode();

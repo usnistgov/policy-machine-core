@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class CreateRuleStatement implements PMLStatement {
+public class CreateRuleStatement extends PMLStatement {
 
     protected Expression name;
     protected SubjectPattern subjectPattern;

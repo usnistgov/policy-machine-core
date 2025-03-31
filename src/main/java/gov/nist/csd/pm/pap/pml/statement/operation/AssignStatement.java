@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -26,7 +26,7 @@ public class AssignStatement extends OperationStatement<AssignOp> {
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String asc = ascendant.execute(ctx, pap).getStringValue();
         List<Value> assignToValue = descendants.execute(ctx, pap).getArrayValue();
         List<String> descs = new ArrayList<>();

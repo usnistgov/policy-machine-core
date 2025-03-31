@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.serialization;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
@@ -59,13 +59,13 @@ class PMLTest {
 
         pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of(ARG_A)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, ActualArgs actualArgs) throws PMException {
-                pap.modify().graph().createPolicyClass(actualArgs.get(ARG_A));
+            public Object execute(PAP pap, Args args) throws PMException {
+                pap.modify().graph().createPolicyClass(args.get(ARG_A));
                 return null;
             }
         }));

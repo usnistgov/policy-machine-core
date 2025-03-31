@@ -9,6 +9,7 @@ public class Type implements Serializable {
 
     private boolean isVoid;
     private boolean isAny;
+    private boolean isNum;
     private boolean isString;
     private boolean isBoolean;
     private boolean isArray;
@@ -20,6 +21,12 @@ public class Type implements Serializable {
     public static Type any() {
         Type type = new Type();
         type.isAny = true;
+        return type;
+    }
+
+    public static Type num() {
+        Type type = new Type();
+        type.isNum = true;
         return type;
     }
 

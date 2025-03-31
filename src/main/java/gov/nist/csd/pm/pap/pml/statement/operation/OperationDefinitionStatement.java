@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
@@ -28,7 +28,7 @@ public class OperationDefinitionStatement extends OperationStatement<CreateAdmin
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         return op.actualArgs(pmlStmtsOperation);
     }
 

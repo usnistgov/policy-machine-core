@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
@@ -30,10 +30,10 @@ public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializa
     }
 
     @Override
-    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
+    public Value execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeRoutineStatements(statements.getStmts(), actualArgs);
+        return ctx.executeRoutineStatements(statements.getStmts(), args);
     }
 
 

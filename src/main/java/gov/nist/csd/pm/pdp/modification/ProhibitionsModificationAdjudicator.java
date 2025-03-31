@@ -3,8 +3,7 @@ package gov.nist.csd.pm.pdp.modification;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
-import gov.nist.csd.pm.pap.function.op.prohibition.ContainerConditionsList;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.pap.function.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
@@ -15,6 +14,7 @@ import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ProhibitionsModificationAdjudicator extends Adjudicator implements ProhibitionsModification {
@@ -31,8 +31,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
     @Override
     public void createProhibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
         CreateProhibitionOp op = new CreateProhibitionOp();
-        ActualArgs args = op.actualArgs(name, subject, accessRightSet, intersection,
-            new ContainerConditionsList(containerConditions));
+        Args args = op.actualArgs(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
@@ -43,8 +42,8 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
-        ActualArgs args = op.actualArgs(name, prohibition.getSubject(), prohibition.getAccessRightSet(),
-            prohibition.isIntersection(), new ContainerConditionsList(prohibition.getContainers()));
+        Args args = op.actualArgs(name, prohibition.getSubject(), prohibition.getAccessRightSet(),
+            prohibition.isIntersection(), new ArrayList<>(prohibition.getContainers()));
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);

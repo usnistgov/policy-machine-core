@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap;
 import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.PMRuntimeException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.AdminFunctionExecutor;
 import gov.nist.csd.pm.common.graph.node.Node;
@@ -120,7 +120,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, ActualArgs args) throws PMException {
+    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args args) throws PMException {
         return adminFunction.execute(this, args);
     }
 
@@ -222,7 +222,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
         ExecutionContext ctx = new ExecutionContext(author, this);
 
-        ctx.executeStatements(compiledPML, new ActualArgs());
+        ctx.executeStatements(compiledPML, new Args());
     }
 
     public List<PMLStatement> compilePML(String input) throws PMException {

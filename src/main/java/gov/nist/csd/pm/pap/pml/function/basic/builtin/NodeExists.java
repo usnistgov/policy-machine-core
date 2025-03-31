@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
@@ -23,7 +23,8 @@ public class NodeExists extends PMLBasicFunction {
     }
 
     @Override
-    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        return new BoolValue(pap.query().graph().nodeExists(actualArgs.get(NODE_NAME_ARG).getStringValue()));
+    public Value execute(PAP pap, Args args) throws PMException {
+        Value value = args.get(NODE_NAME_ARG);
+        return new BoolValue(pap.query().graph().nodeExists(value.getStringValue()));
     }
 }

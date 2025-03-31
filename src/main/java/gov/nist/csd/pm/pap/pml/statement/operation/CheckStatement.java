@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CheckStatement implements PMLStatement {
+public class CheckStatement extends PMLStatement {
     private final Expression arsExpr;
     private final Expression targetExpr;
 
@@ -58,11 +58,6 @@ public class CheckStatement implements PMLStatement {
         return indent(indentLevel) +
             "check " + arsExpr.toFormattedString(0) +
             " on " + targetExpr.toFormattedString(0);
-    }
-
-    @Override
-    public String toString() {
-        return toFormattedString(0);
     }
 
     @Override

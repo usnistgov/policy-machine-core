@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.pap.function.op.routine.DeleteAdminRoutineOp;
 import gov.nist.csd.pm.pap.function.routine.Routine;
@@ -25,7 +25,7 @@ public class RoutinesModificationAdjudicator extends Adjudicator implements Rout
     @Override
     public void createAdminRoutine(Routine<?> routine) throws PMException {
         CreateAdminRoutineOp op = new CreateAdminRoutineOp();
-        ActualArgs args = op.actualArgs(routine);
+        Args args = op.actualArgs(routine);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
@@ -34,7 +34,7 @@ public class RoutinesModificationAdjudicator extends Adjudicator implements Rout
     @Override
     public void deleteAdminRoutine(String name) throws PMException {
         DeleteAdminRoutineOp op = new DeleteAdminRoutineOp();
-        ActualArgs args = op.actualArgs(name);
+        Args args = op.actualArgs(name);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);

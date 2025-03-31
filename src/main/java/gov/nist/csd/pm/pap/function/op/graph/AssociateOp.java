@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -21,27 +21,27 @@ public class AssociateOp extends GraphOp<Void> {
         );
     }
 
-    public ActualArgs actualArgs(long ua, long target, AccessRightSet arset) {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(UA_ARG, ua);
-        actualArgs.put(TARGET_ARG, target);
-        actualArgs.put(ARSET_ARG, arset);
-        return actualArgs;
+    public Args actualArgs(long ua, long target, AccessRightSet arset) {
+        Args args = new Args();
+        args.put(UA_ARG, ua);
+        args.put(TARGET_ARG, target);
+        args.put(ARSET_ARG, arset);
+        return args;
     }
 
     @Override
-    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+    public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().graph().associate(
-                actualArgs.get(UA_ARG),
-                actualArgs.get(TARGET_ARG),
-                actualArgs.get(ARSET_ARG)
+                args.get(UA_ARG),
+                args.get(TARGET_ARG),
+                new AccessRightSet(args.get(ARSET_ARG))
         );
         return null;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actualArgs) throws PMException {
-        privilegeChecker.check(userCtx, actualArgs.get(UA_ARG), ASSOCIATE);
-        privilegeChecker.check(userCtx, actualArgs.get(TARGET_ARG), ASSOCIATE_TO);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        privilegeChecker.check(userCtx, args.get(UA_ARG), ASSOCIATE);
+        privilegeChecker.check(userCtx, args.get(TARGET_ARG), ASSOCIATE_TO);
     }
 }

@@ -4,7 +4,7 @@ import static gov.nist.csd.pm.pap.pml.function.basic.builtin.Append.DST_ARG;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
@@ -26,9 +26,9 @@ public class AppendAll extends PMLBasicFunction {
     }
 
     @Override
-    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        List<Value> valueArr = actualArgs.get(DST_ARG).getArrayValue();
-        List<Value> srcValue = actualArgs.get(SRC_LIST_ARG).getArrayValue();
+    public Value execute(PAP pap, Args args) throws PMException {
+        List<Value> valueArr = args.get(DST_ARG).getArrayValue();
+        List<Value> srcValue = args.get(SRC_LIST_ARG).getArrayValue();
 
         valueArr.addAll(srcValue);
 

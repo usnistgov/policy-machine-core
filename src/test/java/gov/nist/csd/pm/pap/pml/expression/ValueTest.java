@@ -73,7 +73,7 @@ class ValueTest {
         assertTrue(value.getType().isString());
         assertEquals(CREATE_OBJECT_ATTRIBUTE, value.getStringValue());
 
-        key = new StringValue("operands");
+        key = new StringValue("args");
         value = objectToValue.getMapValue().get(key);
         assertTrue(value.getType().isMap());
         assertEquals(

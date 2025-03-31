@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.function;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
 
 import java.io.Serializable;
@@ -21,7 +21,7 @@ public abstract class AdminFunction<T> implements Serializable {
         this.formalArgs = formalArgs;
     }
 
-    public abstract T execute(PAP pap, ActualArgs actualArgs) throws PMException;
+    public abstract T execute(PAP pap, Args args) throws PMException;
 
     public String getName() {
         return name;

@@ -1,0 +1,59 @@
+package gov.nist.csd.pm.pap.function.arg.type;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+public class MapType<K, V> extends ArgType<Map<K, V>> {
+    private final ArgType<K> keyType;
+    private final ArgType<V> valueType;
+
+    public MapType(ArgType<K> keyType, ArgType<V> valueType) {
+        this.keyType = keyType;
+        this.valueType = valueType;
+    }
+
+    public ArgType<K> getKeyType() {
+        return keyType;
+    }
+
+    public ArgType<V> getValueType() {
+        return valueType;
+    }
+
+    @Override
+    public Map<K, V> cast(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+        if (!(obj instanceof Map<?, ?> map)) {
+            throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to Map");
+        }
+        Map<K, V> resultMap = new HashMap<>();
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            K key = keyType.cast(entry.getKey());
+            V value = valueType.cast(entry.getValue());
+            resultMap.put(key, value);
+        }
+        return resultMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MapType<?, ?> mapType)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        return Objects.equals(keyType, mapType.keyType) && Objects.equals(valueType, mapType.valueType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), keyType, valueType);
+    }
+}

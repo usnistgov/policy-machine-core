@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.operation;
 
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -9,7 +10,7 @@ import gov.nist.csd.pm.pap.pml.value.Value;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLOperation extends Operation<Value> {
+public abstract class PMLOperation extends Operation<Value> implements PMLFunction {
 
     public static final PMLFormalArg NODE_NAME_ARG = new PMLFormalArg("nodeName", Type.string());
 

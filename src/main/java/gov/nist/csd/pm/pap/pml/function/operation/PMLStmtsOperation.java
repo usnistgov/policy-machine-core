@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.function.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
@@ -31,15 +31,15 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
         ctx.executeOperationStatements(this.body.getChecks().getStmts(), operands);
     }
 
     @Override
-    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
+    public Value execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeOperationStatements(this.body.getStatements().getStmts(), actualArgs);
+        return ctx.executeOperationStatements(this.body.getStatements().getStmts(), args);
     }
 
     @Override

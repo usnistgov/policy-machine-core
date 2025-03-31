@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -25,7 +25,7 @@ public class SetNodePropertiesStatement extends OperationStatement<SetNodeProper
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String name = nameExpr.execute(ctx, pap).getStringValue();
         Map<Value, Value> map = propertiesExpr.execute(ctx, pap).getMapValue();
         Map<String, String> propertiesMap = new HashMap<>();

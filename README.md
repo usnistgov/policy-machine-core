@@ -111,7 +111,7 @@ public class Main {
 				        descendants: "oa1"
 				    }
 					do(ctx) {
-						associate "ua1" and ctx.operands.name with ["read", "write"]
+						associate "ua1" and ctx.args.name with ["read", "write"]
 					}
 				}""";
 
@@ -148,7 +148,7 @@ public class Main {
 			descendants: "oa1"
 		    }
 		    do(ctx) {
-			associate "ua1" and ctx.operands.name with ["read", "write"]
+			associate "ua1" and ctx.args.name with ["read", "write"]
 		    }
 		}
 		""";

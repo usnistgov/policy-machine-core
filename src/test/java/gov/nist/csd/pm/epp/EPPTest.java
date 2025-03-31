@@ -7,7 +7,7 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Response;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -41,6 +41,8 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
@@ -99,14 +101,14 @@ class EPPTest {
         Operation<String> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
 
             @Override
-            public String execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public String execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
 
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker,
                                    UserContext userCtx,
-                                   ActualArgs actualArgs) throws PMException {
+                                   Args actualArgs) throws PMException {
 
             }
         };
@@ -120,9 +122,9 @@ class EPPTest {
         AdjudicationResponse response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             pap.query().operations().getAdminOperation("op1"),
-            new ActualArgs()
-                .put(new FormalArg<>("a", String.class), "oa1")
-                .put(new FormalArg<>("b", List.class), List.of("oa1", "oa2"))
+            new Args()
+                .put(new FormalArg<>("a", stringType()), "oa1")
+                .put(new FormalArg<>("b", listType(stringType())), List.of("oa1", "oa2"))
         );
         assertEquals(Decision.DENY, response.getDecision());
 
@@ -131,17 +133,18 @@ class EPPTest {
         response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             pap.query().operations().getAdminOperation("op1"),
-            new ActualArgs()
-                .put(new FormalArg<>("a", String.class), "oa1")
-                .put(new FormalArg<>("b", List.class), List.of("oa1", "oa2"))
+            new Args()
+                .put(new FormalArg<>("a", stringType()), "oa1")
+                .put(new FormalArg<>("b", listType(stringType())), List.of("oa1", "oa2"))
         );
         assertEquals(GRANT, response.getDecision());
 
         response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
-            pap.query().operations().getAdminOperation("op1"),
-            new ActualArgs().put(ARG_A, "oa2").put(ARG_B, "oa2")
-            // "op2", Map.of("a", "oa2", "b", "oa2")
+            pap.query().operations().getAdminOperation("op2"),
+            new Args()
+                .put(ARG_A, "oa2")
+                .put(ARG_B, "oa2")
         );
         assertEquals(GRANT, response.getDecision());
 
@@ -340,12 +343,12 @@ class EPPTest {
 
         PMLOperation pmlOperation = new PMLOperation("testFunc", Type.voidType()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
 
             }
 
             @Override
-            public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public Value execute(PAP pap, Args actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
                 return new VoidValue();

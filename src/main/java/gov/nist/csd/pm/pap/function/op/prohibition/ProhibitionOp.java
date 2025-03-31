@@ -1,8 +1,12 @@
 package gov.nist.csd.pm.pap.function.op.prohibition;
 
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.booleanType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
@@ -11,15 +15,16 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public abstract class ProhibitionOp extends Operation<Void> {
 
-    public static final FormalArg<ProhibitionSubject> SUBJECT_ARG = new FormalArg<>("subject", ProhibitionSubject.class);
-    public static final FormalArg<AccessRightSet> ARSET_ARG = new FormalArg<>("arset", AccessRightSet.class);
-    public static final FormalArg<Boolean> INTERSECTION_ARG = new FormalArg<>("intersection", Boolean.class);
-    public static final FormalArg<ContainerConditionsList> CONTAINERS_ARG = new FormalArg<>("containers", ContainerConditionsList.class);
+    public static final FormalArg<ProhibitionSubject> SUBJECT_ARG = new FormalArg<>("subject", new ProhibitionSubjectType());
+    public static final FormalArg<List<String>> ARSET_ARG = new FormalArg<>("arset", listType(stringType()));
+    public static final FormalArg<Boolean> INTERSECTION_ARG = new FormalArg<>("intersection", booleanType());
+    public static final FormalArg<List<ContainerCondition>> CONTAINERS_ARG = new FormalArg<>("containers", listType(new ContainerConditionType()));
 
     private final String processReqCap;
     private final String reqCap;
@@ -40,19 +45,19 @@ public abstract class ProhibitionOp extends Operation<Void> {
         this.reqCap = reqCap;
     }
 
-    public ActualArgs actualArgs(String name, ProhibitionSubject subject, AccessRightSet arset,
-                                 Boolean intersection, ContainerConditionsList containers) {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(NAME_ARG, name);
-        actualArgs.put(SUBJECT_ARG, subject);
-        actualArgs.put(ARSET_ARG, arset);
-        actualArgs.put(INTERSECTION_ARG, intersection);
-        actualArgs.put(CONTAINERS_ARG, containers);
-        return actualArgs;
+    public Args actualArgs(String name, ProhibitionSubject subject, AccessRightSet arset,
+                           Boolean intersection, List<ContainerCondition> containers) {
+        Args args = new Args();
+        args.put(NAME_ARG, name);
+        args.put(SUBJECT_ARG, subject);
+        args.put(ARSET_ARG, new ArrayList<>(arset));
+        args.put(INTERSECTION_ARG, intersection);
+        args.put(CONTAINERS_ARG, containers);
+        return args;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
         ProhibitionSubject subject = operands.get(SUBJECT_ARG);
 
         if (subject.isNode()) {

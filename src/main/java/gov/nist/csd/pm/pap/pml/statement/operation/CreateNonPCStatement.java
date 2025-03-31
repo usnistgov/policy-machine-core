@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.graph.*;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -29,7 +29,7 @@ public class CreateNonPCStatement extends OperationStatement<Operation<Long>> {
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String name = nameExpr.execute(ctx, pap).getStringValue();
         
         List<Value> inList = inExpr.execute(ctx, pap).getArrayValue();

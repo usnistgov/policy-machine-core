@@ -5,7 +5,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -21,25 +21,25 @@ public class SetNodePropertiesOp extends GraphOp<Void> {
         );
     }
     
-    public ActualArgs actualArgs(long nodeId, Properties properties) {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(NODE_ARG, nodeId);
-        actualArgs.put(PROPERTIES_ARG, properties);
-        return actualArgs;
+    public Args actualArgs(long nodeId, Properties properties) {
+        Args args = new Args();
+        args.put(NODE_ARG, nodeId);
+        args.put(PROPERTIES_ARG, properties);
+        return args;
     }
 
     @Override
-    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+    public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().graph().setNodeProperties(
-		        actualArgs.get(NODE_ARG),
-		        actualArgs.get(PROPERTIES_ARG)
+		        args.get(NODE_ARG),
+		        args.get(PROPERTIES_ARG)
         );
 
         return null;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs args) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
         privilegeChecker.check(userCtx, args.get(NODE_ARG), SET_NODE_PROPERTIES);
     }
 }

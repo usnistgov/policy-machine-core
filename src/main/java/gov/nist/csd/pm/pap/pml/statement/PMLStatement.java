@@ -5,8 +5,19 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.value.Value;
 
-public interface PMLStatement extends PMLStatementSerializable {
+public abstract class PMLStatement implements PMLStatementSerializable {
 
-    Value execute(ExecutionContext ctx, PAP pap) throws PMException;
+    public abstract Value execute(ExecutionContext ctx, PAP pap) throws PMException;
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract boolean equals(Object obj);
+
+    @Override
+    public final String toString() {
+        return toFormattedString(0);
+    }
 
 }

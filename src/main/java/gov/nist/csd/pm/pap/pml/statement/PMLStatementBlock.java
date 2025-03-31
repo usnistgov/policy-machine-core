@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.basic.BasicStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -61,6 +61,6 @@ public class PMLStatementBlock extends BasicStatement {
 
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        return ctx.executeStatements(stmts, new ActualArgs());
+        return ctx.executeStatements(stmts, new Args());
     }
 }

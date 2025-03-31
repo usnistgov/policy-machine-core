@@ -1,9 +1,12 @@
 package gov.nist.csd.pm.pap.function.op.obligation;
 
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -19,8 +22,8 @@ import java.util.List;
 public abstract class ObligationOp extends Operation<Void> {
 
     public static final IdNodeFormalArg AUTHOR_ARG = new IdNodeFormalArg("author");
-    public static final FormalArg<String> NAME_ARG = new FormalArg<>("name", String.class);
-    public static final FormalArg<RuleList> RULES_ARG = new FormalArg<>("rules", RuleList.class);
+    public static final FormalArg<String> NAME_ARG = new FormalArg<>("name", stringType());
+    public static final FormalArg<List<Rule>> RULES_ARG = new FormalArg<>("rules", listType(new RuleType()));
 
     private final String reqCap;
 
@@ -33,8 +36,8 @@ public abstract class ObligationOp extends Operation<Void> {
         this.reqCap = reqCap;
     }
 
-    public ActualArgs actualArgs(long author, String name, RuleList rules) {
-        ActualArgs args = new ActualArgs();
+    public Args actualArgs(long author, String name, List<Rule> rules) {
+        Args args = new Args();
         args.put(AUTHOR_ARG, author);
         args.put(NAME_ARG, name);
         args.put(RULES_ARG, rules);
@@ -42,7 +45,7 @@ public abstract class ObligationOp extends Operation<Void> {
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actulArgs) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args actulArgs) throws PMException {
         List<Rule> rules = actulArgs.get(RULES_ARG);
         for (Rule rule : rules) {
             EventPattern eventPattern = rule.getEventPattern();

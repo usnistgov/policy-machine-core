@@ -28,7 +28,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testOperationFormattedString() {
-        FunctionDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
+        OperationDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
                 "op1",
                 Type.string(),
                 List.of(a, b),
@@ -67,7 +67,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testRoutineFormattedString() {
-        FunctionDefinitionStatement stmt = new RoutineDefinitionStatement(new PMLStmtsRoutine(
+        RoutineDefinitionStatement stmt = new RoutineDefinitionStatement(new PMLStmtsRoutine(
                 "rou1",
                 Type.voidType(),
                 List.of(a, b),
@@ -94,7 +94,7 @@ class FunctionDefinitionStatementTest {
 
     @Test
     void testToFormattedStringVoidReturn() {
-        FunctionDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
+        OperationDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
                 "func1",
                 Type.voidType(),
                 List.of(a, b),

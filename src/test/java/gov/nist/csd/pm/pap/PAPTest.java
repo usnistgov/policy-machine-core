@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -21,21 +21,22 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Collection;
 
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest extends PAPTestInitializer {
 
-    public static final FormalArg<String> ARG_A = new FormalArg<>("a", String.class);
-    public static final FormalArg<String> ARG_B = new FormalArg<>("b", String.class);
+    public static final FormalArg<String> ARG_A = new FormalArg<>("a", stringType());
+    public static final FormalArg<String> ARG_B = new FormalArg<>("b", stringType());
 
     static Operation<Value> op = new Operation<Value>("testFunc", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
 
         }
 
         @Override
-        public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
+        public Value execute(PAP pap, Args args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
             return new VoidValue();
         }

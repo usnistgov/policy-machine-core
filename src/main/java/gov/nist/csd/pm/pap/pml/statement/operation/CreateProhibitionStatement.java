@@ -11,8 +11,7 @@ import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
-import gov.nist.csd.pm.pap.function.op.prohibition.ContainerConditionsList;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -49,7 +48,7 @@ public class CreateProhibitionStatement extends OperationStatement<CreateProhibi
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         Value nameValue = this.name.execute(ctx, pap);
 
         // convert subject name to id
@@ -77,7 +76,7 @@ public class CreateProhibitionStatement extends OperationStatement<CreateProhibi
             containerConditions.add(new ContainerCondition(containerId, isComplement));
         }
 
-        return op.actualArgs(nameValue.getStringValue(), prohibitionSubject, ops, isIntersection, new ContainerConditionsList(containerConditions));
+        return op.actualArgs(nameValue.getStringValue(), prohibitionSubject, ops, isIntersection, new ArrayList<>(containerConditions));
     }
 
     @Override

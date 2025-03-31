@@ -3,11 +3,11 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
-import gov.nist.csd.pm.pap.function.op.prohibition.ContainerConditionsList;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
+import java.util.ArrayList;
 
 public class DeleteProhibitionStatement extends DeleteStatement<DeleteProhibitionOp> {
 
@@ -16,7 +16,7 @@ public class DeleteProhibitionStatement extends DeleteStatement<DeleteProhibitio
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String name = expression.execute(ctx, pap).getStringValue();
 
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
@@ -25,6 +25,6 @@ public class DeleteProhibitionStatement extends DeleteStatement<DeleteProhibitio
             prohibition.getSubject(),
             prohibition.getAccessRightSet(),
             prohibition.isIntersection(),
-            new ContainerConditionsList(prohibition.getContainers()));
+            new ArrayList<>(prohibition.getContainers()));
     }
 }

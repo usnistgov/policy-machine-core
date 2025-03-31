@@ -2,14 +2,14 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
-public abstract class OperationStatement<T extends Operation<?>> implements PMLStatement {
+public abstract class OperationStatement<T extends Operation<?>> extends PMLStatement {
 
     protected T op;
 
@@ -21,7 +21,13 @@ public abstract class OperationStatement<T extends Operation<?>> implements PMLS
         return op;
     }
 
-    public abstract ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException;
+    public abstract Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException;
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract boolean equals(Object o);
 
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
@@ -29,10 +35,4 @@ public abstract class OperationStatement<T extends Operation<?>> implements PMLS
 
         return new VoidValue();
     }
-
-    @Override
-    public abstract int hashCode();
-
-    @Override
-    public abstract boolean equals(Object o);
 }

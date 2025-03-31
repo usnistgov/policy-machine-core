@@ -2,7 +2,7 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -38,10 +38,10 @@ public class Response implements Serializable {
     }
 
     public Value execute(ExecutionContext executionCtx, EventContext eventCtx) throws PMException {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(new PMLFormalArg(eventCtxVariable, Type.map(Type.string(), Type.any())), Value.fromObject(eventCtx));
+        Args args = new Args();
+        args.put(new PMLFormalArg(eventCtxVariable, Type.map(Type.string(), Type.any())), Value.fromObject(eventCtx));
 
-        executionCtx.executeStatements(stmts, actualArgs);
+        executionCtx.executeStatements(stmts, args);
 
         return new VoidValue();
     }

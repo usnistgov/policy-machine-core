@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.RoutineExistsException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
@@ -26,7 +26,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, ActualArgs operands) throws PMException {
+        public Void execute(PAP pap, Args operands) throws PMException {
             return null;
         }
     };
@@ -36,7 +36,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, ActualArgs operands) throws PMException {
+        public Void execute(PAP pap, Args operands) throws PMException {
             return null;
         }
     };
@@ -46,7 +46,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, ActualArgs operands) throws PMException {
+        public Void execute(PAP pap, Args operands) throws PMException {
             return null;
         }
     };
@@ -56,7 +56,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, ActualArgs operands) throws PMException {
+        public Void execute(PAP pap, Args operands) throws PMException {
             return null;
         }
     };

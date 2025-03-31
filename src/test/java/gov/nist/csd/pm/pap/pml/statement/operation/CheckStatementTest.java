@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -118,7 +118,7 @@ class CheckStatementTest {
         pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1"), pap.query().operations().getAdminOperation("op1"), new ActualArgs());
+        pdp.adjudicateAdminOperation(new TestUserContext("u1"), pap.query().operations().getAdminOperation("op1"), new Args());
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
     }

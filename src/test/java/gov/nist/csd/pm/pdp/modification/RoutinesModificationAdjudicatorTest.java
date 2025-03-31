@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
@@ -66,7 +66,7 @@ class RoutinesModificationAdjudicatorTest {
     void createAdminRoutine() throws PMException {
         Routine<Void> routine1 = new Routine<>("routine1", List.of()) {
             @Override
-            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
         };
@@ -80,7 +80,7 @@ class RoutinesModificationAdjudicatorTest {
     void deleteAdminRoutine() throws PMException {
         Routine<Void> routine1 = new Routine<>("routine1", List.of()) {
             @Override
-            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
         };

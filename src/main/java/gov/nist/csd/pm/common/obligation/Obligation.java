@@ -91,6 +91,6 @@ public class Obligation implements Serializable {
 
     @Override
     public String toString() {
-        return CreateObligationStatement.fromObligation(this).toString();
+        return CreateObligationStatement.fromObligation(this).toFormattedString(0);
     }
 }

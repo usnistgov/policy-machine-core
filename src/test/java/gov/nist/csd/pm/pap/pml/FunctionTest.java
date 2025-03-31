@@ -14,9 +14,9 @@ public class FunctionTest {
     void testElseIfNotAllPathsReturn() {
         String pml = """
                 operation fun(string a) string {
-                    if equals(a, "a") {
+                    if a == "a" {
                         return "a"
-                    } else if equals(a, "b") {
+                    } else if a == "b" {
                         return "b"
                     }
                 }
@@ -33,9 +33,9 @@ public class FunctionTest {
     void testElseAllPathsReturn() {
         String pml2 = """
                 operation fun(string a) string {
-                    if equals(a, "a") {
+                    if a == "a" {
                         return "a"
-                    } else if equals(a, "b") {
+                    } else if a == "b" {
                         return "b"
                     } else {
                         return "c"
@@ -53,7 +53,7 @@ public class FunctionTest {
     void testElseWithNoElseIfAllPathsReturn() {
         String pml2 = """
                 operation fun(string a) string {
-                    if equals(a, "a") {
+                    if a == "a" {
                         return "a"
                     } else {
                         return "b"

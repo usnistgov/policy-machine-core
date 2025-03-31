@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.context;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -63,7 +63,7 @@ public class ExecutionContext implements Serializable {
         );
     }
 
-    public Value executeStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+    public Value executeStatements(List<PMLStatement> stmts, Args args) throws PMException {
         ExecutionContext copy = writeArgsToScope(args);
 
         for (PMLStatement statement : stmts) {
@@ -79,20 +79,19 @@ public class ExecutionContext implements Serializable {
         return new VoidValue();
     }
 
-    public Value executeOperationStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+    public Value executeOperationStatements(List<PMLStatement> stmts, Args args) throws PMException {
         return executeStatements(stmts, args);
     }
 
-    public Value executeRoutineStatements(List<PMLStatement> stmts, ActualArgs args) throws PMException {
+    public Value executeRoutineStatements(List<PMLStatement> stmts, Args args) throws PMException {
         return executeStatements(stmts, args);
     }
 
-    protected ExecutionContext writeArgsToScope(ActualArgs args) throws PMException {
+    protected ExecutionContext writeArgsToScope(Args args) throws PMException {
         ExecutionContext copy = this.copy();
 
-        args.foreach(arg -> {
-            String key = arg.getName();
-            Object o = args.get(arg);
+        args.foreach((formalArg, o) -> {
+            String key = formalArg.getName();
 
             Value value;
             if (o instanceof Value) {

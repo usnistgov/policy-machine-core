@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pdp.event;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalArg;
 import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalArg;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalArg;
@@ -17,36 +17,36 @@ import java.util.stream.LongStream;
 
 public class EventContextUtil {
 
-    public static EventContext buildEventContext(PAP pap, UserContext userCtx, String opName, ActualArgs args) throws
+    public static EventContext buildEventContext(PAP pap, UserContext userCtx, String opName, Args args) throws
                                                                                                                 PMException {
         String userName = pap.query().graph().getNodeById(userCtx.getUser()).getName();
 
         return new EventContext(userName, userCtx.getProcess(), opName, resolveNodeArgNames(pap, args));
     }
 
-    private static Map<String, Object> resolveNodeArgNames(PAP pap, ActualArgs actualArgs) {
+    private static Map<String, Object> resolveNodeArgNames(PAP pap, Args actualArgs) {
         Map<String, Object> args = new HashMap<>();
 
-        actualArgs.foreach(f -> {
+        actualArgs.foreach((formalArg, value) -> {
             // if the arg is a normal arg, it can be added to the args without any extra processing
-            if (!(f instanceof NodeFormalArg)) {
-                args.put(f.getName(), actualArgs.get(f));
+            if (!(formalArg instanceof NodeFormalArg)) {
+                args.put(formalArg.getName(), value);
 
                 return;
             }
 
             // if the arg is a node arg than we need to convert the node IDs to names for the EPP
-            switch (f) {
+            switch (formalArg) {
                 case IdNodeFormalArg idNodeFormalArg ->
                     args.put(idNodeFormalArg.getName(), resolveNodeArgName(pap, actualArgs.get(idNodeFormalArg)));
                 case ListIdNodeFormalArg listIdNodeFormalArg -> {
-                    LongArrayList ids = actualArgs.get(listIdNodeFormalArg);
-                    List<String> names = LongStream.of(ids.toLongArray())
-                        .mapToObj(id -> resolveNodeArgName(pap, id))
+                    List<Long> ids = actualArgs.get(listIdNodeFormalArg);
+                    List<String> names = ids.stream()
+                        .map(id -> resolveNodeArgName(pap, id))
                         .collect(Collectors.toList());
                     args.put(listIdNodeFormalArg.getName(), names);
                 }
-                default -> throw new IllegalStateException("Unexpected arg type: " + f.getClass().getName());
+                default -> throw new IllegalStateException("Unexpected formal arg: " + formalArg.getClass().getName());
             }
         });
 

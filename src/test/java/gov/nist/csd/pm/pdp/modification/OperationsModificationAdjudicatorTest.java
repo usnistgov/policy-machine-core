@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
@@ -73,12 +73,12 @@ class OperationsModificationAdjudicatorTest {
     void createAdminOperation() throws PMException {
         Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
         };
@@ -92,12 +92,12 @@ class OperationsModificationAdjudicatorTest {
     void deleteAdminOperation() throws PMException {
         Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
         };

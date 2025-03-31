@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
@@ -111,7 +111,7 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, ActualArgs operands) throws PMException {
+    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args operands) throws PMException {
         if (adminFunction instanceof Routine<T> routine) {
             return routine.execute(this, operands);
         } else if (adminFunction instanceof Operation<T> operation) {
@@ -149,7 +149,7 @@ public class PDPTx extends PAP {
         List<PMLStatement> stmts = pmlCompiler.compilePML(pap, input);
 
         ExecutionContext ctx = new PDPExecutionContext(author, this);
-        ctx.executeStatements(stmts, new ActualArgs());
+        ctx.executeStatements(stmts, new Args());
     }
 
     @Override

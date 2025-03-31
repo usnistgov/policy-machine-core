@@ -6,9 +6,8 @@ import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.pap.function.op.obligation.RuleList;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
@@ -36,7 +35,7 @@ public class CreateObligationStatement extends OperationStatement<CreateObligati
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap).getStringValue();
 
         // execute the create rule statements and add to obligation
@@ -46,7 +45,7 @@ public class CreateObligationStatement extends OperationStatement<CreateObligati
             rules.add(rule);
         }
 
-        return op.actualArgs(ctx.author().getUser(), nameStr, new RuleList(rules));
+        return op.actualArgs(ctx.author().getUser(), nameStr, new ArrayList<>(rules));
     }
 
     @Override

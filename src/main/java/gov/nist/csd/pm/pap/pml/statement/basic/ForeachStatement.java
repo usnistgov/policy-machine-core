@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -45,10 +45,10 @@ public class ForeachStatement extends BasicStatement {
 
     private Value executeArrayIterator(ExecutionContext ctx, ArrayValue iterValue) throws PMException{
         for (Value v : iterValue.getValue()) {
-            ActualArgs actualArgs = new ActualArgs();
-            actualArgs.put(new PMLFormalArg(varName, v.getType()), v);
+            Args args = new Args();
+            args.put(new PMLFormalArg(varName, v.getType()), v);
 
-            Value value = ctx.executeStatements(statements, actualArgs);
+            Value value = ctx.executeStatements(statements, args);
 
             if (value instanceof BreakValue) {
                 break;
@@ -64,15 +64,15 @@ public class ForeachStatement extends BasicStatement {
             Value mapValue = iterValue.getMapValue().get(key);
 
             // add the key value
-            ActualArgs actualArgs = new ActualArgs();
-            actualArgs.put(new PMLFormalArg(varName, key.getType()), key);
+            Args args = new Args();
+            args.put(new PMLFormalArg(varName, key.getType()), key);
 
             // add the value value
             if (valueVarName != null) {
-                actualArgs.put(new PMLFormalArg(valueVarName, mapValue.getType()), mapValue);
+                args.put(new PMLFormalArg(valueVarName, mapValue.getType()), mapValue);
             }
 
-            Value value = ctx.executeStatements(statements, actualArgs);
+            Value value = ctx.executeStatements(statements, args);
 
             if (value instanceof BreakValue) {
                 break;

@@ -5,11 +5,10 @@ import gov.nist.csd.pm.common.obligation.Obligation;
 import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.function.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp;
-import gov.nist.csd.pm.pap.function.op.obligation.RuleList;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteRuleStatement.UpdateObligationOp;
@@ -30,7 +29,7 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
     }
 
     @Override
-    public ActualArgs prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
         String ruleName = ruleExpr.execute(ctx, pap).getStringValue();
         String oblName = oblExpr.execute(ctx, pap).getStringValue();
 
@@ -47,7 +46,7 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
         // even though we are updating an obligation, use the same author id as this statement
         // can only be called from within an obligation response which will be executed by the
         // author anyways
-        return op.actualArgs(obligation.getAuthorId(), obligation.getName(), new RuleList(rules));
+        return op.actualArgs(obligation.getAuthorId(), obligation.getName(), new ArrayList<>(rules));
     }
 
     @Override
@@ -78,7 +77,7 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
         }
 
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
             new DeleteObligationOp()
                 .canExecute(privilegeChecker, userCtx, operands);
             new CreateObligationOp()
@@ -86,10 +85,10 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
         }
 
         @Override
-        public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
-            long author = actualArgs.get(AUTHOR_ARG);
-            String name = actualArgs.get(NAME_ARG);
-            List<Rule> rules = actualArgs.get(RULES_ARG);
+        public Void execute(PAP pap, Args args) throws PMException {
+            long author = args.get(AUTHOR_ARG);
+            String name = args.get(NAME_ARG);
+            List<Rule> rules = args.get(RULES_ARG);
 
             // delete the obligation
             pap.modify().obligations().deleteObligation(name);

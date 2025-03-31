@@ -4,7 +4,7 @@ package gov.nist.csd.pm.pap.function.op.graph;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
@@ -22,23 +22,23 @@ public class DeassignOp extends GraphOp<Void> {
         );
     }
     
-    public ActualArgs actualArgs(long ascendant, LongArrayList descendants) {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(ASCENDANT_ARG, ascendant);
-        actualArgs.put(DESCENDANTS_ARG, descendants);
-        return actualArgs;
+    public Args actualArgs(long ascendant, LongArrayList descendants) {
+        Args args = new Args();
+        args.put(ASCENDANT_ARG, ascendant);
+        args.put(DESCENDANTS_ARG, descendants);
+        return args;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
         privilegeChecker.check(userCtx, operands.get(ASCENDANT_ARG), DEASSIGN);
         privilegeChecker.check(userCtx, operands.get(DESCENDANTS_ARG), DEASSIGN_FROM);
     }
 
     @Override
-    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        long asc = actualArgs.get(ASCENDANT_ARG);
-        List<Long> descs = actualArgs.get(DESCENDANTS_ARG);
+    public Void execute(PAP pap, Args args) throws PMException {
+        long asc = args.get(ASCENDANT_ARG);
+        List<Long> descs = args.get(DESCENDANTS_ARG);
 
         pap.modify().graph().deassign(asc, descs);
 

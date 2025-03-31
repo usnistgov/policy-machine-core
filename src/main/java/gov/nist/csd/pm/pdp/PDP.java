@@ -6,7 +6,7 @@ import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.common.tx.TxRunner;
@@ -134,7 +134,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     @Override
     public <T> AdjudicationResponse adjudicateAdminOperation(UserContext user,
                                                              Operation<T> operation,
-                                                             ActualArgs args) throws
+                                                             Args args) throws
                                                                                  PMException {
         try {
             Object returnValue = runTx(user, tx -> {
@@ -152,7 +152,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     @Override
     public <T> AdjudicationResponse adjudicateAdminRoutine(UserContext user,
                                                            Routine<T> routine,
-                                                           ActualArgs args) throws PMException {
+                                                           Args args) throws PMException {
         try {
             Object returnValue = runTx(user, tx -> {
                 if (routine instanceof PMLRoutine) {
@@ -197,7 +197,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
     }
 
-    private <T> Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, Operation<T> operation, ActualArgs args) throws PMException {
+    private <T> Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, Operation<T> operation, Args args) throws PMException {
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(ctx);
         }

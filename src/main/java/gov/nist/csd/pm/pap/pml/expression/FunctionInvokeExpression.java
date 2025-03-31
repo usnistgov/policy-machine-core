@@ -1,10 +1,16 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.longType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.type.LongType;
+import gov.nist.csd.pm.pap.function.op.arg.NodeFormalArg;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -12,14 +18,16 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
 
+import gov.nist.csd.pm.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLActualArgs;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionWrapper;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLArgs;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.function.arg.WrappedFormalArg;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLNodeFormalArg;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
@@ -95,26 +103,22 @@ public class FunctionInvokeExpression extends Expression {
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
         ExecutionContext funcInvokeCtx = ctx.copy();
 
-        // set the execution context if exec is a PML exec
         AdminFunction<?> function = funcInvokeCtx.scope().getFunction(funcName);
 
-        Map<String, Value> actualOperandValues = prepareOperandExpressions(funcInvokeCtx, pap,
-            function);
+        Map<String, Value> actualOperandValues = prepareOperandExpressions(funcInvokeCtx, pap, function);
 
         // set the ctx if PML function
-        if (function instanceof PMLRoutine pmlRoutine) {
-            pmlRoutine.setCtx(funcInvokeCtx.copyWithParentScope());
-        } else if (function instanceof PMLOperation pmlOperation) {
-            pmlOperation.setCtx(funcInvokeCtx.copyWithParentScope());
+        if (function instanceof PMLFunction pmlFunction) {
+            pmlFunction.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
-        ActualArgs args;
-        if ((function instanceof PMLOperationWrapper) || (function instanceof PMLRoutineWrapper)) {
+        Args args;
+        if (function instanceof PMLFunctionWrapper wrapper) {
             // PMLWrappers do not need PML Values as input, just regular objects
-            args = new ActualArgs(valuesMapToObjects(actualOperandValues));
+            args = new Args(valuesMapToObjects(pap, wrapper.getPMLFormalArgs(), actualOperandValues));
         } else {
             // PML functions do expect Values as input
-            args = new PMLActualArgs(actualOperandValues);
+            args = new PMLArgs(actualOperandValues);
         }
 
         // execute the function
@@ -129,17 +133,33 @@ public class FunctionInvokeExpression extends Expression {
         }
     }
 
-    private Map<String, Object> valuesMapToObjects(Map<String, Value> valuesMap) {
-        Map<String, Object> objectMap = new HashMap<>();
-        for (Map.Entry<String, Value> entry : valuesMap.entrySet()) {
-            objectMap.put(entry.getKey(), entry.getValue().toObject());
+    private Map<FormalArg<?>, Object> valuesMapToObjects(PAP pap,
+                                                         List<WrappedFormalArg<?>> formalArgs,
+                                                         Map<String, Value> valuesMap) throws PMException {
+        Map<FormalArg<?>, Object> objectMap = new HashMap<>();
+        for (WrappedFormalArg<?> formalArg : formalArgs) {
+            FormalArg<?> unwrap = formalArg.unwrap();
+            Value value = valuesMap.get(formalArg.getName());
+            Object o = value.toObject();
+            if ((unwrap instanceof NodeFormalArg<?>) && unwrap.getType().equals(longType())) {
+                objectMap.put(unwrap, longType().cast(pap.query().graph().getNodeByName((String) o).getId()));
+            } else if ((unwrap instanceof NodeFormalArg<?>) && unwrap.getType().equals(listType(longType()))) {
+                List<Long> ids = new ArrayList<>();
+                List<String> names = listType(stringType()).cast(o);
+                for (String name : names) {
+                    ids.add(pap.query().graph().getNodeByName(name).getId());
+                }
+
+                objectMap.put(unwrap, ids);
+            } else {
+                objectMap.put(unwrap, value.toObject());
+            }
         }
 
         return objectMap;
     }
 
-    private Map<String, Value> prepareOperandExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?> function)
-    throws PMException {
+    private Map<String, Value> prepareOperandExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?> function) throws PMException {
         List<FormalArg<?>> formalArgs = function.getFormalArgs();
 
         if (actualArgsList.size() != formalArgs.size()) {

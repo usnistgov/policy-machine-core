@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
@@ -27,8 +27,8 @@ public class GetAdjacentAscendants extends PMLBasicFunction {
     }
 
     @Override
-    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        Value nodeName = actualArgs.get(NODE_NAME_ARG);
+    public Value execute(PAP pap, Args args) throws PMException {
+        Value nodeName = args.get(NODE_NAME_ARG);
 
         long id = pap.query().graph().getNodeId(nodeName.getStringValue());
         Collection<Long> ascendants = pap.query().graph().getAdjacentAscendants(id);

@@ -10,7 +10,7 @@ public class PMLFormalArg extends FormalArg<Value> {
     private final Type pmlType;
 
     public PMLFormalArg(String name, Type pmlType) {
-        super(name, Value.class);
+        super(name, new ValueType());
         this.pmlType = pmlType;
     }
 
@@ -20,13 +20,16 @@ public class PMLFormalArg extends FormalArg<Value> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof PMLFormalArg formalArg))
+        }
+        if (!(o instanceof PMLFormalArg that)) {
             return false;
-        if (!super.equals(o))
+        }
+        if (!super.equals(o)) {
             return false;
-        return Objects.equals(pmlType, formalArg.pmlType);
+        }
+        return Objects.equals(pmlType, that.pmlType);
     }
 
     @Override

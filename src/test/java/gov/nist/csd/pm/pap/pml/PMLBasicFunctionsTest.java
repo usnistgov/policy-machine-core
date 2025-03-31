@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
@@ -135,7 +135,7 @@ public class PMLBasicFunctionsTest {
 
 		pdp.adjudicateAdminOperation(new UserContext(id("u1")),
 			pap.query().operations().getAdminOperation("op2"),
-			new ActualArgs());
+			new Args());
 
 		assertFalse(pap.query().graph().nodeExists("pc3"));
 	}
@@ -173,7 +173,7 @@ public class PMLBasicFunctionsTest {
 		epp.subscribeTo(pdp);
 
 		pdp.adjudicateAdminRoutine(new UserContext(id("u1")),
-			pap.query().routines().getAdminRoutine("routine1"), new ActualArgs());
+			pap.query().routines().getAdminRoutine("routine1"), new Args());
 
 		assertFalse(pap.query().graph().nodeExists("pc3"));
 	}

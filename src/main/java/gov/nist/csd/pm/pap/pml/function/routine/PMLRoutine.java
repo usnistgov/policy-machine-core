@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.routine;
 
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -9,7 +10,7 @@ import gov.nist.csd.pm.pap.pml.value.Value;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLRoutine extends Routine<Value> {
+public abstract class PMLRoutine extends Routine<Value> implements PMLFunction {
 
     private final Type returnType;
     private final List<PMLFormalArg> pmlFormalArgs;

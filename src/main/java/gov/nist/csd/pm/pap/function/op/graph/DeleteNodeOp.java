@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
@@ -22,18 +22,18 @@ public class DeleteNodeOp extends GraphOp<Void> {
         );
     }
     
-    public ActualArgs actualArgs(long nodeId, NodeType type, LongArrayList descendants) {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(NODE_ARG, nodeId);
-        actualArgs.put(TYPE_ARG, type);
-        actualArgs.put(DESCENDANTS_ARG, descendants);
-        return actualArgs;
+    public Args actualArgs(long nodeId, NodeType type, LongArrayList descendants) {
+        Args args = new Args();
+        args.put(NODE_ARG, nodeId);
+        args.put(TYPE_ARG, type);
+        args.put(DESCENDANTS_ARG, descendants);
+        return args;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actualArgs) throws PMException {
-        long nodeId = actualArgs.get(NODE_ARG);
-        NodeType type = actualArgs.get(TYPE_ARG);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        long nodeId = args.get(NODE_ARG);
+        NodeType type = args.get(TYPE_ARG);
         ReqCaps reqCaps = getReqCap(type);
 
         // check ascendant privs
@@ -45,15 +45,15 @@ public class DeleteNodeOp extends GraphOp<Void> {
         }
 
         // check for privs on each descendant
-        Collection<Long> descs = actualArgs.get(DESCENDANTS_ARG);
+        Collection<Long> descs = args.get(DESCENDANTS_ARG);
         for (Long desc : descs) {
             privilegeChecker.check(userCtx, desc, reqCaps.descsReqCap);
         }
     }
 
     @Override
-    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        pap.modify().graph().deleteNode(actualArgs.get(NODE_ARG));
+    public Void execute(PAP pap, Args args) throws PMException {
+        pap.modify().graph().deleteNode(args.get(NODE_ARG));
         return null;
     }
 

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.function.op.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -21,20 +21,20 @@ public class DeleteAdminOperationOp extends Operation<Void> {
         );
     }
 
-    public ActualArgs actualArgs(String name) {
-        ActualArgs args = new ActualArgs();
+    public Args actualArgs(String name) {
+        Args args = new Args();
         args.put(NAME_ARG, name);
         return args;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actualArgs) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_OPERATION);
     }
 
     @Override
-    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        String name = actualArgs.get(NAME_ARG);
+    public Void execute(PAP pap, Args args) throws PMException {
+        String name = args.get(NAME_ARG);
         pap.modify().operations().deleteAdminOperation(name);
 
         return null;

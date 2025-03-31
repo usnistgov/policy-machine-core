@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.function.op.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
@@ -25,20 +25,20 @@ public class SetResourceOperationsOp extends Operation<Void> {
         );
     }
 
-    public ActualArgs actualArgs(AccessRightSet accessRightSet) {
-        ActualArgs actualArgs = new ActualArgs();
-        actualArgs.put(ARSET_ARG, accessRightSet);
-        return actualArgs;
+    public Args actualArgs(AccessRightSet accessRightSet) {
+        Args args = new Args();
+        args.put(ARSET_ARG, accessRightSet);
+        return args;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs actualArgs) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_RESOURCE_OPERATIONS);
     }
 
     @Override
-    public Void execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        pap.modify().operations().setResourceOperations(actualArgs.get(ARSET_ARG));
+    public Void execute(PAP pap, Args args) throws PMException {
+        pap.modify().operations().setResourceOperations(new AccessRightSet(args.get(ARSET_ARG)));
 
         return null;
     }

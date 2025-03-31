@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.operation.*;
 import gov.nist.csd.pm.pap.PAP;
@@ -25,7 +25,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     @Override
     public void setResourceOperations(AccessRightSet accessRightSet) throws PMException {
         SetResourceOperationsOp op = new SetResourceOperationsOp();
-        ActualArgs args = op.actualArgs(accessRightSet);
+        Args args = op.actualArgs(accessRightSet);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
@@ -34,7 +34,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     @Override
     public void createAdminOperation(Operation<?> operation) throws PMException {
         CreateAdminOperationOp op = new CreateAdminOperationOp();
-        ActualArgs args = op.actualArgs(operation);
+        Args args = op.actualArgs(operation);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
@@ -43,7 +43,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
         DeleteAdminOperationOp op = new DeleteAdminOperationOp();
-        ActualArgs args = op.actualArgs(operation);
+        Args args = op.actualArgs(operation);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);

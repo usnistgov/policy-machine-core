@@ -4,7 +4,7 @@ package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
@@ -27,8 +27,8 @@ public class GetAssociationsWithTarget extends PMLBasicFunction {
     }
 
     @Override
-    public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
-        Value source = actualArgs.get(NODE_NAME_ARG);
+    public Value execute(PAP pap, Args args) throws PMException {
+        Value source = args.get(NODE_NAME_ARG);
         long id = pap.query().graph().getNodeId(source.getStringValue());
         Collection<Association> associations = pap.query().graph().getAssociationsWithTarget(id);
         List<Value> associationValues = new ArrayList<>(associations.size());

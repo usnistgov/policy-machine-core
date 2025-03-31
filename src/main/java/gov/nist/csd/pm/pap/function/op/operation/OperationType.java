@@ -1,0 +1,19 @@
+package gov.nist.csd.pm.pap.function.op.operation;
+
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.op.Operation;
+
+class OperationType extends ArgType<Operation<?>> {
+
+    @Override
+    public Operation<?> cast(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+        if (!(obj instanceof Operation<?> op)) {
+            throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to Operation");
+        }
+
+        return op;
+    }
+}

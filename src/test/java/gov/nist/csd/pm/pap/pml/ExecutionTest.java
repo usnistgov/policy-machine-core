@@ -158,7 +158,7 @@ public class ExecutionTest {
         String input = """
                 var x = "test"
                 var y = "test"
-                if equals(x, y) {
+                if x == y {
                     create policy class "pc1"
                 }
                 """;
@@ -169,9 +169,9 @@ public class ExecutionTest {
                 var x = "test"
                 var y = "test"
                 var z = "test1"
-                if equals(x, z) {
+                if x == z {
                     create policy class "pc1"
-                } else if equals(x, y) {
+                } else if x == y {
                     create policy class "pc2"
                 }
                 """;
@@ -185,9 +185,9 @@ public class ExecutionTest {
                 var x = "test"
                 var y = "test1"
                 var z = "test2"
-                if equals(x, z) {
+                if x == z {
                     create policy class "pc1"
-                } else if equals(x, y) {
+                } else if x == y {
                     create policy class "pc2"
                 } else {
                     create policy class "pc3"
@@ -205,7 +205,7 @@ public class ExecutionTest {
                 var x = "test"
                 var y = "test1"
                 var z = "test2"
-                if equals(x, y) {
+                if x == y {
                     create policy class "pc1"
                 } else {
                     create policy class "pc2"
@@ -222,7 +222,7 @@ public class ExecutionTest {
                 var x = "test"
                 var y = "test1"
                 var z = "test2"
-                if !equals(x, y) {
+                if x != y {
                     create policy class "pc1"
                 } else {
                     create policy class "pc2"
@@ -316,7 +316,7 @@ public class ExecutionTest {
                 var a = "test"
                 var b = "test"
                 foreach x in ["pc1", "pc2", "pc3"] {
-                    if equals(a, b) {
+                    if a == b {
                         a = "test2"
                         continue
                     }

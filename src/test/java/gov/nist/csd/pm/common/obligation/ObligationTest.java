@@ -2,7 +2,7 @@ package gov.nist.csd.pm.common.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.ActualArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -45,7 +45,7 @@ class ObligationTest {
                     performs "assign"
                     on {
                         ascendant: any,
-                        descendant: "oa1"
+                        descendants: "oa1"
                     }
                     do(ctx) {
                         createX()
@@ -76,12 +76,12 @@ class ObligationTest {
         pap.setPMLConstants(Map.of("x", new StringValue("hello world")));
         pap.setPMLOperations(new PMLOperation("createX", Type.voidType()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ActualArgs operands) {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) {
 
             }
 
             @Override
-            public Value execute(PAP pap, ActualArgs actualArgs) throws PMException {
+            public Value execute(PAP pap, Args args) throws PMException {
                 ExecutionContext ctx = getCtx();
                 pap.executePML(ctx.author(), "create pc x");
 

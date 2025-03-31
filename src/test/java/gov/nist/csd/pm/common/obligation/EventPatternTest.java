@@ -176,7 +176,7 @@ class EventPatternTest {
                 new OperationPattern("assign"),
                 Map.of(
                         "ascendant", List.of(new NodeOperandPattern("a")),
-                        "descendant", List.of(new AnyOperandPattern())
+                        "descendants", List.of(new AnyOperandPattern())
                 )
         );
 

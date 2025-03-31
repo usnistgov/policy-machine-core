@@ -1,9 +1,13 @@
 package gov.nist.csd.pm.pap.function.op.arg;
 
-import it.unimi.dsi.fastutil.longs.LongArrayList;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.longType;
 
-public class ListIdNodeFormalArg extends NodeFormalArg<LongArrayList> {
+import java.util.List;
+
+public class ListIdNodeFormalArg extends NodeFormalArg<List<Long>> {
+
 	public ListIdNodeFormalArg(String name) {
-		super(name, LongArrayList.class);
+		super(name, listType(longType()));
 	}
 }
