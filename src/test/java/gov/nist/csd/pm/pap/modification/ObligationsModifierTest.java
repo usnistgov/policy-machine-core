@@ -11,8 +11,8 @@ import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.InArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.InSubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
@@ -148,7 +148,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                     new EventPattern(
                                             new SubjectPattern(new UsernamePattern("u1")),
                                             new OperationPattern("test_event"),
-                                            Map.of("", List.of(new NodeOperandPattern("oa1")))
+                                            Map.of("", List.of(new NodeArgPattern("oa1")))
                                     ),
                                     new Response("evtCtx", List.of())
                             ))
@@ -162,7 +162,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                     new EventPattern(
                                             new SubjectPattern(new UsernamePattern("u1")),
                                             new OperationPattern("test_event"),
-                                            Map.of("", List.of(new NodeOperandPattern("oa1")))
+                                            Map.of("", List.of(new NodeArgPattern("oa1")))
                                     ),
                                     new Response("evtCtx", List.of())
                             ))
@@ -176,7 +176,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                     new EventPattern(
                                             new SubjectPattern(new UsernamePattern("u1")),
                                             new OperationPattern("test_event"),
-                                            Map.of("", List.of(new InOperandPattern("oa1")))
+                                            Map.of("", List.of(new InArgPattern("oa1")))
                                     ),
                                     new Response("evtCtx", List.of())
                             ))

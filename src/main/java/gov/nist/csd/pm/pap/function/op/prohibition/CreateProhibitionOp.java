@@ -15,13 +15,13 @@ public class CreateProhibitionOp extends ProhibitionOp {
     }
 
     @Override
-    public Void execute(PAP pap, Args operands) throws PMException {
+    public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().prohibitions().createProhibition(
-                operands.get(NAME_ARG),
-                operands.get(SUBJECT_ARG),
-                new AccessRightSet(operands.get(ARSET_ARG)),
-                operands.get(INTERSECTION_ARG),
-                operands.get(CONTAINERS_ARG)
+            args.get(NAME_ARG),
+            args.get(SUBJECT_ARG),
+            new AccessRightSet(args.get(ARSET_ARG)),
+            args.get(INTERSECTION_ARG),
+            args.get(CONTAINERS_ARG)
         );
         return null;
     }

@@ -28,8 +28,8 @@ public class DeleteAdminRoutineOp extends Operation<Void> {
     }
 
     @Override
-    public Void execute(PAP pap, Args operands) throws PMException {
-        String name = operands.get(NAME_ARG);
+    public Void execute(PAP pap, Args args) throws PMException {
+        String name = args.get(NAME_ARG);
 
         pap.modify().routines().deleteAdminRoutine(name);
 
@@ -37,7 +37,7 @@ public class DeleteAdminRoutineOp extends Operation<Void> {
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_ROUTINE);
     }
 }

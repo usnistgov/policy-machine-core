@@ -35,7 +35,7 @@ public class CreateObligationStatement extends OperationStatement<CreateObligati
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap).getStringValue();
 
         // execute the create rule statements and add to obligation

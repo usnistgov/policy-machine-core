@@ -107,7 +107,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     }
 
     private void writeArgsToScope(VisitorContext visitorCtx, List<PMLFormalArg> args) {
-        // write operands to scope for compiling check block
+        // write args to scope for compiling check block
         VisitorContext copy = visitorCtx.copy();
         for (PMLFormalArg formalArg : args) {
             copy.scope().updateVariable(

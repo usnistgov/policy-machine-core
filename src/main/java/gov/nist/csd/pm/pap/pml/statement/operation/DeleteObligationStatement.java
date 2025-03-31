@@ -16,7 +16,7 @@ public class DeleteObligationStatement extends DeleteStatement<DeleteObligationO
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = expression.execute(ctx, pap).getStringValue();
 
         Obligation obligation = pap.query().obligations().getObligation(name);

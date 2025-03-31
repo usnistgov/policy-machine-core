@@ -22,7 +22,7 @@ public class DissociateStatement extends OperationStatement<DissociateOp> {
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String ua = uaExpr.execute(ctx, pap).getStringValue();
         String target = targetExpr.execute(ctx, pap).getStringValue();
 

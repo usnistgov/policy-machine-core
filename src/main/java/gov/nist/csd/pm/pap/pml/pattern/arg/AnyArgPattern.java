@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.pattern.operand;
+package gov.nist.csd.pm.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 
 import java.util.Collection;
 
-public class AnyOperandPattern extends OperandPatternExpression {
+public class AnyArgPattern extends ArgPatternExpression {
     @Override
     public boolean matches(String value, PAP pap) throws PMException {
         return true;
@@ -34,6 +34,6 @@ public class AnyOperandPattern extends OperandPatternExpression {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AnyOperandPattern;
+        return obj instanceof AnyArgPattern;
     }
 }

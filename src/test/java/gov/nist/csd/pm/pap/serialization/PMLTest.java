@@ -59,7 +59,7 @@ class PMLTest {
 
         pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of(ARG_A)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
             }
 

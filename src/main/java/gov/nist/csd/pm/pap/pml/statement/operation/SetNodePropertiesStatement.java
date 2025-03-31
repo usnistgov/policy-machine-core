@@ -25,7 +25,7 @@ public class SetNodePropertiesStatement extends OperationStatement<SetNodeProper
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = nameExpr.execute(ctx, pap).getStringValue();
         Map<Value, Value> map = propertiesExpr.execute(ctx, pap).getMapValue();
         Map<String, String> propertiesMap = new HashMap<>();

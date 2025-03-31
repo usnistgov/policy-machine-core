@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
@@ -25,18 +25,18 @@ public class CreateRuleStatement extends PMLStatement {
     protected Expression name;
     protected SubjectPattern subjectPattern;
     protected OperationPattern operationPattern;
-    protected Map<String, List<OperandPatternExpression>> operandPattern;
+    protected Map<String, List<ArgPatternExpression>> argPattern;
     protected ResponseBlock responseBlock;
 
     public CreateRuleStatement(Expression name,
                                SubjectPattern subjectPattern,
                                OperationPattern operationPattern,
-                               Map<String, List<OperandPatternExpression>> operandPattern,
+                               Map<String, List<ArgPatternExpression>> argPattern,
                                ResponseBlock responseBlock) {
         this.name = name;
         this.subjectPattern = subjectPattern;
         this.operationPattern = operationPattern;
-        this.operandPattern = operandPattern;
+        this.argPattern = argPattern;
         this.responseBlock = responseBlock;
     }
 
@@ -64,12 +64,12 @@ public class CreateRuleStatement extends PMLStatement {
         this.operationPattern = operationPattern;
     }
 
-    public Map<String, List<OperandPatternExpression>> getOperandPattern() {
-        return operandPattern;
+    public Map<String, List<ArgPatternExpression>> getArgPattern() {
+        return argPattern;
     }
 
-    public void setOperandPattern(Map<String, List<OperandPatternExpression>> operandPattern) {
-        this.operandPattern = operandPattern;
+    public void setArgPattern(Map<String, List<ArgPatternExpression>> argPattern) {
+        this.argPattern = argPattern;
     }
 
     public ResponseBlock getResponseBlock() {
@@ -89,7 +89,7 @@ public class CreateRuleStatement extends PMLStatement {
             new EventPattern(
                 subjectPattern,
                 operationPattern,
-                new HashMap<>(operandPattern)
+                new HashMap<>(argPattern)
             ),
             new Response(responseBlock.evtVar, responseBlock.getStatements())
         ));
@@ -101,18 +101,18 @@ public class CreateRuleStatement extends PMLStatement {
 
         String indent = indent(indentLevel);
 
-        String operandsStr = "";
-        for (Map.Entry<String, List<OperandPatternExpression>> operandExpr : operandPattern.entrySet()) {
-            if (!operandsStr.isEmpty()) {
-                operandsStr += ",\n";
+        String argStr = "";
+        for (Map.Entry<String, List<ArgPatternExpression>> argExpr : argPattern.entrySet()) {
+            if (!argStr.isEmpty()) {
+                argStr += ",\n";
             }
 
-            List<OperandPatternExpression> value = operandExpr.getValue();
+            List<ArgPatternExpression> value = argExpr.getValue();
 
-            operandsStr += indent(indentLevel+1) +
-                operandExpr.getKey() + ": " + (value.size() == 1 ? value.getFirst() : value);
+            argStr += indent(indentLevel+1) +
+                argExpr.getKey() + ": " + (value.size() == 1 ? value.getFirst() : value);
         }
-        operandsStr = operandPattern.isEmpty() ? "" : indent + "on {\n" + operandsStr + "\n" + indent + "}";
+        argStr = argPattern.isEmpty() ? "" : indent + "on {\n" + argStr + "\n" + indent + "}";
 
         return String.format(
             """
@@ -124,7 +124,7 @@ public class CreateRuleStatement extends PMLStatement {
             indent, name,
             indent, subjectPattern,
             indent, operationPattern.isAny() ? operationPattern.toString() : "\"" + operationPattern.toString() + "\"",
-            operandsStr,
+            argStr,
             indent, responseBlock.evtVar, block.toFormattedString(indentLevel)
         );
     }
@@ -141,13 +141,13 @@ public class CreateRuleStatement extends PMLStatement {
         return Objects.equals(name, that.name) &&
             Objects.equals(subjectPattern, that.subjectPattern) &&
             Objects.equals(operationPattern, that.operationPattern) &&
-            Objects.equals(operandPattern, that.operandPattern) &&
+            Objects.equals(argPattern, that.argPattern) &&
             Objects.equals(responseBlock, that.responseBlock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, subjectPattern, operationPattern, operandPattern, responseBlock);
+        return Objects.hash(name, subjectPattern, operationPattern, argPattern, responseBlock);
     }
 
     public static class ResponseBlock implements Serializable {

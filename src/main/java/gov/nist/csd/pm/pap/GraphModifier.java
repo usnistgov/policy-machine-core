@@ -16,7 +16,7 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.id.IdGenerator;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
@@ -245,10 +245,10 @@ public class GraphModifier extends Modifier implements GraphModification {
                 // check subject and operation patterns
                 boolean referenced = checkPatternForNode(node.getName(), eventPattern.getSubjectPattern());
 
-                // check operand patterns
-                for (List<OperandPatternExpression> pattern : eventPattern.getArgPatterns().values()) {
-                    for (OperandPatternExpression operandPatternExpression : pattern) {
-                        if (checkPatternForNode(node.getName(), operandPatternExpression)) {
+                // check arg patterns
+                for (List<ArgPatternExpression> pattern : eventPattern.getArgPatterns().values()) {
+                    for (ArgPatternExpression argPatternExpression : pattern) {
+                        if (checkPatternForNode(node.getName(), argPatternExpression)) {
                             referenced = true;
                         }
                     }

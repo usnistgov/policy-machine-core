@@ -14,9 +14,9 @@ public class DeleteProhibitionOp extends ProhibitionOp {
     }
 
     @Override
-    public Void execute(PAP pap, Args operands) throws PMException {
+    public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().prohibitions().deleteProhibition(
-                operands.get(NAME_ARG)
+            args.get(NAME_ARG)
         );
         return null;
     }

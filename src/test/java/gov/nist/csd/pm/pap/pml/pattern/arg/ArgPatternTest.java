@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.pattern.operand;
+package gov.nist.csd.pm.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
@@ -14,10 +14,10 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class OperandPatternTest {
+public class ArgPatternTest {
 
     @Test
-    void testOperandPattern() throws PMException {
+    void testArgPattern() throws PMException {
         MemoryPAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -44,13 +44,13 @@ public class OperandPatternTest {
         CreateRuleStatement stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeOperandPattern("o1")),
-                        "descendants", List.of(new NodeOperandPattern("oa1"))
+                        "ascendant", List.of(new NodeArgPattern("o1")),
+                        "descendants", List.of(new NodeArgPattern("oa1"))
                 ),
-                stmt.getOperandPattern()
+                stmt.getArgPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").getFirst().matches("o1", pap));
+        assertTrue(stmt.getArgPattern().get("descendants").getFirst().matches("oa1", pap));
 
         pml = """
                 create obligation "ob1" {
@@ -67,13 +67,13 @@ public class OperandPatternTest {
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeOperandPattern("o1")),
-                        "descendants", List.of(new NodeOperandPattern("oa1"))
+                        "ascendant", List.of(new NodeArgPattern("o1")),
+                        "descendants", List.of(new NodeArgPattern("oa1"))
                 ),
-                stmt.getOperandPattern()
+                stmt.getArgPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").getFirst().matches("o1", pap));
+        assertTrue(stmt.getArgPattern().get("descendants").getFirst().matches("oa1", pap));
 
         pml = """
                 create obligation "ob1" {
@@ -90,17 +90,17 @@ public class OperandPatternTest {
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeOperandPattern("o1"), new NodeOperandPattern("o2")),
-                        "descendants", List.of(new NegateOperandPatternExpression(new NodeOperandPattern("oa1")))
+                        "ascendant", List.of(new NodeArgPattern("o1"), new NodeArgPattern("o2")),
+                        "descendants", List.of(new NegateArgPatternExpression(new NodeArgPattern("oa1")))
                 ),
-                stmt.getOperandPattern()
+                stmt.getArgPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertFalse(stmt.getOperandPattern().get("ascendant").getFirst().matches("o2", pap));
-        assertTrue(stmt.getOperandPattern().get("ascendant").get(1).matches("o2", pap));
-        assertFalse(stmt.getOperandPattern().get("ascendant").get(1).matches("o3", pap));
-        assertFalse(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").getFirst().matches("oa2", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").getFirst().matches("o1", pap));
+        assertFalse(stmt.getArgPattern().get("ascendant").getFirst().matches("o2", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").get(1).matches("o2", pap));
+        assertFalse(stmt.getArgPattern().get("ascendant").get(1).matches("o3", pap));
+        assertFalse(stmt.getArgPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertTrue(stmt.getArgPattern().get("descendants").getFirst().matches("oa2", pap));
 
         pml = """
                 create obligation "ob1" {
@@ -117,27 +117,27 @@ public class OperandPatternTest {
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeOperandPattern("o1"), new AnyOperandPattern()),
+                        "ascendant", List.of(new NodeArgPattern("o1"), new AnyArgPattern()),
                         "descendants", List.of(
-                                new NegateOperandPatternExpression(new NodeOperandPattern("oa1")),
-                                new ParenOperandPatternExpression(
-                                        new LogicalOperandPatternExpression(
-                                                new NodeOperandPattern("oa1"),
-                                                new NodeOperandPattern("oa2"),
+                                new NegateArgPatternExpression(new NodeArgPattern("oa1")),
+                                new ParenArgPatternExpression(
+                                        new LogicalArgPatternExpression(
+                                                new NodeArgPattern("oa1"),
+                                                new NodeArgPattern("oa2"),
                                                 false
                                         )
                                 )
                         )
                 ),
-                stmt.getOperandPattern()
+                stmt.getArgPattern()
         );
-        assertTrue(stmt.getOperandPattern().get("ascendant").getFirst().matches("o1", pap));
-        assertFalse(stmt.getOperandPattern().get("ascendant").getFirst().matches("o2", pap));
-        assertTrue(stmt.getOperandPattern().get("ascendant").get(1).matches("o2", pap));
-        assertTrue(stmt.getOperandPattern().get("ascendant").get(1).matches("o3", pap));
-        assertFalse(stmt.getOperandPattern().get("descendants").getFirst().matches("oa1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").get(1).matches("oa1", pap));
-        assertTrue(stmt.getOperandPattern().get("descendants").get(1).matches("oa2", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").getFirst().matches("o1", pap));
+        assertFalse(stmt.getArgPattern().get("ascendant").getFirst().matches("o2", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").get(1).matches("o2", pap));
+        assertTrue(stmt.getArgPattern().get("ascendant").get(1).matches("o3", pap));
+        assertFalse(stmt.getArgPattern().get("descendants").getFirst().matches("oa1", pap));
+        assertTrue(stmt.getArgPattern().get("descendants").get(1).matches("oa1", pap));
+        assertTrue(stmt.getArgPattern().get("descendants").get(1).matches("oa2", pap));
     }
 
     @Test

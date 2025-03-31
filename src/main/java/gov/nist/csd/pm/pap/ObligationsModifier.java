@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.modification.ObligationsModification;
 import gov.nist.csd.pm.common.obligation.EventPattern;
 import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
@@ -77,10 +77,10 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
             Pattern pattern = event.getSubjectPattern();
             pattern.checkReferencedNodesExist(store.graph());
 
-            // check operand patterns
-            for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : event.getArgPatterns().entrySet()) {
-                for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
-                    operandPatternExpression.checkReferencedNodesExist(store.graph());
+            // check arg patterns
+            for (Map.Entry<String, List<ArgPatternExpression>> argPattern : event.getArgPatterns().entrySet()) {
+                for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
+                    argPatternExpression.checkReferencedNodesExist(store.graph());
                 }
             }
         }

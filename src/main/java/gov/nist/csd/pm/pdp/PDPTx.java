@@ -111,15 +111,15 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args operands) throws PMException {
+    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args args) throws PMException {
         if (adminFunction instanceof Routine<T> routine) {
-            return routine.execute(this, operands);
+            return routine.execute(this, args);
         } else if (adminFunction instanceof Operation<T> operation) {
-            operation.canExecute(privilegeChecker, userCtx, operands);
-            return operation.execute(pap, operands);
+            operation.canExecute(privilegeChecker, userCtx, args);
+            return operation.execute(pap, args);
         }
 
-        return adminFunction.execute(pap, operands);
+        return adminFunction.execute(pap, args);
     }
 
     @Override

@@ -14,7 +14,7 @@ import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalArg;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
-import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -54,10 +54,10 @@ public abstract class ObligationOp extends Operation<Void> {
             Pattern pattern = eventPattern.getSubjectPattern();
             checkPatternPrivileges(privilegeChecker, userCtx, pattern, reqCap);
 
-            // check operand patterns
-            for (var operandPattern : eventPattern.getArgPatterns().entrySet()) {
-                for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
-                    checkPatternPrivileges(privilegeChecker, userCtx, operandPatternExpression, reqCap);
+            // check arg patterns
+            for (var argPattern : eventPattern.getArgPatterns().entrySet()) {
+                for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
+                    checkPatternPrivileges(privilegeChecker, userCtx, argPatternExpression, reqCap);
                 }
             }
         }

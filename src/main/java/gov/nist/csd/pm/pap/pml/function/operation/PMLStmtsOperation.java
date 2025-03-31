@@ -31,8 +31,8 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
-        ctx.executeOperationStatements(this.body.getChecks().getStmts(), operands);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        ctx.executeOperationStatements(this.body.getChecks().getStmts(), args);
     }
 
     @Override

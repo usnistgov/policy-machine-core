@@ -57,8 +57,8 @@ public abstract class ProhibitionOp extends Operation<Void> {
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
-        ProhibitionSubject subject = operands.get(SUBJECT_ARG);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        ProhibitionSubject subject = args.get(SUBJECT_ARG);
 
         if (subject.isNode()) {
             privilegeChecker.check(userCtx, subject.getNodeId(), reqCap);
@@ -67,7 +67,7 @@ public abstract class ProhibitionOp extends Operation<Void> {
         }
 
         // check that the user can create a prohibition for each container in the condition
-        Collection<ContainerCondition> containers = operands.get(CONTAINERS_ARG);
+        Collection<ContainerCondition> containers = args.get(CONTAINERS_ARG);
         for (ContainerCondition contCond : containers) {
             privilegeChecker.check(userCtx, contCond.getId(), reqCap);
 

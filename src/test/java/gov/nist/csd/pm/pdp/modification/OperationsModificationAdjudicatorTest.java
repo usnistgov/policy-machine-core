@@ -73,7 +73,7 @@ class OperationsModificationAdjudicatorTest {
     void createAdminOperation() throws PMException {
         Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
             }
 
@@ -92,7 +92,7 @@ class OperationsModificationAdjudicatorTest {
     void deleteAdminOperation() throws PMException {
         Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
             }
 

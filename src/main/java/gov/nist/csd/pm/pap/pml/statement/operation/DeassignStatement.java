@@ -25,7 +25,7 @@ public class DeassignStatement extends OperationStatement<DeassignOp> {
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String asc = ascendant.execute(ctx, pap).getStringValue();
         List<Value> deassignFromValue = deassignFrom.execute(ctx, pap).getArrayValue();
         List<String> descs = new ArrayList<>();

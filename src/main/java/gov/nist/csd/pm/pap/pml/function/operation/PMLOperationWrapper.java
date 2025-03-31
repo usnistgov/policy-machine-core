@@ -32,8 +32,8 @@ public class PMLOperationWrapper extends PMLOperation implements PMLFunctionWrap
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
-        operation.canExecute(privilegeChecker, userCtx, operands);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        operation.canExecute(privilegeChecker, userCtx, args);
     }
 
     @Override

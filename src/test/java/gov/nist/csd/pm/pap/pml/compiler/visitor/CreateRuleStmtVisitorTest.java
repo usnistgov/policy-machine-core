@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
@@ -127,18 +127,18 @@ class CreateRuleStmtVisitorTest {
     void testOnClause() throws PMException {
         String pml = """
                     create obligation "obligation1" {
-                        create rule "any operand"
+                        create rule "any arg"
                         when any user
                         performs any operation
                         do(ctx) {}
                         
-                        create rule "any operand with on"
+                        create rule "any arg with on"
                         when any user
                         performs any operation
                         on {}
                         do(ctx) {}
                         
-                        create rule "an operand"
+                        create rule "an arg"
                         when any user
                         performs "assign"
                         on {
@@ -155,25 +155,25 @@ class CreateRuleStmtVisitorTest {
                 new StringLiteral("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("any operand"),
+                                new StringLiteral("any arg"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("any operand with on"),
+                                new StringLiteral("any arg with on"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("an operand"),
+                                new StringLiteral("an arg"),
                                 new SubjectPattern(),
                                 new OperationPattern("assign"),
                                 Map.of(
-                                        "ascendant", List.of(new AnyOperandPattern())
+                                        "ascendant", List.of(new AnyArgPattern())
                                 ),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         )

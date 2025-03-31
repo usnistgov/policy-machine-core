@@ -30,9 +30,9 @@ public class DeassignOp extends GraphOp<Void> {
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
-        privilegeChecker.check(userCtx, operands.get(ASCENDANT_ARG), DEASSIGN);
-        privilegeChecker.check(userCtx, operands.get(DESCENDANTS_ARG), DEASSIGN_FROM);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        privilegeChecker.check(userCtx, args.get(ASCENDANT_ARG), DEASSIGN);
+        privilegeChecker.check(userCtx, args.get(DESCENDANTS_ARG), DEASSIGN_FROM);
     }
 
     @Override

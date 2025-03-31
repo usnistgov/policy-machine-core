@@ -7,7 +7,7 @@ import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.pap.AdminAccessRights;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
@@ -90,10 +90,10 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
 
         // cannot check operation as it is not a node
 
-        // check operands
-        for (Map.Entry<String, List<OperandPatternExpression>> operandPattern : eventPattern.getArgPatterns().entrySet()) {
-            for (OperandPatternExpression operandPatternExpression : operandPattern.getValue()) {
-                privilegeChecker.checkPattern(userCtx, operandPatternExpression, GET_OBLIGATION);
+        // check args
+        for (Map.Entry<String, List<ArgPatternExpression>> argPattern : eventPattern.getArgPatterns().entrySet()) {
+            for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
+                privilegeChecker.checkPattern(userCtx, argPatternExpression, GET_OBLIGATION);
             }
         }
     }

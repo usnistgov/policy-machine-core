@@ -9,7 +9,6 @@ import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalArg;
-import gov.nist.csd.pm.pap.function.arg.type.LongType;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalArg;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
@@ -25,7 +24,6 @@ import gov.nist.csd.pm.pap.pml.function.arg.PMLArgs;
 import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.function.arg.WrappedFormalArg;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLNodeFormalArg;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
@@ -71,16 +69,16 @@ public class FunctionInvokeExpression extends Expression {
             );
         }
 
-        List<Expression> operands = new ArrayList<>();
+        List<Expression> args = new ArrayList<>();
         for (int i = 0; i < formalArgs.size(); i++) {
             PMLParser.ExpressionContext exprCtx = argExpressions.get(i);
             PMLFormalArg formalArg = formalArgs.get(i);
 
             Expression expr = Expression.compile(visitorCtx, exprCtx, formalArg.getPmlType());
-            operands.add(expr);
+            args.add(expr);
         }
 
-        return new FunctionInvokeExpression(funcName, operands);
+        return new FunctionInvokeExpression(funcName, args);
     }
 
     private final String funcName;
@@ -105,7 +103,7 @@ public class FunctionInvokeExpression extends Expression {
 
         AdminFunction<?> function = funcInvokeCtx.scope().getFunction(funcName);
 
-        Map<String, Value> actualOperandValues = prepareOperandExpressions(funcInvokeCtx, pap, function);
+        Map<String, Value> actualArgValues = prepareArgExpressions(funcInvokeCtx, pap, function);
 
         // set the ctx if PML function
         if (function instanceof PMLFunction pmlFunction) {
@@ -115,10 +113,10 @@ public class FunctionInvokeExpression extends Expression {
         Args args;
         if (function instanceof PMLFunctionWrapper wrapper) {
             // PMLWrappers do not need PML Values as input, just regular objects
-            args = new Args(valuesMapToObjects(pap, wrapper.getPMLFormalArgs(), actualOperandValues));
+            args = new Args(valuesMapToObjects(pap, wrapper.getPMLFormalArgs(), actualArgValues));
         } else {
             // PML functions do expect Values as input
-            args = new PMLArgs(actualOperandValues);
+            args = new PMLArgs(actualArgValues);
         }
 
         // execute the function
@@ -159,7 +157,7 @@ public class FunctionInvokeExpression extends Expression {
         return objectMap;
     }
 
-    private Map<String, Value> prepareOperandExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?> function) throws PMException {
+    private Map<String, Value> prepareArgExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?> function) throws PMException {
         List<FormalArg<?>> formalArgs = function.getFormalArgs();
 
         if (actualArgsList.size() != formalArgs.size()) {
@@ -177,8 +175,8 @@ public class FunctionInvokeExpression extends Expression {
         Map<String, Value> values = new HashMap<>();
         for (int i = 0; i < pmlFormalArgs.size(); i++) {
             PMLFormalArg formalArg = pmlFormalArgs.get(i);
-            Expression operandExpr = actualArgsList.get(i);
-            Value argValue = operandExpr.execute(ctx, pap);
+            Expression argExpr = actualArgsList.get(i);
+            Value argValue = argExpr.execute(ctx, pap);
 
 
             if (!argValue.getType().equals(formalArg.getPmlType())) {

@@ -16,8 +16,6 @@ import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ARSET_ARG;
 
 public class SetResourceOperationsOp extends Operation<Void> {
 
-    public static final String OPERATIONS_OPERAND = "operations";
-
     public SetResourceOperationsOp() {
         super(
                 "set_resource_operations",

@@ -18,8 +18,8 @@ public class DeleteNodeStatement extends DeleteStatement<DeleteNodeOp> {
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-        // prepare for execution by replacing the name operand with the ID operand
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        // prepare for execution by replacing the name arg with the ID arg
         String name = expression.execute(ctx, pap).getStringValue();
 
         try {

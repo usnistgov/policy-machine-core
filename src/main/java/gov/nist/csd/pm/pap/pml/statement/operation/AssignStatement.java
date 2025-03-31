@@ -26,7 +26,7 @@ public class AssignStatement extends OperationStatement<AssignOp> {
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String asc = ascendant.execute(ctx, pap).getStringValue();
         List<Value> assignToValue = descendants.execute(ctx, pap).getArrayValue();
         List<String> descs = new ArrayList<>();

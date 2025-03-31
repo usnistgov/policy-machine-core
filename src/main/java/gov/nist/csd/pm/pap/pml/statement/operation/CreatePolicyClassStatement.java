@@ -19,7 +19,7 @@ public class CreatePolicyClassStatement extends OperationStatement<CreatePolicyC
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String pcName = name.execute(ctx, pap).getStringValue();
 
         return op.actualArgs(pcName);

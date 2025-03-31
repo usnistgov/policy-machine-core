@@ -59,7 +59,7 @@ createRuleStatement:
     CREATE RULE ruleName=expression
     WHEN subjectPattern
     PERFORMS operationPattern
-    (ON operandPattern)?
+    (ON argPattern)?
     response ;
 
 // subject
@@ -83,19 +83,19 @@ operationPattern:
     ANY OPERATION #AnyOperation
     | stringLit #IDOperation ;
 
-// operands
-operandPattern: OPEN_CURLY (operandPatternElement (COMMA operandPatternElement)*)? CLOSE_CURLY ;
-operandPatternElement: key=ID COLON (single=operandPatternExpression | multiple=operandPatternExpressionArray);
+// args
+argPattern: OPEN_CURLY (argPatternElement (COMMA argPatternElement)*)? CLOSE_CURLY ;
+argPatternElement: key=ID COLON (single=argPatternExpression | multiple=argPatternExpressionArray);
 
-operandPatternExpressionArray: OPEN_BRACKET operandPatternExpression (COMMA operandPatternExpression)* CLOSE_BRACKET ;
+argPatternExpressionArray: OPEN_BRACKET argPatternExpression (COMMA argPatternExpression)* CLOSE_BRACKET ;
 
-operandPatternExpression:
-     basicOperandPatternExpr #BasicOperandPatternExpression
-     | EXCLAMATION operandPatternExpression #NegateOperandPatternExpression
-     | OPEN_PAREN operandPatternExpression CLOSE_PAREN #ParenOperandPatternExpression
-     | left=operandPatternExpression (LOGICAL_AND | LOGICAL_OR) right=operandPatternExpression #LogicalOperandPatternExpression ;
+argPatternExpression:
+     basicArgPatternExpr #BasicArgPatternExpression
+     | EXCLAMATION argPatternExpression #NegateArgPatternExpression
+     | OPEN_PAREN argPatternExpression CLOSE_PAREN #ParenArgPatternExpression
+     | left=argPatternExpression (LOGICAL_AND | LOGICAL_OR) right=argPatternExpression #LogicalArgPatternExpression ;
 
-basicOperandPatternExpr:
+basicArgPatternExpr:
     ANY #AnyPolicyElement
     | IN stringLit #InPolicyElement
     | stringLit #PolicyElement ;

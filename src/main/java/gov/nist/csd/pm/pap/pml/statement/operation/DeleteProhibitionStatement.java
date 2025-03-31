@@ -16,7 +16,7 @@ public class DeleteProhibitionStatement extends DeleteStatement<DeleteProhibitio
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = expression.execute(ctx, pap).getStringValue();
 
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);

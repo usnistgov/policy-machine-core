@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.pattern.operand;
+package gov.nist.csd.pm.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -9,16 +9,16 @@ import gov.nist.csd.pm.pap.pml.value.StringValue;
 import java.util.Objects;
 import java.util.Set;
 
-public class InOperandPattern extends OperandPatternExpression {
+public class InArgPattern extends ArgPatternExpression {
 
     private final String container;
 
-    public InOperandPattern(StringLiteral container) {
+    public InArgPattern(StringLiteral container) {
         this.container = container.getValue();
     }
 
 
-    public InOperandPattern(String container) {
+    public InArgPattern(String container) {
         this.container = container;
     }
 
@@ -43,7 +43,7 @@ public class InOperandPattern extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof InOperandPattern that)) return false;
+        if (!(o instanceof InArgPattern that)) return false;
         return Objects.equals(container, that.container);
     }
 

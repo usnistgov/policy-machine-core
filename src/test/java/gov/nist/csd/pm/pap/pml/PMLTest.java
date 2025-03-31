@@ -35,7 +35,7 @@ public class PMLTest {
     private static final FormalArg<Map<String, String>> ARGC = new FormalArg<>("c", mapType(stringType(), stringType()));
 
     @Test
-    void testCallingNonPMLOperationAndRoutineFromPMLWithOperandsAndReturnValue() throws PMException {
+    void testCallingNonPMLOperationAndRoutineFromPMLWithArgsAndReturnValue() throws PMException {
         MemoryPAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
@@ -52,7 +52,7 @@ public class PMLTest {
 
         Operation<?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
                 privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");
             }
 

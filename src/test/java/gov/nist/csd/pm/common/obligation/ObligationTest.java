@@ -76,7 +76,7 @@ class ObligationTest {
         pap.setPMLConstants(Map.of("x", new StringValue("hello world")));
         pap.setPMLOperations(new PMLOperation("createX", Type.voidType()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {
 
             }
 

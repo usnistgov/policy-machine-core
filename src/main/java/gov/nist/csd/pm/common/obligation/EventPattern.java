@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.OperandPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 
 import java.io.Serializable;
@@ -14,11 +14,11 @@ public class EventPattern implements Serializable {
 
     protected SubjectPattern subjectPattern;
     protected OperationPattern operationPattern;
-    protected Map<String, List<OperandPatternExpression>> argPatterns;
+    protected Map<String, List<ArgPatternExpression>> argPatterns;
 
     public EventPattern(SubjectPattern subjectPattern,
                         OperationPattern operationPattern,
-                        Map<String, List<OperandPatternExpression>> argPatterns) {
+                        Map<String, List<ArgPatternExpression>> argPatterns) {
         this.subjectPattern = subjectPattern;
         this.operationPattern = operationPattern;
         this.argPatterns = argPatterns;
@@ -46,11 +46,11 @@ public class EventPattern implements Serializable {
         this.operationPattern = operationPattern;
     }
 
-    public Map<String, List<OperandPatternExpression>> getArgPatterns() {
+    public Map<String, List<ArgPatternExpression>> getArgPatterns() {
         return argPatterns;
     }
 
-    public void setArgPatterns(Map<String, List<OperandPatternExpression>> argPatterns) {
+    public void setArgPatterns(Map<String, List<ArgPatternExpression>> argPatterns) {
         this.argPatterns = argPatterns;
     }
 
@@ -61,9 +61,9 @@ public class EventPattern implements Serializable {
             return userMatches;
         }
 
-        boolean operandsMatch = operandsMatch(eventCtx.getArgs(), pap);
+        boolean argsMatch = argsMatch(eventCtx.getArgs(), pap);
 
-        return userMatches && opMatches && operandsMatch;
+        return userMatches && opMatches && argsMatch;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class EventPattern implements Serializable {
         return operationPattern.matches(opName, pap);
     }
 
-    private boolean operandsMatch(Map<String, Object> args, PAP pap) throws PMException {
+    private boolean argsMatch(Map<String, Object> args, PAP pap) throws PMException {
         if (!args.keySet().containsAll(argPatterns.keySet())) {
             return false;
         }
@@ -110,23 +110,23 @@ public class EventPattern implements Serializable {
             }
 
             Object argValue = arg.getValue();
-            List<OperandPatternExpression> expressions = argPatterns.get(arg.getKey());
+            List<ArgPatternExpression> expressions = argPatterns.get(arg.getKey());
 
             // needs to match each expression in pattern list
-            for (OperandPatternExpression operandPatternExpression : expressions) {
+            for (ArgPatternExpression argPatternExpression : expressions) {
                 switch (argValue) {
                     case null -> {}
-                    case String operandValueStr -> {
-                        if (!operandPatternExpression.matches(operandValueStr, pap)) {
+                    case String argValueStr -> {
+                        if (!argPatternExpression.matches(argValueStr, pap)) {
                             return false;
                         }
                     }
-                    case Collection<?> operandValueCollection -> {
-                        if (!operandPatternExpression.matches((Collection<String>) operandValueCollection, pap)) {
+                    case Collection<?> argValueCollection -> {
+                        if (!argPatternExpression.matches((Collection<String>) argValueCollection, pap)) {
                             return false;
                         }
                     }
-                    default -> throw new UnexpectedOperandTypeException(argValue.getClass());
+                    default -> throw new UnexpectedArgTypeException(argValue.getClass());
                 }
             }
         }

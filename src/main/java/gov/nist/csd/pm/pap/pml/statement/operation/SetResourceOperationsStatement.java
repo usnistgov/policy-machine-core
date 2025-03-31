@@ -22,7 +22,7 @@ public class SetResourceOperationsStatement extends OperationStatement<SetResour
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         List<Value> opValues = operationsExpr.execute(ctx, pap).getArrayValue();
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Value opValue : opValues) {

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.pattern.operand;
+package gov.nist.csd.pm.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -7,11 +7,11 @@ import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 
 import java.util.Objects;
 
-public class ParenOperandPatternExpression extends OperandPatternExpression {
+public class ParenArgPatternExpression extends ArgPatternExpression {
 
     private final Pattern expression;
 
-    public ParenOperandPatternExpression(Pattern expression) {
+    public ParenArgPatternExpression(Pattern expression) {
         this.expression = expression;
     }
 
@@ -37,7 +37,7 @@ public class ParenOperandPatternExpression extends OperandPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ParenOperandPatternExpression that)) return false;
+        if (!(o instanceof ParenArgPatternExpression that)) return false;
         return Objects.equals(expression, that.expression);
     }
 

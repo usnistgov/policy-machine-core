@@ -49,9 +49,9 @@ class PMLRoutineWrapperTest {
         Routine<?> op = new Routine<>("routine1", List.of(a, b)) {
 
             @Override
-            public Object execute(PAP pap, Args operands) throws PMException {
-                pap.modify().graph().createObjectAttribute(operands.get(a), List.of(id("pc1")));
-                pap.modify().graph().createObjectAttribute(operands.get(b), List.of(id("pc1")));
+            public Object execute(PAP pap, Args args) throws PMException {
+                pap.modify().graph().createObjectAttribute(args.get(a), List.of(id("pc1")));
+                pap.modify().graph().createObjectAttribute(args.get(b), List.of(id("pc1")));
                 return null;
             }
         };

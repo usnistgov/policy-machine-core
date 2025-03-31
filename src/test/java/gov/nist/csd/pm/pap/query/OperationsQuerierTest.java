@@ -24,7 +24,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
     static Operation<Object> op1 = new Operation<Object>("op1", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
         }
 
@@ -36,7 +36,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
     static Operation<Object> op2 = new Operation<Object>("op2", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
         }
 
@@ -72,7 +72,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
         static Operation<Object> operation = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
             }
 

@@ -8,8 +8,8 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.LogicalOperandPatternExpression;
-import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.LogicalArgPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -34,9 +34,9 @@ class CreateObligationStatementTest {
                         new SubjectPattern(),
                         new OperationPattern("e1"),
                         Map.of(
-                                "opnd1", List.of(new LogicalOperandPatternExpression(
-                                        new NodeOperandPattern("oa1"),
-                                        new NodeOperandPattern("oa2"),
+                                "opnd1", List.of(new LogicalArgPatternExpression(
+                                        new NodeArgPattern("oa1"),
+                                        new NodeArgPattern("oa2"),
                                         false
                                 ))
                         ),
@@ -67,9 +67,9 @@ class CreateObligationStatementTest {
                 new SubjectPattern(),
                 new OperationPattern("e1"),
                 Map.of(
-                        "opnd1", List.of(new LogicalOperandPatternExpression(
-                                new NodeOperandPattern("oa1"),
-                                new NodeOperandPattern("oa2"),
+                        "opnd1", List.of(new LogicalArgPatternExpression(
+                                new NodeArgPattern("oa1"),
+                                new NodeArgPattern("oa2"),
                                 false
                         ))
                 )
@@ -86,9 +86,9 @@ class CreateObligationStatementTest {
                                 new SubjectPattern(),
                                 new OperationPattern("e1"),
                                 Map.of(
-                                        "opnd1", List.of(new LogicalOperandPatternExpression(
-                                                new NodeOperandPattern("oa1"),
-                                                new NodeOperandPattern("oa2"),
+                                        "opnd1", List.of(new LogicalArgPatternExpression(
+                                                new NodeArgPattern("oa1"),
+                                                new NodeArgPattern("oa2"),
                                                 false
                                         ))
                                 ),
@@ -101,9 +101,9 @@ class CreateObligationStatementTest {
                                 new SubjectPattern(new UsernamePattern("u1")),
                                 new OperationPattern("e3"),
                                 Map.of(
-                                        "opnd1", List.of(new LogicalOperandPatternExpression(
-                                                new NodeOperandPattern("oa1"),
-                                                new NodeOperandPattern("oa2"),
+                                        "opnd1", List.of(new LogicalArgPatternExpression(
+                                                new NodeArgPattern("oa1"),
+                                                new NodeArgPattern("oa2"),
                                                 false
                                         ))
                                 ),

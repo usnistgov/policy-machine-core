@@ -21,7 +21,7 @@ public abstract class OperationStatement<T extends Operation<?>> extends PMLStat
         return op;
     }
 
-    public abstract Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException;
+    public abstract Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException;
 
     @Override
     public abstract int hashCode();
@@ -31,7 +31,7 @@ public abstract class OperationStatement<T extends Operation<?>> extends PMLStat
 
     @Override
     public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareOperands(ctx, pap));
+        op.execute(pap, prepareArgs(ctx, pap));
 
         return new VoidValue();
     }

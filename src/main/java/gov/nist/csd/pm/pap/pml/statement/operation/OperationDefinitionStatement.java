@@ -28,7 +28,7 @@ public class OperationDefinitionStatement extends OperationStatement<CreateAdmin
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return op.actualArgs(pmlStmtsOperation);
     }
 

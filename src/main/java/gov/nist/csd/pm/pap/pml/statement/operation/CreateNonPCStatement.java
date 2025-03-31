@@ -29,7 +29,7 @@ public class CreateNonPCStatement extends OperationStatement<Operation<Long>> {
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = nameExpr.execute(ctx, pap).getStringValue();
         
         List<Value> inList = inExpr.execute(ctx, pap).getArrayValue();

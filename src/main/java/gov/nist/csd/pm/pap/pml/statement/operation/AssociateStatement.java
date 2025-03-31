@@ -27,7 +27,7 @@ public class AssociateStatement extends OperationStatement<AssociateOp> {
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         Value uaValue = ua.execute(ctx, pap);
         Value targetValue = target.execute(ctx, pap);
         Value accessRightsValue = accessRights.execute(ctx, pap);

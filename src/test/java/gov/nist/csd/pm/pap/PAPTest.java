@@ -31,7 +31,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     static Operation<Value> op = new Operation<Value>("testFunc", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
         }
 

@@ -3,8 +3,8 @@ package gov.nist.csd.pm.pap.function.op.obligation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.InArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -46,8 +46,8 @@ class ObligationOpTest {
                 () -> checkPatternPrivileges(privilegeChecker, new TestUserContext("u2"), new SubjectPattern(), CREATE_OBLIGATION));
 
         checkPatternPrivileges(privilegeChecker, new TestUserContext("u1"), new LogicalSubjectPatternExpression(
-                new NodeOperandPattern("oa1"),
-                new InOperandPattern("oa2"),
+                new NodeArgPattern("oa1"),
+                new InArgPattern("oa2"),
                 true
         ), CREATE_OBLIGATION);
 

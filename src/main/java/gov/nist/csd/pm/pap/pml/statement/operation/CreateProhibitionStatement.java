@@ -48,7 +48,7 @@ public class CreateProhibitionStatement extends OperationStatement<CreateProhibi
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         Value nameValue = this.name.execute(ctx, pap);
 
         // convert subject name to id

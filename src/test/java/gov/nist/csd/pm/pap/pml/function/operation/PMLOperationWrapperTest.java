@@ -38,7 +38,7 @@ class PMLOperationWrapperTest {
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {
 
             }
         };
@@ -64,8 +64,8 @@ class PMLOperationWrapperTest {
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
-                privilegeChecker.check(userCtx, operands.get(a), List.of("assign"));
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+                privilegeChecker.check(userCtx, args.get(a), List.of("assign"));
             }
         };
 
@@ -110,8 +110,8 @@ class PMLOperationWrapperTest {
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
-                privilegeChecker.check(userCtx, operands.get(a), List.of("assign"));
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+                privilegeChecker.check(userCtx, args.get(a), List.of("assign"));
             }
         };
 

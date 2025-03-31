@@ -29,7 +29,7 @@ public class RoutineDefinitionStatement extends OperationStatement<CreateAdminRo
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return op.actualArgs(pmlStmtsRoutine);
     }
 

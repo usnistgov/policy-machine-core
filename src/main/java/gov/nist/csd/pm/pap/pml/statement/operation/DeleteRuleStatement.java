@@ -29,7 +29,7 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
     }
 
     @Override
-    public Args prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String ruleName = ruleExpr.execute(ctx, pap).getStringValue();
         String oblName = oblExpr.execute(ctx, pap).getStringValue();
 
@@ -77,11 +77,11 @@ public class DeleteRuleStatement extends OperationStatement<UpdateObligationOp> 
         }
 
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args operands) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
             new DeleteObligationOp()
-                .canExecute(privilegeChecker, userCtx, operands);
+                .canExecute(privilegeChecker, userCtx, args);
             new CreateObligationOp()
-                .canExecute(privilegeChecker, userCtx, operands);
+                .canExecute(privilegeChecker, userCtx, args);
         }
 
         @Override

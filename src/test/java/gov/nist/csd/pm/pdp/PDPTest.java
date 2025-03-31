@@ -293,8 +293,8 @@ class PDPTest {
 
         pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of(a)) {
             @Override
-            public String execute(PAP pap, Args operands) throws PMException {
-                pap.modify().graph().createPolicyClass(operands.get(a));
+            public String execute(PAP pap, Args args) throws PMException {
+                pap.modify().graph().createPolicyClass(args.get(a));
                 return "test1";
             }
         });

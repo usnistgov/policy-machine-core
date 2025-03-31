@@ -6,8 +6,8 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.ProcessSubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
@@ -170,13 +170,13 @@ class EventPatternTest {
     }
 
     @Test
-    void testOperandsMatch() throws PMException {
+    void testArgsMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
                 new SubjectPattern(new UsernamePattern("u1")),
                 new OperationPattern("assign"),
                 Map.of(
-                        "ascendant", List.of(new NodeOperandPattern("a")),
-                        "descendants", List.of(new AnyOperandPattern())
+                        "ascendant", List.of(new NodeArgPattern("a")),
+                        "descendants", List.of(new AnyArgPattern())
                 )
         );
 
@@ -193,13 +193,13 @@ class EventPatternTest {
     }
 
     @Test
-    void testOperandsDoNotMatch() throws PMException {
+    void testArgsDoNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
                 new SubjectPattern(new UsernamePattern("u1")),
                 new OperationPattern("assign"),
                 Map.of(
-                        "ascendant", List.of(new NodeOperandPattern("b")),
-                        "descendant", List.of(new AnyOperandPattern())
+                        "ascendant", List.of(new NodeArgPattern("b")),
+                        "descendant", List.of(new AnyArgPattern())
                 )
         );
 
@@ -216,13 +216,13 @@ class EventPatternTest {
     }
 
     @Test
-    void testInvalidNodeOperandType() throws PMException {
+    void testInvalidNodeArgType() throws PMException {
         EventPattern eventPattern = new EventPattern(
                 new SubjectPattern(new UsernamePattern("u1")),
                 new OperationPattern("assign"),
                 Map.of(
-                        "ascendant", List.of(new AnyOperandPattern()),
-                        "descendants", List.of(new AnyOperandPattern())
+                        "ascendant", List.of(new AnyArgPattern()),
+                        "descendants", List.of(new AnyArgPattern())
                 )
         );
 
@@ -235,7 +235,7 @@ class EventPatternTest {
                 Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), Map.of("b", ""))
         );
 
-        assertThrows(UnexpectedOperandTypeException.class,
+        assertThrows(UnexpectedArgTypeException.class,
                 () -> eventPattern.matches(eventContext, pap));
     }
 

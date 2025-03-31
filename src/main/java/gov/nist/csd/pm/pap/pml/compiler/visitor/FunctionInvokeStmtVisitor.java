@@ -70,8 +70,8 @@ public class FunctionInvokeStmtVisitor extends PMLBaseVisitor<FunctionInvokeExpr
                 try {
                     Expression actual = actualArgs.get(i);
                     Type actualType = actual.getType(visitorCtx.scope());
-                    PMLFormalArg operand = formalArgs.get(i);
-                    Type formalType = operand.getPmlType();
+                    PMLFormalArg arg = formalArgs.get(i);
+                    Type formalType = arg.getPmlType();
 
                     if (!actual.getType(visitorCtx.scope()).equals(formalType)) {
                         throw new PMLCompilationRuntimeException(
