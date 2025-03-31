@@ -138,9 +138,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                                                                                  PMException {
         try {
             Object returnValue = runTx(user, tx -> {
-                PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
-
-                return executeOperation(user, ctx, tx, operation, args);
+                return executeOperation(user, tx, operation, args);
             });
 
             return new AdjudicationResponse(GRANT, returnValue);
@@ -156,8 +154,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         try {
             Object returnValue = runTx(user, tx -> {
                 if (routine instanceof PMLRoutine) {
-                    PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
-                    ((PMLRoutine) routine).setCtx(ctx);
+                    ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
                 }
 
                 Object ret = tx.executeAdminFunction(routine, args);
@@ -183,9 +180,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         try {
             runTx(user, tx -> {
                 for (OperationRequest request : operationRequests) {
-                    PDPExecutionContext ctx = new PDPExecutionContext(user, tx);
-
-                    executeOperation(user, ctx, tx, request.op(), request.args());
+                    executeOperation(user, tx, request.op(), request.args());
                 }
 
                 return null;
@@ -197,9 +192,9 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
     }
 
-    private <T> Object executeOperation(UserContext user, ExecutionContext ctx, PDPTx pdpTx, Operation<T> operation, Args args) throws PMException {
+    private <T> Object executeOperation(UserContext user, PDPTx pdpTx, Operation<T> operation, Args args) throws PMException {
         if (operation instanceof PMLOperation) {
-            ((PMLOperation)operation).setCtx(ctx);
+            ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation

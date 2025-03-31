@@ -87,6 +87,10 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         policyStore.verifyAdminPolicy();
     }
 
+    public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
+        return new ExecutionContext(userCtx, this);
+    }
+
     /**
      * Bootstrap the policy with the given PolicyBootstrapper object. The bootstrapping user is the user that will
      * go no record as being the author of any obligations created by the bootstrapper. This user will be created outside
@@ -115,8 +119,6 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
             tx.modify().graph().deleteNode(ua);
             tx.modify().graph().deleteNode(pc);
         });
-
-
     }
 
     @Override

@@ -111,6 +111,11 @@ public class PDPTx extends PAP {
     }
 
     @Override
+    public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
+        return new PDPExecutionContext(userCtx, this);
+    }
+
+    @Override
     public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args args) throws PMException {
         if (adminFunction instanceof Routine<T> routine) {
             return routine.execute(this, args);
@@ -148,8 +153,8 @@ public class PDPTx extends PAP {
         PMLCompiler pmlCompiler = new PMLCompiler();
         List<PMLStatement> stmts = pmlCompiler.compilePML(pap, input);
 
-        ExecutionContext ctx = new PDPExecutionContext(author, this);
-        ctx.executeStatements(stmts, new Args());
+        buildExecutionContext(author)
+            .executeStatements(stmts, new Args());
     }
 
     @Override

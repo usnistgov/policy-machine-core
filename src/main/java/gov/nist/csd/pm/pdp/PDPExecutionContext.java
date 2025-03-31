@@ -12,7 +12,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 
-public class PDPExecutionContext extends ExecutionContext {
+class PDPExecutionContext extends ExecutionContext {
 
     private final PDPTx pdpTx;
 

@@ -9,7 +9,6 @@ import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
-import gov.nist.csd.pm.pdp.PDPExecutionContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +38,7 @@ public class EPP implements EventSubscriber {
                 UserContext authorCtx = new UserContext(author);
 
                 // need to run pdp tx as author of obligation
-                pdp.runTx(authorCtx, txPDP -> response.execute(new PDPExecutionContext(authorCtx, txPDP), eventCtx));
+                pdp.runTx(authorCtx, txPDP -> response.execute(txPDP, authorCtx, eventCtx));
             }
         }
     }
