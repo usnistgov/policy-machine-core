@@ -1,10 +1,12 @@
-package gov.nist.csd.pm.common.obligation;
+package gov.nist.csd.pm.pap.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.GraphModification;
+import gov.nist.csd.pm.pap.obligation.EventPattern;
+import gov.nist.csd.pm.pap.obligation.UnexpectedArgTypeException;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;

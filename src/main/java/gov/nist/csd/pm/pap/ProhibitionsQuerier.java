@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.pap.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.common.graph.dag.Direction;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;

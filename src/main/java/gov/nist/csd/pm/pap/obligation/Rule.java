@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.common.obligation;
+package gov.nist.csd.pm.pap.obligation;
 
 import java.io.Serializable;
 import java.util.Objects;

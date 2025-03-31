@@ -1,6 +1,14 @@
-package gov.nist.csd.pm.common.graph.dag;
+package gov.nist.csd.pm.pap.dag;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.dag.Direction;
+import gov.nist.csd.pm.common.graph.dag.GraphWalker;
+import gov.nist.csd.pm.common.graph.dag.NoopPropagator;
+import gov.nist.csd.pm.common.graph.dag.NoopShortCircuit;
+import gov.nist.csd.pm.common.graph.dag.NoopVisitor;
+import gov.nist.csd.pm.common.graph.dag.Propagator;
+import gov.nist.csd.pm.common.graph.dag.ShortCircuit;
+import gov.nist.csd.pm.common.graph.dag.Visitor;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 
 import java.util.Collection;

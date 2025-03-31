@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.impl.memory.pap.access;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.dag.BreadthFirstGraphWalker;
+import gov.nist.csd.pm.pap.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.common.graph.dag.Direction;
 import gov.nist.csd.pm.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.common.graph.dag.Visitor;

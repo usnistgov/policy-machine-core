@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.function.op.obligation;
 
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 
 class RuleType extends ArgType<Rule> {

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.common.obligation;
+package gov.nist.csd.pm.pap.obligation;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;

@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.store.ObligationsStore;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
