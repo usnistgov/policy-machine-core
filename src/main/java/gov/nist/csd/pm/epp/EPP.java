@@ -3,13 +3,20 @@ package gov.nist.csd.pm.epp;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 
+import gov.nist.csd.pm.pdp.PDPTx;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,12 +41,26 @@ public class EPP implements EventSubscriber {
                     continue;
                 }
 
-                Response response = rule.getResponse();
                 UserContext authorCtx = new UserContext(author);
+                Response response = rule.getResponse();
 
                 // need to run pdp tx as author of obligation
-                pdp.runTx(authorCtx, txPDP -> response.execute(txPDP, authorCtx, eventCtx));
+                pdp.runTx(authorCtx, txPDP -> executeResponse(txPDP, authorCtx, eventCtx, response));
             }
         }
     }
+
+    public Value executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
+        Args args = new Args();
+
+        PMLFormalArg eventCtxArg = new PMLFormalArg(response.getEventCtxVariable(), Type.map(Type.string(), Type.any()));
+        Value evntCtxValue = Value.fromObject(eventCtx);
+        args.put(eventCtxArg, evntCtxValue);
+
+        ExecutionContext executionCtx = pdpTx.buildExecutionContext(userCtx);
+        executionCtx.executeStatements(response.getStatements(), args);
+
+        return new VoidValue();
+    }
+
 }
