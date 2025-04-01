@@ -1,9 +1,8 @@
 package gov.nist.csd.pm.pap.function.op.prohibition;
 
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.booleanType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
-
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.booleanType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.stringType;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.function.arg.Args;

@@ -20,9 +20,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.mapType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.stringType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;

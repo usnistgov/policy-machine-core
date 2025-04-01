@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.function.op.graph;
 
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.mapType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.nodeTypeType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.nodeTypeType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.stringType;
 
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
