@@ -1,9 +1,8 @@
-package gov.nist.csd.pm.pap.function.op.prohibition;
+package gov.nist.csd.pm.pap.function.arg.type;
 
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 
-class ContainerConditionType extends ArgType<ContainerCondition> {
+public final class ContainerConditionType extends ArgType<ContainerCondition> {
 
     @Override
     public ContainerCondition cast(Object obj) {

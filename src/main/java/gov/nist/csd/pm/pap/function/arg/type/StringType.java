@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
-public class StringType extends ArgType<String> {
+public final class StringType extends ArgType<String> {
 
     @Override
     public String cast(Object obj) {

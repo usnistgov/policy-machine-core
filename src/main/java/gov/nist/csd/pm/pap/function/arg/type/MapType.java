@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
-public class MapType<K, V> extends ArgType<Map<K, V>> {
+public final class MapType<K, V> extends ArgType<Map<K, V>> {
     private final ArgType<K> keyType;
     private final ArgType<V> valueType;
 

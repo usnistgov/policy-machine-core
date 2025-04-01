@@ -2,10 +2,12 @@ package gov.nist.csd.pm.pap.function.arg.type;
 
 import java.io.Serializable;
 
-public abstract class ArgType<T> implements Serializable {
+public sealed abstract class ArgType<T> implements Serializable
+    permits StringType, LongType, BooleanType, ListType, MapType, ObjectType, AccessRightSetType, OperationType,
+    RoutineType, RuleType, ProhibitionSubjectType, ContainerConditionType, NodeTypeType {
 
     /**
-     * Convert safely casts a given object into the type defined in T. If obj is not convertable to T an
+     * Safely cast a given object into the type defined in T. If obj is not convertable to T an
      * IllegalArgumentException will be thrown.
      *
      * @param obj the object to convert to T.

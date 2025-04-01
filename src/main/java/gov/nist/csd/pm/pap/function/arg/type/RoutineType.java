@@ -1,9 +1,8 @@
-package gov.nist.csd.pm.pap.function.op.routine;
+package gov.nist.csd.pm.pap.function.arg.type;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 
-class RoutineType extends ArgType<Routine<?>> {
+public final class RoutineType extends ArgType<Routine<?>> {
 
     @Override
     public Routine<?> cast(Object obj) {

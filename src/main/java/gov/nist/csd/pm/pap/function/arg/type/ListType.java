@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ListType<E> extends ArgType<List<E>> {
+public final class ListType<E> extends ArgType<List<E>> {
     private final ArgType<E> elementType;
 
     public ListType(ArgType<E> elementType) {

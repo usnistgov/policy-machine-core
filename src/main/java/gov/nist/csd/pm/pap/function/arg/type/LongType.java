@@ -1,16 +1,15 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
-public class LongType extends ArgType<Long> {
+public final class LongType extends ArgType<Long> {
 
     @Override
     public Long cast(Object obj) {
         if (obj == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        if (!(obj instanceof Long l)) {
-            throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to Long");
+        if (obj instanceof Number number) {
+            return number.longValue();
         }
-
-        return l;
+        throw new IllegalArgumentException("cannot convert " + obj.getClass() + " to Long");
     }
 }

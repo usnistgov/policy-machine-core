@@ -1,9 +1,8 @@
-package gov.nist.csd.pm.pap.function.op.operation;
+package gov.nist.csd.pm.pap.function.arg.type;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 
-class OperationType extends ArgType<Operation<?>> {
+public final class OperationType extends ArgType<Operation<?>> {
 
     @Override
     public Operation<?> cast(Object obj) {

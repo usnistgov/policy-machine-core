@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
 import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.RuleType;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.function.arg.Args;
