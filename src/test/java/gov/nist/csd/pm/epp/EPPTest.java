@@ -41,8 +41,6 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
@@ -121,10 +119,9 @@ class EPPTest {
 
         AdjudicationResponse response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
-            pap.query().operations().getAdminOperation("op1"),
-            new Args()
-                .put(new FormalArg<>("a", stringType()), "oa1")
-                .put(new FormalArg<>("b", listType(stringType())), List.of("oa1", "oa2"))
+            "op1",
+            Map.of("a", "oa1",
+                "b", List.of("oa1", "oa2"))
         );
         assertEquals(Decision.DENY, response.getDecision());
 
@@ -132,19 +129,20 @@ class EPPTest {
 
         response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
-            pap.query().operations().getAdminOperation("op1"),
-            new Args()
-                .put(new FormalArg<>("a", stringType()), "oa1")
-                .put(new FormalArg<>("b", listType(stringType())), List.of("oa1", "oa2"))
+            "op1",
+            Map.of(
+                "a", "oa1",
+                "b", List.of("oa1", "oa2"))
         );
         assertEquals(GRANT, response.getDecision());
 
         response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
-            pap.query().operations().getAdminOperation("op2"),
-            new Args()
-                .put(ARG_A, "oa2")
-                .put(ARG_B, "oa2")
+            "op2",
+            Map.of(
+                ARG_A.getName(), "oa2",
+                ARG_B.getName(), "oa2"
+            )
         );
         assertEquals(GRANT, response.getDecision());
 

@@ -9,6 +9,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
@@ -134,8 +135,8 @@ public class PMLBasicFunctionsTest {
 		epp.subscribeTo(pdp);
 
 		pdp.adjudicateAdminOperation(new UserContext(id("u1")),
-			pap.query().operations().getAdminOperation("op2"),
-			new Args());
+			"op2",
+			Map.of());
 
 		assertFalse(pap.query().graph().nodeExists("pc3"));
 	}
@@ -172,8 +173,7 @@ public class PMLBasicFunctionsTest {
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateAdminRoutine(new UserContext(id("u1")),
-			pap.query().routines().getAdminRoutine("routine1"), new Args());
+		pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
 
 		assertFalse(pap.query().graph().nodeExists("pc3"));
 	}

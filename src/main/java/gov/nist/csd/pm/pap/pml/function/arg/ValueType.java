@@ -10,10 +10,7 @@ public class ValueType extends ArgType<Value> {
         if (obj == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        if (!(obj instanceof Value value)) {
-            throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to Value");
-        }
 
-        return value;
+        return Value.fromObject(obj);
     }
 }

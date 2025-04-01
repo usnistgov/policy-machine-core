@@ -14,6 +14,7 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -84,8 +85,8 @@ class PMLOperationWrapperTest {
         PDP pdp = new PDP(pap);
         pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
-            op,
-            new Args().put(a, id("oa1")).put(b, "b"));
+            "op1",
+            Map.of(a.getName(), id("oa1"), b.getName(), "b"));
         assertTrue(pap.query().graph().nodeExists("b"));
 
         // try again using pml

@@ -8,11 +8,10 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
-import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.common.tx.TxRunner;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.value.Value;
@@ -132,14 +131,12 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public <T> AdjudicationResponse adjudicateAdminOperation(UserContext user,
-                                                             Operation<T> operation,
-                                                             Args args) throws
+    public AdjudicationResponse adjudicateAdminOperation(UserContext user,
+                                                         String operation,
+                                                         Map<String, Object> args) throws
                                                                                  PMException {
         try {
-            Object returnValue = runTx(user, tx -> {
-                return executeOperation(user, tx, operation, args);
-            });
+            Object returnValue = runTx(user, tx -> executeOperation(user, tx, operation, args));
 
             return new AdjudicationResponse(GRANT, returnValue);
         } catch(UnauthorizedException e){
@@ -148,16 +145,18 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public <T> AdjudicationResponse adjudicateAdminRoutine(UserContext user,
-                                                           Routine<T> routine,
-                                                           Args args) throws PMException {
+    public AdjudicationResponse adjudicateAdminRoutine(UserContext user,
+                                                       String routineName,
+                                                       Map<String, Object> args) throws PMException {
+        Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
+
         try {
             Object returnValue = runTx(user, tx -> {
                 if (routine instanceof PMLRoutine) {
                     ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
                 }
 
-                Object ret = tx.executeAdminFunction(routine, args);
+                Object ret = tx.executeAdminFunction(routine, Args.of(routine, args));
 
                 // if the returned object is a value, convert it to an object
                 if (ret instanceof Value value) {
@@ -192,12 +191,15 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
     }
 
-    private <T> Object executeOperation(UserContext user, PDPTx pdpTx, Operation<T> operation, Args args) throws PMException {
+    private Object executeOperation(UserContext user, PDPTx pdpTx, String op, Map<String, Object> actualArgs) throws PMException {
+        Operation<?> operation = pap.query().operations().getAdminOperation(op);
+
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation
+        Args args = Args.of(operation, actualArgs);
         Object ret = pdpTx.executeAdminFunction(operation, args);
 
         // send to EPP

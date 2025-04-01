@@ -157,11 +157,12 @@ public class PMLTest {
         PDP pdp = new PDP(pap);
         AdjudicationResponse response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
-            pap.query().operations().getAdminOperation("op1"),
-            new Args()
-                .put(ARGA, "a")
-                .put(ARGB, List.of("b", "c"))
-                .put(ARGC, Map.of("d", "e", "f", "g"))
+            "op1",
+            Map.of(
+                ARGA.getName(), "a",
+                ARGB.getName(), List.of("b", "c"),
+                ARGC.getName(), Map.of("d", "e", "f", "g")
+            )
         );
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("1a"));
@@ -174,20 +175,22 @@ public class PMLTest {
 
 
         response = pdp.adjudicateAdminOperation(new UserContext(id("u2")),
-            pap.query().operations().getAdminOperation("op1"),
-            new Args()
-                .put(ARGA, "a")
-                .put(ARGB, List.of("b", "c"))
-                .put(ARGC, Map.of("d", "e", "f", "g"))
+            "op1",
+            Map.of(
+                ARGA.getName(), "a",
+                ARGB.getName(), List.of("b", "c"),
+                ARGC.getName(), Map.of("d", "e", "f", "g")
+            )
         );
         assertEquals(DENY, response.getDecision());
 
         response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
-            pap.query().operations().getAdminOperation("op1"),
-            new Args()
-                .put(ARGA, "1")
-                .put(ARGB, List.of("2", "3"))
-                .put(ARGC, Map.of("4", "5", "6", "7"))
+            "op1",
+            Map.of(
+                ARGA.getName(), "1",
+                ARGB.getName(), List.of("2", "3"),
+                ARGC.getName(), Map.of("4", "5", "6", "7")
+            )
         );
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("11"));
@@ -198,11 +201,12 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")), pap.query().operations().getAdminOperation("op1"),
-            new Args()
-                .put(ARGA, "1")
-                .put(ARGB, List.of("2", "3"))
-                .put(ARGC, Map.of("4", "5", "6", "7"))
+        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
+            Map.of(
+                ARGA.getName(), "1",
+                ARGB.getName(), List.of("2", "3"),
+                ARGC.getName(), Map.of("4", "5", "6", "7")
+            )
         );
         assertEquals(DENY, response.getDecision());
     }

@@ -13,6 +13,7 @@ import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -118,7 +119,7 @@ class CheckStatementTest {
         pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1"), pap.query().operations().getAdminOperation("op1"), new Args());
+        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
     }

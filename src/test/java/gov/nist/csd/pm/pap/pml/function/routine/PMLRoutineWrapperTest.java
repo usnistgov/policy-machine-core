@@ -11,6 +11,7 @@ import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -72,8 +73,8 @@ class PMLRoutineWrapperTest {
         PDP pdp = new PDP(pap);
         pdp.adjudicateAdminRoutine(
             new TestUserContext("u1"),
-            pap.query().routines().getAdminRoutine("routine1"),
-            new Args().put(a, "a").put(b, "b")
+            "routine1",
+            Map.of(a.getName(), "a", b.getName(), "b")
         );
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
