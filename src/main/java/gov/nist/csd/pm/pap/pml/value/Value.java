@@ -13,13 +13,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class Value implements Serializable {
+    private static final Gson GSON = new Gson();
+    private static final TypeToken<Map<Object, Object>> MAP_TYPE_TOKEN = new TypeToken<>() {};
 
-    protected Type type;
+    protected final Type type;
 
-    public Value(Type type) {
-        this.type = type;
+    protected Value(Type type) {
+        this.type = Objects.requireNonNull(type, "Type cannot be null");
     }
 
     public Type getType() {
@@ -27,39 +30,35 @@ public abstract class Value implements Serializable {
     }
 
     public String getStringValue() {
-        return this.unwrap().to(StringValue.class).getValue();
+        return unwrap().to(StringValue.class).getValue();
     }
 
     protected Value unwrap() {
-        if (this instanceof ReturnValue rv) {
-            return rv.unwrap();
-        }
-
-        return this;
+        return this instanceof ReturnValue rv ? rv.unwrap() : this;
     }
 
     public Boolean getBooleanValue() {
-        return this.unwrap().to(BoolValue.class).getValue();
+        return unwrap().to(BoolValue.class).getValue();
     }
 
     public List<Value> getArrayValue() {
-        return this.unwrap().to(ArrayValue.class).getValue();
+        return unwrap().to(ArrayValue.class).getValue();
     }
 
     public Map<Value, Value> getMapValue() {
-        return this.unwrap().to(MapValue.class).getValue();
+        return unwrap().to(MapValue.class).getValue();
     }
 
     public Value getProhibitionValue() {
-        return this.unwrap().to(ProhibitionValue.class).getValue();
+        return unwrap().to(ProhibitionValue.class).getValue();
     }
 
     public Rule getRuleValue() {
-        return this.unwrap().to(RuleValue.class).getValue();
+        return unwrap().to(RuleValue.class).getValue();
     }
 
     public Pattern getPatternValue() {
-        return this.unwrap().to(PatternValue.class).getValue();
+        return unwrap().to(PatternValue.class).getValue();
     }
 
     public <T extends Value> T to(Class<T> c) {
@@ -72,26 +71,30 @@ public abstract class Value implements Serializable {
         } else if (type.isBoolean()) {
             return getBooleanValue();
         } else if (type.isArray()) {
-            List<Object> list = new ArrayList<>();
-            List<Value> arrayValue = getArrayValue();
-            for (Value value : arrayValue) {
-                list.add(value.toObject());
-            }
-
-            return list;
+            return convertArrayToObject();
         } else if (type.isMap()) {
-            Map<Object, Object> map = new HashMap<>();
-            Map<Value, Value> mapValue = getMapValue();
-            for (Map.Entry<Value, Value> entry : mapValue.entrySet()) {
-                map.put(entry.getKey().toObject(), entry.getValue().toObject());
-            }
-
-            return map;
-        } else if (type.isVoid()){
+            return convertMapToObject();
+        } else if (type.isVoid()) {
             return null;
         }
 
-        throw new PMRuntimeException("cannot convert value of type " + type + " to an object");
+        throw new PMRuntimeException("Cannot convert value of type " + type + " to an object");
+    }
+
+    private List<Object> convertArrayToObject() {
+        List<Object> list = new ArrayList<>();
+        for (Value value : getArrayValue()) {
+            list.add(value.toObject());
+        }
+        return list;
+    }
+
+    private Map<Object, Object> convertMapToObject() {
+        Map<Object, Object> map = new HashMap<>();
+        for (Map.Entry<Value, Value> entry : getMapValue().entrySet()) {
+            map.put(entry.getKey().toObject(), entry.getValue().toObject());
+        }
+        return map;
     }
 
     @Override
@@ -108,38 +111,35 @@ public abstract class Value implements Serializable {
             case null -> null;
             case Value value -> value;
             case String s -> new StringValue(s);
-            case List list -> toListValue(list);
+            case List<?> list -> toListValue(list);
             case Boolean b -> new BoolValue(b);
-            case Map m -> toMapValue(m);
+            case Map<?, ?> m -> toMapValue(m);
             case NodeType t -> new StringValue(t.toString());
             default -> objToValue(o);
         };
     }
 
-    private static ArrayValue toListValue(List list) {
-        List<Value> valueList = new ArrayList<>();
+    private static ArrayValue toListValue(List<?> list) {
+        List<Value> valueList = new ArrayList<>(list.size());
         for (Object arrObj : list) {
             valueList.add(fromObject(arrObj));
         }
-
         return new ArrayValue(valueList, Type.array(Type.any()));
     }
 
-    private static MapValue toMapValue(Map m) {
-        Map<Value, Value> map = new HashMap<>();
-        for (Object key : m.keySet()) {
-            map.put(fromObject(key), fromObject(m.get(key)));
+    private static MapValue toMapValue(Map<?, ?> m) {
+        Map<Value, Value> map = new HashMap<>(m.size());
+        for (Map.Entry<?, ?> entry : m.entrySet()) {
+            map.put(fromObject(entry.getKey()), fromObject(entry.getValue()));
         }
-
         return new MapValue(map, Type.string(), Type.any());
     }
 
     private static MapValue objToValue(Object o) {
-        Gson gson = new Gson();
-        String json = gson.toJson(o);
-        Map<Object, Object> map = gson.fromJson(json, new TypeToken<Map<Object, Object>>() {}.getType());
+        String json = GSON.toJson(o);
+        Map<Object, Object> map = GSON.fromJson(json, MAP_TYPE_TOKEN.getType());
 
-        Map<Value, Value> valueMap = new HashMap<>();
+        Map<Value, Value> valueMap = new HashMap<>(map.size());
         for (Map.Entry<Object, Object> e : map.entrySet()) {
             valueMap.put(fromObject(e.getKey()), fromObject(e.getValue()));
         }

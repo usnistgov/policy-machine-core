@@ -1,0 +1,70 @@
+package gov.nist.csd.pm.pap.pml.function;
+
+import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+import static org.junit.jupiter.api.Assertions.*;
+
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.modification.OperationsModification;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+class PMLFunctionWrapperTest {
+
+    @Test
+    void testMultipleLayersOfWrappedFunctions() throws PMException {
+        String pml = """
+            operation op4() string {
+               return "op4"
+            }
+            
+            create pc op1(op2(op3(op4())))
+            """;
+
+        MemoryPAP pap = new MemoryPAP();
+        OperationsModification operations = pap.modify().operations();
+
+        FormalArg<String> a = new FormalArg<>("a", stringType());
+
+        operations.createAdminOperation(new Operation<>("op1", List.of(a)) {
+            @Override
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {}
+
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return args.get(a);
+            }
+        });
+
+        operations.createAdminOperation(new Operation<>("op2", List.of(a)) {
+            @Override
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {}
+
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return args.get(a);
+            }
+        });
+
+        operations.createAdminOperation(new Operation<>("op3", List.of(a)) {
+            @Override
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {}
+
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return args.get(a);
+            }
+        });
+
+        pap.executePML(new UserContext(1), pml);
+
+        assertTrue(pap.query().graph().nodeExists("op4"));
+    }
+
+}
