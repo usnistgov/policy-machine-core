@@ -3,11 +3,11 @@ package gov.nist.csd.pm.pap.pml.expression;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.op.graph.CreateObjectAttributeOp;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -78,8 +78,8 @@ class ValueTest {
         assertTrue(value.getType().isMap());
         assertEquals(
                 Map.of(new StringValue("name"), new StringValue("testOA"),
-                        new StringValue("properties"), new MapValue(new HashMap<>(), Type.string(), Type.string()),
-                        new StringValue("descendants"), new ArrayValue(List.of(new StringValue("pc1")), Type.string())
+                        new StringValue("properties"), new MapValue(new HashMap<>(), STRING_TYPE, STRING_TYPE),
+                        new StringValue("descendants"), new ArrayValue(List.of(new StringValue("pc1")), STRING_TYPE)
                 ),
                 value.getMapValue()
         );

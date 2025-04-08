@@ -9,9 +9,9 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pap.pml.value.BoolValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,7 +35,7 @@ class ParenExpressionTest {
                 true && (true || false)
                 """, PMLParser.ExpressionContext.class);
         VisitorContext visitorContext = new VisitorContext(compileScope);
-        Expression e = Expression.compile(visitorContext, ctx, Type.bool());
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         Value actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
@@ -48,7 +48,7 @@ class ParenExpressionTest {
                 (false || false) && (true || false)
                 """, PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileScope);
-        e = Expression.compile(visitorContext, ctx, Type.bool());
+        e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
@@ -61,7 +61,7 @@ class ParenExpressionTest {
                 (false || false) || (true || false)
                 """, PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileScope);
-        e = Expression.compile(visitorContext, ctx, Type.bool());
+        e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
@@ -74,7 +74,7 @@ class ParenExpressionTest {
                 !(false || false) && (true || false)
                 """, PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileScope);
-        e = Expression.compile(visitorContext, ctx, Type.bool());
+        e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
@@ -87,7 +87,7 @@ class ParenExpressionTest {
                 !(false || false) && (false || false || true)
                 """, PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileScope);
-        e = Expression.compile(visitorContext, ctx, Type.bool());
+        e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
@@ -100,7 +100,7 @@ class ParenExpressionTest {
                 !(false || false) && (false || false || true) && false
                 """, PMLParser.ExpressionContext.class);
         visitorContext = new VisitorContext(compileScope);
-        e = Expression.compile(visitorContext, ctx, Type.bool());
+        e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(

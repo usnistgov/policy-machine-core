@@ -8,9 +8,8 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,7 @@ class VariableReferenceTest {
                     a
                     """, PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", Type.string(), false));
+            visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
@@ -66,7 +65,7 @@ class VariableReferenceTest {
                     a.b.c
                     """, PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false));
+            visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, mapType(STRING_TYPE, STRING_TYPE)), false));
             Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
@@ -79,7 +78,7 @@ class VariableReferenceTest {
                     a["b"]["c"]
                     """, PMLParser.VariableReferenceExpressionContext.class);
             visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.map(Type.string(), Type.string())), false));
+            visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, mapType(STRING_TYPE, STRING_TYPE)), false));
             actual = compileVariableReference(visitorContext, ctx.variableReference());
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
@@ -113,7 +112,7 @@ class VariableReferenceTest {
                     a.b.c
                     """, PMLParser.VariableReferenceExpressionContext.class);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), Type.string()), false));
+            visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, STRING_TYPE), false));
             PMLCompilationRuntimeException e = assertThrows(
                     PMLCompilationRuntimeException.class,
                     () -> compileVariableReference(visitorContext, ctx.variableReference())

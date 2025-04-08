@@ -1,30 +1,31 @@
 package gov.nist.csd.pm.epp;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.PDP;
@@ -37,10 +38,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import org.neo4j.codegen.api.ArrayLiteral;
+import org.neo4j.cypher.internal.expressions.StringLiteral;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
@@ -96,17 +101,21 @@ class EPPTest {
                 }
                 """);
 
-        Operation<String> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
+        Operation<String, MapArgs> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
 
             @Override
-            public String execute(PAP pap, Args actualArgs) throws PMException {
+            public String execute(PAP pap, MapArgs args) throws PMException {
+                return "";
+            }
+
+            @Override
+            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
                 return null;
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker,
-                                   UserContext userCtx,
-                                   Args actualArgs) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws
+                                                                                                         PMException {
 
             }
         };
@@ -303,13 +312,13 @@ class EPPTest {
                     new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
                     new Response("evtCtx", List.of(
                         new CreateNonPCStatement(
-                            new StringLiteral("o2"),
+                            new StringLiteralExpression<>("o2", STRING_TYPE),
                             NodeType.O,
-                            new ArrayLiteral(new Expression[]{new StringLiteral("oa1")}, Type.string())
+                            new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("oa1", STRING_TYPE)), listType(STRING_TYPE))
                         ),
 
                         // expect error for node already exists
-                        new CreatePolicyClassStatement(new StringLiteral("pc1"))
+                        new CreatePolicyClassStatement(new StringLiteralExpression<>("pc1", STRING_TYPE))
                     ))
                 ))
             );
@@ -339,17 +348,24 @@ class EPPTest {
     void testCustomFunctionInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        PMLOperation pmlOperation = new PMLOperation("testFunc", Type.voidType()) {
+        PMLOperation pmlOperation = new PMLOperation("testFunc", new VoidType()) {
+
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws
+                                                                                                         PMException {
 
             }
 
             @Override
-            public Value execute(PAP pap, Args actualArgs) throws PMException {
+            public Object execute(PAP pap, MapArgs actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
-                return new VoidValue();
+                return new VoidResult();
+            }
+
+            @Override
+            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
             }
         };
 

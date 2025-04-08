@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -39,7 +39,7 @@ class LiteralVisitorTest {
                 literal
         );
         assertEquals(
-                Type.string(),
+                STRING_TYPE,
                 literal.getType(visitorContext.scope())
         );
     }
@@ -62,7 +62,7 @@ class LiteralVisitorTest {
                 literal
         );
         assertEquals(
-                Type.bool(),
+                BOOLEAN_TYPE,
                 literal.getType(visitorContext.scope())
         );
     }
@@ -82,11 +82,11 @@ class LiteralVisitorTest {
 
         ArrayLiteral arrayLiteral = (ArrayLiteral)literal;
         assertEquals(
-                new ArrayLiteral(List.of(new StringLiteral("a"), new ArrayLiteral(List.of(new StringLiteral("b")), Type.string())), Type.any()),
+                new ArrayLiteral(List.of(new StringLiteral("a"), new ArrayLiteral(List.of(new StringLiteral("b")), STRING_TYPE)), OBJECT_TYPE),
                 arrayLiteral
         );
         assertEquals(
-                Type.array(Type.any()),
+                listType(OBJECT_TYPE),
                 literal.getType(visitorContext.scope())
         );
 
@@ -107,7 +107,7 @@ class LiteralVisitorTest {
                 arrayLiteral
         );
         assertEquals(
-                Type.array(Type.string()),
+                listType(STRING_TYPE),
                 literal.getType(visitorContext.scope())
         );
     }
@@ -156,7 +156,7 @@ class LiteralVisitorTest {
                 mapLiteral
         );
         assertEquals(
-                Type.map(Type.string(), Type.string()),
+                mapType(STRING_TYPE, STRING_TYPE),
                 literal.getType(visitorContext.scope())
         );
     }
@@ -181,12 +181,12 @@ class LiteralVisitorTest {
         assertEquals(
                 new MapLiteral(Map.of(
                         new StringLiteral("a"), new StringLiteral("a1"),
-                        new StringLiteral("b"), new ArrayLiteral(List.of(new StringLiteral("b1")), Type.string())
-                ), Type.string(), Type.any()),
+                        new StringLiteral("b"), new ArrayLiteral(List.of(new StringLiteral("b1")), STRING_TYPE)
+                ), STRING_TYPE, OBJECT_TYPE),
                 mapLiteral
         );
         assertEquals(
-                Type.map(Type.string(), Type.any()),
+                mapType(STRING_TYPE, OBJECT_TYPE),
                 literal.getType(visitorContext.scope())
         );
     }
@@ -210,12 +210,12 @@ class LiteralVisitorTest {
         MapLiteral mapLiteral = (MapLiteral)literal;
         MapLiteral expected = new MapLiteral(new HashMap<>(Map.of(
                 new StringLiteral("a"), new StringLiteral("a1"),
-                new ArrayLiteral(List.of(new StringLiteral("b")), Type.string()), new StringLiteral("b1")
-        )), Type.any(), Type.string());
+                new ArrayLiteral(List.of(new StringLiteral("b")), STRING_TYPE), new StringLiteral("b1")
+        )), OBJECT_TYPE, STRING_TYPE);
 
         assertEquals(expected, mapLiteral);
         assertEquals(
-                Type.map(Type.any(), Type.string()),
+                mapType(OBJECT_TYPE, STRING_TYPE),
                 literal.getType(visitorContext.scope())
         );
     }
@@ -242,7 +242,7 @@ class LiteralVisitorTest {
                 .visitArrayLiteral(arrayCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-                new ArrayLiteral(List.of(), Type.any()),
+                new ArrayLiteral(List.of(), OBJECT_TYPE),
                 arrayLiteral
         );
 
@@ -254,7 +254,7 @@ class LiteralVisitorTest {
                 .visitMapLiteral(mapCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-                new MapLiteral(Map.of(), Type.any(), Type.any()),
+                new MapLiteral(Map.of(), OBJECT_TYPE, OBJECT_TYPE),
                 mapLiteral
         );
     }

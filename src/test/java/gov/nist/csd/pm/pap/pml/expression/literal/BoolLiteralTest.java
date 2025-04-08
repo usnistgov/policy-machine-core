@@ -4,14 +4,15 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoolLiteralTest {
@@ -27,17 +28,17 @@ class BoolLiteralTest {
         Scope<Variable, PMLFunctionSignature> globalScope = new CompileScope();
 
         VisitorContext visitorContext = new VisitorContext(globalScope);
-        Expression expression = Literal.compileLiteral(visitorContext, ctx);
-	    assertInstanceOf(BoolLiteral.class, expression);
+        Expression<Boolean> expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
+	    assertInstanceOf(BoolLiteralExpression.class, expression);
 
-        BoolLiteral a = (BoolLiteral) expression;
+        BoolLiteralExpression a = (BoolLiteralExpression) expression;
         assertEquals(
-               new BoolLiteral(true),
+               new BoolLiteralExpression(true, BOOLEAN_TYPE),
                 a
         );
         assertEquals(
-                Type.bool(),
-                a.getType(globalScope)
+                BOOLEAN_TYPE,
+                a.getType()
         );
 
     }

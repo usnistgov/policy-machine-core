@@ -5,13 +5,10 @@ import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FunctionInvokeStmtVisitorTest {
 
-    private static final PMLFormalArg a = new PMLFormalArg("a", Type.string());
-    private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
-    private static final PMLFormalArg c = new PMLFormalArg("c", Type.array(Type.string()));
+    private static final PMLFormalArg a = new PMLFormalArg("a", STRING_TYPE);
+    private static final PMLFormalArg b = new PMLFormalArg("b", STRING_TYPE);
+    private static final PMLFormalArg c = new PMLFormalArg("c", listType(STRING_TYPE));
 
     PMLFunctionSignature signature = new PMLBasicFunctionSignature(
             "func1",
-            Type.string(),
+            STRING_TYPE,
             List.of(a, b, c)
     );
 
@@ -114,7 +111,7 @@ class FunctionInvokeStmtVisitorTest {
 
         PMLFunctionSignature signature = new PMLBasicFunctionSignature(
                 "func1",
-                Type.string(),
+                STRING_TYPE,
                 List.of()
         );
 

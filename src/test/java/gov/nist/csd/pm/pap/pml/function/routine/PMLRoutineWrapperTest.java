@@ -2,12 +2,11 @@ package gov.nist.csd.pm.pap.pml.function.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
@@ -23,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PMLRoutineWrapperTest {
 
-    private static final FormalArg<String> a = new FormalArg<>("a", stringType());
-    private static final FormalArg<String> b = new FormalArg<>("b", stringType());
+    private static final FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
+    private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
     @Test
     void testConstructor() {
-        Routine<?> op = new Routine<>("routine1", List.of(a, b)) {
+        Routine<?, ?> op = new Routine<>("routine1", List.of(a, b)) {
 
             @Override
             public Object execute(PAP pap, Args actualArgs) throws PMException {
@@ -39,15 +38,15 @@ class PMLRoutineWrapperTest {
         PMLRoutine pmlRoutineWrapper = new PMLRoutineWrapper(op);
         assertEquals(
             pmlRoutineWrapper.getSignature(),
-            new PMLRoutineSignature("routine1", Type.any(), List.of(
-                new PMLFormalArg("a", Type.any()), new PMLFormalArg("b", Type.any())
+            new PMLRoutineSignature("routine1", OBJECT_TYPE, List.of(
+                new PMLFormalArg("a", OBJECT_TYPE), new PMLFormalArg("b", OBJECT_TYPE)
             ))
         );
     }
 
     @Test
     void testExecuteWithPDP() throws PMException {
-        Routine<?> op = new Routine<>("routine1", List.of(a, b)) {
+        Routine<?, ?> op = new Routine<>("routine1", List.of(a, b)) {
 
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
@@ -94,7 +93,7 @@ class PMLRoutineWrapperTest {
 
     @Test
     void testPMLRoutineWrapperWithReturnValue() throws PMException {
-        Routine<?> op = new Routine<>("routine1", List.of()) {
+        Routine<?, ?> op = new Routine<>("routine1", List.of()) {
 
             @Override
             public String execute(PAP pap, Args actualArgs) throws PMException {

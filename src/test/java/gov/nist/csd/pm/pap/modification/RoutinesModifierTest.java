@@ -3,10 +3,13 @@ package gov.nist.csd.pm.pap.modification;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.RoutineExistsException;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.util.SamplePolicy;
+import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -21,42 +24,62 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
 
 
 
-    static Routine<Void> routine1 = new Routine<>(
+    static Routine<Void, MapArgs> routine1 = new Routine<>(
             "routine1",
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, MapArgs args) throws PMException {
+            return null;
+        }
+
+        @Override
+        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };
 
-    static Routine<Void> routine2 = new Routine<>(
+    static Routine<Void, MapArgs> routine2 = new Routine<>(
             "routine2",
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, MapArgs args) throws PMException {
+            return null;
+        }
+
+        @Override
+        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };
 
-    static Routine<Void> routine3 = new Routine<>(
+    static Routine<Void, MapArgs> routine3 = new Routine<>(
             "routine3",
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, MapArgs args) throws PMException {
+            return null;
+        }
+
+        @Override
+        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };
 
-    static Routine<Void> routine4 = new Routine<>(
+    static Routine<Void, MapArgs> routine4 = new Routine<>(
             "routine4",
             List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, MapArgs args) throws PMException {
+            return null;
+        }
+
+        @Override
+        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };

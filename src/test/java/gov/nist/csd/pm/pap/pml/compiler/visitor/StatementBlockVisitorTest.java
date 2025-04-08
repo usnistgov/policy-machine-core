@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ class StatementBlockVisitorTest {
         );
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
         assertDoesNotThrow(
-                () -> new StatementBlockVisitor(visitorContext, Type.string())
+                () -> new StatementBlockVisitor(visitorContext, STRING_TYPE)
                         .visitStatementBlock(ctx)
         );
     }

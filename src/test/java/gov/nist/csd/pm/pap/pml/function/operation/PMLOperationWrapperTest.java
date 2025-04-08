@@ -4,12 +4,11 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalArg;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.util.TestPAP;
@@ -26,12 +25,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PMLOperationWrapperTest {
 
-    private static final IdNodeFormalArg a = new IdNodeFormalArg("a");
-    private static final FormalArg<String> b = new FormalArg<>("b", stringType());
+    private static final IdNodeFormalParameter a = new IdNodeFormalParameter("a");
+    private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
     @Test
     void testConstructor() {
-        Operation<?> op = new Operation<>("op1", List.of(a, b)) {
+        Operation<?, ?> op = new Operation<>("op1", List.of(a, b)) {
 
             @Override
             public Object execute(PAP pap, Args actualArgs) {
@@ -49,8 +48,8 @@ class PMLOperationWrapperTest {
             pmlOperationWrapper.getSignature(),
             new PMLOperationSignature(
                 "op1",
-                Type.any(),
-                List.of(new PMLFormalArg("a", Type.any()), new PMLFormalArg("b", Type.any())))
+                OBJECT_TYPE,
+                List.of(new PMLFormalArg("a", OBJECT_TYPE), new PMLFormalArg("b", OBJECT_TYPE)))
         );
     }
 
@@ -103,7 +102,7 @@ class PMLOperationWrapperTest {
 
     @Test
     void testPMLOperationWrapperWithReturnValue() throws PMException {
-        Operation<?> op = new Operation<>("op1", List.of()) {
+        Operation<?, ?> op = new Operation<>("op1", List.of()) {
 
             @Override
             public Object execute(PAP pap, Args actualArgs) throws PMException {

@@ -3,11 +3,8 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
@@ -51,18 +48,18 @@ class CheckStatementTest {
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
+                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
                 new StringLiteral("o1")
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
+                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
+                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
                 new StringLiteral("assign"),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
+                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
         ), false);
 
         ctx = new ExecutionContext(new UserContext(id("u2")), pap);
@@ -72,18 +69,18 @@ class CheckStatementTest {
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
+                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
                 new StringLiteral("o1")
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
+                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
+                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
                 new StringLiteral("assign"),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
+                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
         ), true);
     }
 

@@ -8,7 +8,7 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -30,7 +30,7 @@ class PMLFunctionWrapperTest {
         MemoryPAP pap = new MemoryPAP();
         OperationsModification operations = pap.modify().operations();
 
-        FormalArg<String> a = new FormalArg<>("a", stringType());
+        FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
         operations.createAdminOperation(new Operation<>("op1", List.of(a)) {
             @Override

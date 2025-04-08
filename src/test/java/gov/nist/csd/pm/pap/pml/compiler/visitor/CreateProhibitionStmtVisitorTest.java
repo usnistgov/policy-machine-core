@@ -6,12 +6,10 @@ import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateProhibitionStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -42,7 +40,7 @@ class CreateProhibitionStmtVisitorTest {
                         ProhibitionSubjectType.USER,
                         buildArrayLiteral("read"),
                         false,
-                        new ArrayLiteral(List.of(new NegatedExpression(new StringLiteral("oa1"))), Type.string())
+                        new ArrayLiteral(List.of(new NegatedExpression(new StringLiteral("oa1"))), STRING_TYPE)
                 ),
                 stmt
         );

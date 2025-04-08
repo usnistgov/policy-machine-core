@@ -3,12 +3,13 @@ package gov.nist.csd.pm.pap.pml.expression.literal;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StringLiteralTest {
@@ -22,17 +23,17 @@ class StringLiteralTest {
                 PMLParser.LiteralExpressionContext.class);
 
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = Literal.compileLiteral(visitorContext, ctx);
-	    assertInstanceOf(StringLiteral.class, expression);
+        Expression<String> expression = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
+	    assertInstanceOf(StringLiteralExpression.class, expression);
 
-        StringLiteral a = (StringLiteral) expression;
+        StringLiteralExpression a = (StringLiteralExpression) expression;
         assertEquals(
-                new StringLiteral("test"),
+                new StringLiteralExpression("test", STRING_TYPE),
                 a
         );
         assertEquals(
-                Type.string(),
-                a.getType(new CompileScope())
+                STRING_TYPE,
+                a.getType()
         );
     }
 

@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -110,7 +110,7 @@ class ForeachStmtVisitorTest {
     @Test
     void testKeyValueVarsAlreadyExist() throws VariableAlreadyDefinedInScopeException {
         VisitorContext visitorCtx = new VisitorContext(testScope.copy());
-        visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
+        visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
 
         testCompilationError(
                 """
@@ -121,7 +121,7 @@ class ForeachStmtVisitorTest {
         );
 
         visitorCtx = new VisitorContext(testScope.copy());
-        visitorCtx.scope().addVariable("y", new Variable("y", Type.string(), false));
+        visitorCtx.scope().addVariable("y", new Variable("y", STRING_TYPE, false));
 
         testCompilationError(
                 """

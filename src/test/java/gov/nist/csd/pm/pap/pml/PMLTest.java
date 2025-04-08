@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -22,7 +22,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.stringType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
@@ -30,9 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PMLTest {
 
-    private static final FormalArg<String> ARGA = new FormalArg<>("a", stringType());
-    private static final FormalArg<List<String>> ARGB = new FormalArg<>("b", listType(stringType()));
-    private static final FormalArg<Map<String, String>> ARGC = new FormalArg<>("c", mapType(stringType(), stringType()));
+    private static final FormalParameter<String> ARGA = new FormalParameter<>("a", STRING_TYPE);
+    private static final FormalParameter<List<String>> ARGB = new FormalParameter<>("b", listType(STRING_TYPE));
+    private static final FormalParameter<Map<String, String>> ARGC = new FormalParameter<>("c", mapType(STRING_TYPE, STRING_TYPE));
 
     @Test
     void testCallingNonPMLOperationAndRoutineFromPMLWithArgsAndReturnValue() throws PMException {
@@ -50,7 +49,7 @@ public class PMLTest {
                 on union of [PM_ADMIN_OBJECT]
                 """);
 
-        Operation<?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
+        Operation<?, ?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
                 privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");

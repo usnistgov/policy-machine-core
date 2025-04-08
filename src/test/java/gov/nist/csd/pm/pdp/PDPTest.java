@@ -5,8 +5,8 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
-import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.op.Operation.NAME_ARG;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
@@ -289,13 +289,18 @@ class PDPTest {
         pap.modify().graph().createUser("u2", List.of(ua2));
         pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
 
-        FormalArg<String> a = new FormalArg<>("a", stringType());
+        FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of(a)) {
+        pap.modify().routines().createAdminRoutine(new Routine<String, MapArgs>("routine1", List.of(a)) {
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, MapArgs args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));
                 return "test1";
+            }
+
+            @Override
+            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
             }
         });
         pap.executePML(new TestUserContext("u1"), """

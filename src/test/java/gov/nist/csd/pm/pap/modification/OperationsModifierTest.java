@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    static Operation<?> testOp = new Operation<>("test", List.of()) {
+    static Operation<?, ?> testOp = new Operation<>("test", List.of()) {
         @Override
         public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 

@@ -6,7 +6,7 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.*;
 import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ class VarStmtVisitorTest {
         @Test
         void testReassign() throws VariableAlreadyDefinedInScopeException {
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             testCompilationError(
                     """
                      var x = "a"
@@ -51,7 +51,7 @@ class VarStmtVisitorTest {
                      var x = "a"
                      """, PMLParser.VarDeclarationContext.class);
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
             testCompilationError(
                     """
@@ -64,7 +64,7 @@ class VarStmtVisitorTest {
         @Test
         void testReassignInBlock() throws VariableAlreadyDefinedInScopeException {
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
             testCompilationError(
                     """
@@ -98,7 +98,7 @@ class VarStmtVisitorTest {
         @Test
         void testReassign() throws VariableAlreadyDefinedInScopeException {
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
             testCompilationError(
                     """
                      x := "a"
@@ -117,7 +117,7 @@ class VarStmtVisitorTest {
                      x = "a"
                      """, PMLParser.VariableAssignmentStatementContext.class);
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             VariableAssignmentStatement stmt =
                     (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
                             .visitVariableAssignmentStatement(ctx);
@@ -131,7 +131,7 @@ class VarStmtVisitorTest {
                      x += "a"
                      """, PMLParser.VariableAssignmentStatementContext.class);
             visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), false));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             stmt = (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
                     .visitVariableAssignmentStatement(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -155,7 +155,7 @@ class VarStmtVisitorTest {
         @Test
         void testVariableIsConstant() throws VariableAlreadyDefinedInScopeException {
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-            visitorCtx.scope().addVariable("x", new Variable("x", Type.string(), true));
+            visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
             testCompilationError(
                     """

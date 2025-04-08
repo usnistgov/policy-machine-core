@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.InArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
@@ -24,7 +24,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.neo4j.cypher.internal.expressions.StringLiteral;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.util.SamplePolicy.loadSamplePolicyFromPML;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,7 +44,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                         new OperationPattern("test_event")
                                 ),
                                 new Response("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("test_pc"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression<>("test_pc", STRING_TYPE))
                                 ))
                         )
                 )
@@ -61,7 +63,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                         new OperationPattern("test_event")
                                 ),
                                 new Response("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("test_pc"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression<>("test_pc", STRING_TYPE))
                                 ))
                         )
                 ).addRule(
@@ -72,7 +74,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                         new OperationPattern("test_event")
                                 ),
                                 new Response("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("test_pc"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression<>("test_pc", STRING_TYPE))
                                 ))
                         )
                 );

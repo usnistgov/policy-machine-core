@@ -1,44 +1,50 @@
 package gov.nist.csd.pm.pap;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PAPTest extends PAPTestInitializer {
 
-    public static final FormalArg<String> ARG_A = new FormalArg<>("a", stringType());
-    public static final FormalArg<String> ARG_B = new FormalArg<>("b", stringType());
+    public static final FormalParameter<String> ARG_A = new FormalParameter<>("a", STRING_TYPE);
+    public static final FormalParameter<String> ARG_B = new FormalParameter<>("b", STRING_TYPE);
 
-    static Operation<Value> op = new Operation<Value>("testFunc", List.of()) {
+    static Operation<Object, MapArgs> op = new Operation<>("testFunc", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws PMException {
 
         }
 
         @Override
-        public Value execute(PAP pap, Args args) throws PMException {
+        public Object execute(PAP pap, MapArgs args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
-            return new VoidValue();
+            return null;
+        }
+
+        @Override
+        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+            return null;
         }
     };
 

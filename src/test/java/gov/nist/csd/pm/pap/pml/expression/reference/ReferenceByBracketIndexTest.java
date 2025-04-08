@@ -8,13 +8,12 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
@@ -30,8 +29,8 @@ class ReferenceByBracketIndexTest {
     void testGetType() throws PMException {
         ReferenceByBracketIndex a = new ReferenceByBracketIndex(new ReferenceByID("a"), new StringLiteral("b"));
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Type expected =  Type.array(Type.string());
-        visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), expected), false));
+        Type expected =  listType(STRING_TYPE);
+        visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, expected), false));
 
         assertEquals(
                 expected,
@@ -43,8 +42,8 @@ class ReferenceByBracketIndexTest {
     void testExecute() throws PMException {
         ReferenceByBracketIndex a = new ReferenceByBracketIndex(new ReferenceByID("a"),  new StringLiteral("b"));
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
-        ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), Type.string());
-        MapValue mapValue = new MapValue(Map.of(new StringValue("b"), expected), Type.string(), Type.array(Type.string()));
+        ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), STRING_TYPE);
+        MapValue mapValue = new MapValue(Map.of(new StringValue("b"), expected), STRING_TYPE, listType(STRING_TYPE));
         executionContext.scope().addVariable("a", mapValue);
 
         PAP pap = new TestPAP();

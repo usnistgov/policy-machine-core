@@ -9,11 +9,8 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.CheckAndStatementsBlock;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
@@ -21,10 +18,10 @@ import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+
+
+
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
@@ -36,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionInvokeExpressionTest {
 
-    private static final PMLFormalArg a = new PMLFormalArg("a", Type.string());
-    private static final PMLFormalArg b = new PMLFormalArg("b", Type.string());
+    private static final PMLFormalArg a = new PMLFormalArg("a", STRING_TYPE);
+    private static final PMLFormalArg b = new PMLFormalArg("b", STRING_TYPE);
 
 	static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", Type.voidType(),
             List.of(a, b),
@@ -48,7 +45,7 @@ class FunctionInvokeExpressionTest {
                             new CreatePolicyClassStatement(new ReferenceByID("b"))
             ))));
     static PMLStmtsOperation stringFunc = new PMLStmtsOperation("stringFunc",
-            Type.string(),
+            STRING_TYPE,
             List.of(a, b),
             new CheckAndStatementsBlock(
             new PMLStatementBlock(),
@@ -153,7 +150,7 @@ class FunctionInvokeExpressionTest {
         Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
-                Type.string(),
+                STRING_TYPE,
                 e.getType(visitorContext.scope())
         );
     }
@@ -181,7 +178,7 @@ class FunctionInvokeExpressionTest {
                 value
         );
         assertEquals(
-                Type.string(),
+                STRING_TYPE,
                 value.getType()
         );
     }

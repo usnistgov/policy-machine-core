@@ -2,13 +2,11 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.util.TestPAP;
@@ -44,7 +42,7 @@ class PMLBootstrapperTest {
                 create pc TEST_CONST
                 """;
 
-        Operation<?> op1 = new Operation<>("op1", List.of()) {
+        Operation<?, ?> op1 = new Operation<>("op1", List.of()) {
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
@@ -56,20 +54,30 @@ class PMLBootstrapperTest {
 
                 return null;
             }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
+            }
         };
 
-        Routine<Object> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?, ?> routine1 = new Routine<>("routine1", List.of()) {
             @Override
             public Object execute(PAP pap, Args actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("routine1");
                 return null;
             }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
+            }
         };
 
         pdp.bootstrap("u1", new PMLBootstrapper(input,
-                                          List.of(new PMLOperationWrapper(op1)),
-                                          List.of(new PMLRoutineWrapper(routine1)),
-                                          Map.of("TEST_CONST", new StringValue("TEST_PC"))
+                                          List.of(op1),
+                                          List.of(routine1),
+                                          Map.of("TEST_CONST", "TEST_PC")
         ));
 
         assertTrue(pap.query().graph().nodeExists("pc1"));

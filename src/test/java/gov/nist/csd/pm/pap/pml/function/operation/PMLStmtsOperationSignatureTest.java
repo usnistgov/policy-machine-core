@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.pml.function.operation;
 
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,11 +13,11 @@ class PMLStmtsOperationSignatureTest {
     void testToFormattedString() {
         PMLOperationSignature pmlStmtsOperationSignature = new PMLOperationSignature(
                 "op1",
-                Type.string(),
+                STRING_TYPE,
             List.of(
-                new PMLNodeFormalArg("a", Type.string()),
-                new PMLFormalArg("b", Type.string()),
-                new PMLFormalArg("c", Type.string())
+                new PMLNodeFormalArg("a", STRING_TYPE),
+                new PMLFormalArg("b", STRING_TYPE),
+                new PMLFormalArg("c", STRING_TYPE)
             )
         );
 

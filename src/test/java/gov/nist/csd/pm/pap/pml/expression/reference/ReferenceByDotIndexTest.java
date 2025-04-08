@@ -7,11 +7,11 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pap.pml.value.ArrayValue;
 import gov.nist.csd.pm.pap.pml.value.MapValue;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,8 @@ class ReferenceByDotIndexTest {
     void testGetType() throws PMException {
         ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Type expected =  Type.array(Type.string());
-        visitorContext.scope().addVariable("a", new Variable("a", Type.map(Type.string(), expected), false));
+        Type expected =  listType(STRING_TYPE);
+        visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, expected), false));
 
         assertEquals(
                 expected,
@@ -42,9 +42,9 @@ class ReferenceByDotIndexTest {
         ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
         PAP pap = new TestPAP();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
-        ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), Type.string());
+        ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), STRING_TYPE);
         MapValue mapValue = new MapValue(
-                Map.of(new StringValue("b"), expected), Type.string(), Type.array(Type.string()));
+                Map.of(new StringValue("b"), expected), STRING_TYPE, listType(STRING_TYPE));
         executionContext.scope().addVariable("a", mapValue);
 
         Value actual = a.execute(executionContext, pap);

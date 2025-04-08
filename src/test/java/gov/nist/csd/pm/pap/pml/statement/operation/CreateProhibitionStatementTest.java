@@ -10,9 +10,7 @@ import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
@@ -35,7 +33,7 @@ class CreateProhibitionStatementTest {
                 buildArrayLiteral("read"),
                 true,
                 new ArrayLiteral(
-                        List.of(new StringLiteral("oa1"), new NegatedExpression(new StringLiteral("oa2"))), Type.string()
+                        List.of(new StringLiteral("oa1"), new NegatedExpression(new StringLiteral("oa2"))), STRING_TYPE
                 )
         );
 
@@ -78,7 +76,7 @@ class CreateProhibitionStatementTest {
                 buildArrayLiteral("read"),
                 true,
                 new ArrayLiteral(
-                        List.of(new StringLiteral("oa1"), new NegatedExpression(new StringLiteral("oa2"))), Type.string()
+                        List.of(new StringLiteral("oa1"), new NegatedExpression(new StringLiteral("oa2"))), STRING_TYPE
                 )
         );
         assertEquals(
