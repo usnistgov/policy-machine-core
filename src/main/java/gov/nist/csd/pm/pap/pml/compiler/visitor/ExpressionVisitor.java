@@ -172,7 +172,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         if (formalArgs.size() != argExpressions.size()) {
             throw new PMLCompilationRuntimeException(
                 ctx,
-                "wrong number of args for signature call " + funcName + ": " +
+                "wrong number of args for function call " + funcName + ": " +
                     "expected " + formalArgs.size() + ", got " + argExpressions.size()
             );
         }
@@ -268,9 +268,13 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     @Override
     public Expression<?> visitMapLiteral(PMLParser.MapLiteralContext ctx) {
-        // the default kv types are OBJECT unless the expected type is map and we can get the expected kv types.
         ArgType<?> keyType = null;
         ArgType<?> valueType = null;
+
+        if (ctx.mapLit().element() == null || ctx.mapLit().element().isEmpty()) {
+            return new MapLiteralExpression<>(new HashMap<>(), OBJECT_TYPE, OBJECT_TYPE);
+        }
+
         Map<Expression<?>, Expression<?>> entries = new HashMap<>();
 
         for (PMLParser.ElementContext elementCtx : ctx.mapLit().element()) {

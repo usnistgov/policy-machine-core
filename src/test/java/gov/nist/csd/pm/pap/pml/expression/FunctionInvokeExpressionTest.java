@@ -27,6 +27,7 @@ import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 
 
+import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
@@ -143,7 +144,7 @@ class FunctionInvokeExpressionTest {
                 """
                 voidFunc("a", ["b", "c"])
                 """, visitorCtx, 1,
-                "invalid argument type: expected string, got []string at arg 1"
+                "Cannot cast from []string to string"
         );
     }
 
@@ -182,7 +183,7 @@ class FunctionInvokeExpressionTest {
                 );
         Object value = e.execute(executionContext, pap);
         assertEquals(
-                "test_ret",
+                new ReturnResult("test_ret"),
                 value
         );
     }

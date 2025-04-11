@@ -31,23 +31,32 @@ class ReferenceByDotIndexTest {
     @Test
     void testGetType() throws PMException {
         MapType<String, List<String>> mapType = ArgType.mapType(STRING_TYPE, listType(STRING_TYPE));
-        DotIndexExpression<?> a = new DotIndexExpression<>(new VariableReferenceExpression<>("a", mapType), "b", listType(STRING_TYPE));
+        DotIndexExpression<?> a = new DotIndexExpression<>(
+            new VariableReferenceExpression<>("a", mapType),
+            "b",
+            listType(STRING_TYPE)
+        );
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         visitorContext.scope().addVariable("a", new Variable("a", mapType, false));
 
         assertEquals(
-                mapType,
+                listType(STRING_TYPE),
                 a.getType()
         );
     }
 
     @Test
     void testExecute() throws PMException {
-        DotIndexExpression<?> a = new DotIndexExpression<>(new VariableReferenceExpression<>("a", mapType(STRING_TYPE, listType(STRING_TYPE))), "b", listType(STRING_TYPE));
+        DotIndexExpression<?> a = new DotIndexExpression<>(
+            new VariableReferenceExpression<>("a", mapType(STRING_TYPE, listType(STRING_TYPE))),
+            "b",
+            listType(STRING_TYPE)
+        );
         PAP pap = new TestPAP();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
-        ArrayLiteralExpression<String> expected = ArrayLiteralExpression.of(List.of(new StringLiteralExpression("1"), new StringLiteralExpression("2")), STRING_TYPE);
-        MapLiteralExpression<String, List<String>> mapValue = MapLiteralExpression.of(Map.of(new StringLiteralExpression("b"), expected), STRING_TYPE, listType(STRING_TYPE));
+        List<String> expected = List.of("1","2");
+        Map<String, List<String>> mapValue = Map.of("b", expected);
+
         executionContext.scope().addVariable("a", mapValue);
 
         Object actual = a.execute(executionContext, pap);

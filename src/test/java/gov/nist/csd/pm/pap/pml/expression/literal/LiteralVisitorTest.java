@@ -10,6 +10,7 @@ import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 
+import javax.print.DocFlavor.STRING;
 import org.apache.arrow.vector.types.pojo.ArrowType.Bool;
 import org.junit.jupiter.api.Test;
 
@@ -85,7 +86,7 @@ class LiteralVisitorTest {
         ArrayLiteralExpression<?> arrayLiteral = (ArrayLiteralExpression<?>)literal;
         assertEquals(
             new ArrayLiteralExpression<>(
-                List.of(new StringLiteralExpression("a"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), OBJECT_TYPE)),
+                List.of(new StringLiteralExpression("a"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), STRING_TYPE)),
                 OBJECT_TYPE
             ),
             arrayLiteral
@@ -177,13 +178,13 @@ class LiteralVisitorTest {
         MapLiteralExpression<?, ?> mapLiteral = (MapLiteralExpression<?, ?>)literal;
         Map<Expression<?>, Expression<?>> map1 = new HashMap<>();
         map1.put(new StringLiteralExpression("a"), new StringLiteralExpression("a1"));
-        map1.put(new StringLiteralExpression("b"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b1")), OBJECT_TYPE));
+        map1.put(new StringLiteralExpression("b"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b1")), STRING_TYPE));
         assertEquals(
-                new MapLiteralExpression<>(map1, OBJECT_TYPE, OBJECT_TYPE),
+                new MapLiteralExpression<>(map1, STRING_TYPE, OBJECT_TYPE),
                 mapLiteral
         );
         assertEquals(
-                mapType(OBJECT_TYPE, OBJECT_TYPE),
+                mapType(STRING_TYPE, OBJECT_TYPE),
                 literal.getType()
         );
     }
@@ -205,7 +206,7 @@ class LiteralVisitorTest {
         MapLiteralExpression<?, ?> mapLiteral = (MapLiteralExpression<?, ?>)literal;
         Map<Expression<?>, Expression<?>> map2 = new HashMap<>();
         map2.put(new StringLiteralExpression("a"), new StringLiteralExpression("a1"));
-        map2.put(new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), OBJECT_TYPE), new StringLiteralExpression("b1"));
+        map2.put(new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), STRING_TYPE), new StringLiteralExpression("b1"));
         MapLiteralExpression<?, ?> expected = new MapLiteralExpression<>(map2, OBJECT_TYPE, STRING_TYPE);
 
         assertEquals(expected, mapLiteral);

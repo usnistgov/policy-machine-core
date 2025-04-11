@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.function.arg.type.LongType;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.arg.type.ObjectType;
 import gov.nist.csd.pm.pap.function.arg.type.StringType;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 
 public class ArgTypeStringer {
 
@@ -18,7 +19,8 @@ public class ArgTypeStringer {
             case MapType<?, ?> mapType ->"map[" + toPMLString(mapType.getKeyType()) + "]" + toPMLString(mapType.getValueType());
             case ObjectType objectType -> "any";
             case StringType stringType -> "string";
-            default -> throw new IllegalArgumentException("AccessRightSet is not a supported type in PML");
+            case VoidType voidType -> "void";
+            default -> throw new IllegalArgumentException(argType + "is not a supported type in PML");
         };
     }
 }

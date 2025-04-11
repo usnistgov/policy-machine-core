@@ -19,7 +19,7 @@ import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.pap.pml.PMLUtil.buildHeterogeneousMapLiteral;
+import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MapLiteralTest {
@@ -43,7 +43,13 @@ class MapLiteralTest {
         values.put("b", "c");
         
         // Use the helper method to create a properly typed MapLiteralExpression
-        Expression<Map<String, Object>> expected = buildHeterogeneousMapLiteral(values);
+        Expression<Map<String, Object>> expected = new MapLiteralExpression<>(
+            Map.of(
+                new StringLiteralExpression("a"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("1"), new StringLiteralExpression("2")), STRING_TYPE),
+                new StringLiteralExpression("b"), new StringLiteralExpression("c")
+            ),
+            STRING_TYPE, OBJECT_TYPE
+        );
 
         assertEquals(
                 expected,

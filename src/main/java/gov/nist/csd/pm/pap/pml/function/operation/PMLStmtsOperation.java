@@ -33,6 +33,8 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
 
     @Override
     public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws PMException {
+        ExecutionContext ctx = getCtx();
+
         ctx.executeOperationStatements(this.body.getChecks().getStmts(), args);
     }
 
@@ -42,7 +44,7 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     }
 
     @Override
-    public StatementResult execute(PAP pap, MapArgs args) throws PMException {
+    public Object execute(PAP pap, MapArgs args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         return ctx.executeOperationStatements(this.body.getStatements().getStmts(), args);

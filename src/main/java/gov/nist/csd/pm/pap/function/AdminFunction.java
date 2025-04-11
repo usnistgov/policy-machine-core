@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,7 +34,7 @@ public abstract class AdminFunction<R, A extends Args> implements Serializable {
         Set<String> expectedKeys = parameters.stream()
                                              .map(FormalParameter::getName)
                                              .collect(Collectors.toSet());
-        Set<String> actualKeys = argsMap.keySet();
+        Set<String> actualKeys = new HashSet<>(argsMap.keySet());
 
         if (actualKeys.size() != expectedKeys.size()) {
             throw new IllegalArgumentException(

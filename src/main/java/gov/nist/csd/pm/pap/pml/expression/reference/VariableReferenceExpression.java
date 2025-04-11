@@ -25,11 +25,7 @@ public class VariableReferenceExpression<T> extends Expression<T> {
 
     @Override
     public T execute(ExecutionContext ctx, PAP pap) throws PMException {
-        try {
-            return (T) ctx.scope().getVariable(varName);
-        } catch (UnknownVariableInScopeException e) {
-            throw new PMException("Unknown variable '" + varName + "' in scope");
-        }
+        return (T) ctx.scope().getVariable(varName);
     }
 
     @Override

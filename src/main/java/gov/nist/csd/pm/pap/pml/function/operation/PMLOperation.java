@@ -19,7 +19,7 @@ public abstract class PMLOperation extends Operation<Object, MapArgs> implements
     private final ArgType<?> returnType;
     private final List<FormalParameter<?>> pmlFormalParameters;
     private final PMLOperationSignature signature;
-    protected ExecutionContext ctx;
+    private ExecutionContext ctx;
 
     public PMLOperation(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
         super(name, new ArrayList<>(formalParameters));

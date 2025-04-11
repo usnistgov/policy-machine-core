@@ -41,7 +41,7 @@ public class ReturnStatement extends BasicStatement<StatementResult> {
     @Override
     public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         if (expr == null) {
-            return new VoidResult();
+            return new ReturnResult(null);
         }
 
         return new ReturnResult(expr.execute(ctx, pap));

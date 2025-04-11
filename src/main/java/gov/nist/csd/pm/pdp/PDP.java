@@ -166,8 +166,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     @Override
     public AdjudicationResponse adjudicateAdminRoutine(UserContext user,
-                                                       List<OperationRequest> operationRequests) throws
-                                                                                                       PMException {
+                                                       List<OperationRequest> operationRequests) throws PMException {
         try {
             runTx(user, tx -> {
                 for (OperationRequest request : operationRequests) {

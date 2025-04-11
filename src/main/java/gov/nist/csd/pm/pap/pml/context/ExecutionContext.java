@@ -76,7 +76,9 @@ public class ExecutionContext implements Serializable {
 
             scope.overwriteFromScope(copy.scope);
 
-            if (result instanceof ReturnResult || result instanceof BreakResult || result instanceof ContinueResult) {
+            if (result instanceof ReturnResult returnResult) {
+                return returnResult;
+            } else if (result instanceof BreakResult || result instanceof ContinueResult) {
                 return (StatementResult) result;
             }
         }
@@ -84,12 +86,24 @@ public class ExecutionContext implements Serializable {
         return new VoidResult();
     }
 
-    public StatementResult executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
-        return executeStatements(stmts, args);
+    public Object executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+        StatementResult result = executeStatements(stmts, args);
+
+        if (result instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 
-    public StatementResult executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
-        return executeStatements(stmts, args);
+    public Object executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+        StatementResult result = executeStatements(stmts, args);
+
+        if (result instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 
     protected ExecutionContext writeArgsToScope(Args args) throws PMException {
@@ -122,5 +136,4 @@ public class ExecutionContext implements Serializable {
     public int hashCode() {
         return Objects.hash(author, scope);
     }
-
 }

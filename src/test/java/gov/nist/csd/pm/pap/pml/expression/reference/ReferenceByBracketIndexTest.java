@@ -53,8 +53,8 @@ class ReferenceByBracketIndexTest {
             listType(STRING_TYPE)
         );
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
-        List<?> expected = List.of("1","2");
-        Map<?, ?> mapValue = Map.of("b", expected);
+        List<String> expected = List.of("1","2");
+        Map<String, List<String>> mapValue = Map.of("b", expected);
         executionContext.scope().addVariable("a", mapValue);
 
         PAP pap = new TestPAP();
@@ -69,7 +69,7 @@ class ReferenceByBracketIndexTest {
                     "b": {
                         "c": {
                             "d": "e"
-                        }  
+                        }
                     }
                 }
                 
@@ -88,7 +88,7 @@ class ReferenceByBracketIndexTest {
                     "b": {
                         "c": {
                             "d": "e"
-                        }  
+                        }
                     }
                 }
                 
@@ -97,7 +97,7 @@ class ReferenceByBracketIndexTest {
         PAP pap = new TestPAP();
         PMLCompilationException e = assertThrows(PMLCompilationException.class,
                                                  () -> pap.executePML(new TestUserContext("u1"), pml));
-        assertEquals("Cannot cast from ArgType string to ArgType bool", e.getErrors().get(0).errorMessage());
+        assertEquals("Cannot cast from string to bool", e.getErrors().get(0).errorMessage());
     }
 
     @Test

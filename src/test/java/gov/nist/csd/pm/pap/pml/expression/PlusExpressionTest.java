@@ -82,7 +82,7 @@ class PlusExpressionTest {
         );
         assertEquals(1, e.getErrors().size());
         assertEquals(
-                "Cannot cast from ArgType []any to ArgType string",
+                "Cannot cast from []string to string",
                 e.getErrors().get(0).errorMessage()
         );
     }
