@@ -33,7 +33,7 @@ public class RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQue
     }
 
     @Override
-    public Routine<?> getAdminRoutine(String routineName) throws PMException {
+    public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().routines().getAdminRoutine(routineName);

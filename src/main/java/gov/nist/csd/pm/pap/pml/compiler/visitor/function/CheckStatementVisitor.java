@@ -1,11 +1,15 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor.function;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.operation.CheckStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import java.util.List;
 
 public class CheckStatementVisitor extends PMLBaseVisitor<CheckStatement> {
     public CheckStatementVisitor(VisitorContext visitorCtx) {
@@ -14,8 +18,8 @@ public class CheckStatementVisitor extends PMLBaseVisitor<CheckStatement> {
 
     @Override
     public CheckStatement visitCheckStatement(PMLParser.CheckStatementContext ctx) {
-        Expression arExpr = Expression.compile(visitorCtx, ctx.ar, Type.string());
-        Expression targetExpr = Expression.compile(visitorCtx, ctx.target, Type.string(), Type.array(Type.string()));
+        Expression<String> arExpr = ExpressionVisitor.compile(visitorCtx, ctx.ar, STRING_TYPE);
+        Expression<List<String>> targetExpr = ExpressionVisitor.compile(visitorCtx, ctx.target, listType(STRING_TYPE));
 
         return new CheckStatement(arExpr, targetExpr);
     }

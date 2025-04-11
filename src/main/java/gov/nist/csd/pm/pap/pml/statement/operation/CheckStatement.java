@@ -6,51 +6,33 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
-import java.util.ArrayList;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.List;
 import java.util.Objects;
 
-public class CheckStatement extends PMLStatement {
-    private final Expression arsExpr;
-    private final Expression targetExpr;
+public class CheckStatement extends PMLStatement<VoidResult> {
+    private final Expression<String> arsExpr;
+    private final Expression<List<String>> targetExpr;
 
-    public CheckStatement(Expression arsExpr, Expression targetExpr) {
+    public CheckStatement(Expression<String> arsExpr, Expression<List<String>> targetExpr) {
         this.arsExpr = arsExpr;
         this.targetExpr = targetExpr;
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Value ars = arsExpr.execute(ctx, pap);
-        Value target = targetExpr.execute(ctx, pap);
-
-        List<String> arsToCheck = new ArrayList<>();
-        if (ars.getType().isString()) {
-            arsToCheck.add(ars.getStringValue());
-        } else {
-            List<Value> arrayValue = ars.getArrayValue();
-            for (Value v : arrayValue) {
-                arsToCheck.add(v.getStringValue());
-            }
-        }
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        String ars = arsExpr.execute(ctx, pap);
+        List<String> targets = targetExpr.execute(ctx, pap);
 
         PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
         privilegeChecker.setExplain(ctx.isExplain());
 
-        if (target.getType().isString()) {
-            long id = pap.query().graph().getNodeByName(target.getStringValue()).getId();
-            privilegeChecker.check(ctx.author(), id, arsToCheck);
-        } else {
-            List<Value> arrayValue = target.getArrayValue();
-            for (Value value : arrayValue) {
-                long id = pap.query().graph().getNodeByName(value.getStringValue()).getId();
-                privilegeChecker.check(ctx.author(), id, arsToCheck);
-            }
+        for (String target : targets) {
+            long id = pap.query().graph().getNodeByName(target).getId();
+            privilegeChecker.check(ctx.author(), id, ars);
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override

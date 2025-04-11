@@ -15,4 +15,9 @@ public final class AccessRightSetType extends ArgType<AccessRightSet> {
 
         return accessRightSet;
     }
+
+    @Override
+    public Class<AccessRightSet> getExpectedClass() {
+        return AccessRightSet.class;
+    }
 }

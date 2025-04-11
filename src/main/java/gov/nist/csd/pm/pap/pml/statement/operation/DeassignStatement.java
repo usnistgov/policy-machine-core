@@ -4,34 +4,30 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.graph.DeassignOp;
+import gov.nist.csd.pm.pap.function.op.graph.DeassignOp.DeassignOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DeassignStatement extends OperationStatement<DeassignOp> {
+public class DeassignStatement extends OperationStatement<DeassignOpArgs> {
 
-    private final Expression ascendant;
-    private final Expression deassignFrom;
+    private final Expression<String> ascendant;
+    private final Expression<List<String>> deassignFrom;
 
-    public DeassignStatement(Expression ascendant, Expression deassignFrom) {
+    public DeassignStatement(Expression<String> ascendant, Expression<List<String>> deassignFrom) {
         super(new DeassignOp());
         this.ascendant = ascendant;
         this.deassignFrom = deassignFrom;
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String asc = ascendant.execute(ctx, pap).getStringValue();
-        List<Value> deassignFromValue = deassignFrom.execute(ctx, pap).getArrayValue();
-        List<String> descs = new ArrayList<>();
-        for (Value value : deassignFromValue) {
-            descs.add(value.getStringValue());
-        }
+    public DeassignOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String asc = ascendant.execute(ctx, pap);
+        List<String> descs = deassignFrom.execute(ctx, pap);
 
         long ascId = pap.query().graph().getNodeId(asc);
         LongArrayList descIds = new LongArrayList();
@@ -39,7 +35,7 @@ public class DeassignStatement extends OperationStatement<DeassignOp> {
             descIds.add(pap.query().graph().getNodeId(desc));
         }
 
-        return op.actualArgs(ascId, descIds);
+        return new DeassignOpArgs(ascId, descIds);
     }
 
     @Override

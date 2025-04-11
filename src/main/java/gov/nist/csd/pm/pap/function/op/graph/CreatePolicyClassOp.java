@@ -4,10 +4,11 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
+import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_POLICY_CLASS;
 
@@ -22,14 +23,20 @@ public class CreatePolicyClassOp extends CreateNodeOp{
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+    protected CreateNodeOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        String name = prepareArg(NAME_ARG, argsMap);
+        return new CreateNodeOpArgs(name, null);
+    }
+
+    @Override
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, CreateNodeOpArgs args) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), CREATE_POLICY_CLASS);
     }
 
     @Override
-    public Long execute(PAP pap, Args args) throws PMException {
+    public Long execute(PAP pap, CreateNodeOpArgs args) throws PMException {
         return pap.modify().graph().createPolicyClass(
-		        args.get(NAME_ARG)
+		        args.getName()
         );
     }
 }

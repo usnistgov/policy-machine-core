@@ -41,7 +41,7 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
+    public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
         privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().operations().getAdminOperation(operationName);

@@ -1,32 +1,34 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
+public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
     public IfStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public PMLStatement visitIfStatement(PMLParser.IfStatementContext ctx) {
+    public PMLStatement<?> visitIfStatement(PMLParser.IfStatementContext ctx) {
         // if block
         VisitorContext localVisitorCtx = visitorCtx.copy();
-        Expression condition = Expression.compile(localVisitorCtx, ctx.condition, Type.bool());
+        Expression<Boolean> condition = ExpressionVisitor.compile(localVisitorCtx, ctx.condition, BOOLEAN_TYPE);
 
-        List<PMLStatement> block = new ArrayList<>();
+        List<PMLStatement<?>> block = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
         for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
-            PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
+            PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
             block.add(statement);
         }
 
@@ -40,10 +42,10 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
         statementVisitor = new StatementVisitor(localVisitorCtx);
         List<IfStatement.ConditionalBlock> elseIfs = new ArrayList<>();
         for (PMLParser.ElseIfStatementContext elseIfStmtCtx : ctx.elseIfStatement()) {
-            condition = Expression.compile(visitorCtx, elseIfStmtCtx.condition, Type.bool());
+            condition = ExpressionVisitor.compile(visitorCtx, elseIfStmtCtx.condition, BOOLEAN_TYPE);
             block = new ArrayList<>();
             for (PMLParser.StatementContext stmtCtx : elseIfStmtCtx.statementBlock().statement()) {
-                PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
+                PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
                 block.add(statement);
             }
             elseIfs.add(new IfStatement.ConditionalBlock(condition, new PMLStatementBlock(block)));
@@ -58,7 +60,7 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement> {
         block = new ArrayList<>();
         if (ctx.elseStatement() != null) {
             for (PMLParser.StatementContext stmtCtx : ctx.elseStatement().statementBlock().statement()) {
-                PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
+                PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
                 block.add(statement);
             }
 

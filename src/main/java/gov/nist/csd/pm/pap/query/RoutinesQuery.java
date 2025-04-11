@@ -19,10 +19,11 @@ public interface RoutinesQuery {
 
     /**
      * Get the admin operation with the given name.
+     *
      * @param routineName The routine name.
      * @return The Routine object.
      * @throws PMException If there is an error in the PM.
      */
-    Routine<?> getAdminRoutine(String routineName) throws PMException;
+    Routine<?, ?> getAdminRoutine(String routineName) throws PMException;
 
 }

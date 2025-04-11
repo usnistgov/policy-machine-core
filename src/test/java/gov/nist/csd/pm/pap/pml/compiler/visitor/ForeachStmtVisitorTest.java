@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
@@ -33,7 +34,7 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testSuccess() {
-        PMLParser.ForeachStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.ForeachStatementContext ctx = TestPMLParser.toCtx(
                 """
                 foreach x in ["a", "b"] {}
                 """,
@@ -46,7 +47,7 @@ class ForeachStmtVisitorTest {
                 stmt
         );
 
-        ctx = PMLContextVisitor.toCtx(
+        ctx = TestPMLParser.toCtx(
                 """
                 foreach x, y in {"a": "b"} {}
                 """,

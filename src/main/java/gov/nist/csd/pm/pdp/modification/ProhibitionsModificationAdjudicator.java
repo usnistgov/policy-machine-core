@@ -10,6 +10,8 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.prohibition.ProhibitionOp;
+import gov.nist.csd.pm.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
@@ -31,7 +33,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
     @Override
     public void createProhibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
         CreateProhibitionOp op = new CreateProhibitionOp();
-        Args args = op.actualArgs(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
+        ProhibitionOpArgs args = new ProhibitionOpArgs(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
@@ -42,7 +44,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
-        Args args = op.actualArgs(name, prohibition.getSubject(), prohibition.getAccessRightSet(),
+        ProhibitionOpArgs args = new ProhibitionOpArgs(name, prohibition.getSubject(), prohibition.getAccessRightSet(),
             prohibition.isIntersection(), new ArrayList<>(prohibition.getContainers()));
 
         op.canExecute(privilegeChecker, userCtx, args);

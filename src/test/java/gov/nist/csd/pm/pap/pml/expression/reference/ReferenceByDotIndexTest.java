@@ -3,14 +3,15 @@ package gov.nist.csd.pm.pap.pml.expression.reference;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-
-import gov.nist.csd.pm.pap.pml.value.ArrayValue;
-import gov.nist.csd.pm.pap.pml.value.MapValue;
-
 
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
@@ -19,6 +20,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,28 +30,27 @@ class ReferenceByDotIndexTest {
 
     @Test
     void testGetType() throws PMException {
-        ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
+        MapType<String, List<String>> mapType = ArgType.mapType(STRING_TYPE, listType(STRING_TYPE));
+        DotIndexExpression<?> a = new DotIndexExpression<>(new VariableReferenceExpression<>("a", mapType), "b", listType(STRING_TYPE));
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Type expected =  listType(STRING_TYPE);
-        visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, expected), false));
+        visitorContext.scope().addVariable("a", new Variable("a", mapType, false));
 
         assertEquals(
-                expected,
-                a.getType(visitorContext.scope())
+                mapType,
+                a.getType()
         );
     }
 
     @Test
     void testExecute() throws PMException {
-        ReferenceByDotIndex a = new ReferenceByDotIndex(new ReferenceByID("a"), "b");
+        DotIndexExpression<?> a = new DotIndexExpression<>(new VariableReferenceExpression<>("a", mapType(STRING_TYPE, listType(STRING_TYPE))), "b", listType(STRING_TYPE));
         PAP pap = new TestPAP();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
-        ArrayValue expected = new ArrayValue(List.of(new StringValue("1"), new StringValue("2")), STRING_TYPE);
-        MapValue mapValue = new MapValue(
-                Map.of(new StringValue("b"), expected), STRING_TYPE, listType(STRING_TYPE));
+        ArrayLiteralExpression<String> expected = ArrayLiteralExpression.of(List.of(new StringLiteralExpression("1"), new StringLiteralExpression("2")), STRING_TYPE);
+        MapLiteralExpression<String, List<String>> mapValue = MapLiteralExpression.of(Map.of(new StringLiteralExpression("b"), expected), STRING_TYPE, listType(STRING_TYPE));
         executionContext.scope().addVariable("a", mapValue);
 
-        Value actual = a.execute(executionContext, pap);
+        Object actual = a.execute(executionContext, pap);
         assertEquals(expected, actual);
     }
 

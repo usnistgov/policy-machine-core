@@ -1,67 +1,60 @@
 package gov.nist.csd.pm.pap.function.op.obligation;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.stringType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.arg.type.RuleType;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalArg;
+import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
+import java.util.Map;
 
-public abstract class ObligationOp extends Operation<Void> {
+public abstract class ObligationOp<A extends ObligationOp.ObligationOpArgs> extends Operation<Void, A> {
 
-    public static final IdNodeFormalArg AUTHOR_ARG = new IdNodeFormalArg("author");
-    public static final FormalArg<String> NAME_ARG = new FormalArg<>("name", stringType());
-    public static final FormalArg<List<Rule>> RULES_ARG = new FormalArg<>("rules", listType(new RuleType()));
+    public static final IdNodeFormalParameter AUTHOR_ARG = new IdNodeFormalParameter("author");
+    public static final FormalParameter<String> NAME_ARG = new FormalParameter<>("name", STRING_TYPE);
+    public static final FormalParameter<List<Rule>> RULES_ARG = new FormalParameter<>("rules", listType(new RuleType()));
 
     private final String reqCap;
 
-    public ObligationOp(String opName, String reqCap) {
-        super(
-                opName,
-                List.of(AUTHOR_ARG, NAME_ARG, RULES_ARG)
-        );
-
+    public ObligationOp(String opName, List<FormalParameter<?>> formalParameters, String reqCap) {
+        super(opName, formalParameters);
         this.reqCap = reqCap;
     }
 
-    public Args actualArgs(long author, String name, List<Rule> rules) {
-        Args args = new Args();
-        args.put(AUTHOR_ARG, author);
-        args.put(NAME_ARG, name);
-        args.put(RULES_ARG, rules);
-        return args;
-    }
+    @Override
+    public abstract A prepareArgs(Map<FormalParameter<?>, Object> argsMap);
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args actulArgs) throws PMException {
-        List<Rule> rules = actulArgs.get(RULES_ARG);
-        for (Rule rule : rules) {
-            EventPattern eventPattern = rule.getEventPattern();
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, A args) throws PMException {
+        List<Rule> rules = args.getRules();
+        if (rules != null) {
+            for (Rule rule : rules) {
+                EventPattern eventPattern = rule.getEventPattern();
 
-            // check subject pattern
-            Pattern pattern = eventPattern.getSubjectPattern();
-            checkPatternPrivileges(privilegeChecker, userCtx, pattern, reqCap);
+                Pattern pattern = eventPattern.getSubjectPattern();
+                checkPatternPrivileges(privilegeChecker, userCtx, pattern, reqCap);
 
-            // check arg patterns
-            for (var argPattern : eventPattern.getArgPatterns().entrySet()) {
-                for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
-                    checkPatternPrivileges(privilegeChecker, userCtx, argPatternExpression, reqCap);
+                for (var argPattern : eventPattern.getArgPatterns().entrySet()) {
+                    for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
+                        checkPatternPrivileges(privilegeChecker, userCtx, argPatternExpression, reqCap);
+                    }
                 }
             }
+        } else {
+            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), reqCap);
         }
     }
 
@@ -69,12 +62,41 @@ public abstract class ObligationOp extends Operation<Void> {
         ReferencedNodes referencedNodes = pattern.getReferencedNodes();
         if (referencedNodes.isAny()) {
             privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), toCheck);
-
             return;
         }
 
         for (String node : referencedNodes.nodes()) {
             privilegeChecker.check(userCtx, node, List.of(toCheck));
+        }
+    }
+
+    public static class ObligationOpArgs extends Args {
+        private Long authorId;
+        private String name;
+        private List<Rule> rules;
+
+        public ObligationOpArgs(Long authorId, String name, List<Rule> rules) {
+            this.authorId = authorId;
+            this.name = name;
+            this.rules = rules;
+        }
+
+        public ObligationOpArgs(String name) {
+            this.name = name;
+            this.authorId = null;
+            this.rules = null;
+        }
+
+        public Long getAuthorId() {
+            return authorId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<Rule> getRules() {
+            return rules;
         }
     }
 }

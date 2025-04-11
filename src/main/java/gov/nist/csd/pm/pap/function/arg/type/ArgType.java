@@ -1,126 +1,107 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
-import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.function.op.Operation;
-import gov.nist.csd.pm.pap.function.routine.Routine;
-import gov.nist.csd.pm.pap.obligation.Rule;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public sealed abstract class ArgType<T> implements Serializable
     permits StringType, LongType, BooleanType, ListType, MapType, ObjectType, AccessRightSetType, OperationType,
-    RoutineType, RuleType, ProhibitionSubjectType, ContainerConditionType, NodeTypeType {
+    RoutineType, RuleType, ProhibitionSubjectType, ContainerConditionType, NodeTypeType, VoidType {
 
-    private static StringType stringType;
-    private static LongType longType;
-    private static BooleanType booleanType;
-    private static ObjectType objectType;
-    private static AccessRightSetType accessRightSetType;
-    private static OperationType operationType;
-    private static RoutineType routineType;
-    private static RuleType ruleType;
-    private static ProhibitionSubjectType prohibitionSubjectType;
-    private static ContainerConditionType containerConditionType;
-    private static NodeTypeType nodeTypeType;
+    public static StringType STRING_TYPE = new StringType();
+    public static LongType LONG_TYPE = new LongType();
+    public static BooleanType BOOLEAN_TYPE = new BooleanType();
+    public static ObjectType OBJECT_TYPE = new ObjectType();
+    public static AccessRightSetType ACCESS_RIGHT_SET_TYPE = new AccessRightSetType();
+    public static OperationType OPERATION_TYPE = new OperationType();
+    public static RoutineType ROUTINE_TYPE = new RoutineType();
+    public static RuleType RULE_TYPE = new RuleType();
+    public static ProhibitionSubjectType PROHIBITION_SUBJECT_TYPE = new ProhibitionSubjectType();
+    public static ContainerConditionType CONTAINER_CONDITION_TYPE = new ContainerConditionType();
+    public static NodeTypeType NODE_TYPE_TYPE = new NodeTypeType();
+    public static VoidType VOID_TYPE = new VoidType();
 
-    public static <E> ArgType<List<E>> listType(ArgType<E> elementType) {
+    public static <E> ListType<E> listType(ArgType<E> elementType) {
         return new ListType<>(elementType);
     }
 
-    public static <K, V> ArgType<Map<K, V>> mapType(ArgType<K> keyType, ArgType<V> valueType) {
+    public static <K, V> MapType<K, V> mapType(ArgType<K> keyType, ArgType<V> valueType) {
         return new MapType<>(keyType, valueType);
     }
 
-    public static ArgType<String> stringType() {
-        if (stringType == null) {
-            stringType = new StringType();
-        }
-
-        return stringType;
+    public static ArgType<?> resolveTypeOfObject(Object o) {
+        return switch (o) {
+            case String s -> STRING_TYPE;
+            case Boolean b -> BOOLEAN_TYPE;
+            case Long l -> LONG_TYPE;
+            case List<?> list -> resolveListType(list);
+            case Map<?, ?> map -> resolveMapType(map);
+            case null, default -> OBJECT_TYPE;
+        };
     }
 
-    public static ArgType<Long> longType() {
-        if (longType == null) {
-            longType = new LongType();
+    private static ArgType<?> resolveListType(List<?> list) {
+        if (list == null || list.isEmpty()) {
+            return OBJECT_TYPE;
         }
 
-        return longType;
+        Object firstElement = list.getFirst();
+        if (firstElement == null) {
+            return OBJECT_TYPE;
+        }
+
+        ArgType<?> firsType = resolveTypeOfObject(firstElement);
+        for (int i = 1; i < list.size(); i++) {
+            Object element = list.get(i);
+
+            if (element == null) {
+                return OBJECT_TYPE;
+            }
+
+            ArgType<?> elementType = resolveTypeOfObject(element);
+            if (!elementType.getClass().equals(firsType.getClass())) {
+                return OBJECT_TYPE;
+            }
+        }
+
+        return firsType;
     }
 
-    public static ArgType<Boolean> booleanType() {
-        if (booleanType == null) {
-            booleanType = new BooleanType();
+    private static MapType<?, ?> resolveMapType(Map<?, ?> map) {
+        if (map == null || map.isEmpty()) {
+            return new MapType<>(OBJECT_TYPE, OBJECT_TYPE);
         }
 
-        return booleanType;
+        ArgType<?> keyType = getMapElementType(map.keySet());
+        ArgType<?> valueType = getMapElementType(map.values());
+
+        return new MapType<>(keyType, valueType);
     }
 
-    public static ArgType<Object> objectType() {
-        if (objectType == null) {
-            objectType = new ObjectType();
+    private static ArgType<?> getMapElementType(Collection<?> values) {
+        if (values.isEmpty()) {
+            return OBJECT_TYPE;
         }
 
-        return objectType;
-    }
-
-    public static ArgType<AccessRightSet> accessRightSetType() {
-        if (accessRightSetType == null) {
-            accessRightSetType = new AccessRightSetType();
+        Object firstValue = values.iterator().next();
+        if (firstValue == null) {
+            return OBJECT_TYPE;
         }
 
-        return accessRightSetType;
-    }
+        ArgType<?> firstType = resolveTypeOfObject(firstValue);
+        for (Object value : values) {
+            if (value == null) {
+                return OBJECT_TYPE;
+            }
 
-    public static ArgType<Operation<?>> operationType() {
-        if (operationType == null) {
-            operationType = new OperationType();
+            ArgType<?> valueType = resolveTypeOfObject(value);
+            if (!valueType.equals(firstType)) {
+                return OBJECT_TYPE;
+            }
         }
 
-        return operationType;
-    }
-
-    public static ArgType<Routine<?>> routineType() {
-        if (routineType == null) {
-            routineType = new RoutineType();
-        }
-
-        return routineType;
-    }
-
-    public static ArgType<Rule> ruleType() {
-        if (ruleType == null) {
-            ruleType = new RuleType();
-        }
-
-        return ruleType;
-    }
-
-    public static ArgType<ProhibitionSubject> prohibitionSubjectType() {
-        if (prohibitionSubjectType == null) {
-            prohibitionSubjectType = new ProhibitionSubjectType();
-        }
-
-        return prohibitionSubjectType;
-    }
-
-    public static ArgType<ContainerCondition> containerConditionType() {
-        if (containerConditionType == null) {
-            containerConditionType = new ContainerConditionType();
-        }
-
-        return containerConditionType;
-    }
-
-    public static ArgType<NodeType> nodeTypeType() {
-        if (nodeTypeType == null) {
-            nodeTypeType = new NodeTypeType();
-        }
-
-        return nodeTypeType;
+        return firstType;
     }
 
     /**
@@ -131,6 +112,23 @@ public sealed abstract class ArgType<T> implements Serializable
      * @return an instance of T from obj.
      */
     public abstract T cast(Object obj);
+
+    public abstract Class<T> getExpectedClass();
+
+    public boolean isCastableTo(ArgType<?> targetType) {
+        if (this.equals(OBJECT_TYPE)) {
+            return true;
+        } else if (targetType.equals(ArgType.OBJECT_TYPE) || this.equals(targetType)) {
+            return true;
+        } else if ((this instanceof ListType<?> sourceList) && (targetType instanceof ListType<?> targetList)) {
+            return sourceList.getElementType().isCastableTo(targetList.getElementType());
+        } else if ((this instanceof MapType<?, ?> sourceMap) && targetType instanceof MapType<?, ?> targetMap) {
+            return sourceMap.getKeyType().isCastableTo(targetMap.getKeyType()) &&
+                sourceMap.getValueType().isCastableTo(targetMap.getValueType());
+        }        
+
+        return false;
+    }
 
     @Override
     public int hashCode() {
@@ -143,6 +141,15 @@ public sealed abstract class ArgType<T> implements Serializable
             return true;
         }
         return obj != null && getClass() == obj.getClass();
+    }
+
+    
+    public <S> ArgType<S> asType(ArgType<S> targetType) {
+        if (!this.isCastableTo(targetType)) {
+            throw new IllegalArgumentException("Cannot cast from " + this + " to " + targetType);
+        }
+        
+        return (ArgType<S>) this;
     }
 }
 

@@ -4,16 +4,14 @@ import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalArg;
-import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalArg;
-import gov.nist.csd.pm.pap.function.op.arg.NodeFormalArg;
+import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
+import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalParameter;
+import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 public class EventContextUtil {
 
@@ -29,7 +27,7 @@ public class EventContextUtil {
 
         actualArgs.foreach((formalArg, value) -> {
             // if the arg is a normal arg, it can be added to the args without any extra processing
-            if (!(formalArg instanceof NodeFormalArg)) {
+            if (!(formalArg instanceof NodeFormalParameter)) {
                 args.put(formalArg.getName(), value);
 
                 return;
@@ -37,9 +35,9 @@ public class EventContextUtil {
 
             // if the arg is a node arg than we need to convert the node IDs to names for the EPP
             switch (formalArg) {
-                case IdNodeFormalArg idNodeFormalArg ->
+                case IdNodeFormalParameter idNodeFormalArg ->
                     args.put(idNodeFormalArg.getName(), resolveNodeArgName(pap, actualArgs.get(idNodeFormalArg)));
-                case ListIdNodeFormalArg listIdNodeFormalArg -> {
+                case ListIdNodeFormalParameter listIdNodeFormalArg -> {
                     List<Long> ids = actualArgs.get(listIdNodeFormalArg);
                     List<String> names = ids.stream()
                         .map(id -> resolveNodeArgName(pap, id))

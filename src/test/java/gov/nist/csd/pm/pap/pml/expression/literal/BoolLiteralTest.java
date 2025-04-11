@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -19,11 +20,10 @@ class BoolLiteralTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 true
-                """,
-                PMLParser.LiteralExpressionContext.class);
+                """);
 
         Scope<Variable, PMLFunctionSignature> globalScope = new CompileScope();
 
@@ -33,7 +33,7 @@ class BoolLiteralTest {
 
         BoolLiteralExpression a = (BoolLiteralExpression) expression;
         assertEquals(
-               new BoolLiteralExpression(true, BOOLEAN_TYPE),
+               new BoolLiteralExpression(true),
                 a
         );
         assertEquals(

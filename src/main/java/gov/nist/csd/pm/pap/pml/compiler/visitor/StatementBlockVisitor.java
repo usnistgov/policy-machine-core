@@ -1,41 +1,42 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
 
-import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
-    private final Type returnType;
+    private final ArgType<?> returnType;
 
-    public StatementBlockVisitor(VisitorContext visitorCtx, Type returnType) {
+    public StatementBlockVisitor(VisitorContext visitorCtx, ArgType<?> returnType) {
         super(visitorCtx);
         this.returnType = returnType;
     }
 
     @Override
     public Result visitBasicStatementBlock(PMLParser.BasicStatementBlockContext ctx) {
-        List<PMLStatement> stmts = new ArrayList<>();
+        List<PMLStatement<?>> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
-            PMLStatement pmlStatement = statementVisitor.visitBasicStatement(statementContext);
+            PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
 
-            if (pmlStatement instanceof FunctionInvokeExpression functionInvokeExpression) {
-                String functionName = functionInvokeExpression.getFuncName();
+            if (pmlStatement instanceof FunctionInvokeExpression<?> functionInvokeExpression) {
+                String functionName = functionInvokeExpression.getFunctionSignature().getName();
 
 	            try {
                     PMLFunctionSignature signature = visitorCtx.scope().getFunction(functionName);
@@ -61,10 +62,10 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
 
     @Override
     public Result visitStatementBlock(PMLParser.StatementBlockContext ctx) {
-        List<PMLStatement> stmts = new ArrayList<>();
+        List<PMLStatement<?>> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
         for (PMLParser.StatementContext statementContext : ctx.statement()) {
-            PMLStatement pmlStatement = statementVisitor.visitStatement(statementContext);
+            PMLStatement<?> pmlStatement = statementVisitor.visitStatement(statementContext);
             stmts.add(pmlStatement);
         }
 
@@ -76,15 +77,15 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         }
     }
 
-    public static boolean checkAllPathsReturned(VisitorContext visitorCtx, List<PMLStatement> statements, Type returnType)
+    public static boolean checkAllPathsReturned(VisitorContext visitorCtx, List<PMLStatement<?>> statements, ArgType<?> returnType)
             throws PMException {
         if (statements.isEmpty()) {
             return false;
         }
 
-        PMLStatement lastStmt = statements.getLast();
+        PMLStatement<?> lastStmt = statements.getLast();
         if (lastStmt instanceof ReturnStatement returnStatement) {
-            if (!returnStatement.matchesReturnType(returnType, visitorCtx.scope())) {
+            if (!returnStatement.matchesReturnType(returnType)) {
                 throw new PMException("return statement \"" + returnStatement + "\" does not match return type " + returnType);
             }
 
@@ -93,7 +94,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
 
 
         boolean allPathsReturned = false;
-        PMLStatement pmlStatement;
+        PMLStatement<?> pmlStatement;
         for (int i = 0; i < statements.size(); i++) {
             pmlStatement = statements.get(i);
 
@@ -102,7 +103,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
                     throw new PMException("function return should be last statement in block");
                 }
 
-                if (!returnStatement.matchesReturnType(returnType, visitorCtx.scope())) {
+                if (!returnStatement.matchesReturnType(returnType)) {
                     throw new PMException("return statement \"" + returnStatement + "\" does not match return type " + returnType);
                 }
 
@@ -119,7 +120,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         return allPathsReturned;
     }
 
-    private static boolean allIfStatementPathsReturned(VisitorContext visitorCtx, IfStatement ifStatement, Type returnType)
+    private static boolean allIfStatementPathsReturned(VisitorContext visitorCtx, IfStatement ifStatement, ArgType<?> returnType)
             throws PMException {
         boolean check = checkAllPathsReturned(visitorCtx, ifStatement.getIfBlock().block().getStmts(), returnType);
         if (!check) {

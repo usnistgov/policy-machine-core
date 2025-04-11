@@ -1,26 +1,36 @@
 package gov.nist.csd.pm.pap.pml.statement.basic;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.value.*;
+import gov.nist.csd.pm.pap.pml.statement.result.BreakResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
 
+import gov.nist.csd.pm.pap.pml.statement.result.ValueResult;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-public class ForeachStatement extends BasicStatement {
+public class ForeachStatement extends BasicStatement<StatementResult> {
 
     private final String varName;
     private final String valueVarName;
-    private final Expression iter;
-    private final List<PMLStatement> statements;
+    private final Expression<?> iter;
+    private final List<PMLStatement<?>> statements;
 
-    public ForeachStatement(String varName, String valueVarName, Expression iter, List<PMLStatement> statements) {
+    public ForeachStatement(String varName, String valueVarName, Expression<?> iter, List<PMLStatement<?>> statements) {
         this.varName = varName;
         this.valueVarName = valueVarName;
         this.iter = iter;
@@ -28,60 +38,61 @@ public class ForeachStatement extends BasicStatement {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+    public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         if (statements.isEmpty()) {
-            return new VoidValue();
+            return new VoidResult();
         }
 
-        Value iterValue = iter.execute(ctx, pap);
-        if (iterValue instanceof ArrayValue arrayValue) {
-            return executeArrayIterator(ctx, arrayValue);
-        } else if (iterValue instanceof MapValue mapValue) {
-            return executeMapIterator(ctx, mapValue);
+        ArgType<?> iterType = iter.getType();
+        Object iterValue = iter.execute(ctx, pap);
+        if (iterValue instanceof List<?> list && iterType instanceof ListType<?> listType) {
+            return executeArrayIterator(ctx, list, listType);
+        } else if (iterValue instanceof Map<?, ?> map && iterType instanceof MapType<?, ?> mapType) {
+            return executeMapIterator(ctx, map, mapType);
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
-    private Value executeArrayIterator(ExecutionContext ctx, ArrayValue iterValue) throws PMException{
-        for (Value v : iterValue.getValue()) {
-            Args args = new Args();
-            args.put(new PMLFormalArg(varName, v.getType()), v);
+    private StatementResult executeArrayIterator(ExecutionContext ctx, List<?> iterValue, ListType<?> listType) throws PMException{
+        for (Object o : iterValue) {
+            Args args = new MapArgs();
+            args.put(new FormalParameter<>(varName, listType.getElementType()), o);
 
-            Value value = ctx.executeStatements(statements, args);
+            StatementResult value = ctx.executeStatements(statements, args);
 
-            if (value instanceof BreakValue) {
+            if (value instanceof BreakResult) {
                 break;
-            } else if (value instanceof ReturnValue) {
+            } else if (value instanceof ReturnResult) {
                 return value;
             }
         }
-        return new VoidValue();
+        return new VoidResult();
     }
 
-    private Value executeMapIterator(ExecutionContext ctx, MapValue iterValue) throws PMException{
-        for (Value key : iterValue.getValue().keySet()) {
-            Value mapValue = iterValue.getMapValue().get(key);
+    private StatementResult executeMapIterator(ExecutionContext ctx, Map<?, ?> iterValue, MapType<?, ?> mapType) throws PMException{
+        for (Object key : iterValue.keySet()) {
+            Object value = iterValue.get(key);
 
             // add the key value
-            Args args = new Args();
-            args.put(new PMLFormalArg(varName, key.getType()), key);
+            Args args = new MapArgs();
+            args.put(new FormalParameter<>(varName, ArgType.resolveTypeOfObject(key)), key);
 
             // add the value value
             if (valueVarName != null) {
-                args.put(new PMLFormalArg(valueVarName, mapValue.getType()), mapValue);
+                args.put(new FormalParameter<>(valueVarName, mapType.getValueType()), value);
             }
 
-            Value value = ctx.executeStatements(statements, args);
+            StatementResult result = ctx.executeStatements(statements, args);
 
-            if (value instanceof BreakValue) {
+            if (result instanceof BreakResult) {
                 break;
-            } else if (value instanceof ReturnValue) {
-                return value;
+            } else if (result instanceof ReturnResult) {
+                return result;
             }
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override

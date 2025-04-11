@@ -4,14 +4,16 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
+import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.DISSOCIATE;
 import static gov.nist.csd.pm.pap.AdminAccessRights.DISSOCIATE_FROM;
 
-public class DissociateOp extends GraphOp<Void> {
+public class DissociateOp extends GraphOp<Void, DissociateOp.DissociateOpArgs> {
 
     public DissociateOp() {
         super(
@@ -19,26 +21,44 @@ public class DissociateOp extends GraphOp<Void> {
                 List.of(UA_ARG, TARGET_ARG)
         );
     }
-    
-    public Args actualArgs(long ua, long target) {
-        Args args = new Args();
-        args.put(UA_ARG, ua);
-        args.put(TARGET_ARG, target);
-        return args;
+
+    public static class DissociateOpArgs extends Args {
+        private final long uaId;
+        private final long targetId;
+
+        public DissociateOpArgs(long uaId, long targetId) {
+            this.uaId = uaId;
+            this.targetId = targetId;
+        }
+
+        public long getUaId() {
+            return uaId;
+        }
+
+        public long getTargetId() {
+            return targetId;
+        }
     }
 
     @Override
-    public Void execute(PAP pap, Args args) throws PMException {
+    protected DissociateOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        Long uaId = prepareArg(UA_ARG, argsMap);
+        Long targetId = prepareArg(TARGET_ARG, argsMap);
+        return new DissociateOpArgs(uaId, targetId);
+    }
+
+    @Override
+    public Void execute(PAP pap, DissociateOpArgs args) throws PMException {
         pap.modify().graph().dissociate(
-                args.get(UA_ARG),
-                args.get(TARGET_ARG)
+                args.getUaId(),
+                args.getTargetId()
         );
         return null;
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
-        privilegeChecker.check(userCtx, args.get(UA_ARG), DISSOCIATE);
-        privilegeChecker.check(userCtx, args.get(TARGET_ARG), DISSOCIATE_FROM);
+    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, DissociateOpArgs args) throws PMException {
+        privilegeChecker.check(userCtx, args.getUaId(), DISSOCIATE);
+        privilegeChecker.check(userCtx, args.getTargetId(), DISSOCIATE_FROM);
     }
 }

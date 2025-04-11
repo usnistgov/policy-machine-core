@@ -28,7 +28,7 @@ public class PMLBasicFunctionsTest {
                 associate "ua1" and PM_ADMIN_OBJECT with ["*"]
                 
                 operation op1(string name) {
-                    check "assign" on "oa1"
+                    check "assign" on ["oa1"]
                 } {
                     create pc name
                 }

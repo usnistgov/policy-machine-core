@@ -5,6 +5,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,10 @@ class CreateNonPCStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        CreateNonPCStatement stmt1 = new CreateNonPCStatement(new StringLiteral("ua1"), NodeType.UA, buildArrayLiteral("pc1"));
-        CreateNonPCStatement stmt2 = new CreateNonPCStatement(new StringLiteral("oa1"), NodeType.OA, buildArrayLiteral("pc1"));
-        CreateNonPCStatement stmt3 = new CreateNonPCStatement(new StringLiteral("u1"), NodeType.U, buildArrayLiteral("ua1"));
-        CreateNonPCStatement stmt4 = new CreateNonPCStatement(new StringLiteral("o1"), NodeType.O, buildArrayLiteral("oa1"));
+        CreateNonPCStatement stmt1 = new CreateNonPCStatement(new StringLiteralExpression("ua1"), NodeType.UA, buildArrayLiteral("pc1"));
+        CreateNonPCStatement stmt2 = new CreateNonPCStatement(new StringLiteralExpression("oa1"), NodeType.OA, buildArrayLiteral("pc1"));
+        CreateNonPCStatement stmt3 = new CreateNonPCStatement(new StringLiteralExpression("u1"), NodeType.U, buildArrayLiteral("ua1"));
+        CreateNonPCStatement stmt4 = new CreateNonPCStatement(new StringLiteralExpression("o1"), NodeType.O, buildArrayLiteral("oa1"));
 
         PAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
@@ -49,7 +50,7 @@ class CreateNonPCStatementTest {
     @Test
     void testToFormattedString() {
         CreateNonPCStatement stmt = new CreateNonPCStatement(
-                new StringLiteral("ua1"),
+                new StringLiteralExpression("ua1"),
                 NodeType.UA,
                 buildArrayLiteral("ua2")
         );

@@ -4,18 +4,17 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 
 import java.util.Objects;
 
 
-public class ShortDeclarationStatement extends BasicStatement {
+public class ShortDeclarationStatement extends BasicStatement<VoidResult> {
 
     private String id;
-    private Expression expression;
+    private Expression<?> expression;
 
-    public ShortDeclarationStatement(String id, Expression expression) {
+    public ShortDeclarationStatement(String id, Expression<?> expression) {
         this.id = id;
         this.expression = expression;
     }
@@ -28,19 +27,19 @@ public class ShortDeclarationStatement extends BasicStatement {
         this.id = id;
     }
 
-    public Expression getExpression() {
+    public Expression<?> getExpression() {
         return expression;
     }
 
-    public void setExpression(Expression expression) {
+    public void setExpression(Expression<?> expression) {
         this.expression = expression;
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         ctx.scope().addVariable(id, expression.execute(ctx, pap));
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override

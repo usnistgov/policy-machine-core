@@ -9,10 +9,10 @@ import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLStmtsBasicFunction;
 import gov.nist.csd.pm.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class BasicFunctionDefinitionStatement extends PMLStatement implements FunctionDefinitionStatement {
+public class BasicFunctionDefinitionStatement extends PMLStatement<VoidResult> implements FunctionDefinitionStatement {
 
     private final PMLStmtsBasicFunction function;
     private final PMLFunctionSignature signature;
@@ -36,10 +36,10 @@ public class BasicFunctionDefinitionStatement extends PMLStatement implements Fu
     }
 
     @Override
-    public VoidValue execute(ExecutionContext ctx, PAP pap) throws PMException {
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         ctx.scope().addFunction(function.getName(), function);
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override

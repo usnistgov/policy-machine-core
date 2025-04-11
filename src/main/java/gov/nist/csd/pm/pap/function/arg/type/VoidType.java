@@ -1,0 +1,14 @@
+package gov.nist.csd.pm.pap.function.arg.type;
+
+public final class VoidType extends ArgType<Void> {
+
+    @Override
+    public Void cast(Object obj) {
+        return null;
+    }
+
+    @Override
+    public Class<Void> getExpectedClass() {
+        return Void.class;
+    }
+}

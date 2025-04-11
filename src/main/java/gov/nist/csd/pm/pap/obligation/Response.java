@@ -8,10 +8,10 @@ import java.util.Objects;
 
 public class Response implements Serializable {
 
-    private final List<PMLStatement> stmts;
+    private final List<PMLStatement<?>> stmts;
     private final String eventCtxVariable;
 
-    public Response(String eventCtxVariable, List<PMLStatement> stmts) {
+    public Response(String eventCtxVariable, List<PMLStatement<?>> stmts) {
         this.eventCtxVariable = eventCtxVariable;
         this.stmts = List.copyOf(stmts);
     }
@@ -25,7 +25,7 @@ public class Response implements Serializable {
         return eventCtxVariable;
     }
 
-    public List<PMLStatement> getStatements() {
+    public List<PMLStatement<?>> getStatements() {
         return stmts;
     }
 

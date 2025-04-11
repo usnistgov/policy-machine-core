@@ -5,31 +5,28 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.pap.function.op.operation.SetResourceOperationsOp.SetResourceOperationsOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.List;
 import java.util.Objects;
 
-public class SetResourceOperationsStatement extends OperationStatement<SetResourceOperationsOp> {
+public class SetResourceOperationsStatement extends OperationStatement<SetResourceOperationsOpArgs> {
 
-    private final Expression operationsExpr;
+    private final Expression<List<String>> operationsExpr;
 
-    public SetResourceOperationsStatement(Expression operationsExpr) {
+    public SetResourceOperationsStatement(Expression<List<String>> operationsExpr) {
         super(new SetResourceOperationsOp());
         this.operationsExpr = operationsExpr;
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        List<Value> opValues = operationsExpr.execute(ctx, pap).getArrayValue();
-        AccessRightSet accessRightSet = new AccessRightSet();
-        for (Value opValue : opValues) {
-            accessRightSet.add(opValue.getStringValue());
-        }
-        
-        return op.actualArgs(accessRightSet);
+    public SetResourceOperationsOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        List<String> opValues = operationsExpr.execute(ctx, pap);
+        AccessRightSet accessRightSet = new AccessRightSet(opValues);
+
+        return new SetResourceOperationsOpArgs(accessRightSet);
     }
 
     @Override

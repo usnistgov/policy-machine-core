@@ -1,22 +1,22 @@
 package gov.nist.csd.pm.pap.pml.statement.basic;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 
 import java.util.Objects;
 
-public class VariableAssignmentStatement extends BasicStatement {
+public class VariableAssignmentStatement extends BasicStatement<VoidResult> {
 
     private final String id;
     private final boolean isPlus;
-    private final Expression expression;
+    private final Expression<?> expression;
 
-    public VariableAssignmentStatement(String id, boolean isPlus, Expression expression) {
+    public VariableAssignmentStatement(String id, boolean isPlus, Expression<?> expression) {
         this.id = id;
         this.isPlus = isPlus;
         this.expression = expression;
@@ -30,25 +30,24 @@ public class VariableAssignmentStatement extends BasicStatement {
         return isPlus;
     }
 
-    public Expression getExpression() {
+    public Expression<?> getExpression() {
         return expression;
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Value value = expression.execute(ctx, pap);
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        Object value = expression.execute(ctx, pap);
 
         // if statement uses '+=' add the existing value to the new value
         if (isPlus) {
-            String strValue = ctx.scope().getVariable(id).getStringValue();
-            String exprValue = expression.execute(ctx, pap).getStringValue();
+            String variable = (String) ctx.scope().getVariable(id);
 
-            value = new StringValue(strValue + exprValue);
+            value = variable + value;
         }
 
         ctx.scope().updateVariable(id, value);
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override

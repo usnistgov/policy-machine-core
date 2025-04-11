@@ -1,32 +1,33 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import gov.nist.csd.pm.pap.pml.exception.ArgTypeNotCastableException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.exception.UnknownPatternException;
+import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateObligationStatement extends OperationStatement<CreateObligationOp> {
+public class CreateObligationStatement extends OperationStatement<ObligationOpArgs> {
 
-    private final Expression name;
+    private final Expression<String> name;
     private final List<CreateRuleStatement> ruleStmts;
 
-    public CreateObligationStatement(Expression name, List<CreateRuleStatement> ruleStmts) {
+    public CreateObligationStatement(Expression<String> name, List<CreateRuleStatement> ruleStmts) {
         super(new CreateObligationOp());
         this.name = name;
         this.ruleStmts = ruleStmts;
     }
 
-    public Expression getName() {
+    public Expression<String> getName() {
         return name;
     }
 
@@ -35,17 +36,17 @@ public class CreateObligationStatement extends OperationStatement<CreateObligati
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String nameStr = name.execute(ctx, pap).getStringValue();
+    public ObligationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String nameStr = name.execute(ctx, pap);
 
         // execute the create rule statements and add to obligation
         List<Rule> rules = new ArrayList<>();
         for (CreateRuleStatement createRuleStmt : ruleStmts) {
-            Rule rule = createRuleStmt.execute(ctx, pap).getRuleValue();
+            Rule rule = createRuleStmt.execute(ctx, pap);
             rules.add(rule);
         }
 
-        return op.actualArgs(ctx.author().getUser(), nameStr, new ArrayList<>(rules));
+        return new ObligationOpArgs(ctx.author().getUser(), nameStr, new ArrayList<>(rules));
     }
 
     @Override
@@ -79,22 +80,23 @@ public class CreateObligationStatement extends OperationStatement<CreateObligati
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         try {
             return new CreateObligationStatement(
-                new StringLiteral(obligation.getName()),
+                new StringLiteralExpression(obligation.getName()),
                 createRuleStatementsFromObligation(obligation.getRules())
             );
-        } catch (UnknownPatternException e) {
+        } catch (UnknownPatternException | ArgTypeNotCastableException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) throws UnknownPatternException {
+    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) throws
+                                                                                                  UnknownPatternException {
         List<CreateRuleStatement> createRuleStatements = new ArrayList<>();
 
         for (Rule rule : rules) {
             EventPattern event = rule.getEventPattern();
 
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                new StringLiteral(rule.getName()),
+                new StringLiteralExpression(rule.getName()),
                 event.getSubjectPattern(),
                 event.getOperationPattern(),
                 event.getArgPatterns(),

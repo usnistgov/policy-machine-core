@@ -2,33 +2,32 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.NoArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.statement.basic.BasicStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 
-public class PMLStatementBlock extends BasicStatement {
+public class PMLStatementBlock extends PMLStatement<StatementResult> {
 
-    private List<PMLStatement> stmts;
+    private List<PMLStatement<?>> stmts;
 
-    public PMLStatementBlock(List<PMLStatement> stmts) {
+    public PMLStatementBlock(List<PMLStatement<?>> stmts) {
         this.stmts = stmts;
     }
 
-    public PMLStatementBlock(PMLStatement ... statements) {
+    public PMLStatementBlock(PMLStatement<?> ... statements) {
         stmts = new ArrayList<>(List.of(statements));
     }
 
-    public List<PMLStatement> getStmts() {
+    public List<PMLStatement<?>> getStmts() {
         return stmts;
     }
 
-    public void setStmts(List<PMLStatement> stmts) {
+    public void setStmts(List<PMLStatement<?>> stmts) {
         this.stmts = stmts;
     }
 
@@ -52,15 +51,14 @@ public class PMLStatementBlock extends BasicStatement {
     @Override
     public String toFormattedString(int indentLevel) {
         StringBuilder sb = new StringBuilder("{\n");
-        for (PMLStatement stmt : stmts) {
+        for (PMLStatement<?> stmt : stmts) {
             sb.append(stmt.toFormattedString(indentLevel+1)).append("\n");
         }
 
         return sb.append(indent(indentLevel)).append("}").toString();
     }
 
-    @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        return ctx.executeStatements(stmts, new Args());
+    public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        return ctx.executeStatements(stmts, new NoArgs());
     }
 }

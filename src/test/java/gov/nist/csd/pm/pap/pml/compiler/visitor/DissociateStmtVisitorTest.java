@@ -1,9 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DissociateStatement;
@@ -16,7 +17,7 @@ class DissociateStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.DissociateStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.DissociateStatementContext ctx = TestPMLParser.toCtx(
                 """
                 dissociate "a" and "b"
                 """,
@@ -25,7 +26,7 @@ class DissociateStmtVisitorTest {
         PMLStatement stmt = new DissociateStmtVisitor(visitorCtx).visitDissociateStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DissociateStatement(new StringLiteral("a"), new StringLiteral("b")),
+                new DissociateStatement(new StringLiteralExpression("a"), new StringLiteralExpression("b")),
                 stmt
         );
     }

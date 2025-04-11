@@ -22,14 +22,14 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
+public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
 
     public PMLVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public List<PMLStatement> visitPml(PMLParser.PmlContext ctx) {
+    public List<PMLStatement<?>> visitPml(PMLParser.PmlContext ctx) {
         SortedStatements sortedStatements = sortStatements(ctx);
 
         CompiledFunctions functions = compileFunctions(
@@ -38,7 +38,7 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
                 sortedStatements.functionCtxs
         );
 
-        List<PMLStatement> stmts = new ArrayList<>();
+        List<PMLStatement<?>> stmts = new ArrayList<>();
         stmts.addAll(functions.operations);
         stmts.addAll(functions.routines);
         stmts.addAll(functions.functions);
@@ -168,13 +168,13 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement>> {
                                      List<RoutineDefinitionStatement> routines,
                                      List<BasicFunctionDefinitionStatement> functions) {}
 
-    private List<PMLStatement> compileStatements(List<PMLParser.StatementContext> statementCtxs) {
-        List<PMLStatement> statements = new ArrayList<>();
+    private List<PMLStatement<?>> compileStatements(List<PMLParser.StatementContext> statementCtxs) {
+        List<PMLStatement<?>> statements = new ArrayList<>();
         for (PMLParser.StatementContext stmtCtx : statementCtxs) {
             StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
 
             try {
-                PMLStatement statement = statementVisitor.visitStatement(stmtCtx);
+                PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
                 statements.add(statement);
             } catch (PMLCompilationRuntimeException e) {
                 visitorCtx.errorLog().addErrors(e.getErrors());

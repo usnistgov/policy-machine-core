@@ -12,10 +12,12 @@ public class PMLCompilationRuntimeException extends RuntimeException {
     private List<CompileError> errors;
 
     public PMLCompilationRuntimeException(ParserRuleContext ctx, String message) {
+        super(message);
         this.errors = List.of(CompileError.fromParserRuleContext(ctx, message));
     }
 
     public PMLCompilationRuntimeException(String message) {
+        super(message);
         this.errors = new ArrayList<>();
         this.errors.add(new CompileError(new Position(0, 0, 0), message));
     }

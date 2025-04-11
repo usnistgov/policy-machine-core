@@ -12,23 +12,21 @@ import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.value.RuleValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class CreateRuleStatement extends PMLStatement {
+public class CreateRuleStatement extends PMLStatement<Rule> {
 
-    protected Expression name;
+    protected Expression<String> name;
     protected SubjectPattern subjectPattern;
     protected OperationPattern operationPattern;
     protected Map<String, List<ArgPatternExpression>> argPattern;
     protected ResponseBlock responseBlock;
 
-    public CreateRuleStatement(Expression name,
+    public CreateRuleStatement(Expression<String> name,
                                SubjectPattern subjectPattern,
                                OperationPattern operationPattern,
                                Map<String, List<ArgPatternExpression>> argPattern,
@@ -40,11 +38,11 @@ public class CreateRuleStatement extends PMLStatement {
         this.responseBlock = responseBlock;
     }
 
-    public Expression getName() {
+    public Expression<String> getName() {
         return name;
     }
 
-    public void setName(Expression name) {
+    public void setName(Expression<String> name) {
         this.name = name;
     }
 
@@ -81,10 +79,10 @@ public class CreateRuleStatement extends PMLStatement {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        String nameValue = name.execute(ctx, pap).getStringValue();
+    public Rule execute(ExecutionContext ctx, PAP pap) throws PMException {
+        String nameValue = name.execute(ctx, pap);
 
-        return new RuleValue(new Rule(
+        return new Rule(
             nameValue,
             new EventPattern(
                 subjectPattern,
@@ -92,7 +90,7 @@ public class CreateRuleStatement extends PMLStatement {
                 new HashMap<>(argPattern)
             ),
             new Response(responseBlock.evtVar, responseBlock.getStatements())
-        ));
+        );
     }
 
     @Override
@@ -152,9 +150,9 @@ public class CreateRuleStatement extends PMLStatement {
 
     public static class ResponseBlock implements Serializable {
         protected String evtVar;
-        protected List<PMLStatement> statements;
+        protected List<PMLStatement<?>> statements;
 
-        public ResponseBlock(String evtVar, List<PMLStatement> statements) {
+        public ResponseBlock(String evtVar, List<PMLStatement<?>> statements) {
             this.evtVar = evtVar;
             this.statements = statements;
         }
@@ -163,7 +161,7 @@ public class CreateRuleStatement extends PMLStatement {
             return evtVar;
         }
 
-        public List<PMLStatement> getStatements() {
+        public List<PMLStatement<?>> getStatements() {
             return statements;
         }
 

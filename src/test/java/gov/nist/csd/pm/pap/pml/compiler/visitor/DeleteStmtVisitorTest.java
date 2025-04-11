@@ -1,9 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteNodeStatement;
@@ -18,7 +19,7 @@ class DeleteStmtVisitorTest {
 
     @Test
     void testDeleteNode() throws PMException {
-        PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.DeleteStatementContext ctx = TestPMLParser.toCtx(
                 """
                 delete node "oa1"
                 """,
@@ -27,7 +28,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteNodeStatement(new StringLiteral("oa1")),
+                new DeleteNodeStatement(new StringLiteralExpression("oa1")),
                 stmt
         );
     }
@@ -46,7 +47,7 @@ class DeleteStmtVisitorTest {
 
     @Test
     void testDeleteObligation() throws PMException {
-        PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.DeleteStatementContext ctx = TestPMLParser.toCtx(
                 """
                 delete obligation "test"
                 """,
@@ -55,14 +56,14 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteObligationStatement(new StringLiteral("test")),
+                new DeleteObligationStatement(new StringLiteralExpression("test")),
                 stmt
         );
     }
 
     @Test
     void testDeleteProhibition() throws PMException {
-        PMLParser.DeleteStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.DeleteStatementContext ctx = TestPMLParser.toCtx(
                 """
                 delete prohibition "test"
                 """,
@@ -71,7 +72,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteProhibitionStatement(new StringLiteral("test")),
+                new DeleteProhibitionStatement(new StringLiteralExpression("test")),
                 stmt
         );
     }

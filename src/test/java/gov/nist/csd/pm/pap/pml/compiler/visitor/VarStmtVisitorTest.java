@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -10,6 +10,7 @@ import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,7 @@ class VarStmtVisitorTest {
 
         @Test
         void testSuccess() throws UnknownVariableInScopeException {
-            PMLParser.VarDeclarationContext ctx = PMLContextVisitor.toCtx(
+            PMLParser.VarDeclarationContext ctx = TestPMLParser.toCtx(
                     """
                      var x = "a"
                      """, PMLParser.VarDeclarationContext.class);
@@ -46,7 +47,7 @@ class VarStmtVisitorTest {
 
         @Test
         void testReassignConstant() throws VariableAlreadyDefinedInScopeException {
-            PMLParser.VarDeclarationContext ctx = PMLContextVisitor.toCtx(
+            PMLParser.VarDeclarationContext ctx = TestPMLParser.toCtx(
                     """
                      var x = "a"
                      """, PMLParser.VarDeclarationContext.class);
@@ -83,7 +84,7 @@ class VarStmtVisitorTest {
     class ShortDeclarationTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException {
-            PMLParser.ShortDeclarationContext ctx = PMLContextVisitor.toCtx(
+            PMLParser.ShortDeclarationContext ctx = TestPMLParser.toCtx(
                     """
                      x := "a"
                      """, PMLParser.ShortDeclarationContext.class);
@@ -112,7 +113,7 @@ class VarStmtVisitorTest {
     class VariableAssignmentTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException, VariableAlreadyDefinedInScopeException {
-            PMLParser.VariableAssignmentStatementContext ctx = PMLContextVisitor.toCtx(
+            PMLParser.VariableAssignmentStatementContext ctx = TestPMLParser.toCtx(
                     """
                      x = "a"
                      """, PMLParser.VariableAssignmentStatementContext.class);
@@ -126,7 +127,7 @@ class VarStmtVisitorTest {
             assertFalse(visitorCtx.scope().getVariable("x").isConst());
             assertFalse(stmt.isPlus());
 
-            ctx = PMLContextVisitor.toCtx(
+            ctx = TestPMLParser.toCtx(
                     """
                      x += "a"
                      """, PMLParser.VariableAssignmentStatementContext.class);

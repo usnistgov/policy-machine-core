@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -16,11 +17,10 @@ class StringLiteralTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 "test"
-                """,
-                PMLParser.LiteralExpressionContext.class);
+                """);
 
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<String> expression = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
@@ -28,7 +28,7 @@ class StringLiteralTest {
 
         StringLiteralExpression a = (StringLiteralExpression) expression;
         assertEquals(
-                new StringLiteralExpression("test", STRING_TYPE),
+                new StringLiteralExpression("test"),
                 a
         );
         assertEquals(

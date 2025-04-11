@@ -4,6 +4,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
@@ -20,7 +21,7 @@ class SetNodePropertiesStatementTest {
     @Test
     void testSuccess() throws PMException {
         SetNodePropertiesStatement stmt = new SetNodePropertiesStatement(
-                new StringLiteral("ua1"),
+                new StringLiteralExpression("ua1"),
                 buildMapLiteral("a", "b", "c", "d")
         );
 
@@ -41,7 +42,7 @@ class SetNodePropertiesStatementTest {
     @Test
     void testToFormattedString() {
         SetNodePropertiesStatement stmt = new SetNodePropertiesStatement(
-                new StringLiteral("ua1"),
+                new StringLiteralExpression("ua1"),
                 buildMapLiteral("a", "b", "c", "d")
         );
 

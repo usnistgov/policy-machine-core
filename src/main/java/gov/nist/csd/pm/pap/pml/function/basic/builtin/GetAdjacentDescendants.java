@@ -1,15 +1,17 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.ArrayValue;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,29 +19,28 @@ import java.util.List;
 
 public class GetAdjacentDescendants extends PMLBasicFunction {
 
-    private static final Type returnType = Type.array(Type.string());
+    private static final ArgType<?> returnType = listType(STRING_TYPE);
 
     public GetAdjacentDescendants() {
         super(
                 "getAdjacentDescendants",
-                Type.array(Type.any()),
+                listType(STRING_TYPE),
                 List.of(NODE_NAME_ARG)
         );
     }
 
     @Override
-    public Value execute(PAP pap, Args args) throws PMException {
-        Value nodeName = args.get(NODE_NAME_ARG);
+    public Object execute(PAP pap, MapArgs args) throws PMException {
+        String nodeName = args.get(NODE_NAME_ARG);
 
-        long id = pap.query().graph().getNodeId(nodeName.getStringValue());
+        long id = pap.query().graph().getNodeId(nodeName);
         Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(id);
-        List<Value> descValues = new ArrayList<>(descendants.size());
-
+        List<String> descValues = new ArrayList<>();
         for (long desc : descendants) {
             Node node = pap.query().graph().getNodeById(desc);
-            descValues.add(new StringValue(node.getName()));
+            descValues.add(node.getName());
         }
 
-        return new ArrayValue(descValues, returnType);
+        return descValues;
     }
 }

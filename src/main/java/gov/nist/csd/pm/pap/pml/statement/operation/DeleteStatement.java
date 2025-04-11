@@ -1,16 +1,17 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
 import java.util.Objects;
 
-public abstract class DeleteStatement<T extends Operation<?>> extends OperationStatement<T> {
+public abstract class DeleteStatement<A extends Args> extends OperationStatement<A> {
 
     protected Type type;
-    protected Expression expression;
+    protected Expression<String> expression;
 
-    public DeleteStatement(T op, Type type, Expression expression) {
+    public DeleteStatement(Operation<?, A> op, Type type, Expression<String> expression) {
         super(op);
         this.type = type;
         this.expression = expression;
@@ -24,11 +25,11 @@ public abstract class DeleteStatement<T extends Operation<?>> extends OperationS
         this.type = type;
     }
 
-    public Expression getExpression() {
+    public Expression<String> getExpression() {
         return expression;
     }
 
-    public void setExpression(Expression expression) {
+    public void setExpression(Expression<String> expression) {
         this.expression = expression;
     }
 

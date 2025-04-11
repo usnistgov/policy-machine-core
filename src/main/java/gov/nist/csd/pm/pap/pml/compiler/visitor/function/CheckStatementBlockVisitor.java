@@ -22,7 +22,7 @@ public class CheckStatementBlockVisitor extends PMLBaseVisitor<PMLStatementBlock
         }
 
         CheckStatementVisitor checkVisitor = new CheckStatementVisitor(visitorCtx);
-        List<PMLStatement> statements = new ArrayList<>();
+        List<PMLStatement<?>> statements = new ArrayList<>();
 
         for (PMLParser.CheckStatementContext checkStatementContext : ctx.checkStatement()) {
             statements.add(checkVisitor.visitCheckStatement(checkStatementContext));

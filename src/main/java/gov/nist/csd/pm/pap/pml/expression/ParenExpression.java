@@ -2,39 +2,26 @@ package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-
-import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.Objects;
 
-public class ParenExpression extends Expression{
+public class ParenExpression<T> extends Expression<T> {
 
-    public static Expression compileParenExpression(VisitorContext visitorCtx,
-                                                    PMLParser.ExpressionContext expressionCtx) {
-        return new ParenExpression(Expression.compile(visitorCtx, expressionCtx, Type.any()));
-    }
+    private final Expression<T> expression;
 
-    private final Expression expression;
-
-    public ParenExpression(Expression expression) {
+    public ParenExpression(Expression<T> expression) {
         this.expression = expression;
     }
 
-    public Expression getExpression() {
+    public Expression<T> getExpression() {
         return expression;
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
-        return expression.getType(scope);
+    public ArgType<T> getType() {
+        return expression.getType();
     }
 
     @Override
@@ -43,15 +30,18 @@ public class ParenExpression extends Expression{
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+    public T execute(ExecutionContext ctx, PAP pap) throws PMException {
         return expression.execute(ctx, pap);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ParenExpression that = (ParenExpression) o;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ParenExpression<?> that)) {
+            return false;
+        }
         return Objects.equals(expression, that.expression);
     }
 

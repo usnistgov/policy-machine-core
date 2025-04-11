@@ -5,7 +5,7 @@ package gov.nist.csd.pm.pap.pml.antlr;
 }
 
 OPERATION: 'operation';
-NODE_ARG: '@node';
+NODE_PARAM: '@node';
 CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';

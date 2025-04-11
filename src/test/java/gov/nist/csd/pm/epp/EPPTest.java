@@ -39,7 +39,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 import org.neo4j.codegen.api.ArrayLiteral;
-import org.neo4j.cypher.internal.expressions.StringLiteral;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
@@ -312,13 +311,13 @@ class EPPTest {
                     new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
                     new Response("evtCtx", List.of(
                         new CreateNonPCStatement(
-                            new StringLiteralExpression<>("o2", STRING_TYPE),
+                            new StringLiteralExpression("o2"),
                             NodeType.O,
-                            new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("oa1", STRING_TYPE)), listType(STRING_TYPE))
+                            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("oa1")), STRING_TYPE)
                         ),
 
                         // expect error for node already exists
-                        new CreatePolicyClassStatement(new StringLiteralExpression<>("pc1", STRING_TYPE))
+                        new CreatePolicyClassStatement(new StringLiteralExpression("pc1"))
                     ))
                 ))
             );
@@ -369,7 +368,7 @@ class EPPTest {
             }
         };
 
-        pap.setPMLOperations(pmlOperation);
+        pap.modify().operations().createAdminOperation(pmlOperation);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
@@ -460,7 +459,7 @@ class EPPTest {
                 associate "ua2" and PM_ADMIN_OBJECT with ["*a"]
                 
                 operation op1() {
-                    check "assign" on "oa1"
+                    check "assign" on ["oa1"]
                 } {
                     create pc "test_pc"
                 }

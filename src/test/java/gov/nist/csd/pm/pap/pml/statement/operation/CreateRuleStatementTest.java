@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.InArgPattern;
@@ -17,7 +18,7 @@ class CreateRuleStatementTest {
     @Test
     void testFormattedString() {
         CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                new StringLiteral("rule1"),
+                new StringLiteralExpression("rule1"),
                 new SubjectPattern(),
                 new OperationPattern(),
                 Map.of(

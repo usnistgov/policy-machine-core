@@ -2,18 +2,26 @@ package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 
+import org.apache.arrow.vector.types.pojo.ArrowType.Bool;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,109 +30,102 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class LiteralVisitorTest {
 
     @Test
-    void testVisitStringLiteral() throws PMException {
-        PMLParser.StringLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+    void testVisitStringLiteralExpression() throws PMException {
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 "test"
-                """,
-                PMLParser.StringLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        StringLiteral literal = new LiteralVisitor(visitorContext)
-                .visitStringLiteral(ctx);
+        Expression<String> literal = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         assertEquals(
-                new StringLiteral("test"),
+                new StringLiteralExpression("test"),
                 literal
         );
         assertEquals(
                 STRING_TYPE,
-                literal.getType(visitorContext.scope())
+                literal.getType()
         );
     }
 
     @Test
     void testVisitBoolLiteral() throws PMException {
-        PMLParser.BoolLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 true
-                """,
-                PMLParser.BoolLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        BoolLiteral literal = new LiteralVisitor(visitorContext)
-                .visitBoolLiteral(ctx);
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         assertEquals(
-                new BoolLiteral(true),
+                new BoolLiteralExpression(true),
                 literal
         );
         assertEquals(
                 BOOLEAN_TYPE,
-                literal.getType(visitorContext.scope())
+                literal.getType()
         );
     }
 
     @Test
     void testVisitArrayLiteral() throws PMException {
-        PMLParser.ArrayLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ["a", ["b"]]
-                """,
-                PMLParser.ArrayLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression literal = new LiteralVisitor(visitorContext)
-                .visitArrayLiteral(ctx);
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, listType(OBJECT_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        ArrayLiteral arrayLiteral = (ArrayLiteral)literal;
+        ArrayLiteralExpression<?> arrayLiteral = (ArrayLiteralExpression<?>)literal;
         assertEquals(
-                new ArrayLiteral(List.of(new StringLiteral("a"), new ArrayLiteral(List.of(new StringLiteral("b")), STRING_TYPE)), OBJECT_TYPE),
-                arrayLiteral
+            new ArrayLiteralExpression<>(
+                List.of(new StringLiteralExpression("a"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), OBJECT_TYPE)),
+                OBJECT_TYPE
+            ),
+            arrayLiteral
         );
         assertEquals(
                 listType(OBJECT_TYPE),
-                literal.getType(visitorContext.scope())
+                literal.getType()
         );
 
-        ctx = PMLContextVisitor.toLiteralCtx(
+        ctx = TestPMLParser.parseExpression(
                 """
                 ["a", "b"]
-                """,
-                PMLParser.ArrayLiteralContext.class);
+                """);
         visitorContext = new VisitorContext(new CompileScope());
-        literal = new LiteralVisitor(visitorContext)
-                .visitArrayLiteral(ctx);
+        literal = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        arrayLiteral = (ArrayLiteral)literal;
+        arrayLiteral = (ArrayLiteralExpression<?>)literal;
         assertEquals(
                 buildArrayLiteral("a", "b"),
                 arrayLiteral
         );
         assertEquals(
                 listType(STRING_TYPE),
-                literal.getType(visitorContext.scope())
+                literal.getType()
         );
     }
 
     @Test
     void testVisitArrayLiteralScopeException() throws PMException {
-        PMLParser.ArrayLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ["a", b]
-                """,
-                PMLParser.ArrayLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
 
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
-                () -> new LiteralVisitor(visitorContext)
-                        .visitArrayLiteral(ctx)
+                () -> ExpressionVisitor.compile(visitorContext, ctx)
         );
 
         assertEquals(1, e.getErrors().size());
@@ -135,126 +136,114 @@ class LiteralVisitorTest {
     }
 
     @Test
-    void testVisitMapLiteral() throws PMException {
-        PMLParser.MapLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+    void testVisitMapLiteralExpression() throws PMException {
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 {
                     "a": "a1",
                     "b": "b1"
                 }
-                """,
-                PMLParser.MapLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression literal = new LiteralVisitor(visitorContext)
-                .visitMapLiteral(ctx);
+        Expression literal = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        MapLiteral mapLiteral = (MapLiteral)literal;
+        MapLiteralExpression mapLiteral = (MapLiteralExpression)literal;
         assertEquals(
                 buildMapLiteral("a", "a1", "b", "b1"),
                 mapLiteral
         );
         assertEquals(
                 mapType(STRING_TYPE, STRING_TYPE),
-                literal.getType(visitorContext.scope())
+                literal.getType()
         );
     }
 
     @Test
-    void testVisitMapLiteralDifferentValueTypes() throws PMException {
-        PMLParser.MapLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+    void testVisitMapLiteralExpressionDifferentValueTypes() throws PMException {
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 {
                     "a": "a1",
                     "b": ["b1"]
                 }
-                """,
-                PMLParser.MapLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression literal = new LiteralVisitor(visitorContext)
-                .visitMapLiteral(ctx);
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx);
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        MapLiteral mapLiteral = (MapLiteral)literal;
+        MapLiteralExpression<?, ?> mapLiteral = (MapLiteralExpression<?, ?>)literal;
+        Map<Expression<?>, Expression<?>> map1 = new HashMap<>();
+        map1.put(new StringLiteralExpression("a"), new StringLiteralExpression("a1"));
+        map1.put(new StringLiteralExpression("b"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b1")), OBJECT_TYPE));
         assertEquals(
-                new MapLiteral(Map.of(
-                        new StringLiteral("a"), new StringLiteral("a1"),
-                        new StringLiteral("b"), new ArrayLiteral(List.of(new StringLiteral("b1")), STRING_TYPE)
-                ), STRING_TYPE, OBJECT_TYPE),
+                new MapLiteralExpression<>(map1, OBJECT_TYPE, OBJECT_TYPE),
                 mapLiteral
         );
         assertEquals(
-                mapType(STRING_TYPE, OBJECT_TYPE),
-                literal.getType(visitorContext.scope())
+                mapType(OBJECT_TYPE, OBJECT_TYPE),
+                literal.getType()
         );
     }
 
     @Test
-    void testVisitMapLiteralDifferentKeyTypes() throws PMException {
-        PMLParser.MapLiteralContext ctx = PMLContextVisitor.toLiteralCtx(
+    void testVisitMapLiteralExpressionDifferentKeyTypes() throws PMException {
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 {
                     "a": "a1",
                     ["b"]: "b1"
                 }
-                """,
-                PMLParser.MapLiteralContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression literal = new LiteralVisitor(visitorContext)
-                .visitMapLiteral(ctx);
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, mapType(OBJECT_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        MapLiteral mapLiteral = (MapLiteral)literal;
-        MapLiteral expected = new MapLiteral(new HashMap<>(Map.of(
-                new StringLiteral("a"), new StringLiteral("a1"),
-                new ArrayLiteral(List.of(new StringLiteral("b")), STRING_TYPE), new StringLiteral("b1")
-        )), OBJECT_TYPE, STRING_TYPE);
+        MapLiteralExpression<?, ?> mapLiteral = (MapLiteralExpression<?, ?>)literal;
+        Map<Expression<?>, Expression<?>> map2 = new HashMap<>();
+        map2.put(new StringLiteralExpression("a"), new StringLiteralExpression("a1"));
+        map2.put(new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), OBJECT_TYPE), new StringLiteralExpression("b1"));
+        MapLiteralExpression<?, ?> expected = new MapLiteralExpression<>(map2, OBJECT_TYPE, STRING_TYPE);
 
         assertEquals(expected, mapLiteral);
         assertEquals(
                 mapType(OBJECT_TYPE, STRING_TYPE),
-                literal.getType(visitorContext.scope())
+                literal.getType()
         );
     }
 
     @Test
     void testEmptyLiterals() throws PMException {
-        PMLParser.StringLiteralContext stringCtx = PMLContextVisitor.toLiteralCtx(
-                "\"\"",
-                PMLParser.StringLiteralContext.class);
+        PMLParser.ExpressionContext stringCtx = TestPMLParser.parseExpression(
+                "\"\"");
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        StringLiteral literal = new LiteralVisitor(visitorContext)
-                .visitStringLiteral(stringCtx);
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, stringCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-                new StringLiteral(""),
+                new StringLiteralExpression(""),
                 literal
         );
 
-        PMLParser.ArrayLiteralContext arrayCtx = PMLContextVisitor.toLiteralCtx(
-                "[]",
-                PMLParser.ArrayLiteralContext.class);
+        PMLParser.ExpressionContext arrayCtx = TestPMLParser.parseExpression(
+                "[]");
         visitorContext = new VisitorContext(new CompileScope());
-        Expression arrayLiteral = new LiteralVisitor(visitorContext)
-                .visitArrayLiteral(arrayCtx);
+        Expression arrayLiteral = ExpressionVisitor.compile(visitorContext, arrayCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-                new ArrayLiteral(List.of(), OBJECT_TYPE),
+            new ArrayLiteralExpression<>(List.of(), OBJECT_TYPE),
                 arrayLiteral
         );
 
-        PMLParser.MapLiteralContext mapCtx = PMLContextVisitor.toLiteralCtx(
-                "{}",
-                PMLParser.MapLiteralContext.class);
+        PMLParser.ExpressionContext mapCtx = TestPMLParser.parseExpression(
+                "{}");
         visitorContext = new VisitorContext(new CompileScope());
-        Expression mapLiteral = new LiteralVisitor(visitorContext)
-                .visitMapLiteral(mapCtx);
+        Expression mapLiteral = ExpressionVisitor.compile(visitorContext, mapCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-                new MapLiteral(Map.of(), OBJECT_TYPE, OBJECT_TYPE),
+                new MapLiteralExpression(Map.of(), OBJECT_TYPE, OBJECT_TYPE),
                 mapLiteral
         );
     }

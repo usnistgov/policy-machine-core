@@ -25,7 +25,7 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
+    public void createAdminOperation(Operation<?, ?> operation) throws PMException {
         if (AdminOperations.isAdminOperation(operation.getName())
                 || store.operations().getAdminOperationNames().contains(operation.getName())) {
             throw new OperationExistsException(operation.getName());

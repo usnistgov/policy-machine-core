@@ -2,18 +2,21 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateProhibitionStatement;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +25,7 @@ class CreateProhibitionStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.CreateProhibitionStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.CreateProhibitionStatementContext ctx = TestPMLParser.toCtx(
                 """
                 create prohibition "test"
                 deny user "u1"
@@ -35,12 +38,14 @@ class CreateProhibitionStmtVisitorTest {
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new CreateProhibitionStatement(
-                        new StringLiteral("test"),
-                        new StringLiteral("u1"),
+                        new StringLiteralExpression("test"),
+                        new StringLiteralExpression("u1"),
                         ProhibitionSubjectType.USER,
                         buildArrayLiteral("read"),
                         false,
-                        new ArrayLiteral(List.of(new NegatedExpression(new StringLiteral("oa1"))), STRING_TYPE)
+                        MapLiteralExpression.of(Map.of(
+                            new StringLiteralExpression("oa1"), new BoolLiteralExpression(true)
+                        ), STRING_TYPE, BOOLEAN_TYPE)
                 ),
                 stmt
         );

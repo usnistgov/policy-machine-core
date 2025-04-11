@@ -6,6 +6,7 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,8 @@ class AssociateStatementTest {
     @Test
     void testSuccess() throws PMException {
         AssociateStatement stmt = new AssociateStatement(
-                new StringLiteral("ua1"),
-                new StringLiteral("oa1"),
+                new StringLiteralExpression("ua1"),
+                new StringLiteralExpression("oa1"),
                 buildArrayLiteral("read")
         );
 
@@ -47,8 +48,8 @@ class AssociateStatementTest {
     @Test
     void testToFormattedString() {
         AssociateStatement stmt = new AssociateStatement(
-                new StringLiteral("ua1"),
-                new StringLiteral("oa1"),
+                new StringLiteralExpression("ua1"),
+                new StringLiteralExpression("oa1"),
                 buildArrayLiteral("read")
         );
         assertEquals(

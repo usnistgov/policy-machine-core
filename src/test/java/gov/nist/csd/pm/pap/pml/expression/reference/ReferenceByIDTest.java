@@ -13,30 +13,31 @@ import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ReferenceByIDTest {
 
     @Test
     void testGetType() throws PMException {
-        ReferenceByID a = new ReferenceByID("a");
+        VariableReferenceExpression<?> a = new VariableReferenceExpression<>("a", STRING_TYPE);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
 
         assertEquals(
                 STRING_TYPE,
-                a.getType(visitorContext.scope())
+                a.getType()
         );
     }
 
     @Test
     void testExecute() throws PMException {
-        ReferenceByID a = new ReferenceByID("a");
+        VariableReferenceExpression<?> a = new VariableReferenceExpression<>("a", STRING_TYPE);
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
-        Value expected = new StringValue("test");
+        Object expected = "test";
         executionContext.scope().addVariable("a", expected);
 
-        Value actual = a.execute(executionContext, new MemoryPAP());
+        Object actual = a.execute(executionContext, new MemoryPAP());
         assertEquals(expected, actual);
     }
 

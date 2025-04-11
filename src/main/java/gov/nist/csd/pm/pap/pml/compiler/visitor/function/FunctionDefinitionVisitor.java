@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor.function;
 
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
@@ -7,7 +10,6 @@ import gov.nist.csd.pm.pap.pml.compiler.visitor.StatementBlockVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLStmtsBasicFunction;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
@@ -19,7 +21,7 @@ import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.OperationDefinitionStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.RoutineDefinitionStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 
 import java.util.*;
 
@@ -89,15 +91,15 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     }
 
     private CheckAndStatementsBlock parseBody(PMLParser.BasicStatementBlockContext ctx,
-                                              Type returnType,
-                                              List<PMLFormalArg> formalArgs) {
+                                              ArgType<?> returnType,
+                                              List<FormalParameter<?>> formalArgs) {
         // create a new scope for the function body
         VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
 
         StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
         StatementBlockVisitor.Result result = statementBlockVisitor.visitBasicStatementBlock(ctx);
 
-        if (!result.allPathsReturned() && !returnType.isVoid()) {
+        if (!result.allPathsReturned() && !returnType.equals(new VoidType())) {
             throw new PMLCompilationRuntimeException(ctx, "not all conditional paths return");
         }
 
@@ -106,13 +108,13 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
 
     private CheckAndStatementsBlock parseBody(PMLParser.CheckStatementBlockContext checkStatementBlockCtx,
                                               PMLParser.StatementBlockContext statementBlockCtx,
-                                              Type returnType,
-                                              List<PMLFormalArg> formalArgs) {
+                                              ArgType<?> returnType,
+                                              List<FormalParameter<?>> formalArgs) {
         VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
         StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
         StatementBlockVisitor.Result result = statementBlockVisitor.visitStatementBlock(statementBlockCtx);
 
-        if (!result.allPathsReturned() && !returnType.isVoid()) {
+        if (!result.allPathsReturned() && !returnType.equals(new VoidType())) {
             throw new PMLCompilationRuntimeException(statementBlockCtx, "not all conditional paths return");
         }
 
@@ -126,15 +128,15 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         return new CheckAndStatementsBlock(checks, result.stmts());
     }
 
-    private VisitorContext initLocalVisitorCtx(List<PMLFormalArg> formalArgs) {
+    private VisitorContext initLocalVisitorCtx(List<FormalParameter<?>> formalArgs) {
         // create a new scope for the function body
         VisitorContext localVisitorCtx = visitorCtx.copy();
 
         // add the args to the local scope, overwriting any variables with the same ID as the formal args
-        for (PMLFormalArg formalArg : formalArgs) {
+        for (FormalParameter<?> formalArg : formalArgs) {
             localVisitorCtx.scope().updateVariable(
                 formalArg.getName(),
-                new Variable(formalArg.getName(), formalArg.getPmlType(), false)
+                new Variable(formalArg.getName(), formalArg.getType(), false)
             );
         }
 

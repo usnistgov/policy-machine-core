@@ -3,10 +3,9 @@ package gov.nist.csd.pm.pap.pml.statement.basic;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.value.BreakValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.statement.result.BreakResult;
 
-public class BreakStatement extends BasicStatement {
+public class BreakStatement extends BasicStatement<BreakResult> {
 
     @Override
     public String toFormattedString(int indentLevel) {
@@ -14,8 +13,8 @@ public class BreakStatement extends BasicStatement {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        return new BreakValue();
+    public BreakResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        return new BreakResult();
     }
 
     @Override

@@ -31,9 +31,9 @@ class OperationDefinitionStatementTest {
                 create o "o3" in ["oa1"]
                 
                 operation op1(string a, []string b) {
-                    check "assign" on a
-                    check "assign" on b
-                    check "assign" on "oa1"
+                    check "assign" on [a]
+                    check "assign" on [b]
+                    check "assign" on ["oa1"]
                 } {
                     create policy class "test"
                 }

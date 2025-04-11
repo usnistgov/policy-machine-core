@@ -4,13 +4,12 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 
 import java.util.List;
 import java.util.Objects;
 
-public class VariableDeclarationStatement extends BasicStatement {
+public class VariableDeclarationStatement extends BasicStatement<VoidResult> {
 
     private final List<Declaration> declarations;
 
@@ -23,13 +22,13 @@ public class VariableDeclarationStatement extends BasicStatement {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         for (Declaration declaration : declarations) {
-            Value value = declaration.expression().execute(ctx, pap);
+            Object value = declaration.expression().execute(ctx, pap);
             ctx.scope().updateVariable(declaration.id(), value);
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class VariableDeclarationStatement extends BasicStatement {
         return sb.toString();
     }
 
-    public record Declaration(String id, Expression expression) {
+    public record Declaration(String id, Expression<?> expression) {
 
         @Override
         public boolean equals(Object o) {

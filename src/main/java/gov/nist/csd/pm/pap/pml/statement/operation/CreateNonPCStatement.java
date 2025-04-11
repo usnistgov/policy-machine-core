@@ -3,25 +3,22 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.graph.*;
+import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateNonPCStatement extends OperationStatement<Operation<Long>> {
+public class CreateNonPCStatement extends OperationStatement<CreateNodeOpArgs> {
 
     private final NodeType nodeType;
-    private final Expression nameExpr;
-    private final Expression inExpr;
+    private final Expression<String> nameExpr;
+    private final Expression<List<String>> inExpr;
 
-    public CreateNonPCStatement(Expression nameExpr, NodeType nodeType, Expression inExpr) {
+    public CreateNonPCStatement(Expression<String> nameExpr, NodeType nodeType, Expression<List<String>> inExpr) {
         super(getOpFromType(nodeType));
         this.nodeType = nodeType;
         this.nameExpr = nameExpr;
@@ -29,22 +26,17 @@ public class CreateNonPCStatement extends OperationStatement<Operation<Long>> {
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String name = nameExpr.execute(ctx, pap).getStringValue();
-        
-        List<Value> inList = inExpr.execute(ctx, pap).getArrayValue();
-        List<String> parentNames = new ArrayList<>();
-        for (Value value : inList) {
-            parentNames.add(value.getStringValue());
+    public CreateNodeOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String name = nameExpr.execute(ctx, pap);
+        List<String> inList = inExpr.execute(ctx, pap);
+
+        // convert desc node names to IDs
+        LongArrayList descIds = new LongArrayList();
+        for (String parentName : inList) {
+            descIds.add(pap.query().graph().getNodeByName(parentName).getId());
         }
 
-        // convert parent node names to IDs
-        LongArrayList parentIds = new LongArrayList();
-        for (String parentName : parentNames) {
-            parentIds.add(pap.query().graph().getNodeByName(parentName).getId());
-        }
-
-        return ((CreateNodeOp) op).actualArgs(name, parentIds);
+        return new CreateNodeOpArgs(name, descIds);
     }
 
     @Override

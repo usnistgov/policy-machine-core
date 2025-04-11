@@ -2,16 +2,17 @@ package gov.nist.csd.pm.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.NoArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class IfStatement extends BasicStatement {
+public class IfStatement extends BasicStatement<StatementResult> {
 
     private final ConditionalBlock ifBlock;
     private final List<ConditionalBlock> elseIfBlocks;
@@ -36,8 +37,8 @@ public class IfStatement extends BasicStatement {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        boolean condition = ifBlock.condition.execute(ctx, pap).getBooleanValue();
+    public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        boolean condition = ifBlock.condition.execute(ctx, pap);
 
         if (condition) {
             return ifBlock.block.execute(ctx, pap);
@@ -45,9 +46,9 @@ public class IfStatement extends BasicStatement {
 
         // check else ifs
         for (ConditionalBlock conditionalBlock : elseIfBlocks) {
-            condition = conditionalBlock.condition.execute(ctx, pap).getBooleanValue();
+            condition = conditionalBlock.condition.execute(ctx, pap);
             if (condition) {
-                return conditionalBlock.block.execute(ctx, pap);
+                return ctx.executeStatements(conditionalBlock.block.getStmts(), new NoArgs());
             }
         }
 
@@ -99,5 +100,5 @@ public class IfStatement extends BasicStatement {
         return Objects.hash(ifBlock, elseIfBlocks, elseBlockStatements);
     }
 
-    public record ConditionalBlock(Expression condition, PMLStatementBlock block) implements Serializable { }
+    public record ConditionalBlock(Expression<Boolean> condition, PMLStatementBlock block) implements Serializable { }
 } 

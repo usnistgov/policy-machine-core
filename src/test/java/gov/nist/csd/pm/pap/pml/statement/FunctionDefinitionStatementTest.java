@@ -2,7 +2,13 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
+import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.CheckAndStatementsBlock;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
@@ -15,12 +21,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionStatementTest {
 
-    private static final PMLNodeFormalArg a = new PMLNodeFormalArg("a", STRING_TYPE);
-    private static final PMLFormalArg b = new PMLFormalArg("b", STRING_TYPE);
+    private static final FormalParameter<String> a = new NodeFormalParameter<>("a", STRING_TYPE);
+    private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
     @Test
     void testOperationFormattedString() {
@@ -30,12 +38,18 @@ class FunctionDefinitionStatementTest {
                 List.of(a, b),
                 new CheckAndStatementsBlock(
                         new PMLStatementBlock(
-                                new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
-                                new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
+                                new CheckStatement(
+                                    new StringLiteralExpression("ar1"),
+                                    new VariableReferenceExpression<>("a", listType(STRING_TYPE))
+                                ),
+                                new CheckStatement(
+                                    new StringLiteralExpression("ar2"),
+                                    ArrayLiteralExpression.of(List.of(new StringLiteralExpression("node")), STRING_TYPE)
+                                )
                         ),
                         new PMLStatementBlock(
                                 List.of(
-                                        new ReturnStatement(new StringLiteral("test"))
+                                        new ReturnStatement(new StringLiteralExpression("test"))
                                 )
                         )
                 )
@@ -43,8 +57,8 @@ class FunctionDefinitionStatementTest {
 
         assertEquals("""
                              operation op1(@node string a, string b) string {
-                                 check "ar1" on a
-                                 check "ar2" on "node"
+                                 check "ar1" on [a]
+                                 check "ar2" on ["node"]
                              } {
                                  return "test"
                              }""",
@@ -52,8 +66,8 @@ class FunctionDefinitionStatementTest {
 
         assertEquals("""
                                  operation op1(@node string a, string b) string {
-                                     check "ar1" on a
-                                     check "ar2" on "node"
+                                     check "ar1" on [a]
+                                     check "ar2" on ["node"]
                                  } {
                                      return "test"
                                  }
@@ -65,11 +79,11 @@ class FunctionDefinitionStatementTest {
     void testRoutineFormattedString() {
         RoutineDefinitionStatement stmt = new RoutineDefinitionStatement(new PMLStmtsRoutine(
                 "rou1",
-                Type.voidType(),
+                new VoidType(),
                 List.of(a, b),
                 new PMLStatementBlock(
                         List.of(
-                                new CreatePolicyClassStatement(new StringLiteral("test"))
+                                new CreatePolicyClassStatement(new StringLiteralExpression("test"))
                         )
                 )
         ));
@@ -92,12 +106,18 @@ class FunctionDefinitionStatementTest {
     void testToFormattedStringVoidReturn() {
         OperationDefinitionStatement stmt = new OperationDefinitionStatement(new PMLStmtsOperation(
                 "func1",
-                Type.voidType(),
+                new VoidType(),
                 List.of(a, b),
                 new CheckAndStatementsBlock(
                         new PMLStatementBlock(
-                                new CheckStatement(new StringLiteral("ar1"), new ReferenceByID("a")),
-                                new CheckStatement(new StringLiteral("ar2"), new StringLiteral("node"))
+                                new CheckStatement(
+                                    new StringLiteralExpression("ar1"),
+                                    ArrayLiteralExpression.of(List.of(new VariableReferenceExpression<>("a", STRING_TYPE)), STRING_TYPE)
+                                ),
+                                new CheckStatement(
+                                    new StringLiteralExpression("ar2"),
+                                    ArrayLiteralExpression.of(List.of(new StringLiteralExpression("node")), STRING_TYPE)
+                                )
                         ),
                         new PMLStatementBlock(
                                 List.of(
@@ -109,8 +129,8 @@ class FunctionDefinitionStatementTest {
 
         assertEquals("""
                              operation func1(@node string a, string b) {
-                                 check "ar1" on a
-                                 check "ar2" on "node"
+                                 check "ar1" on [a]
+                                 check "ar2" on ["node"]
                              } {
                                  return
                              }""",

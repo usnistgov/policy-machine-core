@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
@@ -17,7 +17,7 @@ class SetResourceOperationsStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.SetResourceOperationsStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.SetResourceOperationsStatementContext ctx = TestPMLParser.toCtx(
                 """
                 set resource operations ["a", "b"]
                 """,

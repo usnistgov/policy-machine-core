@@ -5,6 +5,8 @@ import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
@@ -14,7 +16,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import org.neo4j.codegen.api.ArrayLiteral;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,44 +47,29 @@ class CheckStatementTest {
         ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
 
         testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
-                new StringLiteral("o1")
-        ), false);
-
-        testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
-        ), false);
-
-        testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), false);
 
         ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), STRING_TYPE),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
-        ), true);
-
-        testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), STRING_TYPE)
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
     }
 
@@ -100,7 +89,7 @@ class CheckStatementTest {
                 }
                 
                 operation op1() {
-                    check "assign" on testOp()
+                    check "assign" on [testOp()]
                 } {
                     create policy class "pc2"
                 }

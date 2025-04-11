@@ -1,16 +1,17 @@
 package gov.nist.csd.pm.pap.pml.function.basic;
 
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.List;
 
 public class PMLBasicFunctionSignature extends PMLFunctionSignature {
 
-
-    public PMLBasicFunctionSignature(String name, Type returnType, List<PMLFormalArg> formalArgs) {
-        super(name, returnType, formalArgs);
+    public PMLBasicFunctionSignature(String name,
+                                     ArgType<?> returnType,
+                                     List<FormalParameter<?>> formalParameters) {
+        super(name, returnType, formalParameters);
     }
 
     @Override

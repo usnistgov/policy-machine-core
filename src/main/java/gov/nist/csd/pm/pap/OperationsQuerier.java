@@ -26,7 +26,7 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
+    public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
         if (!store.operations().getAdminOperationNames().contains(operationName)) {
             throw new OperationDoesNotExistException(operationName);
         }

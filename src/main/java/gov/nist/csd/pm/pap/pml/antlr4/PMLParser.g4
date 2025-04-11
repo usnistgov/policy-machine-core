@@ -163,12 +163,12 @@ operationDefinitionStatement: operationSignature checkStatementBlock? statementB
 routineDefinitionStatement: routineSignature checkStatementBlock? statementBlock ;
 basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
 
-operationSignature: OPERATION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
-routineSignature: ROUTINE ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
-basicFunctionSignature: FUNCTION ID OPEN_PAREN formalArgList CLOSE_PAREN returnType=variableType? ;
+operationSignature: OPERATION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
-formalArgList: (formalArg (COMMA formalArg)*)? ;
-formalArg: NODE_ARG? variableType ID;
+formalParamList: (formalParam (COMMA formalParam)*)? ;
+formalParam: NODE_PARAM? variableType ID;
 
 returnStatement: RETURN expression?;
 
@@ -225,9 +225,8 @@ stringArrayLit: OPEN_BRACKET (stringLit (COMMA stringLit)*)? CLOSE_BRACKET ;
 mapLit: OPEN_CURLY (element (COMMA element)*)? CLOSE_CURLY ;
 element: key=expression COLON value=expression ;
 
-variableReference:
-    ID #ReferenceByID
-    | variableReference index #ReferenceByIndex ;
+variableReference: ID (index)* ;
+
 index:
     OPEN_BRACKET key=expression CLOSE_BRACKET #BracketIndex
     | DOT key=id #DotIndex;

@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -25,7 +26,7 @@ class DeleteRuleStatementTest {
     @Test
     void testSuccess() throws PMException {
         DeleteRuleStatement stmt = new DeleteRuleStatement(
-                new StringLiteral("rule1"), new StringLiteral("obl1"));
+                new StringLiteralExpression("rule1"), new StringLiteralExpression("obl1"));
 
         PAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
@@ -47,7 +48,7 @@ class DeleteRuleStatementTest {
     @Test
     void testToFormattedString() {
         DeleteRuleStatement stmt = new DeleteRuleStatement(
-                new StringLiteral("rule1"), new StringLiteral("obl1"));
+                new StringLiteralExpression("rule1"), new StringLiteralExpression("obl1"));
 
         assertEquals(
                 """

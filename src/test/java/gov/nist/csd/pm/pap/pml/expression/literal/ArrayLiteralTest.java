@@ -1,16 +1,18 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
+import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.neo4j.codegen.api.ArrayLiteral;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,24 +20,22 @@ class ArrayLiteralTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ["a", "b", "c"]
-                """,
-                PMLParser.LiteralExpressionContext.class);
+                """);
 
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<Object> expression = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
-	    assertInstanceOf(ArrayLiteral.class, expression);
+        Expression<List<String>> expression = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
+	    assertInstanceOf(ArrayLiteralExpression.class, expression);
 
-        ArrayLiteralExpression<?> a = (ArrayLiteralExpression<?>) expression;
         assertEquals(
                 buildArrayLiteral("a", "b", "c"),
-                a
+                expression
         );
         assertEquals(
                 listType(STRING_TYPE),
-                a.getType()
+                expression.getType()
         );
 
     }

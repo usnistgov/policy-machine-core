@@ -1,51 +1,50 @@
 package gov.nist.csd.pm.pap.pml.statement.basic;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.ReturnValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
 
+import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 
-public class ReturnStatement extends BasicStatement {
+public class ReturnStatement extends BasicStatement<StatementResult> {
 
-    private Expression expr;
+    private Expression<?> expr;
 
     public ReturnStatement() {
     }
 
-    public ReturnStatement(Expression expr) {
+    public ReturnStatement(Expression<?> expr) {
         this.expr = expr;
     }
 
-    public Expression getExpr() {
+    public Expression<?> getExpr() {
         return expr;
     }
 
-    public boolean matchesReturnType(Type match, Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
+    public boolean matchesReturnType(ArgType<?> match) {
         if (expr == null) {
-            return match.equals(Type.voidType());
+            return match.equals(new VoidType());
         }
 
-        return expr.getType(scope).equals(match);
+        return expr.getType().equals(match);
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
+    public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         if (expr == null) {
-            return new ReturnValue(new VoidValue());
+            return new VoidResult();
         }
 
-        return new ReturnValue(expr.execute(ctx, pap));
+        return new ReturnResult(expr.execute(ctx, pap));
     }
 
     @Override

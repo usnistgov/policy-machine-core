@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
@@ -74,15 +76,25 @@ public class PMLTest {
 
                 return null;
             }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
+            }
         };
         pap.modify().operations().createAdminOperation(op1);
 
         pap.modify().routines().createAdminRoutine(new Routine<>("routine1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
-                pap.executeAdminFunction(op1, args);
+                pap.executeAdminFunction(op1, args.toMap());
 
                 return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
             }
         });
 
@@ -134,7 +146,7 @@ public class PMLTest {
                 on union of [PM_ADMIN_OBJECT]
                 
                 operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on PM_ADMIN_OBJECT
+                    check "assign" on [PM_ADMIN_OBJECT]
                 } {
                     create pc "1" + a
                 

@@ -11,12 +11,20 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
 
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import org.neo4j.codegen.api.ArrayLiteral;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
@@ -27,14 +35,15 @@ class CreateProhibitionStatementTest {
     @Test
     void testSuccess() throws PMException {
         CreateProhibitionStatement stmt = new CreateProhibitionStatement(
-                new StringLiteral("pro1"),
-                new StringLiteral("ua2"),
-                ProhibitionSubjectType.USER_ATTRIBUTE,
-                buildArrayLiteral("read"),
-                true,
-                new ArrayLiteral(
-                        List.of(new StringLiteral("oa1"), new NegatedExpression(new StringLiteral("oa2"))), STRING_TYPE
-                )
+            new StringLiteralExpression("pro1"),
+            new StringLiteralExpression("ua2"),
+            ProhibitionSubjectType.USER_ATTRIBUTE,
+            buildArrayLiteral("read"),
+            true,
+            MapLiteralExpression.of(Map.of(
+                new StringLiteralExpression("oa1"), new BoolLiteralExpression(false),
+                new StringLiteralExpression("oa2"), new BoolLiteralExpression(true)
+            ), STRING_TYPE, BOOLEAN_TYPE)
         );
 
         PAP pap = new TestPAP();
@@ -53,47 +62,48 @@ class CreateProhibitionStatementTest {
 
         Prohibition prohibition = pap.query().prohibitions().getProhibition("pro1");
         assertEquals(
-                new ProhibitionSubject(id("ua2")),
-                prohibition.getSubject()
+            new ProhibitionSubject(id("ua2")),
+            prohibition.getSubject()
         );
         assertTrue(prohibition.isIntersection());
         assertEquals(
-                new AccessRightSet("read"),
-                prohibition.getAccessRightSet()
+            new AccessRightSet("read"),
+            prohibition.getAccessRightSet()
         );
         assertEquals(
-                List.of(new ContainerCondition(id("oa1"), false), new ContainerCondition(id("oa2"), true)),
-                prohibition.getContainers()
+            List.of(new ContainerCondition(id("oa1"), false), new ContainerCondition(id("oa2"), true)),
+            prohibition.getContainers()
         );
     }
 
     @Test
     void testToFormattedString() {
         CreateProhibitionStatement stmt = new CreateProhibitionStatement(
-                new StringLiteral("pro1"),
-                new StringLiteral("ua2"),
-                ProhibitionSubjectType.USER_ATTRIBUTE,
-                buildArrayLiteral("read"),
-                true,
-                new ArrayLiteral(
-                        List.of(new StringLiteral("oa1"), new NegatedExpression(new StringLiteral("oa2"))), STRING_TYPE
-                )
+            new StringLiteralExpression("pro1"),
+            new StringLiteralExpression("ua2"),
+            ProhibitionSubjectType.USER_ATTRIBUTE,
+            buildArrayLiteral("read"),
+            true,
+            MapLiteralExpression.of(Map.of(
+                new StringLiteralExpression("oa1"), new BoolLiteralExpression(false),
+                new StringLiteralExpression("oa2"), new BoolLiteralExpression(true)
+            ), STRING_TYPE, BOOLEAN_TYPE)
         );
         assertEquals(
-                """
+            """
+                    create prohibition "pro1"
+                      deny UA "ua2"
+                      access rights ["read"]
+                      on intersection of ["oa1", !"oa2"]""",
+            stmt.toFormattedString(0)
+        );
+        assertEquals(
+            """
                         create prohibition "pro1"
                           deny UA "ua2"
                           access rights ["read"]
                           on intersection of ["oa1", !"oa2"]""",
-                stmt.toFormattedString(0)
-        );
-        assertEquals(
-                """
-                            create prohibition "pro1"
-                              deny UA "ua2"
-                              access rights ["read"]
-                              on intersection of ["oa1", !"oa2"]""",
-                stmt.toFormattedString(0)
+            stmt.toFormattedString(0)
         );
     }
 }

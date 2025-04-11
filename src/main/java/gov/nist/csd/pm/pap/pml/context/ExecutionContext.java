@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.context;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
@@ -7,7 +8,11 @@ import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.*;
+import gov.nist.csd.pm.pap.pml.statement.result.BreakResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ContinueResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.io.Serializable;
@@ -17,7 +22,7 @@ import java.util.Objects;
 public class ExecutionContext implements Serializable {
 
     protected final UserContext author;
-    protected final Scope<Value, AdminFunction<?>> scope;
+    protected final Scope<Object, AdminFunction<?, ?>> scope;
     protected final PAP pap;
     private boolean isExplain;
 
@@ -28,7 +33,7 @@ public class ExecutionContext implements Serializable {
         this.isExplain = false;
     }
 
-    public ExecutionContext(UserContext author, PAP pap, Scope<Value, AdminFunction<?>> scope) throws PMException {
+    public ExecutionContext(UserContext author, PAP pap, Scope<Object, AdminFunction<?, ?>> scope) throws PMException {
         this.author = author;
         this.scope = scope;
         this.pap = pap;
@@ -39,7 +44,7 @@ public class ExecutionContext implements Serializable {
         return author;
     }
 
-    public Scope<Value, AdminFunction<?>> scope() {
+    public Scope<Object, AdminFunction<?, ?>> scope() {
         return scope;
     }
 
@@ -63,27 +68,27 @@ public class ExecutionContext implements Serializable {
         );
     }
 
-    public Value executeStatements(List<PMLStatement> stmts, Args args) throws PMException {
+    public StatementResult executeStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         ExecutionContext copy = writeArgsToScope(args);
 
-        for (PMLStatement statement : stmts) {
-            Value value = statement.execute(copy, pap);
+        for (PMLStatement<?> statement : stmts) {
+            Object result = statement.execute(copy, pap);
 
             scope.overwriteFromScope(copy.scope);
 
-            if (value instanceof ReturnValue || value instanceof BreakValue || value instanceof ContinueValue) {
-                return value;
+            if (result instanceof ReturnResult || result instanceof BreakResult || result instanceof ContinueResult) {
+                return (StatementResult) result;
             }
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
-    public Value executeOperationStatements(List<PMLStatement> stmts, Args args) throws PMException {
+    public StatementResult executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         return executeStatements(stmts, args);
     }
 
-    public Value executeRoutineStatements(List<PMLStatement> stmts, Args args) throws PMException {
+    public StatementResult executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         return executeStatements(stmts, args);
     }
 
@@ -93,14 +98,7 @@ public class ExecutionContext implements Serializable {
         args.foreach((formalArg, o) -> {
             String key = formalArg.getName();
 
-            Value value;
-            if (o instanceof Value) {
-                value = (Value) o;
-            } else {
-                value = Value.fromObject(o);
-            }
-
-            copy.scope.updateVariable(key, value);
+            copy.scope.updateVariable(key, o);
         });
 
         return copy;

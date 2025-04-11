@@ -2,9 +2,10 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
@@ -26,7 +27,7 @@ class CreateNonPCStmtVisitorTest {
 
     @Test
     void testSuccess() {
-        PMLParser.CreateNonPCStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.CreateNonPCStatementContext ctx = TestPMLParser.toCtx(
                 """
                 create user attribute "ua1" in ["a"]
                 """,
@@ -35,7 +36,7 @@ class CreateNonPCStmtVisitorTest {
         PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new CreateNonPCStatement(new StringLiteral("ua1"), NodeType.UA, buildArrayLiteral("a")),
+                new CreateNonPCStatement(new StringLiteralExpression("ua1"), NodeType.UA, buildArrayLiteral("a")),
                 stmt
         );
     }

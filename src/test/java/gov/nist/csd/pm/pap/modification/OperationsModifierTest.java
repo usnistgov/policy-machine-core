@@ -6,12 +6,15 @@ import gov.nist.csd.pm.common.exception.OperationExistsException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +34,11 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Override
         public Object execute(PAP pap, Args args) throws PMException {
             return null;
+        }
+
+        @Override
+        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+            return new MapArgs(argsMap);
         }
     };
 

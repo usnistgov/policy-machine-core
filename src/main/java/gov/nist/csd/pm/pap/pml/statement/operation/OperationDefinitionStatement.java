@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import gov.nist.csd.pm.pap.function.op.operation.CreateAdminOperationOp.CreateAdminOperationOpArgs;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -9,10 +10,10 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class OperationDefinitionStatement extends OperationStatement<CreateAdminOperationOp> implements FunctionDefinitionStatement {
+public class OperationDefinitionStatement extends OperationStatement<CreateAdminOperationOpArgs> implements FunctionDefinitionStatement {
 
     protected PMLStmtsOperation pmlStmtsOperation;
 
@@ -28,13 +29,13 @@ public class OperationDefinitionStatement extends OperationStatement<CreateAdmin
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return op.actualArgs(pmlStmtsOperation);
+    public CreateAdminOperationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        return new CreateAdminOperationOpArgs(pmlStmtsOperation);
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Value value = super.execute(ctx, pap);
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        VoidResult value = super.execute(ctx, pap);
 
         ctx.scope().addFunction(pmlStmtsOperation.getName(), pmlStmtsOperation);
 

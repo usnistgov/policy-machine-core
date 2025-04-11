@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.arg.Args;
@@ -7,7 +8,11 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.*;
+import gov.nist.csd.pm.pap.pml.statement.result.BreakResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ContinueResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -21,7 +26,7 @@ class PDPExecutionContext extends ExecutionContext {
         this.pdpTx = pdpTx;
     }
 
-    public PDPExecutionContext(UserContext author, PDPTx pdpTx, Scope<Value, AdminFunction<?>> scope) throws PMException {
+    public PDPExecutionContext(UserContext author, PDPTx pdpTx, Scope<Object, AdminFunction<?, ?>> scope) throws PMException {
         super(author, pdpTx.pap, scope);
         this.pdpTx = pdpTx;
     }
@@ -41,21 +46,21 @@ class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
-    public Value executeStatements(List<PMLStatement> statements, Args args) throws PMException {
+    public StatementResult executeStatements(List<PMLStatement<?>> statements, Args args) throws PMException {
         ExecutionContext copy = writeArgsToScope(args);
 
-        for (PMLStatement statement : statements) {
-            Value value = statement.execute(copy, pdpTx);
-            if (value instanceof ReturnValue || value instanceof BreakValue || value instanceof ContinueValue) {
-                return value;
+        for (PMLStatement<?> statement : statements) {
+            Object value = statement.execute(copy, pdpTx);
+            if (value instanceof ReturnResult || value instanceof BreakResult || value instanceof ContinueResult) {
+                return (StatementResult) value;
             }
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override
-    public Value executeOperationStatements(List<PMLStatement> stmts, Args args) throws PMException {
+    public StatementResult executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         ExecutionContext copy = writeArgsToScope(args);
 
         // for operations, we don't want to use the PDPEC, just the normal one
@@ -65,17 +70,17 @@ class PDPExecutionContext extends ExecutionContext {
         ctx.setExplain(pdpTx.getPrivilegeChecker().isExplain());
 
         for (PMLStatement statement : stmts) {
-            Value value = statement.execute(ctx, pdpTx.pap);
-            if (value instanceof ReturnValue || value instanceof BreakValue || value instanceof ContinueValue) {
-                return value;
+            Object value = statement.execute(ctx, pdpTx.pap);
+            if (value instanceof ReturnResult || value instanceof BreakResult || value instanceof ContinueResult) {
+                return (StatementResult) value;
             }
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override
-    public Value executeRoutineStatements(List<PMLStatement> stmts, Args args) throws PMException {
+    public StatementResult executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         return executeStatements(stmts, args);
     }
 }

@@ -13,4 +13,9 @@ public final class BooleanType extends ArgType<Boolean> {
 
         return b;
     }
+
+    @Override
+    public Class<Boolean> getExpectedClass() {
+        return Boolean.class;
+    }
 }

@@ -12,7 +12,7 @@ public class PatternTestUtil {
 
     public static CreateRuleStatement compileTestCreateRuleStatement(String pml) throws PMException {
         PMLCompiler pmlCompiler = new PMLCompiler();
-        List<PMLStatement> pmlStatements = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> pmlStatements = pmlCompiler.compilePML(pml);
         CreateObligationStatement stmt = (CreateObligationStatement)pmlStatements.getFirst();
         return stmt.getRuleStmts().getFirst();
     }

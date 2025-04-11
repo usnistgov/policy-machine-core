@@ -1,45 +1,46 @@
 package gov.nist.csd.pm.pap.pml.function;
 
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeStringer;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 
-import gov.nist.csd.pm.pap.pml.type.Type;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public abstract class PMLFunctionSignature implements PMLStatementSerializable {
 
     protected String name;
-    protected Type returnType;
-    protected List<PMLFormalArg> formalArgs;
+    protected ArgType<?> returnType;
+    protected List<FormalParameter<?>> formalParameters;
 
-    public PMLFunctionSignature(String name, Type returnType, List<PMLFormalArg> formalArgs) {
+    public PMLFunctionSignature(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
         this.name = name;
         this.returnType = returnType;
-        this.formalArgs = formalArgs;
+        this.formalParameters = formalParameters;
     }
 
     public String getName() {
         return name;
     }
 
-    public Type getReturnType() {
+    public ArgType<?> getReturnType() {
         return returnType;
     }
 
-    public List<PMLFormalArg> getFormalArgs() {
-        return formalArgs;
+    public List<FormalParameter<?>> getFormalArgs() {
+        return formalParameters;
     }
 
     protected String serializeFormalArgs() {
         String pml = "";
-        for (PMLFormalArg formalArg : formalArgs) {
+        for (FormalParameter<?> formalParameter : formalParameters) {
             if (!pml.isEmpty()) {
                 pml += ", ";
             }
 
-            pml += formalArg.getPmlType().toString() + " " + formalArg.getName();
+            pml += ArgTypeStringer.toPMLString(formalParameter.getType()) + " " + formalParameter.getName();
         }
 
         return pml;
@@ -55,7 +56,7 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
             prefix,
             name,
             argsStr,
-            returnType.isVoid() ? "" : returnType.toString() + " "
+            returnType == null ? "" : ArgTypeStringer.toPMLString(returnType) + " "
         );
     }
 
@@ -66,11 +67,11 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
         if (!(o instanceof PMLFunctionSignature signature))
             return false;
         return Objects.equals(name, signature.name) && Objects.equals(returnType,
-            signature.returnType) && Objects.equals(formalArgs, signature.formalArgs);
+            signature.returnType) && Objects.equals(formalParameters, signature.formalParameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, returnType, formalArgs);
+        return Objects.hash(name, returnType, formalParameters);
     }
 }

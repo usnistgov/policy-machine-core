@@ -1,9 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.DeleteRuleStatement;
@@ -16,7 +17,7 @@ class DeleteRuleStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.DeleteRuleStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.DeleteRuleStatementContext ctx = TestPMLParser.toCtx(
                 """
                 delete rule "rule1" from obligation "obl1"
                 """,
@@ -25,7 +26,7 @@ class DeleteRuleStmtVisitorTest {
         PMLStatement stmt = new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteRuleStatement(new StringLiteral("rule1"), new StringLiteral("obl1")),
+                new DeleteRuleStatement(new StringLiteralExpression("rule1"), new StringLiteralExpression("obl1")),
                 stmt
         );
     }

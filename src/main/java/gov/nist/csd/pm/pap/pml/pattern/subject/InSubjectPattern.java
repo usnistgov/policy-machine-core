@@ -2,9 +2,8 @@ package gov.nist.csd.pm.pap.pml.pattern.subject;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
 
 import java.util.Objects;
 import java.util.Set;
@@ -13,7 +12,7 @@ public class InSubjectPattern extends SubjectPatternExpression {
 
     private final String container;
 
-    public InSubjectPattern(StringLiteral container) {
+    public InSubjectPattern(StringLiteralExpression container) {
         this.container = container.getValue();
     }
 
@@ -37,7 +36,7 @@ public class InSubjectPattern extends SubjectPatternExpression {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return "in " + new StringValue(container);
+        return "in \"" + container + "\"";
     }
 
     @Override

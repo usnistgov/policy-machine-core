@@ -1,17 +1,19 @@
 package gov.nist.csd.pm.pap.pml.function.operation;
 
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
 
+import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeStringer;
 import java.util.List;
 
 public class PMLOperationSignature extends PMLFunctionSignature {
 
-    public PMLOperationSignature(String functionName,
-                                 Type returnType,
-                                 List<PMLFormalArg> formalArgs) {
-        super(functionName, returnType, formalArgs);
+    public PMLOperationSignature(String name,
+                                 ArgType<?> returnType,
+                                 List<FormalParameter<?>> formalParameters) {
+        super(name, returnType, formalParameters);
     }
 
     @Override
@@ -22,12 +24,14 @@ public class PMLOperationSignature extends PMLFunctionSignature {
     @Override
     protected String serializeFormalArgs() {
         String pml = "";
-        for (PMLFormalArg formalArg : getFormalArgs()) {
+        for (FormalParameter<?> formalParameter : getFormalArgs()) {
             if (!pml.isEmpty()) {
                 pml += ", ";
             }
 
-            pml += ((formalArg instanceof PMLNodeFormalArg) ? "@node " : "") +  formalArg.getPmlType().toString() + " " + formalArg.getName();
+            pml += ((formalParameter instanceof NodeFormalParameter<?>) ? "@node " : "") +
+                ArgTypeStringer.toPMLString(formalParameter.getType()) + " " +
+                formalParameter.getName();
         }
         return pml;
     }

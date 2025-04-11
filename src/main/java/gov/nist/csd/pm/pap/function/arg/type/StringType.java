@@ -9,4 +9,9 @@ public final class StringType extends ArgType<String> {
         }
         return obj.toString();
     }
+
+    @Override
+    public Class<String> getExpectedClass() {
+        return String.class;
+    }
 }

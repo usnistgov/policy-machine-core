@@ -1,31 +1,32 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
+
 
 import java.util.List;
 
 public class Env extends PMLBasicFunction {
 
-	public static final PMLFormalArg KEY_ARG = new PMLFormalArg("key", Type.string());
+	public static final FormalParameter<String> KEY_ARG = new FormalParameter<>("key", STRING_TYPE);
 
 	public Env() {
 		super(
 				"env",
-				Type.string(),
+				STRING_TYPE,
 				List.of(KEY_ARG)
 		);
 	}
 
 	@Override
-	public Value execute(PAP pap, Args args) throws PMException {
-		String value = System.getenv(args.get(KEY_ARG).getStringValue());
-		return new StringValue(value);
+	public Object execute(PAP pap, MapArgs args) throws PMException {
+		return System.getenv(args.get(KEY_ARG));
 	}
 }

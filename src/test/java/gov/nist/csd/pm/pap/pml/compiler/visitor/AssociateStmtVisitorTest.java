@@ -1,9 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.AssociateStatement;
@@ -22,7 +23,7 @@ class AssociateStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.AssociateStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.AssociateStatementContext ctx = TestPMLParser.toCtx(
                 """
                 associate "a" and "b" with ["c", "d"]
                 """,
@@ -30,7 +31,7 @@ class AssociateStmtVisitorTest {
         PMLStatement stmt = new AssociateStmtVisitor(visitorCtx).visitAssociateStatement(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new AssociateStatement(new StringLiteral("a"), new StringLiteral("b"), buildArrayLiteral("c", "d")),
+                new AssociateStatement(new StringLiteralExpression("a"), new StringLiteralExpression("b"), buildArrayLiteral("c", "d")),
                 stmt
         );
     }

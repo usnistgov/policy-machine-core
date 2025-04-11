@@ -11,7 +11,8 @@ import gov.nist.csd.pm.pap.pml.scope.Scope;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.pml.PMLContextVisitor.toStatementBlockCtx;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.pml.TestPMLParser.toStatementBlockCtx;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StatementBlockVisitorTest {

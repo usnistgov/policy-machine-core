@@ -1,0 +1,55 @@
+package gov.nist.csd.pm.pap.pml.expression.reference;
+
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.common.exception.PMException;
+
+import gov.nist.csd.pm.pap.pml.expression.Expression;
+import java.util.Objects;
+import java.util.Map;
+
+public class DotIndexExpression<T> extends Expression<T> {
+    private final Expression<?> baseExpr;
+    private final String key;
+    private final ArgType<T> valueType;
+
+    public DotIndexExpression(Expression<?> baseExpr, String key, ArgType<T> valueType) {
+        this.baseExpr = baseExpr;
+        this.key = key;
+        this.valueType = valueType;
+    }
+
+    @Override
+    public ArgType<T> getType() {
+        return valueType;
+    }
+
+    @Override
+    public T execute(ExecutionContext ctx, PAP pap) throws PMException {
+        Object baseValue = baseExpr.execute(ctx, pap);
+        if (baseValue instanceof Map<?, ?> map) {
+            return (T) map.get(key);
+        }
+
+        return (T) baseValue;
+    }
+
+    @Override
+    public String toFormattedString(int indentLevel) {
+        return baseExpr.toFormattedString(indentLevel) + "." + key;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DotIndexExpression<?> that = (DotIndexExpression<?>) o;
+        return baseExpr.equals(that.baseExpr) && key.equals(that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(baseExpr, key);
+    }
+} 

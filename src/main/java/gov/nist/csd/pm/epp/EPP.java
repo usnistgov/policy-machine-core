@@ -1,24 +1,28 @@
 package gov.nist.csd.pm.epp;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 
 import gov.nist.csd.pm.pdp.PDPTx;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EPP implements EventSubscriber {
 
@@ -45,22 +49,37 @@ public class EPP implements EventSubscriber {
                 Response response = rule.getResponse();
 
                 // need to run pdp tx as author of obligation
-                pdp.runTx(authorCtx, txPDP -> executeResponse(txPDP, authorCtx, eventCtx, response));
+                pdp.runTx(authorCtx, txPDP -> {
+                    executeResponse(txPDP, authorCtx, eventCtx, response);
+                    return null;
+                });
             }
         }
     }
 
-    public Value executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
-        Args args = new Args();
+    public void executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
+        Args args = new MapArgs();
 
-        PMLFormalArg eventCtxArg = new PMLFormalArg(response.getEventCtxVariable(), Type.map(Type.string(), Type.any()));
-        Value evntCtxValue = Value.fromObject(eventCtx);
-        args.put(eventCtxArg, evntCtxValue);
+        FormalParameter<Map<String, Object>> eventCtxArg = new FormalParameter<>(
+            response.getEventCtxVariable(),
+            mapType(STRING_TYPE, OBJECT_TYPE)
+        );
+
+        args.put(eventCtxArg, eventCtxToMap(eventCtx));
 
         ExecutionContext executionCtx = pdpTx.buildExecutionContext(userCtx);
         executionCtx.executeStatements(response.getStatements(), args);
-
-        return new VoidValue();
     }
 
+    private Map<String, Object> eventCtxToMap(EventContext eventCtx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("user", eventCtx.getUser());
+        map.put("opName", eventCtx.getOpName());
+        map.put("args", eventCtx.getArgs());
+        if (eventCtx.getProcess() != null) {
+            map.put("process", eventCtx.getUser());
+        }
+
+        return map;
+    }
 }

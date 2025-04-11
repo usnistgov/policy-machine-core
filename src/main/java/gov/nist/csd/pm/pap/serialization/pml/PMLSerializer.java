@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.pap.serialization.pml;
 
+import gov.nist.csd.pm.pap.pml.exception.ArgTypeNotCastableException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.pap.pml.statement.operation.*;
-import gov.nist.csd.pm.pap.pml.type.Type;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.pap.serialization.json.*;
@@ -19,6 +19,7 @@ import gov.nist.csd.pm.pap.serialization.json.*;
 import java.util.*;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 public class PMLSerializer implements PolicySerializer {
 
@@ -78,23 +79,23 @@ public class PMLSerializer implements PolicySerializer {
     }
 
     private String jsonResourceOperations(AccessRightSet accessRightSet) {
-        List<Expression> expressions = new ArrayList<>();
+        List<Expression<String>> expressions = new ArrayList<>();
         for (String ar : accessRightSet) {
-            expressions.add(new StringLiteral(ar));
+            expressions.add(new StringLiteralExpression(ar));
         }
 
-        ArrayLiteral arrayLiteral = new ArrayLiteral(expressions, Type.string());
+        ArrayLiteralExpression<String> arrayLiteral = ArrayLiteralExpression.of(expressions, STRING_TYPE);
 
         return new SetResourceOperationsStatement(arrayLiteral).toFormattedString(0) + "\n";
     }
 
     private String jsonGraphToPML(List<JSONNode> pcs, Map<String, JSONNode> uaMap, Map<String, JSONNode> oaMap, Map<String, JSONNode> uMap, Map<String, JSONNode> oMap) {
 
-	    String pml = buildPolicyClassesPML(pcs) +
-			    buildAttributesPML(pcs, uaMap, UA) +
-			    buildAttributesPML(pcs, oaMap, OA) +
-			    buildAssociations(uaMap) +
-			    buildUsersAndObjectsPML(uMap, oMap);
+        String pml = buildPolicyClassesPML(pcs) +
+            buildAttributesPML(pcs, uaMap, UA) +
+            buildAttributesPML(pcs, oaMap, OA) +
+            buildAssociations(uaMap) +
+            buildUsersAndObjectsPML(uMap, oMap);
 
         return pml;
     }
@@ -112,11 +113,11 @@ public class PMLSerializer implements PolicySerializer {
 
             for (JSONAssociation jsonAssociation : associations) {
                 sb.append(
-                        new AssociateStatement(
-                                buildNameExpression(name),
-                                buildNameExpression(jsonAssociation.getTarget()),
-                                setToExpression(jsonAssociation.getArset())
-                        )
+                    new AssociateStatement(
+                        buildNameExpression(name),
+                        buildNameExpression(jsonAssociation.getTarget()),
+                        setToExpression(jsonAssociation.getArset())
+                    )
                 ).append("\n");
             }
         }
@@ -141,7 +142,7 @@ public class PMLSerializer implements PolicySerializer {
         return pml.toString();
     }
 
-    private void createNode(StringBuilder sb, Set<String> createdNodes, String name, NodeType type, Map<String, JSONNode> nodes) {
+    private void createNode(StringBuilder sb, Set<String> createdNodes, String name, NodeType type, Map<String, JSONNode> nodes){
         if (createdNodes.contains(name)) {
             return;
         }
@@ -167,8 +168,8 @@ public class PMLSerializer implements PolicySerializer {
             createdNodes.add(name);
         } else {
             sb.append(new AssignStatement(
-                    buildNameExpression(name),
-                    setToExpression(Set.of(assignment))
+                buildNameExpression(name),
+                setToExpression(Set.of(assignment))
             )).append("\n");
         }
     }
@@ -185,11 +186,11 @@ public class PMLSerializer implements PolicySerializer {
             }
 
             sb.append(new CreatePolicyClassStatement(
-                    buildNameExpression(pc.getName())
+                buildNameExpression(pc.getName())
             )).append("\n");
 
             SetNodePropertiesStatement setNodePropertiesStatement =
-                    buildSetNodePropertiesStatement(pc.getName(), pc.getProperties());
+                buildSetNodePropertiesStatement(pc.getName(), pc.getProperties());
             if (setNodePropertiesStatement != null) {
                 sb.append(setNodePropertiesStatement).append("\n");
             }
@@ -220,19 +221,19 @@ public class PMLSerializer implements PolicySerializer {
         // if node is an admin node, assign to assignments not create
         if (seen.contains(name)) {
             sb.append(new AssignStatement(
-                    buildNameExpression(name),
-                    setToExpression(new HashSet<>(assignments))
+                buildNameExpression(name),
+                setToExpression(new HashSet<>(assignments))
             )).append("\n");
         } else {
             sb.append(new CreateNonPCStatement(
-                    buildNameExpression(name),
-                    type,
-                    setToExpression(new HashSet<>(assignments))
+                buildNameExpression(name),
+                type,
+                setToExpression(new HashSet<>(assignments))
             )).append("\n");
         }
 
         SetNodePropertiesStatement setNodePropertiesStatement =
-                buildSetNodePropertiesStatement(name, jsonNode.getProperties());
+            buildSetNodePropertiesStatement(name, jsonNode.getProperties());
         if (setNodePropertiesStatement != null) {
             sb.append(setNodePropertiesStatement).append("\n");
         }
@@ -251,55 +252,51 @@ public class PMLSerializer implements PolicySerializer {
         return pml.toString();
     }
 
-    private Expression buildNameExpression(String name) {
+    private Expression<String> buildNameExpression(String name) {
         if (AdminPolicy.isAdminPolicyNodeName(name)) {
-            return new ReferenceByID(
-                    AdminPolicyNode.fromNodeName(name).constantName()
+            return new VariableReferenceExpression<>(
+                AdminPolicyNode.fromNodeName(name).constantName(),
+                STRING_TYPE
             );
         }
 
-        return new StringLiteral(name);
+        return new StringLiteralExpression(name);
     }
 
-    private ArrayLiteral setToExpression(Set<String> set) {
-        Expression[] expressions = new Expression[set.size()];
-        int i = 0;
+    private ArrayLiteralExpression<String> setToExpression(Set<String> set) {
+        List<Expression<String>> expressions = new ArrayList<>();
         for (String s : set) {
-            expressions[i] = buildNameExpression(s);
-            i++;
+            expressions.add(buildNameExpression(s));
         }
 
-        return new ArrayLiteral(
-                expressions,
-                Type.string()
-        );
+        return ArrayLiteralExpression.of(expressions, STRING_TYPE);
     }
 
     private SetNodePropertiesStatement buildSetNodePropertiesStatement(String name, List<JSONProperty> properties) {
-        Expression propertiesExpression = jsonPropertiesToExpression(properties);
+        Expression<Map<String, String>> propertiesExpression = jsonPropertiesToExpression(properties);
         if (propertiesExpression == null) {
             return null;
         }
 
         return new SetNodePropertiesStatement(
-                buildNameExpression(name),
-                propertiesExpression
+            buildNameExpression(name),
+            propertiesExpression
         );
     }
 
-    private Expression jsonPropertiesToExpression(List<JSONProperty> properties) {
+    private Expression<Map<String, String>> jsonPropertiesToExpression(List<JSONProperty> properties) {
         if (properties == null || properties.isEmpty()) {
             return null;
         }
 
-        Map<Expression, Expression> propertiesExpressions = new HashMap<>();
+        Map<Expression<String>, Expression<String>> propertiesExpressions = new HashMap<>();
         for (JSONProperty jsonProperty : properties) {
             propertiesExpressions.put(
-                    new StringLiteral(jsonProperty.getKey()),
-                    new StringLiteral(jsonProperty.getValue())
+                new StringLiteralExpression(jsonProperty.getKey()),
+                new StringLiteralExpression(jsonProperty.getValue())
             );
         }
 
-        return new MapLiteral(propertiesExpressions, Type.string(), Type.string());
+        return MapLiteralExpression.of(propertiesExpressions, STRING_TYPE, STRING_TYPE);
     }
 }

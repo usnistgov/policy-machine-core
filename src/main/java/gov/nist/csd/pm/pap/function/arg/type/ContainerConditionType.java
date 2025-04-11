@@ -15,4 +15,9 @@ public final class ContainerConditionType extends ArgType<ContainerCondition> {
 
         return containerCondition;
     }
+
+    @Override
+    public Class<ContainerCondition> getExpectedClass() {
+        return ContainerCondition.class;
+    }
 }

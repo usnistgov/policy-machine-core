@@ -13,7 +13,7 @@ public class RoutinesModifier extends Modifier implements RoutinesModification {
     }
 
     @Override
-    public void createAdminRoutine(Routine<?> routine) throws PMException {
+    public void createAdminRoutine(Routine<?, ?> routine) throws PMException {
         if (store.routines().getAdminRoutineNames().contains(routine.getName())) {
             throw new RoutineExistsException(routine.getName());
         }

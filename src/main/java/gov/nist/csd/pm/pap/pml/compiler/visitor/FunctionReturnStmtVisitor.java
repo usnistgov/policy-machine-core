@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
@@ -33,7 +34,7 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
             );
         }
 
-        Expression e = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+        Expression<?> e = ExpressionVisitor.compile(visitorCtx, ctx.expression(), OBJECT_TYPE);
 
         return new ReturnStatement(e);
     }

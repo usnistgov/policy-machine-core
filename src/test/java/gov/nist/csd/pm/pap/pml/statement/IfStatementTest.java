@@ -3,6 +3,8 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.util.TestPAP;
@@ -53,27 +55,27 @@ class IfStatementTest {
     void testToFormattedStringVoidReturn() {
         IfStatement stmt = new IfStatement(
                 new IfStatement.ConditionalBlock(
-                        new BoolLiteral(true),
+                        new BoolLiteralExpression(true),
                         new PMLStatementBlock(
-                                new CreatePolicyClassStatement(new StringLiteral("a"))
+                                new CreatePolicyClassStatement(new StringLiteralExpression("a"))
                         )
                 ),
                 List.of(
                         new IfStatement.ConditionalBlock(
-                                new BoolLiteral(true),
+                                new BoolLiteralExpression(true),
                                 new PMLStatementBlock(
-                                        new CreatePolicyClassStatement(new StringLiteral("b"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("b"))
                                 )
                         ),
                         new IfStatement.ConditionalBlock(
-                                new BoolLiteral(true),
+                                new BoolLiteralExpression(true),
                                 new PMLStatementBlock(
-                                        new CreatePolicyClassStatement(new StringLiteral("c"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("c"))
                                 )
                         )
                 ),
                 new PMLStatementBlock(
-                        new CreatePolicyClassStatement(new StringLiteral("d"))
+                        new CreatePolicyClassStatement(new StringLiteralExpression("d"))
                 )
         );
 

@@ -1,11 +1,14 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.LiteralVisitor;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
@@ -18,7 +21,6 @@ import gov.nist.csd.pm.pap.pml.pattern.subject.*;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
         ArgMapVisitor argMapVisitor = new ArgMapVisitor(visitorCtx);
         ResponseVisitor responseVisitor = new ResponseVisitor(visitorCtx);
 
-        Expression name = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
+        Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.ruleName, STRING_TYPE);
 
         return new CreateRuleStatement(
                 name,
@@ -51,13 +53,11 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
     static class SubjectPatternVisitor extends PMLBaseVisitor<SubjectPattern> {
 
-        private final LiteralVisitor literalVisitor;
         private final SubjectPatternExpressionVisitor subjectPatternExpressionVisitor;
 
         public SubjectPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
 
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
             this.subjectPatternExpressionVisitor = new SubjectPatternExpressionVisitor(visitorCtx);
         }
 
@@ -74,10 +74,8 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     static class SubjectPatternExpressionVisitor extends PMLBaseVisitor<SubjectPatternExpression> {
-        private final LiteralVisitor literalVisitor;
         public SubjectPatternExpressionVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
         }
 
         @Override
@@ -106,28 +104,24 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
-            return new InSubjectPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new InSubjectPattern(ctx.stringLit().getText());
         }
 
         @Override
         public SubjectPatternExpression visitUsernameSubject(PMLParser.UsernameSubjectContext ctx) {
-            return new UsernamePattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new UsernamePattern(ctx.stringLit().getText());
         }
 
         @Override
         public SubjectPatternExpression visitProcessSubject(PMLParser.ProcessSubjectContext ctx) {
-            return new ProcessSubjectPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new ProcessSubjectPattern(ctx.stringLit().getText());
         }
     }
 
     static class OperationPatternVisitor extends PMLBaseVisitor<OperationPattern> {
 
-        private final LiteralVisitor literalVisitor;
-
         public OperationPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
-
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
         }
 
         @Override
@@ -137,18 +131,14 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public OperationPattern visitIDOperation(PMLParser.IDOperationContext ctx) {
-            return new OperationPattern(literalVisitor.visitStringLit(ctx.stringLit()).getValue());
+            return new OperationPattern(ctx.stringLit().getText());
         }
     }
 
     static class ArgPatternVisitor extends PMLBaseVisitor<ArgPatternExpression> {
 
-        private final LiteralVisitor literalVisitor;
-
         public ArgPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
-
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
         }
 
         @Override
@@ -182,12 +172,12 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public ArgPatternExpression visitInPolicyElement(PMLParser.InPolicyElementContext ctx) {
-            return new InArgPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new InArgPattern(ctx.stringLit().getText());
         }
 
         @Override
         public ArgPatternExpression visitPolicyElement(PMLParser.PolicyElementContext ctx) {
-            return new NodeArgPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new NodeArgPattern(ctx.stringLit().getText());
         }
     }
 
@@ -251,7 +241,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
             // add the event name and event context map to the local parser scope
             VisitorContext localVisitorCtx = visitorCtx.copy();
             try {
-                localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, Type.map(Type.string(), Type.any()), true));
+                localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, mapType(STRING_TYPE, OBJECT_TYPE), true));
             } catch (VariableAlreadyDefinedInScopeException e) {
                 throw new PMLCompilationRuntimeException(e);
             }
@@ -263,9 +253,9 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
             CreateRuleStmtVisitor createRuleStmtVisitor = new CreateRuleStmtVisitor(localVisitorCtx);
             DeleteRuleStmtVisitor deleteRuleStmtVisitor = new DeleteRuleStmtVisitor(localVisitorCtx);
 
-            List<PMLStatement> stmts = new ArrayList<>();
+            List<PMLStatement<?>> stmts = new ArrayList<>();
             for (PMLParser.ResponseStatementContext responseStmtCtx : responseStmtsCtx) {
-                PMLStatement stmt = null;
+                PMLStatement<?> stmt = null;
 
                 if (responseStmtCtx.statement() != null) {
                     stmt = statementVisitor.visitStatement(responseStmtCtx.statement());

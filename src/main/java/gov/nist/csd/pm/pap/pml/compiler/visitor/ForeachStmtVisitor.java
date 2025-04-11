@@ -1,5 +1,12 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -8,10 +15,11 @@ import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
 
 import java.util.ArrayList;
 import java.util.List;
+import org.neo4j.fabric.eval.Catalog.Arg;
 
 public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
 
@@ -23,38 +31,27 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
     public ForeachStatement visitForeachStatement(PMLParser.ForeachStatementContext ctx) {
         boolean isMapFor = ctx.value != null;
 
-        Expression iter;
-        if (isMapFor) {
-            iter = Expression.compile(visitorCtx, ctx.expression(), Type.map(Type.any(), Type.any()));
-        } else {
-            iter = Expression.compile(visitorCtx, ctx.expression(), Type.array(Type.any()));
-        }
+        Expression<?> iter;
+        ArgType<?> keyType;
+        ArgType<?> valueType = null;
 
-        Type iterType;
-        try {
-            iterType = iter.getType(visitorCtx.scope());
-        } catch (PMLScopeException e) {
-            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        if (isMapFor) {
+            iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), mapType(OBJECT_TYPE, OBJECT_TYPE));
+
+            MapType<?, ?> actualMapType = (MapType<?, ?>) iter.getType();
+            keyType = actualMapType.getKeyType();
+            valueType = actualMapType.getValueType();
+        } else {
+            iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), listType(OBJECT_TYPE));
+
+            ListType<?> actualListType = (ListType<?>) iter.getType();
+            keyType = actualListType.getElementType();
         }
 
         String varName = ctx.key.getText();
-        String mapValueVarName = null;
-        if (isMapFor) {
-            mapValueVarName = ctx.value.getText();
-        }
-
-        List<PMLStatement> block = new ArrayList<>();
-        Type keyType;
-        Type valueType = null;
-        if (isMapFor) {
-            keyType = iterType.getMapKeyType();
-            valueType = iterType.getMapValueType();
-        } else {
-            keyType = iterType.getArrayElementType();
-        }
+        String mapValueVarName = isMapFor ? ctx.value.getText() : null;
 
         VisitorContext localVisitorCtx = visitorCtx.copy();
-
         try {
             localVisitorCtx.scope().addVariable(varName, new Variable(varName, keyType, false));
             if (valueType != null) {
@@ -64,8 +61,9 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
 
+        List<PMLStatement<?>> block = new ArrayList<>();
         for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
-            PMLStatement statement = new StatementVisitor(localVisitorCtx)
+            PMLStatement<?> statement = new StatementVisitor(localVisitorCtx)
                     .visitStatement(stmtCtx);
             block.add(statement);
 

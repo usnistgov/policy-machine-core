@@ -7,57 +7,66 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
-public class Args {
+public abstract class Args {
 
-	public static Args of(AdminFunction<?> adminFunction, Map<String, Object> actualArgs) {
-		List<FormalArg<?>> formalArgs = adminFunction.getFormalArgs();
+	public static Args of(AdminFunction<?, ?> adminFunction, Map<String, Object> actualArgs) {
+		List<FormalParameter<?>> formalParameters = adminFunction.getFormalArgs();
 
-		Args args = new Args();
+		Args args = new MapArgs();
 
-		if (formalArgs.size() != actualArgs.size()) {
+		if (formalParameters.size() != actualArgs.size()) {
 			throw new IllegalArgumentException("expected the same number of formalArgs and actualArgs and got " +
-				formalArgs.size() + " and " + actualArgs.size());
+				formalParameters.size() + " and " + actualArgs.size());
 		}
 
-		for (FormalArg<?> formalArg : formalArgs) {
-			if (!actualArgs.containsKey(formalArg.getName())) {
-				throw new IllegalArgumentException("formal argument " + formalArg.getName() + " not found in actual args");
+		for (FormalParameter<?> formalParameter : formalParameters) {
+			if (!actualArgs.containsKey(formalParameter.getName())) {
+				throw new IllegalArgumentException("formal argument " + formalParameter.getName() + " not found in actual args");
 			}
 
-			Object actualArg = actualArgs.get(formalArg.getName());
-			put(formalArg, actualArg, args);
+			Object actualArg = actualArgs.get(formalParameter.getName());
+			put(formalParameter, actualArg, args);
 		}
 
 		return args;
 	}
 
-	private static <T> void put(FormalArg<T> formalArg, Object value, Args args) {
-		T typedValue = formalArg.toExpectedType(value);
-		args.put(formalArg, typedValue);
+	private static <T> void put(FormalParameter<T> formalParameter, Object value, Args args) {
+		T typedValue = formalParameter.toExpectedType(value);
+		args.put(formalParameter, typedValue);
 	}
 
-	private final Map<FormalArg<?>, Object> map;
+	private final Map<FormalParameter<?>, Object> map;
 
 	public Args() {
 		this.map = new HashMap<>();
 	}
 
-	public Args(Map<FormalArg<?>, Object> map) {
+	public Args(Map<FormalParameter<?>, Object> map) {
 		this.map = map;
 	}
 
-	public <T> T get(FormalArg<T> formalArg) {
-		return formalArg.getType().cast(map.get(formalArg));
+	public <T> T get(FormalParameter<T> formalParameter) {
+		return formalParameter.getType().cast(map.get(formalParameter));
 	}
 
-	public <T> Args put(FormalArg<T> formalArg, T value) {
-		map.put(formalArg, value);
+	public Args put(FormalParameter<?> formalParameter, Object value) {
+		map.put(formalParameter, value);
 		return this;
 	}
 
-	public void foreach(BiConsumer<FormalArg<?>, Object> consumer) {
-		for (Entry<FormalArg<?>, Object> e : map.entrySet()) {
+	public void foreach(BiConsumer<FormalParameter<?>, Object> consumer) {
+		for (Entry<FormalParameter<?>, Object> e : map.entrySet()) {
 			consumer.accept(e.getKey(), e.getValue());
 		}
+	}
+
+	public Map<String, Object> toMap() {
+		Map<String, Object> m = new HashMap<>();
+		for (Entry<FormalParameter<?>, Object> e : map.entrySet()) {
+			m.put(e.getKey().getName(), e.getValue());
+		}
+
+		return m;
 	}
 }

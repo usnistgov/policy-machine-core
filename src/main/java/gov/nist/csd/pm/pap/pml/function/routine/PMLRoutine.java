@@ -1,31 +1,31 @@
 package gov.nist.csd.pm.pap.pml.function.routine;
 
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunction;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLRoutine extends Routine<Value> implements PMLFunction {
+public abstract class PMLRoutine extends Routine<Object, MapArgs> implements PMLFunction {
 
-    private final Type returnType;
-    private final List<PMLFormalArg> pmlFormalArgs;
+    private final ArgType<?> returnType;
+    private final List<FormalParameter<?>> pmlFormalParameters;
     private final PMLRoutineSignature signature;
 
     protected ExecutionContext ctx;
 
-    public PMLRoutine(String name, Type returnType, List<PMLFormalArg> formalArgs) {
-        super(name, new ArrayList<>(formalArgs));
+    public PMLRoutine(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
+        super(name, new ArrayList<>(formalParameters));
         this.returnType = returnType;
-        this.pmlFormalArgs = formalArgs;
+        this.pmlFormalParameters = formalParameters;
         this.signature = new PMLRoutineSignature(
                 getName(),
                 returnType,
-                formalArgs
+            formalParameters
         );
     }
 
@@ -33,12 +33,12 @@ public abstract class PMLRoutine extends Routine<Value> implements PMLFunction {
         return signature;
     }
 
-    public Type getReturnType() {
+    public ArgType<?> getReturnType() {
         return returnType;
     }
 
-    public List<PMLFormalArg> getPmlFormalArgs() {
-        return pmlFormalArgs;
+    public List<FormalParameter<?>> getPmlFormalArgs() {
+        return pmlFormalParameters;
     }
 
     public ExecutionContext getCtx() {

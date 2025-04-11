@@ -210,9 +210,9 @@ public abstract class TxCmd implements TxRollbackSupport {
 
     static class CreateAdminRoutine extends TxCmd {
 
-        private final Routine<?> routine;
+        private final Routine<?, ?> routine;
 
-        public CreateAdminRoutine(Routine<?> routine) {
+        public CreateAdminRoutine(Routine<?, ?> routine) {
             this.routine = routine;
         }
 
@@ -224,9 +224,9 @@ public abstract class TxCmd implements TxRollbackSupport {
 
     static class DeleteAdminRoutine extends TxCmd {
 
-        private final Routine<?> routine;
+        private final Routine<?, ?> routine;
 
-        public DeleteAdminRoutine(Routine<?> routine) {
+        public DeleteAdminRoutine(Routine<?, ?> routine) {
             this.routine = routine;
         }
 

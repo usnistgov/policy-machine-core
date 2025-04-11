@@ -5,6 +5,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
@@ -20,7 +21,7 @@ class DissociateStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        DissociateStatement stmt = new DissociateStatement(new StringLiteral("ua1"), new StringLiteral("oa1"));
+        DissociateStatement stmt = new DissociateStatement(new StringLiteralExpression("ua1"), new StringLiteralExpression("oa1"));
 
         PAP pap = new TestPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
@@ -39,7 +40,7 @@ class DissociateStatementTest {
 
     @Test
     void testToFormattedString() {
-        DissociateStatement stmt = new DissociateStatement(new StringLiteral("ua1"), buildArrayLiteral("oa1"));
+        DissociateStatement stmt = new DissociateStatement(new StringLiteralExpression("ua1"), new StringLiteralExpression("oa1"));
 
         assertEquals("dissociate \"ua1\" and [\"oa1\"]", stmt.toFormattedString(0));
         assertEquals(

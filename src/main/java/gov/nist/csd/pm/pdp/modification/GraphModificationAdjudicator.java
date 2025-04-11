@@ -13,12 +13,21 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.graph.*;
+import gov.nist.csd.pm.pap.function.op.graph.AssignOp.AssignOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.AssociateOp.AssociateOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.DeassignOp.DeassignOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.DeleteNodeOp.DeleteNodeOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.DissociateOp.DissociateOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodeProeprtiesOpArgs;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
@@ -37,7 +46,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public long createPolicyClass(String name) throws PMException {
         CreatePolicyClassOp op = new CreatePolicyClassOp();
-        Args args = op.actualArgs(name);
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, List.of());
 
         return executeOp(op, args);
     }
@@ -45,7 +54,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public long createUserAttribute(String name, Collection<Long> descendants) throws PMException {
         CreateUserAttributeOp op = new CreateUserAttributeOp();
-        Args args = op.actualArgs(name, new LongArrayList(descendants));
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -53,7 +62,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public long createObjectAttribute(String name, Collection<Long> descendants) throws PMException {
         CreateObjectAttributeOp op = new CreateObjectAttributeOp();
-        Args args = op.actualArgs(name, new LongArrayList(descendants));
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -61,7 +70,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public long createObject(String name, Collection<Long> descendants) throws PMException {
         CreateObjectOp op = new CreateObjectOp();
-        Args args = op.actualArgs(name, new LongArrayList(descendants));
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -69,7 +78,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public long createUser(String name, Collection<Long> descendants) throws PMException {
         CreateUserOp op = new CreateUserOp();
-        Args args = op.actualArgs(name, new LongArrayList(descendants));
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -77,7 +86,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         SetNodePropertiesOp op = new SetNodePropertiesOp();
-        Args args = op.actualArgs(id, new Properties(properties));
+        SetNodeProeprtiesOpArgs args = new SetNodeProeprtiesOpArgs(id, new Properties(properties));
 
         executeOp(op, args);
     }
@@ -88,7 +97,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         LongArrayList descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
 
         DeleteNodeOp op = new DeleteNodeOp();
-        Args args = op.actualArgs(id, node.getType(), descendants);
+        DeleteNodeOpArgs args = new DeleteNodeOpArgs(id, node.getType(), descendants);
 
         // build event context before executing or else the node will not exist when the util
         // tries to convert the id to the name
@@ -100,7 +109,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void assign(long ascId, Collection<Long> descendants) throws PMException {
         AssignOp op = new AssignOp();
-        Args args = op.actualArgs(ascId, new LongArrayList(descendants));
+        AssignOpArgs args = new AssignOpArgs(ascId, new LongArrayList(descendants));
 
         executeOp(op, args);
     }
@@ -108,7 +117,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         DeassignOp op = new DeassignOp();
-        Args args = op.actualArgs(ascendant, new LongArrayList(descendants));
+        DeassignOpArgs args = new DeassignOpArgs(ascendant, new LongArrayList(descendants));
 
         executeOp(op, args);
     }
@@ -116,7 +125,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         AssociateOp op = new AssociateOp();
-        Args args = op.actualArgs(ua, target, accessRights);
+        AssociateOpArgs args = new AssociateOpArgs(ua, target, accessRights);
 
         executeOp(op, args);
     }
@@ -124,21 +133,21 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void dissociate(long ua, long target) throws PMException {
         DissociateOp op = new DissociateOp();
-        Args args = op.actualArgs(ua, target);
+        DissociateOpArgs args = new DissociateOpArgs(ua, target);
 
         executeOp(op, args);
     }
 
-    private <T> void executeOp(Operation<T> op, Args args, EventContext eventContext) throws PMException {
+    private <R, A extends Args> void executeOp(Operation<R, A> op, A args, EventContext eventContext) throws PMException {
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
 
         eventPublisher.publishEvent(eventContext);
     }
 
-    private <T> T executeOp(Operation<T> op, Args args) throws PMException {
+    private <R, A extends Args> R executeOp(Operation<R, A> op, A args) throws PMException {
         op.canExecute(privilegeChecker, userCtx, args);
-        T ret = op.execute(pap, args);
+        R ret = op.execute(pap, args);
 
         eventPublisher.publishEvent(buildEventContext(pap, userCtx, op.getName(), args));
 

@@ -32,7 +32,7 @@ public class Neo4jMemoryOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public void createAdminOperation(Operation<?> operation) throws PMException {
+	public void createAdminOperation(Operation<?, ?> operation) throws PMException {
 		String hex = Neo4jUtil.serialize(operation);
 
 		txHandler.runTx(tx -> {
@@ -88,8 +88,8 @@ public class Neo4jMemoryOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public Operation<?> getAdminOperation(String operationName) throws PMException {
-		AtomicReference<Operation<?>> operation = new AtomicReference<>();
+	public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
+		AtomicReference<Operation<?, ?>> operation = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
 			Node node = tx.findNode(ADMIN_OPERATION_LABEL, NAME_PROPERTY, operationName);
@@ -97,7 +97,7 @@ public class Neo4jMemoryOperationsStore implements OperationsStore {
 				return;
 			}
 
-			Operation<?> op = (Operation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString());
+			Operation<?, ?> op = (Operation<?, ?>) deserialize(node.getProperty(DATA_PROPERTY).toString());
 			operation.set(op);
 		});
 

@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.pap.pml.compiler;
 
-import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public record Variable(String name, Type type, boolean isConst) implements Serializable {
+public record Variable(String name, ArgType<?> type, boolean isConst) implements Serializable {
 
     @Override
     public boolean equals(Object o) {

@@ -15,4 +15,9 @@ public final class NodeTypeType extends ArgType<NodeType> {
 
         return nodeType;
     }
-} 
+
+    @Override
+    public Class<NodeType> getExpectedClass() {
+        return NodeType.class;
+    }
+}

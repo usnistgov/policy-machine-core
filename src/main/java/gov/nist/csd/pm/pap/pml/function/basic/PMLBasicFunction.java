@@ -1,50 +1,55 @@
 package gov.nist.csd.pm.pap.pml.function.basic;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public abstract class PMLBasicFunction extends AdminFunction<Value> implements PMLFunction {
+public abstract class PMLBasicFunction extends AdminFunction<Object, MapArgs> implements PMLFunction {
 
-	public static final PMLFormalArg NODE_NAME_ARG = new PMLFormalArg("nodeName", Type.string());
+	public static final ObjectMapper objectMapper = new ObjectMapper();
+	public static final FormalParameter<String> NODE_NAME_ARG = new FormalParameter<>("nodeName", STRING_TYPE);
 
-	private final Type returnType;
-	private final List<PMLFormalArg> pmlFormalArgs;
+	private final ArgType<?> returnType;
+	private final List<FormalParameter<?>> pmlFormalParameters;
 	private final PMLBasicFunctionSignature signature;
 	protected ExecutionContext ctx;
 
-	public PMLBasicFunction(String name, Type returnType, List<PMLFormalArg> formalArgs) {
-		super(name, new ArrayList<>(formalArgs));
+	public PMLBasicFunction(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
+		super(name, new ArrayList<>(formalParameters));
 
 		this.returnType = returnType;
-		this.pmlFormalArgs = formalArgs;
-		this.signature = new PMLBasicFunctionSignature(name, returnType, formalArgs);
+		this.pmlFormalParameters = formalParameters;
+		this.signature = new PMLBasicFunctionSignature(name, returnType, formalParameters);
 	}
 
-	public PMLBasicFunction(String name, Type returnType) {
+	public PMLBasicFunction(String name, ArgType<?> returnType) {
 		super(name, new ArrayList<>());
 
 		this.returnType = returnType;
-		this.pmlFormalArgs = new ArrayList<>();
+		this.pmlFormalParameters = new ArrayList<>();
 		this.signature = new PMLBasicFunctionSignature(name, returnType, new ArrayList<>());
 	}
 
-	public List<PMLFormalArg> getPmlFormalArgs() {
-		return pmlFormalArgs;
+	public List<FormalParameter<?>> getPmlFormalArgs() {
+		return pmlFormalParameters;
 	}
 
 	public PMLFunctionSignature getSignature() {
 		return signature;
 	}
 
-	public Type getReturnType() {
+	public ArgType<?> getReturnType() {
 		return returnType;
 	}
 
@@ -58,5 +63,10 @@ public abstract class PMLBasicFunction extends AdminFunction<Value> implements P
 
 	public void setCtx(ExecutionContext ctx) {
 		this.ctx = ctx;
+	}
+
+	@Override
+	protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+		return new MapArgs(argsMap);
 	}
 }

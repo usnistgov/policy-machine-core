@@ -2,9 +2,8 @@ package gov.nist.csd.pm.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
 
 import java.util.Objects;
 import java.util.Set;
@@ -13,7 +12,7 @@ public class NodeArgPattern extends ArgPatternExpression {
 
     private final String node;
 
-    public NodeArgPattern(StringLiteral node) {
+    public NodeArgPattern(StringLiteralExpression node) {
         this.node = node.getValue();
     }
 
@@ -33,7 +32,7 @@ public class NodeArgPattern extends ArgPatternExpression {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return new StringValue(node).toString();
+        return "\"" + node + "\"";
     }
 
     @Override

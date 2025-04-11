@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
@@ -44,30 +45,30 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
         assertEquals(
                 new CreateObligationStatement(
-                        new StringLiteral("obligation1"),
+                        new StringLiteralExpression("obligation1"),
                         List.of(
                                 new CreateRuleStatement(
-                                        new StringLiteral("any user"),
+                                        new StringLiteralExpression("any user"),
                                         new SubjectPattern(),
                                         new OperationPattern("test_event"),
                                         Map.of(),
                                         new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                                 ),
                                 new CreateRuleStatement(
-                                        new StringLiteral("users"),
+                                        new StringLiteralExpression("users"),
                                         new SubjectPattern(new UsernamePattern("u1")),
                                         new OperationPattern("test_event"),
                                         Map.of(),
                                         new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                                 ),
                                 new CreateRuleStatement(
-                                        new StringLiteral("users list"),
+                                        new StringLiteralExpression("users list"),
                                         new SubjectPattern(new LogicalSubjectPatternExpression(new UsernamePattern("u1"), new UsernamePattern("u2"), false)),
                                         new OperationPattern("test_event"),
                                         Map.of(),
@@ -89,15 +90,15 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
-                new StringLiteral("obligation1"),
+                new StringLiteralExpression("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("r1"),
+                                new StringLiteralExpression("r1"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
@@ -146,29 +147,29 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
-                new StringLiteral("obligation1"),
+                new StringLiteralExpression("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("any arg"),
+                                new StringLiteralExpression("any arg"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("any arg with on"),
+                                new StringLiteralExpression("any arg with on"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("an arg"),
+                                new StringLiteralExpression("an arg"),
                                 new SubjectPattern(),
                                 new OperationPattern("assign"),
                                 Map.of(
@@ -195,21 +196,21 @@ class CreateRuleStmtVisitorTest {
                         }
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.getFirst();
         CreateObligationStatement expected = new CreateObligationStatement(
-                new StringLiteral("obligation1"),
+                new StringLiteralExpression("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("r1"),
+                                new StringLiteralExpression("r1"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("pc1")),
-                                        new CreatePolicyClassStatement(new StringLiteral("pc2"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc1")),
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
                                 ))
                         )
                 )

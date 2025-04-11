@@ -1,43 +1,29 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-
-import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.ComplementedValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.Objects;
 
-public class NegatedExpression extends Expression {
+public class NegatedExpression extends Expression<Boolean> {
 
-    public static NegatedExpression compileNegatedExpression(VisitorContext visitorCtx,
-                                                             PMLParser.NegateExpressionContext negateExpressionContext) {
-        Expression expression = Expression.compile(visitorCtx, negateExpressionContext.expression(), Type.any());
+    private final Expression<Boolean> expression;
 
-        return new NegatedExpression(expression);
-    }
-
-    private final Expression expression;
-
-    public NegatedExpression(Expression expression) {
+    public NegatedExpression(Expression<Boolean> expression) {
         this.expression = expression;
     }
 
-    public Expression getExpression() {
+    public Expression<Boolean> getExpression() {
         return expression;
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
-        return expression.getType(scope);
+    public ArgType<Boolean> getType() {
+        return BOOLEAN_TYPE;
     }
 
     @Override
@@ -46,8 +32,8 @@ public class NegatedExpression extends Expression {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        return new ComplementedValue(expression.execute(ctx, pap));
+    public Boolean execute(ExecutionContext ctx, PAP pap) throws PMException {
+        return !expression.execute(ctx, pap);
     }
 
     @Override

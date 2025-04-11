@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.function;
 
-import static gov.nist.csd.pm.pap.function.arg.type.SupportedArgTypes.stringType;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 import gov.nist.csd.pm.common.exception.PMException;
@@ -9,10 +9,12 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class PMLFunctionWrapperTest {
@@ -40,6 +42,11 @@ class PMLFunctionWrapperTest {
             public Object execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
             }
+
+            @Override
+            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
+            }
         });
 
         operations.createAdminOperation(new Operation<>("op2", List.of(a)) {
@@ -50,6 +57,11 @@ class PMLFunctionWrapperTest {
             public Object execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
             }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
+            }
         });
 
         operations.createAdminOperation(new Operation<>("op3", List.of(a)) {
@@ -59,6 +71,11 @@ class PMLFunctionWrapperTest {
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
             }
         });
 

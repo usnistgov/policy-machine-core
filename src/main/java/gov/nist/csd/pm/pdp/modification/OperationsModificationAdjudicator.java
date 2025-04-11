@@ -7,6 +7,9 @@ import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.operation.*;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.operation.CreateAdminOperationOp.CreateAdminOperationOpArgs;
+import gov.nist.csd.pm.pap.function.op.operation.DeleteAdminOperationOp.DeleteAdminOperationOpArgs;
+import gov.nist.csd.pm.pap.function.op.operation.SetResourceOperationsOp.SetResourceOperationsOpArgs;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
@@ -25,16 +28,16 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     @Override
     public void setResourceOperations(AccessRightSet accessRightSet) throws PMException {
         SetResourceOperationsOp op = new SetResourceOperationsOp();
-        Args args = op.actualArgs(accessRightSet);
+        SetResourceOperationsOpArgs args = new SetResourceOperationsOpArgs(accessRightSet);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
+    public void createAdminOperation(Operation<?, ?> operation) throws PMException {
         CreateAdminOperationOp op = new CreateAdminOperationOp();
-        Args args = op.actualArgs(operation);
+        CreateAdminOperationOpArgs args = new CreateAdminOperationOpArgs(operation);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);
@@ -43,7 +46,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
         DeleteAdminOperationOp op = new DeleteAdminOperationOp();
-        Args args = op.actualArgs(operation);
+        DeleteAdminOperationOpArgs args = new DeleteAdminOperationOpArgs(operation);
 
         op.canExecute(privilegeChecker, userCtx, args);
         op.execute(pap, args);

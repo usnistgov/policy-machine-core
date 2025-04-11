@@ -14,7 +14,6 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.AccessAdjudication;
 import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
@@ -148,7 +147,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     public AdjudicationResponse adjudicateAdminRoutine(UserContext user,
                                                        String routineName,
                                                        Map<String, Object> args) throws PMException {
-        Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
+        Routine<?, ?> routine = pap.query().routines().getAdminRoutine(routineName);
 
         try {
             Object returnValue = runTx(user, tx -> {
@@ -156,14 +155,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                     ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
                 }
 
-                Object ret = tx.executeAdminFunction(routine, Args.of(routine, args));
-
-                // if the returned object is a value, convert it to an object
-                if (ret instanceof Value value) {
-                    ret = value.toObject();
-                }
-
-                return ret;
+                return tx.executeAdminFunction(routine, args);
             });
 
             return new AdjudicationResponse(GRANT, returnValue);
@@ -192,28 +184,22 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     private Object executeOperation(UserContext user, PDPTx pdpTx, String op, Map<String, Object> actualArgs) throws PMException {
-        Operation<?> operation = pap.query().operations().getAdminOperation(op);
+        Operation<?, ?> operation = pap.query().operations().getAdminOperation(op);
 
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation
-        Args args = Args.of(operation, actualArgs);
-        Object ret = pdpTx.executeAdminFunction(operation, args);
+        Object ret = pdpTx.executeAdminFunction(operation, actualArgs);
 
         // send to EPP
         publishEvent(EventContextUtil.buildEventContext(
             pap,
             user,
             operation.getName(),
-            args
+            operation.validateAndPrepareArgs(actualArgs)
         ));
-
-        // if the returned object is a value, convert it to an object
-        if (ret instanceof Value value) {
-            ret = value.toObject();
-        }
 
         return ret;
     }

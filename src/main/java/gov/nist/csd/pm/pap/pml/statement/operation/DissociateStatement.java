@@ -4,33 +4,34 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.graph.DissociateOp;
+import gov.nist.csd.pm.pap.function.op.graph.DissociateOp.DissociateOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.query.GraphQuery;
 
 import java.util.Objects;
 
-public class DissociateStatement extends OperationStatement<DissociateOp> {
+public class DissociateStatement extends OperationStatement<DissociateOpArgs> {
 
-    private final Expression uaExpr;
-    private final Expression targetExpr;
+    private final Expression<String> uaExpr;
+    private final Expression<String> targetExpr;
 
-    public DissociateStatement(Expression uaExpr, Expression targetExpr) {
+    public DissociateStatement(Expression<String> uaExpr, Expression<String> targetExpr) {
         super(new DissociateOp());
         this.uaExpr = uaExpr;
         this.targetExpr = targetExpr;
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String ua = uaExpr.execute(ctx, pap).getStringValue();
-        String target = targetExpr.execute(ctx, pap).getStringValue();
+    public DissociateOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String ua = uaExpr.execute(ctx, pap);
+        String target = targetExpr.execute(ctx, pap);
 
         GraphQuery graph = pap.query().graph();
         long uaId = graph.getNodeByName(ua).getId();
         long targetId = graph.getNodeByName(target).getId();
 
-        return op.actualArgs(uaId, targetId);
+        return new DissociateOpArgs(uaId, targetId);
     }
 
     @Override

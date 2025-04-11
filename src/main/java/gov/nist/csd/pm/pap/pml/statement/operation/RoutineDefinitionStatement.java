@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import gov.nist.csd.pm.pap.function.op.routine.CreateAdminRoutineOp.CreateAdminRoutineOpArgs;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -9,11 +10,10 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.pap.pml.statement.FunctionDefinitionStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class RoutineDefinitionStatement extends OperationStatement<CreateAdminRoutineOp> implements
-    FunctionDefinitionStatement {
+public class RoutineDefinitionStatement extends OperationStatement<CreateAdminRoutineOpArgs> implements FunctionDefinitionStatement {
 
     protected PMLStmtsRoutine pmlStmtsRoutine;
 
@@ -29,13 +29,13 @@ public class RoutineDefinitionStatement extends OperationStatement<CreateAdminRo
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return op.actualArgs(pmlStmtsRoutine);
+    public CreateAdminRoutineOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        return new CreateAdminRoutineOpArgs(pmlStmtsRoutine);
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Value value = super.execute(ctx, pap);
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        VoidResult value = super.execute(ctx, pap);
 
         ctx.scope().addFunction(pmlStmtsRoutine.getName(), pmlStmtsRoutine);
 

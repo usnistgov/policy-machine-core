@@ -4,6 +4,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class AssignStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        AssignStatement stmt = new AssignStatement(new StringLiteral("u1"), buildArrayLiteral("ua2", "ua3"));
+        AssignStatement stmt = new AssignStatement(new StringLiteralExpression("u1"), buildArrayLiteral("ua2", "ua3"));
 
         PAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
@@ -35,7 +36,7 @@ class AssignStatementTest {
 
     @Test
     void testToFormattedString() {
-        AssignStatement stmt = new AssignStatement(new StringLiteral("u1"), buildArrayLiteral("ua2", "ua3"));
+        AssignStatement stmt = new AssignStatement(new StringLiteralExpression("u1"), buildArrayLiteral("ua2", "ua3"));
         assertEquals(
                 "assign \"u1\" to [\"ua2\", \"ua3\"]",
                 stmt.toFormattedString(0)

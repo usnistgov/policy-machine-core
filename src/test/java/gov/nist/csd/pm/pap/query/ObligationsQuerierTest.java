@@ -7,6 +7,7 @@ import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
@@ -33,7 +34,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                                         new OperationPattern("test_event")
                                 ),
                                 new Response("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("test_pc"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
                 )
@@ -52,7 +53,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                                         new OperationPattern("test_event")
                                 ),
                                 new Response("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("test_pc"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
                 ).addRule(
@@ -63,7 +64,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                                         new OperationPattern("test_event")
                                 ),
                                 new Response("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("test_pc"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
                 );

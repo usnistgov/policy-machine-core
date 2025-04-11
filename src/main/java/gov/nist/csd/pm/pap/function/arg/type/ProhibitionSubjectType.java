@@ -15,4 +15,9 @@ public final class ProhibitionSubjectType extends ArgType<ProhibitionSubject> {
 
         return prohibitionSubject;
     }
+
+    @Override
+    public Class<ProhibitionSubject> getExpectedClass() {
+        return ProhibitionSubject.class;
+    }
 }

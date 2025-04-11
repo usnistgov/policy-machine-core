@@ -1,33 +1,34 @@
 package gov.nist.csd.pm.pap.function.op.graph;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.NODE_TYPE_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.nodeTypeType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.stringType;
 
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.function.arg.FormalArg;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.AccessRightSetType;
-import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalArg;
-import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalArg;
+import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalParameter;
+import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 
 import java.util.List;
 import java.util.Map;
 
-public abstract class GraphOp<T> extends Operation<T> {
+public abstract class GraphOp<R, A extends Args> extends Operation<R, A> {
 
-    public static final FormalArg<NodeType> TYPE_ARG = new FormalArg<>("type", nodeTypeType());
-    public static final FormalArg<Map<String, String>> PROPERTIES_ARG = new FormalArg<>("properties", mapType(stringType(), stringType()));
-    public static final FormalArg<AccessRightSet> ARSET_ARG = new FormalArg<>("arset", new AccessRightSetType());
+    public static final FormalParameter<NodeType> TYPE_ARG = new FormalParameter<>("type", NODE_TYPE_TYPE);
+    public static final FormalParameter<Map<String, String>> PROPERTIES_ARG = new FormalParameter<>("properties", mapType(STRING_TYPE, STRING_TYPE));
+    public static final FormalParameter<AccessRightSet> ARSET_ARG = new FormalParameter<>("arset", new AccessRightSetType());
 
-    public static final ListIdNodeFormalArg DESCENDANTS_ARG = new ListIdNodeFormalArg("descendants");
+    public static final ListIdNodeFormalParameter DESCENDANTS_ARG = new ListIdNodeFormalParameter("descendants");
 
-    public static final IdNodeFormalArg ASCENDANT_ARG = new IdNodeFormalArg("ascendant");
-    public static final IdNodeFormalArg UA_ARG = new IdNodeFormalArg("ua");
-    public static final IdNodeFormalArg TARGET_ARG = new IdNodeFormalArg("target");
+    public static final IdNodeFormalParameter ASCENDANT_ARG = new IdNodeFormalParameter("ascendant");
+    public static final IdNodeFormalParameter UA_ARG = new IdNodeFormalParameter("ua");
+    public static final IdNodeFormalParameter TARGET_ARG = new IdNodeFormalParameter("target");
 
-    public GraphOp(String name, List<FormalArg<?>> formalArgs) {
-        super(name, formalArgs);
+    public GraphOp(String name, List<FormalParameter<?>> formalParameters) {
+        super(name, formalParameters);
     }
 }

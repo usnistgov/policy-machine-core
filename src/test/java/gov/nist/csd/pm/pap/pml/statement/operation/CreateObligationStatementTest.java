@@ -6,6 +6,7 @@ import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.LogicalArgPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
@@ -27,9 +28,9 @@ class CreateObligationStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        CreateObligationStatement stmt = new CreateObligationStatement(new StringLiteral("o1"), List.of(
+        CreateObligationStatement stmt = new CreateObligationStatement(new StringLiteralExpression("o1"), List.of(
                 new CreateRuleStatement(
-                        new StringLiteral("rule1"),
+                        new StringLiteralExpression("rule1"),
                         new SubjectPattern(),
                         new OperationPattern("e1"),
                         Map.of(
@@ -40,7 +41,7 @@ class CreateObligationStatementTest {
                                 ))
                         ),
                         new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                new CreatePolicyClassStatement(new StringLiteral("pc2"))
+                                new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
                         ))
                 )
         ));
@@ -78,10 +79,10 @@ class CreateObligationStatementTest {
     @Test
     void testToFormattedString() {
         CreateObligationStatement stmt = new CreateObligationStatement(
-                new StringLiteral("obl1"),
+                new StringLiteralExpression("obl1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("rule1"),
+                                new StringLiteralExpression("rule1"),
                                 new SubjectPattern(),
                                 new OperationPattern("e1"),
                                 Map.of(
@@ -92,11 +93,11 @@ class CreateObligationStatementTest {
                                         ))
                                 ),
                                 new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("pc2"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
                                 ))
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("rule2"),
+                                new StringLiteralExpression("rule2"),
                                 new SubjectPattern(new UsernamePattern("u1")),
                                 new OperationPattern("e3"),
                                 Map.of(
@@ -107,7 +108,7 @@ class CreateObligationStatementTest {
                                         ))
                                 ),
                                 new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteral("pc3"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc3"))
                                 ))
                         )
                 )

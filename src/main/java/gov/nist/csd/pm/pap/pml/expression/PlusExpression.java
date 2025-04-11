@@ -1,41 +1,27 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-
-import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.Objects;
 
-public class PlusExpression extends Expression{
+public class PlusExpression extends Expression<String> {
 
-    public static Expression compilePlusExpression(VisitorContext visitorCtx, PMLParser.PlusExpressionContext plusExpressionsContext) {
-        return new PlusExpression(
-                Expression.compile(visitorCtx, plusExpressionsContext.left, Type.string()),
-                Expression.compile(visitorCtx, plusExpressionsContext.right, Type.string())
-        );
-    }
+    private final Expression<String> left;
+    private final Expression<String> right;
 
-    private final Expression left;
-    private final Expression right;
-
-    public PlusExpression(Expression left, Expression right) {
+    public PlusExpression(Expression<String> left, Expression<String> right) {
         this.left = left;
         this.right = right;
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLFunctionSignature> scope) throws PMLScopeException {
-        return Type.string();
+    public ArgType<String> getType() {
+        return STRING_TYPE;
     }
 
     @Override
@@ -44,11 +30,11 @@ public class PlusExpression extends Expression{
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        String leftValue = left.execute(ctx, pap).getStringValue();
-        String rightValue = right.execute(ctx, pap).getStringValue();
+    public String execute(ExecutionContext ctx, PAP pap) throws PMException {
+        String leftValue = left.execute(ctx, pap);
+        String rightValue = right.execute(ctx, pap);
 
-        return new StringValue(leftValue + rightValue);
+        return leftValue + rightValue;
     }
 
     @Override

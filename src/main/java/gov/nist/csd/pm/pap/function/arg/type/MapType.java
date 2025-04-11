@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 public final class MapType<K, V> extends ArgType<Map<K, V>> {
@@ -38,6 +36,11 @@ public final class MapType<K, V> extends ArgType<Map<K, V>> {
             resultMap.put(key, value);
         }
         return resultMap;
+    }
+
+    @Override
+    public Class<Map<K, V>> getExpectedClass() {
+        return (Class<Map<K, V>>)(Class<?>) Map.class;
     }
 
     @Override

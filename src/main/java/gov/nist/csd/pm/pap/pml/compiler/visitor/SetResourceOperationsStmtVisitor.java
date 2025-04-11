@@ -1,10 +1,14 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.operation.SetResourceOperationsStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import java.util.List;
+
 
 public class SetResourceOperationsStmtVisitor extends PMLBaseVisitor<SetResourceOperationsStatement> {
 
@@ -14,7 +18,7 @@ public class SetResourceOperationsStmtVisitor extends PMLBaseVisitor<SetResource
 
     @Override
     public SetResourceOperationsStatement visitSetResourceOperationsStatement(PMLParser.SetResourceOperationsStatementContext ctx) {
-        Expression expression = Expression.compile(visitorCtx, ctx.accessRightsArr, Type.array(Type.string()));
+        Expression<List<String>> expression = ExpressionVisitor.compile(visitorCtx, ctx.accessRightsArr, listType(STRING_TYPE));
 
         return new SetResourceOperationsStatement(expression);
     }

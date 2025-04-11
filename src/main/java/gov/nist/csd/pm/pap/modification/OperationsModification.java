@@ -21,7 +21,7 @@ public interface OperationsModification {
      * @param operation The operation to create.
      * @throws PMException If there is an error in the PM.
      */
-    void createAdminOperation(Operation<?> operation) throws PMException;
+    void createAdminOperation(Operation<?, ?> operation) throws PMException;
 
     /**
      * Delete the admin operation with the given name.

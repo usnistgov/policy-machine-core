@@ -2,6 +2,8 @@ package gov.nist.csd.pm.pap.serialization;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
@@ -13,6 +15,7 @@ import gov.nist.csd.pm.util.PolicyEquals;
 import gov.nist.csd.pm.util.SamplePolicy;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -56,7 +59,7 @@ class PMLTest {
         MemoryPAP pap = new TestPAP();
         assertThrows(PMException.class, () -> pap.deserialize(new TestUserContext("u1"), pml, pmlDeserializer));
 
-        pap.setPMLOperations(new PMLOperationWrapper(new Operation<>("testFunc", List.of(ARG_A)) {
+        pap.modify().operations().createAdminOperation(new Operation<>("testFunc", List.of(ARG_A)) {
             @Override
             public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
 
@@ -67,7 +70,12 @@ class PMLTest {
                 pap.modify().graph().createPolicyClass(args.get(ARG_A));
                 return null;
             }
-        }));
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new MapArgs(argsMap);
+            }
+        });
 
         PMLDeserializer pmlDeserializer2 = new PMLDeserializer();
         pap.deserialize(new TestUserContext("u1"), pml, pmlDeserializer2);

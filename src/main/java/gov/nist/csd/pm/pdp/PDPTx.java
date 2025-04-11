@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.AdminFunction;
+import gov.nist.csd.pm.pap.function.arg.NoArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
@@ -11,10 +12,7 @@ import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
@@ -63,63 +61,17 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_PML_OPS);
-        super.setPMLOperations(pmlOperations);
-    }
-
-    @Override
-    public void setPMLOperations(PMLOperation... operations) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_PML_OPS);
-        super.setPMLOperations(operations);
-    }
-
-    @Override
-    public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_PML_ROUTINES);
-        super.setPMLRoutines(pmlRoutines);
-    }
-
-    @Override
-    public void setPMLRoutines(PMLRoutine... routines) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_PML_ROUTINES);
-        super.setPMLRoutines(routines);
-    }
-
-    @Override
-    public Map<String, PMLOperation> getPMLOperations() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), REVIEW_POLICY);
-        return super.getPMLOperations();
-    }
-
-    @Override
-    public Map<String, PMLRoutine> getPMLRoutines() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), REVIEW_POLICY);
-        return super.getPMLRoutines();
-    }
-
-    @Override
-    public void setPMLConstants(Map<String, Value> pmlConstants) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_PML_CONSTANTS);
-        super.setPMLConstants(pmlConstants);
-    }
-
-    @Override
-    public Map<String, Value> getPMLConstants() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), REVIEW_POLICY);
-        return super.getPMLConstants();
-    }
-
-    @Override
     public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
         return new PDPExecutionContext(userCtx, this);
     }
 
     @Override
-    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args args) throws PMException {
-        if (adminFunction instanceof Routine<T> routine) {
+    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction, Map<String, Object> argsMap) throws PMException {
+        A args = adminFunction.validateAndPrepareArgs(argsMap);
+
+        if (adminFunction instanceof Routine<R, A> routine) {
             return routine.execute(this, args);
-        } else if (adminFunction instanceof Operation<T> operation) {
+        } else if (adminFunction instanceof Operation<R, A> operation) {
             operation.canExecute(privilegeChecker, userCtx, args);
             return operation.execute(pap, args);
         }
@@ -151,10 +103,10 @@ public class PDPTx extends PAP {
 
     public void executePML(UserContext author, String input) throws PMException {
         PMLCompiler pmlCompiler = new PMLCompiler();
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pap, input);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pap, input);
 
         buildExecutionContext(author)
-            .executeStatements(stmts, new Args());
+            .executeStatements(stmts, new NoArgs());
     }
 
     @Override

@@ -1,13 +1,20 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.CheckAndStatementsBlock;
@@ -20,29 +27,30 @@ import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 
 
-
-
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionInvokeExpressionTest {
 
-    private static final PMLFormalArg a = new PMLFormalArg("a", STRING_TYPE);
-    private static final PMLFormalArg b = new PMLFormalArg("b", STRING_TYPE);
+    private static final FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
+    private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
-	static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", Type.voidType(),
+	static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", new VoidType(),
             List.of(a, b),
             new CheckAndStatementsBlock(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
-                            new CreatePolicyClassStatement(new ReferenceByID("a")),
-                            new CreatePolicyClassStatement(new ReferenceByID("b"))
+                            new CreatePolicyClassStatement(new VariableReferenceExpression<>("a", STRING_TYPE)),
+                            new CreatePolicyClassStatement(new VariableReferenceExpression<>("b", STRING_TYPE))
             ))));
     static PMLStmtsOperation stringFunc = new PMLStmtsOperation("stringFunc",
             STRING_TYPE,
@@ -50,8 +58,8 @@ class FunctionInvokeExpressionTest {
             new CheckAndStatementsBlock(
             new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
-                    new VariableAssignmentStatement("x", false, new StringLiteral("test")),
-                    new ReturnStatement(new StringLiteral("test_ret"))
+                    new VariableAssignmentStatement("x", false, new StringLiteralExpression("test")),
+                    new ReturnStatement(new StringLiteralExpression("test_ret"))
             ))));
 
     private Scope<Variable, PMLFunctionSignature> testScope() throws
@@ -66,40 +74,40 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testVoidReturnType() throws PMException {
-        PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 voidFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                """);
 
 
         VisitorContext visitorContext = new VisitorContext(testScope());
 
-        Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
-                new FunctionInvokeExpression(voidFunc.getSignature().getName(), List.of(
-                        new StringLiteral("a"),
-                        new StringLiteral("b")
-                )),
+                new FunctionInvokeExpression<>(voidFunc.getSignature(), List.of(
+                        new StringLiteralExpression("a"),
+                        new StringLiteralExpression("b")
+                ), new VoidType()),
                 e
         );
         assertEquals(
-                Type.voidType(),
-                e.getType(visitorContext.scope())
+                new VoidType(),
+                e.getType()
         );
 
         PAP pap = new TestPAP();
         pap.modify().operations().createAdminOperation(voidFunc);
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
-        Value value = e.execute(executionContext, new MemoryPAP());
+        Object value = e.execute(executionContext, new MemoryPAP());
         assertEquals(
-                new VoidValue(),
+                new VoidResult(),
                 value
         );
 
         assertEquals(
-                Type.voidType(),
-                value.getType()
+                new VoidType(),
+                value
         );
     }
 
@@ -141,28 +149,28 @@ class FunctionInvokeExpressionTest {
 
     @Test
     void testExecuteReturnValue() throws PMException {
-        PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 stringFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(testScope());
 
-        Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
                 STRING_TYPE,
-                e.getType(visitorContext.scope())
+                e.getType()
         );
     }
 
     @Test
     void testExecuteWithFunctionExecutor() throws PMException {
-        PMLParser.FunctionInvokeExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 stringFunc("a", "b")
-                """, PMLParser.FunctionInvokeExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(testScope());
-        Expression e = FunctionInvokeExpression.compileFunctionInvokeExpression(visitorContext, ctx);
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 
         PAP pap = new TestPAP();
@@ -172,14 +180,10 @@ class FunctionInvokeExpressionTest {
                         new UserContext(0),
                         pap
                 );
-        Value value = e.execute(executionContext, pap);
+        Object value = e.execute(executionContext, pap);
         assertEquals(
-                new StringValue("test_ret"),
+                "test_ret",
                 value
-        );
-        assertEquals(
-                STRING_TYPE,
-                value.getType()
         );
     }
 

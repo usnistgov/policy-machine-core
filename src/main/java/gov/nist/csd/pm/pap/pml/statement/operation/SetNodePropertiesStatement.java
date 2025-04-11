@@ -5,38 +5,35 @@ import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp;
+import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodeProeprtiesOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SetNodePropertiesStatement extends OperationStatement<SetNodePropertiesOp> {
+public class SetNodePropertiesStatement extends OperationStatement<SetNodeProeprtiesOpArgs> {
 
-    private final Expression nameExpr;
-    private final Expression propertiesExpr;
+    private final Expression<String> nameExpr;
+    private final Expression<Map<String, String>> propertiesExpr;
 
-    public SetNodePropertiesStatement(Expression nameExpr, Expression propertiesExpr) {
+    public SetNodePropertiesStatement(Expression<String> nameExpr, Expression<Map<String, String>> propertiesExpr) {
         super(new SetNodePropertiesOp());
         this.nameExpr = nameExpr;
         this.propertiesExpr = propertiesExpr;
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String name = nameExpr.execute(ctx, pap).getStringValue();
-        Map<Value, Value> map = propertiesExpr.execute(ctx, pap).getMapValue();
-        Map<String, String> propertiesMap = new HashMap<>();
-        for (Value key : map.keySet()) {
-            propertiesMap.put(key.getStringValue(), map.get(key).getStringValue());
-        }
+    public SetNodeProeprtiesOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String name = nameExpr.execute(ctx, pap);
+        Map<String, String> map = propertiesExpr.execute(ctx, pap);
 
         long id = pap.query().graph().getNodeId(name);
-        Properties properties = new Properties(propertiesMap);
+        Properties properties = new Properties(map);
         
-        return op.actualArgs(id, properties);
+        return new SetNodeProeprtiesOpArgs(id, properties);
     }
 
     @Override

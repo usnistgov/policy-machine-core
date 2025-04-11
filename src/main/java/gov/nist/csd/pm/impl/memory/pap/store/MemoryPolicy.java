@@ -22,8 +22,8 @@ public class MemoryPolicy {
     protected Map<Long, Collection<Prohibition>> nodeProhibitions;
     protected Map<String, Collection<Prohibition>> processProhibitions;
     protected List<Obligation> obligations;
-    protected Map<String, Operation<?>> operations;
-    protected Map<String, Routine<?>> routines;
+    protected Map<String, Operation<?, ?>> operations;
+    protected Map<String, Routine<?, ?>> routines;
 
     public MemoryPolicy() {
         reset();

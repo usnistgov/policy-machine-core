@@ -1,10 +1,13 @@
 package gov.nist.csd.pm.pap.pml.function.operation;
 
 
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PMLOperationSignatureTest {
@@ -15,9 +18,9 @@ class PMLOperationSignatureTest {
                 "op1",
                 listType(STRING_TYPE),
                 List.of(
-                    new PMLNodeFormalArg("a", STRING_TYPE),
-                    new PMLFormalArg("b", STRING_TYPE),
-                    new PMLFormalArg("c", STRING_TYPE)
+                    new FormalParameter<>("a", STRING_TYPE),
+                    new FormalParameter<>("b", STRING_TYPE),
+                    new FormalParameter<>("c", STRING_TYPE)
                 )
         );
 

@@ -4,6 +4,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ class DeassignStatementTest {
     @Test
     void testSuccess() throws PMException {
         DeassignStatement stmt = new DeassignStatement(
-                new StringLiteral("ua3"),
+                new StringLiteralExpression("ua3"),
                 buildArrayLiteral("ua1", "ua2")
         );
 
@@ -39,7 +40,7 @@ class DeassignStatementTest {
     @Test
     void testToFormattedString() {
         DeassignStatement stmt = new DeassignStatement(
-                new StringLiteral("ua3"),
+                new StringLiteralExpression("ua3"),
                 buildArrayLiteral("ua1", "ua2")
         );
 

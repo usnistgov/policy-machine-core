@@ -20,7 +20,7 @@ public class RoutinesQuerier extends Querier implements RoutinesQuery {
     }
 
     @Override
-    public Routine<?> getAdminRoutine(String routineName) throws PMException {
+    public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
         if (!store.routines().getAdminRoutineNames().contains(routineName)) {
             throw new RoutineDoesNotExistException(routineName);
         }

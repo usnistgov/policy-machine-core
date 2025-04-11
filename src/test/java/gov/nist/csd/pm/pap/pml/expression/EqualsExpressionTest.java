@@ -1,18 +1,23 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
+import com.google.protobuf.BoolValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.pap.pml.value.BoolValue;
 
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,63 +26,60 @@ class EqualsExpressionTest {
 
     @Test
     void testEqualsString() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 "a" == "a"
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
         assertEquals(
-                new EqualsExpression(new StringLiteral("a"), new StringLiteral("a"), true),
+                new EqualsExpression(new StringLiteralExpression("a"), new StringLiteralExpression("a"), true),
                 equalsExpression
         );
 
         MemoryPAP pap = new TestPAP();
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), pap), pap);
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), pap), pap);
         assertEquals(
-                new BoolValue(true),
+                true,
                 value
         );
     }
 
     @Test
     void testNotEqualsString() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 "a" != "a"
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
         assertEquals(
-                new EqualsExpression(new StringLiteral("a"), new StringLiteral("a"), false),
+                new EqualsExpression(new StringLiteralExpression("a"), new StringLiteralExpression("a"), false),
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testEqualsArray() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ["a", "b"] == ["a", "b"]
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
@@ -86,19 +88,18 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(true),
+                true,
                 value
         );
 
-        ctx = PMLContextVisitor.toExpressionCtx(
+        ctx = TestPMLParser.parseExpression(
                 """
                 ["a", "b"] == ["b", "a"]
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         visitorContext = new VisitorContext(new CompileScope());
-        expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         equalsExpression = (EqualsExpression) expression;
@@ -109,20 +110,19 @@ class EqualsExpressionTest {
 
         value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testNotEqualsArray() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ["a", "b"] != ["a", "b"]
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
@@ -131,91 +131,87 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testEqualsBool() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 true == true
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
         assertEquals(
-                new EqualsExpression(new BoolLiteral(true), new BoolLiteral(true), true),
+                new EqualsExpression(new BoolLiteralExpression(true), new BoolLiteralExpression(true), true),
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(true),
+                true,
                 value
         );
 
-        ctx = PMLContextVisitor.toExpressionCtx(
+        ctx = TestPMLParser.parseExpression(
                 """
                 true == false
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         visitorContext = new VisitorContext(new CompileScope());
-        expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         equalsExpression = (EqualsExpression) expression;
         assertEquals(
-                new EqualsExpression(new BoolLiteral(true), new BoolLiteral(false), true),
+                new EqualsExpression(new BoolLiteralExpression(true), new BoolLiteralExpression(false), true),
                 equalsExpression
         );
 
         value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testNotEqualsBool() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 true != true
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
         assertEquals(
-                new EqualsExpression(new BoolLiteral(true), new BoolLiteral(true), false),
+                new EqualsExpression(new BoolLiteralExpression(true), new BoolLiteralExpression(true), false),
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testEqualsMap() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 {"a": "a", "b": "b"} == {"a": "a", "b": "b"}
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
@@ -224,19 +220,18 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(true),
+                true,
                 value
         );
 
-        ctx = PMLContextVisitor.toExpressionCtx(
+        ctx = TestPMLParser.parseExpression(
                 """
                 {"a": "a", "b": "b"} == {"a": "a", "b": "c"}
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         visitorContext = new VisitorContext(new CompileScope());
-        expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         equalsExpression = (EqualsExpression) expression;
@@ -247,20 +242,19 @@ class EqualsExpressionTest {
 
         value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testNotEqualsMap() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 {"a": "a", "b": "b"} != {"a": "a", "b": "b"}
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
@@ -269,61 +263,59 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testEqualsWithParens() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ("a" + "b") == ("a" + "b")
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
         assertEquals(
                 new EqualsExpression(
                         new ParenExpression(
-                                new PlusExpression(new StringLiteral("a"), new StringLiteral("b"))
+                                new PlusExpression(new StringLiteralExpression("a"), new StringLiteralExpression("b"))
                         ),
                         new ParenExpression(
-                                new PlusExpression(new StringLiteral("a"), new StringLiteral("b"))
+                                new PlusExpression(new StringLiteralExpression("a"), new StringLiteralExpression("b"))
                         ),
                         true
                 ),
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(true),
+                true,
                 value
         );
 
-        ctx = PMLContextVisitor.toExpressionCtx(
+        ctx = TestPMLParser.parseExpression(
                 """
                 ("a" + "b") == ("a" + "c")
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         visitorContext = new VisitorContext(new CompileScope());
-        expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         equalsExpression = (EqualsExpression) expression;
         assertEquals(
                 new EqualsExpression(
                         new ParenExpression(
-                                new PlusExpression(new StringLiteral("a"), new StringLiteral("b"))
+                                new PlusExpression(new StringLiteralExpression("a"), new StringLiteralExpression("b"))
                         ),
                         new ParenExpression(
-                                new PlusExpression(new StringLiteral("a"), new StringLiteral("c"))
+                                new PlusExpression(new StringLiteralExpression("a"), new StringLiteralExpression("c"))
                         ),
                         true
                 ),
@@ -332,39 +324,38 @@ class EqualsExpressionTest {
 
         value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
     }
 
     @Test
     void testNotEqualsDifferentTypes() throws PMException {
-        PMLParser.EqualsExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ("a" + "b") == (true)
-                """,
-                PMLParser.EqualsExpressionContext.class);
+                """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression expression = EqualsExpression.compileEqualsExpression(visitorContext, ctx);
+        Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         EqualsExpression equalsExpression = (EqualsExpression) expression;
         assertEquals(
                 new EqualsExpression(
                         new ParenExpression(
-                                new PlusExpression(new StringLiteral("a"), new StringLiteral("b"))
+                                new PlusExpression(new StringLiteralExpression("a"), new StringLiteralExpression("b"))
                         ),
                         new ParenExpression(
-                                new BoolLiteral(true)
+                                new BoolLiteralExpression(true)
                         ),
                         true
                 ),
                 equalsExpression
         );
 
-        Value value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
-                new BoolValue(false),
+                false,
                 value
         );
 

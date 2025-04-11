@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class AdminOperations {
 
-    public static List<Operation<?>> ADMIN_OPERATIONS = List.of(
+    public static List<Operation<?, ?>> ADMIN_OPERATIONS = List.of(
             new AssignOp(),
             new AssociateOp(),
             new CreateObjectAttributeOp(),
@@ -52,8 +52,8 @@ public class AdminOperations {
         return ADMIN_OP_NAMES.contains(opName);
     }
 
-    public static Operation<?> get(String opName) throws AdminOperationDoesNotExistException {
-        for (Operation<?> op : ADMIN_OPERATIONS) {
+    public static Operation<?, ?> get(String opName) throws AdminOperationDoesNotExistException {
+        for (Operation<?, ?> op : ADMIN_OPERATIONS) {
             if (op.getName().equals(opName)) {
                 return op;
             }
@@ -64,7 +64,7 @@ public class AdminOperations {
 
     private static Set<String> adminOperationNames() {
         Set<String> names = new HashSet<>();
-        for (Operation<?> op : ADMIN_OPERATIONS) {
+        for (Operation<?, ?> op : ADMIN_OPERATIONS) {
             names.add(op.getName());
         }
 

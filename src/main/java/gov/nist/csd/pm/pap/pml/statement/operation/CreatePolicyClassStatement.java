@@ -3,26 +3,28 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
 import gov.nist.csd.pm.pap.function.op.graph.CreatePolicyClassOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
+import java.util.List;
 import java.util.Objects;
 
-public class CreatePolicyClassStatement extends OperationStatement<CreatePolicyClassOp> {
+public class CreatePolicyClassStatement extends OperationStatement<CreateNodeOpArgs> {
 
-    private final Expression name;
+    private final Expression<String> name;
 
-    public CreatePolicyClassStatement(Expression name) {
+    public CreatePolicyClassStatement(Expression<String> name) {
         super(new CreatePolicyClassOp());
 
         this.name = name;
     }
 
     @Override
-    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String pcName = name.execute(ctx, pap).getStringValue();
+    public CreateNodeOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String pcName = name.execute(ctx, pap);
 
-        return op.actualArgs(pcName);
+        return new CreateNodeOpArgs(pcName, List.of());
     }
 
     @Override

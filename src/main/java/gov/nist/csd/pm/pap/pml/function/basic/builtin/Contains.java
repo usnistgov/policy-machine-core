@@ -1,35 +1,35 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.pml.function.arg.PMLFormalArg;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.BoolValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.List;
 
 public class Contains extends PMLBasicFunction {
 
-    public static final PMLFormalArg ARR_ARG = new PMLFormalArg("arr", Type.array(Type.any()));
-    public static final PMLFormalArg ELEMENT_ARG = new PMLFormalArg("element", Type.any());
+    public static final FormalParameter<List<Object>> ARR_ARG = new FormalParameter<>("arr", listType(OBJECT_TYPE));
+    public static final FormalParameter<Object> ELEMENT_ARG = new FormalParameter<>("element", OBJECT_TYPE);
 
     public Contains() {
         super(
                 "contains",
-                Type.bool(),
+                BOOLEAN_TYPE,
                 List.of(ARR_ARG, ELEMENT_ARG)
         );
     }
 
     @Override
-    public Value execute(PAP pap, Args args) throws PMException {
-        List<Value> valueArr = args.get(ARR_ARG).getArrayValue();
-        Value element = args.get(ELEMENT_ARG);
-        boolean contains = valueArr.contains(element);
-        return new BoolValue(contains);
+    public Object execute(PAP pap, MapArgs args) throws PMException {
+        List<Object> valueArr = args.get(ARR_ARG);
+        Object element = args.get(ELEMENT_ARG);
+        return valueArr.contains(element);
     }
 }
 

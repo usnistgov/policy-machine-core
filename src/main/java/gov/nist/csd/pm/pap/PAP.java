@@ -2,23 +2,19 @@ package gov.nist.csd.pm.pap;
 
 import gov.nist.csd.pm.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.AdminFunctionExecutor;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.tx.Transactional;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
+import gov.nist.csd.pm.pap.function.arg.NoArgs;
 import gov.nist.csd.pm.pap.id.IdGenerator;
 import gov.nist.csd.pm.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
@@ -27,7 +23,6 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
@@ -38,9 +33,6 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
     protected final PolicyStore policyStore;
     private final PolicyModifier modifier;
-    private Map<String, PMLOperation> pmlOperations;
-    private Map<String, PMLRoutine> pmlRoutines;
-    private Map<String, Value> pmlConstants;
     private IdGenerator idGenerator;
 
     public PAP(PolicyStore policyStore) throws PMException {
@@ -48,9 +40,6 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
         this.policyStore = policyStore;
         this.modifier = new PolicyModifier(policyStore, idGenerator);
-        this.pmlOperations = new HashMap<>();
-        this.pmlRoutines = new HashMap<>();
-        this.pmlConstants = new HashMap<>();
 
         // verify admin policy
         this.policyStore.verifyAdminPolicy();
@@ -122,8 +111,8 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <T> T executeAdminFunction(AdminFunction<T> adminFunction, Args args) throws PMException {
-        return adminFunction.execute(this, args);
+    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction, Map<String, Object> args) throws PMException {
+        return adminFunction.execute(this, adminFunction.validateAndPrepareArgs(args));
     }
 
     /**
@@ -162,72 +151,17 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         commit();
     }
 
-    public void setPMLOperations(Map<String, PMLOperation> pmlOperations) throws PMException {
-        checkFunctionNames(pmlOperations.keySet());
-        this.pmlOperations = pmlOperations;
-    }
-
-    public void setPMLOperations(PMLOperation... operations) throws PMException {
-        checkFunctionNames(Arrays.stream(operations).map(PMLOperation::getName).collect(Collectors.toSet()));
-        for (PMLOperation operation : operations) {
-            this.pmlOperations.put(operation.getName(), operation);
-        }
-    }
-
-    public void setPMLRoutines(Map<String, PMLRoutine> pmlRoutines) throws PMException {
-        checkFunctionNames(pmlRoutines.keySet());
-        this.pmlRoutines = pmlRoutines;
-    }
-
-    public void setPMLRoutines(PMLRoutine... routines) throws PMException {
-        checkFunctionNames(Arrays.stream(routines).map(PMLRoutine::getName).collect(Collectors.toSet()));
-        for (PMLRoutine routine : routines) {
-            this.pmlRoutines.put(routine.getName(), routine);
-        }
-    }
-
-    public Map<String, PMLOperation> getPMLOperations() throws PMException {
-        return pmlOperations;
-    }
-
-    public Map<String, PMLRoutine> getPMLRoutines() throws PMException {
-        return pmlRoutines;
-    }
-
-    private void checkFunctionNames(Collection<String> names) {
-        // check no operations conflict with existing operations in the PAP
-        pmlOperations.keySet().forEach(name -> {
-            if (!names.contains(name)) {
-                return;
-            }
-
-            try {
-                throw new FunctionAlreadyDefinedInScopeException(name);
-            } catch (FunctionAlreadyDefinedInScopeException e) {
-                throw new PMRuntimeException(e);
-            }
-        });
-    }
-
-    public void setPMLConstants(Map<String, Value> pmlConstants) throws PMException {
-        this.pmlConstants = pmlConstants;
-    }
-
-    public Map<String, Value> getPMLConstants() throws PMException {
-        return pmlConstants;
-    }
-
     public void executePML(UserContext author, String input) throws PMException {
         PMLCompiler pmlCompiler = new PMLCompiler();
 
-        List<PMLStatement> compiledPML = pmlCompiler.compilePML(this, input);
+        List<PMLStatement<?>> compiledPML = pmlCompiler.compilePML(this, input);
 
         ExecutionContext ctx = new ExecutionContext(author, this);
 
-        ctx.executeStatements(compiledPML, new Args());
+        ctx.executeStatements(compiledPML, new NoArgs());
     }
 
-    public List<PMLStatement> compilePML(String input) throws PMException {
+    public List<PMLStatement<?>> compilePML(String input) throws PMException {
         PMLCompiler pmlCompiler = new PMLCompiler();
 
         return pmlCompiler.compilePML(this, input);

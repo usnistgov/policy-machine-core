@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.scope;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
@@ -9,13 +10,10 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationWrapper;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineWrapper;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,6 +21,8 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.function.basic.builtin.PMLBuiltinFunctions.builtinFunctions;
 
 public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
@@ -31,8 +31,8 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         Map<String, Variable> constants = new HashMap<>();
 
         // admin policy nodes constants
-        constants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.constantName(), Type.string(), true));
-        constants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.constantName(), Type.string(), true));
+        constants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.constantName(), STRING_TYPE, true));
+        constants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.constantName(), STRING_TYPE, true));
         setConstants(constants);
 
         // add builtin operations
@@ -47,15 +47,8 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
     public CompileScope(PAP pap) throws PMException {
         // add constants
         Map<String, Variable> constants = new HashMap<>();
-        constants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.nodeName(), Type.string(), true));
-        constants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.nodeName(), Type.string(), true));
-
-        Map<String, Value> pmlConstants = pap.getPMLConstants();
-        for (Map.Entry<String, Value> pmlConstant : pmlConstants.entrySet()) {
-            String key = pmlConstant.getKey();
-            Value value = pmlConstant.getValue();
-            constants.put(key, new Variable(key, value.getType(), true));
-        }
+        constants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.nodeName(), STRING_TYPE, true));
+        constants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.nodeName(), STRING_TYPE, true));
         setConstants(constants);
 
         // add pml operations and routines stored in PAP
@@ -63,37 +56,35 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         for (Map.Entry<String, PMLBasicFunction> e : builtinFunctions().entrySet()) {
             functions.put(e.getKey(), e.getValue().getSignature());
         }
-        for (Map.Entry<String, PMLOperation> pmlOp : pap.getPMLOperations().entrySet()) {
-            String key = pmlOp.getKey();
-            PMLOperation value = pmlOp.getValue();
-            functions.put(key, value.getSignature());
-        }
-        for (Map.Entry<String, PMLRoutine> pmlRoutine : pap.getPMLRoutines().entrySet()) {
-            String key = pmlRoutine.getKey();
-            PMLRoutine value = pmlRoutine.getValue();
-            functions.put(key, value.getSignature());
-        }
         setFunctions(functions);
 
         // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
-            Operation<?> operation = pap.query().operations().getAdminOperation(opName);
+            Operation<?, ?> operation = pap.query().operations().getAdminOperation(opName);
             if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
                 addFunction(opName, pmlStmtsOperation.getSignature());
             } else {
-                addFunction(opName, new PMLOperationWrapper(operation).getSignature());
+                addFunction(opName, new PMLOperationSignature(
+                    operation.getName(),
+                    OBJECT_TYPE,
+                    operation.getFormalArgs()
+                ));
             }
         }
 
         // same for routines
         Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
         for (String routineName : routineNames) {
-            Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
+            Routine<?, ?> routine = pap.query().routines().getAdminRoutine(routineName);
             if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
                 addFunction(routineName, pmlStmtsRoutine.getSignature());
             } else {
-                addFunction(routineName, new PMLRoutineWrapper(routine).getSignature());
+                addFunction(routineName, new PMLOperationSignature(
+                    routine.getName(),
+                    OBJECT_TYPE,
+                    routine.getFormalArgs()
+                ));
             }
         }
     }

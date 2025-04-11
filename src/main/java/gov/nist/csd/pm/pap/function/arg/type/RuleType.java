@@ -15,4 +15,9 @@ public final class RuleType extends ArgType<Rule> {
 
         return rule;
     }
+
+    @Override
+    public Class<Rule> getExpectedClass() {
+        return Rule.class;
+    }
 }

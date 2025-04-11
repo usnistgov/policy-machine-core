@@ -3,21 +3,34 @@ package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+
+import java.util.List;
+import java.util.Map;
 
 import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_USER_ATTRIBUTE;
 
-public class CreateUserAttributeOp extends CreateNodeOp{
+public class CreateUserAttributeOp extends CreateNodeOp {
     public CreateUserAttributeOp() {
-        super("create_user_attribute", CREATE_USER_ATTRIBUTE);
-
+        super(
+            "create_user_attribute",
+            List.of(NAME_ARG, DESCENDANTS_ARG),
+            CREATE_USER_ATTRIBUTE
+        );
     }
 
     @Override
-    public Long execute(PAP pap, Args args) throws PMException {
+    protected CreateNodeOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        String name = prepareArg(NAME_ARG, argsMap);
+        List<Long> descIds = prepareArg(DESCENDANTS_ARG, argsMap);
+        return new CreateNodeOpArgs(name, descIds);
+    }
+
+    @Override
+    public Long execute(PAP pap, CreateNodeOpArgs args) throws PMException {
         return pap.modify().graph().createUserAttribute(
-		        args.get(NAME_ARG),
-		        args.get(DESCENDANTS_ARG)
+		        args.getName(),
+		        args.getDescendantIds()
         );
     }
 }

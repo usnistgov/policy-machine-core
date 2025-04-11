@@ -2,18 +2,27 @@ package gov.nist.csd.pm.pap.pml.expression.reference;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 
+import java.util.Map;
+import javax.print.DocFlavor.STRING;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.pml.expression.reference.VariableReference.compileVariableReference;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor.compile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -23,35 +32,35 @@ class VariableReferenceTest {
     class ReferenceByIDTest {
         @Test
         void testReferenceById() throws PMException {
-            PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+            PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
+                """
+                a
+                """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
             visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
-            Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
+            Expression<String> actual = compile(visitorContext, ctx, STRING_TYPE);
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
-                    new ReferenceByID("a"),
-                    actual
+                new VariableReferenceExpression<>("a", STRING_TYPE),
+                actual
             );
         }
 
         @Test
         void testUnknownVariable() throws PMException {
-            PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+            PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
+                """
+                a
+                """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
             PMLCompilationRuntimeException e = assertThrows(
-                    PMLCompilationRuntimeException.class,
-                    () -> compileVariableReference(visitorContext, ctx.variableReference())
+                PMLCompilationRuntimeException.class,
+                () -> compile(visitorContext, ctx, STRING_TYPE)
             );
             assertEquals(1, e.getErrors().size());
             assertEquals(
-                    "unknown variable 'a' in scope",
-                    e.getErrors().get(0).errorMessage()
+                "unknown variable 'a' in scope",
+                e.getErrors().get(0).errorMessage()
             );
         }
     }
@@ -60,67 +69,84 @@ class VariableReferenceTest {
     class ReferenceByIndexTest {
         @Test
         void testSuccess() throws PMException {
-            PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a.b.c
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+            PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
+                """
+                a.b.c
+                """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, mapType(STRING_TYPE, STRING_TYPE)), false));
-            Expression actual = compileVariableReference(visitorContext, ctx.variableReference());
+            MapType<String, Map<String, String>> mapType = mapType(STRING_TYPE, mapType(STRING_TYPE, STRING_TYPE));
+            visitorContext.scope().addVariable("a", new Variable("a", mapType, false));
+            Expression<String> actual = compile(visitorContext, ctx, STRING_TYPE);
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
-                    new ReferenceByDotIndex(new ReferenceByDotIndex(new ReferenceByID("a"), "b"), "c"),
-                    actual
+                new DotIndexExpression<>(
+                    new DotIndexExpression<>(
+                        new VariableReferenceExpression<>("a", mapType),
+                        "b",
+                        mapType(STRING_TYPE, STRING_TYPE)
+                    ),
+                    "c",
+                    STRING_TYPE
+                ),
+                actual
             );
 
-            ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a["b"]["c"]
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+            ctx = TestPMLParser.parseExpression(
+                """
+                a["b"]["c"]
+                """);
             visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, mapType(STRING_TYPE, STRING_TYPE)), false));
-            actual = compileVariableReference(visitorContext, ctx.variableReference());
+            visitorContext.scope().addVariable("a", new Variable("a", mapType, false));
+            actual = compile(visitorContext, ctx, STRING_TYPE);
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
-                    new ReferenceByBracketIndex(new ReferenceByBracketIndex(new ReferenceByID("a"), new StringLiteral("b")), new StringLiteral("c")),
-                    actual
+                new BracketIndexExpression<>(
+                    new BracketIndexExpression<>(
+                        new VariableReferenceExpression<>("a", mapType),
+                        new StringLiteralExpression("b"),
+                        mapType(STRING_TYPE, STRING_TYPE)
+                    ),
+                    new StringLiteralExpression("c"),
+                    STRING_TYPE
+                ),
+                actual
             );
         }
 
         @Test
         void testUnknownVariable() throws PMException {
-            PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a.b.c
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+            PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
+                """
+                a.b.c
+                """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
             PMLCompilationRuntimeException e = assertThrows(
-                    PMLCompilationRuntimeException.class,
-                    () -> compileVariableReference(visitorContext, ctx.variableReference())
+                PMLCompilationRuntimeException.class,
+                () -> compile(visitorContext, ctx, OBJECT_TYPE)
             );
             assertEquals(1, e.getErrors().size());
             assertEquals(
-                    "unknown variable 'a' in scope",
-                    e.getErrors().get(0).errorMessage()
+                "unknown variable 'a' in scope",
+                e.getErrors().get(0).errorMessage()
             );
         }
 
         @Test
         void testVarRefNotAMap() throws PMException {
-            PMLParser.VariableReferenceExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
-                    """
-                    a.b.c
-                    """, PMLParser.VariableReferenceExpressionContext.class);
+            PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
+                """
+                a.b.c
+                """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
             visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, STRING_TYPE), false));
             PMLCompilationRuntimeException e = assertThrows(
-                    PMLCompilationRuntimeException.class,
-                    () -> compileVariableReference(visitorContext, ctx.variableReference())
+                PMLCompilationRuntimeException.class,
+                () -> compile(visitorContext, ctx, OBJECT_TYPE)
             );
             assertEquals(1, e.getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(
-                    "expected type map but got string",
-                    e.getErrors().get(0).errorMessage()
+                "Type mismatch: Cannot apply indexing to type string. Expected Map.",
+                e.getErrors().get(0).errorMessage()
             );
         }
     }

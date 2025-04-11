@@ -216,7 +216,7 @@ class PDPTest {
                 create o "o1" in ["oa1"]
                 
                 operation op1() string {
-                    check "assign_to" on "oa2"
+                    check "assign_to" on ["oa2"]
                 } {
                     create pc "test"
                     return "test"
@@ -501,7 +501,7 @@ class PDPTest {
                 create u "u1" in ["ua1"]
                
                 operation op1(@node string name) {
-                    check "create_policy_class" on name
+                    check "create_policy_class" on [name]
                 } {}
                
                 """);
