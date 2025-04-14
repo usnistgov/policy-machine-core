@@ -1,12 +1,8 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
-
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Represents a compiled PML expression that evaluates to a value of type T.
@@ -22,9 +18,9 @@ public abstract class Expression<T> extends PMLStatement<T> {
      */
     public abstract ArgType<T> getType();
 
-    public <S> Expression<S> asType(ArgType<S> targetType) {
+    public <S> Expression<S> asType(ArgType<S> targetType) throws UnexpectedExpressionTypeException {
         if (!getType().isCastableTo(targetType)) {
-            throw new IllegalArgumentException("Cannot cast from " + getType() + " to " + targetType);
+            throw new UnexpectedExpressionTypeException(getType(), targetType);
         }
 
         return (Expression<S>) this;
