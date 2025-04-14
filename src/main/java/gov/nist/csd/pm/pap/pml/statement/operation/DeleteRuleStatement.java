@@ -1,21 +1,15 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
+import gov.nist.csd.pm.pap.function.op.obligation.UpdateObligationOp;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.function.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.pap.function.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class DeleteRuleStatement extends OperationStatement<ObligationOpArgs> {
@@ -66,47 +60,5 @@ public class DeleteRuleStatement extends OperationStatement<ObligationOpArgs> {
     @Override
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) + String.format("delete rule %s from obligation %s", ruleExpr, oblExpr);
-    }
-
-    static class UpdateObligationOp extends ObligationOp<ObligationOpArgs> {
-
-        public UpdateObligationOp() {
-            super(
-                "delete_rule",
-                List.of(AUTHOR_ARG, NAME_ARG, RULES_ARG),
-                ""
-            );
-        }
-
-        @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, ObligationOpArgs args) throws PMException {
-            new DeleteObligationOp()
-                .canExecute(privilegeChecker, userCtx, args);
-            new CreateObligationOp()
-                .canExecute(privilegeChecker, userCtx, args);
-        }
-
-        @Override
-        public Void execute(PAP pap, ObligationOpArgs args) throws PMException {
-            long author = args.getAuthorId();
-            String name = args.getName();
-            List<Rule> rules = args.getRules();
-
-            // delete the obligation
-            pap.modify().obligations().deleteObligation(name);
-
-            // recreate it with updated ruleset
-            pap.modify().obligations().createObligation(author, name, rules);
-
-            return null;
-        }
-
-        @Override
-        public ObligationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            Long authorId = prepareArg(AUTHOR_ARG, argsMap);
-            String name = prepareArg(NAME_ARG, argsMap);
-            List<Rule> rules = prepareArg(RULES_ARG, argsMap);
-            return new ObligationOpArgs(authorId, name, rules);
-        }
     }
 }

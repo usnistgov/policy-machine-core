@@ -61,6 +61,6 @@ public class ShortDeclarationStatement extends BasicStatement<VoidResult> {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + id + " := " + expression.toFormattedString(indentLevel);
+        return indent(indentLevel) + id + " := " + expression.toString();
     }
 }

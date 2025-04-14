@@ -9,7 +9,6 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.op.graph.*;
@@ -19,7 +18,7 @@ import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
 import gov.nist.csd.pm.pap.function.op.graph.DeassignOp.DeassignOpArgs;
 import gov.nist.csd.pm.pap.function.op.graph.DeleteNodeOp.DeleteNodeOpArgs;
 import gov.nist.csd.pm.pap.function.op.graph.DissociateOp.DissociateOpArgs;
-import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodeProeprtiesOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodePropertiesOpArgs;
 import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
@@ -32,12 +31,11 @@ import java.util.Map;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
-    private final UserContext userCtx;
     private final PAP pap;
     private final EventPublisher eventPublisher;
 
-    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
-        super(privilegeChecker);
+    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher) {
+        super(pap, userCtx);
         this.userCtx = userCtx;
         this.pap = pap;
         this.eventPublisher = eventPublisher;
@@ -86,7 +84,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         SetNodePropertiesOp op = new SetNodePropertiesOp();
-        SetNodeProeprtiesOpArgs args = new SetNodeProeprtiesOpArgs(id, new Properties(properties));
+        SetNodePropertiesOpArgs args = new SetNodePropertiesOpArgs(id, new Properties(properties));
 
         executeOp(op, args);
     }
@@ -139,14 +137,14 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     private <R, A extends Args> void executeOp(Operation<R, A> op, A args, EventContext eventContext) throws PMException {
-        op.canExecute(privilegeChecker, userCtx, args);
+        op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
 
         eventPublisher.publishEvent(eventContext);
     }
 
     private <R, A extends Args> R executeOp(Operation<R, A> op, A args) throws PMException {
-        op.canExecute(privilegeChecker, userCtx, args);
+        op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 
         eventPublisher.publishEvent(buildEventContext(pap, userCtx, op.getName(), args));

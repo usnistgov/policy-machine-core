@@ -1,14 +1,11 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.modification;
 
-import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.id.IdGenerator;
-import gov.nist.csd.pm.pap.modification.PolicyModification;
-import gov.nist.csd.pm.pap.store.PolicyStore;
 
 /**
  * PolicyStore is an abstract class that outlines the expected behavior of a backend implementation.
  */
-public class PolicyModifier extends Modifier implements PolicyModification {
+public class PolicyModifier implements PolicyModification {
 
     private final GraphModifier graphModifier;
     private final ProhibitionsModifier prohibitionsModifier;
@@ -16,13 +13,16 @@ public class PolicyModifier extends Modifier implements PolicyModification {
     private final OperationsModifier operationsModifier;
     private final RoutinesModifier routinesModifier;
 
-    public PolicyModifier(PolicyStore store, IdGenerator idGenerator) throws PMException {
-        super(store);
-        this.graphModifier = new GraphModifier(store, idGenerator);
-        this.prohibitionsModifier = new ProhibitionsModifier(store);
-        this.obligationsModifier = new ObligationsModifier(store);
-        this.operationsModifier = new OperationsModifier(store);
-        this.routinesModifier = new RoutinesModifier(store);
+    public PolicyModifier(GraphModifier graphModifier,
+                          ProhibitionsModifier prohibitionsModifier,
+                          ObligationsModifier obligationsModifier,
+                          OperationsModifier operationsModifier,
+                          RoutinesModifier routinesModifier) {
+        this.graphModifier = graphModifier;
+        this.prohibitionsModifier = prohibitionsModifier;
+        this.obligationsModifier = obligationsModifier;
+        this.operationsModifier = operationsModifier;
+        this.routinesModifier = routinesModifier;
     }
 
     public void setIdGenerator(IdGenerator idGenerator) {
@@ -53,4 +53,5 @@ public class PolicyModifier extends Modifier implements PolicyModification {
     public RoutinesModifier routines() {
         return routinesModifier;
     }
+
 }

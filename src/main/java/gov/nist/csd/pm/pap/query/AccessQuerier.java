@@ -1,4 +1,10 @@
-package gov.nist.csd.pm.impl.memory.pap.access;
+package gov.nist.csd.pm.pap.query;
+
+import static gov.nist.csd.pm.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.pap.query.access.AccessRightResolver.resolveDeniedAccessRights;
+import static gov.nist.csd.pm.pap.query.access.AccessRightResolver.resolvePrivileges;
+import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.Direction;
@@ -6,36 +12,37 @@ import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.AccessQuerier;
+import gov.nist.csd.pm.pap.query.access.Explainer;
+import gov.nist.csd.pm.pap.query.access.TargetEvaluator;
+import gov.nist.csd.pm.pap.query.access.UserEvaluator;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+public class AccessQuerier extends Querier implements AccessQuery {
 
-import static gov.nist.csd.pm.common.graph.node.NodeType.U;
-import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.pap.AccessRightResolver.resolveDeniedAccessRights;
-import static gov.nist.csd.pm.pap.AccessRightResolver.resolvePrivileges;
-import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
-
-public class MemoryAccessQuerier extends AccessQuerier {
-    
-    public MemoryAccessQuerier(PolicyStore memoryPolicyStore) {
-        super(memoryPolicyStore);
+    public AccessQuerier(PolicyStore store) {
+        super(store);
     }
 
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
         // traverse the user side of the graph to get the associations
-        MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
+        UserEvaluator userEvaluator = new UserEvaluator(store);
         UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
 
         // traverse the target side of the graph to get permissions per policy class
-        MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(store);
+        TargetEvaluator targetEvaluator = new TargetEvaluator(store);
         TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
         // resolve the permissions
@@ -45,11 +52,11 @@ public class MemoryAccessQuerier extends AccessQuerier {
     @Override
     public List<AccessRightSet> computePrivileges(UserContext userCtx, List<TargetContext> targetCtxs) throws PMException {
         // traverse the user side of the graph to get the associations
-        MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
+        UserEvaluator userEvaluator = new UserEvaluator(store);
         UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
 
         // traverse the target side of the graph to get permissions per policy class
-        MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(store);
+        TargetEvaluator targetEvaluator = new TargetEvaluator(store);
 
         List<AccessRightSet> accessRightSets = new ArrayList<>();
         for (TargetContext targetCtx : targetCtxs) {
@@ -67,14 +74,14 @@ public class MemoryAccessQuerier extends AccessQuerier {
         AccessRightSet accessRights = new AccessRightSet();
 
         // traverse the user side of the graph to get the associations
-        MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
+        UserEvaluator userEvaluator = new UserEvaluator(store);
         UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
         if (userDagResult.borderTargets().isEmpty()) {
             return accessRights;
         }
 
         // traverse the target side of the graph to get permissions per policy class
-        MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(store);
+        TargetEvaluator targetEvaluator = new TargetEvaluator(store);
         TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
         // resolve the permissions
@@ -86,7 +93,7 @@ public class MemoryAccessQuerier extends AccessQuerier {
         Map<Long, AccessRightSet> results = new HashMap<>();
 
         //get border nodes.  Can be OA or UA.  Return empty set if no attrs are reachable
-        MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(store);
+        UserEvaluator userEvaluator = new UserEvaluator(store);
         UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
         if (userDagResult.borderTargets().isEmpty()) {
             return results;
@@ -132,9 +139,9 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
-        return new MemoryUserEvaluator(store)
-                .evaluate(userCtx)
-                .borderTargets();
+        return new UserEvaluator(store)
+            .evaluate(userCtx)
+            .borderTargets();
     }
 
     @Override
@@ -177,8 +184,8 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
     @Override
     public Explain explain(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        return new MemoryExplainer(store)
-                .explain(userCtx, targetCtx);
+        return new Explainer(store)
+            .explain(userCtx, targetCtx);
     }
 
     @Override
@@ -187,19 +194,19 @@ public class MemoryAccessQuerier extends AccessQuerier {
 
         for (long pc : store.graph().getPolicyClasses()) {
             new GraphStoreBFS(store.graph())
-                    .withDirection(Direction.ASCENDANTS)
-                    .withVisitor(n -> {
-                        AccessRightSet privs = computePrivileges(userCtx, new TargetContext(n));
-                        if (privs.isEmpty()) {
-                            return;
-                        }
+                .withDirection(Direction.ASCENDANTS)
+                .withVisitor(n -> {
+                    AccessRightSet privs = computePrivileges(userCtx, new TargetContext(n));
+                    if (privs.isEmpty()) {
+                        return;
+                    }
 
-                        pos.put(n, privs);
-                    })
-                    .withSinglePathShortCircuit(n -> {
-                        return pos.containsKey(n);
-                    })
-                    .walk(pc);
+                    pos.put(n, privs);
+                })
+                .withSinglePathShortCircuit(n -> {
+                    return pos.containsKey(n);
+                })
+                .walk(pc);
         }
 
         Map<Node, AccessRightSet> posWithNodes = new HashMap<>();
@@ -211,8 +218,8 @@ public class MemoryAccessQuerier extends AccessQuerier {
     }
 
     private void getAndStorePrivileges(Map<Long, AccessRightSet> arsetMap, UserDagResult userDagResult, long target) throws PMException {
-        TargetDagResult result = new MemoryTargetEvaluator(store)
-                .evaluate(userDagResult, new TargetContext(target));
+        TargetDagResult result = new TargetEvaluator(store)
+            .evaluate(userDagResult, new TargetContext(target));
         AccessRightSet privileges = resolvePrivileges(userDagResult, result, store.operations().getResourceOperations());
         arsetMap.put(target, privileges);
     }

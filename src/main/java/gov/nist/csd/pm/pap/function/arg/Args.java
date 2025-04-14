@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
-public abstract class Args {
+public class Args {
 
 	public static Args of(AdminFunction<?, ?> adminFunction, Map<String, Object> actualArgs) {
 		List<FormalParameter<?>> formalParameters = adminFunction.getFormalArgs();
 
-		Args args = new MapArgs();
+		Args args = new Args();
 
 		if (formalParameters.size() != actualArgs.size()) {
 			throw new IllegalArgumentException("expected the same number of formalArgs and actualArgs and got " +

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 

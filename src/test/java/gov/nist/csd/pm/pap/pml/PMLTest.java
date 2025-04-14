@@ -3,12 +3,10 @@ package gov.nist.csd.pm.pap.pml;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
@@ -48,13 +46,13 @@ public class PMLTest {
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of [PM_ADMIN_OBJECT]
+                on union of {PM_ADMIN_OBJECT: false}
                 """);
 
         Operation<?, ?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
-                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");
             }
 
             @Override
@@ -79,7 +77,7 @@ public class PMLTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         };
         pap.modify().operations().createAdminOperation(op1);
@@ -94,7 +92,7 @@ public class PMLTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         });
 
@@ -143,7 +141,7 @@ public class PMLTest {
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of [PM_ADMIN_OBJECT]
+                on union of {PM_ADMIN_OBJECT: false}
                 
                 operation op1(string a, []string b, map[string]string c) {
                     check "assign" on [PM_ADMIN_OBJECT]

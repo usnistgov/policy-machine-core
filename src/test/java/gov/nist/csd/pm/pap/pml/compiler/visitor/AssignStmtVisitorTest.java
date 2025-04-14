@@ -18,13 +18,12 @@ class AssignStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.AssignStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 assign "a" to ["b", "c"]
-                """,
-                PMLParser.AssignStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new AssignStmtVisitor(visitorCtx).visitAssignStatement(ctx);
+        PMLStatement stmt = new AssignStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new AssignStatement(new StringLiteralExpression("a"), buildArrayLiteral("b", "c")),
@@ -40,14 +39,14 @@ class AssignStmtVisitorTest {
                 """
                 assign "a" to "b"
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]string], got string"
+                "expected expression type []string, got string"
         );
 
         testCompilationError(
                 """
                 assign ["a"] to "b"
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
     }
 

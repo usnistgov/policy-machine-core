@@ -1,19 +1,18 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.common.exception.ProhibitionContainerDoesNotExistException;
 import gov.nist.csd.pm.common.exception.ProhibitionExistsException;
 import gov.nist.csd.pm.common.exception.ProhibitionSubjectDoesNotExistException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.store.PolicyStore;
 
+import gov.nist.csd.pm.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static gov.nist.csd.pm.pap.GraphModifier.checkAccessRightsValid;
+import static gov.nist.csd.pm.pap.modification.GraphModifier.checkAccessRightsValid;
 
 public class ProhibitionsModifier extends Modifier implements ProhibitionsModification {
 
@@ -26,7 +25,7 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
                                   boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
         checkCreateInput(name, subject, accessRightSet, new ArrayList<>(containerConditions));
 
-        store.prohibitions().createProhibition(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
+        policyStore.prohibitions().createProhibition(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
     }
 
     @Override
@@ -35,7 +34,7 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
             return;
         }
 
-        store.prohibitions().deleteProhibition(name);
+        policyStore.prohibitions().deleteProhibition(name);
     }
 
     /**
@@ -49,12 +48,12 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
      */
     protected void checkCreateInput(String name, ProhibitionSubject subject, AccessRightSet accessRightSet,
                                     Collection<ContainerCondition> containerConditions) throws PMException {
-        if (store.prohibitions().prohibitionExists(name)) {
+        if (policyStore.prohibitions().prohibitionExists(name)) {
             throw new ProhibitionExistsException(name);
         }
 
         // check the prohibition parameters are valid
-        checkAccessRightsValid(store.operations().getResourceOperations(), accessRightSet);
+        checkAccessRightsValid(policyStore.operations().getResourceOperations(), accessRightSet);
         checkProhibitionSubjectExists(subject);
         checkProhibitionContainersExist(containerConditions);
     }
@@ -68,13 +67,13 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDeleteInput(String name) throws PMException {
-	    return store.prohibitions().prohibitionExists(name);
+	    return policyStore.prohibitions().prohibitionExists(name);
     }
 
     protected void checkProhibitionSubjectExists(ProhibitionSubject subject)
             throws PMException {
         if (subject.isNode()) {
-            if (!store.graph().nodeExists(subject.getNodeId())) {
+            if (!policyStore.graph().nodeExists(subject.getNodeId())) {
                 throw new ProhibitionSubjectDoesNotExistException(subject.getNodeId());
             }
         }
@@ -83,7 +82,7 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
     protected void checkProhibitionContainersExist(Collection<ContainerCondition> containerConditions)
             throws PMException {
         for (ContainerCondition container : containerConditions) {
-            if (!store.graph().nodeExists(container.getId())) {
+            if (!policyStore.graph().nodeExists(container.getId())) {
                 throw new ProhibitionContainerDoesNotExistException(container.getId());
             }
         }

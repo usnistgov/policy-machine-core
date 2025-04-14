@@ -97,7 +97,7 @@ class ReferenceByBracketIndexTest {
         PAP pap = new TestPAP();
         PMLCompilationException e = assertThrows(PMLCompilationException.class,
                                                  () -> pap.executePML(new TestUserContext("u1"), pml));
-        assertEquals("Cannot cast from string to bool", e.getErrors().get(0).errorMessage());
+        assertEquals("expected expression type bool, got string", e.getErrors().get(0).errorMessage());
     }
 
     @Test

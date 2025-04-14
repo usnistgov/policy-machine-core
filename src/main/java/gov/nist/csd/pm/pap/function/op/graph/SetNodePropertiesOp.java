@@ -3,53 +3,57 @@ package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodeProeprtiesOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodePropertiesOpArgs;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.SET_NODE_PROPERTIES;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.SET_NODE_PROPERTIES;
 
-public class SetNodePropertiesOp extends GraphOp<Void, SetNodeProeprtiesOpArgs> {
+public class SetNodePropertiesOp extends GraphOp<Void, SetNodePropertiesOpArgs> {
 
     public SetNodePropertiesOp() {
         super(
                 "set_node_properties",
-                List.of(NODE_ARG, PROPERTIES_ARG)
+                List.of(NODE_ID_PARAM, PROPERTIES_PARAM)
         );
     }
 
     @Override
-    public Void execute(PAP pap, SetNodeProeprtiesOpArgs args) throws PMException {
+    protected SetNodePropertiesOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        return new SetNodePropertiesOpArgs(
+            prepareArg(NODE_ID_PARAM, argsMap),
+            prepareArg(PROPERTIES_PARAM, argsMap)
+        );
+    }
+
+    @Override
+    public void canExecute(PAP pap, UserContext userCtx, SetNodePropertiesOpArgs args) throws PMException {
+        pap.privilegeChecker().check(userCtx, args.get(NODE_ID_PARAM), SET_NODE_PROPERTIES);
+    }
+
+    @Override
+    public Void execute(PAP pap, SetNodePropertiesOpArgs args) throws PMException {
         pap.modify().graph().setNodeProperties(
-		        args.get(NODE_ARG),
-		        args.get(PROPERTIES_ARG)
+            args.getNodeId(),
+            args.getProperties()
         );
 
         return null;
     }
 
-    @Override
-    protected SetNodeProeprtiesOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return new SetNodeProeprtiesOpArgs(
-            prepareArg(NODE_ARG, argsMap),
-            prepareArg(PROPERTIES_ARG, argsMap)
-        );
-    }
-
-    @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, SetNodeProeprtiesOpArgs args) throws PMException {
-        privilegeChecker.check(userCtx, args.get(NODE_ARG), SET_NODE_PROPERTIES);
-    }
-
-    public static class SetNodeProeprtiesOpArgs extends Args {
+    public static class SetNodePropertiesOpArgs extends Args {
         private long nodeId;
         private Map<String, String> properties;
-        public SetNodeProeprtiesOpArgs(long nodeId, Map<String, String> properties) {
+        public SetNodePropertiesOpArgs(long nodeId, Map<String, String> properties) {
+            super(Map.of(
+                NODE_ID_PARAM, nodeId,
+                PROPERTIES_PARAM, properties
+            ));
+
             this.nodeId = nodeId;
             this.properties = properties;
         }

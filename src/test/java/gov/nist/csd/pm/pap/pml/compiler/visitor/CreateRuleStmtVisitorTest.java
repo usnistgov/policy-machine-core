@@ -49,6 +49,7 @@ class CreateRuleStmtVisitorTest {
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
+
         assertEquals(
                 new CreateObligationStatement(
                         new StringLiteralExpression("obligation1"),

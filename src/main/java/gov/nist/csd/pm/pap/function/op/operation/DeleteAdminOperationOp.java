@@ -5,24 +5,21 @@ import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_ADMIN_OPERATION;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.DELETE_ADMIN_OPERATION;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 public class DeleteAdminOperationOp extends Operation<Void, DeleteAdminOperationOp.DeleteAdminOperationOpArgs> {
 
-    public static final FormalParameter<String> NAME_ARG = new FormalParameter<>("name", STRING_TYPE);
-
     public DeleteAdminOperationOp() {
         super(
                 "delete_admin_operation",
-                List.of(NAME_ARG)
+                List.of(NAME_PARAM)
         );
     }
 
@@ -30,6 +27,10 @@ public class DeleteAdminOperationOp extends Operation<Void, DeleteAdminOperation
         private final String name;
 
         public DeleteAdminOperationOpArgs(String name) {
+            super(Map.of(
+                NAME_PARAM, name
+            ));
+
             this.name = name;
         }
 
@@ -39,14 +40,15 @@ public class DeleteAdminOperationOp extends Operation<Void, DeleteAdminOperation
     }
 
     @Override
-    public DeleteAdminOperationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_ARG, argsMap);
+    protected DeleteAdminOperationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        String name = prepareArg(NAME_PARAM, argsMap);
         return new DeleteAdminOperationOpArgs(name);
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, DeleteAdminOperationOpArgs args) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_OPERATION);
+    public void canExecute(PAP pap,
+                           UserContext userCtx, DeleteAdminOperationOpArgs args) throws PMException {
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_OPERATION);
     }
 
     @Override

@@ -17,14 +17,13 @@ class SetResourceOperationsStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.SetResourceOperationsStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 set resource operations ["a", "b"]
-                """,
-                PMLParser.SetResourceOperationsStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new SetResourceOperationsStmtVisitor(visitorCtx)
-                .visitSetResourceOperationsStatement(ctx);
+                .visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new SetResourceOperationsStatement(buildArrayLiteral("a", "b")),
@@ -40,7 +39,7 @@ class SetResourceOperationsStmtVisitorTest {
                 """
                 set resource operations "a"
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]string], got string"
+                "expected expression type []string, got string"
         );
     }
 

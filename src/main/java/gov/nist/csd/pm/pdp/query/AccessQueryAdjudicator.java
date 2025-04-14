@@ -4,7 +4,6 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.AccessQuery;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
@@ -17,11 +16,8 @@ import java.util.Map;
 
 public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
-    private final PAP pap;
-
-    public AccessQueryAdjudicator(PAP pap, PrivilegeChecker privilegeChecker) {
-        super(privilegeChecker);
-        this.pap = pap;
+    public AccessQueryAdjudicator(PAP pap, UserContext userCtx) {
+        super(pap, userCtx);
     }
 
     @Override

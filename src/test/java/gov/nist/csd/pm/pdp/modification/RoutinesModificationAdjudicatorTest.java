@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pdp.modification;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
@@ -60,8 +59,8 @@ class RoutinesModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new RoutinesModificationAdjudicator(new TestUserContext("u1"), pap, pdp.getPrivilegeChecker());
-        fail = new RoutinesModificationAdjudicator(new UserContext(id("u2")), pap, pdp.getPrivilegeChecker());
+        ok = new RoutinesModificationAdjudicator(new TestUserContext("u1"), pap);
+        fail = new RoutinesModificationAdjudicator(new UserContext(id("u2")), pap);
     }
 
 
@@ -75,7 +74,7 @@ class RoutinesModificationAdjudicatorTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         };
 
@@ -94,7 +93,7 @@ class RoutinesModificationAdjudicatorTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         };
         ok.createAdminRoutine(routine1);

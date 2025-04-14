@@ -9,6 +9,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.pap.pml.expression.literal.*;
 import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
@@ -216,10 +217,10 @@ public class ObjectTypeErrorHandlingTest {
         assertEquals("b", result.get(1));
         
         // Try to cast list<string> to something incompatible
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(UnexpectedExpressionTypeException.class, () -> {
             stringArray.asType(mapType(STRING_TYPE, STRING_TYPE));
         });
-        assertTrue(exception.getMessage().contains("Cannot cast"));
+        assertTrue(exception.getMessage().contains("expected"));
     }
     
     @Test

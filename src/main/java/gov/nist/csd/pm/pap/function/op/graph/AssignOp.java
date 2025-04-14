@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.graph.AssignOp.AssignOpArgs;
@@ -11,22 +10,22 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.ASSIGN;
-import static gov.nist.csd.pm.pap.AdminAccessRights.ASSIGN_TO;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.ASSIGN;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.ASSIGN_TO;
 
 public class AssignOp extends GraphOp<Void, AssignOpArgs> {
 
     public AssignOp() {
         super(
                 "assign",
-                List.of(ASCENDANT_ARG, DESCENDANTS_ARG)
+                List.of(ASCENDANT_PARAM, DESCENDANTS_PARAM)
         );
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, AssignOpArgs args) throws PMException {
-        privilegeChecker.check(userCtx, args.getAscendantId(), ASSIGN);
-        privilegeChecker.check(userCtx, args.getDescendantIds(), ASSIGN_TO);
+    public void canExecute(PAP pap, UserContext userCtx, AssignOpArgs args) throws PMException {
+        pap.privilegeChecker().check(userCtx, args.getAscendantId(), ASSIGN);
+        pap.privilegeChecker().check(userCtx, args.getDescendantIds(), ASSIGN_TO);
     }
 
     @Override
@@ -37,8 +36,8 @@ public class AssignOp extends GraphOp<Void, AssignOpArgs> {
 
     @Override
     protected AssignOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long ascId = prepareArg(ASCENDANT_ARG, argsMap);
-        List<Long> descIds = prepareArg(DESCENDANTS_ARG, argsMap);
+        Long ascId = prepareArg(ASCENDANT_PARAM, argsMap);
+        List<Long> descIds = prepareArg(DESCENDANTS_PARAM, argsMap);
 
         return new AssignOpArgs(ascId, descIds);
     }
@@ -48,6 +47,11 @@ public class AssignOp extends GraphOp<Void, AssignOpArgs> {
         private final List<Long> descendantIds;
 
         public AssignOpArgs(long ascendantId, List<Long> descendantIds) {
+            super(Map.of(
+                ASCENDANT_PARAM, ascendantId,
+                DESCENDANTS_PARAM, descendantIds
+            ));
+
             this.ascendantId = ascendantId;
             this.descendantIds = descendantIds;
         }

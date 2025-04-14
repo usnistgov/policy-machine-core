@@ -17,13 +17,12 @@ class DissociateStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.DissociateStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 dissociate "a" and "b"
-                """,
-                PMLParser.DissociateStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new DissociateStmtVisitor(visitorCtx).visitDissociateStatement(ctx);
+        PMLStatement<?> stmt = new DissociateStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new DissociateStatement(new StringLiteralExpression("a"), new StringLiteralExpression("b")),
@@ -39,14 +38,14 @@ class DissociateStmtVisitorTest {
                 """
                 dissociate ["a"] and "b"
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
                 );
 
         testCompilationError(
                 """
                 dissociate "a" and ["b"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
     }
 

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.memory.pap.access;
+package gov.nist.csd.pm.pap.query.access;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.dag.DepthFirstGraphWalker;
@@ -12,11 +12,11 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
-public class MemoryUserExplainer {
+public class UserExplainer {
 
 	private final PolicyStore policyStore;
 
-	public MemoryUserExplainer(PolicyStore policyStore) {
+	public UserExplainer(PolicyStore policyStore) {
 		this.policyStore = policyStore;
 	}
 

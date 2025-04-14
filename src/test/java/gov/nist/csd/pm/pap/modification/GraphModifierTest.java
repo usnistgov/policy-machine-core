@@ -23,7 +23,7 @@ import java.util.List;
 
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.common.graph.node.Properties.toProperties;
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class GraphModifierTest extends PAPTestInitializer {

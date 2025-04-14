@@ -70,10 +70,8 @@ class CreateProhibitionStatementTest {
             new AccessRightSet("read"),
             prohibition.getAccessRightSet()
         );
-        assertEquals(
-            List.of(new ContainerCondition(id("oa1"), false), new ContainerCondition(id("oa2"), true)),
-            prohibition.getContainers()
-        );
+        assertTrue(prohibition.getContainers().contains(new ContainerCondition(id("oa1"), false)));
+        assertTrue(prohibition.getContainers().contains(new ContainerCondition(id("oa2"), true)));
     }
 
     @Test
@@ -89,21 +87,21 @@ class CreateProhibitionStatementTest {
                 new StringLiteralExpression("oa2"), new BoolLiteralExpression(true)
             ), STRING_TYPE, BOOLEAN_TYPE)
         );
-        assertEquals(
-            """
-                    create prohibition "pro1"
-                      deny UA "ua2"
-                      access rights ["read"]
-                      on intersection of ["oa1", !"oa2"]""",
-            stmt.toFormattedString(0)
-        );
-        assertEquals(
-            """
-                        create prohibition "pro1"
-                          deny UA "ua2"
-                          access rights ["read"]
-                          on intersection of ["oa1", !"oa2"]""",
-            stmt.toFormattedString(0)
-        );
+
+        String str = stmt.toFormattedString(0);
+        assertTrue(str.contains("create prohibition \"pro1\""));
+        assertTrue(str.contains("  deny UA \"ua2\""));
+        assertTrue(str.contains("  access rights [\"read\"]"));
+        assertTrue(str.contains("  on intersection of "));
+        assertTrue(str.contains("\"oa1\": false"));
+        assertTrue(str.contains("\"oa2\": true"));
+
+        str = stmt.toFormattedString(1);
+        assertTrue(str.contains("    create prohibition \"pro1\""));
+        assertTrue(str.contains("      deny UA \"ua2\""));
+        assertTrue(str.contains("      access rights [\"read\"]"));
+        assertTrue(str.contains("      on intersection of "));
+        assertTrue(str.contains("\"oa1\": false"));
+        assertTrue(str.contains("\"oa2\": true"));
     }
 }

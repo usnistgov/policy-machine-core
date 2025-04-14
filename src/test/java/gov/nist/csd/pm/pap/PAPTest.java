@@ -1,13 +1,11 @@
 package gov.nist.csd.pm.pap;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
@@ -30,20 +28,20 @@ public abstract class PAPTest extends PAPTestInitializer {
     public static final FormalParameter<String> ARG_A = new FormalParameter<>("a", STRING_TYPE);
     public static final FormalParameter<String> ARG_B = new FormalParameter<>("b", STRING_TYPE);
 
-    static Operation<Object, MapArgs> op = new Operation<>("testFunc", List.of()) {
+    static Operation<Object, Args> op = new Operation<>("testFunc", List.of()) {
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws PMException {
+        public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
         }
 
         @Override
-        public Object execute(PAP pap, MapArgs args) throws PMException {
+        public Object execute(PAP pap, Args args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
             return null;
         }
 
         @Override
-        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };

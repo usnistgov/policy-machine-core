@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.serialization.pml;
 
-import gov.nist.csd.pm.pap.pml.exception.ArgTypeNotCastableException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;

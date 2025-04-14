@@ -73,7 +73,7 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
             Expression<?> argExpr = actualArgsList.get(i);
             Object argValue = argExpr.execute(ctx, pap);
 
-            if (!argExpr.getType().equals(formalParam.getType())) {
+            if (!argExpr.getType().isCastableTo(formalParam.getType())) {
                 throw new PMLExecutionException("expected type " + formalParam.getType() + ", got type " + argExpr.getType());
             }
 

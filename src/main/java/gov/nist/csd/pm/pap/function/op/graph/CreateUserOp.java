@@ -8,21 +8,21 @@ import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_USER;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_USER;
 
 public class CreateUserOp extends CreateNodeOp {
     public CreateUserOp() {
         super(
             "create_user",
-            List.of(NAME_ARG, DESCENDANTS_ARG),
+            List.of(NAME_PARAM, DESCENDANTS_PARAM),
             CREATE_USER
         );
     }
 
     @Override
     protected CreateNodeOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_ARG, argsMap);
-        List<Long> descIds = prepareArg(DESCENDANTS_ARG, argsMap);
+        String name = prepareArg(NAME_PARAM, argsMap);
+        List<Long> descIds = prepareArg(DESCENDANTS_PARAM, argsMap);
         return new CreateNodeOpArgs(name, descIds);
     }
 

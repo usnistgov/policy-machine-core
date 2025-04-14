@@ -17,13 +17,12 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.CreatePolicyStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 create policy class "test"
-                """,
-                PMLParser.CreatePolicyStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
+        PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test")),
@@ -34,13 +33,12 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testSuccessWithProperties() throws PMException {
-        PMLParser.CreatePolicyStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 create policy class "test" 
-                """,
-                PMLParser.CreatePolicyStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visitCreatePolicyStatement(ctx);
+        PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test")),
@@ -56,7 +54,7 @@ class CreatePolicyStmtVisitorTest {
                 """
                 create policy class ["test"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
     }
 }

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
@@ -29,10 +29,10 @@ class PDPTxTest {
                 create u "u2" in ["ua2"]
                 associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 """);
-        PDPTx u2 = new PDPTx(new UserContext(id("u2")), new PrivilegeChecker(pap), pap, List.of());
+        PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, u2::reset);
 
-        PDPTx u1 = new PDPTx(new TestUserContext("u1"), new PrivilegeChecker(pap), pap, List.of());
+        PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
         assertDoesNotThrow(u1::reset);
     }
 
@@ -47,10 +47,10 @@ class PDPTxTest {
                 create u "u2" in ["ua2"]
                 associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
                 """);
-        PDPTx u2 = new PDPTx(new UserContext(id("u2")), new PrivilegeChecker(pap), pap, List.of());
+        PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.serialize(new JSONSerializer()));
 
-        PDPTx u1 = new PDPTx(new TestUserContext("u1"), new PrivilegeChecker(pap), pap, List.of());
+        PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
         assertDoesNotThrow(() -> u1.serialize(new JSONSerializer()));
     }
 
@@ -68,10 +68,10 @@ class PDPTxTest {
 
         String serialize = "create pc \"test\"";
 
-        PDPTx u2 = new PDPTx(new UserContext(id("u2")), new PrivilegeChecker(pap), pap, List.of());
+        PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.deserialize(new UserContext(0), serialize, new PMLDeserializer()));
 
-        PDPTx u1 = new PDPTx(new TestUserContext("u1"), new PrivilegeChecker(pap), pap, List.of());
+        PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
         assertDoesNotThrow(() -> u1.deserialize(new UserContext(0), serialize, new PMLDeserializer()));
     }
 }

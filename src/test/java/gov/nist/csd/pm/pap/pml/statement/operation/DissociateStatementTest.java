@@ -42,9 +42,9 @@ class DissociateStatementTest {
     void testToFormattedString() {
         DissociateStatement stmt = new DissociateStatement(new StringLiteralExpression("ua1"), new StringLiteralExpression("oa1"));
 
-        assertEquals("dissociate \"ua1\" and [\"oa1\"]", stmt.toFormattedString(0));
+        assertEquals("dissociate \"ua1\" and \"oa1\"", stmt.toFormattedString(0));
         assertEquals(
-                "    dissociate \"ua1\" and [\"oa1\"]",
+                "    dissociate \"ua1\" and \"oa1\"",
                 stmt.toFormattedString(1)
         );
     }

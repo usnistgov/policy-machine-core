@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap.function.op.graph;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
@@ -12,16 +11,14 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
 
 public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
-
-    public static final IdNodeFormalParameter NODE_ARG = new IdNodeFormalParameter("node");
 
     public DeleteNodeOp() {
         super(
                 "delete_node",
-                List.of(NODE_ARG, TYPE_ARG, DESCENDANTS_ARG)
+                List.of(NODE_ID_PARAM, TYPE_PARAM, DESCENDANTS_PARAM)
         );
     }
 
@@ -31,6 +28,12 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
         private final List<Long> descendantIds;
 
         public DeleteNodeOpArgs(long nodeId, NodeType type, List<Long> descendantIds) {
+            super(Map.of(
+                NODE_ID_PARAM, nodeId,
+                TYPE_PARAM, type,
+                DESCENDANTS_PARAM, descendantIds
+            ));
+
             this.nodeId = nodeId;
             this.type = type;
             this.descendantIds = descendantIds;
@@ -51,19 +54,19 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
 
     @Override
     protected DeleteNodeOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long nodeId = prepareArg(NODE_ARG, argsMap);
-        NodeType type = prepareArg(TYPE_ARG, argsMap);
-        List<Long> descIds = prepareArg(DESCENDANTS_ARG, argsMap);
+        Long nodeId = prepareArg(NODE_ID_PARAM, argsMap);
+        NodeType type = prepareArg(TYPE_PARAM, argsMap);
+        List<Long> descIds = prepareArg(DESCENDANTS_PARAM, argsMap);
         return new DeleteNodeOpArgs(nodeId, type, descIds);
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, DeleteNodeOpArgs args) throws PMException {
+    public void canExecute(PAP pap, UserContext userCtx, DeleteNodeOpArgs args) throws PMException {
         long nodeId = args.getNodeId();
         NodeType type = args.getType();
         ReqCaps reqCaps = getReqCap(type);
 
-        privilegeChecker.check(userCtx, nodeId, reqCaps.ascReqCap);
+        pap.privilegeChecker().check(userCtx, nodeId, reqCaps.ascReqCap);
 
         if (type == NodeType.PC) {
             return;
@@ -71,7 +74,7 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
 
         List<Long> descs = args.getDescendantIds();
         for (Long desc : descs) {
-            privilegeChecker.check(userCtx, desc, reqCaps.descsReqCap);
+            pap.privilegeChecker().check(userCtx, desc, reqCaps.descsReqCap);
         }
     }
 

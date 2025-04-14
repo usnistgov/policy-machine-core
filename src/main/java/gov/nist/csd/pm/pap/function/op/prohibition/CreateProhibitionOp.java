@@ -11,27 +11,27 @@ import gov.nist.csd.pm.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpAr
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_PROCESS_PROHIBITION;
-import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_PROHIBITION;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_PROCESS_PROHIBITION;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_PROHIBITION;
 
 public class CreateProhibitionOp extends ProhibitionOp<ProhibitionOpArgs> {
 
     public CreateProhibitionOp() {
         super(
             "create_prohibition",
-            List.of(NAME_ARG, SUBJECT_ARG, ARSET_ARG, INTERSECTION_ARG, CONTAINERS_ARG),
+            List.of(NAME_PARAM, SUBJECT_PARAM, ARSET_PARAM, INTERSECTION_PARAM, CONTAINERS_PARAM),
             CREATE_PROCESS_PROHIBITION,
             CREATE_PROHIBITION
         );
     }
 
     @Override
-    public ProhibitionOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_ARG, argsMap);
-        ProhibitionSubject subject = prepareArg(SUBJECT_ARG, argsMap);
-        AccessRightSet arset = prepareArg(ARSET_ARG, argsMap);
-        Boolean intersection = prepareArg(INTERSECTION_ARG, argsMap);
-        List<ContainerCondition> containers = prepareArg(CONTAINERS_ARG, argsMap);
+    protected ProhibitionOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        String name = prepareArg(NAME_PARAM, argsMap);
+        ProhibitionSubject subject = prepareArg(SUBJECT_PARAM, argsMap);
+        AccessRightSet arset = prepareArg(ARSET_PARAM, argsMap);
+        Boolean intersection = prepareArg(INTERSECTION_PARAM, argsMap);
+        List<ContainerCondition> containers = prepareArg(CONTAINERS_PARAM, argsMap);
         return new ProhibitionOpArgs(name, subject, arset, intersection, containers);
     }
 

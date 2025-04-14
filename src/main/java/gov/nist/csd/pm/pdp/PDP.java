@@ -6,11 +6,9 @@ import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.common.tx.TxRunner;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
@@ -29,24 +27,18 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     protected final PAP pap;
     protected final List<EventSubscriber> eventSubscribers;
-    private final PrivilegeChecker privilegeChecker;
 
     public PDP(PAP pap) {
         this.pap = pap;
         this.eventSubscribers = new ArrayList<>();
-        this.privilegeChecker = new PrivilegeChecker(pap);
-    }
-
-    public PrivilegeChecker getPrivilegeChecker() {
-        return privilegeChecker;
     }
 
     public void setExplain(boolean explain) {
-        privilegeChecker.setExplain(explain);
+        pap.privilegeChecker().setExplain(explain);
     }
 
     public boolean isExplain() {
-        return privilegeChecker.isExplain();
+        return pap.privilegeChecker().isExplain();
     }
 
     /**
@@ -58,7 +50,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
      */
     public <T> T runTx(UserContext userCtx, PDPTxRunner<T> txRunner) throws PMException {
         return TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, privilegeChecker, pap, eventSubscribers);
+            PDPTx pdpTx = new PDPTx(userCtx, pap, eventSubscribers);
             return txRunner.run(pdpTx);
         });
     }
@@ -104,7 +96,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
 
         try {
-            privilegeChecker.check(user, policyElementId, resourceOperation);
+            pap.privilegeChecker().check(user, policyElementId, resourceOperation);
         } catch (UnauthorizedException e) {
             return new AdjudicationResponse(e);
         }

@@ -17,13 +17,12 @@ class DeleteRuleStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.DeleteRuleStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 delete rule "rule1" from obligation "obl1"
-                """,
-                PMLParser.DeleteRuleStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
+        PMLStatement stmt = new DeleteRuleStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new DeleteRuleStatement(new StringLiteralExpression("rule1"), new StringLiteralExpression("obl1")),
@@ -39,14 +38,14 @@ class DeleteRuleStmtVisitorTest {
                 """
                 delete rule ["rule1"] from obligation "obl1"
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
                 delete rule "rule1" from obligation ["obl1"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
     }
 

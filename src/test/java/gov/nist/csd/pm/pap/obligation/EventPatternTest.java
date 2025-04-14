@@ -5,8 +5,6 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.modification.GraphModification;
-import gov.nist.csd.pm.pap.obligation.EventPattern;
-import gov.nist.csd.pm.pap.obligation.UnexpectedArgTypeException;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
@@ -21,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ASCENDANT_ARG;
-import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.DESCENDANTS_ARG;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EventPatternTest {
@@ -53,7 +51,7 @@ class EventPatternTest {
                 "u1",
                 null,
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -73,7 +71,7 @@ class EventPatternTest {
                 "u1",
                 null,
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -93,7 +91,7 @@ class EventPatternTest {
                 "u1",
                 "",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -117,7 +115,7 @@ class EventPatternTest {
                 "u1",
                 "p1",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -141,7 +139,7 @@ class EventPatternTest {
                 "u1",
                 "p2",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -165,7 +163,7 @@ class EventPatternTest {
                 "u1",
                 "p2",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -188,7 +186,7 @@ class EventPatternTest {
                 "u1",
                 "",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -211,7 +209,7 @@ class EventPatternTest {
                 "u1",
                 "",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), List.of("b"))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -234,7 +232,7 @@ class EventPatternTest {
                 "u1",
                 "",
                 "assign",
-                Map.of(ASCENDANT_ARG.getName(), "a", DESCENDANTS_ARG.getName(), Map.of("b", ""))
+                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), Map.of("b", ""))
         );
 
         assertThrows(UnexpectedArgTypeException.class,

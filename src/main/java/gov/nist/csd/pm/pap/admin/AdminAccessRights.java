@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.admin;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 

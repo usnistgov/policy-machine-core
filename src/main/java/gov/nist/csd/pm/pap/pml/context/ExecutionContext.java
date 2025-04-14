@@ -24,20 +24,17 @@ public class ExecutionContext implements Serializable {
     protected final UserContext author;
     protected final Scope<Object, AdminFunction<?, ?>> scope;
     protected final PAP pap;
-    private boolean isExplain;
 
     public ExecutionContext(UserContext author, PAP pap) throws PMException {
         this.author = author;
         this.scope = new ExecuteScope(pap);
         this.pap = pap;
-        this.isExplain = false;
     }
 
     public ExecutionContext(UserContext author, PAP pap, Scope<Object, AdminFunction<?, ?>> scope) throws PMException {
         this.author = author;
         this.scope = scope;
         this.pap = pap;
-        this.isExplain = false;
     }
 
     public UserContext author() {
@@ -46,14 +43,6 @@ public class ExecutionContext implements Serializable {
 
     public Scope<Object, AdminFunction<?, ?>> scope() {
         return scope;
-    }
-
-    public boolean isExplain() {
-        return isExplain;
-    }
-
-    public void setExplain(boolean explain) {
-        isExplain = explain;
     }
 
     public ExecutionContext copy() throws PMException {

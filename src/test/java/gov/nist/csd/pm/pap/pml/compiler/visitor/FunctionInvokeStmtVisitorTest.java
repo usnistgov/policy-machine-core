@@ -46,13 +46,10 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.FunctionInvokeStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
             """
             func1("a", "b", ["c", "d"])
-            """,
-            PMLParser.FunctionInvokeStatementContext.class);
-
-
+            """);
 
         CompileScope compileScope = new CompileScope();
         compileScope.addFunction("func1", signature);
@@ -60,7 +57,7 @@ class FunctionInvokeStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(compileScope);
 
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
-            .visitFunctionInvokeStatement(ctx);
+            .visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
 
         assertEquals(expected, stmt);
@@ -98,22 +95,20 @@ class FunctionInvokeStmtVisitorTest {
         CompileScope compileScope = new CompileScope();
         compileScope.addFunction("func1", signature);
         VisitorContext visitorCtx = new VisitorContext(compileScope);
-
         testCompilationError(
             """
             func1("a", "b", true)
             """, visitorCtx, 1,
-            "invalid argument type: expected []string, got bool at arg 2"
+            "expected expression type []string, got bool"
         );
     }
 
     @Test
     void testNoArgs() throws PMException {
-        PMLParser.FunctionInvokeStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
             """
             func1()
-            """,
-            PMLParser.FunctionInvokeStatementContext.class);
+            """);
 
         PMLFunctionSignature signature = new PMLBasicFunctionSignature(
             "func1",
@@ -126,7 +121,7 @@ class FunctionInvokeStmtVisitorTest {
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
         PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
-            .visitFunctionInvokeStatement(ctx);
+            .visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
 
         FunctionInvokeExpression expected = new FunctionInvokeExpression(

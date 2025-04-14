@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.pap.function.op.prohibition;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ACCESS_RIGHT_SET_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.ContainerConditionType;
@@ -14,7 +14,6 @@ import gov.nist.csd.pm.pap.function.arg.type.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
@@ -24,11 +23,10 @@ import java.util.Map;
 
 public abstract class ProhibitionOp<A extends ProhibitionOp.ProhibitionOpArgs> extends Operation<Void, A> {
 
-    public static final FormalParameter<String> NAME_ARG = new FormalParameter<>("name", STRING_TYPE);
-    public static final FormalParameter<ProhibitionSubject> SUBJECT_ARG = new FormalParameter<>("subject", new ProhibitionSubjectType());
-    public static final FormalParameter<AccessRightSet> ARSET_ARG = new FormalParameter<>("arset", ACCESS_RIGHT_SET_TYPE);
-    public static final FormalParameter<Boolean> INTERSECTION_ARG = new FormalParameter<>("intersection", BOOLEAN_TYPE);
-    public static final FormalParameter<List<ContainerCondition>> CONTAINERS_ARG = new FormalParameter<>("containers", listType(new ContainerConditionType()));
+    public static final FormalParameter<ProhibitionSubject> SUBJECT_PARAM = new FormalParameter<>("subject", new ProhibitionSubjectType());
+    public static final FormalParameter<AccessRightSet> ARSET_PARAM = new FormalParameter<>("arset", ACCESS_RIGHT_SET_TYPE);
+    public static final FormalParameter<Boolean> INTERSECTION_PARAM = new FormalParameter<>("intersection", BOOLEAN_TYPE);
+    public static final FormalParameter<List<ContainerCondition>> CONTAINERS_PARAM = new FormalParameter<>("containers", listType(new ContainerConditionType()));
 
     private final String processReqCap;
     private final String reqCap;
@@ -47,6 +45,14 @@ public abstract class ProhibitionOp<A extends ProhibitionOp.ProhibitionOpArgs> e
         private List<ContainerCondition> containers;
 
         public ProhibitionOpArgs(String name, ProhibitionSubject subject, AccessRightSet arset, Boolean intersection, List<ContainerCondition> containers) {
+            super(Map.of(
+                NAME_PARAM, name,
+                SUBJECT_PARAM, subject,
+                ARSET_PARAM, arset,
+                INTERSECTION_PARAM, intersection,
+                CONTAINERS_PARAM, containers
+            ));
+
             this.name = name;
             this.subject = subject;
             this.arset = arset;
@@ -70,30 +76,30 @@ public abstract class ProhibitionOp<A extends ProhibitionOp.ProhibitionOpArgs> e
     }
 
     @Override
-    public abstract A prepareArgs(Map<FormalParameter<?>, Object> argsMap);
+    protected abstract A prepareArgs(Map<FormalParameter<?>, Object> argsMap);
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, A args) throws PMException {
+    public void canExecute(PAP pap, UserContext userCtx, A args) throws PMException {
         ProhibitionSubject subject = args.getSubject();
 
         if (subject != null) {
             if (subject.isNode()) {
-                privilegeChecker.check(userCtx, subject.getNodeId(), reqCap);
+                pap.privilegeChecker().check(userCtx, subject.getNodeId(), reqCap);
             } else {
-                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), processReqCap);
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), processReqCap);
             }
 
             Collection<ContainerCondition> containers = args.getContainers();
             if (containers != null) {
                 for (ContainerCondition contCond : containers) {
-                    privilegeChecker.check(userCtx, contCond.getId(), reqCap);
+                    pap.privilegeChecker().check(userCtx, contCond.getId(), reqCap);
                     if (contCond.isComplement()) {
-                        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), reqCap);
+                        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), reqCap);
                     }
                 }
             }
         } else {
-            privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), processReqCap);
+            pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), processReqCap);
         }
     }
 }

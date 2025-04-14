@@ -5,7 +5,6 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;

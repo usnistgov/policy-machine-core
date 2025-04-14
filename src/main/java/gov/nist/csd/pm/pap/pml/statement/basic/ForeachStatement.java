@@ -5,7 +5,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
@@ -55,7 +55,7 @@ public class ForeachStatement extends BasicStatement<StatementResult> {
 
     private StatementResult executeArrayIterator(ExecutionContext ctx, List<?> iterValue, ListType<?> listType) throws PMException{
         for (Object o : iterValue) {
-            Args args = new MapArgs();
+            Args args = new Args();
             args.put(new FormalParameter<>(varName, listType.getElementType()), o);
 
             StatementResult value = ctx.executeStatements(statements, args);
@@ -74,7 +74,7 @@ public class ForeachStatement extends BasicStatement<StatementResult> {
             Object value = iterValue.get(key);
 
             // add the key value
-            Args args = new MapArgs();
+            Args args = new Args();
             args.put(new FormalParameter<>(varName, ArgType.resolveTypeOfObject(key)), key);
 
             // add the value value

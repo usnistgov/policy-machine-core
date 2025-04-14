@@ -9,23 +9,23 @@ import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBLIGATION;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
 
 public class CreateObligationOp extends ObligationOp<ObligationOpArgs> {
 
     public CreateObligationOp() {
         super(
             "create_obligation",
-            List.of(AUTHOR_ARG, NAME_ARG, RULES_ARG),
+            List.of(AUTHOR_PARAM, NAME_PARAM, RULES_PARAM),
             CREATE_OBLIGATION
         );
     }
 
     @Override
-    public ObligationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long authorId = prepareArg(AUTHOR_ARG, argsMap);
-        String name = prepareArg(NAME_ARG, argsMap);
-        List<Rule> rules = prepareArg(RULES_ARG, argsMap);
+    protected ObligationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        Long authorId = prepareArg(AUTHOR_PARAM, argsMap);
+        String name = prepareArg(NAME_PARAM, argsMap);
+        List<Rule> rules = prepareArg(RULES_PARAM, argsMap);
         return new ObligationOpArgs(authorId, name, rules);
     }
 

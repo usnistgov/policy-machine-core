@@ -9,17 +9,14 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 
+import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import java.util.List;
 import java.util.Map;
 
-public class DiscoveryQueryAdjudicator {
-
-	private final PAP pap;
-	private final UserContext userCtx;
+public class DiscoveryQueryAdjudicator extends Adjudicator {
 
 	public DiscoveryQueryAdjudicator(PAP pap, UserContext userCtx) {
-		this.pap = pap;
-		this.userCtx = userCtx;
+		super(pap, userCtx);
 	}
 
 	public AccessRightSet computePrivileges(TargetContext targetCtx) throws PMException {

@@ -6,10 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.modification.OperationsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -36,7 +34,7 @@ class PMLFunctionWrapperTest {
 
         operations.createAdminOperation(new Operation<>("op1", List.of(a)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {}
+            public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
@@ -44,14 +42,14 @@ class PMLFunctionWrapperTest {
             }
 
             @Override
-            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
         });
 
         operations.createAdminOperation(new Operation<>("op2", List.of(a)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {}
+            public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
@@ -60,13 +58,13 @@ class PMLFunctionWrapperTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         });
 
         operations.createAdminOperation(new Operation<>("op3", List.of(a)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) {}
+            public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
@@ -75,7 +73,7 @@ class PMLFunctionWrapperTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         });
 

@@ -6,7 +6,6 @@ import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.util.TestPAP;
@@ -38,18 +37,16 @@ class PMLBootstrapperTest {
                 op1()
                 
                 routine1()
-                
-                create pc TEST_CONST
                 """;
 
         Operation<?, ?> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Args actualArgs) throws PMException {
+            public Object execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("op1");
 
                 return null;
@@ -74,16 +71,11 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap("u1", new PMLBootstrapper(input,
-                                          List.of(op1),
-                                          List.of(routine1),
-                                          Map.of("TEST_CONST", "TEST_PC")
-        ));
+        pdp.bootstrap("u1", new PMLBootstrapper(List.of(op1), List.of(routine1), input));
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("op1"));
         assertTrue(pap.query().graph().nodeExists("routine1"));
-        assertTrue(pap.query().graph().nodeExists("TEST_PC"));
         assertTrue(pap.query().graph().nodeExists("ua1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
         assertTrue(pap.query().graph().nodeExists("u1"));

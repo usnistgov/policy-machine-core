@@ -4,9 +4,9 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;
-import gov.nist.csd.pm.pap.AdminAccessRights;
+import gov.nist.csd.pm.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -17,19 +17,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.GET_OBLIGATION;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.GET_OBLIGATION;
+import static gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.checkPatternPrivileges;
 
 public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
 
-    private final UserContext userCtx;
-    private final PAP pap;
-    private final PrivilegeChecker privilegeChecker;
-
-    public ObligationsQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(privilegeChecker);
-        this.userCtx = userCtx;
-        this.pap = pap;
-        this.privilegeChecker = privilegeChecker;
+    public ObligationsQueryAdjudicator(PAP pap, UserContext userCtx) {
+        super(pap, userCtx);
     }
 
     @Override
@@ -77,7 +71,7 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
 
     @Override
     public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
-        privilegeChecker.check(userCtx, userId, AdminAccessRights.REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, userId, AdminAccessRights.REVIEW_POLICY);
 
         return pap.query().obligations().getObligationsWithAuthor(userId);
     }
@@ -86,14 +80,14 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
         EventPattern eventPattern = rule.getEventPattern();
 
         // check subject
-        privilegeChecker.checkPattern(userCtx, eventPattern.getSubjectPattern(), GET_OBLIGATION);
+        checkPatternPrivileges(pap, userCtx, eventPattern.getSubjectPattern(), GET_OBLIGATION);
 
         // cannot check operation as it is not a node
 
         // check args
         for (Map.Entry<String, List<ArgPatternExpression>> argPattern : eventPattern.getArgPatterns().entrySet()) {
             for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
-                privilegeChecker.checkPattern(userCtx, argPatternExpression, GET_OBLIGATION);
+                checkPatternPrivileges(pap, userCtx, argPatternExpression, GET_OBLIGATION);
             }
         }
     }

@@ -1,26 +1,22 @@
 package gov.nist.csd.pm.epp;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
@@ -38,13 +34,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import org.neo4j.codegen.api.ArrayLiteral;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;
@@ -100,22 +94,22 @@ class EPPTest {
                 }
                 """);
 
-        Operation<String, MapArgs> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
+        Operation<String, Args> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
 
             @Override
-            public String execute(PAP pap, MapArgs args) throws PMException {
-                return "";
-            }
-
-            @Override
-            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
                 return null;
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws
                                                                                                          PMException {
 
+            }
+
+            @Override
+            public String execute(PAP pap, Args args) throws PMException {
+                return "";
             }
         };
 
@@ -350,20 +344,20 @@ class EPPTest {
         PMLOperation pmlOperation = new PMLOperation("testFunc", new VoidType()) {
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws
                                                                                                          PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, MapArgs actualArgs) throws PMException {
+            public Object execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
                 return new VoidResult();
             }
 
             @Override
-            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
                 return null;
             }
         };

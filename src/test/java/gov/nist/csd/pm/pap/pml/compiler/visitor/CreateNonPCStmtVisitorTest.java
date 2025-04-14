@@ -27,13 +27,12 @@ class CreateNonPCStmtVisitorTest {
 
     @Test
     void testSuccess() {
-        PMLParser.CreateNonPCStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 create user attribute "ua1" in ["a"]
-                """,
-                PMLParser.CreateNonPCStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
-        PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
+        PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new CreateNonPCStatement(new StringLiteralExpression("ua1"), NodeType.UA, buildArrayLiteral("a")),
@@ -48,14 +47,14 @@ class CreateNonPCStmtVisitorTest {
                 """
                 create user attribute ["ua1"] in ["a"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
                 create user attribute "ua1" in "a"
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]string], got string"
+                "expected expression type []string, got string"
         );
     }
 

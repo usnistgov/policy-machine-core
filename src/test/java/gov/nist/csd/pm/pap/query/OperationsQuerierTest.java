@@ -3,13 +3,11 @@ package gov.nist.csd.pm.pap.query;
 import gov.nist.csd.pm.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.SamplePolicy;
 import java.util.Map;
@@ -25,37 +23,37 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
-    static Operation<Object, MapArgs> op1 = new Operation<>("op1", List.of()) {
+    static Operation<Object, Args> op1 = new Operation<>("op1", List.of()) {
 
         @Override
-        public Object execute(PAP pap, MapArgs args) throws PMException {
+        public Object execute(PAP pap, Args args) throws PMException {
             return null;
         }
 
         @Override
-        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
 
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws
+        public void canExecute(PAP pap, UserContext userCtx, Args args) throws
                                                                                                      PMException {
         }
     };
 
-    static Operation<Object, MapArgs> op2 = new Operation<>("op2", List.of()) {
+    static Operation<Object, Args> op2 = new Operation<>("op2", List.of()) {
         @Override
-        public Object execute(PAP pap, MapArgs args) throws PMException {
+        public Object execute(PAP pap, Args args) throws PMException {
             return null;
         }
 
         @Override
-        protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
 
         @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws
+        public void canExecute(PAP pap, UserContext userCtx, Args args) throws
                                                                                                      PMException {
 
         }

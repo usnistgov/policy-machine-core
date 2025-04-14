@@ -2,13 +2,11 @@ package gov.nist.csd.pm.pap.pml.function.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -32,19 +30,19 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws PMException {
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         ctx.executeOperationStatements(this.body.getChecks().getStmts(), args);
     }
 
     @Override
-    protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return new MapArgs(argsMap);
+    protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        return new Args(argsMap);
     }
 
     @Override
-    public Object execute(PAP pap, MapArgs args) throws PMException {
+    public Object execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         return ctx.executeOperationStatements(this.body.getStatements().getStmts(), args);

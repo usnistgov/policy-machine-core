@@ -1,30 +1,24 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.tx.Transactional;
 import gov.nist.csd.pm.pap.id.IdGenerator;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
-public abstract class Modifier implements Transactional {
+abstract class Modifier implements Transactional {
 
-    protected PolicyStore store;
-    protected IdGenerator idGenerator;
+    protected PolicyStore policyStore;
 
-    public Modifier(PolicyStore store) {
-        this.store = store;
+    public Modifier(PolicyStore policyStore) {
+        this.policyStore = policyStore;
     }
 
-    public Modifier(PolicyStore store, IdGenerator idGenerator) {
-        this.store = store;
-        this.idGenerator = idGenerator;
+    public PolicyStore getPolicyStore() {
+        return policyStore;
     }
 
-    public IdGenerator getIdGenerator() {
-        return idGenerator;
-    }
-
-    public void setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
+    public void setPolicyStore(PolicyStore policyStore) {
+        this.policyStore = policyStore;
     }
 
     protected <T> T runTx(Runner<T> txRunner) throws PMException {
@@ -52,17 +46,17 @@ public abstract class Modifier implements Transactional {
 
     @Override
     public final void beginTx() throws PMException {
-        store.beginTx();
+        policyStore.beginTx();
     }
 
     @Override
     public final void commit() throws PMException {
-        store.commit();
+        policyStore.commit();
     }
 
     @Override
     public final void rollback() throws PMException {
-        store.rollback();
+        policyStore.rollback();
     }
 
     public interface Runner<T> {

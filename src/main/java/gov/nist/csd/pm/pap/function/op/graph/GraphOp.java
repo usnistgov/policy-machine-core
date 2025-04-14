@@ -18,15 +18,15 @@ import java.util.Map;
 
 public abstract class GraphOp<R, A extends Args> extends Operation<R, A> {
 
-    public static final FormalParameter<NodeType> TYPE_ARG = new FormalParameter<>("type", NODE_TYPE_TYPE);
-    public static final FormalParameter<Map<String, String>> PROPERTIES_ARG = new FormalParameter<>("properties", mapType(STRING_TYPE, STRING_TYPE));
-    public static final FormalParameter<AccessRightSet> ARSET_ARG = new FormalParameter<>("arset", new AccessRightSetType());
+    public static final FormalParameter<NodeType> TYPE_PARAM = new FormalParameter<>("type", NODE_TYPE_TYPE);
+    public static final FormalParameter<Map<String, String>> PROPERTIES_PARAM = new FormalParameter<>("properties", mapType(STRING_TYPE, STRING_TYPE));
+    public static final FormalParameter<AccessRightSet> ARSET_PARAM = new FormalParameter<>("arset", new AccessRightSetType());
 
-    public static final ListIdNodeFormalParameter DESCENDANTS_ARG = new ListIdNodeFormalParameter("descendants");
+    public static final ListIdNodeFormalParameter DESCENDANTS_PARAM = new ListIdNodeFormalParameter("descendants");
 
-    public static final IdNodeFormalParameter ASCENDANT_ARG = new IdNodeFormalParameter("ascendant");
-    public static final IdNodeFormalParameter UA_ARG = new IdNodeFormalParameter("ua");
-    public static final IdNodeFormalParameter TARGET_ARG = new IdNodeFormalParameter("target");
+    public static final IdNodeFormalParameter ASCENDANT_PARAM = new IdNodeFormalParameter("ascendant");
+    public static final IdNodeFormalParameter UA_PARAM = new IdNodeFormalParameter("ua");
+    public static final IdNodeFormalParameter TARGET_PARAM = new IdNodeFormalParameter("target");
 
     public GraphOp(String name, List<FormalParameter<?>> formalParameters) {
         super(name, formalParameters);

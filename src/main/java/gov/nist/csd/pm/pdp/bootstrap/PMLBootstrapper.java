@@ -4,29 +4,29 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
-public class PMLBootstrapper implements PolicyBootstrapper {
+public class PMLBootstrapper extends PolicyBootstrapper {
 
     private final String pml;
-    private final List<Operation<?, ?>> pmlOperations;
-    private final List<Routine<?, ?>> pmlRoutines;
-    private final Map<String, Object> pmlConstants;
 
-    public PMLBootstrapper(String pml, List<Operation<?, ?>> pmlOperations, List<Routine<?, ?>> pmlRoutines, Map<String, Object> pmlConstants) {
+    public PMLBootstrapper(List<Operation<?, ?>> operations, List<Routine<?, ?>> routines, String pml) {
+        super(operations, routines);
         this.pml = pml;
-        this.pmlOperations = pmlOperations;
-        this.pmlRoutines = pmlRoutines;
-        this.pmlConstants = pmlConstants;
     }
 
     @Override
     public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+        for (Operation<?, ?> op : operations) {
+            pap.modify().operations().createAdminOperation(op);
+        }
+
+        for (Routine<?, ?> r : routines) {
+            pap.modify().routines().createAdminRoutine(r);
+        }
+
         pap.executePML(bootstrapUser, pml);
     }
 }

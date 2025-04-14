@@ -1,17 +1,12 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp;
-import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
-import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp;
 import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Rule;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.pap.function.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.modification.ObligationsModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
@@ -21,11 +16,8 @@ import java.util.List;
 
 public class ObligationsModificationAdjudicator extends Adjudicator implements ObligationsModification {
 
-    private final UserContext userCtx;
-    private final PAP pap;
-
-    public ObligationsModificationAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(privilegeChecker);
+    public ObligationsModificationAdjudicator(UserContext userCtx, PAP pap) {
+        super(pap, userCtx);
         this.userCtx = userCtx;
         this.pap = pap;
     }
@@ -35,7 +27,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
         CreateObligationOp op = new CreateObligationOp();
         ObligationOpArgs args = new ObligationOpArgs(authorId, name, new ArrayList<>(rules));
 
-        op.canExecute(privilegeChecker, userCtx, args);
+        op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
     }
 
@@ -50,7 +42,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
                 new ArrayList<>(obligation.getRules())
         );
 
-        op.canExecute(privilegeChecker, userCtx, args);
+        op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
     }
 }

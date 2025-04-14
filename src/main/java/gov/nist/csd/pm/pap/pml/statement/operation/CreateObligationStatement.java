@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.pap.pml.exception.ArgTypeNotCastableException;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.exception.UnknownPatternException;
 import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Obligation;
@@ -78,18 +76,13 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
     }
 
     public static CreateObligationStatement fromObligation(Obligation obligation) {
-        try {
-            return new CreateObligationStatement(
-                new StringLiteralExpression(obligation.getName()),
-                createRuleStatementsFromObligation(obligation.getRules())
-            );
-        } catch (UnknownPatternException | ArgTypeNotCastableException e) {
-            throw new RuntimeException(e);
-        }
+        return new CreateObligationStatement(
+            new StringLiteralExpression(obligation.getName()),
+            createRuleStatementsFromObligation(obligation.getRules())
+        );
     }
 
-    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) throws
-                                                                                                  UnknownPatternException {
+    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) {
         List<CreateRuleStatement> createRuleStatements = new ArrayList<>();
 
         for (Rule rule : rules) {

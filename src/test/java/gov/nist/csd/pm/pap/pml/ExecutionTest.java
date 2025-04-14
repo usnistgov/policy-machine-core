@@ -430,12 +430,12 @@ public class ExecutionTest {
                 create prohibition "p1"
                 deny user attribute "ua1"
                 access rights ["read"]
-                on union of ["oa1"]
+                on union of {"oa1": false}
                 
                 create prohibition "p2"
                 deny user attribute "ua1"
                 access rights ["read"]
-                on union of ["oa1"]
+                on union of {"oa1": false}
                 """;
         pap.executePML(new TestUserContext("u1"), input);
 

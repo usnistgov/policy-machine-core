@@ -9,7 +9,7 @@ import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
@@ -58,14 +58,14 @@ public class EPP implements EventSubscriber {
     }
 
     public void executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
-        Args args = new MapArgs();
+        Args args = new Args();
 
-        FormalParameter<Map<String, Object>> eventCtxArg = new FormalParameter<>(
+        FormalParameter<Map<String, Object>> eventCtxParam = new FormalParameter<>(
             response.getEventCtxVariable(),
             mapType(STRING_TYPE, OBJECT_TYPE)
         );
 
-        args.put(eventCtxArg, eventCtxToMap(eventCtx));
+        args.put(eventCtxParam, eventCtxToMap(eventCtx));
 
         ExecutionContext executionCtx = pdpTx.buildExecutionContext(userCtx);
         executionCtx.executeStatements(response.getStatements(), args);

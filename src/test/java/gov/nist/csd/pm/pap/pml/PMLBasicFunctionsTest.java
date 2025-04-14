@@ -106,6 +106,10 @@ public class PMLBasicFunctionsTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
+                operation op2() {
+                    routine1()
+                }
+                
                 routine routine1() {
                     op1()
                 }
@@ -114,14 +118,10 @@ public class PMLBasicFunctionsTest {
                     create pc "pc2"
                 }
                 
-                operation op2() {
-                    routine1()
-                }
-                
                 create obligation "ob1" {
                     create rule "r1"
                     when any user
-                    performs any operation
+                    performs "op1"
                     do(ctx) {
                         create pc "pc3"
                     }

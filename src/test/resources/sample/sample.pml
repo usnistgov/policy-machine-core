@@ -41,20 +41,20 @@ routine deleteAllProjects(string locProjectOA) {
 }
 
 operation deleteReadme(@node string projectReadme) {
-    check "delete_readme" on projectReadme
+    check "delete_readme" on [projectReadme]
 } {
     delete node projectReadme
 }
 
 operation deleteProject(@node string projectName) {
-    check "delete_project" on projectName
+    check "delete_project" on [projectName]
 } {
     delete node projectName
 }
 
 operation createProject(string projectName, @node string locProjectAttr) {
-   check "assign_to" on "project"
-   check "assign_to" on locProjectAttr
+   check "assign_to" on ["project"]
+   check "assign_to" on [locProjectAttr]
 } {
     create oa projectName in ["project", locProjectAttr]
     create o projectName + " README" in [projectName]
@@ -68,7 +68,7 @@ operation createProjectAdmin(string projectName) {
     create prohibition "deny admin delete README"
     deny user attribute uaName
     access rights ["delete_readme"]
-    on union of [projectName]
+    on union of {projectName: false}
 }
 
 create obligation "create us project admin" {

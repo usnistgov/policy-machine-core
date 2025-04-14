@@ -8,6 +8,8 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.expression.FunctionInvokeExpression;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
@@ -232,7 +234,7 @@ public class ObjectTypeFunctionTest {
         PMLParser.ExpressionContext invalidCtx = TestPMLParser.parseExpression(invalidCall);
 
         // Should have compilation errors
-        Exception exception = assertThrows(PMException.class, () -> {
+        Exception exception = assertThrows(PMLCompilationRuntimeException.class, () -> {
             ExpressionVisitor.compile(visitorContext, invalidCtx, OBJECT_TYPE);
         });
     }

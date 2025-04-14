@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.memory.pap.access;
+package gov.nist.csd.pm.pap.query.access;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.dag.BreadthFirstGraphWalker;
@@ -14,11 +14,11 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
-public class MemoryUserEvaluator {
+public class UserEvaluator {
 
 	private final PolicyStore policyStore;
 
-	public MemoryUserEvaluator(PolicyStore policyStore) {
+	public UserEvaluator(PolicyStore policyStore) {
 		this.policyStore = policyStore;
 	}
 

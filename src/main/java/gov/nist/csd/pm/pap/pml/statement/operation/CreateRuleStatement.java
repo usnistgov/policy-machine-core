@@ -121,7 +121,7 @@ public class CreateRuleStatement extends PMLStatement<Rule> {
             %sdo (%s) %s""",
             indent, name,
             indent, subjectPattern,
-            indent, operationPattern.isAny() ? operationPattern.toString() : "\"" + operationPattern.toString() + "\"",
+            indent, operationPattern,
             argStr,
             indent, responseBlock.evtVar, block.toFormattedString(indentLevel)
         );

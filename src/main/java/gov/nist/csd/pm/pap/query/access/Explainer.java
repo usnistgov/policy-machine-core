@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.memory.pap.access;
+package gov.nist.csd.pm.pap.query.access;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.dag.TargetDagResult;
@@ -14,13 +14,13 @@ import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.AccessRightResolver.*;
+import static gov.nist.csd.pm.pap.query.access.AccessRightResolver.*;
 
-public class MemoryExplainer {
+public class Explainer {
 
 	private final PolicyStore policyStore;
 
-	public MemoryExplainer(PolicyStore policyStore) {
+	public Explainer(PolicyStore policyStore) {
 		this.policyStore = policyStore;
 	}
 
@@ -29,11 +29,11 @@ public class MemoryExplainer {
 		List<PolicyClassExplain> resolvedPaths = resolvePaths(userCtx, targetCtx);
 
 		// evaluate user
-		MemoryUserEvaluator userEvaluator = new MemoryUserEvaluator(policyStore);
+		UserEvaluator userEvaluator = new UserEvaluator(policyStore);
 		UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
 
 		// evaluate target
-		MemoryTargetEvaluator targetEvaluator = new MemoryTargetEvaluator(policyStore);
+		TargetEvaluator targetEvaluator = new TargetEvaluator(policyStore);
 		TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
 		// resolve privs and prohibitions
@@ -45,8 +45,8 @@ public class MemoryExplainer {
 	}
 
 	private List<PolicyClassExplain> resolvePaths(UserContext userCtx, TargetContext targetCtx) throws PMException {
-		MemoryUserExplainer userExplainer = new MemoryUserExplainer(policyStore);
-		MemoryTargetExplainer targetExplainer = new MemoryTargetExplainer(policyStore);
+		UserExplainer userExplainer = new UserExplainer(policyStore);
+		TargetExplainer targetExplainer = new TargetExplainer(policyStore);
 		Map<Node, Map<Path, List<Association>>> targetPaths = targetExplainer.explainTarget(targetCtx);
 		Map<Node, Set<Path>> userPaths = userExplainer.explainIntersectionOfTargetPaths(userCtx, targetPaths);
 

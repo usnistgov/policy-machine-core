@@ -4,11 +4,9 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
@@ -60,8 +58,8 @@ class OperationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new OperationsModificationAdjudicator(new TestUserContext("u1"), pap, pdp.getPrivilegeChecker());
-        fail = new OperationsModificationAdjudicator(new UserContext(id("u2")), pap, pdp.getPrivilegeChecker());
+        ok = new OperationsModificationAdjudicator(new TestUserContext("u1"), pap);
+        fail = new OperationsModificationAdjudicator(new UserContext(id("u2")), pap);
     }
 
 
@@ -76,7 +74,7 @@ class OperationsModificationAdjudicatorTest {
     void createAdminOperation() throws PMException {
         Operation<Void, ?> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
@@ -87,7 +85,7 @@ class OperationsModificationAdjudicatorTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         };
 
@@ -98,20 +96,20 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        Operation<Void, MapArgs> op1 = new Operation<>("op1", List.of()) {
+        Operation<Void, Args> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, MapArgs args) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, MapArgs actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
 
             @Override
-            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
         };
         ok.createAdminOperation(op1);

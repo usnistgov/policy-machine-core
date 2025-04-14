@@ -26,7 +26,7 @@ class IfStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.IfStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 if true {
                     x := "a"
@@ -35,11 +35,9 @@ class IfStmtVisitorTest {
                 } else {
                     x := "c"
                 }
-                """,
-                PMLParser.IfStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new IfStmtVisitor(visitorCtx)
-                .visitIfStatement(ctx);
+        PMLStatement<?> stmt = new IfStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new IfStatement(
@@ -65,7 +63,7 @@ class IfStmtVisitorTest {
                     x := "c"
                 }
                 """, visitorCtx, 1,
-                "expected expression type(s) [bool], got string"
+                "expected expression type bool, got string"
                 );
     }
 

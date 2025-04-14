@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -24,12 +24,9 @@ public class CheckStatement extends PMLStatement<VoidResult> {
         String ars = arsExpr.execute(ctx, pap);
         List<String> targets = targetExpr.execute(ctx, pap);
 
-        PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
-        privilegeChecker.setExplain(ctx.isExplain());
-
         for (String target : targets) {
             long id = pap.query().graph().getNodeByName(target).getId();
-            privilegeChecker.check(ctx.author(), id, ars);
+            pap.privilegeChecker().check(ctx.author(), id, ars);
         }
 
         return new VoidResult();

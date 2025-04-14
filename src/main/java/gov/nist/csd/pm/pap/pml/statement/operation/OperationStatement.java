@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;

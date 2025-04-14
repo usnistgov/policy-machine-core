@@ -9,10 +9,10 @@ import gov.nist.csd.pm.pap.function.arg.type.ObjectType;
 import gov.nist.csd.pm.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.ExpressionListContext;
-import gov.nist.csd.pm.pap.pml.exception.ArgTypeNotCastableException;
+import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
-import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BracketIndexContext;
@@ -70,8 +70,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
         try {
             return compiledExpression.asType(expectedType);
-        } catch (IllegalArgumentException e) {
-            throw new ArgTypeNotCastableException(ctx, compiledExpression.getType(), expectedType);
+        } catch (UnexpectedExpressionTypeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
     }
 
@@ -118,8 +118,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
         try {
             return compiled.asType(expectedType);
-        } catch (IllegalArgumentException e) {
-            throw new ArgTypeNotCastableException(ctx, compiled.getType(), expectedType);
+        } catch (UnexpectedExpressionTypeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
     }
 
@@ -208,8 +208,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
                 } else if (indexCtx instanceof DotIndexContext dotIndexContext) {
                     baseExpr = createDotIndexExpression(baseExpr, dotIndexContext);
                 }
-            } catch (ArgTypeNotCastableException e) {
-                throw new PMLCompilationRuntimeException(indexCtx, e.getMessage());
+            } catch (UnexpectedExpressionTypeException e) {
+                throw new PMLCompilationRuntimeException(ctx, e.getMessage());
             }
         }
 
@@ -298,7 +298,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return new MapLiteralExpression<>(entries, keyType, valueType);
     }
 
-    private Expression<?> createDotIndexExpression(Expression<?> baseExpr, PMLParser.DotIndexContext ctx){
+    private Expression<?> createDotIndexExpression(Expression<?> baseExpr, PMLParser.DotIndexContext ctx) throws
+                                                                                                          UnexpectedExpressionTypeException {
         String key = ctx.key.getText();
         MapType<?, ?> mapType = validateMapType(baseExpr.getType(), ctx);
 
@@ -310,7 +311,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return new DotIndexExpression<>(baseExpr, key, valueType);
     }
 
-    private Expression<?> createBracketIndexExpression(Expression<?> baseExpr, PMLParser.BracketIndexContext ctx) {
+    private Expression<?> createBracketIndexExpression(Expression<?> baseExpr, PMLParser.BracketIndexContext ctx) throws
+                                                                                                                  UnexpectedExpressionTypeException {
         Expression<?> indexExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), OBJECT_TYPE);
         MapType<?, ?> mapType = validateMapType(baseExpr.getType(), ctx);
 
@@ -336,15 +338,16 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return mapType;
     }
 
-    private static String removeQuotes(String s) {
+    public static String removeQuotes(String s) {
         return s.trim().substring(1, s.length() - 1);
     }
 
-    private static void assertIsCastableTo(ParserRuleContext ctx, ArgType<?> type, ArgType<?> targetType) {
+    private static void assertIsCastableTo(ParserRuleContext ctx, ArgType<?> type, ArgType<?> targetType) throws
+                                                                                                          UnexpectedExpressionTypeException {
         if (type.isCastableTo(targetType)) {
             return;
         }
 
-        throw new ArgTypeNotCastableException(ctx, type, targetType);
+        throw new UnexpectedExpressionTypeException(type, targetType);
     }
 }

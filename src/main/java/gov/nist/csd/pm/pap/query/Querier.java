@@ -1,8 +1,8 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
-public abstract class Querier {
+abstract class Querier {
 
     protected PolicyStore store;
 

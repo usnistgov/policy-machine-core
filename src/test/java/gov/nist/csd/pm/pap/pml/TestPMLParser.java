@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml;
 import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.PmlContext;
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser.StatementContext;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -83,23 +84,6 @@ public class TestPMLParser {
         } else {
             throw new IllegalArgumentException("Unsupported parser rule class: " + ruleClass.getName());
         }
-    }
-
-    public static <T extends RuleContext> T toCtx(String input, Class<T> t) {
-        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
-
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(pmlErrorHandler);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PMLParser parser = new PMLParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(pmlErrorHandler);
-
-        RuleContext pmlContext = parsePml(input);
-
-        return t.cast(pmlContext);
     }
 
     public static PMLParser.StatementBlockContext toStatementBlockCtx(String input) {

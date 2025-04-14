@@ -18,14 +18,13 @@ class SetNodePropertiesStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.SetNodePropertiesStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 set properties of "o1" to {"a": "b"}
-                """,
-                PMLParser.SetNodePropertiesStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new SetNodePropertiesStmtVisitor(visitorCtx)
-                .visitSetNodePropertiesStatement(ctx);
+        PMLStatement<?> stmt = new SetNodePropertiesStmtVisitor(visitorCtx)
+                .visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new SetNodePropertiesStatement(new StringLiteralExpression("o1"), buildMapLiteral("a", "b")),
@@ -41,14 +40,14 @@ class SetNodePropertiesStmtVisitorTest {
                 """
                 set properties of ["o1"] to {"a": "b"}
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
                 set properties of "o1" to ["a", "b"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [map[string]string], got []string"
+                "expected expression type map[string]string, got []string"
         );
     }
 

@@ -2,9 +2,9 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.pap.AdminAccessRights;
+import gov.nist.csd.pm.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PrivilegeCheckerTest {
@@ -33,10 +34,9 @@ class PrivilegeCheckerTest {
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
         long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-        PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
-        privilegeChecker.check(new UserContext(u1), "o1", List.of("read"));
-        privilegeChecker.check(new UserContext(u1), "pc1", List.of(AdminAccessRights.ASSIGN_TO));
-        assertThrows(UnauthorizedException.class, () -> privilegeChecker.check(new UserContext(u1), "pc1", List.of(AdminAccessRights.DELETE_POLICY_CLASS)));
+        pap.privilegeChecker().check(new UserContext(u1), id("o1"), List.of("read"));
+        pap.privilegeChecker().check(new UserContext(u1), id("pc1"), List.of(AdminAccessRights.ASSIGN_TO));
+        assertThrows(UnauthorizedException.class, () -> pap.privilegeChecker().check(new UserContext(u1), id("pc1"), List.of(AdminAccessRights.DELETE_POLICY_CLASS)));
     }
 
 }

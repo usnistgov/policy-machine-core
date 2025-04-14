@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function;
 
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.VOID_TYPE;
+
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
@@ -56,7 +58,7 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
             prefix,
             name,
             argsStr,
-            returnType == null ? "" : ArgTypeStringer.toPMLString(returnType) + " "
+            returnType == null || returnType.equals(VOID_TYPE) ? "" : ArgTypeStringer.toPMLString(returnType) + " "
         );
     }
 

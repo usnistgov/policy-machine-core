@@ -57,7 +57,7 @@ class FunctionDefinitionStatementTest {
 
         assertEquals("""
                              operation op1(@node string a, string b) string {
-                                 check "ar1" on [a]
+                                 check "ar1" on a
                                  check "ar2" on ["node"]
                              } {
                                  return "test"
@@ -66,7 +66,7 @@ class FunctionDefinitionStatementTest {
 
         assertEquals("""
                                  operation op1(@node string a, string b) string {
-                                     check "ar1" on [a]
+                                     check "ar1" on a
                                      check "ar2" on ["node"]
                                  } {
                                      return "test"

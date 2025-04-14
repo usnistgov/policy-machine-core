@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.dag.DepthFirstGraphWalker;
@@ -8,7 +8,7 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.query.ProhibitionsQuery;
+import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.ArrayList;
@@ -18,12 +18,8 @@ import java.util.Map;
 
 public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 
-    private final GraphQuerier graphQuerier;
-
-    public ProhibitionsQuerier(PolicyStore store, GraphQuerier graphQuerier) {
+    public ProhibitionsQuerier(PolicyStore store) {
         super(store);
-
-        this.graphQuerier = graphQuerier;
     }
 
     @Override
@@ -63,7 +59,7 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     public Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
-        new DepthFirstGraphWalker(graphQuerier)
+        new GraphStoreDFS(store.graph())
                 .withVisitor((n) -> {
                     pros.addAll(getProhibitionsWithSubject(new ProhibitionSubject(n)));
                 })

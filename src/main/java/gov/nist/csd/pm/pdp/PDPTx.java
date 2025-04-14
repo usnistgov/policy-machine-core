@@ -5,11 +5,10 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.arg.NoArgs;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
@@ -22,32 +21,39 @@ import gov.nist.csd.pm.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
 
 public class PDPTx extends PAP {
 
     final PAP pap;
 
     private final UserContext userCtx;
-    private final PrivilegeChecker privilegeChecker;
-    private final PDPEventPublisher eventEmitter;
+    private final PDPEventPublisher eventPublisher;
 
     private final PolicyModificationAdjudicator pdpModifier;
     private final PolicyQueryAdjudicator pdpQuerier;
 
-    public PDPTx(UserContext userCtx, PrivilegeChecker privilegeChecker, PAP pap, List<EventSubscriber> epps) throws PMException {
+    public PDPTx(UserContext userCtx, PAP pap, List<EventSubscriber> epps) throws PMException {
         super(pap);
 
         this.userCtx = userCtx;
-        this.privilegeChecker = privilegeChecker;
         this.pap = pap;
-        this.eventEmitter = new PDPEventPublisher(epps);
-        this.pdpModifier = new PolicyModificationAdjudicator(this.userCtx, this.pap, this.eventEmitter, this.privilegeChecker);
-        this.pdpQuerier = new PolicyQueryAdjudicator(this.userCtx, this.pap, this.privilegeChecker);
+        this.eventPublisher = new PDPEventPublisher(epps);
+        this.pdpModifier = new PolicyModificationAdjudicator(this.userCtx, this.pap, this.eventPublisher);
+        this.pdpQuerier = new PolicyQueryAdjudicator(this.pap, this.userCtx);
     }
 
-    public PrivilegeChecker getPrivilegeChecker() {
-        return privilegeChecker;
+    public PDPTx(PAP pap,
+                 UserContext userCtx,
+                 PDPEventPublisher eventPublisher,
+                 PolicyModificationAdjudicator pdpModifier,
+                 PolicyQueryAdjudicator pdpQuerier) throws PMException {
+        super(pap);
+        this.pap = pap;
+        this.userCtx = userCtx;
+        this.eventPublisher = eventPublisher;
+        this.pdpModifier = pdpModifier;
+        this.pdpQuerier = pdpQuerier;
     }
 
     @Override
@@ -66,13 +72,14 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction, Map<String, Object> argsMap) throws PMException {
+    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction,
+                                                      Map<String, Object> argsMap) throws PMException {
         A args = adminFunction.validateAndPrepareArgs(argsMap);
 
         if (adminFunction instanceof Routine<R, A> routine) {
             return routine.execute(this, args);
         } else if (adminFunction instanceof Operation<R, A> operation) {
-            operation.canExecute(privilegeChecker, userCtx, args);
+            operation.canExecute(pap, userCtx, args);
             return operation.execute(pap, args);
         }
 
@@ -81,22 +88,21 @@ public class PDPTx extends PAP {
 
     @Override
     public void reset() throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), RESET);
+        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), RESET);
 
         pap.reset();
     }
 
     @Override
     public String serialize(PolicySerializer serializer) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SERIALIZE_POLICY);
+        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SERIALIZE_POLICY);
 
         return pap.serialize(serializer);
     }
 
     @Override
-    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer)
-            throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DESERIALIZE_POLICY);
+    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer) throws PMException {
+        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DESERIALIZE_POLICY);
 
         pap.deserialize(author, input, policyDeserializer);
     }

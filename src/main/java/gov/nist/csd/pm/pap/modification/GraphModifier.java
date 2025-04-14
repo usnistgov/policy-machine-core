@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.*;
 import gov.nist.csd.pm.common.graph.dag.Direction;
@@ -14,12 +14,11 @@ import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.id.IdGenerator;
-import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
+
 import gov.nist.csd.pm.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.pap.store.PolicyStore;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -27,13 +26,24 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.pap.AdminAccessRights.allAdminAccessRights;
-import static gov.nist.csd.pm.pap.AdminAccessRights.wildcardAccessRights;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.allAdminAccessRights;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.wildcardAccessRights;
 
 public class GraphModifier extends Modifier implements GraphModification {
 
+    private IdGenerator idGenerator;
+
     public GraphModifier(PolicyStore store, IdGenerator idGenerator) {
-        super(store, idGenerator);
+        super(store);
+        this.idGenerator = idGenerator;
+    }
+
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
     }
 
     @Override
@@ -42,12 +52,12 @@ public class GraphModifier extends Modifier implements GraphModification {
 
         if (name.equals(AdminPolicyNode.PM_ADMIN_PC.nodeName())) {
             return AdminPolicyNode.PM_ADMIN_PC.nodeId();
-        } else if (store.graph().nodeExists(name)) {
+        } else if (policyStore.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
         }
 
         // create pc node
-        store.graph().createNode(id, name, PC);
+        policyStore.graph().createNode(id, name, PC);
 
         return id;
     }
@@ -78,7 +88,7 @@ public class GraphModifier extends Modifier implements GraphModification {
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         checkSetNodePropertiesInput(id);
 
-        store.graph().setNodeProperties(id, properties);
+        policyStore.graph().setNodeProperties(id, properties);
     }
 
     @Override
@@ -87,7 +97,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             return;
         }
 
-        store.graph().deleteNode(id);
+        policyStore.graph().deleteNode(id);
     }
 
     @Override
@@ -97,7 +107,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                 continue;
             }
 
-            store.graph().createAssignment(ascId, descendant);
+            policyStore.graph().createAssignment(ascId, descendant);
         }
     }
 
@@ -108,7 +118,7 @@ public class GraphModifier extends Modifier implements GraphModification {
                 continue;
             }
 
-            store.graph().deleteAssignment(ascendant, descendant);
+            policyStore.graph().deleteAssignment(ascendant, descendant);
         }
     }
 
@@ -116,7 +126,7 @@ public class GraphModifier extends Modifier implements GraphModification {
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         checkAssociateInput(ua, target, accessRights);
 
-        store.graph().createAssociation(ua, target, accessRights);
+        policyStore.graph().createAssociation(ua, target, accessRights);
     }
 
     @Override
@@ -125,7 +135,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             return;
         }
 
-        store.graph().deleteAssociation(ua, target);
+        policyStore.graph().deleteAssociation(ua, target);
     }
 
     /**
@@ -138,7 +148,7 @@ public class GraphModifier extends Modifier implements GraphModification {
     protected void checkAssignmentDoesNotCreateLoop(long ascendant, long descendant) throws PMException {
         AtomicBoolean loop = new AtomicBoolean(false);
 
-        new GraphStoreDFS(store.graph())
+        new GraphStoreDFS(policyStore.graph())
                 .withVisitor((node -> {
                     if (node != ascendant) {
                         return;
@@ -151,8 +161,8 @@ public class GraphModifier extends Modifier implements GraphModification {
                 .walk(descendant);
 
         if (loop.get()) {
-            Node aNode = store.graph().getNodeById(ascendant);
-            Node dNode = store.graph().getNodeById(descendant);
+            Node aNode = policyStore.graph().getNodeById(ascendant);
+            Node dNode = policyStore.graph().getNodeById(descendant);
             throw new AssignmentCausesLoopException(aNode.getName(), dNode.getName());
         }
     }
@@ -164,7 +174,7 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected void checkSetNodePropertiesInput(long id) throws PMException {
-        if (!store.graph().nodeExists(id)) {
+        if (!policyStore.graph().nodeExists(id)) {
             throw new NodeDoesNotExistException(id);
         }
     }
@@ -179,20 +189,20 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDeleteNodeInput(long id) throws PMException {
-        if (!store.graph().nodeExists(id)) {
+        if (!policyStore.graph().nodeExists(id)) {
             return false;
         }
 
         Collection<Long> ascendants;
         try {
-            ascendants = store.graph().getAdjacentAscendants(id);
+            ascendants = policyStore.graph().getAdjacentAscendants(id);
         } catch (NodeDoesNotExistException e) {
             // quietly return if the nodes already does not exist as this is the desired state
             return false;
         }
 
         if (!ascendants.isEmpty()) {
-            Node node = store.graph().getNodeById(id);
+            Node node = policyStore.graph().getNodeById(id);
             throw new NodeHasAscendantsException(node.nameAndId());
         }
 
@@ -210,11 +220,11 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected void checkIfNodeInProhibition(long id) throws PMException {
-        Map<Long, Collection<Prohibition>> allProhibitions = store.prohibitions().getNodeProhibitions();
+        Map<Long, Collection<Prohibition>> allProhibitions = policyStore.prohibitions().getNodeProhibitions();
         for (Collection<Prohibition> subjPros : allProhibitions.values()) {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(id, p)) {
-                    Node node = store.graph().getNodeById(id);
+                    Node node = policyStore.graph().getNodeById(id);
                     throw new NodeReferencedInProhibitionException(node.nameAndId(), p.getName());
                 }
             }
@@ -229,9 +239,9 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected void checkIfNodeInObligation(long id) throws PMException {
-        Node node = store.graph().getNodeById(id);
+        Node node = policyStore.graph().getNodeById(id);
 
-        Collection<Obligation> obligations = store.obligations().getObligations();
+        Collection<Obligation> obligations = policyStore.obligations().getObligations();
         for (Obligation obligation : obligations) {
             // if the node is the author of the obligation or referenced in any rules throw an exception
             if (obligation.getAuthorId() == id) {
@@ -277,20 +287,20 @@ public class GraphModifier extends Modifier implements GraphModification {
      */
     protected boolean checkAssignInput(long ascendant, long descendant) throws PMException {
         // getting both nodes will check if they exist
-        if (!store.graph().nodeExists(ascendant)) {
+        if (!policyStore.graph().nodeExists(ascendant)) {
             throw new NodeDoesNotExistException(ascendant);
-        } else if (!store.graph().nodeExists(descendant)) {
+        } else if (!policyStore.graph().nodeExists(descendant)) {
             throw new NodeDoesNotExistException(descendant);
         }
 
         // ignore if assignment already exists
-        Collection<Long> descendants = store.graph().getAdjacentDescendants(ascendant);
+        Collection<Long> descendants = policyStore.graph().getAdjacentDescendants(ascendant);
         if (new HashSet<>(descendants).contains(descendant)) {
             return false;
         }
 
-        Node ascNode = store.graph().getNodeById(ascendant);
-        Node descNode = store.graph().getNodeById(descendant);
+        Node ascNode = policyStore.graph().getNodeById(ascendant);
+        Node descNode = policyStore.graph().getNodeById(descendant);
 
         // check node types make a valid assignment relation
         Assignment.checkAssignment(ascNode.getType(), descNode.getType());
@@ -312,23 +322,23 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDeassignInput(long ascendant, long descendant) throws PMException {
-        if (!store.graph().nodeExists(ascendant)) {
+        if (!policyStore.graph().nodeExists(ascendant)) {
             throw new NodeDoesNotExistException(ascendant);
-        } else if (!store.graph().nodeExists(descendant)) {
+        } else if (!policyStore.graph().nodeExists(descendant)) {
             throw new NodeDoesNotExistException(descendant);
         } else if (ascendant == AdminPolicyNode.PM_ADMIN_OBJECT.nodeId() &&
                 descendant == AdminPolicyNode.PM_ADMIN_PC.nodeId()) {
             throw new CannotDeleteAdminPolicyConfigException();
         }
 
-        Collection<Long> descs = store.graph().getAdjacentDescendants(ascendant);
+        Collection<Long> descs = policyStore.graph().getAdjacentDescendants(ascendant);
         if (!new HashSet<>(descs).contains(descendant)) {
             return false;
         }
 
         if (descs.size() == 1) {
-            Node aNode = store.graph().getNodeById(ascendant);
-            Node dNode = store.graph().getNodeById(descendant);
+            Node aNode = policyStore.graph().getNodeById(ascendant);
+            Node dNode = policyStore.graph().getNodeById(descendant);
             throw new DisconnectedNodeException(aNode.nameAndId(), dNode.nameAndId());
         }
 
@@ -346,17 +356,17 @@ public class GraphModifier extends Modifier implements GraphModification {
      * association.
      */
     protected void checkAssociateInput(long ua, long target, AccessRightSet accessRights) throws PMException {
-        if (!store.graph().nodeExists(ua)) {
+        if (!policyStore.graph().nodeExists(ua)) {
             throw new NodeDoesNotExistException(ua);
-        } else if (!store.graph().nodeExists(target)) {
+        } else if (!policyStore.graph().nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }
 
-        Node uaNode = store.graph().getNodeById(ua);
-        Node targetNode = store.graph().getNodeById(target);
+        Node uaNode = policyStore.graph().getNodeById(ua);
+        Node targetNode = policyStore.graph().getNodeById(target);
 
         // check the access rights are valid
-        checkAccessRightsValid(store.operations().getResourceOperations(), accessRights);
+        checkAccessRightsValid(policyStore.operations().getResourceOperations(), accessRights);
 
         // check the types of each node make a valid association
         Association.checkAssociation(uaNode.getType(), targetNode.getType());
@@ -372,13 +382,13 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDissociateInput(long ua, long target) throws PMException {
-        if (!store.graph().nodeExists(ua)) {
+        if (!policyStore.graph().nodeExists(ua)) {
             throw new NodeDoesNotExistException(ua);
-        } else if (!store.graph().nodeExists(target)) {
+        } else if (!policyStore.graph().nodeExists(target)) {
             throw new NodeDoesNotExistException(target);
         }
 
-        Collection<Association> associations = store.graph().getAssociationsWithSource(ua);
+        Collection<Association> associations = policyStore.graph().getAssociationsWithSource(ua);
         for (Association a : associations) {
             if (a.getSource() == ua && a.getTarget() == target) {
                 return true;
@@ -418,9 +428,9 @@ public class GraphModifier extends Modifier implements GraphModification {
 
         if (name.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName())) {
             return AdminPolicyNode.PM_ADMIN_OBJECT.nodeId();
-        } else if (store.graph().nodeExists(name)) {
+        } else if (policyStore.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
-        } else if (store.graph().nodeExists(id)) {
+        } else if (policyStore.graph().nodeExists(id)) {
             throw new NodeIdExistsException(id);
         }
 
@@ -431,20 +441,20 @@ public class GraphModifier extends Modifier implements GraphModification {
 
         // check assign inputs
         for (long assignment : descendants) {
-            String assignmentName = store.graph().getNodeById(assignment).getName();
+            String assignmentName = policyStore.graph().getNodeById(assignment).getName();
             if (name.equals(assignmentName)) {
                 throw new AssignmentCausesLoopException(name, assignmentName);
             }
 
-            Node assignNode = store.graph().getNodeById(assignment);
+            Node assignNode = policyStore.graph().getNodeById(assignment);
             Assignment.checkAssignment(type, assignNode.getType());
         }
 
         return runTx(() -> {
-            store.graph().createNode(id, name, type);
+            policyStore.graph().createNode(id, name, type);
 
             for (long desc : descendants) {
-                store.graph().createAssignment(id, desc);
+                policyStore.graph().createAssignment(id, desc);
             }
 
             return id;

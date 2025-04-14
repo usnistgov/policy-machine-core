@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AccessQuerierTest extends PAPTestInitializer {
@@ -150,9 +150,9 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa4"]
                 
                 create prohibition "p1"
-                deny user "u1" 
+                deny user "u1"
                 access rights ["write"]
-                on union of ["oa1"]
+                on union of {"oa1": false}
                 """;
         pap.reset();
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
@@ -187,16 +187,16 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create prohibition "p1"
                 deny user "u1" 
                 access rights ["write"]
-                on union of ["oa1"]
+                on union of {"oa1": false}
                 
                 create prohibition "p2"
                 deny user "u1" 
                 access rights ["write"]
-                on union of [!"oa1"]
+                on union of {"oa1": true}
                 """;
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
 
-        Explain explain = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
+        Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         Explain expected = new Explain(
                 new AccessRightSet("read"),
                 List.of(
@@ -230,7 +230,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                         new Prohibition("p1", new ProhibitionSubject(id("u1")), new AccessRightSet("write"), false, List.of(new ContainerCondition(id("oa1"), false)))
                 )
         );
-        assertExplainEquals(expected, explain);
+        assertExplainEquals(expected, actual);
     }
 
     private void assertExplainEquals(Explain expected, Explain actual) {
@@ -667,7 +667,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create prohibition "p1"
                 deny user "u1"
                 access rights ["write"]
-                on union of ["o1"]
+                on union of {"o1": false}
                 """;
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
         SubgraphPrivileges actual = pap.query().access().computeSubgraphPrivileges(new UserContext(id("u1")), id("oa1"));
@@ -768,7 +768,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create prohibition "p1"
                 deny user "u1" 
                 access rights ["write"]
-                on union of ["oa1"]
+                on union of {"oa1": false}
                 """;
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
         Map<Long, AccessRightSet> u1 = pap.query().access().computeCapabilityList(new UserContext(id("u1")));
@@ -813,7 +813,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create prohibition "p1"
                 deny user "u1" 
                 access rights ["write"]
-                on union of ["oa1"]
+                on union of {"oa1": false}
                 """;
         pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
         AccessRightSet deniedPrivileges = pap.query().access().computeDeniedPrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
@@ -1628,7 +1628,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create prohibition "p1"
                 deny user "u1"
                 access rights ["read"]
-                on union of ["o1"]
+                on union of {"o1": false}
                 """;
         pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 
@@ -1650,7 +1650,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create prohibition "p1"
                 deny user "u1"
                 access rights ["read"]
-                on intersection of ["oa1", "oa2"]
+                on intersection of {"oa1": false, "oa2": false}
                 """;
         pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
 

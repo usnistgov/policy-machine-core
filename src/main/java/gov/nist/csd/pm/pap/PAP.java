@@ -9,12 +9,14 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.tx.Transactional;
 import gov.nist.csd.pm.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.pap.function.arg.NoArgs;
+import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.id.IdGenerator;
-import gov.nist.csd.pm.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.pap.modification.PolicyModification;
+import gov.nist.csd.pm.pap.modification.PolicyModifier;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.PolicyDeserializer;
@@ -29,50 +31,57 @@ import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 
-public abstract class PAP implements AdminFunctionExecutor, Transactional {
+public class PAP implements AdminFunctionExecutor, Transactional {
 
-    protected final PolicyStore policyStore;
+    private final PolicyStore policyStore;
     private final PolicyModifier modifier;
-    private IdGenerator idGenerator;
+    private final PolicyQuerier querier;
+    private final PrivilegeChecker privilegeChecker;
 
-    public PAP(PolicyStore policyStore) throws PMException {
-        this.idGenerator = new RandomIdGenerator();
-
+    public PAP(PolicyStore policyStore, PolicyModifier modifier, PolicyQuerier querier, PrivilegeChecker privilegeChecker) throws PMException {
         this.policyStore = policyStore;
-        this.modifier = new PolicyModifier(policyStore, idGenerator);
+        this.modifier = modifier;
+        this.querier = querier;
+        this.privilegeChecker = privilegeChecker;
 
         // verify admin policy
         this.policyStore.verifyAdminPolicy();
     }
 
-    public PAP(PAP pap) throws PMException {
-        this(pap.policyStore);
-        this.withIdGenerator(pap.idGenerator);
+    public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) {
+        this.querier = querier;
+        this.modifier = modifier;
+        this.policyStore = policyStore;
+        this.privilegeChecker = new PrivilegeChecker(querier.access());
     }
 
-    public PAP withIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-        this.modifier.setIdGenerator(idGenerator);
-        return this;
+    public PAP(PAP pap) throws PMException {
+        this(pap.policyStore, pap.modifier, pap.querier, pap.privilegeChecker);
+    }
+
+    public PolicyQuery query() {
+        return querier;
+    }
+
+    public PolicyModification modify() {
+        return modifier;
     }
 
     public PolicyStore policyStore() {
         return policyStore;
     }
 
-    public IdGenerator idGenerator() {
-        return this.idGenerator;
+    public PrivilegeChecker privilegeChecker() {
+        return privilegeChecker;
     }
 
-    public abstract PolicyQuery query();
-
-    public PolicyModification modify() {
-        return modifier;
+    public PAP withIdGenerator(IdGenerator idGenerator) {
+        this.modifier.graph().setIdGenerator(idGenerator);
+        return this;
     }
 
     public void reset() throws PMException {
         policyStore.reset();
-
         policyStore.verifyAdminPolicy();
     }
 
@@ -111,7 +120,8 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction, Map<String, Object> args) throws PMException {
+    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction,
+                                                      Map<String, Object> args) throws PMException {
         return adminFunction.execute(this, adminFunction.validateAndPrepareArgs(args));
     }
 
@@ -178,6 +188,21 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
             rollback();
             throw e;
         }
+    }
+
+    @Override
+    public void beginTx() throws PMException {
+        policyStore.beginTx();
+    }
+
+    @Override
+    public void commit() throws PMException {
+        policyStore.commit();
+    }
+
+    @Override
+    public void rollback() throws PMException {
+        policyStore.rollback();
     }
 
     public interface TxRunner {

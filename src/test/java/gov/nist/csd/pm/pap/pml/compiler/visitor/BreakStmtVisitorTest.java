@@ -20,15 +20,14 @@ class BreakStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.ForeachStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 foreach x in ["a"] {
                     break
                 }
-                """,
-                PMLParser.ForeachStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
+        PMLStatement<?> stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new ForeachStatement("x", null, buildArrayLiteral("a"), List.of(

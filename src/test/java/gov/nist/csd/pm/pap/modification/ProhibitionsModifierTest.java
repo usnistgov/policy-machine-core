@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
@@ -102,12 +102,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
                     create prohibition "p1"
                     deny user attribute "ua1"
                     access rights ["read"]
-                    on union of ["US project"]
+                    on union of {"US project": false}
                     
                     create prohibition "p2"
                     deny user attribute "ua1"
                     access rights ["read"]
-                    on union of ["US project"]
+                    on union of {"US project": false}
                     """);
             });
 
@@ -116,12 +116,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
                     create prohibition "p3"
                     deny user attribute "ua1"
                     access rights ["read"]
-                    on union of ["US project"]
+                    on union of {"US project": false}
                     
                     create prohibition "p4"
                     deny user attribute "ua1"
                     access rights ["read"]
-                    on union of ["US project"]
+                    on union of {"US project": false}
                     """);
                 throw new PMException("");
             }));
@@ -174,12 +174,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
                     create prohibition "p1"
                     deny user attribute "ua1"
                     access rights ["read"]
-                    on union of ["US project"]
+                    on union of {"US project": false}
                     
                     create prohibition "p2"
                     deny user attribute "ua1"
                     access rights ["read"]
-                    on union of ["US project"]
+                    on union of {"US project": false}
                     """);
             });
 

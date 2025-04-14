@@ -4,9 +4,8 @@ import gov.nist.csd.pm.common.exception.*;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.epp.EPP;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -18,6 +17,7 @@ import gov.nist.csd.pm.pap.query.model.explain.*;
 import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.pdp.adjudication.Decision;
 import gov.nist.csd.pm.pdp.adjudication.OperationRequest;
+import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -26,10 +26,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.pap.PAPTest.testAdminPolicy;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.op.Operation.NAME_ARG;
+import static gov.nist.csd.pm.pap.function.op.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
@@ -72,10 +72,13 @@ class PDPTest {
         PAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
 
-        pdp.bootstrap("u1", (u, p) -> {
-            long pc1 = p.modify().graph().createPolicyClass("pc1");
-            long ua1 = p.modify().graph().createUserAttribute("ua1", List.of(pc1));
-            p.modify().graph().assign(u.getUser(), List.of(ua1));
+        pdp.bootstrap("u1", new PolicyBootstrapper() {
+            @Override
+            public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+                long pc1 = pap.modify().graph().createPolicyClass("pc1");
+                long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+                pap.modify().graph().assign(bootstrapUser.getUser(), List.of(ua1));
+            }
         });
 
         testAdminPolicy(pap);
@@ -87,8 +90,11 @@ class PDPTest {
         PAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
 
-        assertThrows(DisconnectedNodeException.class, () -> pdp.bootstrap("u1", (u, p) -> {
-            long pc1 = p.modify().graph().createPolicyClass("pc1");
+        assertThrows(DisconnectedNodeException.class, () -> pdp.bootstrap("u1", new PolicyBootstrapper() {
+            @Override
+            public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+                long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            }
         }));
     }
 
@@ -98,7 +104,12 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         pap.modify().graph().createPolicyClass("pc1");
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap("u1", (user, policy) -> {});
+            pdp.bootstrap("u1", new PolicyBootstrapper() {
+                @Override
+                public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+
+                }
+            });
         });
 
         pap.reset();
@@ -116,13 +127,23 @@ class PDPTest {
                 Collections.singleton(new ContainerCondition(id("oa1"), false)));
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap("u1", (user, policy) -> {});
+            pdp.bootstrap("u1",new PolicyBootstrapper() {
+                @Override
+                public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+
+                }
+            });
         });
 
         pap.modify().obligations().createObligation(id("u1"), "obl1", List.of());
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap("u1", (u, policy) -> {});
+            pdp.bootstrap("u1", new PolicyBootstrapper() {
+                @Override
+                public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+
+                }
+            });
         });
     }
 
@@ -291,16 +312,16 @@ class PDPTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().routines().createAdminRoutine(new Routine<String, MapArgs>("routine1", List.of(a)) {
+        pap.modify().routines().createAdminRoutine(new Routine<String, Args>("routine1", List.of(a)) {
             @Override
-            public String execute(PAP pap, MapArgs args) throws PMException {
+            public String execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));
                 return "test1";
             }
 
             @Override
-            protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
         });
         pap.executePML(new TestUserContext("u1"), """
@@ -475,8 +496,8 @@ class PDPTest {
         epp.subscribeTo(pdp);
 
         AdjudicationResponse response = pdp.adjudicateAdminRoutine(new TestUserContext("u1"), List.of(
-                new OperationRequest("op1", Map.of(NAME_ARG.getName(), "pc2")),
-                new OperationRequest("op1", Map.of(NAME_ARG.getName(), "pc3"))
+                new OperationRequest("op1", Map.of(NAME_PARAM.getName(), "pc2")),
+                new OperationRequest("op1", Map.of(NAME_PARAM.getName(), "pc3"))
         ));
 
         assertNull(response.getValue());
@@ -509,7 +530,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         AdjudicationResponse response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
             "op1",
-            Map.of(NAME_ARG.getName(), "test"));
+            Map.of(NAME_PARAM.getName(), "test"));
         assertEquals(response.getDecision(), DENY);
         assertNull(response.getExplain());
     }

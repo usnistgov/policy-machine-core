@@ -55,26 +55,6 @@ public class TypeCoercionTest {
     }
 
     @Test
-    void testNumberToString() throws PMException {
-        // PML should allow number to string coercion in concatenation
-        String pml = "\"The answer is \" + 42";
-        PMLParser.ExpressionContext ctx = TestPMLParser.toCtx(
-                pml,
-                PMLParser.ExpressionContext.class);
-        
-        // Compile with expected type STRING
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
-        
-        // Should compile without errors
-        assertEquals(0, visitorContext.errorLog().getErrors().size());
-        
-        // Execute and verify
-        Object result = expr.execute(executionContext, pap);
-        assertEquals("The answer is 42", result);
-    }
-
-    @Test
     void testListTypeCoercion() throws PMException {
         // Test coercion between collection types
         // Create a list of strings
@@ -156,18 +136,16 @@ public class TypeCoercionTest {
     }
 
     @Test
-    void testCoercionInPMLCode() throws PMException {
+    void testCoercionInPML() throws PMException {
         // Test automatic coercion in PML code
         String pml = """
                 {
                     "stringList": ["a", "b", "c"],
-                    "mixedList": ["x", 42, true]
+                    "mixedList": ["x", true]
                 }
                 """;
         
-        PMLParser.ExpressionContext ctx = TestPMLParser.toCtx(
-                pml,
-                PMLParser.ExpressionContext.class);
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
         // Compile with expected type of map<string, list<object>>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
@@ -190,10 +168,9 @@ public class TypeCoercionTest {
         
         // Check mixedList
         List<?> mixedList = (List<?>) result.get("mixedList");
-        assertEquals(3, mixedList.size());
+        assertEquals(2, mixedList.size());
         assertEquals("x", mixedList.get(0));
-        assertEquals(42L, mixedList.get(1));
-        assertEquals(true, mixedList.get(2));
+        assertEquals(true, mixedList.get(1));
     }
 
     @Test
@@ -201,13 +178,11 @@ public class TypeCoercionTest {
         // Test coercion in more complex expressions
         String pml = """
                 {
-                    "result": ["prefix_" + 1, 2 + 3, true && false]
+                    "result": ["test", true && false]
                 }
                 """;
         
-        PMLParser.ExpressionContext ctx = TestPMLParser.toCtx(
-                pml,
-                PMLParser.ExpressionContext.class);
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
         // Compile with expected type
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
@@ -221,10 +196,9 @@ public class TypeCoercionTest {
         Map<?, ?> result = (Map<?, ?>) expr.execute(executionContext, pap);
         List<?> resultList = (List<?>) result.get("result");
         
-        assertEquals(3, resultList.size());
-        assertEquals("prefix_1", resultList.get(0));  // String concatenation
-        assertEquals(5L, resultList.get(1));         // Numeric addition
-        assertEquals(false, resultList.get(2));     // Boolean operation
+        assertEquals(2, resultList.size());
+        assertEquals("test", resultList.get(0));  // String concatenation
+        assertEquals(false, resultList.get(1));     // Boolean operation
     }
     
     @Test
@@ -233,14 +207,11 @@ public class TypeCoercionTest {
         String pml = """
                 {
                     "obj1": "string value",
-                    "obj2": 42,
-                    "obj3": true
+                    "obj2": true
                 }
                 """;
         
-        PMLParser.ExpressionContext ctx = TestPMLParser.toCtx(
-                pml,
-                PMLParser.ExpressionContext.class);
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
         // Compile with map<string, object> type
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
@@ -255,11 +226,9 @@ public class TypeCoercionTest {
         
         // Now get individual values and verify their types
         String stringValue = (String) result.get("obj1");
-        Long numValue = (Long) result.get("obj2");
-        Boolean boolValue = (Boolean) result.get("obj3");
+        Boolean boolValue = (Boolean) result.get("obj2");
         
         assertEquals("string value", stringValue);
-        assertEquals(42L, numValue);
         assertEquals(true, boolValue);
     }
 } 

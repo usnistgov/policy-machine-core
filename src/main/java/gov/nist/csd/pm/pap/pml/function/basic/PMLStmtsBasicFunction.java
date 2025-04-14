@@ -3,13 +3,12 @@ package gov.nist.csd.pm.pap.pml.function.basic;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatementSerializable {
@@ -29,15 +28,10 @@ public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatem
     }
 
     @Override
-    public Object execute(PAP pap, MapArgs args) throws PMException {
+    public Object execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         return ctx.executeRoutineStatements(statements.getStmts(), args);
-    }
-
-    @Override
-    protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return new MapArgs(argsMap);
     }
 
     @Override

@@ -104,17 +104,17 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
-            return new InSubjectPattern(ctx.stringLit().getText());
+            return new InSubjectPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public SubjectPatternExpression visitUsernameSubject(PMLParser.UsernameSubjectContext ctx) {
-            return new UsernamePattern(ctx.stringLit().getText());
+            return new UsernamePattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public SubjectPatternExpression visitProcessSubject(PMLParser.ProcessSubjectContext ctx) {
-            return new ProcessSubjectPattern(ctx.stringLit().getText());
+            return new ProcessSubjectPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 
@@ -131,7 +131,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public OperationPattern visitIDOperation(PMLParser.IDOperationContext ctx) {
-            return new OperationPattern(ctx.stringLit().getText());
+            return new OperationPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 
@@ -172,12 +172,12 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public ArgPatternExpression visitInPolicyElement(PMLParser.InPolicyElementContext ctx) {
-            return new InArgPattern(ctx.stringLit().getText());
+            return new InArgPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public ArgPatternExpression visitPolicyElement(PMLParser.PolicyElementContext ctx) {
-            return new NodeArgPattern(ctx.stringLit().getText());
+            return new NodeArgPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 

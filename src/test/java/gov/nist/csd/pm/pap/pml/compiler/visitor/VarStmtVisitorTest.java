@@ -21,13 +21,13 @@ class VarStmtVisitorTest {
 
         @Test
         void testSuccess() throws UnknownVariableInScopeException {
-            PMLParser.VarDeclarationContext ctx = TestPMLParser.toCtx(
+            PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                     """
                      var x = "a"
-                     """, PMLParser.VarDeclarationContext.class);
+                     """);
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
             new VarStmtVisitor(visitorCtx)
-                    .visitVarDeclaration(ctx);
+                    .visit(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
             assertTrue(visitorCtx.scope().variableExists("x"));
             assertFalse(visitorCtx.scope().getVariable("x").isConst());
@@ -47,10 +47,6 @@ class VarStmtVisitorTest {
 
         @Test
         void testReassignConstant() throws VariableAlreadyDefinedInScopeException {
-            PMLParser.VarDeclarationContext ctx = TestPMLParser.toCtx(
-                    """
-                     var x = "a"
-                     """, PMLParser.VarDeclarationContext.class);
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
@@ -84,13 +80,13 @@ class VarStmtVisitorTest {
     class ShortDeclarationTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException {
-            PMLParser.ShortDeclarationContext ctx = TestPMLParser.toCtx(
+            PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                     """
                      x := "a"
-                     """, PMLParser.ShortDeclarationContext.class);
+                     """);
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
             new VarStmtVisitor(visitorCtx)
-                    .visitShortDeclaration(ctx);
+                    .visit(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
             assertTrue(visitorCtx.scope().variableExists("x"));
             assertFalse(visitorCtx.scope().getVariable("x").isConst());
@@ -113,28 +109,28 @@ class VarStmtVisitorTest {
     class VariableAssignmentTest {
         @Test
         void testSuccess() throws UnknownVariableInScopeException, VariableAlreadyDefinedInScopeException {
-            PMLParser.VariableAssignmentStatementContext ctx = TestPMLParser.toCtx(
+            PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                     """
                      x = "a"
-                     """, PMLParser.VariableAssignmentStatementContext.class);
+                     """);
             VisitorContext visitorCtx = new VisitorContext(new CompileScope());
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             VariableAssignmentStatement stmt =
                     (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
-                            .visitVariableAssignmentStatement(ctx);
+                            .visit(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
             assertTrue(visitorCtx.scope().variableExists("x"));
             assertFalse(visitorCtx.scope().getVariable("x").isConst());
             assertFalse(stmt.isPlus());
 
-            ctx = TestPMLParser.toCtx(
+            ctx = TestPMLParser.parseStatement(
                     """
                      x += "a"
-                     """, PMLParser.VariableAssignmentStatementContext.class);
+                     """);
             visitorCtx = new VisitorContext(new CompileScope());
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             stmt = (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
-                    .visitVariableAssignmentStatement(ctx);
+                    .visit(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
             assertTrue(visitorCtx.scope().variableExists("x"));
             assertFalse(visitorCtx.scope().getVariable("x").isConst());

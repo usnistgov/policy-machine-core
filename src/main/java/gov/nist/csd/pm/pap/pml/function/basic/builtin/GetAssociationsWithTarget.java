@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 
@@ -25,13 +25,13 @@ public class GetAssociationsWithTarget extends PMLBasicFunction {
         super(
             "getAssociationsWithTarget",
             returnType,
-            List.of(NODE_NAME_ARG)
+            List.of(NODE_NAME_PARAM)
         );
     }
 
     @Override
-    public Object execute(PAP pap, MapArgs args) throws PMException {
-        String target = args.get(NODE_NAME_ARG);
+    public Object execute(PAP pap, Args args) throws PMException {
+        String target = args.get(NODE_NAME_PARAM);
 
         long id = pap.query().graph().getNodeId(target);
         Collection<Association> associations = pap.query().graph().getAssociationsWithTarget(id);

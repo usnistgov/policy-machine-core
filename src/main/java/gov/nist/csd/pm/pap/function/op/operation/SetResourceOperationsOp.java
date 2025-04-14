@@ -6,22 +6,21 @@ import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.SET_RESOURCE_OPERATIONS;
-import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ARSET_ARG;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.SET_RESOURCE_OPERATIONS;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ARSET_PARAM;
 
 public class SetResourceOperationsOp extends Operation<Void, SetResourceOperationsOp.SetResourceOperationsOpArgs> {
 
     public SetResourceOperationsOp() {
         super(
                 "set_resource_operations",
-                List.of(ARSET_ARG)
+                List.of(ARSET_PARAM)
         );
     }
 
@@ -29,6 +28,10 @@ public class SetResourceOperationsOp extends Operation<Void, SetResourceOperatio
         private final AccessRightSet accessRightSet;
 
         public SetResourceOperationsOpArgs(AccessRightSet accessRightSet) {
+            super(Map.of(
+                ARSET_PARAM, accessRightSet
+            ));
+
             this.accessRightSet = accessRightSet;
         }
 
@@ -39,13 +42,14 @@ public class SetResourceOperationsOp extends Operation<Void, SetResourceOperatio
 
     @Override
     public SetResourceOperationsOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        AccessRightSet arset = prepareArg(ARSET_ARG, argsMap);
+        AccessRightSet arset = prepareArg(ARSET_PARAM, argsMap);
         return new SetResourceOperationsOpArgs(arset);
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, SetResourceOperationsOpArgs args) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_RESOURCE_OPERATIONS);
+    public void canExecute(PAP pap,
+                           UserContext userCtx, SetResourceOperationsOpArgs args) throws PMException {
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_RESOURCE_OPERATIONS);
     }
 
     @Override

@@ -3,11 +3,9 @@ package gov.nist.csd.pm.pap.serialization;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pap.serialization.pml.PMLSerializer;
@@ -61,7 +59,7 @@ class PMLTest {
 
         pap.modify().operations().createAdminOperation(new Operation<>("testFunc", List.of(ARG_A)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Args args) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
@@ -73,7 +71,7 @@ class PMLTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new MapArgs(argsMap);
+                return new Args(argsMap);
             }
         });
 

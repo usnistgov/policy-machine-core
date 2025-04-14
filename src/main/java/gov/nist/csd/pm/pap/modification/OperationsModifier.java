@@ -1,15 +1,15 @@
-package gov.nist.csd.pm.pap;
+package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.common.exception.OperationExistsException;
-import gov.nist.csd.pm.pap.modification.OperationsModification;
+import gov.nist.csd.pm.pap.admin.AdminOperations;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.store.PolicyStore;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.pap.AdminAccessRights.isWildcardAccessRight;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.isWildcardAccessRight;
 
 public class OperationsModifier extends Modifier implements OperationsModification {
 
@@ -21,28 +21,28 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     public void setResourceOperations(AccessRightSet resourceOperations) throws PMException {
         checkSetResourceAccessRightsInput(resourceOperations);
 
-        store.operations().setResourceOperations(resourceOperations);
+        policyStore.operations().setResourceOperations(resourceOperations);
     }
 
     @Override
     public void createAdminOperation(Operation<?, ?> operation) throws PMException {
         if (AdminOperations.isAdminOperation(operation.getName())
-                || store.operations().getAdminOperationNames().contains(operation.getName())) {
+                || policyStore.operations().getAdminOperationNames().contains(operation.getName())) {
             throw new OperationExistsException(operation.getName());
         }
 
-        store.operations().createAdminOperation(operation);
+        policyStore.operations().createAdminOperation(operation);
     }
 
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
         // return without error if the operation does not exist or is a built in admin op such as assign
         if (AdminOperations.ADMIN_OP_NAMES.contains(operation)
-                || !store.operations().getAdminOperationNames().contains(operation)) {
+                || !policyStore.operations().getAdminOperationNames().contains(operation)) {
             return;
         }
 
-        store.operations().deleteAdminOperation(operation);
+        policyStore.operations().deleteAdminOperation(operation);
     }
 
     /**

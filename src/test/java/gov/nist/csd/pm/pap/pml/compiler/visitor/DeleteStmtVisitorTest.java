@@ -19,13 +19,12 @@ class DeleteStmtVisitorTest {
 
     @Test
     void testDeleteNode() throws PMException {
-        PMLParser.DeleteStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 delete node "oa1"
-                """,
-                PMLParser.DeleteStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
+        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new DeleteNodeStatement(new StringLiteralExpression("oa1")),
@@ -41,19 +40,18 @@ class DeleteStmtVisitorTest {
                 """
                 delete node ["oa1"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
     }
 
     @Test
     void testDeleteObligation() throws PMException {
-        PMLParser.DeleteStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 delete obligation "test"
-                """,
-                PMLParser.DeleteStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
+        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new DeleteObligationStatement(new StringLiteralExpression("test")),
@@ -63,13 +61,12 @@ class DeleteStmtVisitorTest {
 
     @Test
     void testDeleteProhibition() throws PMException {
-        PMLParser.DeleteStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 delete prohibition "test"
-                """,
-                PMLParser.DeleteStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
+        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new DeleteProhibitionStatement(new StringLiteralExpression("test")),

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.operation;
 
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,7 +19,7 @@ class PMLOperationSignatureTest {
                 "op1",
                 listType(STRING_TYPE),
                 List.of(
-                    new FormalParameter<>("a", STRING_TYPE),
+                    new NodeFormalParameter<>("a", STRING_TYPE),
                     new FormalParameter<>("b", STRING_TYPE),
                     new FormalParameter<>("c", STRING_TYPE)
                 )

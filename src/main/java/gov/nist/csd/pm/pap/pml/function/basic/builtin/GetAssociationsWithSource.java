@@ -8,16 +8,13 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 
-import gov.nist.csd.pm.pap.pml.statement.operation.DeleteStatement.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.neo4j.fabric.eval.Catalog.Arg;
 
 public class GetAssociationsWithSource extends PMLBasicFunction {
 
@@ -27,13 +24,13 @@ public class GetAssociationsWithSource extends PMLBasicFunction {
         super(
                 "getAssociationsWithSource",
                 returnType,
-                List.of(NODE_NAME_ARG)
+                List.of(NODE_NAME_PARAM)
         );
     }
 
     @Override
-    public Object execute(PAP pap, MapArgs args) throws PMException {
-        String source = args.get(NODE_NAME_ARG);
+    public Object execute(PAP pap, Args args) throws PMException {
+        String source = args.get(NODE_NAME_PARAM);
 
         long id = pap.query().graph().getNodeId(source);
         Collection<Association> associations = pap.query().graph().getAssociationsWithSource(id);

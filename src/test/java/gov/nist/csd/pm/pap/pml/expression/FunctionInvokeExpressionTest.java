@@ -101,15 +101,7 @@ class FunctionInvokeExpressionTest {
         pap.modify().operations().createAdminOperation(voidFunc);
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         Object value = e.execute(executionContext, new MemoryPAP());
-        assertEquals(
-                new VoidResult(),
-                value
-        );
-
-        assertEquals(
-                new VoidType(),
-                value
-        );
+        assertNull(value);
     }
 
     @Test
@@ -144,7 +136,7 @@ class FunctionInvokeExpressionTest {
                 """
                 voidFunc("a", ["b", "c"])
                 """, visitorCtx, 1,
-                "Cannot cast from []string to string"
+                "expected expression type string, got []string"
         );
     }
 
@@ -183,7 +175,7 @@ class FunctionInvokeExpressionTest {
                 );
         Object value = e.execute(executionContext, pap);
         assertEquals(
-                new ReturnResult("test_ret"),
+                "test_ret",
                 value
         );
     }

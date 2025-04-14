@@ -12,7 +12,7 @@ public class CompilerTestUtil {
 
     public static void testCompilationError(String input, VisitorContext visitorContext,
                                                 int numExpectedErrors, String ... expectedError) {
-        ParserRuleContext ctx = TestPMLParser.toCtx(input, ParserRuleContext.class);
+        ParserRuleContext ctx = TestPMLParser.parseStatement(input);
         StatementVisitor statementVisitor = new StatementVisitor(visitorContext);
 
         PMLCompilationRuntimeException e = assertThrows(

@@ -34,26 +34,24 @@ class ForeachStmtVisitorTest {
 
     @Test
     void testSuccess() {
-        PMLParser.ForeachStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 foreach x in ["a", "b"] {}
-                """,
-                PMLParser.ForeachStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(testScope);
-        PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
+        PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new ForeachStatement("x", null, buildArrayLiteral("a", "b"), List.of()),
                 stmt
         );
 
-        ctx = TestPMLParser.toCtx(
+        ctx = TestPMLParser.parseStatement(
                 """
                 foreach x, y in {"a": "b"} {}
-                """,
-                PMLParser.ForeachStatementContext.class);
+                """);
         visitorCtx = new VisitorContext(testScope);
-        stmt = new ForeachStmtVisitor(visitorCtx).visitForeachStatement(ctx);
+        stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new ForeachStatement("x", "y", buildMapLiteral("a", "b"), List.of()),
@@ -69,7 +67,7 @@ class ForeachStmtVisitorTest {
                 """
                 foreach x in "a" {}
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]any], got string"
+                "expected expression type []any, got string"
 
         );
 
@@ -77,7 +75,7 @@ class ForeachStmtVisitorTest {
                 """
                 foreach x in {"a": "b"} {}
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]any], got map[string]string"
+                "expected expression type []any, got map[string]string"
 
         );
     }
@@ -90,7 +88,7 @@ class ForeachStmtVisitorTest {
                 """
                 foreach x, y in ["a"] {}
                 """, visitorCtx, 1,
-                "expected expression type(s) [map[any]any], got []string"
+                "expected expression type map[any]any, got []string"
 
         );
     }
@@ -141,7 +139,7 @@ class ForeachStmtVisitorTest {
                 """
                 foreach x in {"a": "b"} {}
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]any], got map[string]string"
+                "expected expression type []any, got map[string]string"
 
         );
     }
@@ -152,9 +150,9 @@ class ForeachStmtVisitorTest {
 
         testCompilationError(
                 """
-                foreach x, y in ["a": "b"] {}
+                foreach x, y in ["a", "b"] {}
                 """, visitorCtx, 1,
-                "expected expression type(s) [map[any]any], got []string"
+                "expected expression type map[any]any, got []string"
 
         );
     }

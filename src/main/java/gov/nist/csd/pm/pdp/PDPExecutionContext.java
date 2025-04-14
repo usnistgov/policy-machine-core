@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.pdp;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.arg.Args;
@@ -60,27 +59,25 @@ class PDPExecutionContext extends ExecutionContext {
     }
 
     @Override
-    public StatementResult executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+    public Object executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         ExecutionContext copy = writeArgsToScope(args);
 
         // for operations, we don't want to use the PDPEC, just the normal one
         // to avoid having access checks inside for loops when they call
         // ctx.executeStatements()
         ExecutionContext ctx = new ExecutionContext(copy.author(), pdpTx.pap, copy.scope());
-        ctx.setExplain(pdpTx.getPrivilegeChecker().isExplain());
 
-        for (PMLStatement statement : stmts) {
-            Object value = statement.execute(ctx, pdpTx.pap);
-            if (value instanceof ReturnResult || value instanceof BreakResult || value instanceof ContinueResult) {
-                return (StatementResult) value;
-            }
-        }
-
-        return new VoidResult();
+        return ctx.executeOperationStatements(stmts, args);
     }
 
     @Override
-    public StatementResult executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
-        return executeStatements(stmts, args);
+    public Object executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+        StatementResult result = executeStatements(stmts, args);
+
+        if (result instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 }

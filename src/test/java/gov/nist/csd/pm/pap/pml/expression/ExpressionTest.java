@@ -4,6 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser.ExpressionContext;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -66,7 +67,7 @@ class ExpressionTest {
         );
         assertEquals(1, e.getErrors().size());
         assertEquals(
-                "expected expression type(s) [[]string], got string",
+                "expected expression type []string, got string",
                 e.getErrors().get(0).errorMessage()
         );
     }
@@ -125,5 +126,4 @@ class ExpressionTest {
         );
         assertEquals(1, e.getErrors().size());
     }
-
 }

@@ -40,7 +40,7 @@ public class OperationPattern extends Pattern {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return isAny ? "any operation" : value;
+        return isAny ? "any operation" : String.format("\"%s\"", value);
     }
 
     @Override

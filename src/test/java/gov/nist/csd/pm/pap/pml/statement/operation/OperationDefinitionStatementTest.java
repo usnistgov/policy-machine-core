@@ -32,7 +32,7 @@ class OperationDefinitionStatementTest {
                 
                 operation op1(string a, []string b) {
                     check "assign" on [a]
-                    check "assign" on [b]
+                    check "assign" on b
                     check "assign" on ["oa1"]
                 } {
                     create policy class "test"

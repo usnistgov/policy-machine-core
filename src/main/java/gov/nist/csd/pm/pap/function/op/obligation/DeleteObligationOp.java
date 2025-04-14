@@ -8,21 +8,21 @@ import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_OBLIGATION;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.DELETE_OBLIGATION;
 
 public class DeleteObligationOp extends ObligationOp<ObligationOpArgs> {
 
     public DeleteObligationOp() {
         super(
             "delete_obligation",
-            List.of(NAME_ARG),
+            List.of(NAME_PARAM),
             DELETE_OBLIGATION
         );
     }
 
     @Override
-    public ObligationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_ARG, argsMap);
+    protected ObligationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        String name = prepareArg(NAME_PARAM, argsMap);
         return new ObligationOpArgs(name);
     }
 

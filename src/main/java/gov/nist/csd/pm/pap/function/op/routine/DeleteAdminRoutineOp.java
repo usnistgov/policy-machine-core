@@ -5,24 +5,21 @@ import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.DELETE_ADMIN_ROUTINE;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.DELETE_ADMIN_ROUTINE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 public class DeleteAdminRoutineOp extends Operation<Void, DeleteAdminRoutineOp.DeleteAdminRoutineOpArgs> {
-
-    public static final FormalParameter<String> NAME_ARG = new FormalParameter<>("name", STRING_TYPE);
-
+    
     public DeleteAdminRoutineOp() {
         super(
                 "delete_admin_routine",
-                List.of(NAME_ARG)
+                List.of(NAME_PARAM)
         );
     }
 
@@ -39,8 +36,8 @@ public class DeleteAdminRoutineOp extends Operation<Void, DeleteAdminRoutineOp.D
     }
 
     @Override
-    public DeleteAdminRoutineOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_ARG, argsMap);
+    protected DeleteAdminRoutineOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        String name = prepareArg(NAME_PARAM, argsMap);
         return new DeleteAdminRoutineOpArgs(name);
     }
 
@@ -51,7 +48,8 @@ public class DeleteAdminRoutineOp extends Operation<Void, DeleteAdminRoutineOp.D
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, DeleteAdminRoutineOpArgs args) throws PMException {
-        privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_ROUTINE);
+    public void canExecute(PAP pap,
+                           UserContext userCtx, DeleteAdminRoutineOpArgs args) throws PMException {
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_ROUTINE);
     }
 }

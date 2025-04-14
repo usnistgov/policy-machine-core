@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -10,15 +9,15 @@ import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.DEASSIGN;
-import static gov.nist.csd.pm.pap.AdminAccessRights.DEASSIGN_FROM;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.DEASSIGN;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.DEASSIGN_FROM;
 
 public class DeassignOp extends GraphOp<Void, DeassignOp.DeassignOpArgs> {
 
     public DeassignOp() {
         super(
                 "deassign",
-                List.of(ASCENDANT_ARG, DESCENDANTS_ARG)
+                List.of(ASCENDANT_PARAM, DESCENDANTS_PARAM)
         );
     }
 
@@ -27,6 +26,11 @@ public class DeassignOp extends GraphOp<Void, DeassignOp.DeassignOpArgs> {
         private final List<Long> descendantIds;
 
         public DeassignOpArgs(long ascendantId, List<Long> descendantIds) {
+            super(Map.of(
+                ASCENDANT_PARAM, ascendantId,
+                DESCENDANTS_PARAM, descendantIds
+            ));
+
             this.ascendantId = ascendantId;
             this.descendantIds = descendantIds;
         }
@@ -42,15 +46,15 @@ public class DeassignOp extends GraphOp<Void, DeassignOp.DeassignOpArgs> {
 
     @Override
     protected DeassignOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long ascId = prepareArg(ASCENDANT_ARG, argsMap);
-        List<Long> descIds = prepareArg(DESCENDANTS_ARG, argsMap);
+        Long ascId = prepareArg(ASCENDANT_PARAM, argsMap);
+        List<Long> descIds = prepareArg(DESCENDANTS_PARAM, argsMap);
         return new DeassignOpArgs(ascId, descIds);
     }
 
     @Override
-    public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, DeassignOpArgs args) throws PMException {
-        privilegeChecker.check(userCtx, args.getAscendantId(), DEASSIGN);
-        privilegeChecker.check(userCtx, args.getDescendantIds(), DEASSIGN_FROM);
+    public void canExecute(PAP pap, UserContext userCtx, DeassignOpArgs args) throws PMException {
+        pap.privilegeChecker().check(userCtx, args.getAscendantId(), DEASSIGN);
+        pap.privilegeChecker().check(userCtx, args.getDescendantIds(), DEASSIGN_FROM);
     }
 
     @Override

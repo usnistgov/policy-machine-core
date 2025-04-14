@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function.routine;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -10,7 +10,7 @@ import gov.nist.csd.pm.pap.pml.function.PMLFunction;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLRoutine extends Routine<Object, MapArgs> implements PMLFunction {
+public abstract class PMLRoutine extends Routine<Object, Args> implements PMLFunction {
 
     private final ArgType<?> returnType;
     private final List<FormalParameter<?>> pmlFormalParameters;

@@ -19,13 +19,12 @@ class CreateObligationStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.CreateObligationStatementContext ctx = TestPMLParser.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 create obligation "test" {}
-                """,
-                PMLParser.CreateObligationStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new CreateObligationStmtVisitor(visitorCtx).visitCreateObligationStatement(ctx);
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new CreateObligationStatement(new StringLiteralExpression("test"), List.of()),
@@ -41,7 +40,7 @@ class CreateObligationStmtVisitorTest {
                 """
                 create obligation ["test"] {}
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
                 );
     }
 

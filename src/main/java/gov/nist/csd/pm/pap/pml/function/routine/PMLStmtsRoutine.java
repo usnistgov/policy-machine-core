@@ -2,14 +2,12 @@ package gov.nist.csd.pm.pap.pml.function.routine;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.MapArgs;
+import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
 
 import java.util.List;
 import java.util.Map;
@@ -32,12 +30,12 @@ public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializa
     }
 
     @Override
-    protected MapArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return null;
+    protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+        return new Args(argsMap);
     }
 
     @Override
-    public StatementResult execute(PAP pap, MapArgs args) throws PMException {
+    public Object execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         return ctx.executeRoutineStatements(statements.getStmts(), args);
