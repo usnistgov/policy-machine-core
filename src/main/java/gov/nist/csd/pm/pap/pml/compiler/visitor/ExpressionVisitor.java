@@ -63,8 +63,6 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
                                             ExpressionContext ctx,
                                             Type<T> expectedType) {
-        if ()
-
         ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
         Expression<?> compiledExpression = visitor.visit(ctx);
         Type<?> resultType = compiledExpression.getType();
