@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function.operation;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public class PMLOperationSignature extends PMLFunctionSignature {
 
     public PMLOperationSignature(String name,
-                                 ArgType<?> returnType,
+                                 Type<?> returnType,
                                  List<FormalParameter<?>> formalParameters) {
         super(name, returnType, formalParameters);
     }

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 
@@ -16,9 +16,9 @@ public abstract class Expression<T> extends PMLStatement<T> {
      *
      * @return The ArgType representing the expression's result type.
      */
-    public abstract ArgType<T> getType();
+    public abstract Type<T> getType();
 
-    public <S> Expression<S> asType(ArgType<S> targetType) throws UnexpectedExpressionTypeException {
+    public <S> Expression<S> asType(Type<S> targetType) throws UnexpectedExpressionTypeException {
         if (!getType().isCastableTo(targetType)) {
             throw new UnexpectedExpressionTypeException(getType(), targetType);
         }

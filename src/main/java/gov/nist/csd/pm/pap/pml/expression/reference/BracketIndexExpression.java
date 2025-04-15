@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.expression.reference;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
@@ -12,16 +12,16 @@ import java.util.Map;
 public class BracketIndexExpression<T> extends Expression<T> {
     private final Expression<?> baseExpr;
     private final Expression<?> indexExpr;
-    private final ArgType<T> valueType;
+    private final Type<T> valueType;
 
-    public BracketIndexExpression(Expression<?> baseExpr, Expression<?> indexExpr, ArgType<T> valueType) {
+    public BracketIndexExpression(Expression<?> baseExpr, Expression<?> indexExpr, Type<T> valueType) {
         this.baseExpr = baseExpr;
         this.indexExpr = indexExpr;
         this.valueType = valueType;
     }
 
     @Override
-    public ArgType<T> getType() {
+    public Type<T> getType() {
         return valueType;
     }
 

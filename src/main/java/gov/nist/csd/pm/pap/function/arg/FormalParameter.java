@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.pap.function.arg;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import java.io.Serializable;
 import java.util.Objects;
 
 public class FormalParameter<T> implements Serializable {
 
 	private final String name;
-	private final ArgType<T> type;
+	private final Type<T> type;
 
-	public FormalParameter(String name, ArgType<T> type) {
+	public FormalParameter(String name, Type<T> type) {
 		this.name = name;
 		this.type = type;
 	}
@@ -18,7 +18,7 @@ public class FormalParameter<T> implements Serializable {
 		return name;
 	}
 
-	public ArgType<T> getType() {
+	public Type<T> getType() {
 		return type;
 	}
 

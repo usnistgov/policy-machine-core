@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor.function;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
@@ -40,7 +38,7 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
 
             // get arg type
             PMLParser.VariableTypeContext varTypeContext = formalArgCtx.variableType();
-            ArgType<?> type = ArgTypeResolver.resolveFromParserCtx(varTypeContext);
+            Type<?> type = ArgTypeResolver.resolveFromParserCtx(varTypeContext);
 
             if (isNodeop) {
                 formalArgs.add(new NodeFormalParameter<>(name, type));

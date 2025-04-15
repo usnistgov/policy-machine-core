@@ -17,14 +17,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the ArgType system, focusing on compatibility with ANY_TYPE
  * and ensuring all types work correctly with ANY_TYPE as the expected type.
  */
-public class ArgTypeCompatibilityTest {
+public class TypeCompatibilityTest {
 
     private PAP pap;
     private ExecutionContext executionContext;
@@ -282,7 +282,7 @@ public class ArgTypeCompatibilityTest {
         // Create a map with a null value (represented as an ObjectLiteralExpression that returns null)
         Expression<?> nullExpr = new Expression<Object>() {
             @Override
-            public ArgType<Object> getType() {
+            public Type<Object> getType() {
                 return ANY_TYPE;
             }
 

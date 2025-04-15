@@ -4,20 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class MapType<K, V> extends ArgType<Map<K, V>> {
-    private final ArgType<K> keyType;
-    private final ArgType<V> valueType;
+public final class MapType<K, V> extends Type<Map<K, V>> {
+    private final Type<K> keyType;
+    private final Type<V> valueType;
 
-    public MapType(ArgType<K> keyType, ArgType<V> valueType) {
+    public MapType(Type<K> keyType, Type<V> valueType) {
         this.keyType = keyType;
         this.valueType = valueType;
     }
 
-    public ArgType<K> getKeyType() {
+    public Type<K> getKeyType() {
         return keyType;
     }
 
-    public ArgType<V> getValueType() {
+    public Type<V> getValueType() {
         return valueType;
     }
 

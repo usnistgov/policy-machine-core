@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminAccessRights.DELETE_ADMIN_ROUTINE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 public class DeleteAdminRoutineOp extends Operation<Void, DeleteAdminRoutineOp.DeleteAdminRoutineOpArgs> {
     

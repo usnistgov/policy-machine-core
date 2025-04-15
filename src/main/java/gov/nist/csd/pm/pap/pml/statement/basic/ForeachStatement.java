@@ -1,12 +1,10 @@
 package gov.nist.csd.pm.pap.pml.statement.basic;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -42,7 +40,7 @@ public class ForeachStatement extends BasicStatement<StatementResult> {
             return new VoidResult();
         }
 
-        ArgType<?> iterType = iter.getType();
+        Type<?> iterType = iter.getType();
         Object iterValue = iter.execute(ctx, pap);
         if (iterValue instanceof List<?> list && iterType instanceof ListType<?> listType) {
             return executeArrayIterator(ctx, list, listType);
@@ -75,7 +73,7 @@ public class ForeachStatement extends BasicStatement<StatementResult> {
 
             // add the key value
             Args args = new Args();
-            args.put(new FormalParameter<>(varName, ArgType.resolveTypeOfObject(key)), key);
+            args.put(new FormalParameter<>(varName, Type.resolveTypeOfObject(key)), key);
 
             // add the value value
             if (valueVarName != null) {

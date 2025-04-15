@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
@@ -14,7 +14,7 @@ import java.util.Objects;
 public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatementSerializable {
     private PMLStatementBlock statements;
 
-    public PMLStmtsBasicFunction(String name, ArgType<?> returnType, List<FormalParameter<?>> formalArgs, PMLStatementBlock statements) {
+    public PMLStmtsBasicFunction(String name, Type<?> returnType, List<FormalParameter<?>> formalArgs, PMLStatementBlock statements) {
         super(name, returnType, formalArgs);
         this.statements = statements;
     }

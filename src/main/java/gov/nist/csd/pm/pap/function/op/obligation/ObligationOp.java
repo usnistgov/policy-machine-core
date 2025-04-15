@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.function.op.obligation;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;

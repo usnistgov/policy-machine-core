@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;

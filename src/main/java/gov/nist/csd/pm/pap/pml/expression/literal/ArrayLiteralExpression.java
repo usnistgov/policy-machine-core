@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
@@ -15,14 +15,14 @@ import java.util.Objects;
 
 public class ArrayLiteralExpression<E> extends Expression<List<E>> {
 
-    public static <E> ArrayLiteralExpression<E> of(List<Expression<E>> expressions, ArgType<E> elementType) {
+    public static <E> ArrayLiteralExpression<E> of(List<Expression<E>> expressions, Type<E> elementType) {
         return new ArrayLiteralExpression<>(new ArrayList<>(expressions), elementType);
     }
 
     private final List<Expression<?>> compiledExpressions;
     private final ListType<E> type;
 
-    public ArrayLiteralExpression(List<Expression<?>> compiledExpressions, ArgType<E> elementType) {
+    public ArrayLiteralExpression(List<Expression<?>> compiledExpressions, Type<E> elementType) {
         this.compiledExpressions = new ArrayList<>(compiledExpressions);
         this.type = listType(Objects.requireNonNull(elementType));
     }

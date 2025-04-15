@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;

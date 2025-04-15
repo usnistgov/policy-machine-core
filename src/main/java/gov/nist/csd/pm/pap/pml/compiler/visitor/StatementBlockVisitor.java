@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
@@ -21,9 +21,9 @@ import java.util.List;
 
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
-    private final ArgType<?> returnType;
+    private final Type<?> returnType;
 
-    public StatementBlockVisitor(VisitorContext visitorCtx, ArgType<?> returnType) {
+    public StatementBlockVisitor(VisitorContext visitorCtx, Type<?> returnType) {
         super(visitorCtx);
         this.returnType = returnType;
     }
@@ -77,7 +77,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         }
     }
 
-    public static boolean checkAllPathsReturned(VisitorContext visitorCtx, List<PMLStatement<?>> statements, ArgType<?> returnType)
+    public static boolean checkAllPathsReturned(VisitorContext visitorCtx, List<PMLStatement<?>> statements, Type<?> returnType)
             throws PMException {
         if (statements.isEmpty()) {
             return false;
@@ -120,7 +120,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         return allPathsReturned;
     }
 
-    private static boolean allIfStatementPathsReturned(VisitorContext visitorCtx, IfStatement ifStatement, ArgType<?> returnType)
+    private static boolean allIfStatementPathsReturned(VisitorContext visitorCtx, IfStatement ifStatement, Type<?> returnType)
             throws PMException {
         boolean check = checkAllPathsReturned(visitorCtx, ifStatement.getIfBlock().block().getStmts(), returnType);
         if (!check) {

@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.pap.function.op.graph;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
@@ -31,8 +31,8 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
         boolean isMapFor = ctx.value != null;
 
         Expression<?> iter;
-        ArgType<?> keyType;
-        ArgType<?> valueType = null;
+        Type<?> keyType;
+        Type<?> valueType = null;
 
         if (isMapFor) {
             iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), mapType(ANY_TYPE, ANY_TYPE));

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.function.arg.type;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 
-public final class AccessRightSetType extends ArgType<AccessRightSet> {
+public final class AccessRightSetType extends Type<AccessRightSet> {
 
     @Override
     public AccessRightSet cast(Object obj) {

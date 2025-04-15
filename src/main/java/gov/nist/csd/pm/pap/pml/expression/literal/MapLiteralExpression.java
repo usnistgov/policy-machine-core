@@ -2,13 +2,13 @@ package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
 
-    public static <K, V> MapLiteralExpression<K, V> of(Map<Expression<K>, Expression<V>> map, ArgType<K> keyType, ArgType<V> valueType) {
+    public static <K, V> MapLiteralExpression<K, V> of(Map<Expression<K>, Expression<V>> map, Type<K> keyType, Type<V> valueType) {
         return new MapLiteralExpression<>(new HashMap<>(map), keyType, valueType);
     }
     
@@ -25,10 +25,10 @@ public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
     }
 
     private final Map<Expression<?>, Expression<?>> compiledExpressions;
-    private final ArgType<K> keyType;
-    private final ArgType<V> valueType;
+    private final Type<K> keyType;
+    private final Type<V> valueType;
 
-    public MapLiteralExpression(Map<Expression<?>, Expression<?>> compiledExpressions, ArgType<K> keyType, ArgType<V> valueType) {
+    public MapLiteralExpression(Map<Expression<?>, Expression<?>> compiledExpressions, Type<K> keyType, Type<V> valueType) {
         this.compiledExpressions = Objects.requireNonNull(compiledExpressions);
         this.keyType = Objects.requireNonNull(keyType);
         this.valueType = Objects.requireNonNull(valueType);
@@ -36,7 +36,7 @@ public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
 
     @Override
     public MapType<K, V> getType() {
-        return ArgType.mapType(keyType, valueType);
+        return Type.mapType(keyType, valueType);
     }
 
     @Override

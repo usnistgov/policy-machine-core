@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.epp;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventSubscriber;

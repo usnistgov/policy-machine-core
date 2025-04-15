@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.routine;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunction;
@@ -12,13 +12,13 @@ import java.util.List;
 
 public abstract class PMLRoutine extends Routine<Object, Args> implements PMLFunction {
 
-    private final ArgType<?> returnType;
+    private final Type<?> returnType;
     private final List<FormalParameter<?>> pmlFormalParameters;
     private final PMLRoutineSignature signature;
 
     protected ExecutionContext ctx;
 
-    public PMLRoutine(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLRoutine(String name, Type<?> returnType, List<FormalParameter<?>> formalParameters) {
         super(name, new ArrayList<>(formalParameters));
         this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;
@@ -33,7 +33,7 @@ public abstract class PMLRoutine extends Routine<Object, Args> implements PMLFun
         return signature;
     }
 
-    public ArgType<?> getReturnType() {
+    public Type<?> getReturnType() {
         return returnType;
     }
 

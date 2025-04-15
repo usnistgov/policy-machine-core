@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
-public final class BooleanType extends ArgType<Boolean> {
+public final class BooleanType extends Type<Boolean> {
 
     @Override
     public Boolean cast(Object obj) {

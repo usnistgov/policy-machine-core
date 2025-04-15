@@ -38,7 +38,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;

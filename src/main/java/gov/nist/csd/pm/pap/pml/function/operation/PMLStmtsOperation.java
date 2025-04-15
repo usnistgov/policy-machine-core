@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
@@ -18,7 +18,7 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     private final CheckAndStatementsBlock body;
 
     public PMLStmtsOperation(String name,
-                             ArgType<?> returnType,
+                             Type<?> returnType,
                              List<FormalParameter<?>> formalParameters,
                              CheckAndStatementsBlock body) {
         super(name, returnType, formalParameters);

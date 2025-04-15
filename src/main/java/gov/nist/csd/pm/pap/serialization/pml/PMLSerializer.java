@@ -18,7 +18,7 @@ import gov.nist.csd.pm.pap.serialization.json.*;
 import java.util.*;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 
 public class PMLSerializer implements PolicySerializer {
 

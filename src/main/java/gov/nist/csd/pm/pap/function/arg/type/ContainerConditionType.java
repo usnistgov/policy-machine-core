@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.function.arg.type;
 
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 
-public final class ContainerConditionType extends ArgType<ContainerCondition> {
+public final class ContainerConditionType extends Type<ContainerCondition> {
 
     @Override
     public ContainerCondition cast(Object obj) {

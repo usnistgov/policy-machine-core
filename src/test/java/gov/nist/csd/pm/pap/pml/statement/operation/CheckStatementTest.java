@@ -16,9 +16,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import org.neo4j.codegen.api.ArrayLiteral;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 

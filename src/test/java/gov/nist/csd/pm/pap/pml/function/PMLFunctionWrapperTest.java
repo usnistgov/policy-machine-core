@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.function;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 import gov.nist.csd.pm.common.exception.PMException;

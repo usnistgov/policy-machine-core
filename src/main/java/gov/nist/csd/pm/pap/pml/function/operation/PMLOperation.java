@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.operation;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.Args;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunction;
@@ -12,12 +12,12 @@ import java.util.List;
 
 public abstract class PMLOperation extends Operation<Object, Args> implements PMLFunction {
 
-    private final ArgType<?> returnType;
+    private final Type<?> returnType;
     private final List<FormalParameter<?>> pmlFormalParameters;
     private final PMLOperationSignature signature;
     private ExecutionContext ctx;
 
-    public PMLOperation(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLOperation(String name, Type<?> returnType, List<FormalParameter<?>> formalParameters) {
         super(name, new ArrayList<>(formalParameters));
 
         this.returnType = returnType;
@@ -25,7 +25,7 @@ public abstract class PMLOperation extends Operation<Object, Args> implements PM
         this.signature = new PMLOperationSignature(name, returnType, formalParameters);
     }
 
-    public PMLOperation(String name, ArgType<?> returnType) {
+    public PMLOperation(String name, Type<?> returnType) {
         super(name, new ArrayList<>());
 
         this.returnType = returnType;
@@ -41,7 +41,7 @@ public abstract class PMLOperation extends Operation<Object, Args> implements PM
         return signature;
     }
 
-    public ArgType<?> getReturnType() {
+    public Type<?> getReturnType() {
         return returnType;
     }
 

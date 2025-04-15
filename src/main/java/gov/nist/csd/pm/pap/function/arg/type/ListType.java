@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public final class ListType<E> extends ArgType<List<E>> {
+public final class ListType<E> extends Type<List<E>> {
 
-    private final ArgType<E> elementType;
+    private final Type<E> elementType;
 
-    public ListType(ArgType<E> elementType) {
+    public ListType(Type<E> elementType) {
         this.elementType = elementType;
     }
 
-    public ArgType<E> getElementType() {
+    public Type<E> getElementType() {
         return elementType;
     }
 

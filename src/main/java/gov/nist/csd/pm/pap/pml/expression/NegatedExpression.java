@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
 import java.util.Objects;
@@ -22,7 +22,7 @@ public class NegatedExpression extends Expression<Boolean> {
     }
 
     @Override
-    public ArgType<Boolean> getType() {
+    public Type<Boolean> getType() {
         return BOOLEAN_TYPE;
     }
 

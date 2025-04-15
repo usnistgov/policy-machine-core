@@ -1,25 +1,24 @@
 package gov.nist.csd.pm.pap.pml.expression.reference;
 
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
 
 import java.util.Objects;
 
 public class VariableReferenceExpression<T> extends Expression<T> {
     private final String varName;
-    private final ArgType<T> type;
+    private final Type<T> type;
 
-    public VariableReferenceExpression(String varName, ArgType<T> type) {
+    public VariableReferenceExpression(String varName, Type<T> type) {
         this.varName = varName;
         this.type = type;
     }
 
     @Override
-    public ArgType<T> getType() {
+    public Type<T> getType() {
         return type;
     }
 

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

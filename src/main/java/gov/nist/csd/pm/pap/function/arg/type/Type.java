@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public sealed abstract class ArgType<T> implements Serializable
+public sealed abstract class Type<T> implements Serializable
     permits StringType, LongType, BooleanType, ListType, MapType, AnyType, AccessRightSetType, OperationType,
     RoutineType, RuleType, ProhibitionSubjectType, ContainerConditionType, NodeTypeType, VoidType {
 
@@ -22,15 +22,15 @@ public sealed abstract class ArgType<T> implements Serializable
     public static NodeTypeType NODE_TYPE_TYPE = new NodeTypeType();
     public static VoidType VOID_TYPE = new VoidType();
 
-    public static <E> ListType<E> listType(ArgType<E> elementType) {
+    public static <E> ListType<E> listType(Type<E> elementType) {
         return new ListType<>(elementType);
     }
 
-    public static <K, V> MapType<K, V> mapType(ArgType<K> keyType, ArgType<V> valueType) {
+    public static <K, V> MapType<K, V> mapType(Type<K> keyType, Type<V> valueType) {
         return new MapType<>(keyType, valueType);
     }
 
-    public static ArgType<?> resolveTypeOfObject(Object o) {
+    public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {
             case String s -> STRING_TYPE;
             case Boolean b -> BOOLEAN_TYPE;
@@ -41,7 +41,7 @@ public sealed abstract class ArgType<T> implements Serializable
         };
     }
 
-    private static ArgType<?> resolveListType(List<?> list) {
+    private static Type<?> resolveListType(List<?> list) {
         if (list == null || list.isEmpty()) {
             return ANY_TYPE;
         }
@@ -51,7 +51,7 @@ public sealed abstract class ArgType<T> implements Serializable
             return ANY_TYPE;
         }
 
-        ArgType<?> firsType = resolveTypeOfObject(firstElement);
+        Type<?> firsType = resolveTypeOfObject(firstElement);
         for (int i = 1; i < list.size(); i++) {
             Object element = list.get(i);
 
@@ -59,7 +59,7 @@ public sealed abstract class ArgType<T> implements Serializable
                 return ANY_TYPE;
             }
 
-            ArgType<?> elementType = resolveTypeOfObject(element);
+            Type<?> elementType = resolveTypeOfObject(element);
             if (!elementType.getClass().equals(firsType.getClass())) {
                 return ANY_TYPE;
             }
@@ -73,13 +73,13 @@ public sealed abstract class ArgType<T> implements Serializable
             return new MapType<>(ANY_TYPE, ANY_TYPE);
         }
 
-        ArgType<?> keyType = getMapElementType(map.keySet());
-        ArgType<?> valueType = getMapElementType(map.values());
+        Type<?> keyType = getMapElementType(map.keySet());
+        Type<?> valueType = getMapElementType(map.values());
 
         return new MapType<>(keyType, valueType);
     }
 
-    private static ArgType<?> getMapElementType(Collection<?> values) {
+    private static Type<?> getMapElementType(Collection<?> values) {
         if (values.isEmpty()) {
             return ANY_TYPE;
         }
@@ -89,13 +89,13 @@ public sealed abstract class ArgType<T> implements Serializable
             return ANY_TYPE;
         }
 
-        ArgType<?> firstType = resolveTypeOfObject(firstValue);
+        Type<?> firstType = resolveTypeOfObject(firstValue);
         for (Object value : values) {
             if (value == null) {
                 return ANY_TYPE;
             }
 
-            ArgType<?> valueType = resolveTypeOfObject(value);
+            Type<?> valueType = resolveTypeOfObject(value);
             if (!valueType.equals(firstType)) {
                 return ANY_TYPE;
             }
@@ -115,10 +115,10 @@ public sealed abstract class ArgType<T> implements Serializable
 
     public abstract Class<T> getExpectedClass();
 
-    public boolean isCastableTo(ArgType<?> targetType) {
+    public boolean isCastableTo(Type<?> targetType) {
         if (this.equals(ANY_TYPE)) {
             return true;
-        } else if (targetType.equals(ArgType.ANY_TYPE) || this.equals(targetType)) {
+        } else if (targetType.equals(Type.ANY_TYPE) || this.equals(targetType)) {
             return true;
         } else if ((this instanceof ListType<?> sourceList) && (targetType instanceof ListType<?> targetList)) {
             return sourceList.getElementType().isCastableTo(targetList.getElementType());
@@ -144,12 +144,12 @@ public sealed abstract class ArgType<T> implements Serializable
     }
 
     
-    public <S> ArgType<S> asType(ArgType<S> targetType) {
+    public <S> Type<S> asType(Type<S> targetType) {
         if (!this.isCastableTo(targetType)) {
             throw new IllegalArgumentException("Cannot cast from " + this + " to " + targetType);
         }
         
-        return (ArgType<S>) this;
+        return (Type<S>) this;
     }
 }
 

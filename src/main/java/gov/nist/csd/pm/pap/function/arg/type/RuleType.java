@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.function.arg.type;
 
 import gov.nist.csd.pm.pap.obligation.Rule;
 
-public final class RuleType extends ArgType<Rule> {
+public final class RuleType extends Type<Rule> {
 
     @Override
     public Rule cast(Object obj) {

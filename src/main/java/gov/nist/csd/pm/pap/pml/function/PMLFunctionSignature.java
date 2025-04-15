@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.pap.pml.function;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.VOID_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.VOID_TYPE;
 
-import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeStringer;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 
@@ -14,10 +13,10 @@ import java.util.Objects;
 public abstract class PMLFunctionSignature implements PMLStatementSerializable {
 
     protected String name;
-    protected ArgType<?> returnType;
+    protected Type<?> returnType;
     protected List<FormalParameter<?>> formalParameters;
 
-    public PMLFunctionSignature(String name, ArgType<?> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLFunctionSignature(String name, Type<?> returnType, List<FormalParameter<?>> formalParameters) {
         this.name = name;
         this.returnType = returnType;
         this.formalParameters = formalParameters;
@@ -27,7 +26,7 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
         return name;
     }
 
-    public ArgType<?> getReturnType() {
+    public Type<?> getReturnType() {
         return returnType;
     }
 

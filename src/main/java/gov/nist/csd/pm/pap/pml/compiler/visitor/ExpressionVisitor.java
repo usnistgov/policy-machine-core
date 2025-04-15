@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -13,7 +13,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.ExpressionListContext;
 import gov.nist.csd.pm.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BracketIndexContext;
@@ -62,10 +62,10 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
                                             ExpressionContext ctx,
-                                            ArgType<T> expectedType) {
+                                            Type<T> expectedType) {
         ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
         Expression<?> compiledExpression = visitor.visit(ctx);
-        ArgType<?> resultType = compiledExpression.getType();
+        Type<?> resultType = compiledExpression.getType();
 
         if (expectedType.equals(ANY_TYPE) || resultType.equals(expectedType)) {
             return (Expression<T>) compiledExpression;
@@ -87,7 +87,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return visitor.visit(ctx);
     }
 
-    public static <T> Expression<T> fromString(VisitorContext visitorCtx, String input, ArgType<T> expectedType) {
+    public static <T> Expression<T> fromString(VisitorContext visitorCtx, String input, Type<T> expectedType) {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 
         PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
@@ -112,7 +112,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     public static <T> Expression<T> compileFunctionInvoke(VisitorContext visitorCtx,
                                                           FunctionInvokeContext ctx,
-                                                          ArgType<T> expectedType) {
+                                                          Type<T> expectedType) {
         Objects.requireNonNull(visitorCtx);
         Objects.requireNonNull(ctx);
 
@@ -252,7 +252,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             return new ArrayLiteralExpression<>(new ArrayList<>(), ANY_TYPE);
         }
 
-        ArgType<?> elementType = null;
+        Type<?> elementType = null;
         List<Expression<?>> elements = new ArrayList<>();
 
         for (PMLParser.ExpressionContext elementCtx : ctx.arrayLit().expressionList().expression()) {
@@ -271,8 +271,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     @Override
     public Expression<?> visitMapLiteral(PMLParser.MapLiteralContext ctx) {
-        ArgType<?> keyType = null;
-        ArgType<?> valueType = null;
+        Type<?> keyType = null;
+        Type<?> valueType = null;
 
         if (ctx.mapLit().element() == null || ctx.mapLit().element().isEmpty()) {
             return new MapLiteralExpression<>(new HashMap<>(), ANY_TYPE, ANY_TYPE);
@@ -309,7 +309,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         // check that the key type of this map is string which is the only type supported for dot indexes
         assertIsCastableTo(mapType.getKeyType(), STRING_TYPE);
 
-        ArgType<?> valueType = mapType.getValueType();
+        Type<?> valueType = mapType.getValueType();
 
         return new DotIndexExpression<>(baseExpr, key, valueType);
     }
@@ -322,12 +322,12 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         // check taht the maps key type is castable to the index expressions type
         assertIsCastableTo(mapType.getKeyType(), indexExpr.getType());
 
-        ArgType<?> valueType = mapType.getValueType();
+        Type<?> valueType = mapType.getValueType();
 
         return new BracketIndexExpression<>(baseExpr, indexExpr, valueType);
     }
 
-    private MapType<?, ?> validateMapType(ArgType<?> type, ParserRuleContext ctx) {
+    private MapType<?, ?> validateMapType(Type<?> type, ParserRuleContext ctx) {
         if (type instanceof AnyType) {
             return mapType(ANY_TYPE, ANY_TYPE);
         }
@@ -345,7 +345,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return s.trim().substring(1, s.length() - 1);
     }
 
-    private static void assertIsCastableTo(ArgType<?> type, ArgType<?> targetType) throws UnexpectedExpressionTypeException {
+    private static void assertIsCastableTo(Type<?> type, Type<?> targetType) throws UnexpectedExpressionTypeException {
         if (type.isCastableTo(targetType)) {
             return;
         }
@@ -356,15 +356,15 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     private static class ExpressionWrapper<T> extends Expression<T> {
         private final Expression<?> wrapped;
-        private final ArgType<T> expectedType;
+        private final Type<T> expectedType;
         
-        ExpressionWrapper(Expression<?> wrapped, ArgType<T> expectedType) {
+        ExpressionWrapper(Expression<?> wrapped, Type<T> expectedType) {
             this.wrapped = wrapped;
             this.expectedType = expectedType;
         }
         
         @Override
-        public ArgType<T> getType() {
+        public Type<T> getType() {
             return expectedType;
         }
         

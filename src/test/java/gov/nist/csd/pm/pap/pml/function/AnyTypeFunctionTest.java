@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.pml.function;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -21,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

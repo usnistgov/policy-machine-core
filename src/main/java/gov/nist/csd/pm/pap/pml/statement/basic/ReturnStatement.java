@@ -1,17 +1,14 @@
 package gov.nist.csd.pm.pap.pml.statement.basic;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 
 import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
-import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 
@@ -30,7 +27,7 @@ public class ReturnStatement extends BasicStatement<StatementResult> {
         return expr;
     }
 
-    public boolean matchesReturnType(ArgType<?> match) {
+    public boolean matchesReturnType(Type<?> match) {
         if (expr == null) {
             return match.equals(new VoidType());
         }

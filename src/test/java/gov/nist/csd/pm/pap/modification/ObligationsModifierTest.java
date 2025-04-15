@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.util.SamplePolicy.loadSamplePolicyFromPML;
 import static org.junit.jupiter.api.Assertions.*;
 

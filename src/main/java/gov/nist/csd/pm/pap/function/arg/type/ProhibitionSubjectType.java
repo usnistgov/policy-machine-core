@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.function.arg.type;
 
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 
-public final class ProhibitionSubjectType extends ArgType<ProhibitionSubject> {
+public final class ProhibitionSubjectType extends Type<ProhibitionSubject> {
 
     @Override
     public ProhibitionSubject cast(Object obj) {

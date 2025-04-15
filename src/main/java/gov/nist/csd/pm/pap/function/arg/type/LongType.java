@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
-public final class LongType extends ArgType<Long> {
+public final class LongType extends Type<Long> {
 
     @Override
     public Long cast(Object obj) {

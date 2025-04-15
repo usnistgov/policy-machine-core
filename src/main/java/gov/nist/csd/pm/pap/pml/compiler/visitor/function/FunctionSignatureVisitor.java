@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor.function;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BasicFunctionSignatureContext;
@@ -40,7 +40,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     @Override
     public PMLOperationSignature visitOperationSignature(OperationSignatureContext ctx) {
         String funcName = ctx.ID().getText();
-        ArgType<?> returnType = parseReturnType(ctx.returnType);
+        Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx).visitFormalParamList(ctx.formalParamList());
 
         writeArgsToScope(visitorCtx, args);
@@ -59,7 +59,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     @Override
     public PMLRoutineSignature visitRoutineSignature(RoutineSignatureContext ctx) {
         String funcName = ctx.ID().getText();
-        ArgType<?> returnType = parseReturnType(ctx.returnType);
+        Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx).visitFormalParamList(ctx.formalParamList());
 
         writeArgsToScope(visitorCtx, args);
@@ -78,7 +78,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     @Override
     public PMLBasicFunctionSignature visitBasicFunctionSignature(BasicFunctionSignatureContext ctx) {
         String funcName = ctx.ID().getText();
-        ArgType<?> returnType = parseReturnType(ctx.returnType);
+        Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx).visitFormalParamList(ctx.formalParamList());
 
         writeArgsToScope(visitorCtx, args);
@@ -120,7 +120,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
         }
     }
 
-    private ArgType<?> parseReturnType(PMLParser.VariableTypeContext variableTypeContext) {
+    private Type<?> parseReturnType(PMLParser.VariableTypeContext variableTypeContext) {
         if (variableTypeContext == null) {
             return new VoidType();
         }

@@ -9,9 +9,7 @@ import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
 
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
@@ -20,11 +18,8 @@ import gov.nist.csd.pm.util.TestPAP;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import org.neo4j.codegen.api.ArrayLiteral;
-
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.util.TestIdGenerator.ids;

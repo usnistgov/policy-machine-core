@@ -4,7 +4,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
 
@@ -17,11 +17,11 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
 
     private final PMLFunctionSignature functionSignature;
     private final List<Expression<?>> actualArgsList;
-    private final ArgType<T> expectedReturnType;
+    private final Type<T> expectedReturnType;
 
     public FunctionInvokeExpression(PMLFunctionSignature functionSignature,
                                     List<Expression<?>> actualArgsList,
-                                    ArgType<T> expectedReturnType) {
+                                    Type<T> expectedReturnType) {
         this.functionSignature = functionSignature;
         this.actualArgsList = actualArgsList;
         this.expectedReturnType = expectedReturnType;
@@ -35,12 +35,12 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
         return actualArgsList;
     }
 
-    public ArgType<T> getExpectedReturnType() {
+    public Type<T> getExpectedReturnType() {
         return expectedReturnType;
     }
 
     @Override
-    public ArgType<T> getType() {
+    public Type<T> getType() {
         return expectedReturnType;
     }
 

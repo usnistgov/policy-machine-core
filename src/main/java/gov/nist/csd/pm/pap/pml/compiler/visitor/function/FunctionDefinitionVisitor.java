@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor.function;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
@@ -91,7 +91,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     }
 
     private CheckAndStatementsBlock parseBody(PMLParser.BasicStatementBlockContext ctx,
-                                              ArgType<?> returnType,
+                                              Type<?> returnType,
                                               List<FormalParameter<?>> formalArgs) {
         // create a new scope for the function body
         VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
@@ -108,7 +108,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
 
     private CheckAndStatementsBlock parseBody(PMLParser.CheckStatementBlockContext checkStatementBlockCtx,
                                               PMLParser.StatementBlockContext statementBlockCtx,
-                                              ArgType<?> returnType,
+                                              Type<?> returnType,
                                               List<FormalParameter<?>> formalArgs) {
         VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
         StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);

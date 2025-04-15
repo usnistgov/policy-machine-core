@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.function.arg.type;
 
-public final class AnyType extends ArgType<Object> {
+public final class AnyType extends Type<Object> {
 
     @Override
     public Object cast(Object obj) {
@@ -15,7 +15,7 @@ public final class AnyType extends ArgType<Object> {
      * @param <T> The Java type of the target
      * @return The object cast to type T
      */
-    public <T> T castTo(Object obj, ArgType<T> targetType) {
+    public <T> T castTo(Object obj, Type<T> targetType) {
         if (obj == null) {
             return null;
         }
