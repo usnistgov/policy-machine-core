@@ -42,8 +42,8 @@ class ForeachStmtVisitorTest {
         PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new ForeachStatement("x", null, buildArrayLiteral("a", "b"), List.of()),
-                stmt
+                new ForeachStatement("x", null, buildArrayLiteral("a", "b"), List.of()).toString(),
+                stmt.toString()
         );
 
         ctx = TestPMLParser.parseStatement(
@@ -54,8 +54,8 @@ class ForeachStmtVisitorTest {
         stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new ForeachStatement("x", "y", buildMapLiteral("a", "b"), List.of()),
-                stmt
+                new ForeachStatement("x", "y", buildMapLiteral("a", "b"), List.of()).toString(),
+                stmt.toString()
         );
     }
 

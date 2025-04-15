@@ -10,7 +10,6 @@ import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;

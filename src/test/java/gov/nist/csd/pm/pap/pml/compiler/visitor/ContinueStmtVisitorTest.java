@@ -32,8 +32,8 @@ class ContinueStmtVisitorTest {
         assertEquals(
                 new ForeachStatement("x", null, buildArrayLiteral("a"), List.of(
                         new ContinueStatement()
-                )),
-                stmt
+                )).toString(),
+                stmt.toString()
         );
     }
 

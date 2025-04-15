@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests specifically focused on mixed collections in the PML language.
- * These tests ensure that collections with OBJECT_TYPE as element or value type
+ * These tests ensure that collections with ANY_TYPE as element or value type
  * can properly handle mixed types of data.
  */
 public class MixedCollectionsTest {
@@ -42,8 +42,8 @@ public class MixedCollectionsTest {
                 new BoolLiteralExpression(true)
         );
         
-        ArrayLiteralExpression<?> array = new ArrayLiteralExpression<>(elements, OBJECT_TYPE);
-        assertEquals(listType(OBJECT_TYPE), array.getType());
+        ArrayLiteralExpression<?> array = new ArrayLiteralExpression<>(elements, ANY_TYPE);
+        assertEquals(listType(ANY_TYPE), array.getType());
         
         // Execute the array and verify results
         List<?> result = array.execute(executionContext, pap);
@@ -65,12 +65,12 @@ public class MixedCollectionsTest {
         
         // Compile with expected type of list<object>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, listType(OBJECT_TYPE));
+        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, listType(ANY_TYPE));
         
         // Verify no compilation errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(expression instanceof ArrayLiteralExpression);
-        assertEquals(listType(OBJECT_TYPE), expression.getType());
+        assertEquals(listType(ANY_TYPE), expression.getType());
         
         // Execute and verify results
         List<?> result = (List<?>) expression.execute(executionContext, pap);
@@ -88,8 +88,8 @@ public class MixedCollectionsTest {
         entries.put(new StringLiteralExpression("string2"), new StringLiteralExpression("value2"));
         entries.put(new StringLiteralExpression("boolean"), new BoolLiteralExpression(true));
         
-        MapLiteralExpression<?, ?> map = new MapLiteralExpression<>(entries, STRING_TYPE, OBJECT_TYPE);
-        assertEquals(mapType(STRING_TYPE, OBJECT_TYPE), map.getType());
+        MapLiteralExpression<?, ?> map = new MapLiteralExpression<>(entries, STRING_TYPE, ANY_TYPE);
+        assertEquals(mapType(STRING_TYPE, ANY_TYPE), map.getType());
         
         // Execute the map and verify results
         Map<?, ?> result = map.execute(executionContext, pap);
@@ -115,12 +115,12 @@ public class MixedCollectionsTest {
         
         // Compile with expected type of map<string, object>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, ANY_TYPE));
         
         // Verify no compilation errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(expression instanceof MapLiteralExpression);
-        assertEquals(mapType(STRING_TYPE, OBJECT_TYPE), expression.getType());
+        assertEquals(mapType(STRING_TYPE, ANY_TYPE), expression.getType());
         
         // Execute and verify results
         Map<?, ?> result = (Map<?, ?>) expression.execute(executionContext, pap);
@@ -146,12 +146,12 @@ public class MixedCollectionsTest {
         
         // Compile with expected type of map<object, string>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(OBJECT_TYPE, STRING_TYPE));
+        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(ANY_TYPE, STRING_TYPE));
         
         // Verify no compilation errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(expression instanceof MapLiteralExpression);
-        assertEquals(mapType(OBJECT_TYPE, STRING_TYPE), expression.getType());
+        assertEquals(mapType(ANY_TYPE, STRING_TYPE), expression.getType());
         
         // Execute and verify results
         Map<?, ?> result = (Map<?, ?>) expression.execute(executionContext, pap);
@@ -184,7 +184,7 @@ public class MixedCollectionsTest {
         
         // Compile with expected type of map<string, object>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, ANY_TYPE));
         
         // Verify no compilation errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -245,7 +245,7 @@ public class MixedCollectionsTest {
         
         // Compile with expected type of map<string, object>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, ANY_TYPE));
         
         // Verify no compilation errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -276,14 +276,14 @@ public class MixedCollectionsTest {
         // Empty array - use TestPMLParser instead of PMLContextVisitor
         PMLParser.ExpressionContext arrayCtx = TestPMLParser.parseExpression(emptyArrayCode);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> arrayExpr = ExpressionVisitor.compile(visitorContext, arrayCtx, listType(OBJECT_TYPE));
+        Expression<?> arrayExpr = ExpressionVisitor.compile(visitorContext, arrayCtx, listType(ANY_TYPE));
         List<?> arrayResult = (List<?>) arrayExpr.execute(executionContext, pap);
         assertTrue(arrayResult.isEmpty());
         
         // Empty map - use TestPMLParser instead of PMLContextVisitor
         PMLParser.ExpressionContext mapCtx = TestPMLParser.parseExpression(emptyMapCode);
         visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, mapCtx, mapType(OBJECT_TYPE, OBJECT_TYPE));
+        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, mapCtx, mapType(ANY_TYPE, ANY_TYPE));
         Map<?, ?> mapResult = (Map<?, ?>) mapExpr.execute(executionContext, pap);
         assertTrue(mapResult.isEmpty());
     }
@@ -298,7 +298,7 @@ public class MixedCollectionsTest {
         );
         
         ArrayLiteralExpression<String> stringArray = new ArrayLiteralExpression<>(stringElements, STRING_TYPE);
-        Expression<List<Object>> objectArray = stringArray.asType(listType(OBJECT_TYPE));
+        Expression<List<Object>> objectArray = stringArray.asType(listType(ANY_TYPE));
         
         List<Object> result = objectArray.execute(executionContext, pap);
         assertEquals(3, result.size());
@@ -312,7 +312,7 @@ public class MixedCollectionsTest {
         stringEntries.put(new StringLiteralExpression("key2"), new StringLiteralExpression("value2"));
         
         MapLiteralExpression<String, String> stringMap = new MapLiteralExpression<>(stringEntries, STRING_TYPE, STRING_TYPE);
-        Expression<Map<String, Object>> objectMap = stringMap.asType(mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<Map<String, Object>> objectMap = stringMap.asType(mapType(STRING_TYPE, ANY_TYPE));
         
         Map<String, Object> mapResult = objectMap.execute(executionContext, pap);
         assertEquals(2, mapResult.size());

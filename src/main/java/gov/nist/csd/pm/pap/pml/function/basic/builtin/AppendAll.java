@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.pml.function.basic.builtin.Append.DST_PARAM;
 
@@ -14,12 +14,12 @@ import java.util.List;
 
 public class AppendAll extends PMLBasicFunction {
 
-    public static final FormalParameter<List<Object>> SRC_LIST_PARAM = new FormalParameter<>("src", listType(OBJECT_TYPE));
+    public static final FormalParameter<List<Object>> SRC_LIST_PARAM = new FormalParameter<>("src", listType(ANY_TYPE));
 
     public AppendAll() {
         super(
                 "appendAll",
-                listType(OBJECT_TYPE),
+                listType(ANY_TYPE),
                 List.of(DST_PARAM, SRC_LIST_PARAM)
         );
     }

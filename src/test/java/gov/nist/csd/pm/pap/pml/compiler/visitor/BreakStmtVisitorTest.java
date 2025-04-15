@@ -29,11 +29,13 @@ class BreakStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement<?> stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        ForeachStatement expected = new ForeachStatement("x", null, buildArrayLiteral("a"), List.of(
+            new BreakStatement()
+        ));
         assertEquals(
-                new ForeachStatement("x", null, buildArrayLiteral("a"), List.of(
-                        new BreakStatement()
-                )),
-                stmt
+                expected.toString(),
+                stmt.toString()
         );
     }
 

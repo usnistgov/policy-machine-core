@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
@@ -29,7 +29,7 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
         List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
         for (PMLParser.VarSpecContext varSpecContext : ctx.varSpec()) {
             String varName = varSpecContext.ID().getText();
-            Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, varSpecContext.expression(), OBJECT_TYPE);
+            Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, varSpecContext.expression(), ANY_TYPE);
 
             try {
                 visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(), false));
@@ -46,7 +46,7 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
     @Override
     public PMLStatement<?> visitShortDeclaration(PMLParser.ShortDeclarationContext ctx) {
         String varName = ctx.ID().getText();
-        Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), OBJECT_TYPE);
+        Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         ShortDeclarationStatement stmt = new ShortDeclarationStatement(varName, expr);
 
@@ -66,7 +66,7 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
     @Override
     public PMLStatement<?> visitVariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
         String varName = ctx.ID().getText();
-        Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), OBJECT_TYPE);
+        Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         VariableAssignmentStatement stmt = new VariableAssignmentStatement(
                 varName,

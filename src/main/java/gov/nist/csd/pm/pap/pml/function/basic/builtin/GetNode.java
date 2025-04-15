@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
@@ -21,7 +21,7 @@ public class GetNode extends PMLBasicFunction {
     public GetNode() {
         super(
                 "getNode",
-                ArgType.mapType(STRING_TYPE, OBJECT_TYPE),
+                ArgType.mapType(STRING_TYPE, ANY_TYPE),
                 List.of(NODE_NAME_PARAM)
         );
     }

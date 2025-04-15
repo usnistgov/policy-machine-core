@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class GetAssociationsWithSource extends PMLBasicFunction {
 
-    private static final ArgType<?> returnType = ArgType.listType(ArgType.mapType(STRING_TYPE, OBJECT_TYPE));
+    private static final ArgType<?> returnType = ArgType.listType(ArgType.mapType(STRING_TYPE, ANY_TYPE));
 
     public GetAssociationsWithSource() {
         super(

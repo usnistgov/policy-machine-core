@@ -1,13 +1,11 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.arg.type.ListType;
-import gov.nist.csd.pm.pap.function.arg.type.ObjectType;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.pap.pml.expression.Expression;

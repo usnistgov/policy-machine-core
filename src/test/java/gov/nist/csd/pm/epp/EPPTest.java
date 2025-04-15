@@ -85,10 +85,10 @@ class EPPTest {
                         b: "oa2"
                     }
                     do(ctx) {
-                        create pc ctx.args.a + "pc1"
+                        create pc ctx.args.a + "pc3"
                         
                         foreach x in ctx.args.b {
-                            create pc x + "pc2"
+                            create pc x + "pc4"
                         }
                     }
                 }
@@ -98,7 +98,7 @@ class EPPTest {
 
             @Override
             protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return null;
+                return new Args(argsMap);
             }
 
             @Override
@@ -143,7 +143,7 @@ class EPPTest {
             "op2",
             Map.of(
                 ARG_A.getName(), "oa2",
-                ARG_B.getName(), "oa2"
+                ARG_B.getName(), List.of("oa2")
             )
         );
         assertEquals(GRANT, response.getDecision());
@@ -151,8 +151,8 @@ class EPPTest {
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1pc2"));
         assertTrue(pap.query().graph().nodeExists("oa2pc2"));
-        assertTrue(pap.query().graph().nodeExists("oa2pc1"));
-        assertTrue(pap.query().graph().nodeExists("oa2pc2"));
+        assertTrue(pap.query().graph().nodeExists("oa2pc3"));
+        assertTrue(pap.query().graph().nodeExists("oa2pc4"));
     }
 
     @Test

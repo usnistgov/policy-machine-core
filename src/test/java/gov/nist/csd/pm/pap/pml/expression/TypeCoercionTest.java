@@ -14,8 +14,6 @@ import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
@@ -23,27 +21,25 @@ import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for type coercion between compatible types when using OBJECT_TYPE.
+ * Tests for type coercion between compatible types when using ANY_TYPE.
  * These tests ensure that automatic type conversion works correctly
- * in expressions that involve OBJECT_TYPE.
+ * in expressions that involve ANY_TYPE.
  */
 public class TypeCoercionTest {
 
-    @Mock
     private PAP pap;
     private ExecutionContext executionContext;
 
     @BeforeEach
     void setUp() throws PMException {
-        MockitoAnnotations.openMocks(this);
         executionContext = new ExecutionContext(new TestUserContext("u1"), new MemoryPAP());
     }
 
     @Test
     void testStringToObjectCoercion() throws PMException {
-        // Test implicit coercion from STRING_TYPE to OBJECT_TYPE
+        // Test implicit coercion from STRING_TYPE to ANY_TYPE
         StringLiteralExpression stringExpr = new StringLiteralExpression("test");
-        Expression<Object> objectExpr = stringExpr.asType(OBJECT_TYPE);
+        Expression<Object> objectExpr = stringExpr.asType(ANY_TYPE);
         
         // Execute and verify
         Object result = objectExpr.execute(executionContext, pap);
@@ -65,8 +61,8 @@ public class TypeCoercionTest {
         // Create as STRING_TYPE array
         ArrayLiteralExpression<String> stringArray = new ArrayLiteralExpression<>(stringElements, STRING_TYPE);
         
-        // Coerce to OBJECT_TYPE array
-        Expression<List<Object>> objectArray = stringArray.asType(listType(OBJECT_TYPE));
+        // Coerce to ANY_TYPE array
+        Expression<List<Object>> objectArray = stringArray.asType(listType(ANY_TYPE));
         
         // Execute and verify
         List<Object> result = objectArray.execute(executionContext, pap);
@@ -90,9 +86,9 @@ public class TypeCoercionTest {
         MapLiteralExpression<String, String> stringMap = 
                 new MapLiteralExpression<>(entries, STRING_TYPE, STRING_TYPE);
         
-        // Coerce to STRING_TYPE -> OBJECT_TYPE map
+        // Coerce to STRING_TYPE -> ANY_TYPE map
         Expression<Map<String, Object>> objectMap = 
-                stringMap.asType(mapType(STRING_TYPE, OBJECT_TYPE));
+                stringMap.asType(mapType(STRING_TYPE, ANY_TYPE));
         
         // Execute and verify
         Map<String, Object> result = objectMap.execute(executionContext, pap);
@@ -124,7 +120,7 @@ public class TypeCoercionTest {
         
         // Coerce to list<list<object>>
         Expression<List<List<Object>>> coercedArray = 
-                outerArray.asType(listType(listType(OBJECT_TYPE)));
+                outerArray.asType(listType(listType(ANY_TYPE)));
         
         // Execute and verify
         List<List<Object>> result = coercedArray.execute(executionContext, pap);
@@ -150,7 +146,7 @@ public class TypeCoercionTest {
         // Compile with expected type of map<string, list<object>>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                mapType(STRING_TYPE, listType(OBJECT_TYPE)));
+                mapType(STRING_TYPE, listType(ANY_TYPE)));
         
         // Should compile without errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -187,7 +183,7 @@ public class TypeCoercionTest {
         // Compile with expected type
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                mapType(STRING_TYPE, listType(OBJECT_TYPE)));
+                mapType(STRING_TYPE, listType(ANY_TYPE)));
         
         // Should compile without errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -203,7 +199,7 @@ public class TypeCoercionTest {
     
     @Test
     void testObjectToPrimitiveTypeCoercion() throws PMException {
-        // Test that values from OBJECT_TYPE can be coerced to primitive types
+        // Test that values from ANY_TYPE can be coerced to primitive types
         String pml = """
                 {
                     "obj1": "string value",
@@ -216,7 +212,7 @@ public class TypeCoercionTest {
         // Compile with map<string, object> type
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                mapType(STRING_TYPE, OBJECT_TYPE));
+                mapType(STRING_TYPE, ANY_TYPE));
         
         // Should compile without errors
         assertEquals(0, visitorContext.errorLog().getErrors().size());

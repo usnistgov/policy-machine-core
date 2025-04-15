@@ -3,11 +3,9 @@ package gov.nist.csd.pm.pap.pml.expression.reference;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -15,11 +13,10 @@ import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 
 import java.util.Map;
-import javax.print.DocFlavor.STRING;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor.compile;
@@ -122,7 +119,7 @@ class VariableReferenceTest {
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
             PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
-                () -> compile(visitorContext, ctx, OBJECT_TYPE)
+                () -> compile(visitorContext, ctx, ANY_TYPE)
             );
             assertEquals(1, e.getErrors().size());
             assertEquals(
@@ -141,7 +138,7 @@ class VariableReferenceTest {
             visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, STRING_TYPE), false));
             PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
-                () -> compile(visitorContext, ctx, OBJECT_TYPE)
+                () -> compile(visitorContext, ctx, ANY_TYPE)
             );
             assertEquals(1, e.getErrors().size(), visitorContext.errorLog().toString());
             assertEquals(

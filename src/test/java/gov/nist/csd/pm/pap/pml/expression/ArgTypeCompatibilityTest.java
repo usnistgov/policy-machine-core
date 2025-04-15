@@ -14,8 +14,6 @@ import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
@@ -23,18 +21,16 @@ import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the ArgType system, focusing on compatibility with OBJECT_TYPE
- * and ensuring all types work correctly with OBJECT_TYPE as the expected type.
+ * Tests for the ArgType system, focusing on compatibility with ANY_TYPE
+ * and ensuring all types work correctly with ANY_TYPE as the expected type.
  */
 public class ArgTypeCompatibilityTest {
 
-    @Mock
     private PAP pap;
     private ExecutionContext executionContext;
 
     @BeforeEach
     void setUp() throws PMException {
-        MockitoAnnotations.openMocks(this);
         executionContext = new ExecutionContext(new TestUserContext("u1"), new MemoryPAP());
     }
 
@@ -42,37 +38,37 @@ public class ArgTypeCompatibilityTest {
 
     @Test
     void testAllTypesCastableToObjectType() {
-        // All types should be castable to OBJECT_TYPE
-        assertTrue(STRING_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(BOOLEAN_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(ACCESS_RIGHT_SET_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(OPERATION_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(ROUTINE_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(RULE_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(PROHIBITION_SUBJECT_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(CONTAINER_CONDITION_TYPE.isCastableTo(OBJECT_TYPE));
-        assertTrue(NODE_TYPE_TYPE.isCastableTo(OBJECT_TYPE));
+        // All types should be castable to ANY_TYPE
+        assertTrue(STRING_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(BOOLEAN_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(ACCESS_RIGHT_SET_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(OPERATION_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(ROUTINE_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(RULE_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(PROHIBITION_SUBJECT_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(CONTAINER_CONDITION_TYPE.isCastableTo(ANY_TYPE));
+        assertTrue(NODE_TYPE_TYPE.isCastableTo(ANY_TYPE));
         
-        // Collection types should also be castable to OBJECT_TYPE
-        assertTrue(listType(STRING_TYPE).isCastableTo(OBJECT_TYPE));
-        assertTrue(mapType(STRING_TYPE, BOOLEAN_TYPE).isCastableTo(OBJECT_TYPE));
+        // Collection types should also be castable to ANY_TYPE
+        assertTrue(listType(STRING_TYPE).isCastableTo(ANY_TYPE));
+        assertTrue(mapType(STRING_TYPE, BOOLEAN_TYPE).isCastableTo(ANY_TYPE));
         
-        // OBJECT_TYPE should be castable to itself
-        assertTrue(OBJECT_TYPE.isCastableTo(OBJECT_TYPE));
+        // ANY_TYPE should be castable to itself
+        assertTrue(ANY_TYPE.isCastableTo(ANY_TYPE));
 
-        // Nested collection types should be castable to OBJECT_TYPE
-        assertTrue(listType(mapType(STRING_TYPE, BOOLEAN_TYPE)).isCastableTo(OBJECT_TYPE));
-        assertTrue(mapType(STRING_TYPE, listType(BOOLEAN_TYPE)).isCastableTo(OBJECT_TYPE));
+        // Nested collection types should be castable to ANY_TYPE
+        assertTrue(listType(mapType(STRING_TYPE, BOOLEAN_TYPE)).isCastableTo(ANY_TYPE));
+        assertTrue(mapType(STRING_TYPE, listType(BOOLEAN_TYPE)).isCastableTo(ANY_TYPE));
     }
 
     @Test
     void testObjectTypeAsSourceType() {
-        // OBJECT_TYPE should be castable to any other type in isCastableTo
+        // ANY_TYPE should be castable to any other type in isCastableTo
         // This intentionally tests the first condition in isCastableTo method
-        assertTrue(OBJECT_TYPE.isCastableTo(STRING_TYPE));
-        assertTrue(OBJECT_TYPE.isCastableTo(BOOLEAN_TYPE));
-        assertTrue(OBJECT_TYPE.isCastableTo(listType(STRING_TYPE)));
-        assertTrue(OBJECT_TYPE.isCastableTo(mapType(STRING_TYPE, BOOLEAN_TYPE)));
+        assertTrue(ANY_TYPE.isCastableTo(STRING_TYPE));
+        assertTrue(ANY_TYPE.isCastableTo(BOOLEAN_TYPE));
+        assertTrue(ANY_TYPE.isCastableTo(listType(STRING_TYPE)));
+        assertTrue(ANY_TYPE.isCastableTo(mapType(STRING_TYPE, BOOLEAN_TYPE)));
     }
 
     @Test
@@ -83,47 +79,47 @@ public class ArgTypeCompatibilityTest {
         Object listValue = Arrays.asList("a", "b", "c");
         Object mapValue = Map.of("key1", "value1", "key2", "value2");
         
-        assertEquals(stringValue, OBJECT_TYPE.cast(stringValue));
-        assertEquals(booleanValue, OBJECT_TYPE.cast(booleanValue));
-        assertEquals(listValue, OBJECT_TYPE.cast(listValue));
-        assertEquals(mapValue, OBJECT_TYPE.cast(mapValue));
+        assertEquals(stringValue, ANY_TYPE.cast(stringValue));
+        assertEquals(booleanValue, ANY_TYPE.cast(booleanValue));
+        assertEquals(listValue, ANY_TYPE.cast(listValue));
+        assertEquals(mapValue, ANY_TYPE.cast(mapValue));
         
         // Test null handling
-        assertNull(OBJECT_TYPE.cast(null));
+        assertNull(ANY_TYPE.cast(null));
     }
 
     @Test
     void testObjectTypeCastToMethod() {
         // Test the specialized castTo method in ObjectType
-        ObjectType objectType = new ObjectType();
+        AnyType anyType = new AnyType();
         
         String stringValue = "test";
         Boolean booleanValue = true;
         
         // Cast from Object to specific types
-        assertEquals(stringValue, objectType.castTo(stringValue, STRING_TYPE));
-        assertEquals(booleanValue, objectType.castTo(booleanValue, BOOLEAN_TYPE));
+        assertEquals(stringValue, anyType.castTo(stringValue, STRING_TYPE));
+        assertEquals(booleanValue, anyType.castTo(booleanValue, BOOLEAN_TYPE));
         
         // Test null handling
-        assertNull(objectType.castTo(null, STRING_TYPE));
+        assertNull(anyType.castTo(null, STRING_TYPE));
     }
 
     // ==================== Expression Compilation Tests ====================
 
     @Test
     void testCompileExpressionsWithObjectTypeExpected() throws PMException {
-        // Test compiling various expressions when the expected type is OBJECT_TYPE
+        // Test compiling various expressions when the expected type is ANY_TYPE
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         
         // String literal
         PMLParser.ExpressionContext stringCtx = TestPMLParser.parseExpression("\"test\"");
-        Expression<?> stringExpr = ExpressionVisitor.compile(visitorContext, stringCtx, OBJECT_TYPE);
+        Expression<?> stringExpr = ExpressionVisitor.compile(visitorContext, stringCtx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(STRING_TYPE, stringExpr.getType());
         
         // Boolean literal
         PMLParser.ExpressionContext boolCtx = TestPMLParser.parseExpression("true");
-        Expression<?> boolExpr = ExpressionVisitor.compile(visitorContext, boolCtx, OBJECT_TYPE);
+        Expression<?> boolExpr = ExpressionVisitor.compile(visitorContext, boolCtx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(BOOLEAN_TYPE, boolExpr.getType());
     }
@@ -137,10 +133,10 @@ public class ArgTypeCompatibilityTest {
         PMLParser.ExpressionContext arrayCtx = TestPMLParser.parseExpression("""
                 ["a", "value", true]
                 """);
-        Expression<?> arrayExpr = ExpressionVisitor.compile(visitorContext, arrayCtx, listType(OBJECT_TYPE));
+        Expression<?> arrayExpr = ExpressionVisitor.compile(visitorContext, arrayCtx, listType(ANY_TYPE));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(arrayExpr instanceof ArrayLiteralExpression);
-        assertEquals(listType(OBJECT_TYPE), arrayExpr.getType());
+        assertEquals(listType(ANY_TYPE), arrayExpr.getType());
         
         // Map with mixed value types
         PMLParser.ExpressionContext mapCtx = TestPMLParser.parseExpression("""
@@ -150,10 +146,10 @@ public class ArgTypeCompatibilityTest {
                     "boolean": true
                 }
                 """);
-        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, mapCtx, mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, mapCtx, mapType(STRING_TYPE, ANY_TYPE));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(mapExpr instanceof MapLiteralExpression);
-        assertEquals(mapType(STRING_TYPE, OBJECT_TYPE), mapExpr.getType());
+        assertEquals(mapType(STRING_TYPE, ANY_TYPE), mapExpr.getType());
     }
 
     // ==================== Expression Execution Tests ====================
@@ -162,12 +158,12 @@ public class ArgTypeCompatibilityTest {
     void testExecuteExpressionsWithObjectType() throws PMException {
         // String literal
         StringLiteralExpression stringExpr = new StringLiteralExpression("test");
-        Object stringResult = stringExpr.asType(OBJECT_TYPE).execute(executionContext, pap);
+        Object stringResult = stringExpr.asType(ANY_TYPE).execute(executionContext, pap);
         assertEquals("test", stringResult);
 
         // Boolean literal
         BoolLiteralExpression boolExpr = new BoolLiteralExpression(true);
-        Object boolResult = boolExpr.asType(OBJECT_TYPE).execute(executionContext, pap);
+        Object boolResult = boolExpr.asType(ANY_TYPE).execute(executionContext, pap);
         assertEquals(true, boolResult);
     }
 
@@ -179,7 +175,7 @@ public class ArgTypeCompatibilityTest {
         arrayElements.add(new StringLiteralExpression("value"));
         arrayElements.add(new BoolLiteralExpression(true));
         
-        ArrayLiteralExpression<?> arrayExpr = new ArrayLiteralExpression<>(arrayElements, OBJECT_TYPE);
+        ArrayLiteralExpression<?> arrayExpr = new ArrayLiteralExpression<>(arrayElements, ANY_TYPE);
         List<?> arrayResult = arrayExpr.execute(executionContext, pap);
         
         assertEquals(3, arrayResult.size());
@@ -193,7 +189,7 @@ public class ArgTypeCompatibilityTest {
         mapEntries.put(new StringLiteralExpression("string2"), new StringLiteralExpression("value2"));
         mapEntries.put(new StringLiteralExpression("boolean"), new BoolLiteralExpression(true));
         
-        MapLiteralExpression<?, ?> mapExpr = new MapLiteralExpression<>(mapEntries, STRING_TYPE, OBJECT_TYPE);
+        MapLiteralExpression<?, ?> mapExpr = new MapLiteralExpression<>(mapEntries, STRING_TYPE, ANY_TYPE);
         Map<?, ?> mapResult = mapExpr.execute(executionContext, pap);
         
         assertEquals(3, mapResult.size());
@@ -213,19 +209,19 @@ public class ArgTypeCompatibilityTest {
         List<Expression<?>> innerArray1Elements = new ArrayList<>();
         innerArray1Elements.add(new StringLiteralExpression("a"));
         innerArray1Elements.add(new BoolLiteralExpression(true));
-        ArrayLiteralExpression<?> innerArray1 = new ArrayLiteralExpression<>(innerArray1Elements, OBJECT_TYPE);
+        ArrayLiteralExpression<?> innerArray1 = new ArrayLiteralExpression<>(innerArray1Elements, ANY_TYPE);
         
         // Inner array 2
         List<Expression<?>> innerArray2Elements = new ArrayList<>();
         innerArray2Elements.add(new BoolLiteralExpression(true));
         innerArray2Elements.add(new StringLiteralExpression("b"));
-        ArrayLiteralExpression<?> innerArray2 = new ArrayLiteralExpression<>(innerArray2Elements, OBJECT_TYPE);
+        ArrayLiteralExpression<?> innerArray2 = new ArrayLiteralExpression<>(innerArray2Elements, ANY_TYPE);
         
         // Inner map
         Map<Expression<?>, Expression<?>> innerMapEntries = new HashMap<>();
         innerMapEntries.put(new StringLiteralExpression("key1"), new StringLiteralExpression("value1"));
         innerMapEntries.put(new StringLiteralExpression("key2"), new BoolLiteralExpression(true));
-        MapLiteralExpression<?, ?> innerMap = new MapLiteralExpression<>(innerMapEntries, STRING_TYPE, OBJECT_TYPE);
+        MapLiteralExpression<?, ?> innerMap = new MapLiteralExpression<>(innerMapEntries, STRING_TYPE, ANY_TYPE);
         
         // Outer map
         Map<Expression<?>, Expression<?>> outerMapEntries = new HashMap<>();
@@ -234,7 +230,7 @@ public class ArgTypeCompatibilityTest {
         outerMapEntries.put(new StringLiteralExpression("map"), innerMap);
         outerMapEntries.put(new StringLiteralExpression("primitive"), new BoolLiteralExpression(false));
         
-        MapLiteralExpression<?, ?> outerMap = new MapLiteralExpression<>(outerMapEntries, STRING_TYPE, OBJECT_TYPE);
+        MapLiteralExpression<?, ?> outerMap = new MapLiteralExpression<>(outerMapEntries, STRING_TYPE, ANY_TYPE);
         
         // Execute the complex structure
         Map<?, ?> result = outerMap.execute(executionContext, pap);
@@ -270,13 +266,13 @@ public class ArgTypeCompatibilityTest {
     void testEmptyCollections() throws PMException {
         // Empty array
         List<Expression<?>> emptyArrayElements = new ArrayList<>();
-        ArrayLiteralExpression<?> emptyArrayExpr = new ArrayLiteralExpression<>(emptyArrayElements, OBJECT_TYPE);
+        ArrayLiteralExpression<?> emptyArrayExpr = new ArrayLiteralExpression<>(emptyArrayElements, ANY_TYPE);
         List<?> emptyArrayResult = emptyArrayExpr.execute(executionContext, pap);
         assertTrue(emptyArrayResult.isEmpty());
         
         // Empty map
         Map<Expression<?>, Expression<?>> emptyMapEntries = new HashMap<>();
-        MapLiteralExpression<?, ?> emptyMapExpr = new MapLiteralExpression<>(emptyMapEntries, OBJECT_TYPE, OBJECT_TYPE);
+        MapLiteralExpression<?, ?> emptyMapExpr = new MapLiteralExpression<>(emptyMapEntries, ANY_TYPE, ANY_TYPE);
         Map<?, ?> emptyMapResult = emptyMapExpr.execute(executionContext, pap);
         assertTrue(emptyMapResult.isEmpty());
     }
@@ -287,7 +283,7 @@ public class ArgTypeCompatibilityTest {
         Expression<?> nullExpr = new Expression<Object>() {
             @Override
             public ArgType<Object> getType() {
-                return OBJECT_TYPE;
+                return ANY_TYPE;
             }
 
             @Override
@@ -317,7 +313,7 @@ public class ArgTypeCompatibilityTest {
         mapEntries.put(new StringLiteralExpression("nullKey"), nullExpr);
         mapEntries.put(new StringLiteralExpression("nonNullKey"), new StringLiteralExpression("value"));
         
-        MapLiteralExpression<?, ?> mapExpr = new MapLiteralExpression<>(mapEntries, STRING_TYPE, OBJECT_TYPE);
+        MapLiteralExpression<?, ?> mapExpr = new MapLiteralExpression<>(mapEntries, STRING_TYPE, ANY_TYPE);
         Map<?, ?> mapResult = mapExpr.execute(executionContext, pap);
         
         assertEquals(2, mapResult.size());

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 
@@ -241,7 +241,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
             // add the event name and event context map to the local parser scope
             VisitorContext localVisitorCtx = visitorCtx.copy();
             try {
-                localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, mapType(STRING_TYPE, OBJECT_TYPE), true));
+                localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, mapType(STRING_TYPE, ANY_TYPE), true));
             } catch (VariableAlreadyDefinedInScopeException e) {
                 throw new PMLCompilationRuntimeException(e);
             }

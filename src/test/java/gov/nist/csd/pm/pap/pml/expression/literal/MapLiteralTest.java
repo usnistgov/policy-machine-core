@@ -2,7 +2,6 @@ package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.type.ArgType;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -15,11 +14,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
-import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MapLiteralTest {
@@ -35,7 +32,8 @@ class MapLiteralTest {
                 """);
 
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<Map<String, Object>> actual = ExpressionVisitor.compile(visitorContext, ctx, ArgType.mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<Map<String, Object>> actual = ExpressionVisitor.compile(visitorContext, ctx, ArgType.mapType(STRING_TYPE,
+            ANY_TYPE));
         
         // Create a Map with Java data types
         Map<String, Object> values = new HashMap<>();
@@ -48,7 +46,7 @@ class MapLiteralTest {
                 new StringLiteralExpression("a"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("1"), new StringLiteralExpression("2")), STRING_TYPE),
                 new StringLiteralExpression("b"), new StringLiteralExpression("c")
             ),
-            STRING_TYPE, OBJECT_TYPE
+            STRING_TYPE, ANY_TYPE
         );
 
         assertEquals(
@@ -56,7 +54,7 @@ class MapLiteralTest {
                 actual
         );
         assertEquals(
-                mapType(STRING_TYPE, OBJECT_TYPE),
+                mapType(STRING_TYPE, ANY_TYPE),
                 actual.getType()
         );
 

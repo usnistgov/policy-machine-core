@@ -17,8 +17,6 @@ import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
@@ -26,35 +24,34 @@ import static gov.nist.csd.pm.pap.function.arg.type.ArgType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests focused on error handling and edge cases for OBJECT_TYPE.
+ * Tests focused on error handling and edge cases for ANY_TYPE.
  * These tests ensure that the type system properly handles errors
- * and edge cases when dealing with OBJECT_TYPE.
+ * and edge cases when dealing with ANY_TYPE.
  */
-public class ObjectTypeErrorHandlingTest {
+public class AnyTypeErrorHandlingTest {
 
-    @Mock
     private PAP pap;
     private ExecutionContext executionContext;
 
     @BeforeEach
     void setUp() throws PMException {
-        MockitoAnnotations.openMocks(this);
+        pap = new MemoryPAP();
         executionContext = new ExecutionContext(new TestUserContext("u1"), new MemoryPAP());
     }
 
     @Test
     void testNullValueHandling() {
         // Test that ObjectType.cast properly handles null
-        assertNull(OBJECT_TYPE.cast(null));
+        assertNull(ANY_TYPE.cast(null));
         
         // Test that collections with null elements work correctly
-        ObjectType objectType = new ObjectType();
+        AnyType anyType = new AnyType();
         
         // Test casting null to various types should return null
-        assertNull(objectType.castTo(null, STRING_TYPE));
-        assertNull(objectType.castTo(null, BOOLEAN_TYPE));
-        assertNull(objectType.castTo(null, listType(STRING_TYPE)));
-        assertNull(objectType.castTo(null, mapType(STRING_TYPE, BOOLEAN_TYPE)));
+        assertNull(anyType.castTo(null, STRING_TYPE));
+        assertNull(anyType.castTo(null, BOOLEAN_TYPE));
+        assertNull(anyType.castTo(null, listType(STRING_TYPE)));
+        assertNull(anyType.castTo(null, mapType(STRING_TYPE, BOOLEAN_TYPE)));
     }
     
     @Test
@@ -62,7 +59,7 @@ public class ObjectTypeErrorHandlingTest {
         // Test cases where cast operations should fail
         
         // Cast Boolean to String should fail in certain contexts
-        ObjectType objectType = new ObjectType();
+        AnyType anyType = new AnyType();
         Boolean boolValue = true;
         
         // Cast String to Boolean should fail
@@ -75,15 +72,15 @@ public class ObjectTypeErrorHandlingTest {
     
     @Test
     void testObjectTypeCasting() throws PMException {
-        // Test explicit casting behavior with OBJECT_TYPE
+        // Test explicit casting behavior with ANY_TYPE
         
         // Create expressions of different types
         StringLiteralExpression stringExpr = new StringLiteralExpression("test");
         BoolLiteralExpression boolExpr = new BoolLiteralExpression(true);
         
-        // Cast to OBJECT_TYPE
-        Expression<Object> objectStringExpr = stringExpr.asType(OBJECT_TYPE);
-        Expression<Object> objectBoolExpr = boolExpr.asType(OBJECT_TYPE);
+        // Cast to ANY_TYPE
+        Expression<Object> objectStringExpr = stringExpr.asType(ANY_TYPE);
+        Expression<Object> objectBoolExpr = boolExpr.asType(ANY_TYPE);
         
         // Execute and verify the results
         assertEquals("test", objectStringExpr.execute(executionContext, pap));
@@ -96,39 +93,39 @@ public class ObjectTypeErrorHandlingTest {
     
     @Test
     void testVariableWithObjectType() throws PMException {
-        // Test that variables with OBJECT_TYPE can hold any value
+        // Test that variables with ANY_TYPE can hold any value
         
-        // Create a variable with OBJECT_TYPE
+        // Create a variable with ANY_TYPE
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        visitorContext.scope().addVariable("objVar", new Variable("objVar", OBJECT_TYPE, false));
+        visitorContext.scope().addVariable("objVar", new Variable("objVar", ANY_TYPE, false));
         
         // Reference the variable with different expected types
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression("objVar");
         
-        // Should work with OBJECT_TYPE
-        Expression<?> expr1 = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
+        // Should work with ANY_TYPE
+        Expression<?> expr1 = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new VariableReferenceExpression<>("objVar", OBJECT_TYPE), expr1);
+        assertEquals(new VariableReferenceExpression<>("objVar", ANY_TYPE), expr1);
         
-        // Should also work with STRING_TYPE because OBJECT_TYPE is castable to any type
+        // Should also work with STRING_TYPE because ANY_TYPE is castable to any type
         Expression<?> expr2 = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new VariableReferenceExpression<>("objVar", OBJECT_TYPE), expr2);
+        assertEquals(STRING_TYPE, expr2.getType());
         
         // Should also work with BOOLEAN_TYPE
         Expression<?> expr3 = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new VariableReferenceExpression<>("objVar", OBJECT_TYPE), expr3);
+        assertEquals(BOOLEAN_TYPE, expr3.getType());
         
         // Should work with collection types too
         Expression<?> expr4 = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new VariableReferenceExpression<>("objVar", OBJECT_TYPE), expr4);
+        assertEquals(listType(STRING_TYPE), expr4.getType());
     }
     
     @Test
     void testCollectionTypeConsistency() throws PMException {
-        // Test that collections maintain type consistency when using OBJECT_TYPE
+        // Test that collections maintain type consistency when using ANY_TYPE
         
         // Create a list with mixed types
         List<Expression<?>> elements = List.of(
@@ -137,8 +134,8 @@ public class ObjectTypeErrorHandlingTest {
                 new BoolLiteralExpression(true)
         );
         
-        // Create an array expression with OBJECT_TYPE
-        ArrayLiteralExpression<?> array = new ArrayLiteralExpression<>(elements, OBJECT_TYPE);
+        // Create an array expression with ANY_TYPE
+        ArrayLiteralExpression<?> array = new ArrayLiteralExpression<>(elements, ANY_TYPE);
         
         // Execute and verify the results
         List<?> result = array.execute(executionContext, pap);
@@ -156,7 +153,7 @@ public class ObjectTypeErrorHandlingTest {
     
     @Test
     void testReferencingCollectionElements() throws PMException {
-        // Test that elements from collections with OBJECT_TYPE can be referenced and used
+        // Test that elements from collections with ANY_TYPE can be referenced and used
         
         // Create a complex structure: a map with different types of values
         String pml = """
@@ -173,7 +170,7 @@ public class ObjectTypeErrorHandlingTest {
         
         // Compile with expected type of map<string, object>
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, OBJECT_TYPE));
+        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, ANY_TYPE));
         
         // Execute the map
         Map<?, ?> result = (Map<?, ?>) mapExpr.execute(executionContext, pap);
@@ -198,7 +195,7 @@ public class ObjectTypeErrorHandlingTest {
     
     @Test
     void testCastingBetweenCollectionTypes() throws PMException {
-        // Test casting between collection types with OBJECT_TYPE
+        // Test casting between collection types with ANY_TYPE
         
         // Create a list<string>
         List<Expression<?>> stringElements = List.of(
@@ -208,7 +205,7 @@ public class ObjectTypeErrorHandlingTest {
         ArrayLiteralExpression<String> stringArray = new ArrayLiteralExpression<>(stringElements, STRING_TYPE);
         
         // Cast to list<object>
-        Expression<List<Object>> objectArray = stringArray.asType(listType(OBJECT_TYPE));
+        Expression<List<Object>> objectArray = stringArray.asType(listType(ANY_TYPE));
         
         // Execute and verify results
         List<Object> result = objectArray.execute(executionContext, pap);
@@ -229,7 +226,7 @@ public class ObjectTypeErrorHandlingTest {
         entries.put(new StringLiteralExpression("string"), new StringLiteralExpression("value"));
         entries.put(new StringLiteralExpression("boolean"), new BoolLiteralExpression(true));
         
-        MapLiteralExpression<?, ?> map = new MapLiteralExpression<>(entries, STRING_TYPE, OBJECT_TYPE);
+        MapLiteralExpression<?, ?> map = new MapLiteralExpression<>(entries, STRING_TYPE, ANY_TYPE);
         
         Map<?, ?> result = map.execute(executionContext, pap);
         

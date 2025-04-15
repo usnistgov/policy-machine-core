@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.epp;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 
@@ -9,7 +9,6 @@ import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.obligation.Response;
 import gov.nist.csd.pm.pap.obligation.Rule;
@@ -62,7 +61,7 @@ public class EPP implements EventSubscriber {
 
         FormalParameter<Map<String, Object>> eventCtxParam = new FormalParameter<>(
             response.getEventCtxVariable(),
-            mapType(STRING_TYPE, OBJECT_TYPE)
+            mapType(STRING_TYPE, ANY_TYPE)
         );
 
         args.put(eventCtxParam, eventCtxToMap(eventCtx));

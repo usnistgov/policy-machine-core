@@ -8,7 +8,7 @@ import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
     }
     
     public static MapLiteralExpression<?, ?> of(Map<Expression<?>, Expression<?>> map) {
-        return new MapLiteralExpression<>(map, OBJECT_TYPE, OBJECT_TYPE);
+        return new MapLiteralExpression<>(map, ANY_TYPE, ANY_TYPE);
     }
 
     private final Map<Expression<?>, Expression<?>> compiledExpressions;

@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -10,8 +9,6 @@ import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 
-import javax.print.DocFlavor.STRING;
-import org.apache.arrow.vector.types.pojo.ArrowType.Bool;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -19,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
@@ -79,7 +76,7 @@ class LiteralVisitorTest {
                 ["a", ["b"]]
                 """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, listType(OBJECT_TYPE));
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, listType(ANY_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -87,12 +84,12 @@ class LiteralVisitorTest {
         assertEquals(
             new ArrayLiteralExpression<>(
                 List.of(new StringLiteralExpression("a"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), STRING_TYPE)),
-                OBJECT_TYPE
+                ANY_TYPE
             ),
             arrayLiteral
         );
         assertEquals(
-                listType(OBJECT_TYPE),
+                listType(ANY_TYPE),
                 literal.getType()
         );
 
@@ -180,11 +177,11 @@ class LiteralVisitorTest {
         map1.put(new StringLiteralExpression("a"), new StringLiteralExpression("a1"));
         map1.put(new StringLiteralExpression("b"), new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b1")), STRING_TYPE));
         assertEquals(
-                new MapLiteralExpression<>(map1, STRING_TYPE, OBJECT_TYPE),
+                new MapLiteralExpression<>(map1, STRING_TYPE, ANY_TYPE),
                 mapLiteral
         );
         assertEquals(
-                mapType(STRING_TYPE, OBJECT_TYPE),
+                mapType(STRING_TYPE, ANY_TYPE),
                 literal.getType()
         );
     }
@@ -199,7 +196,7 @@ class LiteralVisitorTest {
                 }
                 """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, mapType(OBJECT_TYPE, STRING_TYPE));
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, mapType(ANY_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -207,11 +204,11 @@ class LiteralVisitorTest {
         Map<Expression<?>, Expression<?>> map2 = new HashMap<>();
         map2.put(new StringLiteralExpression("a"), new StringLiteralExpression("a1"));
         map2.put(new ArrayLiteralExpression<>(List.of(new StringLiteralExpression("b")), STRING_TYPE), new StringLiteralExpression("b1"));
-        MapLiteralExpression<?, ?> expected = new MapLiteralExpression<>(map2, OBJECT_TYPE, STRING_TYPE);
+        MapLiteralExpression<?, ?> expected = new MapLiteralExpression<>(map2, ANY_TYPE, STRING_TYPE);
 
         assertEquals(expected, mapLiteral);
         assertEquals(
-                mapType(OBJECT_TYPE, STRING_TYPE),
+                mapType(ANY_TYPE, STRING_TYPE),
                 literal.getType()
         );
     }
@@ -234,7 +231,7 @@ class LiteralVisitorTest {
         Expression arrayLiteral = ExpressionVisitor.compile(visitorContext, arrayCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-            new ArrayLiteralExpression<>(List.of(), OBJECT_TYPE),
+            new ArrayLiteralExpression<>(List.of(), ANY_TYPE),
                 arrayLiteral
         );
 
@@ -244,7 +241,7 @@ class LiteralVisitorTest {
         Expression mapLiteral = ExpressionVisitor.compile(visitorContext, mapCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
-                new MapLiteralExpression(Map.of(), OBJECT_TYPE, OBJECT_TYPE),
+                new MapLiteralExpression(Map.of(), ANY_TYPE, ANY_TYPE),
                 mapLiteral
         );
     }

@@ -1,12 +1,10 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
-import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
@@ -27,15 +25,13 @@ import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 
 
-import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
-import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,7 +79,7 @@ class FunctionInvokeExpressionTest {
 
         VisitorContext visitorContext = new VisitorContext(testScope());
 
-        Expression e = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
                 new FunctionInvokeExpression<>(voidFunc.getSignature(), List.of(
@@ -148,7 +144,7 @@ class FunctionInvokeExpressionTest {
                 """);
         VisitorContext visitorContext = new VisitorContext(testScope());
 
-        Expression e = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
                 STRING_TYPE,
@@ -163,7 +159,7 @@ class FunctionInvokeExpressionTest {
                 stringFunc("a", "b")
                 """);
         VisitorContext visitorContext = new VisitorContext(testScope());
-        Expression e = ExpressionVisitor.compile(visitorContext, ctx, OBJECT_TYPE);
+        Expression e = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 
         PAP pap = new TestPAP();

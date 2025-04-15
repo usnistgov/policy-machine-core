@@ -350,15 +350,16 @@ public class ExecutionTest {
 
         String input1 = """
                 operation testFunc(any x) {
-                    create policy class x
+                    create ua "ua1" in x
                 }
                 
-                testFunc(["pc1"])
+                create pc "pc1"
+                testFunc("pc1")
                 """;
 
         
         PAP pap1 = new TestPAP();
-        assertThrows(ClassCastException.class, () -> pap1.executePML(new TestUserContext("u1"), input1));
+        assertThrows(IllegalArgumentException.class, () -> pap1.executePML(new TestUserContext("u1"), input1));
 
         PAP pap2 = new TestPAP();
         String input2 = """

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 
 import gov.nist.csd.pm.common.exception.PMException;
@@ -14,8 +14,8 @@ import java.util.List;
 
 public class Contains extends PMLBasicFunction {
 
-    public static final FormalParameter<List<Object>> ARR_PARAM = new FormalParameter<>("arr", listType(OBJECT_TYPE));
-    public static final FormalParameter<Object> ELEMENT_PARAM = new FormalParameter<>("element", OBJECT_TYPE);
+    public static final FormalParameter<List<Object>> ARR_PARAM = new FormalParameter<>("arr", listType(ANY_TYPE));
+    public static final FormalParameter<Object> ELEMENT_PARAM = new FormalParameter<>("element", ANY_TYPE);
 
     public Contains() {
         super(

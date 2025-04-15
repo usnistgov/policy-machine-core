@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -17,8 +17,9 @@ import java.util.Map;
 
 public class ContainsKey extends PMLBasicFunction {
 
-    public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", ArgType.mapType(OBJECT_TYPE, OBJECT_TYPE));
-    public static final FormalParameter<Object> KEY_PARAM = new FormalParameter<>("key", OBJECT_TYPE);
+    public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", ArgType.mapType(
+        ANY_TYPE, ANY_TYPE));
+    public static final FormalParameter<Object> KEY_PARAM = new FormalParameter<>("key", ANY_TYPE);
 
 
     public ContainsKey() {

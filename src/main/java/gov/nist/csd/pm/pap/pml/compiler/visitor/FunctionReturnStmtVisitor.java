@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -34,7 +34,7 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
             );
         }
 
-        Expression<?> e = ExpressionVisitor.compile(visitorCtx, ctx.expression(), OBJECT_TYPE);
+        Expression<?> e = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         return new ReturnStatement(e);
     }

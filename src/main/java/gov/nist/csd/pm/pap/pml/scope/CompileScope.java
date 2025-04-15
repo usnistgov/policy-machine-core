@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.pap.pml.scope;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.function.arg.type.ArgType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
@@ -9,10 +8,8 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
-import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLStmtsRoutine;
 
 import java.util.Collection;
@@ -21,7 +18,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 import static gov.nist.csd.pm.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.function.basic.builtin.PMLBuiltinFunctions.builtinFunctions;
 
@@ -67,7 +64,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
             } else {
                 addFunction(opName, new PMLOperationSignature(
                     operation.getName(),
-                    OBJECT_TYPE,
+                    ANY_TYPE,
                     operation.getFormalArgs()
                 ));
             }
@@ -82,7 +79,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
             } else {
                 addFunction(routineName, new PMLOperationSignature(
                     routine.getName(),
-                    OBJECT_TYPE,
+                    ANY_TYPE,
                     routine.getFormalArgs()
                 ));
             }

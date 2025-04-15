@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.pml.function.arg;
 
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.STRING_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
@@ -18,7 +18,7 @@ public class ArgTypeResolver {
 
     public static ArgType<?> resolveFromParserCtx(PMLParser.VariableTypeContext ctx) {
         return switch (ctx) {
-            case AnyTypeContext anyTypeContext -> OBJECT_TYPE;
+            case AnyTypeContext anyTypeContext -> ANY_TYPE;
             case StringTypeContext stringTypeContext -> STRING_TYPE;
             case BooleanTypeContext booleanTypeContext -> BOOLEAN_TYPE;
             case ArrayVarTypeContext arrayVarTypeContext ->
@@ -28,7 +28,7 @@ public class ArgTypeResolver {
                     resolveFromParserCtx(mapVarTypeContext.mapType().keyType),
                     resolveFromParserCtx(mapVarTypeContext.mapType().valueType)
                 );
-            default -> OBJECT_TYPE;
+            default -> ANY_TYPE;
         };
     }
 

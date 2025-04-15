@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.pap.function.arg.type.ArgType.OBJECT_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.ArgType.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.listType;
 import static gov.nist.csd.pm.pap.function.arg.type.ArgType.mapType;
 
@@ -19,7 +19,6 @@ import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.neo4j.fabric.eval.Catalog.Arg;
 
 public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
 
@@ -36,13 +35,13 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
         ArgType<?> valueType = null;
 
         if (isMapFor) {
-            iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), mapType(OBJECT_TYPE, OBJECT_TYPE));
+            iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), mapType(ANY_TYPE, ANY_TYPE));
 
             MapType<?, ?> actualMapType = (MapType<?, ?>) iter.getType();
             keyType = actualMapType.getKeyType();
             valueType = actualMapType.getValueType();
         } else {
-            iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), listType(OBJECT_TYPE));
+            iter = ExpressionVisitor.compile(visitorCtx, ctx.expression(), listType(ANY_TYPE));
 
             ListType<?> actualListType = (ListType<?>) iter.getType();
             keyType = actualListType.getElementType();
