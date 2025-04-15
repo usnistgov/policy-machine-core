@@ -39,7 +39,7 @@ public class GetAssociationsWithTarget extends PMLBasicFunction {
             associationValues.add(Map.of(
                 "ua", pap.query().graph().getNodeById(association.getSource()).getName(),
                 "target", pap.query().graph().getNodeById(association.getTarget()).getName(),
-                "arset", association.getAccessRightSet()
+                "arset", new ArrayList<>(association.getAccessRightSet())
             ));
         }
 

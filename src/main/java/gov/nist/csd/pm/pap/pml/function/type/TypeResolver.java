@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.function.arg;
+package gov.nist.csd.pm.pap.pml.function.type;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
@@ -14,7 +14,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BooleanTypeContext;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.MapVarTypeContext;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.StringTypeContext;
 
-public class ArgTypeResolver {
+public class TypeResolver {
 
     public static Type<?> resolveFromParserCtx(PMLParser.VariableTypeContext ctx) {
         return switch (ctx) {

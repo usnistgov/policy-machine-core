@@ -4,7 +4,7 @@ import static gov.nist.csd.pm.pap.function.arg.type.Type.VOID_TYPE;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
-import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeStringer;
+import gov.nist.csd.pm.pap.pml.function.type.TypeStringer;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
                 pml += ", ";
             }
 
-            pml += ArgTypeStringer.toPMLString(formalParameter.getType()) + " " + formalParameter.getName();
+            pml += TypeStringer.toPMLString(formalParameter.getType()) + " " + formalParameter.getName();
         }
 
         return pml;
@@ -57,7 +57,7 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
             prefix,
             name,
             argsStr,
-            returnType == null || returnType.equals(VOID_TYPE) ? "" : ArgTypeStringer.toPMLString(returnType) + " "
+            returnType == null || returnType.equals(VOID_TYPE) ? "" : TypeStringer.toPMLString(returnType) + " "
         );
     }
 

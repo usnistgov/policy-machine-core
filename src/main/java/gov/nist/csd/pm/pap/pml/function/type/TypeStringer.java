@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.function.arg;
+package gov.nist.csd.pm.pap.pml.function.type;
 
 import gov.nist.csd.pm.pap.function.arg.type.AnyType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
@@ -9,7 +9,7 @@ import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.arg.type.StringType;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 
-public class ArgTypeStringer {
+public class TypeStringer {
 
     public static String toPMLString(Type<?> type) {
         return switch (type) {

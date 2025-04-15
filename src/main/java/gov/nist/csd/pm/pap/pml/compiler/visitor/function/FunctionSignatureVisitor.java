@@ -11,7 +11,7 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeResolver;
+import gov.nist.csd.pm.pap.pml.function.type.TypeResolver;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineSignature;
@@ -125,6 +125,6 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
             return new VoidType();
         }
 
-        return ArgTypeResolver.resolveFromParserCtx(variableTypeContext);
+        return TypeResolver.resolveFromParserCtx(variableTypeContext);
     }
 }

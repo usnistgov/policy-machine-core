@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 
-import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeStringer;
+import gov.nist.csd.pm.pap.pml.function.type.TypeStringer;
 import java.util.List;
 
 public class PMLOperationSignature extends PMLFunctionSignature {
@@ -30,7 +30,7 @@ public class PMLOperationSignature extends PMLFunctionSignature {
             }
 
             pml += ((formalParameter instanceof NodeFormalParameter<?>) ? "@node " : "") +
-                ArgTypeStringer.toPMLString(formalParameter.getType()) + " " +
+                TypeStringer.toPMLString(formalParameter.getType()) + " " +
                 formalParameter.getName();
         }
         return pml;

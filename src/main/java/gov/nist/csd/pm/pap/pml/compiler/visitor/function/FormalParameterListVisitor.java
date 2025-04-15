@@ -7,7 +7,7 @@ import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeResolver;
+import gov.nist.csd.pm.pap.pml.function.type.TypeResolver;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +38,7 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
 
             // get arg type
             PMLParser.VariableTypeContext varTypeContext = formalArgCtx.variableType();
-            Type<?> type = ArgTypeResolver.resolveFromParserCtx(varTypeContext);
+            Type<?> type = TypeResolver.resolveFromParserCtx(varTypeContext);
 
             if (isNodeop) {
                 formalArgs.add(new NodeFormalParameter<>(name, type));

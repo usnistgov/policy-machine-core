@@ -46,7 +46,7 @@ import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.arg.ArgTypeStringer;
+import gov.nist.csd.pm.pap.pml.function.type.TypeStringer;
 import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
 import java.util.ArrayList;
@@ -63,6 +63,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
                                             ExpressionContext ctx,
                                             Type<T> expectedType) {
+        if ()
+
         ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
         Expression<?> compiledExpression = visitor.visit(ctx);
         Type<?> resultType = compiledExpression.getType();
@@ -335,7 +337,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         if (!(type instanceof MapType<?, ?> mapType)) {
             throw new PMLCompilationRuntimeException(ctx,
                 String.format("Type mismatch: Cannot apply indexing to type %s. Expected Map.",
-                    ArgTypeStringer.toPMLString(type)));
+                    TypeStringer.toPMLString(type)));
         }
 
         return mapType;

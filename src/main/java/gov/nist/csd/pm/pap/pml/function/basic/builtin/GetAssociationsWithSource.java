@@ -28,7 +28,7 @@ public class GetAssociationsWithSource extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public List<Map<String, Object>> execute(PAP pap, Args args) throws PMException {
         String source = args.get(NODE_NAME_PARAM);
 
         long id = pap.query().graph().getNodeId(source);
@@ -38,7 +38,7 @@ public class GetAssociationsWithSource extends PMLBasicFunction {
             associationValues.add(Map.of(
                 "ua", pap.query().graph().getNodeById(association.getSource()).getName(),
                 "target", pap.query().graph().getNodeById(association.getTarget()).getName(),
-                "arset", association.getAccessRightSet()
+                "arset", new ArrayList<>(association.getAccessRightSet())
             ));
         }
 
