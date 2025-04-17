@@ -107,7 +107,7 @@ public class PAP implements AdminFunctionExecutor, Transactional {
             // create bootstrap policy and user
             long pc = tx.modify().graph().createPolicyClass("bootstrap");
             long ua = tx.modify().graph().createUserAttribute("bootstrapper", List.of(pc));
-            long bootstrapUserId = tx.modify().graph().createUserAttribute(bootstrapUser, List.of(ua));
+            long bootstrapUserId = tx.modify().graph().createUser(bootstrapUser, List.of(ua));
 
             // execute the bootstrapper
             bootstrapper.bootstrap(new UserContext(bootstrapUserId), tx);
