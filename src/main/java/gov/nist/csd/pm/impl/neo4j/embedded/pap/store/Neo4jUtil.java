@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.common.exception.InvalidProhibitionSubjectException;
 import gov.nist.csd.pm.common.exception.PMException;

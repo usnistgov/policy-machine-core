@@ -1,7 +1,7 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jMemoryPolicyStore;
+import gov.nist.csd.pm.impl.neo4j.embedded.pap.store.Neo4jEmbeddedPolicyStore;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTest;
 import gov.nist.csd.pm.pap.modification.*;
@@ -24,7 +24,7 @@ class TestTx {
 		if (graphDb == null) {
 			DatabaseManagementService managementService = new DatabaseManagementServiceBuilder(new File("/tmp/test").toPath()).build();
 			graphDb = managementService.database(DEFAULT_DATABASE_NAME);
-			Neo4jMemoryPolicyStore.createIndexes(graphDb);
+			Neo4jEmbeddedPolicyStore.createIndexes(graphDb);
 		}
 
 		try(Transaction tx = graphDb.beginTx()) {
@@ -36,107 +36,107 @@ class TestTx {
 	}
 }
 
-public class Neo4jMemoryPAPTest extends PAPTest {
+public class Neo4JEmbeddedPAPTest extends PAPTest {
 	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryAccessQuerierTest extends AccessQuerierTest {
+class Neo4jEmbeddedAccessQuerierTest extends AccessQuerierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryGraphModifierTest extends GraphModifierTest {
+class Neo4jEmbeddedGraphModifierTest extends GraphModifierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryGraphQuerierTest extends GraphQuerierTest {
+class Neo4jEmbeddedGraphQuerierTest extends GraphQuerierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryObligationsModifierTest extends ObligationsModifierTest {
+class Neo4jEmbeddedObligationsModifierTest extends ObligationsModifierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryObligationsQuerierTest extends ObligationsQuerierTest {
+class Neo4jEmbeddedObligationsQuerierTest extends ObligationsQuerierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 
 }
 
-class MemoryOperationsModifierTest extends OperationsModifierTest {
+class Neo4jEmbeddedOperationsModifierTest extends OperationsModifierTest {
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryOperationsQueryTest extends OperationsQuerierTest {
+class Neo4jEmbeddedOperationsQueryTest extends OperationsQuerierTest {
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryProhibitionsModifierTest extends ProhibitionsModifierTest {
+class Neo4jEmbeddedProhibitionsModifierTest extends ProhibitionsModifierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryProhibitionsQuerierTest extends ProhibitionsQuerierTest {
+class Neo4jEmbeddedProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryRoutinesModifierTest extends RoutinesModifierTest {
+class Neo4jEmbeddedRoutinesModifierTest extends RoutinesModifierTest {
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }
 
-class MemoryRoutinesQuerierTest extends RoutinesQuerierTest {
+class Neo4jEmbeddedRoutinesQuerierTest extends RoutinesQuerierTest {
 	@Override
 	public PAP initializePAP() throws PMException {
-		return new Neo4jMemoryPAP(new Neo4jMemoryPolicyStore(TestTx.getTx()))
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 				.withIdGenerator(new TestIdGenerator());
 	}
 }

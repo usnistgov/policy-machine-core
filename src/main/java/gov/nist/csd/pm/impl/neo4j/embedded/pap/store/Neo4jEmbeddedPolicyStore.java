@@ -1,11 +1,11 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.store.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
-public class Neo4jMemoryPolicyStore implements PolicyStore {
+public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
 	public static void createIndexes(GraphDatabaseService graphDb) {
 		// create the indexes
@@ -27,7 +27,7 @@ public class Neo4jMemoryPolicyStore implements PolicyStore {
 	 * @param graphDb The graph database service
 	 * @throws PMException If an error occurs initializing the policy store
 	 */
-	public Neo4jMemoryPolicyStore(GraphDatabaseService graphDb) throws PMException {
+	public Neo4jEmbeddedPolicyStore(GraphDatabaseService graphDb) throws PMException {
 		this.txHandler = new TxHandler(graphDb);
 	}
 
@@ -41,27 +41,27 @@ public class Neo4jMemoryPolicyStore implements PolicyStore {
 
 	@Override
 	public GraphStore graph() {
-		return new Neo4jMemoryGraphStore(txHandler);
+		return new Neo4jEmbeddedGraphStore(txHandler);
 	}
 
 	@Override
 	public ProhibitionsStore prohibitions() {
-		return new Neo4jMemoryProhibitionStore(txHandler);
+		return new Neo4jEmbeddedProhibitionStore(txHandler);
 	}
 
 	@Override
 	public ObligationsStore obligations() {
-		return new Neo4jMemoryObligationStore(txHandler);
+		return new Neo4jEmbeddedObligationStore(txHandler);
 	}
 
 	@Override
 	public OperationsStore operations() {
-		return new Neo4jMemoryOperationsStore(txHandler);
+		return new Neo4jEmbeddedOperationsStore(txHandler);
 	}
 
 	@Override
 	public RoutinesStore routines() {
-		return new Neo4jMemoryRoutinesStore(txHandler);
+		return new Neo4jEmbeddedRoutinesStore(txHandler);
 	}
 
 	@Override

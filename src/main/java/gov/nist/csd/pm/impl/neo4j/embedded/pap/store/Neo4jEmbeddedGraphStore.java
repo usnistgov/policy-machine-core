@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
@@ -17,13 +17,13 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jUtil.*;
+import static gov.nist.csd.pm.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 
-public class Neo4jMemoryGraphStore implements GraphStore {
+public class Neo4jEmbeddedGraphStore implements GraphStore {
 
 	private final TxHandler txHandler;
 
-	public Neo4jMemoryGraphStore(TxHandler txHandler) {
+	public Neo4jEmbeddedGraphStore(TxHandler txHandler) {
 		this.txHandler = txHandler;
 	}
 

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
@@ -16,13 +16,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jUtil.*;
+import static gov.nist.csd.pm.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 
-public class Neo4jMemoryProhibitionStore implements ProhibitionsStore {
+public class Neo4jEmbeddedProhibitionStore implements ProhibitionsStore {
 
 	private final TxHandler txHandler;
 
-	public Neo4jMemoryProhibitionStore(TxHandler txHandler) {
+	public Neo4jEmbeddedProhibitionStore(TxHandler txHandler) {
 		this.txHandler = txHandler;
 	}
 

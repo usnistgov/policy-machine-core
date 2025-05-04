@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.routine.Routine;
@@ -11,13 +11,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jUtil.*;
+import static gov.nist.csd.pm.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 
-public class Neo4jMemoryRoutinesStore implements RoutinesStore {
+public class Neo4jEmbeddedRoutinesStore implements RoutinesStore {
 
 	private final TxHandler txHandler;
 
-	public Neo4jMemoryRoutinesStore(TxHandler txHandler) {
+	public Neo4jEmbeddedRoutinesStore(TxHandler txHandler) {
 		this.txHandler = txHandler;
 	}
 

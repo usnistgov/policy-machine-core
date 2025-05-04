@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.impl.neo4j.memory.pap.store;
+package gov.nist.csd.pm.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.obligation.Obligation;
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static gov.nist.csd.pm.impl.neo4j.memory.pap.store.Neo4jUtil.*;
+import static gov.nist.csd.pm.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 
-public class Neo4jMemoryObligationStore implements ObligationsStore {
+public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 
 	private final TxHandler txHandler;
 
-	public Neo4jMemoryObligationStore(TxHandler txHandler) {
+	public Neo4jEmbeddedObligationStore(TxHandler txHandler) {
 		this.txHandler = txHandler;
 	}
 
