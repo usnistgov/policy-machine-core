@@ -3,7 +3,6 @@ package gov.nist.csd.pm.pap.function.op;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ class PrivilegeCheckerTest {
 				""";
 
 		MemoryPAP pap = new TestPAP();
-		pap.deserialize(new UserContext(id("u1")), pml, new PMLDeserializer());
+		pap.executePML(new UserContext(id("u1")), pml);
 
 		assertDoesNotThrow(() -> pap.privilegeChecker().check(new UserContext(id("u1")), id("o1"), List.of()));
 		assertThrows(PMException.class, () -> pap.privilegeChecker().check(new UserContext(id("u2")), id("o1"), List.of()));

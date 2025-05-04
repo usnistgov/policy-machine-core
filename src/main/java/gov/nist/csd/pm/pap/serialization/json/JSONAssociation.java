@@ -6,23 +6,23 @@ import java.util.Objects;
 
 public class JSONAssociation {
 
-    private String target;
+    private long target;
     private AccessRightSet arset;
 
     public JSONAssociation() {
         arset = new AccessRightSet();
     }
 
-    public JSONAssociation(String target, AccessRightSet arset) {
+    public JSONAssociation(long target, AccessRightSet arset) {
         this.target = target;
         this.arset = arset;
     }
 
-    public String getTarget() {
+    public long getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
+    public void setTarget(long target) {
         this.target = target;
     }
 

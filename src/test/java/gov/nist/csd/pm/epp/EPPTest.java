@@ -23,7 +23,6 @@ import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
@@ -219,7 +218,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -266,7 +265,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
             ids("oa1")));
@@ -389,7 +388,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         pdp.runTx(new UserContext(id("u1")), (txPDP) -> {
             txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1"));
@@ -433,7 +432,7 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
         assertFalse(pap.query().graph().nodeExists("test"));

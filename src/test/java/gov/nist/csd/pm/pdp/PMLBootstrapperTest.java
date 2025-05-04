@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.pdp;
 
+import gov.nist.csd.pm.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
@@ -8,12 +9,14 @@ import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.bootstrap.PMLBootstrapper;
+import gov.nist.csd.pm.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PMLBootstrapperTest {
@@ -71,7 +74,7 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap("u1", new PMLBootstrapper(List.of(op1), List.of(routine1), input));
+        pdp.bootstrap(new PMLBootstrapper(List.of(op1), List.of(routine1), "u1", input));
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("op1"));
@@ -79,6 +82,16 @@ class PMLBootstrapperTest {
         assertTrue(pap.query().graph().nodeExists("ua1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
         assertTrue(pap.query().graph().nodeExists("u1"));
+    }
+
+    @Test
+    void testBootstrapThrowsExceptionWhenUserNotAssigned() throws PMException {
+        PAP pap = new TestPAP();
+        PDP pdp = new PDP(pap);
+
+        assertThrows(DisconnectedNodeException.class, () -> pdp.bootstrap(new PMLBootstrapper(
+            List.of(), List.of(), "u1", "create pc \"pc1\""
+        )));
     }
 
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/usnistgov/policy-machine-core/master/src/main/resources/json/pm.schema.json",
-    "title": "Policy Machine JSON Schema",
+    "$id": "https://raw.githubusercontent.com/usnistgov/policy-machine-core/master/src/main/resources/json/pm-id.schema.json",
+    "title": "Policy Machine JSON Schema (ID-based)",
     "type": "object",
     "properties": {
         "resourceOperations": {
@@ -49,13 +49,13 @@
         "prohibitions": {
             "type": "array",
             "items": {
-                "type": "string"
+                "$ref": "#/$defs/prohibition"
             }
         },
         "obligations": {
             "type": "array",
             "items": {
-                "type": "string"
+                "$ref": "#/$defs/obligation"
             }
         },
         "operations": {
@@ -87,6 +87,9 @@
         "pcNode": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -98,6 +101,7 @@
                 }
             },
             "requiredProperties": [
+                "id",
                 "name"
             ],
             "additionalProperties": false
@@ -105,6 +109,9 @@
         "uaNode": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -112,7 +119,7 @@
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "associations": {
@@ -121,7 +128,7 @@
                         "type": "object",
                         "properties": {
                             "target": {
-                                "type": "string"
+                                "type": "integer"
                             },
                             "arset": {
                                 "type": "array",
@@ -140,6 +147,7 @@
                 }
             },
             "requiredProperties": [
+                "id",
                 "name",
                 "assignments"
             ],
@@ -148,6 +156,9 @@
         "otherNode": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -155,7 +166,7 @@
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "properties": {
@@ -166,8 +177,101 @@
                 }
             },
             "requiredProperties": [
+                "id",
                 "name",
                 "assignments"
+            ],
+            "additionalProperties": false
+        },
+        "obligation": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "author": {
+                    "type": "integer"
+                },
+                "pml": {
+                    "type": "string"
+                }
+            },
+            "requiredProperties": [
+                "name",
+                "author",
+                "pml"
+            ],
+            "additionalProperties": false
+        },
+        "containerSpec": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "complement": {
+                    "type": "boolean"
+                }
+            },
+            "requiredProperties": [
+                "id",
+                "complement"
+            ],
+            "additionalProperties": false
+        },
+        "prohibition": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "subject": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "node": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": ["node"],
+                            "additionalProperties": false
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "process": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["process"],
+                            "additionalProperties": false
+                        }
+                    ]
+                },
+                "containers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/containerSpec"
+                    }
+                },
+                "arset": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "intersection": {
+                    "type": "boolean",
+                    "default": true
+                }
+            },
+            "requiredProperties": [
+                "name",
+                "subject",
+                "containers",
+                "operations"
             ],
             "additionalProperties": false
         }

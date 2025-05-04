@@ -5,7 +5,6 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -25,17 +24,12 @@ public class SamplePolicy {
         long u1 = pap.modify().graph().createUser("u1", Collections.singleton(ua1));
         pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
 
-        pap.deserialize(new TestUserContext("u1"), s, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), s);
     }
 
     public static void loadSamplePolicyFromJSON(PAP pap) throws IOException, PMException {
         String s = IOUtils.resourceToString("sample/sample.json", StandardCharsets.UTF_8, SamplePolicy.class.getClassLoader());
-        long testPc = pap.modify().graph().createPolicyClass("test_pc");
-        long ua1 = pap.modify().graph().createUserAttribute("ua1", Collections.singleton(testPc));
-        long u1 = pap.modify().graph().createUser("u1", Collections.singleton(ua1));
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
-
-        pap.deserialize(new TestUserContext("u1"), s, new JSONDeserializer());
+        pap.deserialize(s, new JSONDeserializer());
     }
 
     public static String loadSamplePolicyPML() throws IOException {

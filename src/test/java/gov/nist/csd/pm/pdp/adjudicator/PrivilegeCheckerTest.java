@@ -3,9 +3,7 @@ package gov.nist.csd.pm.pdp.adjudicator;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,7 +22,7 @@ class PrivilegeCheckerTest {
     @BeforeAll
     static void setup() throws PMException {
         pap = new TestPAP();
-        pap.deserialize(
+        pap.executePML(
                 new TestUserContext("u1"),
                 """
                         set resource operations ["read", "write"]
@@ -43,8 +41,7 @@ class PrivilegeCheckerTest {
                         create user "u2" in ["ua2"]
                         
                         create object "o1" in ["oa1"]
-                        """,
-                        new PMLDeserializer()
+                        """
         );
     }
 

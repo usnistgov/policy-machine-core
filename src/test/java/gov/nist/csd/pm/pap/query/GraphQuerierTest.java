@@ -8,7 +8,6 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
 import gov.nist.csd.pm.pap.query.model.subgraph.Subgraph;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -257,7 +256,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                 
                 create o "o1" in ["oa3", "oa6"]
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         Collection<Long> conts = pap.query().graph().getAttributeDescendants(id("o1"));
         List<Long> expected = ids("oa3", "oa2", "oa1", "oa6", "oa5");
@@ -283,7 +282,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                       
                       create o "o1" in ["oa3", "oa6"]
                       """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         Collection<Long> pcs = pap.query().graph().getPolicyClassDescendants(id("o1"));
         List<Long> expected = ids("pc1", "pc2");
@@ -309,7 +308,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                       
                       create o "o1" in ["oa3", "oa6"]
                       """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         long o1 = id("o1");
         assertTrue(pap.query().graph().isAscendant(o1, id("oa1")));
@@ -338,7 +337,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
                                       
                       create o "o1" in ["oa3", "oa6"]
                       """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         long o1 = id("o1");
         assertTrue(pap.query().graph().isDescendant(o1, id("oa1")));
@@ -368,7 +367,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
                 create o "o1" in ["oa3", "oa6"]
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         Subgraph actual = pap.query().graph().getAscendantSubgraph(id("pc1"));
         assertSubgraphEquals(new Subgraph(
@@ -408,7 +407,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
                 create o "o1" in ["oa3", "oa6"]
                 """;
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         Subgraph actual = pap.query().graph().getDescendantSubgraph(id("o1"));
         assertSubgraphEquals(new Subgraph(

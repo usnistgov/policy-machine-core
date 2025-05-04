@@ -8,21 +8,24 @@
   "graph": {
     "pcs": [
       {
+        "id": 1,
         "name": "RBAC"
       },
       {
+        "id": 2,
         "name": "Location"
       }
     ],
     "uas": [
       {
+        "id": 3,
         "name": "US user",
         "assignments": [
-          "Location"
+          2
         ],
         "associations": [
           {
-            "target": "US project",
+            "target": 13,
             "arset": [
               "*"
             ]
@@ -30,13 +33,14 @@
         ]
       },
       {
+        "id": 4,
         "name": "reader",
         "assignments": [
-          "employee"
+          7
         ],
         "associations": [
           {
-            "target": "project",
+            "target": 11,
             "arset": [
               "read"
             ]
@@ -44,13 +48,14 @@
         ]
       },
       {
+        "id": 5,
         "name": "EU user",
         "assignments": [
-          "Location"
+          2
         ],
         "associations": [
           {
-            "target": "EU project",
+            "target": 9,
             "arset": [
               "*"
             ]
@@ -58,13 +63,14 @@
         ]
       },
       {
+        "id": 6,
         "name": "writer",
         "assignments": [
-          "reader"
+          4
         ],
         "associations": [
           {
-            "target": "project",
+            "target": 11,
             "arset": [
               "write"
             ]
@@ -72,19 +78,21 @@
         ]
       },
       {
+        "id": 7,
         "name": "employee",
         "assignments": [
-          "RBAC"
+          1
         ]
       },
       {
+        "id": 8,
         "name": "deleter",
         "assignments": [
-          "employee"
+          7
         ],
         "associations": [
           {
-            "target": "project",
+            "target": 11,
             "arset": [
               "write"
             ]
@@ -94,86 +102,101 @@
     ],
     "oas": [
       {
+        "id": 9,
         "name": "EU project",
         "assignments": [
-          "Location"
+          2
         ]
       },
       {
+        "id": 10,
         "name": "us_project1",
         "assignments": [
-          "US project",
-          "project"
+          13,
+          11
         ]
       },
       {
+        "id": 11,
         "name": "project",
         "assignments": [
-          "RBAC"
+          1
         ]
       },
       {
+        "id": 12,
         "name": "eu_project1",
         "assignments": [
-          "project",
-          "EU project"
+          11,
+          9
         ]
       },
       {
+        "id": 13,
         "name": "US project",
         "assignments": [
-          "Location"
+          2
         ]
       }
     ],
     "users": [
       {
+        "id": 14,
         "name": "eu_writer1",
         "assignments": [
-          "EU user",
-          "writer"
+          5,
+          6
         ]
       },
       {
+        "id": 15,
         "name": "us_writer1",
         "assignments": [
-          "US user",
-          "writer"
+          3,
+          6
         ]
       },
       {
+        "id": 16,
         "name": "eu_reader1",
         "assignments": [
-          "EU user",
-          "reader"
+          5,
+          4
         ]
       },
       {
+        "id": 17,
         "name": "us_reader1",
         "assignments": [
-          "US user",
-          "reader"
+          3,
+          4
         ]
       }
     ],
     "objects": [
       {
+        "id": 18,
         "name": "eu_project1 README",
         "assignments": [
-          "eu_project1"
+          12
         ]
       },
       {
+        "id": 19,
         "name": "us_project1 README",
         "assignments": [
-          "us_project1"
+          10
         ]
       }
     ]
   },
   "prohibitions": [],
   "obligations": [
-    "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n}"
+    {
+      "author": 14,
+      "name": "create us project admin",
+      "pml": "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n}"
+    }
   ],
   "operations": [
     "operation deleteProject(@node string projectName) {\n    check \"delete_project\" on [projectName]\n} {\n    delete node projectName\n}",

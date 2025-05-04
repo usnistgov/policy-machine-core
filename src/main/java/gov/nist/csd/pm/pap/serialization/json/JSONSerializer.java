@@ -4,6 +4,8 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.Association;
+import gov.nist.csd.pm.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
@@ -15,6 +17,7 @@ import gov.nist.csd.pm.pap.pml.statement.operation.CreateProhibitionStatement;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.serialization.PolicySerializer;
 
+import gov.nist.csd.pm.pap.serialization.json.JSONProhibition.JSONSubject;
 import java.util.*;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.*;
@@ -24,17 +27,17 @@ public class JSONSerializer implements PolicySerializer {
     @Override
     public String serialize(PolicyQuery policyQuery) throws PMException {
         return buildJSONPolicy(policyQuery)
-                .toString();
+            .toString();
     }
 
     public JSONPolicy buildJSONPolicy(PolicyQuery policyQuery) throws PMException {
         return new JSONPolicy(
-                policyQuery.operations().getResourceOperations(),
-                buildGraphJSON(policyQuery),
-                buildProhibitionsJSON(policyQuery),
-                buildObligationsJSON(policyQuery),
-                buildOperationsJSON(policyQuery),
-                buildRoutinesJSON(policyQuery)
+            policyQuery.operations().getResourceOperations(),
+            buildGraphJSON(policyQuery),
+            buildProhibitionsJSON(policyQuery),
+            buildObligationsJSON(policyQuery),
+            buildOperationsJSON(policyQuery),
+            buildRoutinesJSON(policyQuery)
         );
     }
 
@@ -68,21 +71,32 @@ public class JSONSerializer implements PolicySerializer {
         return json;
     }
 
-    private List<String> buildObligationsJSON(PolicyQuery policyQuery) throws PMException {
-        List<String> jsonObligations = new ArrayList<>();
+    private List<JSONObligation> buildObligationsJSON(PolicyQuery policyQuery) throws PMException {
+        List<JSONObligation> jsonObligations = new ArrayList<>();
         Collection<Obligation> all = policyQuery.obligations().getObligations();
         for (Obligation obligation : all) {
-            jsonObligations.add(obligation.toString());
+            jsonObligations.add(JSONObligation.fromObligation(obligation));
         }
 
         return jsonObligations;
     }
 
-    private List<String> buildProhibitionsJSON(PolicyQuery policyQuery) throws PMException {
-        List<String> prohibitions = new ArrayList<>();
+    private List<JSONProhibition> buildProhibitionsJSON(PolicyQuery policyQuery) throws PMException {
+        List<JSONProhibition> prohibitions = new ArrayList<>();
         Collection<Prohibition> all = policyQuery.prohibitions().getProhibitions();
         for (Prohibition prohibition : all) {
-            prohibitions.add(CreateProhibitionStatement.fromProhibition(policyQuery, prohibition).toString());
+            ProhibitionSubject subject = prohibition.getSubject();
+            Collection<ContainerCondition> containers = prohibition.getContainers();
+
+            JSONProhibition jsonProhibition = new JSONProhibition(
+                prohibition.getName(),
+                JSONSubject.fromProhibitionSubject(subject),
+                containers,
+                prohibition.getAccessRightSet().stream().toList(),
+                prohibition.isIntersection()
+            );
+
+            prohibitions.add(jsonProhibition);
         }
 
         return prohibitions;
@@ -90,11 +104,11 @@ public class JSONSerializer implements PolicySerializer {
 
     private JSONGraph buildGraphJSON(PolicyQuery policyQuery) throws PMException {
         return new JSONGraph(
-                buildPolicyClasses(policyQuery),
-                buildUserAttributes(policyQuery),
-                buildNonUANodes(policyQuery, OA),
-                buildNonUANodes(policyQuery, U),
-                buildNonUANodes(policyQuery, O)
+            buildPolicyClasses(policyQuery),
+            buildUserAttributes(policyQuery),
+            buildNonUANodes(policyQuery, OA),
+            buildNonUANodes(policyQuery, U),
+            buildNonUANodes(policyQuery, O)
         );
     }
 
@@ -107,22 +121,10 @@ public class JSONSerializer implements PolicySerializer {
                 continue;
             }
 
-            Node n = policyQuery.graph().getNodeById(node.getId());
-            String name = n.getName();
-            List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
-
+            List<JSONProperty> properties = mapToJsonProperties(node.getProperties());
             Collection<Long> descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
-            List<String> descendantNames = descendants.stream()
-                    .map(m -> {
-                        try {
-                            return policyQuery.graph().getNodeById(m).getName();
-                        } catch (PMException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
 
-            nodes.add(new JSONNode(name, properties, descendantNames, null));
+            nodes.add(new JSONNode(node.getId(), node.getName(), properties, descendants, null));
         }
 
         return nodes;
@@ -153,35 +155,23 @@ public class JSONSerializer implements PolicySerializer {
 
         Collection<Node> search = policyQuery.graph().search(UA, new HashMap<>());
         for (Node node : search) {
-            Node n = policyQuery.graph().getNodeById(node.getId());
-
             Collection<Long> descendants = policyQuery.graph().getAdjacentDescendants(node.getId());
-            List<String> descendantNames = descendants.stream()
-                    .map(m -> {
-                        try {
-                            return policyQuery.graph().getNodeById(m).getName();
-                        } catch (PMException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-
             Collection<Association> assocList = policyQuery.graph().getAssociationsWithSource(node.getId());
             List<JSONAssociation> jsonAssociations = new ArrayList<>();
             for (Association assoc : assocList) {
                 jsonAssociations.add(new JSONAssociation(
-                        policyQuery.graph().getNodeById(assoc.getTarget()).getName(),
-                        assoc.getAccessRightSet())
+                    assoc.getTarget(),
+                    assoc.getAccessRightSet())
                 );
             }
 
-            List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
+            List<JSONProperty> properties = mapToJsonProperties(node.getProperties());
 
             JSONNode jsonNode;
             if (jsonAssociations.isEmpty()) {
-                jsonNode = new JSONNode(n.getName(), properties, descendantNames, null);
+                jsonNode = new JSONNode(node.getId(), node.getName(), properties, descendants, null);
             } else {
-                jsonNode = new JSONNode(n.getName(), properties, descendantNames, jsonAssociations);
+                jsonNode = new JSONNode(node.getId(), node.getName(), properties, descendants, jsonAssociations);
             }
 
             userAttributes.add(jsonNode);
@@ -202,7 +192,7 @@ public class JSONSerializer implements PolicySerializer {
             Node n = policyQuery.graph().getNodeById(pc);
             String name = n.getName();
             List<JSONProperty> properties = mapToJsonProperties(n.getProperties());
-            JSONNode jsonPolicyClass = new JSONNode(name, properties, null, null);
+            JSONNode jsonPolicyClass = new JSONNode(n.getId(), name, properties, null, null);
 
             policyClassesList.add(jsonPolicyClass);
         }

@@ -35,7 +35,7 @@ public class JSONSerializationTest {
         );
 
         for (JSONPolicy policy : policies) {
-            assertDoesNotThrow(() -> new MemoryPAP().deserialize(new UserContext(0), policy.toString(), new JSONDeserializer()));
+            assertDoesNotThrow(() -> new MemoryPAP().deserialize(policy.toString(), new JSONDeserializer()));
         }
     }
 

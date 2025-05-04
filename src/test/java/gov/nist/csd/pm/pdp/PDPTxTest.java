@@ -2,10 +2,8 @@ package gov.nist.csd.pm.pdp;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.json.JSONSerializer;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -69,9 +67,9 @@ class PDPTxTest {
         String serialize = "create pc \"test\"";
 
         PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
-        assertThrows(UnauthorizedException.class, () -> u2.deserialize(new UserContext(0), serialize, new PMLDeserializer()));
+        assertThrows(UnauthorizedException.class, () -> u2.executePML(new UserContext(0), serialize));
 
         PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
-        assertDoesNotThrow(() -> u1.deserialize(new UserContext(0), serialize, new PMLDeserializer()));
+        assertDoesNotThrow(() -> u1.executePML(new UserContext(0), serialize));
     }
 }

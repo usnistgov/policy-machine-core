@@ -101,10 +101,10 @@ public class PDPTx extends PAP {
     }
 
     @Override
-    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer) throws PMException {
+    public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
         privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DESERIALIZE_POLICY);
 
-        pap.deserialize(author, input, policyDeserializer);
+        pap.deserialize(input, policyDeserializer);
     }
 
     public void executePML(UserContext author, String input) throws PMException {

@@ -94,29 +94,16 @@ public class PAP implements AdminFunctionExecutor, Transactional {
      * go no record as being the author of any obligations created by the bootstrapper. This user will be created outside
      * the PolicyBootstrapper and already exists when the bootstrapper is executed. The bootstrap user must be assigned
      * to attributes within the PolicyBootstrapper or an exception will be thrown.
-     * @param bootstrapUser the name of the user bootstrapping the policy.
      * @param bootstrapper the PolicyBootstrapper that will build the custom bootstrap policy.
      * @throws PMException if there is an error bootstrapping.
      */
-    public void bootstrap(String bootstrapUser, PolicyBootstrapper bootstrapper) throws PMException {
+    public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
         if(!isPolicyEmpty()) {
             throw new BootstrapExistingPolicyException();
         }
 
-        runTx(tx -> {
-            // create bootstrap policy and user
-            long pc = tx.modify().graph().createPolicyClass("bootstrap");
-            long ua = tx.modify().graph().createUserAttribute("bootstrapper", List.of(pc));
-            long bootstrapUserId = tx.modify().graph().createUser(bootstrapUser, List.of(ua));
-
-            // execute the bootstrapper
-            bootstrapper.bootstrap(new UserContext(bootstrapUserId), tx);
-
-            // clean up bootstrap policy
-            tx.modify().graph().deassign(bootstrapUserId, List.of(ua));
-            tx.modify().graph().deleteNode(ua);
-            tx.modify().graph().deleteNode(pc);
-        });
+        // execute the bootstrapper
+        runTx(bootstrapper::bootstrap);
     }
 
     @Override
@@ -143,16 +130,15 @@ public class PAP implements AdminFunctionExecutor, Transactional {
      * nodes are assumed to be created and can be referenced in the input string without explicit creation. If any of the
      * admin policy nodes are created in the input string an exception will be thrown.
      *
-     * @param author The UserContext describing the author of the deserialized policy elements.
      * @param input The string representation of the policy to deserialize.
      * @param policyDeserializer The PolicyDeserializer to apply the input string to the policy.
      * @throws PMException If there is an error deserializing the given inputs string.
      */
-    public void deserialize(UserContext author, String input, PolicyDeserializer policyDeserializer) throws PMException {
+    public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
         beginTx();
 
         try {
-            policyDeserializer.deserialize(this, author, input);
+            policyDeserializer.deserialize(this, input);
         } catch (PMException e) {
             rollback();
             throw e;

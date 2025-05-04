@@ -5,7 +5,6 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.util.TestPAP;
 import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -458,7 +457,7 @@ public class ExecutionTest {
                 """;
 
          PAP pap = new TestPAP();
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -475,7 +474,7 @@ public class ExecutionTest {
                 """;
 
          PAP pap = new TestPAP();
-        pap.deserialize(new TestUserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         assertFalse(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));

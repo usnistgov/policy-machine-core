@@ -72,12 +72,12 @@ class PDPTest {
         PAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
 
-        pdp.bootstrap("u1", new PolicyBootstrapper() {
+        pdp.bootstrap(new PolicyBootstrapper() {
             @Override
-            public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+            public void bootstrap(PAP pap) throws PMException {
                 long pc1 = pap.modify().graph().createPolicyClass("pc1");
                 long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-                pap.modify().graph().assign(bootstrapUser.getUser(), List.of(ua1));
+                pap.modify().graph().createUser("u1", List.of(ua1));
             }
         });
 
@@ -86,27 +86,14 @@ class PDPTest {
     }
 
     @Test
-    void testBootstrapThrowsExceptionWhenUserNotAssigned() throws PMException {
-        PAP pap = new TestPAP();
-        PDP pdp = new PDP(pap);
-
-        assertThrows(DisconnectedNodeException.class, () -> pdp.bootstrap("u1", new PolicyBootstrapper() {
-            @Override
-            public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
-                long pc1 = pap.modify().graph().createPolicyClass("pc1");
-            }
-        }));
-    }
-
-    @Test
     void testBootstrapWithExistingPolicyThrowsException() throws PMException {
         PAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         pap.modify().graph().createPolicyClass("pc1");
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap("u1", new PolicyBootstrapper() {
+            pdp.bootstrap(new PolicyBootstrapper() {
                 @Override
-                public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+                public void bootstrap(PAP pap) throws PMException {
 
                 }
             });
@@ -127,9 +114,9 @@ class PDPTest {
                 Collections.singleton(new ContainerCondition(id("oa1"), false)));
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap("u1",new PolicyBootstrapper() {
+            pdp.bootstrap(new PolicyBootstrapper() {
                 @Override
-                public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+                public void bootstrap(PAP pap) throws PMException {
 
                 }
             });
@@ -138,9 +125,9 @@ class PDPTest {
         pap.modify().obligations().createObligation(id("u1"), "obl1", List.of());
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
-            pdp.bootstrap("u1", new PolicyBootstrapper() {
+            pdp.bootstrap(new PolicyBootstrapper() {
                 @Override
-                public void bootstrap(UserContext bootstrapUser, PAP pap) throws PMException {
+                public void bootstrap(PAP pap) throws PMException {
 
                 }
             });

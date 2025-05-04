@@ -68,8 +68,8 @@ public class PDP implements EventPublisher, AccessAdjudication {
         });
     }
 
-    public void bootstrap(String bootstrapUser, PolicyBootstrapper bootstrapper) throws PMException {
-        pap.bootstrap(bootstrapUser, bootstrapper);
+    public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
+        pap.bootstrap(bootstrapper);
     }
 
     @Override
