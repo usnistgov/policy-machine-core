@@ -47,16 +47,19 @@ public class EPP implements EventSubscriber {
                 UserContext authorCtx = new UserContext(author);
                 Response response = rule.getResponse();
 
-                // need to run pdp tx as author of obligation
-                pdp.runTx(authorCtx, txPDP -> {
-                    executeResponse(txPDP, authorCtx, eventCtx, response);
-                    return null;
-                });
+                executeResponse(authorCtx, response, eventCtx);
             }
         }
     }
 
-    public void executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
+    public void executeResponse(UserContext user, Response response, EventContext eventCtx) throws PMException {
+        pdp.runTx(user, pdpTx -> {
+            executeResponse(pdpTx, user, eventCtx, response);
+            return null;
+        });
+    }
+
+    private void executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
         Args args = new Args();
 
         FormalParameter<Map<String, Object>> eventCtxParam = new FormalParameter<>(
