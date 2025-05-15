@@ -116,6 +116,11 @@ public class PDPTx extends PAP {
     }
 
     @Override
+    public void executePML(UserContext author, String input) throws PMException {
+        throw new PMException("not supported by PDPTx, use executePML(String input) instead");
+    }
+
+    @Override
     public void beginTx() throws PMException {
         pap.beginTx();
     }

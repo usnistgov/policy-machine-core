@@ -43,7 +43,7 @@ class OperationDefinitionStatementTest {
 
         PDP pdp = new PDP(pap);
         pdp.runTx(new TestUserContext("u1"), tx -> {
-            tx.executePML(new TestUserContext("u1"), """
+            tx.executePML("""
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
@@ -82,7 +82,7 @@ class OperationDefinitionStatementTest {
 
         PDP pdp = new PDP(pap);
         pdp.runTx(new TestUserContext("u1"), tx -> {
-            tx.executePML(new TestUserContext("u1"), """
+            tx.executePML("""
                 op1("test1", ["o2", "o3"])
                 """);
             return null;
@@ -90,7 +90,7 @@ class OperationDefinitionStatementTest {
         assertTrue(pap.query().graph().nodeExists("test1"));
 
         pdp.runTx(new UserContext(id("u2")), tx -> {
-            tx.executePML(new UserContext(id("u2")), """
+            tx.executePML("""
                 op1("test2", ["o2", "o3"])
                 """);
             return null;

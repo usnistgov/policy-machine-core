@@ -63,7 +63,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
      */
     public void executePML(UserContext userCtx, String pml) throws PMException {
         runTx(userCtx, tx -> {
-            tx.executePML(userCtx, pml);
+            tx.executePML(pml);
             return null;
         });
     }
