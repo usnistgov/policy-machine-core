@@ -107,11 +107,11 @@ public class PDPTx extends PAP {
         pap.deserialize(input, policyDeserializer);
     }
 
-    public void executePML(UserContext author, String input) throws PMException {
+    public void executePML(String input) throws PMException {
         PMLCompiler pmlCompiler = new PMLCompiler();
         List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pap, input);
 
-        buildExecutionContext(author)
+        buildExecutionContext(userCtx)
             .executeStatements(stmts, new NoArgs());
     }
 

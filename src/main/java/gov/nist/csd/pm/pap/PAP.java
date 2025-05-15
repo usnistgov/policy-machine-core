@@ -31,7 +31,7 @@ import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODES;
 import static gov.nist.csd.pm.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 
-public class PAP implements AdminFunctionExecutor, Transactional {
+public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
     private final PolicyStore policyStore;
     private final PolicyModifier modifier;
