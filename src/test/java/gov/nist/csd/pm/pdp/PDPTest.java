@@ -405,7 +405,7 @@ class PDPTest {
                 """);
         PDP pdp = new PDP(pap);
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new TestUserContext("u1"), tx -> {
-            tx.executePML(new TestUserContext("u1"), "r1()");
+            tx.executePML("r1()");
             return null;
         }));
         assertFalse(pap.query().graph().nodeExists("o1"));

@@ -67,9 +67,9 @@ class PDPTxTest {
         String serialize = "create pc \"test\"";
 
         PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
-        assertThrows(UnauthorizedException.class, () -> u2.executePML(new UserContext(0), serialize));
+        assertThrows(UnauthorizedException.class, () -> u2.executePML(serialize));
 
         PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
-        assertDoesNotThrow(() -> u1.executePML(new UserContext(0), serialize));
+        assertDoesNotThrow(() -> u1.executePML(serialize));
     }
 }

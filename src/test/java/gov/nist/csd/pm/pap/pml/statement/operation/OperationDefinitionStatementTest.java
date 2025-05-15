@@ -51,7 +51,7 @@ class OperationDefinitionStatementTest {
         assertTrue(pap.query().graph().nodeExists("test"));
 
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id("u2")), tx -> {
-            tx.executePML(new UserContext(id("u2")), """
+            tx.executePML("""
                 op1("o1", ["o2", "o3"])
                 """);
             return null;
