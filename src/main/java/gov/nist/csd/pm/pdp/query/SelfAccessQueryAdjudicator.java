@@ -6,16 +6,15 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
 import java.util.List;
 import java.util.Map;
 
-public class DiscoveryQueryAdjudicator extends Adjudicator {
+public class SelfAccessQueryAdjudicator extends Adjudicator {
 
-	public DiscoveryQueryAdjudicator(PAP pap, UserContext userCtx) {
+	public SelfAccessQueryAdjudicator(PAP pap, UserContext userCtx) {
 		super(pap, userCtx);
 	}
 
@@ -31,18 +30,6 @@ public class DiscoveryQueryAdjudicator extends Adjudicator {
 		return pap.query().access().computeDeniedPrivileges(userCtx, targetCtx);
 	}
 
-	public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
-		return pap.query().access().computeCapabilityList(userCtx);
-	}
-
-	public Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
-		return pap.query().access().computeACL(targetCtx);
-	}
-
-	public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
-		return pap.query().access().computeDestinationAttributes(userCtx);
-	}
-
 	public SubgraphPrivileges computeSubgraphPrivileges(long root) throws PMException {
 		return pap.query().access().computeSubgraphPrivileges(userCtx, root);
 	}
@@ -53,10 +40,6 @@ public class DiscoveryQueryAdjudicator extends Adjudicator {
 
 	public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(long root) throws PMException {
 		return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
-	}
-
-	public Explain explain(TargetContext targetCtx) throws PMException {
-		return pap.query().access().explain(userCtx, targetCtx);
 	}
 
 	public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
