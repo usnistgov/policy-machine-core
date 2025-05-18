@@ -114,14 +114,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public AdjudicationResponse adjudicateResourceOperation(UserContext user,
-                                                            String targetName,
-                                                            String resourceOperation) throws
-                                                                                            PMException {
-        return adjudicateResourceOperation(user, pap.query().graph().getNodeId(targetName), resourceOperation);
-    }
-
-    @Override
     public AdjudicationResponse adjudicateAdminOperation(UserContext user,
                                                          String operation,
                                                          Map<String, Object> args) throws

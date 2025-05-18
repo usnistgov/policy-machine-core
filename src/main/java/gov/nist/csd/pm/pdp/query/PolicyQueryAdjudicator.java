@@ -12,7 +12,7 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     private final ObligationsQueryAdjudicator obligations;
     private final OperationsQueryAdjudicator operations;
     private final RoutinesQueryAdjudicator routines;
-    private final SelfAccessQueryAdjudicator discovery;
+    private final SelfAccessQueryAdjudicator selfAccess;
 
     public PolicyQueryAdjudicator(PAP pap, UserContext userCtx) {
         this.access = new AccessQueryAdjudicator(pap, userCtx);
@@ -21,7 +21,7 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
         this.obligations = new ObligationsQueryAdjudicator(pap, userCtx);
         this.operations = new OperationsQueryAdjudicator(pap, userCtx);
         this.routines = new RoutinesQueryAdjudicator(pap, userCtx);
-        this.discovery = new SelfAccessQueryAdjudicator(pap, userCtx);
+        this.selfAccess = new SelfAccessQueryAdjudicator(pap, userCtx);
     }
 
     public PolicyQueryAdjudicator(AccessQueryAdjudicator access,
@@ -30,19 +30,23 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
                                   ObligationsQueryAdjudicator obligations,
                                   OperationsQueryAdjudicator operations,
                                   RoutinesQueryAdjudicator routines,
-                                  SelfAccessQueryAdjudicator discovery) {
+                                  SelfAccessQueryAdjudicator selfAccess) {
         this.access = access;
         this.graph = graph;
         this.prohibitions = prohibitions;
         this.obligations = obligations;
         this.operations = operations;
         this.routines = routines;
-        this.discovery = discovery;
+        this.selfAccess = selfAccess;
     }
 
     @Override
     public AccessQueryAdjudicator access() {
         return access;
+    }
+
+    public SelfAccessQueryAdjudicator selfAccess() {
+        return selfAccess;
     }
 
     @Override
@@ -68,10 +72,6 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     @Override
     public RoutinesQueryAdjudicator routines() {
         return routines;
-    }
-
-    public SelfAccessQueryAdjudicator discovery() {
-        return discovery;
     }
 
 }

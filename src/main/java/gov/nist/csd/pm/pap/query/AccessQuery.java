@@ -72,7 +72,7 @@ public interface AccessQuery {
      * Compute the attributes that are targets of associations in which the user attribute is a descendant of the user.
      * The provided UserContext allows for the specification of a single node or a list of attributes.
      *
-     * @param userCtx The user and process or list of attributes and process. Process is optional.
+     * @param userCtx The user or list of attributes. Process is ignored.
      * @return A mapping of the destination attributes to the access rights in the destination association.
      * @throws PMException If there is an error in the PM.
      */
