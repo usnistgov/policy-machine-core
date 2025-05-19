@@ -42,7 +42,7 @@ public class SelfAccessQueryAdjudicator extends Adjudicator {
 		return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
 	}
 
-	public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+	public Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException {
 		return pap.query().access().computePersonalObjectSystem(userCtx);
 	}
 }
