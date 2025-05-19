@@ -5,7 +5,7 @@ import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 
-import gov.nist.csd.pm.pap.pml.function.type.TypeStringer;
+import gov.nist.csd.pm.pap.pml.type.TypeStringer;
 import java.util.List;
 
 public class PMLOperationSignature extends PMLFunctionSignature {

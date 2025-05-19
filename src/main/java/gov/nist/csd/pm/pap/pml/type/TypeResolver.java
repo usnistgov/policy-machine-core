@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.function.type;
+package gov.nist.csd.pm.pap.pml.type;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;

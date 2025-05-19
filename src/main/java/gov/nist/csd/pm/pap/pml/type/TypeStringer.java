@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.pap.pml.function.type;
+package gov.nist.csd.pm.pap.pml.type;
 
 import gov.nist.csd.pm.pap.function.arg.type.AnyType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;

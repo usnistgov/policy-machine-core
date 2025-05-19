@@ -35,14 +35,6 @@ public class TypeCompatibilityTest {
     void testAllTypesCastableToObjectType() {
         assertTrue(STRING_TYPE.isCastableTo(ANY_TYPE));
         assertTrue(BOOLEAN_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(ACCESS_RIGHT_SET_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(OPERATION_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(ROUTINE_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(RULE_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(PROHIBITION_SUBJECT_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(CONTAINER_CONDITION_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(NODE_TYPE_TYPE.isCastableTo(ANY_TYPE));
-        
         assertTrue(listType(STRING_TYPE).isCastableTo(ANY_TYPE));
         assertTrue(mapType(STRING_TYPE, BOOLEAN_TYPE).isCastableTo(ANY_TYPE));
         

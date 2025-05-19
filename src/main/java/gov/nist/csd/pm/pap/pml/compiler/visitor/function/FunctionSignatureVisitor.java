@@ -11,12 +11,12 @@ import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.pap.pml.function.type.TypeResolver;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.pap.pml.function.operation.PMLOperationSignature;
 import gov.nist.csd.pm.pap.pml.function.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 
+import gov.nist.csd.pm.pap.pml.type.TypeResolver;
 import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 

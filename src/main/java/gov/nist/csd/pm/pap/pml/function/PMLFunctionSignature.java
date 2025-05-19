@@ -4,9 +4,9 @@ import static gov.nist.csd.pm.pap.function.arg.type.Type.VOID_TYPE;
 
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
-import gov.nist.csd.pm.pap.pml.function.type.TypeStringer;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 
+import gov.nist.csd.pm.pap.pml.type.TypeStringer;
 import java.util.List;
 import java.util.Objects;
 

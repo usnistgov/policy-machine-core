@@ -5,21 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public sealed abstract class Type<T> implements Serializable
-    permits StringType, LongType, BooleanType, ListType, MapType, AnyType, AccessRightSetType, OperationType,
-    RoutineType, RuleType, ProhibitionSubjectType, ContainerConditionType, NodeTypeType, VoidType {
+public abstract class Type<T> implements Serializable {
 
     public static StringType STRING_TYPE = new StringType();
     public static LongType LONG_TYPE = new LongType();
     public static BooleanType BOOLEAN_TYPE = new BooleanType();
     public static AnyType ANY_TYPE = new AnyType();
-    public static AccessRightSetType ACCESS_RIGHT_SET_TYPE = new AccessRightSetType();
-    public static OperationType OPERATION_TYPE = new OperationType();
-    public static RoutineType ROUTINE_TYPE = new RoutineType();
-    public static RuleType RULE_TYPE = new RuleType();
-    public static ProhibitionSubjectType PROHIBITION_SUBJECT_TYPE = new ProhibitionSubjectType();
-    public static ContainerConditionType CONTAINER_CONDITION_TYPE = new ContainerConditionType();
-    public static NodeTypeType NODE_TYPE_TYPE = new NodeTypeType();
     public static VoidType VOID_TYPE = new VoidType();
 
     public static <E> ListType<E> listType(Type<E> elementType) {

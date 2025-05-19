@@ -1,8 +1,9 @@
-package gov.nist.csd.pm.pap.function.arg.type;
+package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 
-public final class NodeTypeType extends Type<NodeType> {
+final class NodeTypeType extends Type<NodeType> {
 
     @Override
     public NodeType cast(Object obj) {

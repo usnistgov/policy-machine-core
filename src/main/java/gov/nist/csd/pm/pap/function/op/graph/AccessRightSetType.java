@@ -1,6 +1,7 @@
-package gov.nist.csd.pm.pap.function.arg.type;
+package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 
 public final class AccessRightSetType extends Type<AccessRightSet> {
 
