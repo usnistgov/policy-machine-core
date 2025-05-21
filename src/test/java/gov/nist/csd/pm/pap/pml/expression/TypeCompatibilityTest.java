@@ -35,21 +35,21 @@ public class TypeCompatibilityTest {
     void testAllTypesCastableToObjectType() {
         assertTrue(STRING_TYPE.isCastableTo(ANY_TYPE));
         assertTrue(BOOLEAN_TYPE.isCastableTo(ANY_TYPE));
-        assertTrue(listType(STRING_TYPE).isCastableTo(ANY_TYPE));
-        assertTrue(mapType(STRING_TYPE, BOOLEAN_TYPE).isCastableTo(ANY_TYPE));
+        assertTrue(ListType.of(STRING_TYPE).isCastableTo(ANY_TYPE));
+        assertTrue(MapType.of(STRING_TYPE, BOOLEAN_TYPE).isCastableTo(ANY_TYPE));
         
         assertTrue(ANY_TYPE.isCastableTo(ANY_TYPE));
 
-        assertTrue(listType(mapType(STRING_TYPE, BOOLEAN_TYPE)).isCastableTo(ANY_TYPE));
-        assertTrue(mapType(STRING_TYPE, listType(BOOLEAN_TYPE)).isCastableTo(ANY_TYPE));
+        assertTrue(ListType.of(MapType.of(STRING_TYPE, BOOLEAN_TYPE)).isCastableTo(ANY_TYPE));
+        assertTrue(MapType.of(STRING_TYPE, ListType.of(BOOLEAN_TYPE)).isCastableTo(ANY_TYPE));
     }
 
     @Test
     void testObjectTypeAsSourceType() {
         assertTrue(ANY_TYPE.isCastableTo(STRING_TYPE));
         assertTrue(ANY_TYPE.isCastableTo(BOOLEAN_TYPE));
-        assertTrue(ANY_TYPE.isCastableTo(listType(STRING_TYPE)));
-        assertTrue(ANY_TYPE.isCastableTo(mapType(STRING_TYPE, BOOLEAN_TYPE)));
+        assertTrue(ANY_TYPE.isCastableTo(ListType.of(STRING_TYPE)));
+        assertTrue(ANY_TYPE.isCastableTo(MapType.of(STRING_TYPE, BOOLEAN_TYPE)));
     }
 
     @Test
@@ -102,10 +102,10 @@ public class TypeCompatibilityTest {
         PMLParser.ExpressionContext arrayCtx = TestPMLParser.parseExpression("""
                 ["a", "value", true]
                 """);
-        Expression<?> arrayExpr = ExpressionVisitor.compile(visitorContext, arrayCtx, listType(ANY_TYPE));
+        Expression<?> arrayExpr = ExpressionVisitor.compile(visitorContext, arrayCtx, ListType.of(ANY_TYPE));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(arrayExpr instanceof ArrayLiteralExpression);
-        assertEquals(listType(ANY_TYPE), arrayExpr.getType());
+        assertEquals(ListType.of(ANY_TYPE), arrayExpr.getType());
         
         PMLParser.ExpressionContext mapCtx = TestPMLParser.parseExpression("""
                 {
@@ -114,10 +114,10 @@ public class TypeCompatibilityTest {
                     "boolean": true
                 }
                 """);
-        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, mapCtx, mapType(STRING_TYPE, ANY_TYPE));
+        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, mapCtx, MapType.of(STRING_TYPE, ANY_TYPE));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(mapExpr instanceof MapLiteralExpression);
-        assertEquals(mapType(STRING_TYPE, ANY_TYPE), mapExpr.getType());
+        assertEquals(MapType.of(STRING_TYPE, ANY_TYPE), mapExpr.getType());
     }
 
     @Test

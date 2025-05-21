@@ -36,7 +36,7 @@ public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
 
     @Override
     public MapType<K, V> getType() {
-        return Type.mapType(keyType, valueType);
+        return MapType.of(keyType, valueType);
     }
 
     @Override

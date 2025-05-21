@@ -3,6 +3,8 @@ package gov.nist.csd.pm.pap.pml.expression;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
@@ -50,14 +52,14 @@ public class TypeCoercionTest {
         
         ArrayLiteralExpression<String> stringArray = new ArrayLiteralExpression<>(stringElements, STRING_TYPE);
         
-        Expression<List<Object>> objectArray = stringArray.asType(listType(ANY_TYPE));
+        Expression<List<Object>> objectArray = stringArray.asType(ListType.of(ANY_TYPE));
         
         List<Object> result = objectArray.execute(executionContext, pap);
         assertEquals(2, result.size());
         assertEquals("a", result.get(0));
         assertEquals("b", result.get(1));
         
-        assertEquals(listType(STRING_TYPE), stringArray.getType());
+        assertEquals(ListType.of(STRING_TYPE), stringArray.getType());
     }
 
     @Test
@@ -70,14 +72,14 @@ public class TypeCoercionTest {
                 new MapLiteralExpression<>(entries, STRING_TYPE, STRING_TYPE);
         
         Expression<Map<String, Object>> objectMap =
-                stringMap.asType(mapType(STRING_TYPE, ANY_TYPE));
+                stringMap.asType(MapType.of(STRING_TYPE, ANY_TYPE));
         
         Map<String, Object> result = objectMap.execute(executionContext, pap);
         assertEquals(2, result.size());
         assertEquals("value1", result.get("key1"));
         assertEquals("value2", result.get("key2"));
         
-        assertEquals(mapType(STRING_TYPE, STRING_TYPE), stringMap.getType());
+        assertEquals(MapType.of(STRING_TYPE, STRING_TYPE), stringMap.getType());
     }
 
     @Test
@@ -91,10 +93,10 @@ public class TypeCoercionTest {
         List<Expression<?>> outerElements = new ArrayList<>();
         outerElements.add(innerArray);
         ArrayLiteralExpression<List<String>> outerArray = 
-                new ArrayLiteralExpression<>(outerElements, listType(STRING_TYPE));
+                new ArrayLiteralExpression<>(outerElements, ListType.of(STRING_TYPE));
         
         Expression<List<List<Object>>> coercedArray =
-                outerArray.asType(listType(listType(ANY_TYPE)));
+                outerArray.asType(ListType.of(ListType.of(ANY_TYPE)));
         
         List<List<Object>> result = coercedArray.execute(executionContext, pap);
         assertEquals(1, result.size());
@@ -117,7 +119,7 @@ public class TypeCoercionTest {
         
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                mapType(STRING_TYPE, listType(ANY_TYPE)));
+                MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)));
         
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         
@@ -148,7 +150,7 @@ public class TypeCoercionTest {
         
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                mapType(STRING_TYPE, listType(ANY_TYPE)));
+                MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)));
         
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         
@@ -173,7 +175,7 @@ public class TypeCoercionTest {
         
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                mapType(STRING_TYPE, ANY_TYPE));
+                MapType.of(STRING_TYPE, ANY_TYPE));
         
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 

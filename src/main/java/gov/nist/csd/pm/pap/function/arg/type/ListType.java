@@ -6,6 +6,10 @@ import java.util.Objects;
 
 public final class ListType<E> extends Type<List<E>> {
 
+    public static <T> ListType<T> of(Type<T> type) {
+        return new ListType<>(type);
+    }
+
     private final Type<E> elementType;
 
     public ListType(Type<E> elementType) {
@@ -29,11 +33,6 @@ public final class ListType<E> extends Type<List<E>> {
             resultList.add(elementType.cast(element));
         }
         return resultList;
-    }
-
-    @Override
-    public Class<List<E>> getExpectedClass() {
-        return (Class<List<E>>)(Class<?>) List.class;
     }
 
     @Override

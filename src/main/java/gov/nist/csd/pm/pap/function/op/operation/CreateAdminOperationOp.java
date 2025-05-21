@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_ADMIN_OPERATION;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 
 public class CreateAdminOperationOp extends Operation<Void, CreateAdminOperationOp.CreateAdminOperationOpArgs> {
 
-    public static final FormalParameter<Operation<?, ?>> OPERATION_PARAM = new FormalParameter<>("operation", new OperationType());
+    public static final FormalParameter<Object> OPERATION_PARAM = new FormalParameter<>("operation", ANY_TYPE);
 
     public CreateAdminOperationOp() {
         super(
@@ -42,7 +43,7 @@ public class CreateAdminOperationOp extends Operation<Void, CreateAdminOperation
 
     @Override
     protected CreateAdminOperationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Operation<?, ?> operation = prepareArg(OPERATION_PARAM, argsMap);
+        Operation<?, ?> operation = (Operation<?, ?>) prepareArg(OPERATION_PARAM, argsMap);
         return new CreateAdminOperationOpArgs(operation);
     }
 

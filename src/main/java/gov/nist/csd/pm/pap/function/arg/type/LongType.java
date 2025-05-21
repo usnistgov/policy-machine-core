@@ -13,8 +13,4 @@ public final class LongType extends Type<Long> {
         throw new IllegalArgumentException("cannot convert " + obj.getClass() + " to Long");
     }
 
-    @Override
-    public Class<Long> getExpectedClass() {
-        return Long.class;
-    }
 }

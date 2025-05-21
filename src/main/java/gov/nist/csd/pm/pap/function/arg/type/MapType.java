@@ -5,6 +5,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class MapType<K, V> extends Type<Map<K, V>> {
+
+    public static <K, V> MapType<K, V> of(Type<K> keyType, Type<V> valueType) {
+        return new MapType<>(keyType.asType(keyType), valueType.asType(valueType));
+    }
+
     private final Type<K> keyType;
     private final Type<V> valueType;
 
@@ -36,11 +41,6 @@ public final class MapType<K, V> extends Type<Map<K, V>> {
             resultMap.put(key, value);
         }
         return resultMap;
-    }
-
-    @Override
-    public Class<Map<K, V>> getExpectedClass() {
-        return (Class<Map<K, V>>)(Class<?>) Map.class;
     }
 
     @Override

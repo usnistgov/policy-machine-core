@@ -3,9 +3,10 @@ package gov.nist.csd.pm.pap.pml.type;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 
+
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser.AnyTypeContext;
@@ -22,9 +23,9 @@ public class TypeResolver {
             case StringTypeContext stringTypeContext -> STRING_TYPE;
             case BooleanTypeContext booleanTypeContext -> BOOLEAN_TYPE;
             case ArrayVarTypeContext arrayVarTypeContext ->
-                listType(resolveFromParserCtx(arrayVarTypeContext.arrayType().variableType()));
+                ListType.of(resolveFromParserCtx(arrayVarTypeContext.arrayType().variableType()));
             case MapVarTypeContext mapVarTypeContext ->
-                mapType(
+                MapType.of(
                     resolveFromParserCtx(mapVarTypeContext.mapType().keyType),
                     resolveFromParserCtx(mapVarTypeContext.mapType().valueType)
                 );

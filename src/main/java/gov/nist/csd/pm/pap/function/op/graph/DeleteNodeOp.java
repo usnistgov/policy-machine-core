@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.function.op.graph;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.exception.UnknownTypeException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
@@ -55,7 +56,12 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
     @Override
     protected DeleteNodeOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
         Long nodeId = prepareArg(NODE_ID_PARAM, argsMap);
-        NodeType type = prepareArg(TYPE_PARAM, argsMap);
+        NodeType type;
+        try {
+            type = NodeType.toNodeType(prepareArg(TYPE_PARAM, argsMap));
+        } catch (UnknownTypeException e) {
+            throw new IllegalArgumentException(e);
+        }
         List<Long> descIds = prepareArg(DESCENDANTS_PARAM, argsMap);
         return new DeleteNodeOpArgs(nodeId, type, descIds);
     }

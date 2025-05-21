@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor.function;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 
+
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.PMLBaseVisitor;
@@ -19,7 +20,7 @@ public class CheckStatementVisitor extends PMLBaseVisitor<CheckStatement> {
     @Override
     public CheckStatement visitCheckStatement(PMLParser.CheckStatementContext ctx) {
         Expression<String> arExpr = ExpressionVisitor.compile(visitorCtx, ctx.ar, STRING_TYPE);
-        Expression<List<String>> targetExpr = ExpressionVisitor.compile(visitorCtx, ctx.target, listType(STRING_TYPE));
+        Expression<List<String>> targetExpr = ExpressionVisitor.compile(visitorCtx, ctx.target, ListType.of(STRING_TYPE));
 
         return new CheckStatement(arExpr, targetExpr);
     }

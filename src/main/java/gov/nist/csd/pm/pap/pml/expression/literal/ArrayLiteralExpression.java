@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -24,7 +24,7 @@ public class ArrayLiteralExpression<E> extends Expression<List<E>> {
 
     public ArrayLiteralExpression(List<Expression<?>> compiledExpressions, Type<E> elementType) {
         this.compiledExpressions = new ArrayList<>(compiledExpressions);
-        this.type = listType(Objects.requireNonNull(elementType));
+        this.type = ListType.of(Objects.requireNonNull(elementType));
     }
 
     @Override

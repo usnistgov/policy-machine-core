@@ -10,8 +10,4 @@ public final class StringType extends Type<String> {
         return obj.toString();
     }
 
-    @Override
-    public Class<String> getExpectedClass() {
-        return String.class;
-    }
 }

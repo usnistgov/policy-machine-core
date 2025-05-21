@@ -2,6 +2,7 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +26,7 @@ class FunctionInvokeStmtVisitorTest {
 
     private static final FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
     private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
-    private static final FormalParameter<List<String>> c = new FormalParameter<>("c", listType(STRING_TYPE));
+    private static final FormalParameter<List<String>> c = new FormalParameter<>("c", ListType.of(STRING_TYPE));
 
     PMLFunctionSignature signature = new PMLBasicFunctionSignature(
         "func1",
@@ -34,7 +34,7 @@ class FunctionInvokeStmtVisitorTest {
         List.of(a, b, c)
     );
 
-    FunctionInvokeExpression expected = new FunctionInvokeExpression(
+    FunctionInvokeExpression<String> expected = new FunctionInvokeExpression(
         signature,
         List.of(
             new StringLiteralExpression("a"),

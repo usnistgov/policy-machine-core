@@ -3,6 +3,8 @@ package gov.nist.csd.pm.pap.pml.function;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
@@ -120,8 +122,8 @@ public class AnyTypeFunctionTest {
                 "collectionsFunction",
             ANY_TYPE,  // Return type
                 Arrays.asList(
-                        new FormalParameter<>("arrayArg", listType(ANY_TYPE)),
-                        new FormalParameter<>("mapArg", mapType(STRING_TYPE, ANY_TYPE))
+                        new FormalParameter<>("arrayArg", ListType.of(ANY_TYPE)),
+                        new FormalParameter<>("mapArg", MapType.of(STRING_TYPE, ANY_TYPE))
                 )
         );
 
@@ -157,10 +159,10 @@ public class AnyTypeFunctionTest {
         // Create a function signature with nested ANY_TYPE parameters
         PMLFunctionSignature functionSignature = new PMLBasicFunctionSignature(
                 "nestedFunction",
-                listType(mapType(STRING_TYPE, ANY_TYPE)),  // Return type: list<map<string, object>>
+                ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)),  // Return type: list<map<string, object>>
                 List.of(
                         new FormalParameter<>("complexArg",
-                            mapType(STRING_TYPE, listType(ANY_TYPE)))
+                            MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)))
                 )
         );
 
@@ -183,10 +185,10 @@ public class AnyTypeFunctionTest {
 
         // Should compile without errors
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
-                listType(mapType(STRING_TYPE, ANY_TYPE)));
+                ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(expr instanceof FunctionInvokeExpression);
-        assertEquals(listType(mapType(STRING_TYPE, ANY_TYPE)), expr.getType());
+        assertEquals(ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)), expr.getType());
     }
 
     @Test

@@ -1,18 +1,24 @@
 package gov.nist.csd.pm.pap.function.op.prohibition;
 
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.LONG_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.pap.function.op.graph.AccessRightSetType;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.util.Collection;
@@ -21,10 +27,10 @@ import java.util.Map;
 
 public abstract class ProhibitionOp<A extends ProhibitionOp.ProhibitionOpArgs> extends Operation<Void, A> {
 
-    public static final FormalParameter<ProhibitionSubject> SUBJECT_PARAM = new FormalParameter<>("subject", new ProhibitionSubjectType());
-    public static final FormalParameter<AccessRightSet> ARSET_PARAM = new FormalParameter<>("arset", new AccessRightSetType());
+    public static final FormalParameter<Object> SUBJECT_PARAM = new FormalParameter<>("subject", ANY_TYPE);
+    public static final FormalParameter<List<String>> ARSET_PARAM = new FormalParameter<>("arset", ListType.of(STRING_TYPE));
     public static final FormalParameter<Boolean> INTERSECTION_PARAM = new FormalParameter<>("intersection", BOOLEAN_TYPE);
-    public static final FormalParameter<List<ContainerCondition>> CONTAINERS_PARAM = new FormalParameter<>("containers", listType(new ContainerConditionType()));
+    public static final FormalParameter<Map<Long, Boolean>> CONTAINERS_PARAM = new FormalParameter<>("containers", MapType.of(LONG_TYPE, BOOLEAN_TYPE));
 
     private final String processReqCap;
     private final String reqCap;

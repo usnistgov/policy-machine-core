@@ -1,9 +1,11 @@
 package gov.nist.csd.pm.pap.function.op.obligation;
 
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.obligation.EventPattern;
 import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.function.arg.Args;
@@ -22,7 +24,7 @@ import java.util.Map;
 public abstract class ObligationOp<A extends ObligationOp.ObligationOpArgs> extends Operation<Void, A> {
 
     public static final IdNodeFormalParameter AUTHOR_PARAM = new IdNodeFormalParameter("author");
-    public static final FormalParameter<List<Rule>> RULES_PARAM = new FormalParameter<>("rules", listType(new RuleType()));
+    public static final FormalParameter<List<Object>> RULES_PARAM = new FormalParameter<>("rules", ListType.of(ANY_TYPE));
 
     private final String reqCap;
 

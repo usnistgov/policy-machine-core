@@ -24,8 +24,4 @@ public final class AnyType extends Type<Object> {
         return targetType.cast(obj);
     }
 
-    @Override
-    public Class<Object> getExpectedClass() {
-        return Object.class;
-    }
 }

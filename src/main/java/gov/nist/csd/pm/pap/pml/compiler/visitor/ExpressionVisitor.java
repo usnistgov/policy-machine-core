@@ -3,7 +3,7 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
+
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
@@ -329,7 +329,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     private MapType<?, ?> validateMapType(Type<?> type, ParserRuleContext ctx) {
         if (type instanceof AnyType) {
-            return mapType(ANY_TYPE, ANY_TYPE);
+            return MapType.of(ANY_TYPE, ANY_TYPE);
         }
 
         if (!(type instanceof MapType<?, ?> mapType)) {

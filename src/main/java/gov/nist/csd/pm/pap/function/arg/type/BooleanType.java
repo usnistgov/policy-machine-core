@@ -14,8 +14,4 @@ public final class BooleanType extends Type<Boolean> {
         return b;
     }
 
-    @Override
-    public Class<Boolean> getExpectedClass() {
-        return Boolean.class;
-    }
 }

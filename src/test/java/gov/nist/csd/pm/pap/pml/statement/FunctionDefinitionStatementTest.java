@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.statement;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
@@ -22,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionStatementTest {
@@ -40,7 +41,7 @@ class FunctionDefinitionStatementTest {
                         new PMLStatementBlock(
                                 new CheckStatement(
                                     new StringLiteralExpression("ar1"),
-                                    new VariableReferenceExpression<>("a", listType(STRING_TYPE))
+                                    new VariableReferenceExpression<>("a", ListType.of(STRING_TYPE))
                                 ),
                                 new CheckStatement(
                                     new StringLiteralExpression("ar2"),

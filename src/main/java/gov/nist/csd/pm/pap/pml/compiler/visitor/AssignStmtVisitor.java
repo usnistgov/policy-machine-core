@@ -1,8 +1,9 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 
+
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -19,7 +20,7 @@ public class AssignStmtVisitor extends PMLBaseVisitor<AssignStatement> {
     @Override
     public AssignStatement visitAssignStatement(PMLParser.AssignStatementContext ctx) {
         Expression<String> ascendant = ExpressionVisitor.compile(visitorCtx, ctx.ascendantNode, STRING_TYPE);
-        Expression<List<String>> descendants = ExpressionVisitor.compile(visitorCtx, ctx.descendantNodes, listType(STRING_TYPE));
+        Expression<List<String>> descendants = ExpressionVisitor.compile(visitorCtx, ctx.descendantNodes, ListType.of(STRING_TYPE));
 
         return new AssignStatement(ascendant, descendants);
     }

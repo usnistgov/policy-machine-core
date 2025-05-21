@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -18,8 +20,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
+
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +77,7 @@ class LiteralVisitorTest {
                 ["a", ["b"]]
                 """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, listType(ANY_TYPE));
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(ANY_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -89,7 +90,7 @@ class LiteralVisitorTest {
             arrayLiteral
         );
         assertEquals(
-                listType(ANY_TYPE),
+                ListType.of(ANY_TYPE),
                 literal.getType()
         );
 
@@ -98,7 +99,7 @@ class LiteralVisitorTest {
                 ["a", "b"]
                 """);
         visitorContext = new VisitorContext(new CompileScope());
-        literal = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
+        literal = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -108,7 +109,7 @@ class LiteralVisitorTest {
                 arrayLiteral
         );
         assertEquals(
-                listType(STRING_TYPE),
+                ListType.of(STRING_TYPE),
                 literal.getType()
         );
     }
@@ -143,7 +144,7 @@ class LiteralVisitorTest {
                 }
                 """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression literal = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, STRING_TYPE));
+        Expression literal = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -153,7 +154,7 @@ class LiteralVisitorTest {
                 mapLiteral
         );
         assertEquals(
-                mapType(STRING_TYPE, STRING_TYPE),
+                MapType.of(STRING_TYPE, STRING_TYPE),
                 literal.getType()
         );
     }
@@ -181,7 +182,7 @@ class LiteralVisitorTest {
                 mapLiteral
         );
         assertEquals(
-                mapType(STRING_TYPE, ANY_TYPE),
+                MapType.of(STRING_TYPE, ANY_TYPE),
                 literal.getType()
         );
     }
@@ -196,7 +197,7 @@ class LiteralVisitorTest {
                 }
                 """);
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, mapType(ANY_TYPE, STRING_TYPE));
+        Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(ANY_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -208,7 +209,7 @@ class LiteralVisitorTest {
 
         assertEquals(expected, mapLiteral);
         assertEquals(
-                mapType(ANY_TYPE, STRING_TYPE),
+                MapType.of(ANY_TYPE, STRING_TYPE),
                 literal.getType()
         );
     }

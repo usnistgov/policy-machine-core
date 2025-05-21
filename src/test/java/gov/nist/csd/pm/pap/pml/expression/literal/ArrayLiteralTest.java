@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -11,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +26,7 @@ class ArrayLiteralTest {
                 """);
 
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<List<String>> expression = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
+        Expression<List<String>> expression = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
 	    assertInstanceOf(ArrayLiteralExpression.class, expression);
 
         assertEquals(
@@ -33,7 +34,7 @@ class ArrayLiteralTest {
                 expression
         );
         assertEquals(
-                listType(STRING_TYPE),
+                ListType.of(STRING_TYPE),
                 expression.getType()
         );
 

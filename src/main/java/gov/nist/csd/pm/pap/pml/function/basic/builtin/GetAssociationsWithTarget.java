@@ -8,6 +8,8 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.Association;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 
@@ -18,7 +20,7 @@ import java.util.Map;
 
 public class GetAssociationsWithTarget extends PMLBasicFunction {
 
-    private static final Type<?> returnType = Type.listType(Type.mapType(STRING_TYPE, ANY_TYPE));
+    private static final Type<?> returnType = ListType.of(MapType.of(STRING_TYPE, ANY_TYPE));
 
     public GetAssociationsWithTarget() {
         super(

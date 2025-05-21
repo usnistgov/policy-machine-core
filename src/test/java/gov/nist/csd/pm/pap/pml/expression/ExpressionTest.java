@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -43,10 +43,10 @@ class ExpressionTest {
                 a
                 """);
         visitorContext = new VisitorContext(new CompileScope());
-        visitorContext.scope().addVariable("a", new Variable("a", listType(STRING_TYPE), false));
-        actual = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
+        visitorContext.scope().addVariable("a", new Variable("a", ListType.of(STRING_TYPE), false));
+        actual = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
         assertEquals(
-                new VariableReferenceExpression<>("a", listType(STRING_TYPE)),
+                new VariableReferenceExpression<>("a", ListType.of(STRING_TYPE)),
                 actual
         );
     }
@@ -61,7 +61,7 @@ class ExpressionTest {
         visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
-                () -> ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE))
+                () -> ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE))
         );
         assertEquals(1, e.getErrors().size());
         assertEquals(

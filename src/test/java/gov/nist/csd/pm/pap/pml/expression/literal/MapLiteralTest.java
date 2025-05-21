@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
@@ -16,7 +17,6 @@ import java.util.List;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MapLiteralTest {
@@ -32,7 +32,7 @@ class MapLiteralTest {
                 """);
 
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<Map<String, Object>> actual = ExpressionVisitor.compile(visitorContext, ctx, Type.mapType(STRING_TYPE,
+        Expression<Map<String, Object>> actual = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE,
             ANY_TYPE));
         
         // Create a Map with Java data types
@@ -54,7 +54,7 @@ class MapLiteralTest {
                 actual
         );
         assertEquals(
-                mapType(STRING_TYPE, ANY_TYPE),
+                MapType.of(STRING_TYPE, ANY_TYPE),
                 actual.getType()
         );
 

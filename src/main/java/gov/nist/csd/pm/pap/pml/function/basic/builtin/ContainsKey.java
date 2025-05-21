@@ -8,6 +8,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public class ContainsKey extends PMLBasicFunction {
 
-    public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", Type.mapType(
+    public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", MapType.of(
         ANY_TYPE, ANY_TYPE));
     public static final FormalParameter<Object> KEY_PARAM = new FormalParameter<>("key", ANY_TYPE);
 

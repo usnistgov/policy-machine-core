@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor.compile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,7 +70,7 @@ class VariableReferenceTest {
                 a.b.c
                 """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
-            MapType<String, Map<String, String>> mapType = mapType(STRING_TYPE, mapType(STRING_TYPE, STRING_TYPE));
+            MapType<String, Map<String, String>> mapType = MapType.of(STRING_TYPE, MapType.of(STRING_TYPE, STRING_TYPE));
             visitorContext.scope().addVariable("a", new Variable("a", mapType, false));
             Expression<String> actual = compile(visitorContext, ctx, STRING_TYPE);
             assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().toString());
@@ -80,7 +79,7 @@ class VariableReferenceTest {
                     new DotIndexExpression<>(
                         new VariableReferenceExpression<>("a", mapType),
                         "b",
-                        mapType(STRING_TYPE, STRING_TYPE)
+                        MapType.of(STRING_TYPE, STRING_TYPE)
                     ),
                     "c",
                     STRING_TYPE
@@ -101,7 +100,7 @@ class VariableReferenceTest {
                     new BracketIndexExpression<>(
                         new VariableReferenceExpression<>("a", mapType),
                         new StringLiteralExpression("b"),
-                        mapType(STRING_TYPE, STRING_TYPE)
+                        MapType.of(STRING_TYPE, STRING_TYPE)
                     ),
                     new StringLiteralExpression("c"),
                     STRING_TYPE
@@ -135,7 +134,7 @@ class VariableReferenceTest {
                 a.b.c
                 """);
             VisitorContext visitorContext = new VisitorContext(new CompileScope());
-            visitorContext.scope().addVariable("a", new Variable("a", mapType(STRING_TYPE, STRING_TYPE), false));
+            visitorContext.scope().addVariable("a", new Variable("a", MapType.of(STRING_TYPE, STRING_TYPE), false));
             PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
                 () -> compile(visitorContext, ctx, ANY_TYPE)

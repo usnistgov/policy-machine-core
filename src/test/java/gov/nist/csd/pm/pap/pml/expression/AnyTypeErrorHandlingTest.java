@@ -42,8 +42,8 @@ public class AnyTypeErrorHandlingTest {
         
         assertNull(anyType.castTo(null, STRING_TYPE));
         assertNull(anyType.castTo(null, BOOLEAN_TYPE));
-        assertNull(anyType.castTo(null, listType(STRING_TYPE)));
-        assertNull(anyType.castTo(null, mapType(STRING_TYPE, BOOLEAN_TYPE)));
+        assertNull(anyType.castTo(null, ListType.of(STRING_TYPE)));
+        assertNull(anyType.castTo(null, MapType.of(STRING_TYPE, BOOLEAN_TYPE)));
     }
     
     @Test
@@ -89,9 +89,9 @@ public class AnyTypeErrorHandlingTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(BOOLEAN_TYPE, expr3.getType());
         
-        Expression<?> expr4 = ExpressionVisitor.compile(visitorContext, ctx, listType(STRING_TYPE));
+        Expression<?> expr4 = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(listType(STRING_TYPE), expr4.getType());
+        assertEquals(ListType.of(STRING_TYPE), expr4.getType());
     }
     
     @Test
@@ -130,7 +130,7 @@ public class AnyTypeErrorHandlingTest {
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
-        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, ctx, mapType(STRING_TYPE, ANY_TYPE));
+        Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE, ANY_TYPE));
         
         Map<?, ?> result = (Map<?, ?>) mapExpr.execute(executionContext, pap);
         
@@ -158,7 +158,7 @@ public class AnyTypeErrorHandlingTest {
         );
         ArrayLiteralExpression<String> stringArray = new ArrayLiteralExpression<>(stringElements, STRING_TYPE);
         
-        Expression<List<Object>> objectArray = stringArray.asType(listType(ANY_TYPE));
+        Expression<List<Object>> objectArray = stringArray.asType(ListType.of(ANY_TYPE));
         
         List<Object> result = objectArray.execute(executionContext, pap);
         assertEquals(2, result.size());
@@ -167,7 +167,7 @@ public class AnyTypeErrorHandlingTest {
         
         // Try to cast list<string> to something incompatible
         Exception exception = assertThrows(UnexpectedExpressionTypeException.class, () -> {
-            stringArray.asType(mapType(STRING_TYPE, STRING_TYPE));
+            stringArray.asType(MapType.of(STRING_TYPE, STRING_TYPE));
         });
         assertTrue(exception.getMessage().contains("expected"));
     }

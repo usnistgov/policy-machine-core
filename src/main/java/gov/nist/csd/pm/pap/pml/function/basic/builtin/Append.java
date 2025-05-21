@@ -1,25 +1,25 @@
 package gov.nist.csd.pm.pap.pml.function.basic.builtin;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.function.basic.PMLBasicFunction;
 
 import java.util.List;
 
 public class Append extends PMLBasicFunction {
 
-    public static final FormalParameter<List<Object>> DST_PARAM = new FormalParameter<>("dst", listType(ANY_TYPE));
+    public static final FormalParameter<List<Object>> DST_PARAM = new FormalParameter<>("dst", ListType.of(ANY_TYPE));
     public static final FormalParameter<Object> SRC_PARAM = new FormalParameter<>("src", ANY_TYPE);
 
     public Append() {
         super(
                 "append",
-                listType(ANY_TYPE),
+                ListType.of(ANY_TYPE),
                 List.of(DST_PARAM, SRC_PARAM)
         );
     }

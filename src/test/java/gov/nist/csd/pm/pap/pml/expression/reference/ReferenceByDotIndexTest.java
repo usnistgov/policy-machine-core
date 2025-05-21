@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.expression.reference;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
@@ -18,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,17 +27,17 @@ class ReferenceByDotIndexTest {
 
     @Test
     void testGetType() throws PMException {
-        MapType<String, List<String>> mapType = Type.mapType(STRING_TYPE, listType(STRING_TYPE));
+        MapType<String, List<String>> mapType = MapType.of(STRING_TYPE, ListType.of(STRING_TYPE));
         DotIndexExpression<?> a = new DotIndexExpression<>(
             new VariableReferenceExpression<>("a", mapType),
             "b",
-            listType(STRING_TYPE)
+            ListType.of(STRING_TYPE)
         );
         VisitorContext visitorContext = new VisitorContext(new CompileScope());
         visitorContext.scope().addVariable("a", new Variable("a", mapType, false));
 
         assertEquals(
-                listType(STRING_TYPE),
+                ListType.of(STRING_TYPE),
                 a.getType()
         );
     }
@@ -45,9 +45,9 @@ class ReferenceByDotIndexTest {
     @Test
     void testExecute() throws PMException {
         DotIndexExpression<?> a = new DotIndexExpression<>(
-            new VariableReferenceExpression<>("a", mapType(STRING_TYPE, listType(STRING_TYPE))),
+            new VariableReferenceExpression<>("a", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE))),
             "b",
-            listType(STRING_TYPE)
+            ListType.of(STRING_TYPE)
         );
         PAP pap = new TestPAP();
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);

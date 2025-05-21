@@ -28,7 +28,7 @@ public class AssociateOp extends GraphOp<Void, AssociateOpArgs> {
         return new AssociateOpArgs(
             prepareArg(UA_PARAM, argsMap),
             prepareArg(TARGET_PARAM, argsMap),
-            prepareArg(ARSET_PARAM, argsMap)
+            new AccessRightSet(prepareArg(ARSET_PARAM, argsMap))
         );
     }
 

@@ -42,7 +42,7 @@ public class SetResourceOperationsOp extends Operation<Void, SetResourceOperatio
 
     @Override
     public SetResourceOperationsOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        AccessRightSet arset = prepareArg(ARSET_PARAM, argsMap);
+        AccessRightSet arset = new AccessRightSet(prepareArg(ARSET_PARAM, argsMap));
         return new SetResourceOperationsOpArgs(arset);
     }
 

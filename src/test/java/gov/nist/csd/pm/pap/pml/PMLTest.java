@@ -3,6 +3,8 @@ package gov.nist.csd.pm.pap.pml;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
@@ -20,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
+
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.util.TestIdGenerator.id;
@@ -30,8 +31,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PMLTest {
 
     private static final FormalParameter<String> ARGA = new FormalParameter<>("a", STRING_TYPE);
-    private static final FormalParameter<List<String>> ARGB = new FormalParameter<>("b", listType(STRING_TYPE));
-    private static final FormalParameter<Map<String, String>> ARGC = new FormalParameter<>("c", mapType(STRING_TYPE, STRING_TYPE));
+    private static final FormalParameter<List<String>> ARGB = new FormalParameter<>("b", ListType.of(STRING_TYPE));
+    private static final FormalParameter<Map<String, String>> ARGC = new FormalParameter<>("c", MapType.of(STRING_TYPE, STRING_TYPE));
 
     @Test
     void testCallingNonPMLOperationAndRoutineFromPMLWithArgsAndReturnValue() throws PMException {

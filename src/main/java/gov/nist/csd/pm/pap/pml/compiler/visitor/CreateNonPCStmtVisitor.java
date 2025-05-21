@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -10,7 +11,7 @@ import java.util.List;
 
 import static gov.nist.csd.pm.common.graph.node.NodeType.OA;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
+
 
 public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement> {
 
@@ -22,7 +23,7 @@ public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement>
     public CreateNonPCStatement visitCreateNonPCStatement(PMLParser.CreateNonPCStatementContext ctx) {
         NodeType type = getNodeType(ctx.nonPCNodeType());
         Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.name, STRING_TYPE);
-        Expression<List<String>> assignTo = ExpressionVisitor.compile(visitorCtx, ctx.in, listType(STRING_TYPE));
+        Expression<List<String>> assignTo = ExpressionVisitor.compile(visitorCtx, ctx.in, ListType.of(STRING_TYPE));
 
         return new CreateNonPCStatement(name, type, assignTo);
     }

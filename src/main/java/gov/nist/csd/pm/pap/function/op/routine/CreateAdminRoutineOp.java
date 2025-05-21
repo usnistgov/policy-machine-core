@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.pap.admin.AdminAccessRights.CREATE_ADMIN_ROUTINE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
 
 public class CreateAdminRoutineOp extends Operation<Void, CreateAdminRoutineOp.CreateAdminRoutineOpArgs> {
 
-    public static final FormalParameter<Routine<?, ?>> ROUTINE_PARAM = new FormalParameter<>("routine", new RoutineType());
+    public static final FormalParameter<Object> ROUTINE_PARAM = new FormalParameter<>("routine", ANY_TYPE);
 
     public CreateAdminRoutineOp() {
         super(
@@ -43,7 +44,7 @@ public class CreateAdminRoutineOp extends Operation<Void, CreateAdminRoutineOp.C
 
     @Override
     protected CreateAdminRoutineOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Routine<?, ?> routine = prepareArg(ROUTINE_PARAM, argsMap);
+        Routine<?, ?> routine = (Routine<?, ?>) prepareArg(ROUTINE_PARAM, argsMap);
         return new CreateAdminRoutineOpArgs(routine);
     }
 

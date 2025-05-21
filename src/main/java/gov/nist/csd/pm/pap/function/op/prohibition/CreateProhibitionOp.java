@@ -8,6 +8,7 @@ import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +29,15 @@ public class CreateProhibitionOp extends ProhibitionOp<ProhibitionOpArgs> {
     @Override
     protected ProhibitionOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
         String name = prepareArg(NAME_PARAM, argsMap);
-        ProhibitionSubject subject = prepareArg(SUBJECT_PARAM, argsMap);
-        AccessRightSet arset = prepareArg(ARSET_PARAM, argsMap);
+        ProhibitionSubject subject = (ProhibitionSubject) prepareArg(SUBJECT_PARAM, argsMap);
+        AccessRightSet arset = new AccessRightSet(prepareArg(ARSET_PARAM, argsMap));
         Boolean intersection = prepareArg(INTERSECTION_PARAM, argsMap);
-        List<ContainerCondition> containers = prepareArg(CONTAINERS_PARAM, argsMap);
-        return new ProhibitionOpArgs(name, subject, arset, intersection, containers);
+        Map<Long, Boolean> containers = prepareArg(CONTAINERS_PARAM, argsMap);
+        List<ContainerCondition> containerConditions = new ArrayList<>();
+        for (var container : containers.entrySet()) {
+            containerConditions.add(new ContainerCondition(container.getKey(), container.getValue()));
+        }
+        return new ProhibitionOpArgs(name, subject, arset, intersection, containerConditions);
     }
 
     @Override

@@ -7,8 +7,4 @@ public final class VoidType extends Type<Void> {
         return null;
     }
 
-    @Override
-    public Class<Void> getExpectedClass() {
-        return Void.class;
-    }
 }

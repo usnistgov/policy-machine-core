@@ -2,10 +2,12 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
+
+
 
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
@@ -30,11 +32,11 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
             type = ProhibitionSubjectType.USER_ATTRIBUTE;
         }
 
-        Expression<List<String>> accessRights = ExpressionVisitor.compile(visitorCtx, ctx.accessRights, listType(STRING_TYPE));
+        Expression<List<String>> accessRights = ExpressionVisitor.compile(visitorCtx, ctx.accessRights, ListType.of(STRING_TYPE));
 
         boolean isIntersection = ctx.INTERSECTION() != null;
 
-        Expression<Map<String, Boolean>> cc = ExpressionVisitor.compile(visitorCtx, ctx.containers, mapType(STRING_TYPE, BOOLEAN_TYPE));
+        Expression<Map<String, Boolean>> cc = ExpressionVisitor.compile(visitorCtx, ctx.containers, MapType.of(STRING_TYPE, BOOLEAN_TYPE));
 
         return new CreateProhibitionStatement(name, subject, type, accessRights, isIntersection, cc);
     }

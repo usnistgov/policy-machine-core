@@ -5,21 +5,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Type<T> implements Serializable {
+public sealed abstract class Type<T> implements Serializable
+    permits AnyType, BooleanType, ListType, LongType, MapType, StringType, VoidType {
 
     public static StringType STRING_TYPE = new StringType();
     public static LongType LONG_TYPE = new LongType();
     public static BooleanType BOOLEAN_TYPE = new BooleanType();
     public static AnyType ANY_TYPE = new AnyType();
     public static VoidType VOID_TYPE = new VoidType();
-
-    public static <E> ListType<E> listType(Type<E> elementType) {
-        return new ListType<>(elementType);
-    }
-
-    public static <K, V> MapType<K, V> mapType(Type<K> keyType, Type<V> valueType) {
-        return new MapType<>(keyType, valueType);
-    }
 
     public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {
@@ -103,8 +96,6 @@ public abstract class Type<T> implements Serializable {
      * @return an instance of T from obj.
      */
     public abstract T cast(Object obj);
-
-    public abstract Class<T> getExpectedClass();
 
     public boolean isCastableTo(Type<?> targetType) {
         if (this.equals(ANY_TYPE)) {

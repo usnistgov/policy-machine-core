@@ -1,13 +1,14 @@
 package gov.nist.csd.pm.pap.function.op.arg;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.LONG_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.listType;
 
+
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
 import java.util.List;
 
 public class ListIdNodeFormalParameter extends NodeFormalParameter<List<Long>> {
 
 	public ListIdNodeFormalParameter(String name) {
-		super(name, listType(LONG_TYPE));
+		super(name, ListType.of(LONG_TYPE));
 	}
 }

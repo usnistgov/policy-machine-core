@@ -1,24 +1,23 @@
 package gov.nist.csd.pm.pap.function.op.graph;
 
 import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.pap.function.arg.type.Type.mapType;
 
-import gov.nist.csd.pm.common.graph.node.NodeType;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.function.arg.Args;
 import gov.nist.csd.pm.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalParameter;
-import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.function.op.Operation;
 
+import gov.nist.csd.pm.pap.function.op.arg.IdNodeFormalParameter;
+import gov.nist.csd.pm.pap.function.op.arg.ListIdNodeFormalParameter;
 import java.util.List;
 import java.util.Map;
 
 public abstract class GraphOp<R, A extends Args> extends Operation<R, A> {
 
-    public static final FormalParameter<NodeType> TYPE_PARAM = new FormalParameter<>("type", new NodeTypeType());
-    public static final FormalParameter<Map<String, String>> PROPERTIES_PARAM = new FormalParameter<>("properties", mapType(STRING_TYPE, STRING_TYPE));
-    public static final FormalParameter<AccessRightSet> ARSET_PARAM = new FormalParameter<>("arset", new AccessRightSetType());
+    public static final FormalParameter<String> TYPE_PARAM = new FormalParameter<>("type", STRING_TYPE);
+    public static final FormalParameter<Map<String, String>> PROPERTIES_PARAM = new FormalParameter<>("properties", MapType.of(STRING_TYPE, STRING_TYPE));
+    public static final FormalParameter<List<String>> ARSET_PARAM = new FormalParameter<>("arset", ListType.of(STRING_TYPE));
 
     public static final ListIdNodeFormalParameter DESCENDANTS_PARAM = new ListIdNodeFormalParameter("descendants");
 
