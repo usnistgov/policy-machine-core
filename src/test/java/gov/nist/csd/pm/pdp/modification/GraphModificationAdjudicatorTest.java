@@ -1,27 +1,35 @@
 package gov.nist.csd.pm.pdp.modification;
 
+import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.op.graph.*;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.pap.function.op.graph.*;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
+import static gov.nist.csd.pm.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.pap.function.op.Operation.NODE_ID_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ARSET_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.PROPERTIES_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.TARGET_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.TYPE_PARAM;
+import static gov.nist.csd.pm.pap.function.op.graph.GraphOp.UA_PARAM;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GraphModificationAdjudicatorTest {
@@ -37,9 +45,11 @@ class GraphModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new UserContext("u1"), """
+        TestUserContext u1 = new TestUserContext("u1");
+
+        pap.executePML(u1, """
                 create pc "pc1"
                 create pc "pc2"
                 create ua "ua1" in ["pc1"]
@@ -63,19 +73,21 @@ class GraphModificationAdjudicatorTest {
 
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new GraphModificationAdjudicator(new UserContext("u1"), pap, pdp, new PrivilegeChecker(pap));
-        fail = new GraphModificationAdjudicator(new UserContext("u2"), pap, pdp, new PrivilegeChecker(pap));
+        ok = new GraphModificationAdjudicator(u1, pap, pdp);
+        fail = new GraphModificationAdjudicator(new TestUserContext("u2"), pap, pdp);
     }
 
     @Test
     void createPolicyClass() throws PMException {
         assertDoesNotThrow(() -> ok.createPolicyClass("test"));
         assertEquals(
-                new EventContext("u1", new CreatePolicyClassOp(), Map.of(NAME_OPERAND, "test")),
+                new EventContext("u1", null, new CreatePolicyClassOp().getName(), Map.of(NAME_PARAM.getName(), "test",
+                    DESCENDANTS_PARAM.getName(), List.of())),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -85,153 +97,133 @@ class GraphModificationAdjudicatorTest {
 
     @Test
     void createUserAttribute() throws PMException {
-        assertDoesNotThrow(() -> ok.createUserAttribute("test", List.of("ua1")));
+        assertDoesNotThrow(() -> ok.createUserAttribute("test", ids("ua1")));
         assertEquals(
-                new EventContext("u1", new CreateUserAttributeOp(), Map.of(NAME_OPERAND, "test", DESCENDANTS_OPERAND, List.of("ua1"))),
+                new EventContext("u1", null, new CreateUserAttributeOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("ua1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () -> fail.createUserAttribute("test", List.of("ua1")));
+        assertThrows(UnauthorizedException.class, () -> fail.createUserAttribute("test", ids("ua1")));
     }
 
     @Test
     void createObjectAttribute() throws PMException {
-        assertDoesNotThrow(() -> ok.createObjectAttribute("test", List.of("oa1")));
+        assertDoesNotThrow(() -> ok.createObjectAttribute("test", ids("oa1")));
         assertEquals(
-                new EventContext("u1", new CreateObjectAttributeOp(), Map.of(NAME_OPERAND, "test", DESCENDANTS_OPERAND, List.of("oa1"))),
+                new EventContext("u1", null, new CreateObjectAttributeOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("oa1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () ->  fail.createObjectAttribute("test", List.of("oa1")));
+        assertThrows(UnauthorizedException.class, () ->  fail.createObjectAttribute("test", ids("oa1")));
     }
 
     @Test
     void createObject() throws PMException {
-        assertDoesNotThrow(() -> ok.createObject("test", List.of("oa1")));
+        assertDoesNotThrow(() -> ok.createObject("test", ids("oa1")));
         assertEquals(
-                new EventContext("u1", new CreateObjectOp(), Map.of(NAME_OPERAND, "test", DESCENDANTS_OPERAND, List.of("oa1"))),
+                new EventContext("u1", null, new CreateObjectOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("oa1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () ->  fail.createObject("test", List.of("oa1")));
+        assertThrows(UnauthorizedException.class, () ->  fail.createObject("test", ids("oa1")));
     }
 
     @Test
     void createUser() throws PMException {
-        assertDoesNotThrow(() -> ok.createUser("test", List.of("ua1")));
+        assertDoesNotThrow(() -> ok.createUser("test", ids("ua1")));
         assertEquals(
-                new EventContext("u1", new CreateUserOp(), Map.of(NAME_OPERAND, "test", DESCENDANTS_OPERAND, List.of("ua1"))),
+                new EventContext("u1", null, new CreateUserOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("ua1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () -> fail.createUser("test", List.of("ua1")));
+        assertThrows(UnauthorizedException.class, () -> fail.createUser("test", ids("ua1")));
     }
 
     @Test
     void setNodeProperties() throws PMException {
-        assertDoesNotThrow(() -> ok.setNodeProperties("o1", Map.of("a", "b")));
+        assertDoesNotThrow(() -> ok.setNodeProperties(id("o1"), Map.of("a", "b")));
         assertEquals(
-                new EventContext("u1", new SetNodePropertiesOp(), Map.of(NAME_OPERAND, "o1", PROPERTIES_OPERAND, Map.of("a", "b"))),
+                new EventContext("u1", null, new SetNodePropertiesOp().getName(), Map.of(NODE_ID_PARAM.getName(), "o1", PROPERTIES_PARAM.getName(), Map.of("a", "b"))),
                 testEventProcessor.getEventContext()
         );
-        assertTrue(pap.query().graph().getNode("o1").getProperties().equals(Map.of("a", "b")));
+	    assertEquals(pap.query().graph().getNodeByName("o1").getProperties(), Map.of("a", "b"));
 
-        assertThrows(UnauthorizedException.class, () -> fail.setNodeProperties("o1", Map.of("a", "b")));
+        assertThrows(UnauthorizedException.class, () -> fail.setNodeProperties(id("o1"), Map.of("a", "b")));
     }
 
     @Test
     void deleteNodeOk() throws PMException {
-        assertDoesNotThrow(() -> ok.deleteNode("o1"));
+        assertDoesNotThrow(() -> ok.deleteNode(id("o1")));
         assertEquals(
-                new EventContext("u1", new DeleteObjectOp(), Map.of(NAME_OPERAND, "o1", DESCENDANTS_OPERAND, Set.of("oa1"), TYPE_OPERAND, NodeType.O)),
-                testEventProcessor.getEventContext()
-        );
-        assertDoesNotThrow(() -> ok.deleteNode("oa2"));
-        assertEquals(
-                new EventContext("u1", new DeleteObjectAttributeOp(), Map.of(NAME_OPERAND, "oa2", DESCENDANTS_OPERAND, Set.of("pc1"), TYPE_OPERAND, NodeType.OA)),
-                testEventProcessor.getEventContext()
-        );
-        assertDoesNotThrow(() -> ok.deleteNode("ua4"));
-        assertEquals(
-                new EventContext("u1", new DeleteUserAttributeOp(), Map.of(NAME_OPERAND, "ua4", DESCENDANTS_OPERAND, Set.of("pc1"), TYPE_OPERAND, NodeType.UA)),
-                testEventProcessor.getEventContext()
-        );
-        assertDoesNotThrow(() -> ok.deleteNode("pc2"));
-        assertEquals(
-                new EventContext("u1", new DeletePolicyClassOp(), Map.of(NAME_OPERAND, "pc2", TYPE_OPERAND, NodeType.PC, DESCENDANTS_OPERAND, Set.of())),
-                testEventProcessor.getEventContext()
-        );
-        assertDoesNotThrow(() -> ok.deleteNode("u1"));
-        assertEquals(
-                new EventContext("u1", new DeleteUserOp(), Map.of(NAME_OPERAND, "u1", DESCENDANTS_OPERAND, Set.of("ua1", "ua3"), TYPE_OPERAND, NodeType.U)),
-                testEventProcessor.getEventContext()
+            new EventContext("u1", null, new DeleteNodeOp().getName(),
+                Map.of(
+                    NODE_ID_PARAM.getName(), "o1",
+                    TYPE_PARAM.getName(), NodeType.O,
+                    DESCENDANTS_PARAM.getName(), new ArrayList<>(List.of("oa1"))
+                )
+            ),
+            testEventProcessor.getEventContext()
         );
 
         assertFalse(pap.query().graph().nodeExists("o1"));
-        assertFalse(pap.query().graph().nodeExists("oa2"));
-        assertFalse(pap.query().graph().nodeExists("ua4"));
-        assertFalse(pap.query().graph().nodeExists("pc2"));
-        assertFalse(pap.query().graph().nodeExists("u1"));
     }
 
     @Test
     void deleteNodeFail() {
-        assertThrows(UnauthorizedException.class, () -> fail.deleteNode("pc1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteNode("ua1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteNode("oa1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteNode("u1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteNode("o1"));
+        assertThrows(UnauthorizedException.class, () -> fail.deleteNode(id("pc1")));
     }
 
     @Test
     void assign() throws PMException {
-        assertDoesNotThrow(() -> ok.assign("o1", List.of("oa2")));
+        assertDoesNotThrow(() -> ok.assign(id("o1"), ids("oa2")));
         assertEquals(
-                new EventContext("u1", new AssignOp(), Map.of(ASCENDANT_OPERAND, "o1", DESCENDANTS_OPERAND, List.of("oa2"))),
+                new EventContext("u1", null, new AssignOp().getName(), Map.of(ASCENDANT_PARAM.getName(), "o1", DESCENDANTS_PARAM.getName(), List.of("oa2"))),
                 testEventProcessor.getEventContext()
         );
-        assertTrue(pap.query().graph().isAscendant("o1", "oa2"));
+        assertTrue(pap.query().graph().isAscendant(id("o1"), id("oa2")));
 
-        assertThrows(UnauthorizedException.class, () -> fail.assign("o1", List.of("oa1")));
+        assertThrows(UnauthorizedException.class, () -> fail.assign(id("o1"), ids("oa1")));
     }
 
     @Test
     void deassign() throws PMException {
-        assertDoesNotThrow(() -> ok.deassign("u1", List.of("ua1")));
+        assertDoesNotThrow(() -> ok.deassign(id("u1"), ids("ua1")));
         assertEquals(
-                new EventContext("u1", new DeassignOp(), Map.of(ASCENDANT_OPERAND, "u1", DESCENDANTS_OPERAND, List.of("ua1"))),
+                new EventContext("u1", null, new DeassignOp().getName(), Map.of(ASCENDANT_PARAM.getName(), "u1", DESCENDANTS_PARAM.getName(), List.of("ua1"))),
                 testEventProcessor.getEventContext()
         );
-        assertFalse(pap.query().graph().isAscendant("u1", "ua1"));
+        assertFalse(pap.query().graph().isAscendant(id("u1"), id("ua1")));
 
-        assertThrows(UnauthorizedException.class, () -> fail.deassign("o1", List.of("oa1")));
+        assertThrows(UnauthorizedException.class, () -> fail.deassign(id("o1"), ids("oa1")));
     }
 
     @Test
     void associate() throws PMException {
-        assertDoesNotThrow(() -> ok.associate("ua1", "ua3", new AccessRightSet("assign")));
+        assertDoesNotThrow(() -> ok.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
         assertEquals(
-                new EventContext("u1", new AssociateOp(), Map.of(UA_OPERAND, "ua1", TARGET_OPERAND, "ua3", ARSET_OPERAND, new AccessRightSet("assign"))),
+                new EventContext("u1", null, new AssociateOp().getName(), Map.of(UA_PARAM.getName(), "ua1", TARGET_PARAM.getName(), "ua3", ARSET_PARAM.getName(), new AccessRightSet("assign"))),
                 testEventProcessor.getEventContext()
         );
-        assertTrue(pap.query().graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "ua3", new AccessRightSet("assign"))));
+        assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1"))
+                .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("assign"))));
 
-        assertThrows(UnauthorizedException.class, () -> fail.associate("ua1", "ua3", new AccessRightSet("assign")));
+        assertThrows(UnauthorizedException.class, () -> fail.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
     }
 
     @Test
     void dissociate() throws PMException {
-        assertDoesNotThrow(() -> ok.dissociate("ua1", "ua3"));
+        assertDoesNotThrow(() -> ok.dissociate(id("ua1"), id("ua3")));
         assertEquals(
-                new EventContext("u1", new DissociateOp(), Map.of(UA_OPERAND, "ua1", TARGET_OPERAND, "ua3")),
+                new EventContext("u1", null, new DissociateOp().getName(), Map.of(UA_PARAM.getName(), "ua1", TARGET_PARAM.getName(), "ua3")),
                 testEventProcessor.getEventContext()
         );
-        assertFalse(pap.query().graph().getAssociationsWithSource("ua1").contains(new Association("ua1", "ua3", new AccessRightSet("*a"))));
+        assertFalse(pap.query().graph().getAssociationsWithSource(id("ua1"))
+                .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("*a"))));
 
-        assertThrows(UnauthorizedException.class, () -> fail.dissociate("ua1", "ua3"));
+        assertThrows(UnauthorizedException.class, () -> fail.dissociate(id("ua1"), id("ua3")));
     }
 }

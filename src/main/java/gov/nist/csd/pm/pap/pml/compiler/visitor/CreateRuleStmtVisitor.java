@@ -1,19 +1,27 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+
+
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.LiteralVisitor;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.*;
+import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ArgPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.InArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.LogicalArgPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NegateArgPatternExpression;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.ParenArgPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.*;
 import gov.nist.csd.pm.pap.pml.scope.VariableAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.pap.pml.statement.*;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateFunctionStatement;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,29 +38,27 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     public CreateRuleStatement visitCreateRuleStatement(PMLParser.CreateRuleStatementContext ctx) {
         SubjectPatternVisitor subjectPatternVisitor = new SubjectPatternVisitor(visitorCtx);
         OperationPatternVisitor operationPatternVisitor = new OperationPatternVisitor(visitorCtx);
-        OperandMapVisitor operandMapVisitor = new OperandMapVisitor(visitorCtx);
+        ArgMapVisitor argMapVisitor = new ArgMapVisitor(visitorCtx);
         ResponseVisitor responseVisitor = new ResponseVisitor(visitorCtx);
 
-        Expression name = Expression.compile(visitorCtx, ctx.ruleName, Type.string());
+        Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.ruleName, STRING_TYPE);
 
         return new CreateRuleStatement(
                 name,
                 subjectPatternVisitor.visit(ctx.subjectPattern()),
                 operationPatternVisitor.visit(ctx.operationPattern()),
-                operandMapVisitor.visitOperandPattern(ctx.operandPattern()),
+                argMapVisitor.visitArgPattern(ctx.argPattern()),
                 responseVisitor.visitResponse(ctx.response())
         );
     }
 
     static class SubjectPatternVisitor extends PMLBaseVisitor<SubjectPattern> {
 
-        private LiteralVisitor literalVisitor;
-        private SubjectPatternExpressionVisitor subjectPatternExpressionVisitor;
+        private final SubjectPatternExpressionVisitor subjectPatternExpressionVisitor;
 
         public SubjectPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
 
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
             this.subjectPatternExpressionVisitor = new SubjectPatternExpressionVisitor(visitorCtx);
         }
 
@@ -69,10 +75,8 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
     }
 
     static class SubjectPatternExpressionVisitor extends PMLBaseVisitor<SubjectPatternExpression> {
-        private LiteralVisitor literalVisitor;
         public SubjectPatternExpressionVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
         }
 
         @Override
@@ -101,28 +105,24 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
-            return new InSubjectPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new InSubjectPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public SubjectPatternExpression visitUsernameSubject(PMLParser.UsernameSubjectContext ctx) {
-            return new UsernamePattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new UsernamePattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public SubjectPatternExpression visitProcessSubject(PMLParser.ProcessSubjectContext ctx) {
-            return new ProcessSubjectPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+            return new ProcessSubjectPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 
     static class OperationPatternVisitor extends PMLBaseVisitor<OperationPattern> {
 
-        private LiteralVisitor literalVisitor;
-
         public OperationPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
-
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
         }
 
         @Override
@@ -132,38 +132,34 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public OperationPattern visitIDOperation(PMLParser.IDOperationContext ctx) {
-            return new OperationPattern(literalVisitor.visitStringLit(ctx.stringLit()).getValue());
+            return new OperationPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 
-    static class OperandPatternVisitor extends PMLBaseVisitor<OperandPatternExpression> {
+    static class ArgPatternVisitor extends PMLBaseVisitor<ArgPatternExpression> {
 
-        private LiteralVisitor literalVisitor;
-
-        public OperandPatternVisitor(VisitorContext visitorCtx) {
+        public ArgPatternVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
-
-            this.literalVisitor = new LiteralVisitor(visitorCtx);
         }
 
         @Override
-        public OperandPatternExpression visitParenOperandPatternExpression(PMLParser.ParenOperandPatternExpressionContext ctx) {
-            return new ParenOperandPatternExpression(visit(ctx.operandPatternExpression()));
+        public ArgPatternExpression visitParenArgPatternExpression(PMLParser.ParenArgPatternExpressionContext ctx) {
+            return new ParenArgPatternExpression(visit(ctx.argPatternExpression()));
         }
 
         @Override
-        public OperandPatternExpression visitNegateOperandPatternExpression(PMLParser.NegateOperandPatternExpressionContext ctx) {
-            return new NegateOperandPatternExpression(visit(ctx.operandPatternExpression()));
+        public ArgPatternExpression visitNegateArgPatternExpression(PMLParser.NegateArgPatternExpressionContext ctx) {
+            return new NegateArgPatternExpression(visit(ctx.argPatternExpression()));
         }
 
         @Override
-        public OperandPatternExpression visitBasicOperandPatternExpression(PMLParser.BasicOperandPatternExpressionContext ctx) {
-            return visit(ctx.basicOperandPatternExpr());
+        public ArgPatternExpression visitBasicArgPatternExpression(PMLParser.BasicArgPatternExpressionContext ctx) {
+            return visit(ctx.basicArgPatternExpr());
         }
 
         @Override
-        public OperandPatternExpression visitLogicalOperandPatternExpression(PMLParser.LogicalOperandPatternExpressionContext ctx) {
-            return new LogicalOperandPatternExpression(
+        public ArgPatternExpression visitLogicalArgPatternExpression(PMLParser.LogicalArgPatternExpressionContext ctx) {
+            return new LogicalArgPatternExpression(
                     visit(ctx.left),
                     visit(ctx.right),
                     ctx.LOGICAL_AND() != null
@@ -171,41 +167,41 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
         }
 
         @Override
-        public OperandPatternExpression visitAnyPolicyElement(PMLParser.AnyPolicyElementContext ctx) {
-            return new AnyOperandPattern();
+        public ArgPatternExpression visitAnyPolicyElement(PMLParser.AnyPolicyElementContext ctx) {
+            return new AnyArgPattern();
         }
 
         @Override
-        public OperandPatternExpression visitInPolicyElement(PMLParser.InPolicyElementContext ctx) {
-            return new InOperandPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+        public ArgPatternExpression visitInPolicyElement(PMLParser.InPolicyElementContext ctx) {
+            return new InArgPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
-        public OperandPatternExpression visitPolicyElement(PMLParser.PolicyElementContext ctx) {
-            return new NodeOperandPattern(literalVisitor.visitStringLit(ctx.stringLit()));
+        public ArgPatternExpression visitPolicyElement(PMLParser.PolicyElementContext ctx) {
+            return new NodeArgPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 
-    static class OperandMapVisitor extends PMLBaseVisitor<Map<String, List<OperandPatternExpression>>> {
+    static class ArgMapVisitor extends PMLBaseVisitor<Map<String, List<ArgPatternExpression>>> {
 
-        private OperandPatternVisitor operandPatternVisitor = new OperandPatternVisitor(visitorCtx);
+        private ArgPatternVisitor argPatternVisitor = new ArgPatternVisitor(visitorCtx);
 
-        public OperandMapVisitor(VisitorContext visitorCtx) {
+        public ArgMapVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
 
-            this.operandPatternVisitor = new OperandPatternVisitor(visitorCtx);
+            this.argPatternVisitor = new ArgPatternVisitor(visitorCtx);
         }
 
         @Override
-        public Map<String, List<OperandPatternExpression>> visitOperandPattern(PMLParser.OperandPatternContext ctx) {
-            Map<String, List<OperandPatternExpression>> map = new HashMap<>();
+        public Map<String, List<ArgPatternExpression>> visitArgPattern(PMLParser.ArgPatternContext ctx) {
+            Map<String, List<ArgPatternExpression>> map = new HashMap<>();
 
             if (ctx == null) {
                 return new HashMap<>();
             }
 
-            for (PMLParser.OperandPatternElementContext operandPatternElementContext : ctx.operandPatternElement()) {
-                Map<String, List<OperandPatternExpression>> elementMap = visitOperandPatternElement(operandPatternElementContext);
+            for (PMLParser.ArgPatternElementContext argPatternElementContext : ctx.argPatternElement()) {
+                Map<String, List<ArgPatternExpression>> elementMap = visitArgPatternElement(argPatternElementContext);
                 map.putAll(elementMap);
             }
 
@@ -213,19 +209,19 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
         }
 
         @Override
-        public Map<String, List<OperandPatternExpression>> visitOperandPatternElement(PMLParser.OperandPatternElementContext ctx) {
+        public Map<String, List<ArgPatternExpression>> visitArgPatternElement(PMLParser.ArgPatternElementContext ctx) {
             String key = ctx.key.getText();
 
-            List<OperandPatternExpression> expressions = new ArrayList<>();
+            List<ArgPatternExpression> expressions = new ArrayList<>();
             if (ctx.single != null) {
-                OperandPatternExpression pattern = operandPatternVisitor.visit(ctx.single);
+                ArgPatternExpression pattern = argPatternVisitor.visit(ctx.single);
                 expressions.add(pattern);
             } else if (ctx.multiple != null) {
-                for (PMLParser.OperandPatternExpressionContext operandCtx : ctx.multiple.operandPatternExpression()) {
-                    expressions.add(operandPatternVisitor.visit(operandCtx));
+                for (PMLParser.ArgPatternExpressionContext argCtx : ctx.multiple.argPatternExpression()) {
+                    expressions.add(argPatternVisitor.visit(argCtx));
                 }
             } else {
-                throw new PMLCompilationRuntimeException(ctx, "Invalid operand pattern expression: " + ctx.getText());
+                throw new PMLCompilationRuntimeException(ctx, "Invalid arg pattern expression: " + ctx.getText());
             }
 
             return Map.of(key, expressions);
@@ -246,7 +242,7 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
             // add the event name and event context map to the local parser scope
             VisitorContext localVisitorCtx = visitorCtx.copy();
             try {
-                localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, Type.map(Type.string(), Type.any()), true));
+                localVisitorCtx.scope().addVariable(evtVar, new Variable(evtVar, MapType.of(STRING_TYPE, ANY_TYPE), true));
             } catch (VariableAlreadyDefinedInScopeException e) {
                 throw new PMLCompilationRuntimeException(e);
             }
@@ -258,9 +254,9 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
             CreateRuleStmtVisitor createRuleStmtVisitor = new CreateRuleStmtVisitor(localVisitorCtx);
             DeleteRuleStmtVisitor deleteRuleStmtVisitor = new DeleteRuleStmtVisitor(localVisitorCtx);
 
-            List<PMLStatement> stmts = new ArrayList<>();
+            List<PMLStatement<?>> stmts = new ArrayList<>();
             for (PMLParser.ResponseStatementContext responseStmtCtx : responseStmtsCtx) {
-                PMLStatement stmt = null;
+                PMLStatement<?> stmt = null;
 
                 if (responseStmtCtx.statement() != null) {
                     stmt = statementVisitor.visitStatement(responseStmtCtx.statement());
@@ -268,10 +264,6 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
                     stmt = createRuleStmtVisitor.visitCreateRuleStatement(responseStmtCtx.createRuleStatement());
                 } else if (responseStmtCtx.deleteRuleStatement() != null) {
                     stmt = deleteRuleStmtVisitor.visitDeleteRuleStatement(responseStmtCtx.deleteRuleStatement());
-                }
-
-                if (stmt instanceof CreateFunctionStatement) {
-                    throw new PMLCompilationRuntimeException(responseStmtCtx, "operations/routines are not allowed inside response blocks");
                 }
 
                 stmts.add(stmt);

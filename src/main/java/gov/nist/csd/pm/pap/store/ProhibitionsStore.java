@@ -19,7 +19,10 @@ public interface ProhibitionsStore extends Transactional {
                            Collection<ContainerCondition> containerConditions) throws PMException;
     void deleteProhibition(String name) throws PMException;
 
-    Map<String, Collection<Prohibition>> getProhibitions() throws PMException;
+    Map<Long, Collection<Prohibition>> getNodeProhibitions() throws PMException;
+    Map<String, Collection<Prohibition>> getProcessProhibitions() throws PMException;
     Prohibition getProhibition(String name) throws PMException;
     boolean prohibitionExists(String name) throws PMException;
+    Collection<Prohibition> getProhibitionsWithNode(long subject) throws PMException;
+    Collection<Prohibition> getProhibitionsWithProcess(String subject) throws PMException;
 }

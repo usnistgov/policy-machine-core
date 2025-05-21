@@ -2,45 +2,36 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.common.op.PreparedOperation;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 
-import java.util.*;
+public abstract class OperationStatement<A extends Args> extends PMLStatement<VoidResult> {
 
-public abstract class OperationStatement extends PreparedOperation<Void> implements PMLStatement {
+    protected Operation<?, A> op;
 
-    public OperationStatement(Operation<Void> op) {
-        super(op, new HashMap<>());
+    public OperationStatement(Operation<?, A> op) {
+        this.op = op;
     }
 
-    public abstract Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException;
+    public Operation<?, A> getOp() {
+        return op;
+    }
+
+    public abstract A prepareArgs(ExecutionContext ctx, PAP pap) throws PMException;
 
     @Override
-    public final VoidValue execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Map<String, Object> prepareOperands = prepareOperands(ctx, pap);
-        setOperands(prepareOperands);
-
-        execute(pap);
-
-        return new VoidValue();
-    }
-
-    @Override
-    public final Void execute(PAP pap) throws PMException  {
-        return super.execute(pap);
-    }
-
-    @Override
-    public String toString() {
-        return toFormattedString(0);
-    }
+    public abstract int hashCode();
 
     @Override
     public abstract boolean equals(Object o);
 
     @Override
-    public abstract int hashCode();
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        op.execute(pap, prepareArgs(ctx, pap));
+
+        return new VoidResult();
+    }
 }

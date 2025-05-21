@@ -1,31 +1,43 @@
 package gov.nist.csd.pm.pap.pml;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.common.routine.Routine;
-import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+
 import static gov.nist.csd.pm.pdp.adjudication.Decision.DENY;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PMLTest {
 
+    private static final FormalParameter<String> ARGA = new FormalParameter<>("a", STRING_TYPE);
+    private static final FormalParameter<List<String>> ARGB = new FormalParameter<>("b", ListType.of(STRING_TYPE));
+    private static final FormalParameter<Map<String, String>> ARGC = new FormalParameter<>("c", MapType.of(STRING_TYPE, STRING_TYPE));
+
     @Test
-    void testCallingNonPMLOperationAndRoutineFromPMLWithOperandsAndReturnValue() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+    void testCallingNonPMLOperationAndRoutineFromPMLWithArgsAndReturnValue() throws PMException {
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -35,20 +47,20 @@ public class PMLTest {
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of [PM_ADMIN_OBJECT]
+                on union of {PM_ADMIN_OBJECT: false}
                 """);
 
-        Operation<?> op1 = new Operation<>("op1", List.of("a", "b", "c")) {
+        Operation<?, ?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-                privilegeChecker.check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), "assign");
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");
             }
 
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                String a = (String) operands.get("a");
-                List<String> b = (List<String>) operands.get("b");
-                Map<String, String> c = (Map<String, String>) operands.get("c");
+            public Object execute(PAP pap, Args actualArgs) throws PMException {
+                String a = actualArgs.get(ARGA);
+                List<String> b = actualArgs.get(ARGB);
+                Map<String, String> c = actualArgs.get(ARGC);
 
                 pap.modify().graph().createPolicyClass("1" + a);
 
@@ -63,20 +75,30 @@ public class PMLTest {
 
                 return null;
             }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
+            }
         };
         pap.modify().operations().createAdminOperation(op1);
 
-        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", List.of("a", "b", "c")) {
+        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
-                pap.executeAdminExecutable(op1, operands);
+            public Object execute(PAP pap, Args args) throws PMException {
+                pap.executeAdminFunction(op1, args.toMap());
 
                 return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
         });
 
         PDP pdp = new PDP(pap);
-        pdp.executePML(new UserContext("u1"), """
+        pdp.executePML(new TestUserContext("u1"), """
                 op1("a", ["b", "c"], {"d": "e", "f": "g"})
                 """);
         assertTrue(pap.query().graph().nodeExists("1a"));
@@ -87,11 +109,11 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext("u2"), """
+        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext(id("u2")), """
                 op1("a", ["b", "c"], {"d": "e", "f": "g"})
                 """));
 
-        pdp.executePML(new UserContext("u1"), """
+        pdp.executePML(new TestUserContext("u1"), """
                 routine1("1", ["2", "3"], {"4": "5", "6": "7"})
                 """);
         assertTrue(pap.query().graph().nodeExists("11"));
@@ -102,15 +124,15 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext("u2"), """
+        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext(id("u2")), """
                 routine1("1", ["2", "3"], {"4": "5", "6": "7"})
                 """));
     }
 
     @Test
     void testCallPMLOperationAndRoutineFromNonPML() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -120,10 +142,10 @@ public class PMLTest {
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of [PM_ADMIN_OBJECT]
+                on union of {PM_ADMIN_OBJECT: false}
                 
                 operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on PM_ADMIN_OBJECT
+                    check "assign" on [PM_ADMIN_OBJECT]
                 } {
                     create pc "1" + a
                 
@@ -143,8 +165,15 @@ public class PMLTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdjudicationResponse response = pdp.adjudicateAdminOperation(new UserContext("u1"),
-                "op1", Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")));
+        AdjudicationResponse response = pdp.adjudicateAdminOperation(
+            new TestUserContext("u1"),
+            "op1",
+            Map.of(
+                ARGA.getName(), "a",
+                ARGB.getName(), List.of("b", "c"),
+                ARGC.getName(), Map.of("d", "e", "f", "g")
+            )
+        );
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("1a"));
         assertTrue(pap.query().graph().nodeExists("1b"));
@@ -155,12 +184,24 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1g"));
 
 
-        response = pdp.adjudicateAdminOperation(new UserContext("u2"), "op1",
-                Map.of("a", "a", "b", List.of("b", "c"), "c", Map.of("d", "e", "f", "g")));
+        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")),
+            "op1",
+            Map.of(
+                ARGA.getName(), "a",
+                ARGB.getName(), List.of("b", "c"),
+                ARGC.getName(), Map.of("d", "e", "f", "g")
+            )
+        );
         assertEquals(DENY, response.getDecision());
 
-        response = pdp.adjudicateAdminOperation(new UserContext("u1"), "op1",
-                Map.of("a", "1", "b", List.of("2", "3"), "c", Map.of("4", "5", "6", "7")));
+        response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+            "op1",
+            Map.of(
+                ARGA.getName(), "1",
+                ARGB.getName(), List.of("2", "3"),
+                ARGC.getName(), Map.of("4", "5", "6", "7")
+            )
+        );
         assertEquals(GRANT, response.getDecision());
         assertTrue(pap.query().graph().nodeExists("11"));
         assertTrue(pap.query().graph().nodeExists("12"));
@@ -170,8 +211,15 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        response = pdp.adjudicateAdminOperation(new UserContext("u2"), "op1",
-                Map.of("a", "1", "b", List.of("2", "3"), "c", Map.of("4", "5", "6", "7")));
+        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
+            Map.of(
+                ARGA.getName(), "1",
+                ARGB.getName(), List.of("2", "3"),
+                ARGC.getName(), Map.of("4", "5", "6", "7")
+            )
+        );
         assertEquals(DENY, response.getDecision());
     }
+
+
 }

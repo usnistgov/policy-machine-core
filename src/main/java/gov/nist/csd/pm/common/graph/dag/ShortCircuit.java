@@ -4,6 +4,6 @@ import gov.nist.csd.pm.common.exception.PMException;
 
 public interface ShortCircuit {
 
-    boolean evaluate(String node) throws PMException;
+    boolean evaluate(long nodeId) throws PMException;
 
 }

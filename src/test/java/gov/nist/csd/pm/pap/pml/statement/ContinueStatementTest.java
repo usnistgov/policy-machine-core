@@ -2,9 +2,10 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.statement.basic.ContinueStatement;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,8 +23,8 @@ class ContinueStatementTest {
                     create policy class x         
                 }
                 """;
-        PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        PAP pap = new TestPAP();
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertFalse(pap.query().graph().nodeExists("b"));
@@ -43,8 +44,8 @@ class ContinueStatementTest {
                     create policy class x         
                 }
                 """;
-        PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        PAP pap = new TestPAP();
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertFalse(pap.query().graph().nodeExists("b"));

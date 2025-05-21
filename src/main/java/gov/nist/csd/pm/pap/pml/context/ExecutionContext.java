@@ -1,104 +1,108 @@
 package gov.nist.csd.pm.pap.pml.context;
 
+import com.sun.jdi.VoidValue;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.pml.scope.ExecuteGlobalScope;
-import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.*;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.pap.pml.scope.Scope;
+import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.statement.result.BreakResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ContinueResult;
+import gov.nist.csd.pm.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.pap.pml.statement.result.StatementResult;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class ExecutionContext implements Serializable {
 
     protected final UserContext author;
-    protected final Scope<Value, AdminExecutable<?>> scope;
+    protected final Scope<Object, AdminFunction<?, ?>> scope;
     protected final PAP pap;
-    private boolean isExplain;
 
     public ExecutionContext(UserContext author, PAP pap) throws PMException {
         this.author = author;
-        this.scope = new Scope<>(new ExecuteGlobalScope(pap));
+        this.scope = new ExecuteScope(pap);
         this.pap = pap;
-        this.isExplain = false;
     }
 
-    public ExecutionContext(UserContext author, PAP pap, Scope<Value, AdminExecutable<?>> scope) throws PMException {
+    public ExecutionContext(UserContext author, PAP pap, Scope<Object, AdminFunction<?, ?>> scope) throws PMException {
         this.author = author;
         this.scope = scope;
         this.pap = pap;
-        this.isExplain = false;
     }
 
     public UserContext author() {
         return author;
     }
 
-    public Scope<Value, AdminExecutable<?>> scope() {
+    public Scope<Object, AdminFunction<?, ?>> scope() {
         return scope;
-    }
-
-    public boolean isExplain() {
-        return isExplain;
-    }
-
-    public void setExplain(boolean explain) {
-        isExplain = explain;
     }
 
     public ExecutionContext copy() throws PMException {
         return new ExecutionContext(author, pap, scope.copy());
     }
 
-    public ExecutionContext copyWithoutScope() throws PMException {
-        return new ExecutionContext(author, pap);
+    public ExecutionContext copyWithParentScope() throws PMException {
+        return new ExecutionContext(
+                author,
+                pap,
+                scope.getParentScope() == null ? new ExecuteScope(pap) : scope.getParentScope().copy()
+        );
     }
 
-    public Value executeStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        ExecutionContext copy = writeOperandsToScope(operands);
+    public StatementResult executeStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+        ExecutionContext copy = writeArgsToScope(args);
 
-        for (PMLStatement statement : stmts) {
-            Value value = statement.execute(copy, pap);
+        for (PMLStatement<?> statement : stmts) {
+            Object result = statement.execute(copy, pap);
 
-            scope.local().overwriteFromLocalScope(copy.scope.local());
+            scope.overwriteFromScope(copy.scope);
 
-            if (value instanceof ReturnValue || value instanceof BreakValue || value instanceof ContinueValue) {
-                return value;
+            if (result instanceof ReturnResult returnResult) {
+                return returnResult;
+            } else if (result instanceof BreakResult || result instanceof ContinueResult) {
+                return (StatementResult) result;
             }
         }
 
-        return new VoidValue();
+        return new VoidResult();
     }
 
-    public Value executeOperationStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        return executeStatements(stmts, operands);
+    public Object executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+        StatementResult result = executeStatements(stmts, args);
+
+        if (result instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 
-    public Value executeRoutineStatements(List<PMLStatement> stmts, Map<String, Object> operands) throws PMException {
-        return executeStatements(stmts, operands);
+    public Object executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
+        StatementResult result = executeStatements(stmts, args);
+
+        if (result instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 
-    protected ExecutionContext writeOperandsToScope(Map<String, Object> operands) throws PMException {
+    protected ExecutionContext writeArgsToScope(Args args) throws PMException {
         ExecutionContext copy = this.copy();
 
-        for (Map.Entry<String, Object> entry : operands.entrySet()) {
-            String key = entry.getKey();
-            Object o = entry.getValue();
+        args.foreach((formalArg, o) -> {
+            String key = formalArg.getName();
 
-            Value value;
-            if (o instanceof Value) {
-                value = (Value) o;
-            } else {
-                value = Value.fromObject(o);
-            }
-
-            copy.scope.local().addOrOverwriteVariable(key, value);
-        }
+            copy.scope.updateVariable(key, o);
+        });
 
         return copy;
     }
@@ -121,5 +125,4 @@ public class ExecutionContext implements Serializable {
     public int hashCode() {
         return Objects.hash(author, scope);
     }
-
 }

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.pap.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 
 /**
  * Interface for managing NGAC administrative routines.
@@ -13,7 +13,7 @@ public interface RoutinesModification {
      * @param routine The routine to create.
      * @throws PMException If there is an error in the PM.
      */
-    void createAdminRoutine(Routine<?> routine) throws PMException;
+    void createAdminRoutine(Routine<?, ?> routine) throws PMException;
 
     /**
      * Delete the admin routine with the given name.

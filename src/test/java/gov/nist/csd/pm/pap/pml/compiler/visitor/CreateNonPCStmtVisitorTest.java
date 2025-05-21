@@ -1,19 +1,16 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.operation.builtin.Equals;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
@@ -21,26 +18,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CreateNonPCStmtVisitorTest {
 
-    private static CompileGlobalScope testGlobalScope;
+    private static CompileScope testGlobalScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testGlobalScope = new CompileGlobalScope();
-        testGlobalScope.addExecutables(Map.of("equals", new Equals().getSignature()));
+        testGlobalScope = new CompileScope();
     }
 
     @Test
     void testSuccess() {
-        PMLParser.CreateNonPCStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 create user attribute "ua1" in ["a"]
-                """,
-                PMLParser.CreateNonPCStatementContext.class);
+                """);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
-        PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visitCreateNonPCStatement(ctx);
+        PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new CreateNonPCStatement(new StringLiteral("ua1"), NodeType.UA, buildArrayLiteral("a")),
+                new CreateNonPCStatement(new StringLiteralExpression("ua1"), NodeType.UA, buildArrayLiteral("a")),
                 stmt
         );
     }
@@ -52,14 +47,14 @@ class CreateNonPCStmtVisitorTest {
                 """
                 create user attribute ["ua1"] in ["a"]
                 """, visitorCtx, 1,
-                "expected expression type(s) [string], got []string"
+                "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
                 create user attribute "ua1" in "a"
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]string], got string"
+                "expected expression type []string, got string"
         );
     }
 

@@ -2,17 +2,19 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.statement.basic.IfStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IfStatementTest {
 
@@ -40,8 +42,8 @@ class IfStatementTest {
                 func1("c")
                 func1("d")
                 """;
-        PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        PAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
@@ -53,27 +55,27 @@ class IfStatementTest {
     void testToFormattedStringVoidReturn() {
         IfStatement stmt = new IfStatement(
                 new IfStatement.ConditionalBlock(
-                        new BoolLiteral(true),
+                        new BoolLiteralExpression(true),
                         new PMLStatementBlock(
-                                new CreatePolicyStatement(new StringLiteral("a"))
+                                new CreatePolicyClassStatement(new StringLiteralExpression("a"))
                         )
                 ),
                 List.of(
                         new IfStatement.ConditionalBlock(
-                                new BoolLiteral(true),
+                                new BoolLiteralExpression(true),
                                 new PMLStatementBlock(
-                                        new CreatePolicyStatement(new StringLiteral("b"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("b"))
                                 )
                         ),
                         new IfStatement.ConditionalBlock(
-                                new BoolLiteral(true),
+                                new BoolLiteralExpression(true),
                                 new PMLStatementBlock(
-                                        new CreatePolicyStatement(new StringLiteral("c"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("c"))
                                 )
                         )
                 ),
                 new PMLStatementBlock(
-                        new CreatePolicyStatement(new StringLiteral("d"))
+                        new CreatePolicyClassStatement(new StringLiteralExpression("d"))
                 )
         );
 

@@ -1,43 +1,45 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.pap.function.op.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.NegatedExpression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.ComplementedValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
-
+import gov.nist.csd.pm.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
+import gov.nist.csd.pm.pap.query.PolicyQuery;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.GraphOp.ARSET_OPERAND;
-import static gov.nist.csd.pm.common.op.prohibition.ProhibitionOp.*;
+public class CreateProhibitionStatement extends OperationStatement<ProhibitionOpArgs> {
 
-public class CreateProhibitionStatement extends OperationStatement {
+    private final Expression<String> name;
+    private final Expression<String> subject;
+    private final ProhibitionSubjectType subjectType;
+    private final Expression<List<String>> accessRights;
+    private final boolean isIntersection;
+    private final Expression<Map<String, Boolean>> containers;
 
-    private Expression name;
-    private Expression subject;
-    private ProhibitionSubject.Type subjectType;
-    private Expression accessRights;
-    private boolean isIntersection;
-    private Expression containers;
-
-    public CreateProhibitionStatement(Expression name, Expression subject, ProhibitionSubject.Type subjectType, Expression accessRights,
-                                      boolean isIntersection, Expression containers) {
+    public CreateProhibitionStatement(Expression<String> name, Expression<String> subject, ProhibitionSubjectType subjectType,
+                                      Expression<List<String>> accessRights, boolean isIntersection, Expression<Map<String, Boolean>> containers) {
         super(new CreateProhibitionOp());
         this.name = name;
         this.subject = subject;
@@ -48,33 +50,27 @@ public class CreateProhibitionStatement extends OperationStatement {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap)
-            throws PMException {
-        Value idValue = this.name .execute(ctx, pap);
-        Value subjectValue = this.subject.execute(ctx, pap);
-        Value permissionsValue = this.accessRights.execute(ctx, pap);
+    public ProhibitionOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String name = this.name.execute(ctx, pap);
+        String subject = this.subject.execute(ctx, pap);
+        AccessRightSet ops = new AccessRightSet(this.accessRights.execute(ctx, pap));
 
-        List<Value> arrayValue = permissionsValue.getArrayValue();
-        AccessRightSet ops = new AccessRightSet();
-        for (Value v : arrayValue) {
-            ops.add(v.getStringValue());
+        ProhibitionSubject prohibitionSubject;
+        if (subjectType == ProhibitionSubjectType.PROCESS) {
+            prohibitionSubject = new ProhibitionSubject(subject);
+        } else {
+            long subjectId = pap.query().graph().getNodeId(subject);
+            prohibitionSubject = new ProhibitionSubject(subjectId);
         }
 
         List<ContainerCondition> containerConditions = new ArrayList<>();
-        for (Value container : containers.execute(ctx, pap).getArrayValue()) {
-            boolean isComplement = container instanceof ComplementedValue;
-            String containerName = container.getStringValue();
+        for (var container : containers.execute(ctx, pap).entrySet()) {
+            long containerId = pap.query().graph().getNodeId(container.getKey());
 
-            containerConditions.add(new ContainerCondition(containerName, isComplement));
+            containerConditions.add(new ContainerCondition(containerId, container.getValue()));
         }
 
-        return Map.of(
-                NAME_OPERAND, idValue.getStringValue(),
-                SUBJECT_OPERAND, new ProhibitionSubject(subjectValue.getStringValue(), subjectType),
-                ARSET_OPERAND, ops,
-                INTERSECTION_OPERAND, isIntersection,
-                CONTAINERS_OPERAND, containerConditions
-        );
+        return new ProhibitionOpArgs(name, prohibitionSubject, ops, isIntersection, new ArrayList<>(containerConditions));
     }
 
     @Override
@@ -82,23 +78,28 @@ public class CreateProhibitionStatement extends OperationStatement {
         String subjectStr = getSubjectStr();
         String indent = indent(indentLevel);
         return String.format(
-                """
-                %screate prohibition %s
-                %s  deny %s %s
-                %s  access rights %s
-                %s  on %s of %s""",
-                indent, name,
-                indent, subjectStr, subject,
-                indent, accessRights,
-                indent, (isIntersection ? "intersection" : "union"), containers
+            """
+            %screate prohibition %s
+            %s  deny %s %s
+            %s  access rights %s
+            %s  on %s of %s""",
+            indent, name,
+            indent, subjectStr, subject,
+            indent, accessRights,
+            indent, (isIntersection ? "intersection" : "union"), containers
         );
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CreateProhibitionStatement that)) return false;
-        return isIntersection == that.isIntersection && Objects.equals(name, that.name) && Objects.equals(subject, that.subject) && subjectType == that.subjectType && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers, that.containers);
+        if (this == o)
+            return true;
+        if (!(o instanceof CreateProhibitionStatement that))
+            return false;
+        return isIntersection == that.isIntersection && Objects.equals(name, that.name)
+            && Objects.equals(subject, that.subject) && subjectType == that.subjectType
+            && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers,
+            that.containers);
     }
 
     @Override
@@ -117,36 +118,50 @@ public class CreateProhibitionStatement extends OperationStatement {
         return subjectStr;
     }
 
-    public static CreateProhibitionStatement fromProhibition(Prohibition prohibition) {
-        List<Expression> accessRightsList = new ArrayList<>();
+    public static CreateProhibitionStatement fromProhibition(PolicyQuery policyQuery, Prohibition prohibition) throws PMException {
+        List<Expression<String>> accessRightsList = new ArrayList<>();
         for (String ar : prohibition.getAccessRightSet()) {
             if (isAdminAccessRight(ar)) {
-                accessRightsList.add(new ReferenceByID(ar));
+                accessRightsList.add(new VariableReferenceExpression<>(ar, STRING_TYPE));
             } else {
-                accessRightsList.add(new StringLiteral(ar));
+                accessRightsList.add(new StringLiteralExpression(ar));
             }
         }
-        ArrayLiteral arList = new ArrayLiteral(accessRightsList, Type.string());
 
-        List<Expression> containersList = new ArrayList<>();
+        ArrayLiteralExpression<String> arList = ArrayLiteralExpression.of(accessRightsList, STRING_TYPE);
+
+        Map<Expression<String>, Expression<Boolean>> containersMap = new HashMap<>();
         for (ContainerCondition cc : prohibition.getContainers()) {
-            StringLiteral s = new StringLiteral(cc.getName());
-            if (cc.isComplement()) {
-                containersList.add(new NegatedExpression(s));
-            } else {
-                containersList.add(s);
-            }
+            String contName = policyQuery.graph().getNodeById(cc.getId()).getName();
+            StringLiteralExpression s = new StringLiteralExpression(contName);
+            containersMap.put(s, new BoolLiteralExpression(cc.isComplement()));
         }
 
-        ArrayLiteral containers = new ArrayLiteral(containersList, Type.string());
+        MapLiteralExpression<String, Boolean> containers = MapLiteralExpression.of(containersMap, STRING_TYPE, BOOLEAN_TYPE);
+
+        ProhibitionSubjectType type;
+        StringLiteralExpression subjectName;
+        if (prohibition.getSubject().isNode()) {
+            Node subjectNode = policyQuery.graph().getNodeById(prohibition.getSubject().getNodeId());
+            subjectName = new StringLiteralExpression(subjectNode.getName());
+
+            if (subjectNode.getType() == NodeType.UA) {
+                type = ProhibitionSubjectType.USER_ATTRIBUTE;
+            } else {
+                type = ProhibitionSubjectType.USER;
+            }
+        } else {
+            subjectName = new StringLiteralExpression(prohibition.getSubject().getProcess());
+            type = ProhibitionSubjectType.PROCESS;
+        }
 
         return new CreateProhibitionStatement(
-                new StringLiteral(prohibition.getName()),
-                new StringLiteral(prohibition.getSubject().getName()),
-                prohibition.getSubject().getType(),
-                arList,
-                prohibition.isIntersection(),
-                containers
+            new StringLiteralExpression(prohibition.getName()),
+            subjectName,
+            type,
+            arList,
+            prohibition.isIntersection(),
+            containers
         );
     }
 }

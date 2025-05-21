@@ -3,14 +3,16 @@ package gov.nist.csd.pm.pap.admin;
 public enum AdminPolicyNode {
 
     // Admin policy class
-    PM_ADMIN_PC("PM_ADMIN"),
+    PM_ADMIN_PC(-1, "PM_ADMIN"),
     // Admin policy object attribute
-    PM_ADMIN_OBJECT("PM_ADMIN:object");
+    PM_ADMIN_OBJECT(-2, "PM_ADMIN:object");
 
-    private final String value;
+    private final long id;
+    private final String name;
 
-    AdminPolicyNode(String value) {
-        this.value = value;
+    AdminPolicyNode(long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public static AdminPolicyNode fromNodeName(String ascendant) {
@@ -31,6 +33,10 @@ public enum AdminPolicyNode {
     }
 
     public String nodeName() {
-        return value;
+        return name;
+    }
+
+    public long nodeId() {
+        return id;
     }
 }

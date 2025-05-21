@@ -14,4 +14,15 @@ public class PMRuntimeException extends RuntimeException {
         super(message, e);
     }
 
+    public PMRuntimeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public PMRuntimeException(Throwable cause) {
+        super(cause);
+    }
+
+    public PMRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

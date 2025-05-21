@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pap.pml;
 
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,17 +14,17 @@ public class FunctionTest {
     void testElseIfNotAllPathsReturn() {
         String pml = """
                 operation fun(string a) string {
-                    if equals(a, "a") {
+                    if a == "a" {
                         return "a"
-                    } else if equals(a, "b") {
+                    } else if a == "b" {
                         return "b"
                     }
                 }
                 """;
 
         PMLCompilationException e = assertThrows(PMLCompilationException.class, () -> {
-            PAP pap = new MemoryPAP();
-            pap.executePML(new UserContext("u1"), pml);
+            PAP pap = new TestPAP();
+            pap.executePML(new TestUserContext("u1"), pml);
         });
         assertEquals("not all conditional paths return", e.getErrors().get(0).errorMessage());
     }
@@ -33,9 +33,9 @@ public class FunctionTest {
     void testElseAllPathsReturn() {
         String pml2 = """
                 operation fun(string a) string {
-                    if equals(a, "a") {
+                    if a == "a" {
                         return "a"
-                    } else if equals(a, "b") {
+                    } else if a == "b" {
                         return "b"
                     } else {
                         return "c"
@@ -44,8 +44,8 @@ public class FunctionTest {
                 """;
 
         assertDoesNotThrow(() -> {
-            PAP pap = new MemoryPAP();
-            pap.executePML(new UserContext("u1"), pml2);
+            PAP pap = new TestPAP();
+            pap.executePML(new TestUserContext("u1"), pml2);
         });
     }
 
@@ -53,7 +53,7 @@ public class FunctionTest {
     void testElseWithNoElseIfAllPathsReturn() {
         String pml2 = """
                 operation fun(string a) string {
-                    if equals(a, "a") {
+                    if a == "a" {
                         return "a"
                     } else {
                         return "b"
@@ -62,8 +62,8 @@ public class FunctionTest {
                 """;
 
         assertDoesNotThrow(() -> {
-            PAP pap = new MemoryPAP();
-            pap.executePML(new UserContext("u1"), pml2);
+            PAP pap = new TestPAP();
+            pap.executePML(new TestUserContext("u1"), pml2);
         });
     }
 

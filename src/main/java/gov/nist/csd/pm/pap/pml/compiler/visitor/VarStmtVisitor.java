@@ -1,16 +1,18 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
 import gov.nist.csd.pm.pap.pml.statement.*;
-import gov.nist.csd.pm.pap.pml.statement.ShortDeclarationStatement;
-import gov.nist.csd.pm.pap.pml.statement.VariableAssignmentStatement;
-import gov.nist.csd.pm.pap.pml.statement.VariableDeclarationStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.pap.pml.statement.basic.ShortDeclarationStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableDeclarationStatement;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +25,14 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
     }
 
     @Override
-    public PMLStatement visitVarDeclaration(PMLParser.VarDeclarationContext ctx) {
+    public PMLStatement<?> visitVarDeclaration(PMLParser.VarDeclarationContext ctx) {
         List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
         for (PMLParser.VarSpecContext varSpecContext : ctx.varSpec()) {
             String varName = varSpecContext.ID().getText();
-            Expression expr = Expression.compile(visitorCtx, varSpecContext.expression(), Type.any());
+            Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, varSpecContext.expression(), ANY_TYPE);
 
             try {
-                visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(visitorCtx.scope()), false));
+                visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(), false));
             } catch (PMLScopeException e) {
                 throw new PMLCompilationRuntimeException(ctx, e.getMessage());
             }
@@ -42,9 +44,9 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
     }
 
     @Override
-    public PMLStatement visitShortDeclaration(PMLParser.ShortDeclarationContext ctx) {
+    public PMLStatement<?> visitShortDeclaration(PMLParser.ShortDeclarationContext ctx) {
         String varName = ctx.ID().getText();
-        Expression expr = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+        Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         ShortDeclarationStatement stmt = new ShortDeclarationStatement(varName, expr);
 
@@ -53,7 +55,7 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
                 throw new PMLCompilationRuntimeException(ctx, "variable " + varName + " already exists");
             }
 
-            visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(visitorCtx.scope()), false));
+            visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(), false));
         } catch (PMLScopeException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
@@ -62,9 +64,9 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
     }
 
     @Override
-    public PMLStatement visitVariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
+    public PMLStatement<?> visitVariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
         String varName = ctx.ID().getText();
-        Expression expr = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+        Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         VariableAssignmentStatement stmt = new VariableAssignmentStatement(
                 varName,

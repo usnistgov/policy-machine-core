@@ -1,9 +1,8 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.query.PolicyQuery;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.query.*;
 
 public class PolicyQueryAdjudicator implements PolicyQuery {
 
@@ -13,19 +12,41 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     private final ObligationsQueryAdjudicator obligations;
     private final OperationsQueryAdjudicator operations;
     private final RoutinesQueryAdjudicator routines;
+    private final SelfAccessQueryAdjudicator selfAccess;
 
-    public PolicyQueryAdjudicator(UserContext userCtx, PAP pap, PrivilegeChecker privilegeChecker) {
-        this.access = new AccessQueryAdjudicator(userCtx, pap, privilegeChecker);
-        this.graph = new GraphQueryAdjudicator(userCtx, pap, privilegeChecker);
-        this.prohibitions = new ProhibitionsQueryAdjudicator(userCtx, pap, privilegeChecker);
-        this.obligations = new ObligationsQueryAdjudicator(userCtx, pap, privilegeChecker);
-        this.operations = new OperationsQueryAdjudicator(userCtx, pap, privilegeChecker);
-        this.routines = new RoutinesQueryAdjudicator(userCtx, pap, privilegeChecker);
+    public PolicyQueryAdjudicator(PAP pap, UserContext userCtx) {
+        this.access = new AccessQueryAdjudicator(pap, userCtx);
+        this.graph = new GraphQueryAdjudicator(pap, userCtx);
+        this.prohibitions = new ProhibitionsQueryAdjudicator(pap, userCtx);
+        this.obligations = new ObligationsQueryAdjudicator(pap, userCtx);
+        this.operations = new OperationsQueryAdjudicator(pap, userCtx);
+        this.routines = new RoutinesQueryAdjudicator(pap, userCtx);
+        this.selfAccess = new SelfAccessQueryAdjudicator(pap, userCtx);
+    }
+
+    public PolicyQueryAdjudicator(AccessQueryAdjudicator access,
+                                  GraphQueryAdjudicator graph,
+                                  ProhibitionsQueryAdjudicator prohibitions,
+                                  ObligationsQueryAdjudicator obligations,
+                                  OperationsQueryAdjudicator operations,
+                                  RoutinesQueryAdjudicator routines,
+                                  SelfAccessQueryAdjudicator selfAccess) {
+        this.access = access;
+        this.graph = graph;
+        this.prohibitions = prohibitions;
+        this.obligations = obligations;
+        this.operations = operations;
+        this.routines = routines;
+        this.selfAccess = selfAccess;
     }
 
     @Override
     public AccessQueryAdjudicator access() {
         return access;
+    }
+
+    public SelfAccessQueryAdjudicator selfAccess() {
+        return selfAccess;
     }
 
     @Override

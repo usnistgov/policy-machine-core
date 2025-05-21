@@ -5,6 +5,6 @@ import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import java.util.Map;
 import java.util.Set;
 
-public record TargetDagResult(Map<String, AccessRightSet> pcMap, Set<String> reachedTargets) {
+public record TargetDagResult(Map<Long, AccessRightSet> pcMap, Set<Long> reachedTargets) {
 
 }

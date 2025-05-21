@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.pml.pattern;
 
+import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.pap.store.GraphStore;
 
@@ -26,8 +26,8 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
     }
 
     public boolean matches(Collection<String> value, PAP pap) throws PMException {
-        for (String s : value) {
-            if (matches(s, pap)) {
+        for (String opValue : value) {
+            if (matches(opValue, pap)) {
                 return true;
             }
         }

@@ -2,67 +2,41 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
-
-import java.util.ArrayList;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import java.util.List;
 import java.util.Objects;
 
-public class CheckStatement implements PMLStatement {
+public class CheckStatement extends PMLStatement<VoidResult> {
+    private final Expression<String> arsExpr;
+    private final Expression<List<String>> targetExpr;
 
-    private Expression arsExpr;
-    private Expression targetExpr;
-
-    public CheckStatement(Expression arsExpr, Expression targetExpr) {
+    public CheckStatement(Expression<String> arsExpr, Expression<List<String>> targetExpr) {
         this.arsExpr = arsExpr;
         this.targetExpr = targetExpr;
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Value ars = arsExpr.execute(ctx, pap);
-        Value target = targetExpr.execute(ctx, pap);
+    public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        String ars = arsExpr.execute(ctx, pap);
+        List<String> targets = targetExpr.execute(ctx, pap);
 
-        List<String> arsToCheck = new ArrayList<>();
-        if (ars.getType().isString()) {
-            arsToCheck.add(ars.getStringValue());
-        } else {
-            List<Value> arrayValue = ars.getArrayValue();
-            for (Value v : arrayValue) {
-                arsToCheck.add(v.getStringValue());
-            }
+        for (String target : targets) {
+            long id = pap.query().graph().getNodeByName(target).getId();
+            pap.privilegeChecker().check(ctx.author(), id, ars);
         }
 
-        PrivilegeChecker privilegeChecker = new PrivilegeChecker(pap);
-        privilegeChecker.setExplain(ctx.isExplain());
-
-        if (target.getType().isString()) {
-            privilegeChecker.check(ctx.author(), target.getStringValue(), arsToCheck);
-        } else {
-            List<Value> arrayValue = target.getArrayValue();
-            for (Value value : arrayValue) {
-                privilegeChecker.check(ctx.author(), value.getStringValue(), arsToCheck);
-            }
-        }
-
-        return new VoidValue();
+        return new VoidResult();
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) +
-                "check " + arsExpr.toFormattedString(0) +
-                " on " + targetExpr.toFormattedString(0);
-    }
-
-    @Override
-    public String toString() {
-        return toFormattedString(0);
+            "check " + arsExpr.toFormattedString(0) +
+            " on " + targetExpr.toFormattedString(0);
     }
 
     @Override

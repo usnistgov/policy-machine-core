@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.pap.serialization;
 
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.pap.serialization.json.JSONGraph;
@@ -35,7 +35,7 @@ public class JSONSerializationTest {
         );
 
         for (JSONPolicy policy : policies) {
-            assertDoesNotThrow(() -> new MemoryPAP().deserialize(new UserContext(""), policy.toString(), new JSONDeserializer()));
+            assertDoesNotThrow(() -> new MemoryPAP().deserialize(policy.toString(), new JSONDeserializer()));
         }
     }
 

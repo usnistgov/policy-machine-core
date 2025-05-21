@@ -3,6 +3,7 @@ package gov.nist.csd.pm.pap.pml.pattern.subject;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
+import gov.nist.csd.pm.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,7 +15,7 @@ class SubjectPatternTest {
 
     @Test
     void testSubjectPattern() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         SubjectPattern pattern = new SubjectPattern();
         assertTrue(pattern.matches("test", pap));
 
@@ -25,12 +26,12 @@ class SubjectPatternTest {
 
     @Test
     void testPML() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1", "ua2"));
-        pap.modify().graph().createUser("u2", List.of("ua2"));
+        MemoryPAP pap = new TestPAP();
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
+        pap.modify().graph().createUser("u1", List.of(ua1, ua2));
+        pap.modify().graph().createUser("u2", List.of(ua2));
 
         String pml = """
                 create obligation "ob1" {

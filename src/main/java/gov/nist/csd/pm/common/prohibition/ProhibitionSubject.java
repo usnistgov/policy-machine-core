@@ -1,93 +1,53 @@
 package gov.nist.csd.pm.common.prohibition;
 
-import gov.nist.csd.pm.common.exception.InvalidProhibitionSubjectException;
-
-import java.io.Serializable;
 import java.util.Objects;
 
-public class ProhibitionSubject implements Serializable {
+public class ProhibitionSubject {
 
-    public static ProhibitionSubject userAttribute(String ua) {
-        return new ProhibitionSubject(ua, Type.USER_ATTRIBUTE);
-    }
+	private long nodeId;
+	private String process;
 
-    public static ProhibitionSubject user(String user) {
-        return new ProhibitionSubject(user, Type.USER);
-    }
+	public ProhibitionSubject(long nodeId) {
+		this.nodeId = nodeId;
+	}
 
-    public static ProhibitionSubject process(String process) {
-        return new ProhibitionSubject(process, Type.PROCESS);
-    }
+	public ProhibitionSubject(String process) {
+		this.process = process;
+	}
 
-    private String name;
-    private Type type;
+	public long getNodeId() {
+		if (nodeId == 0) {
+			throw new IllegalStateException("nodeId not set");
+		}
 
-    public ProhibitionSubject() {}
+		return nodeId;
+	}
 
-    public ProhibitionSubject(String name, Type type) {
-        this.name = name;
-        this.type = type;
-    }
+	public String getProcess() {
+		return process;
+	}
 
-    public ProhibitionSubject(String name, String type) throws InvalidProhibitionSubjectException {
-        this.name = name;
-        this.type = typeFromString(type);
-    }
+	public boolean isNode() {
+		return nodeId != 0;
+	}
 
-    public String getName() {
-        return name;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ProhibitionSubject that)) return false;
+		return nodeId == that.nodeId && Objects.equals(process, that.process);
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(nodeId, process);
+	}
 
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public enum Type {
-        USER_ATTRIBUTE,
-        USER,
-        PROCESS
-    }
-
-    private Type typeFromString(String s) throws InvalidProhibitionSubjectException {
-        switch (s) {
-            case "USER_ATTRIBUTE" -> {
-                return Type.USER_ATTRIBUTE;
-            }
-            case "USER" -> {
-                return Type.USER;
-            }
-            case "PROCESS" -> {
-                return Type.PROCESS;
-            }
-            default -> throw new InvalidProhibitionSubjectException(s);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ProhibitionSubject subject)) return false;
-        return Objects.equals(name, subject.name) && type == subject.type;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, type);
-    }
-
-    @Override
-    public String toString() {
-        return "ProhibitionSubject{" +
-                "name='" + name + '\'' +
-                ", type=" + type +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ProhibitionSubject{" +
+				"nodeId=" + nodeId +
+				", process='" + process + '\'' +
+				'}';
+	}
 }

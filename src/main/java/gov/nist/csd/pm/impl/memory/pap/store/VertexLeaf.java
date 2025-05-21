@@ -1,20 +1,22 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 class VertexLeaf extends Vertex {
 
-    private ObjectOpenHashSet<String> descendants;
+    private final LongArrayList descendants;
 
-    public VertexLeaf(String name, NodeType type) {
-        super(name, type);
-        this.descendants = new ObjectOpenHashSet<>();
+    public VertexLeaf(long id, String name, NodeType type) {
+        super(id, name, type);
+        this.descendants = new LongArrayList();
     }
 
     @Override
@@ -23,42 +25,42 @@ class VertexLeaf extends Vertex {
     }
 
     @Override
-    protected ObjectOpenHashSet<String> getAdjacentDescendants() {
-        return new ObjectOpenHashSet<>(descendants);
+    protected Collection<Long> getAdjacentDescendants() {
+        return descendants;
     }
 
     @Override
-    protected ObjectOpenHashSet<String> getAdjacentAscendants() {
-        return new ObjectOpenHashSet<>();
+    protected Collection<Long> getAdjacentAscendants() {
+        return new LongArrayList();
     }
 
     @Override
-    protected ObjectOpenHashSet<Association> getOutgoingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Collection<Association> getOutgoingAssociations() {
+        return new ObjectArrayList<>();
     }
 
     @Override
-    protected ObjectOpenHashSet<Association> getIncomingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Collection<Association> getIncomingAssociations() {
+        return new ObjectArrayList<>();
     }
 
     @Override
-    public void addAssignment(String ascendant, String descendant) {
+    public void addAssignment(long ascendant, long descendant) {
         descendants.add(descendant);
     }
 
     @Override
-    public void deleteAssignment(String ascendant, String descendant) {
-        descendants.remove(descendant);
+    public void deleteAssignment(long ascendant, long descendant) {
+        descendants.removeLong(descendants.indexOf(descendant));
     }
 
     @Override
-    public void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
+    public void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
 
     }
 
     @Override
-    public void deleteAssociation(String ua, String target) {
+    public void deleteAssociation(long ua, long target) {
 
     }
 }

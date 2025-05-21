@@ -5,7 +5,7 @@ import gov.nist.csd.pm.common.exception.PMException;
 public class AllPathsShortCircuit implements ShortCircuit{
 
     private boolean s;
-    private ShortCircuit shortCircuit;
+    private final ShortCircuit shortCircuit;
 
     public AllPathsShortCircuit(ShortCircuit shortCircuit) {
         this.s = false;
@@ -13,8 +13,8 @@ public class AllPathsShortCircuit implements ShortCircuit{
     }
 
     @Override
-    public boolean evaluate(String node) throws PMException {
-        boolean e = this.shortCircuit.evaluate(node);
+    public boolean evaluate(long nodeId) throws PMException {
+        boolean e = this.shortCircuit.evaluate(nodeId);
         if (!s) {
             s = e;
         }

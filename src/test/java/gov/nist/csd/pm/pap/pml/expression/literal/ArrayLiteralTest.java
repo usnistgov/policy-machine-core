@@ -1,13 +1,17 @@
 package gov.nist.csd.pm.pap.pml.expression.literal;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,24 +20,22 @@ class ArrayLiteralTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.LiteralExpressionContext ctx = PMLContextVisitor.toExpressionCtx(
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 ["a", "b", "c"]
-                """,
-                PMLParser.LiteralExpressionContext.class);
+                """);
 
-        VisitorContext visitorContext = new VisitorContext(new CompileGlobalScope());
-        Expression expression = Literal.compileLiteral(visitorContext, ctx);
-        assertTrue(expression instanceof ArrayLiteral);
+        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        Expression<List<String>> expression = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
+	    assertInstanceOf(ArrayLiteralExpression.class, expression);
 
-        ArrayLiteral a = (ArrayLiteral) expression;
         assertEquals(
                 buildArrayLiteral("a", "b", "c"),
-                a
+                expression
         );
         assertEquals(
-                Type.array(Type.string()),
-                a.getType()
+                ListType.of(STRING_TYPE),
+                expression.getType()
         );
 
     }

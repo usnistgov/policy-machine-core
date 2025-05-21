@@ -8,9 +8,9 @@ import java.util.Map;
 
 public interface AccessAdjudication {
 
-    AdjudicationResponse adjudicateResourceOperation(UserContext user, String policyElement, String resourceOperation) throws PMException;
-    AdjudicationResponse adjudicateAdminOperation(UserContext user, String name, Map<String, Object> operands) throws PMException;
-    AdjudicationResponse adjudicateAdminRoutine(UserContext user, String name, Map<String, Object> operands) throws PMException;
+    AdjudicationResponse adjudicateResourceOperation(UserContext user, long targetId, String resourceOperation) throws PMException;
+    AdjudicationResponse adjudicateAdminOperation(UserContext user, String operation, Map<String, Object> args) throws PMException;
+    AdjudicationResponse adjudicateAdminRoutine(UserContext user, String routine, Map<String, Object> args) throws PMException;
     AdjudicationResponse adjudicateAdminRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException;
 
 }

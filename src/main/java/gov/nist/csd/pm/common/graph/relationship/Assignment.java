@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class Assignment extends Relationship implements Serializable {
 
-    public Assignment(String source, String target) {
+    public Assignment(long source, long target) {
         super(source, target);
     }
 

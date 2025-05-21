@@ -1,81 +1,13 @@
 package gov.nist.csd.pm.pap.pml;
 
-import gov.nist.csd.pm.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParserBaseVisitor;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
 
 public class PMLContextVisitor extends PMLParserBaseVisitor<RuleContext> {
 
-    public static <T extends RuleContext> T toCtx(String input, Class<T> t) {
-        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
-
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(pmlErrorHandler);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PMLParser parser = new PMLParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(pmlErrorHandler);
-
-        RuleContext ruleContext = new PMLContextVisitor().visitPml(parser.pml());
-
-        return t.cast(ruleContext);
-    }
-
-    public static PMLParser.StatementBlockContext toStatementBlockCtx(String input) {
-        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
-
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(pmlErrorHandler);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PMLParser parser = new PMLParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(pmlErrorHandler);
-
-        return parser.statementBlock();
-    }
-
-    public static <T extends PMLParser.ExpressionContext> T toExpressionCtx(String input, Class<T> t) {
-        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
-
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(pmlErrorHandler);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PMLParser parser = new PMLParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(pmlErrorHandler);
-
-        PMLParser.ExpressionContext expr = parser.expression();
-
-        return t.cast(expr);
-    }
-
-    public static <T extends PMLParser.LiteralContext> T toLiteralCtx(String input, Class<T> t) {
-        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
-
-        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(pmlErrorHandler);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PMLParser parser = new PMLParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(pmlErrorHandler);
-
-        PMLParser.LiteralContext expr = parser.literal();
-
-        return t.cast(expr);
-    }
-
-    @Override
+    /*@Override
     public RuleContext visitPml(PMLParser.PmlContext ctx) {
         PMLParser.StatementContext statement = ctx.statement(0);
         return visitStatement(statement);
@@ -157,7 +89,7 @@ public class PMLContextVisitor extends PMLParserBaseVisitor<RuleContext> {
     }
 
     @Override
-    public RuleContext visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+    public RuleContext visitBasicFunctionDefinitionStatement(BasicFunctionDefinitionStatementContext ctx) {
         return ctx;
     }
 
@@ -217,12 +149,12 @@ public class PMLContextVisitor extends PMLParserBaseVisitor<RuleContext> {
     }
 
     @Override
-    public RuleContext visitLiteralExpression(PMLParser.LiteralExpressionContext ctx) {
+    public RuleContext visitLiteralExpression(PMLParser.ExpressionContext ctx) {
         return ctx;
     }
 
     @Override
     public RuleContext visitEqualsExpression(PMLParser.EqualsExpressionContext ctx) {
         return ctx;
-    }
+    }*/
 }

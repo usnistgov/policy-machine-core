@@ -2,7 +2,7 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.function.op.Operation;
 
 import java.util.Collection;
 
@@ -31,6 +31,6 @@ public interface OperationsQuery {
      * @return The Operation object.
      * @throws PMException If there is an error in the PM.
      */
-    Operation<?> getAdminOperation(String operationName) throws PMException;
+    Operation<?, ?> getAdminOperation(String operationName) throws PMException;
 
 }

@@ -1,24 +1,27 @@
 package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.EventPattern;
-import gov.nist.csd.pm.common.obligation.Response;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.obligation.EventPattern;
+import gov.nist.csd.pm.pap.obligation.Response;
+import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ObligationsModificationAdjudicatorTest {
 
@@ -33,9 +36,9 @@ class ObligationsModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new UserContext("u1"), """
+        pap.executePML(new TestUserContext("u1"), """
                create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -53,25 +56,26 @@ class ObligationsModificationAdjudicatorTest {
 
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ObligationsModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
-        fail = new ObligationsModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());
+        ok = new ObligationsModificationAdjudicator(new TestUserContext("u1"), pap);
+        fail = new ObligationsModificationAdjudicator(new UserContext(id("u2")), pap);
     }
 
 
     @Test
     void createObligation() {
-        assertDoesNotThrow(() -> ok.createObligation("u1", "name", List.of(
+        assertDoesNotThrow(() -> ok.createObligation(id("u1"), "name", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
                         new Response("e", List.of())
                 )
         )));
-        assertThrows(UnauthorizedException.class, () -> fail.createObligation("u1", "name", List.of(
+        assertThrows(UnauthorizedException.class, () -> fail.createObligation(id("u1"), "name", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
@@ -82,14 +86,14 @@ class ObligationsModificationAdjudicatorTest {
 
     @Test
     void deleteObligation() throws PMException {
-        ok.createObligation("u1", "test", List.of(
+        ok.createObligation(id("u1"), "test", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
                         new Response("e", List.of())
                 )
         ));
-        ok.createObligation("u1", "test2", List.of(
+        ok.createObligation(id("u1"), "test2", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
@@ -97,7 +101,6 @@ class ObligationsModificationAdjudicatorTest {
                 )
         ));
         assertDoesNotThrow(() -> ok.deleteObligation("test"));
-        assertFalse(pap.query().prohibitions().getProhibitions().containsKey("test"));
         assertThrows(UnauthorizedException.class, () -> fail.deleteObligation("test2"));
     }
 }

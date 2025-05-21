@@ -1,42 +1,32 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
+import gov.nist.csd.pm.pap.function.op.obligation.UpdateObligationOp;
+import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.common.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.common.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.obligation.ObligationOp.AUTHOR_OPERAND;
-import static gov.nist.csd.pm.common.op.obligation.ObligationOp.RULES_OPERAND;
+public class DeleteRuleStatement extends OperationStatement<ObligationOpArgs> {
 
+    private final Expression<String> ruleExpr;
+    private final Expression<String> oblExpr;
 
-public class DeleteRuleStatement extends OperationStatement {
-
-    private final Expression ruleExpr;
-    private final Expression oblExpr;
-
-    public DeleteRuleStatement(Expression ruleExpr, Expression oblExpr) {
+    public DeleteRuleStatement(Expression<String> ruleExpr, Expression<String> oblExpr) {
         super(new UpdateObligationOp());
         this.ruleExpr = ruleExpr;
         this.oblExpr = oblExpr;
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-        String ruleName = ruleExpr.execute(ctx, pap).getStringValue();
-        String oblName = oblExpr.execute(ctx, pap).getStringValue();
+    public ObligationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String ruleName = ruleExpr.execute(ctx, pap);
+        String oblName = oblExpr.execute(ctx, pap);
 
         Obligation obligation = pap.query().obligations().getObligation(oblName);
         List<Rule> rules = new ArrayList<>();
@@ -48,16 +38,10 @@ public class DeleteRuleStatement extends OperationStatement {
             rules.add(rule);
         }
 
-        return Map.of(
-                AUTHOR_OPERAND, obligation.getAuthor(),
-                NAME_OPERAND, obligation.getName(),
-                RULES_OPERAND, rules
-        );
-    }
-
-    @Override
-    public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + String.format("delete rule %s from obligation %s", ruleExpr, oblExpr);
+        // even though we are updating an obligation, use the same author id as this statement
+        // can only be called from within an obligation response which will be executed by the
+        // author anyways
+        return new ObligationOpArgs(obligation.getAuthorId(), obligation.getName(), new ArrayList<>(rules));
     }
 
     @Override
@@ -72,33 +56,9 @@ public class DeleteRuleStatement extends OperationStatement {
         return Objects.hash(ruleExpr, oblExpr);
     }
 
-    static class UpdateObligationOp extends Operation<Void> {
 
-        public UpdateObligationOp() {
-            super(
-                    "delete_rule",
-                    List.of(AUTHOR_OPERAND, NAME_OPERAND, RULES_OPERAND)
-            );
-        }
-
-        @Override
-        public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
-            new DeleteObligationOp()
-                    .canExecute(privilegeChecker, userCtx, operands);
-            new CreateObligationOp()
-                    .canExecute(privilegeChecker, userCtx, operands);
-        }
-
-        @Override
-        public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
-            String author = (String) operands.get(AUTHOR_OPERAND);
-            String name = (String) operands.get(NAME_OPERAND);
-            List<Rule> rules = (List<Rule>) operands.get(RULES_OPERAND);
-
-            pap.modify().obligations().deleteObligation(name);
-            pap.modify().obligations().createObligation(author, name, rules);
-
-            return null;
-        }
+    @Override
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("delete rule %s from obligation %s", ruleExpr, oblExpr);
     }
 }

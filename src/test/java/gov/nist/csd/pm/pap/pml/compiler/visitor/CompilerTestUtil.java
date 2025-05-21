@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CompilerTestUtil {
 
-    public static <T> void testCompilationError(String input, VisitorContext visitorContext,
+    public static void testCompilationError(String input, VisitorContext visitorContext,
                                                 int numExpectedErrors, String ... expectedError) {
-        ParserRuleContext ctx = PMLContextVisitor.toCtx(input, ParserRuleContext.class);
+        ParserRuleContext ctx = TestPMLParser.parseStatement(input);
         StatementVisitor statementVisitor = new StatementVisitor(visitorContext);
 
         PMLCompilationRuntimeException e = assertThrows(

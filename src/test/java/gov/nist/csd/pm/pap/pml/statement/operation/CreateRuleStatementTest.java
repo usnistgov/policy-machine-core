@@ -1,29 +1,29 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.InOperandPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.NodeOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.InArgPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.NodeArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CreateRuleStatementTest {
 
     @Test
     void testFormattedString() {
         CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                new StringLiteral("rule1"),
+                new StringLiteralExpression("rule1"),
                 new SubjectPattern(),
                 new OperationPattern(),
                 Map.of(
-                        "a", List.of(new AnyOperandPattern()),
-                        "b", List.of(new InOperandPattern("test"), new NodeOperandPattern("test"))
+                        "a", List.of(new AnyArgPattern()),
+                        "b", List.of(new InArgPattern("test"), new NodeArgPattern("test"))
                 ),
                 new CreateRuleStatement.ResponseBlock("", List.of())
         );

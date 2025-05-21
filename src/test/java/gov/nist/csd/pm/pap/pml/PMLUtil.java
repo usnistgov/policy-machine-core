@@ -1,32 +1,37 @@
 package gov.nist.csd.pm.pap.pml;
 
-import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 
-import java.util.*;
+
+import gov.nist.csd.pm.pap.pml.expression.Expression;
+
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PMLUtil {
 
-    public static ArrayLiteral buildArrayLiteral(String ... arr) {
-        List<Expression> l = new ArrayList<>();
+    public static Expression<List<String>> buildArrayLiteral(String ... arr) {
+        List<Expression<String>> l = new ArrayList<>();
         for (String s : arr) {
-            l.add(new StringLiteral(s));
+            l.add(new StringLiteralExpression(s));
         }
 
-        return new ArrayLiteral(l, Type.string());
+        return ArrayLiteralExpression.of(l, STRING_TYPE);
     }
 
-    public static MapLiteral buildMapLiteral(String ... arr) {
-        Map<Expression, Expression> mapExpr = new HashMap<>();
+    public static MapLiteralExpression<String, String> buildMapLiteral(String ... arr) {
+        Map<Expression<?>, Expression<?>> mapExpr = new HashMap<>();
 
         for (int i = 0; i < arr.length; i+=2) {
-            Expression expression = new StringLiteral(arr[i]);
-            mapExpr.put(expression, new StringLiteral(arr[i+1]));
+            Expression<String> expression = new StringLiteralExpression(arr[i]);
+            mapExpr.put(expression, new StringLiteralExpression(arr[i+1]));
         }
 
-        return new MapLiteral(mapExpr, Type.string(), Type.string());
+        return new MapLiteralExpression<>(mapExpr, STRING_TYPE, STRING_TYPE);
     }
 }

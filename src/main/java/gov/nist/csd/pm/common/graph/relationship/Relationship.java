@@ -8,21 +8,21 @@ import java.util.Objects;
  * and a target node.
  */
 public class Relationship implements Serializable {
-    private String source;
-    private String target;
+    private long source;
+    private long target;
     private AccessRightSet accessRightSet;
 
     public Relationship() {
 
     }
 
-    public Relationship(String source, String target) {
+    public Relationship(long source, long target) {
         this.source = source;
         this.target = target;
         this.accessRightSet = null;
     }
 
-    public Relationship(String source, String target, AccessRightSet accessRightSet) {
+    public Relationship(long source, long target, AccessRightSet accessRightSet) {
         this.source = source;
         this.target = target;
         this.accessRightSet = accessRightSet;
@@ -32,19 +32,19 @@ public class Relationship implements Serializable {
         this.accessRightSet = accessRightSet;
     }
 
-    public String getSource() {
+    public long getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(long source) {
         this.source = source;
     }
 
-    public String getTarget() {
+    public long getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
+    public void setTarget(long target) {
         this.target = target;
     }
 
@@ -69,11 +69,10 @@ public class Relationship implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Relationship)) {
+        if (!(o instanceof Relationship that)) {
             return false;
         }
-        Relationship that = (Relationship) o;
-        return Objects.equals(source, that.source) && Objects.equals(
+	    return Objects.equals(source, that.source) && Objects.equals(
                 target, that.target) && Objects.equals(accessRightSet, that.accessRightSet);
     }
 

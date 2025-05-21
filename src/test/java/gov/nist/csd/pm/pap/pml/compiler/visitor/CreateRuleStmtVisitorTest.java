@@ -3,15 +3,15 @@ package gov.nist.csd.pm.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.pap.pml.pattern.operand.AnyOperandPattern;
+import gov.nist.csd.pm.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.UsernamePattern;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateObligationStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateRuleStatement;
 import org.junit.jupiter.api.Test;
 
@@ -45,30 +45,31 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
+
         assertEquals(
                 new CreateObligationStatement(
-                        new StringLiteral("obligation1"),
+                        new StringLiteralExpression("obligation1"),
                         List.of(
                                 new CreateRuleStatement(
-                                        new StringLiteral("any user"),
+                                        new StringLiteralExpression("any user"),
                                         new SubjectPattern(),
                                         new OperationPattern("test_event"),
                                         Map.of(),
                                         new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                                 ),
                                 new CreateRuleStatement(
-                                        new StringLiteral("users"),
+                                        new StringLiteralExpression("users"),
                                         new SubjectPattern(new UsernamePattern("u1")),
                                         new OperationPattern("test_event"),
                                         Map.of(),
                                         new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                                 ),
                                 new CreateRuleStatement(
-                                        new StringLiteral("users list"),
+                                        new StringLiteralExpression("users list"),
                                         new SubjectPattern(new LogicalSubjectPatternExpression(new UsernamePattern("u1"), new UsernamePattern("u2"), false)),
                                         new OperationPattern("test_event"),
                                         Map.of(),
@@ -90,15 +91,15 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
-                new StringLiteral("obligation1"),
+                new StringLiteralExpression("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("r1"),
+                                new StringLiteralExpression("r1"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
@@ -127,18 +128,18 @@ class CreateRuleStmtVisitorTest {
     void testOnClause() throws PMException {
         String pml = """
                     create obligation "obligation1" {
-                        create rule "any operand"
+                        create rule "any arg"
                         when any user
                         performs any operation
                         do(ctx) {}
                         
-                        create rule "any operand with on"
+                        create rule "any arg with on"
                         when any user
                         performs any operation
                         on {}
                         do(ctx) {}
                         
-                        create rule "an operand"
+                        create rule "an arg"
                         when any user
                         performs "assign"
                         on {
@@ -147,33 +148,33 @@ class CreateRuleStmtVisitorTest {
                         do(ctx) {}
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.get(0);
         CreateObligationStatement expected = new CreateObligationStatement(
-                new StringLiteral("obligation1"),
+                new StringLiteralExpression("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("any operand"),
+                                new StringLiteralExpression("any arg"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("any operand with on"),
+                                new StringLiteralExpression("any arg with on"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         ),
                         new CreateRuleStatement(
-                                new StringLiteral("an operand"),
+                                new StringLiteralExpression("an arg"),
                                 new SubjectPattern(),
                                 new OperationPattern("assign"),
                                 Map.of(
-                                        "ascendant", List.of(new AnyOperandPattern())
+                                        "ascendant", List.of(new AnyArgPattern())
                                 ),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         )
@@ -196,21 +197,21 @@ class CreateRuleStmtVisitorTest {
                         }
                     }
                     """;
-        List<PMLStatement> stmts = pmlCompiler.compilePML(pml);
+        List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pml);
         assertEquals(1, stmts.size());
 
         CreateObligationStatement stmt = (CreateObligationStatement)stmts.getFirst();
         CreateObligationStatement expected = new CreateObligationStatement(
-                new StringLiteral("obligation1"),
+                new StringLiteralExpression("obligation1"),
                 List.of(
                         new CreateRuleStatement(
-                                new StringLiteral("r1"),
+                                new StringLiteralExpression("r1"),
                                 new SubjectPattern(),
                                 new OperationPattern(),
                                 Map.of(),
                                 new CreateRuleStatement.ResponseBlock("ctx", List.of(
-                                        new CreatePolicyStatement(new StringLiteral("pc1")),
-                                        new CreatePolicyStatement(new StringLiteral("pc2"))
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc1")),
+                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
                                 ))
                         )
                 )
@@ -219,7 +220,7 @@ class CreateRuleStmtVisitorTest {
     }
 
     @Test
-    void testFunctionInResponseReturnsError() throws PMException {
+    void testFunctionInResponseOk() throws PMException {
         String pml = """
                     create obligation "obligation1" {
                         create rule "e1 and e2"
@@ -230,14 +231,7 @@ class CreateRuleStmtVisitorTest {
                         }
                     }
                     """;
-        PMLCompilationException e = assertThrows(
-                PMLCompilationException.class,
-                () -> pmlCompiler.compilePML(pml)
-        );
-        assertEquals(
-                "operations/routines are not allowed inside response blocks",
-                e.getErrors().getFirst().errorMessage()
-        );
+        assertDoesNotThrow(() -> pmlCompiler.compilePML(pml));
     }
 
     @Test

@@ -4,13 +4,16 @@ import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class Explain {
     private AccessRightSet privileges;
-    private List<PolicyClassExplain> policyClasses;
+    private Collection<PolicyClassExplain> policyClasses;
     private AccessRightSet deniedPrivileges;
-    private List<Prohibition> prohibitions;
+    private Collection<Prohibition> prohibitions;
 
     public Explain() {
         privileges = new AccessRightSet();
@@ -19,14 +22,14 @@ public class Explain {
         prohibitions = new ArrayList<>();
     }
 
-    public Explain(AccessRightSet privileges, List<PolicyClassExplain> policyClasses) {
+    public Explain(AccessRightSet privileges, Collection<PolicyClassExplain> policyClasses) {
         this.privileges = privileges;
         this.policyClasses = policyClasses;
         this.deniedPrivileges = new AccessRightSet();
         this.prohibitions = new ArrayList<>();
     }
 
-    public Explain(AccessRightSet privileges, List<PolicyClassExplain> policyClasses, AccessRightSet deniedPrivileges,
+    public Explain(AccessRightSet privileges, Collection<PolicyClassExplain> policyClasses, AccessRightSet deniedPrivileges,
                    List<Prohibition> prohibitions) {
         this.privileges = privileges;
         this.policyClasses = policyClasses;
@@ -42,7 +45,7 @@ public class Explain {
         this.privileges = privileges;
     }
 
-    public List<PolicyClassExplain> getPolicyClasses() {
+    public Collection<PolicyClassExplain> getPolicyClasses() {
         return policyClasses;
     }
 
@@ -58,7 +61,7 @@ public class Explain {
         this.deniedPrivileges = deniedPrivileges;
     }
 
-    public List<Prohibition> getProhibitions() {
+    public Collection<Prohibition> getProhibitions() {
         return prohibitions;
     }
 

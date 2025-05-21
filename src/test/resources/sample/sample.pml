@@ -40,21 +40,21 @@ routine deleteAllProjects(string locProjectOA) {
     }
 }
 
-operation deleteReadme(nodeop string projectReadme) {
-    check "delete_readme" on projectReadme
+operation deleteReadme(@node string projectReadme) {
+    check "delete_readme" on [projectReadme]
 } {
-    delete object projectReadme
+    delete node projectReadme
 }
 
-operation deleteProject(nodeop string projectName) {
-    check "delete_project" on projectName
+operation deleteProject(@node string projectName) {
+    check "delete_project" on [projectName]
 } {
-    delete oa projectName
+    delete node projectName
 }
 
-operation createProject(string projectName, nodeop string locProjectAttr) {
-   check "assign_to" on "project"
-   check "assign_to" on locProjectAttr
+operation createProject(string projectName, @node string locProjectAttr) {
+   check "assign_to" on ["project"]
+   check "assign_to" on [locProjectAttr]
 } {
     create oa projectName in ["project", locProjectAttr]
     create o projectName + " README" in [projectName]
@@ -68,7 +68,7 @@ operation createProjectAdmin(string projectName) {
     create prohibition "deny admin delete README"
     deny user attribute uaName
     access rights ["delete_readme"]
-    on union of [projectName]
+    on union of {projectName: false}
 }
 
 create obligation "create us project admin" {
@@ -79,7 +79,7 @@ create obligation "create us project admin" {
         locProjectAttr: "US project"
     }
     do(ctx) {
-        createProjectAdmin(ctx.operands.projectName)
+        createProjectAdmin(ctx.args.projectName)
     }
 
     create rule "eu project"
@@ -89,6 +89,6 @@ create obligation "create us project admin" {
         locProjectAttr: "EU project"
     }
     do(ctx) {
-        createProjectAdmin(ctx.operands.projectName)
+        createProjectAdmin(ctx.args.projectName)
     }
 }

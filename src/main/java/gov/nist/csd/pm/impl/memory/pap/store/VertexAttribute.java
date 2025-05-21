@@ -1,26 +1,28 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 class VertexAttribute extends Vertex {
 
-    private ObjectOpenHashSet<String> descendants;
-    private ObjectOpenHashSet<String> ascendants;
-    private ObjectOpenHashSet<Association> outgoingAssociations;
-    private ObjectOpenHashSet<Association> incomingAssociations;
+    private final LongArrayList descendants;
+    private final LongArrayList ascendants;
+    private final ObjectArrayList<Association> outgoingAssociations;
+    private final ObjectArrayList<Association> incomingAssociations;
 
-    public VertexAttribute(String name, NodeType type) {
-        super(name, type);
-        this.descendants = new ObjectOpenHashSet<>();
-        this.ascendants = new ObjectOpenHashSet<>();
-        this.outgoingAssociations = new ObjectOpenHashSet<>();
-        this.incomingAssociations = new ObjectOpenHashSet<>();
+    public VertexAttribute(long id, String name, NodeType type) {
+        super(id, name, type);
+        this.descendants = new LongArrayList();
+        this.ascendants = new LongArrayList();
+        this.outgoingAssociations = new ObjectArrayList<>();
+        this.incomingAssociations = new ObjectArrayList<>();
     }
 
     @Override
@@ -29,28 +31,28 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    public ObjectOpenHashSet<String> getAdjacentDescendants() {
-        return new ObjectOpenHashSet<>(descendants);
+    public Collection<Long> getAdjacentDescendants() {
+        return descendants;
     }
 
     @Override
-    public ObjectOpenHashSet<String> getAdjacentAscendants() {
-        return new ObjectOpenHashSet<>(ascendants);
+    public Collection<Long> getAdjacentAscendants() {
+        return ascendants;
     }
 
     @Override
-    public ObjectOpenHashSet<Association> getOutgoingAssociations() {
-        return new ObjectOpenHashSet<>(outgoingAssociations);
+    public Collection<Association> getOutgoingAssociations() {
+        return outgoingAssociations;
     }
 
     @Override
-    public ObjectOpenHashSet<Association> getIncomingAssociations() {
-        return new ObjectOpenHashSet<>(incomingAssociations);
+    public Collection<Association> getIncomingAssociations() {
+        return incomingAssociations;
     }
 
     @Override
-    protected void addAssignment(String ascendant, String descendant) {
-        if (ascendant.equals(name)) {
+    protected void addAssignment(long ascendant, long descendant) {
+        if (ascendant == id) {
             descendants.add(descendant);
         } else {
             ascendants.add(ascendant);
@@ -58,17 +60,17 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    protected void deleteAssignment(String ascendant, String descendant) {
-        if (ascendant.equals(name)) {
-            descendants.remove(descendant);
+    protected void deleteAssignment(long ascendant, long descendant) {
+        if (ascendant == id) {
+            descendants.removeLong(descendants.indexOf(descendant));
         } else {
-            ascendants.remove(ascendant);
+            ascendants.removeLong(ascendants.indexOf(ascendant));
         }
     }
 
     @Override
-    public void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
-        if (ua.equals(name)) {
+    public void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
+        if (ua == id) {
             outgoingAssociations.add(new Association(ua, target, accessRightSet));
         } else {
             incomingAssociations.add(new Association(ua, target, accessRightSet));
@@ -76,11 +78,11 @@ class VertexAttribute extends Vertex {
     }
 
     @Override
-    public void deleteAssociation(String ua, String target) {
-        if (ua.equals(name)) {
-            outgoingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
+    public void deleteAssociation(long ua, long target) {
+        if (ua == id) {
+            outgoingAssociations.removeIf(a -> a.getSource() == ua && a.getTarget() == target);
         } else {
-            incomingAssociations.removeIf(a -> a.getSource().equals(ua) && a.getTarget().equals(target));
+            incomingAssociations.removeIf(a -> a.getSource() == ua && a.getTarget() == target);
         }
     }
 }

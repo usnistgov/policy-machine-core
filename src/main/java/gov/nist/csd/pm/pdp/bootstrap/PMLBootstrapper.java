@@ -1,36 +1,49 @@
 package gov.nist.csd.pm.pdp.bootstrap;
 
-import gov.nist.csd.pm.pap.PAP;
+import static gov.nist.csd.pm.common.tx.TxRunner.runTx;
+
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.routine.Routine;
+
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-
 import java.util.List;
-import java.util.Map;
 
-public class PMLBootstrapper implements PolicyBootstrapper {
+public class PMLBootstrapper extends PolicyBootstrapper {
 
-    private UserContext boostrapper;
-    private String pml;
-    private List<PMLOperation> pmlOperations;
-    private List<PMLRoutine> pmlRoutines;
-    private Map<String, Value> pmlConstants;
+    private final String bootstrapUser;
+    private final String pml;
 
-    public PMLBootstrapper(UserContext boostrapper, String pml, List<PMLOperation> pmlOperations, List<PMLRoutine> pmlRoutines, Map<String, Value> pmlConstants) {
-        this.boostrapper = boostrapper;
+    public PMLBootstrapper(List<Operation<?, ?>> operations, List<Routine<?, ?>> routines, String bootstrapUser, String pml) {
+        super(operations, routines);
+        this.bootstrapUser = bootstrapUser;
         this.pml = pml;
-        this.pmlOperations = pmlOperations;
-        this.pmlRoutines = pmlRoutines;
-        this.pmlConstants = pmlConstants;
     }
 
     @Override
     public void bootstrap(PAP pap) throws PMException {
-        pap.setPMLOperations(pmlOperations.toArray(PMLOperation[]::new));
-        pap.setPMLRoutines(pmlRoutines.toArray(PMLRoutine[]::new));
-        pap.setPMLConstants(pmlConstants);
-        pap.executePML(boostrapper, pml);
+        for (Operation<?, ?> op : operations) {
+            pap.modify().operations().createAdminOperation(op);
+        }
+
+        for (Routine<?, ?> r : routines) {
+            pap.modify().routines().createAdminRoutine(r);
+        }
+
+        pap.runTx(tx -> {
+            // create bootstrap policy and user
+            long pc = tx.modify().graph().createPolicyClass("bootstrap");
+            long ua = tx.modify().graph().createUserAttribute("bootstrapper", List.of(pc));
+            long bootstrapUserId = tx.modify().graph().createUser(bootstrapUser, List.of(ua));
+
+            // execute the pml
+            pap.executePML(new UserContext(bootstrapUserId), pml);
+
+            // clean up bootstrap policy
+            tx.modify().graph().deassign(bootstrapUserId, List.of(ua));
+            tx.modify().graph().deleteNode(ua);
+            tx.modify().graph().deleteNode(pc);
+        });
     }
 }

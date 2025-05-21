@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.routine.Routine;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.store.RoutinesStore;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class MemoryRoutinesStore extends MemoryStore implements RoutinesStore {
     }
 
     @Override
-    public void createAdminRoutine(Routine<?> routine) throws PMException {
+    public void createAdminRoutine(Routine<?, ?> routine) throws PMException {
         policy.routines.put(routine.getName(), routine);
 
         txCmdTracker.trackOp(tx, new TxCmd.CreateAdminRoutine(routine));
@@ -21,7 +21,7 @@ public class MemoryRoutinesStore extends MemoryStore implements RoutinesStore {
 
     @Override
     public void deleteAdminRoutine(String name) throws PMException {
-        Routine<?> routine = policy.routines.get(name);
+        Routine<?, ?> routine = policy.routines.get(name);
 
         policy.routines.remove(name);
 
@@ -34,7 +34,7 @@ public class MemoryRoutinesStore extends MemoryStore implements RoutinesStore {
     }
 
     @Override
-    public Routine getAdminRoutine(String routineName) throws PMException {
+    public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
         return policy.routines.get(routineName);
     }
 }

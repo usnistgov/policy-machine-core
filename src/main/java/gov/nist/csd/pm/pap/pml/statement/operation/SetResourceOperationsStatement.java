@@ -3,53 +3,46 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.pap.function.op.operation.SetResourceOperationsOp.SetResourceOperationsOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
+public class SetResourceOperationsStatement extends OperationStatement<SetResourceOperationsOpArgs> {
 
+    private final Expression<List<String>> operationsExpr;
 
-public class SetResourceOperationsStatement extends OperationStatement {
-
-    private Expression ops;
-
-    public SetResourceOperationsStatement(Expression ops) {
+    public SetResourceOperationsStatement(Expression<List<String>> operationsExpr) {
         super(new SetResourceOperationsOp());
-
-        this.ops = ops;
+        this.operationsExpr = operationsExpr;
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap)
-            throws PMException {
-        Value arValue = ops.execute(ctx, pap);
-        AccessRightSet accessRightSet = new AccessRightSet();
-        for (Value v : arValue.getArrayValue()) {
-            accessRightSet.add(v.getStringValue());
-        }
+    public SetResourceOperationsOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        List<String> opValues = operationsExpr.execute(ctx, pap);
+        AccessRightSet accessRightSet = new AccessRightSet(opValues);
 
-        return Map.of(OPERATIONS_OPERAND, accessRightSet);
+        return new SetResourceOperationsOpArgs(accessRightSet);
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + String.format("set resource operations %s", ops);
+        return indent(indentLevel) + "set resource operations " + operationsExpr;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SetResourceOperationsStatement that)) return false;
-        return Objects.equals(ops, that.ops);
+        return Objects.equals(operationsExpr, that.operationsExpr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(ops);
+        return Objects.hash(operationsExpr);
     }
-}
+} 

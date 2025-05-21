@@ -4,25 +4,29 @@ import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.type.Type;
+
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CheckStatementTest {
 
     @Test
     void test() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -39,47 +43,32 @@ class CheckStatementTest {
                 create u "u2" in ["ua2"]
                 """);
 
-        ExecutionContext ctx = new ExecutionContext(new UserContext("u1"), pap);
+        ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
 
         testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), false);
 
+        ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
-        ), false);
-
-        testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
-        ), false);
-
-        ctx = new ExecutionContext(new UserContext("u2"), pap);
-        testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
-                new StringLiteral("o1")
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-                new ArrayLiteral(List.of(new StringLiteral("assign"), new StringLiteral("assign_to")), Type.string()),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
-        ), true);
-
-        testCheck(ctx, pap, new CheckStatement(
-                new StringLiteral("assign"),
-                new ArrayLiteral(List.of(new StringLiteral("o1"), new StringLiteral("o2")), Type.string())
+            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
     }
 
@@ -99,7 +88,7 @@ class CheckStatementTest {
                 }
                 
                 operation op1() {
-                    check "assign" on testOp()
+                    check "assign" on [testOp()]
                 } {
                     create policy class "pc2"
                 }
@@ -111,11 +100,11 @@ class CheckStatementTest {
                 
                 create u "u1" in ["ua1"]                
                 """;
-        PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), pml);
+        PAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new UserContext("u1"), "op1", Map.of());
+        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
     }

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.op.Operation;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.store.OperationsStore;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
+    public void createAdminOperation(Operation<?, ?> operation) throws PMException {
         policy.operations.put(operation.getName(), operation);
     }
 
@@ -47,7 +47,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
+    public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
         return policy.operations.get(operationName);
     }
 }

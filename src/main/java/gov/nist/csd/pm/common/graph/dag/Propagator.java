@@ -10,6 +10,6 @@ public interface Propagator {
      * @param src The node that holds the information already.
      * @param dst The node to propagate the information to.
      */
-    void propagate(String src, String dst) throws PMException;
+    void propagate(long src, long dst) throws PMException;
 
 }

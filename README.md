@@ -96,11 +96,10 @@ public class Main {
 		// create a prohibition
 		pap.modify().prohibitions().createProhibition(
 				"deny u1 write on oa1",
-				ProhibitionSubject.userAttribute("u1"),
+				ProhibitionSubject.userAttribute("u1"), ,
 				new AccessRightSet("write"),
 				false,
-				List.of(new ContainerCondition("oa1", false))
-		);
+				List.of(new ContainerCondition("oa1", false)));
 
 		// create an obligation that associates ua1 with any OA
 		String obligationPML = """
@@ -112,7 +111,7 @@ public class Main {
 				        descendants: "oa1"
 				    }
 					do(ctx) {
-						associate "ua1" and ctx.operands.name with ["read", "write"]
+						associate "ua1" and ctx.args.name with ["read", "write"]
 					}
 				}""";
 
@@ -149,7 +148,7 @@ public class Main {
 			descendants: "oa1"
 		    }
 		    do(ctx) {
-			associate "ua1" and ctx.operands.name with ["read", "write"]
+			associate "ua1" and ctx.args.name with ["read", "write"]
 		    }
 		}
 		""";

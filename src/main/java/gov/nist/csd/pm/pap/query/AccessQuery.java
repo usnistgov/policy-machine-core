@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.pap.query.model.explain.Explain;
+import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
 
 import java.util.List;
 import java.util.Map;
@@ -50,30 +51,32 @@ public interface AccessQuery {
     /**
      * Compute a mapping of all the nodes the user has access to the access rights they have on each. The provided
      * UserContext allows for the specification of a single node or a list of attributes.
-     * @param userCtx   The user and process or list of attributes and process. Process is optional.
+     *
+     * @param userCtx The user and process or list of attributes and process. Process is optional.
      * @return A mapping of node names to access rights.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException;
+    Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException;
 
     /**
      * Compute the Access Control List for the node or a list of attributes. The provided TargetContext allows for the
      * specification of a single node or a list of attributes.
+     *
      * @param targetCtx The target node or list of attributes.
      * @return A mapping of each user and their privileges on the target.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException;
+    Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException;
 
     /**
      * Compute the attributes that are targets of associations in which the user attribute is a descendant of the user.
      * The provided UserContext allows for the specification of a single node or a list of attributes.
      *
-     * @param userCtx   The user and process or list of attributes and process. Process is optional.
+     * @param userCtx The user or list of attributes. Process is ignored.
      * @return A mapping of the destination attributes to the access rights in the destination association.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException;
+    Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException;
 
     /**
      * Compute the privileges for all nodes in the subgraph starting at the root node. The returned Subgraph object stores
@@ -86,7 +89,7 @@ public interface AccessQuery {
      * @return The Subgraph for the root node.
      * @throws PMException If there is an error in the PM.
      */
-    SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException;
+    SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException;
 
     /**
      * Compute the privileges for the adjacent ascendants of the given root node. Any node that the user does not have
@@ -98,19 +101,19 @@ public interface AccessQuery {
      * @return A Map of the adjacent ascendants of the root node the user has access to and the privileges on each.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException;
+    Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException;
 
     /**
      * Compute the privileges for the adjacent descendants of the given root node. Any node that the user does not have
      * access to will be included in the result but will have an empty privileges set. The provided UserContext allows
      * for the specification of a single node or a list of attributes.
      *
-     * @param userCtx   The user and process or list of attributes and process. Process is optional.
-     * @param root The root node.
+     * @param userCtx The user and process or list of attributes and process. Process is optional.
+     * @param root    The root node.
      * @return A Map of the adjacent descendants of the root node the user has access to and the privileges on each.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException;
+    Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException;
 
     /**
      * Explain why a user may or may not have privileges on a target node. The provided User and Target contexts, allow
@@ -130,10 +133,10 @@ public interface AccessQuery {
      * nodes will just be the set of policy classes. The provided UserContext allows for the specification of a single
      * node or a list of attributes.
      *
-     * @param userCtx   The user and process or list of attributes and process. Process is optional.
+     * @param userCtx The user and process or list of attributes and process. Process is optional.
      * @return A map of nodes representing the first level of the user's POS and the privileges of the user.
      * @throws PMException If there is an error in the PM.
      */
-    Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException;
+    Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException;
 
 }

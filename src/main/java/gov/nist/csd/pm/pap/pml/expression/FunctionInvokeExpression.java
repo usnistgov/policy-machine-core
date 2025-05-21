@@ -1,160 +1,83 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.AdminFunction;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.executable.AdminExecutable;
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLExecutionException;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperationWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutineWrapper;
-import gov.nist.csd.pm.pap.pml.executable.routine.PMLRoutine;
-import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.scope.UnknownFunctionInScopeException;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.ReturnValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
+
+import gov.nist.csd.pm.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.pap.pml.function.PMLFunctionSignature;
 
 import java.util.*;
 
-public class FunctionInvokeExpression extends Expression {
+public class FunctionInvokeExpression<T> extends Expression<T> {
 
-    public static Expression compileFunctionInvokeExpression(VisitorContext visitorCtx,
-                                                             PMLParser.FunctionInvokeExpressionContext functionInvokeExpressionContext) {
-        PMLParser.FunctionInvokeContext functionInvokeContext = functionInvokeExpressionContext.functionInvoke();
-        return compileFunctionInvoke(visitorCtx, functionInvokeContext);
+    private final PMLFunctionSignature functionSignature;
+    private final List<Expression<?>> actualArgsList;
+    private final Type<T> expectedReturnType;
+
+    public FunctionInvokeExpression(PMLFunctionSignature functionSignature,
+                                    List<Expression<?>> actualArgsList,
+                                    Type<T> expectedReturnType) {
+        this.functionSignature = functionSignature;
+        this.actualArgsList = actualArgsList;
+        this.expectedReturnType = expectedReturnType;
     }
 
-    public static Expression compileFunctionInvoke(VisitorContext visitorCtx, PMLParser.FunctionInvokeContext functionInvokeContext) {
-        String funcName = functionInvokeContext.ID().getText();
-
-        PMLExecutableSignature signature;
-        try {
-            signature = visitorCtx.scope().getFunction(funcName);
-        } catch (UnknownFunctionInScopeException e) {
-            throw new PMLCompilationRuntimeException(functionInvokeContext, e.getMessage());
-        }
-
-        List<String> operandNames = signature.getOperands();
-        Map<String, Type> operandTypes = signature.getOperandTypes();
-        PMLParser.FunctionInvokeArgsContext funcCallArgsCtx = functionInvokeContext.functionInvokeArgs();
-        List<PMLParser.ExpressionContext> argExpressions =  new ArrayList<>();
-        PMLParser.ExpressionListContext expressionListContext = funcCallArgsCtx.expressionList();
-        if (expressionListContext != null) {
-            argExpressions = expressionListContext.expression();
-        }
-
-        if (operandNames.size() != argExpressions.size()) {
-            throw new PMLCompilationRuntimeException(
-                    functionInvokeContext,
-                    "wrong number of args for signature call " + funcName + ": " +
-                            "expected " + operandNames.size() + ", got " + argExpressions.size()
-            );
-        }
-
-        Map<String, Expression> operands = new HashMap<>();
-        for (int i = 0; i < operandNames.size(); i++) {
-            PMLParser.ExpressionContext exprCtx = argExpressions.get(i);
-            String operand = operandNames.get(i);
-            Type operandType = operandTypes.get(operand);
-
-            Expression expr = Expression.compile(visitorCtx, exprCtx, operandType);
-            operands.put(operand, expr);
-        }
-
-        return new FunctionInvokeExpression(signature, operands);
+    public PMLFunctionSignature getFunctionSignature() {
+        return functionSignature;
     }
 
-    private PMLExecutableSignature signature;
-    private List<Expression> actualArgsList;
-    private Map<String, Expression> operands;
-
-    public FunctionInvokeExpression(PMLExecutableSignature signature, Map<String, Expression> actualOperands) {
-        this.signature = signature;
-        this.actualArgsList = getActualArgsList(this.signature, actualOperands);
-        this.operands = new HashMap<>(actualOperands);
-    }
-
-    public PMLExecutableSignature getSignature() {
-        return signature;
-    }
-
-    public List<Expression> getActualArgsList() {
+    public List<Expression<?>> getActualArgsList() {
         return actualArgsList;
     }
 
+    public Type<T> getExpectedReturnType() {
+        return expectedReturnType;
+    }
+
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        String name = signature.getFunctionName();
-        ExecutionContext funcInvokeCtx = ctx.copyWithoutScope();
-        Map<String, Value> operandValues = prepareOperandExpressions(ctx, pap);
-
-        // set the execution context if exec is a PML exec
-        AdminExecutable<?> executable = funcInvokeCtx.scope().getFunction(name);
-        if (executable instanceof PMLRoutine pmlRoutine) {
-            pmlRoutine.setCtx(funcInvokeCtx);
-        } else if (executable instanceof PMLOperation pmlOperation) {
-            pmlOperation.setCtx(funcInvokeCtx);
-        }
-
-        // PMLWrappers dont need Values, just objects
-        Map<String, Object> operands;
-        if ((executable instanceof PMLOperationWrapper) || (executable instanceof PMLRoutineWrapper)) {
-            operands = valuesMapToObjects(operandValues);
-        } else {
-            operands = new HashMap<>(operandValues);
-        }
-
-        // execute the executable
-        Object o = pap.executeAdminExecutable(executable, operands);
-
-        // return the value
-        Value value = Value.fromObject(o);
-        if (value instanceof ReturnValue returnValue) {
-            return returnValue.getValue();
-        } else {
-            return value;
-        }
+    public Type<T> getType() {
+        return expectedReturnType;
     }
 
-    private Map<String, Object> valuesMapToObjects(Map<String, Value> valuesMap) {
-        Map<String, Object> objectMap = new HashMap<>();
-        for (Map.Entry<String, Value> entry : valuesMap.entrySet()) {
-            objectMap.put(entry.getKey(), entry.getValue().toObject());
+    @Override
+    public T execute(ExecutionContext ctx, PAP pap) throws PMException {
+        ExecutionContext funcInvokeCtx = ctx.copy();
+        AdminFunction<?, ?> function = funcInvokeCtx.scope().getFunction(functionSignature.getName());
+        Map<String, Object> actualArgValues = prepareArgExpressions(funcInvokeCtx, pap, function);
+
+        // set the ctx if PML function
+        if (function instanceof PMLFunction pmlFunction) {
+            pmlFunction.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
-        return objectMap;
+        // execute the function
+        return (T) pap.executeAdminFunction(function, actualArgValues);
     }
 
-    private Map<String, Value> prepareOperandExpressions(ExecutionContext ctx, PAP pap)
-            throws PMException {
-        String funcName = signature.getFunctionName();
-        List<String> operandsNames = signature.getOperands();
+    private Map<String, Object> prepareArgExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?, ?> function) throws PMException {
+        List<FormalParameter<?>> formalParams = function.getFormalArgs();
 
-        if (operands.size() != operandsNames.size()) {
-            throw new PMLExecutionException("expected " + operandsNames.size() + " args for function \""
-                    + funcName + "\", got " + operands.size());
+        if (actualArgsList.size() != formalParams.size()) {
+            throw new PMLExecutionException("expected " + formalParams.size() + " args for function \""
+                + functionSignature.getName() + "\", got " + formalParams.size());
         }
 
-        Map<String, Value> values = new HashMap<>();
-        for (int i = 0; i < operandsNames.size(); i++) {
-            String operand = operandsNames.get(i);
-            Type operandType = signature.getOperandTypes().get(operand);
-            Expression operandExpr = operands.get(operand);
-            Value argValue = operandExpr.execute(ctx, pap);
+        Map<String, Object > values = new HashMap<>();
+        for (int i = 0; i < formalParams.size(); i++) {
+            FormalParameter<?> formalParam = formalParams.get(i);
+            Expression<?> argExpr = actualArgsList.get(i);
+            Object argValue = argExpr.execute(ctx, pap);
 
-            if (!argValue.getType().equals(operandType)) {
-                throw new PMLExecutionException("expected " + operandType + " for arg " + i + " for function \""
-                        + funcName + "\", got " + argValue.getType());
+            if (!argExpr.getType().isCastableTo(formalParam.getType())) {
+                throw new PMLExecutionException("expected type " + formalParam.getType() + ", got type " + argExpr.getType());
             }
 
-            values.put(operand, argValue);
+            values.put(formalParam.getName(), argValue);
         }
 
         return values;
@@ -162,13 +85,13 @@ public class FunctionInvokeExpression extends Expression {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return String.format("%s%s(%s)", indent(indentLevel), signature.getFunctionName(), argsToString());
+        return String.format("%s%s(%s)", indent(indentLevel), functionSignature.getName(), argsToString());
     }
 
     private String argsToString() {
         StringBuilder s = new StringBuilder();
-        for (Expression arg : actualArgsList) {
-            if (s.length() > 0) {
+        for (Expression<?> arg : actualArgsList) {
+            if (!s.isEmpty()) {
                 s.append(", ");
             }
             s.append(arg);
@@ -179,28 +102,18 @@ public class FunctionInvokeExpression extends Expression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FunctionInvokeExpression that)) return false;
-        return Objects.equals(signature, that.signature) && Objects.equals(actualArgsList, that.actualArgsList) && Objects.equals(operands, that.operands);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof FunctionInvokeExpression<?> that)) {
+            return false;
+        }
+        return Objects.equals(functionSignature, that.functionSignature) && Objects.equals(
+            actualArgsList, that.actualArgsList) && Objects.equals(expectedReturnType, that.expectedReturnType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(signature, actualArgsList, operands);
-    }
-
-    @Override
-    public Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException {
-        return signature.getReturnType();
-    }
-
-    private List<Expression> getActualArgsList(PMLExecutableSignature signature, Map<String, Expression> args) {
-        List<String> pmlOperandDefs = signature.getOperands();
-        List<Expression> actualArgs = new ArrayList<>();
-        for (String operandDef : pmlOperandDefs) {
-            actualArgs.add(args.get(operandDef));
-        }
-
-        return actualArgs;
+        return Objects.hash(functionSignature, actualArgsList, expectedReturnType);
     }
 }

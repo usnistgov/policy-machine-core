@@ -19,44 +19,10 @@
         </extensions>
 
         <plugins>
-            <!-- grpc plugins -->
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.6.1</version>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                    <clearOutputDirectory>false</clearOutputDirectory>
-                    <!-- Protobuf Compiler -->
-                    <protocArtifact>com.google.protobuf:protoc:3.25.5:exe:${os.detected.classifier}</protocArtifact>
-                    <!-- gRPC Compiler -->
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.61.1:exe:${os.detected.classifier}</pluginArtifact>
-                </configuration>
-                <executions>
-                    <!-- Execution for Message Classes -->
-                    <execution>
-                        <id>generate-protobuf-messages</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>compile-custom</goal>
-                        </goals>
-                        <configuration>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
-                <configuration>
-                    <includes>
-                        <include>**/*.class</include>
-                        <include>${project.build.directory}/generated-sources/**/*.java</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -71,7 +37,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-sources/gov/nist/csd/pm</source>
+                                <source>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -85,7 +51,6 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
-                    <generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -130,15 +95,6 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
-                <configuration>
-                    <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
-                    <visitor>true</visitor>
-                    <arguments>
-                        <argument>-package</argument>
-                        <argument>gov.nist.csd.pm.pap.pml.antlr</argument>
-                    </arguments>
-                </configuration>
                 <executions>
                     <execution>
                         <id>generate-antlr-sources</id>
@@ -147,12 +103,18 @@
                         </goals>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <sourceDirectory>${project.basedir}/src/main/java/gov/nist/csd/pm/pap/pml/antlr4</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/pap/pml/antlr</outputDirectory>
-                            <sourceDirectory>src/main/java/gov/nist/csd/pm/pap/pml/antlr</sourceDirectory>
+                            <visitor>true</visitor>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-dependency-plugin</artifactId>
+               <version>3.8.1</version> 
+           </plugin>
         </plugins>
 
     </build>
@@ -184,11 +146,7 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.14.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.13.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -202,31 +160,27 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.25.5</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
         </dependency>
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-protobuf</artifactId>
-            <version>1.61.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-stub</artifactId>
-            <version>1.61.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>annotations-api</artifactId>
-            <version>6.0.53</version>
-            <scope>provided</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.7</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
             <version>5.25.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-slf4j-provider</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

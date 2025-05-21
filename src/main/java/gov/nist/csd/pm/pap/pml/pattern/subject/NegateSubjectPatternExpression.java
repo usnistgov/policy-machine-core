@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.pap.pml.pattern.subject;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
-import gov.nist.csd.pm.pap.PAP;
 
 import java.util.Objects;
 
 public class NegateSubjectPatternExpression extends SubjectPatternExpression {
 
-    private Pattern subjectPatternExpression;
+    private final Pattern subjectPatternExpression;
 
     public NegateSubjectPatternExpression(Pattern subjectPatternExpression) {
         this.subjectPatternExpression = subjectPatternExpression;

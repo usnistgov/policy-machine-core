@@ -1,156 +1,154 @@
 package gov.nist.csd.pm.pdp.modification;
 
-import gov.nist.csd.pm.common.op.graph.*;
-import gov.nist.csd.pm.pap.modification.GraphModification;
+import static gov.nist.csd.pm.pdp.event.EventContextUtil.buildEventContext;
+
 import gov.nist.csd.pm.common.event.EventContext;
 import gov.nist.csd.pm.common.event.EventPublisher;
-import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
+import gov.nist.csd.pm.common.graph.node.Properties;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.op.Operation;
+import gov.nist.csd.pm.pap.function.op.graph.*;
+import gov.nist.csd.pm.pap.function.op.graph.AssignOp.AssignOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.AssociateOp.AssociateOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.DeassignOp.DeassignOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.DeleteNodeOp.DeleteNodeOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.DissociateOp.DissociateOpArgs;
+import gov.nist.csd.pm.pap.function.op.graph.SetNodePropertiesOp.SetNodePropertiesOpArgs;
+import gov.nist.csd.pm.pap.modification.GraphModification;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.pdp.adjudication.Adjudicator;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.GraphOp.*;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
-    private final UserContext userCtx;
     private final PAP pap;
     private final EventPublisher eventPublisher;
 
-    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher, PrivilegeChecker privilegeChecker) {
-        super(privilegeChecker);
+    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher) {
+        super(pap, userCtx);
         this.userCtx = userCtx;
         this.pap = pap;
         this.eventPublisher = eventPublisher;
     }
 
     @Override
-    public String createPolicyClass(String name) throws PMException {
-        EventContext event = new CreatePolicyClassOp()
-                .withOperands(Map.of(NAME_OPERAND, name))
-                .execute(pap, userCtx, privilegeChecker);
+    public long createPolicyClass(String name) throws PMException {
+        CreatePolicyClassOp op = new CreatePolicyClassOp();
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, List.of());
 
-        eventPublisher.publishEvent(event);
-
-        return name;
+        return executeOp(op, args);
     }
 
     @Override
-    public String createUserAttribute(String name, Collection<String> descendants) throws PMException {
-        EventContext event = new CreateUserAttributeOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+    public long createUserAttribute(String name, Collection<Long> descendants) throws PMException {
+        CreateUserAttributeOp op = new CreateUserAttributeOp();
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
-        eventPublisher.publishEvent(event);
-
-        return name;
+        return executeOp(op, args);
     }
 
     @Override
-    public String createObjectAttribute(String name, Collection<String> descendants) throws PMException {
-        EventContext event = new CreateObjectAttributeOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+    public long createObjectAttribute(String name, Collection<Long> descendants) throws PMException {
+        CreateObjectAttributeOp op = new CreateObjectAttributeOp();
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
-        eventPublisher.publishEvent(event);
-
-        return name;
+        return executeOp(op, args);
     }
 
     @Override
-    public String createObject(String name, Collection<String> descendants) throws PMException {
-        EventContext event = new CreateObjectOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+    public long createObject(String name, Collection<Long> descendants) throws PMException {
+        CreateObjectOp op = new CreateObjectOp();
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
-        eventPublisher.publishEvent(event);
-
-        return name;
+        return executeOp(op, args);
     }
 
     @Override
-    public String createUser(String name, Collection<String> descendants) throws PMException {
-        EventContext event = new CreateUserOp()
-                .withOperands(Map.of(NAME_OPERAND, name, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+    public long createUser(String name, Collection<Long> descendants) throws PMException {
+        CreateUserOp op = new CreateUserOp();
+        CreateNodeOpArgs args = new CreateNodeOpArgs(name, new ArrayList<>(descendants));
 
-        eventPublisher.publishEvent(event);
-
-        return name;
+        return executeOp(op, args);
     }
 
     @Override
-    public void setNodeProperties(String name, Map<String, String> properties) throws PMException {
-        EventContext event = new SetNodePropertiesOp()
-                .withOperands(Map.of(NAME_OPERAND, name, PROPERTIES_OPERAND, properties))
-                .execute(pap, userCtx, privilegeChecker);
+    public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
+        SetNodePropertiesOp op = new SetNodePropertiesOp();
+        SetNodePropertiesOpArgs args = new SetNodePropertiesOpArgs(id, new Properties(properties));
 
-        eventPublisher.publishEvent(event);
+        executeOp(op, args);
     }
 
     @Override
-    public void deleteNode(String name) throws PMException {
-        NodeType nodeType = pap.query().graph().getNode(name).getType();
-        Collection<String> descendants = pap.query().graph().getAdjacentDescendants(name);
+    public void deleteNode(long id) throws PMException {
+        Node node = pap.query().graph().getNodeById(id);
+        LongArrayList descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
 
-        Operation<?> op = new DeletePolicyClassOp();
+        DeleteNodeOp op = new DeleteNodeOp();
+        DeleteNodeOpArgs args = new DeleteNodeOpArgs(id, node.getType(), descendants);
 
-        switch (nodeType) {
-            case OA -> op = new DeleteObjectAttributeOp();
-            case UA -> op = new DeleteUserAttributeOp();
-            case O -> op = new DeleteObjectOp();
-            case U -> op = new DeleteUserOp();
-        }
+        // build event context before executing or else the node will not exist when the util
+        // tries to convert the id to the name
+        EventContext eventContext = buildEventContext(pap, userCtx, op.getName(), args);
 
-        EventContext event = op.
-                withOperands(Map.of(NAME_OPERAND, name, TYPE_OPERAND, nodeType, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
-
-        eventPublisher.publishEvent(event);
+        executeOp(op, args, eventContext);
     }
 
     @Override
-    public void assign(String ascendant, Collection<String> descendants) throws PMException {
-        EventContext event = new AssignOp()
-                .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+    public void assign(long ascId, Collection<Long> descendants) throws PMException {
+        AssignOp op = new AssignOp();
+        AssignOpArgs args = new AssignOpArgs(ascId, new LongArrayList(descendants));
 
-        eventPublisher.publishEvent(event);
+        executeOp(op, args);
     }
 
     @Override
-    public void deassign(String ascendant, Collection<String> descendants) throws PMException {
-        EventContext event = new DeassignOp()
-                .withOperands(Map.of(ASCENDANT_OPERAND, ascendant, DESCENDANTS_OPERAND, descendants))
-                .execute(pap, userCtx, privilegeChecker);
+    public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
+        DeassignOp op = new DeassignOp();
+        DeassignOpArgs args = new DeassignOpArgs(ascendant, new LongArrayList(descendants));
 
-        eventPublisher.publishEvent(event);
+        executeOp(op, args);
     }
 
     @Override
-    public void associate(String ua, String target, AccessRightSet accessRights) throws PMException {
-        EventContext event = new AssociateOp()
-                .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target, ARSET_OPERAND, accessRights))
-                .execute(pap, userCtx, privilegeChecker);
+    public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
+        AssociateOp op = new AssociateOp();
+        AssociateOpArgs args = new AssociateOpArgs(ua, target, accessRights);
 
-        eventPublisher.publishEvent(event);
+        executeOp(op, args);
     }
 
     @Override
-    public void dissociate(String ua, String target) throws PMException {
-        EventContext event = new DissociateOp()
-                .withOperands(Map.of(UA_OPERAND, ua, TARGET_OPERAND, target))
-                .execute(pap, userCtx, privilegeChecker);
+    public void dissociate(long ua, long target) throws PMException {
+        DissociateOp op = new DissociateOp();
+        DissociateOpArgs args = new DissociateOpArgs(ua, target);
 
-        eventPublisher.publishEvent(event);
+        executeOp(op, args);
+    }
 
+    private <R, A extends Args> void executeOp(Operation<R, A> op, A args, EventContext eventContext) throws PMException {
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+
+        eventPublisher.publishEvent(eventContext);
+    }
+
+    private <R, A extends Args> R executeOp(Operation<R, A> op, A args) throws PMException {
+        op.canExecute(pap, userCtx, args);
+        R ret = op.execute(pap, args);
+
+        eventPublisher.publishEvent(buildEventContext(pap, userCtx, op.getName(), args));
+
+        return ret;
     }
 }

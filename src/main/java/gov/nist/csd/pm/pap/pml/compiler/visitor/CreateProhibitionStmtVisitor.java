@@ -1,11 +1,19 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+
+
+
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubjectType;
+import gov.nist.csd.pm.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.Expression;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateProhibitionStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import java.util.List;
+import java.util.Map;
 
 public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibitionStatement> {
 
@@ -15,22 +23,20 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
 
     @Override
     public CreateProhibitionStatement visitCreateProhibitionStatement(PMLParser.CreateProhibitionStatementContext ctx) {
-        Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
-        Expression subject = Expression.compile(visitorCtx, ctx.subject, Type.string());
-        ProhibitionSubject.Type type;
+        Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.name, STRING_TYPE);
+        Expression<String> subject = ExpressionVisitor.compile(visitorCtx, ctx.subject, STRING_TYPE);
+        ProhibitionSubjectType type = ProhibitionSubjectType.PROCESS;
         if (ctx.USER() != null) {
-            type = ProhibitionSubject.Type.USER;
+            type = ProhibitionSubjectType.USER;
         } else if (ctx.USER_ATTRIBUTE() != null) {
-            type = ProhibitionSubject.Type.USER_ATTRIBUTE;
-        } else {
-            type = ProhibitionSubject.Type.PROCESS;
+            type = ProhibitionSubjectType.USER_ATTRIBUTE;
         }
 
-        Expression accessRights = Expression.compile(visitorCtx, ctx.accessRights, Type.array(Type.string()));
+        Expression<List<String>> accessRights = ExpressionVisitor.compile(visitorCtx, ctx.accessRights, ListType.of(STRING_TYPE));
 
         boolean isIntersection = ctx.INTERSECTION() != null;
 
-        Expression cc = Expression.compile(visitorCtx, ctx.containers, Type.array(Type.string()));
+        Expression<Map<String, Boolean>> cc = ExpressionVisitor.compile(visitorCtx, ctx.containers, MapType.of(STRING_TYPE, BOOLEAN_TYPE));
 
         return new CreateProhibitionStatement(name, subject, type, accessRights, isIntersection, cc);
     }

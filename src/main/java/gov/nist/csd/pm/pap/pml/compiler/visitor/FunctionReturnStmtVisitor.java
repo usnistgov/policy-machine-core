@@ -1,21 +1,22 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.statement.FunctionReturnStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import gov.nist.csd.pm.pap.pml.statement.basic.ReturnStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStatement> {
+public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
 
     public FunctionReturnStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public FunctionReturnStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
+    public ReturnStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
         ParserRuleContext enclosingCtx = getEnclosingContext(ctx);
         if (enclosingCtx == null) {
             throw new PMLCompilationRuntimeException(
@@ -25,7 +26,7 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStat
         }
 
         if (ctx.expression() == null) {
-            return new FunctionReturnStatement();
+            return new ReturnStatement();
         } else if (enclosingCtx instanceof PMLParser.ResponseContext) {
             throw new PMLCompilationRuntimeException(
                     ctx,
@@ -33,13 +34,15 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<FunctionReturnStat
             );
         }
 
-        Expression e = Expression.compile(visitorCtx, ctx.expression(), Type.any());
+        Expression<?> e = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
-        return new FunctionReturnStatement(e);
+        return new ReturnStatement(e);
     }
 
     private ParserRuleContext getEnclosingContext(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.FunctionDefinitionStatementContext ||
+        if (ctx instanceof PMLParser.BasicFunctionDefinitionStatementContext ||
+                ctx instanceof PMLParser.OperationDefinitionStatementContext ||
+                ctx instanceof PMLParser.RoutineDefinitionStatementContext ||
                 ctx instanceof PMLParser.ResponseContext) {
             return ctx;
         } else if (ctx == null) {

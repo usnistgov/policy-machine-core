@@ -1,61 +1,88 @@
 package gov.nist.csd.pm.epp;
 
-import gov.nist.csd.pm.common.event.EventSubscriber;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
+
+
 import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pdp.PDP;
+import gov.nist.csd.pm.common.event.EventSubscriber;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.Response;
+import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.pap.PAP;
+import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.common.obligation.Response;
-import gov.nist.csd.pm.common.obligation.Rule;
-import gov.nist.csd.pm.pdp.PDPExecutionContext;
+import gov.nist.csd.pm.pdp.PDP;
 
+import gov.nist.csd.pm.pdp.PDPTx;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class EPP {
+public class EPP implements EventSubscriber {
 
-    private final EPPEventSubscriber eventListener;
+    private final PAP pap;
+    private final PDP pdp;
 
-    public EPP(PDP pdp, PAP pap) throws PMException {
-        eventListener = new EPPEventSubscriber(pdp, pap);
-
-        pdp.addEventSubscriber(eventListener);
+    public EPP(PDP pdp, PAP pap) {
+        this.pap = pap;
+        this.pdp = pdp;
     }
 
-    public EPPEventSubscriber getEventProcessor() {
-        return eventListener;
-    }
-
-    public static class EPPEventSubscriber implements EventSubscriber {
-
-        private PDP pdp;
-        private PAP pap;
-
-        public EPPEventSubscriber(PDP pdp, PAP pap) {
-            this.pdp = pdp;
-            this.pap = pap;
-        }
-
-        @Override
-        public void processEvent(EventContext eventCtx) throws PMException {
-            Collection<Obligation> obligations = pap.query().obligations().getObligations();
-            for(Obligation obligation : obligations) {
-                String author = obligation.getAuthor();
-                List<Rule> rules = obligation.getRules();
-                for(Rule rule : rules) {
-                    if(!rule.getEventPattern().matches(eventCtx, pap)) {
-                        continue;
-                    }
-
-                    Response response = rule.getResponse();
-                    UserContext userContext = new UserContext(author);
-
-                    // need to run pdp tx as author
-                    pdp.runTx(userContext, txPDP -> response.execute(new PDPExecutionContext(userContext, txPDP), eventCtx));
+    @Override
+    public void processEvent(EventContext eventCtx) throws PMException {
+        Collection<Obligation> obligations = pap.query().obligations().getObligations();
+        for(Obligation obligation : obligations) {
+            long author = obligation.getAuthorId();
+            List<Rule> rules = obligation.getRules();
+            for(Rule rule : rules) {
+                if(!rule.getEventPattern().matches(eventCtx, pap)) {
+                    continue;
                 }
+
+                UserContext authorCtx = new UserContext(author);
+                Response response = rule.getResponse();
+
+                executeResponse(authorCtx, response, eventCtx);
             }
         }
+    }
+
+    public void executeResponse(UserContext user, Response response, EventContext eventCtx) throws PMException {
+        pdp.runTx(user, pdpTx -> {
+            executeResponse(pdpTx, user, eventCtx, response);
+            return null;
+        });
+    }
+
+    private void executeResponse(PDPTx pdpTx, UserContext userCtx, EventContext eventCtx, Response response) throws PMException {
+        Args args = new Args();
+
+        FormalParameter<Map<String, Object>> eventCtxParam = new FormalParameter<>(
+            response.getEventCtxVariable(),
+            MapType.of(STRING_TYPE, ANY_TYPE)
+        );
+
+        args.put(eventCtxParam, eventCtxToMap(eventCtx));
+
+        ExecutionContext executionCtx = pdpTx.buildExecutionContext(userCtx);
+        executionCtx.executeStatements(response.getStatements(), args);
+    }
+
+    private Map<String, Object> eventCtxToMap(EventContext eventCtx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("user", eventCtx.getUser());
+        map.put("opName", eventCtx.getOpName());
+        map.put("args", eventCtx.getArgs());
+        if (eventCtx.getProcess() != null) {
+            map.put("process", eventCtx.getUser());
+        }
+
+        return map;
     }
 }

@@ -10,12 +10,17 @@ public class JSONPolicy {
 
     private AccessRightSet resourceOperations;
     private JSONGraph graph;
-    private List<String> prohibitions;
-    private List<String> obligations;
+    private List<JSONProhibition> prohibitions;
+    private List<JSONObligation> obligations;
     private List<String> operations;
     private List<String> routines;
 
-    public JSONPolicy(AccessRightSet resourceOperations, JSONGraph graph, List<String> prohibitions, List<String> obligations, List<String> operations, List<String> routines) {
+    public JSONPolicy(AccessRightSet resourceOperations,
+                      JSONGraph graph,
+                      List<JSONProhibition> prohibitions,
+                      List<JSONObligation> obligations,
+                      List<String> operations,
+                      List<String> routines) {
         this.resourceOperations = resourceOperations;
         this.graph = graph;
         this.prohibitions = prohibitions;
@@ -40,19 +45,19 @@ public class JSONPolicy {
         this.graph = graph;
     }
 
-    public List<String> getProhibitions() {
+    public List<JSONProhibition> getProhibitions() {
         return prohibitions;
     }
 
-    public void setProhibitions(List<String> prohibitions) {
+    public void setProhibitions(List<JSONProhibition> prohibitions) {
         this.prohibitions = prohibitions;
     }
 
-    public List<String> getObligations() {
+    public List<JSONObligation> getObligations() {
         return obligations;
     }
 
-    public void setObligations(List<String> obligations) {
+    public void setObligations(List<JSONObligation> obligations) {
         this.obligations = obligations;
     }
 

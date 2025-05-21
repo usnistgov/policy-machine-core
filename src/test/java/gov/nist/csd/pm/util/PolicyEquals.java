@@ -5,17 +5,15 @@ import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import gov.nist.csd.pm.common.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.Obligation;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
 import gov.nist.csd.pm.pap.query.PolicyQuery;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 
 import static gov.nist.csd.pm.common.graph.node.Properties.NO_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PolicyEquals {
 
@@ -23,37 +21,37 @@ public class PolicyEquals {
         // check nodes
         // assignments
         // associations
-        Collection<String> aNodes = new HashSet<>(a.graph().search(NodeType.ANY, NO_PROPERTIES));
-        Collection<String> bNodes = new HashSet<>(b.graph().search(NodeType.ANY, NO_PROPERTIES));
+        HashSet<Node> aNodes = new HashSet<>(a.graph().search(NodeType.ANY, NO_PROPERTIES));
+        HashSet<Node> bNodes = new HashSet<>(b.graph().search(NodeType.ANY, NO_PROPERTIES));
         assertEquals(aNodes, bNodes);
 
-        for (String nodeName : aNodes) {
-            Node aNode = a.graph().getNode(nodeName);
-            Node bNode = b.graph().getNode(nodeName);
+        for (Node node : aNodes) {
+            Node aNode = a.graph().getNodeByName(node.getName());
+            Node bNode = b.graph().getNodeByName(node.getName());
             assertEquals(aNode, bNode);
 
-            Collection<String> aAscendants = new HashSet<>(a.graph().getAdjacentAscendants(nodeName));
-            Collection<String> aDescendants = new HashSet<>(a.graph().getAdjacentDescendants(nodeName));
+            Collection<Long> aAscendants = new HashSet<>(a.graph().getAdjacentAscendants(node.getId()));
+            Collection<Long> aDescendants = new HashSet<>(a.graph().getAdjacentDescendants(node.getId()));
 
-            Collection<String> bAscendants = new HashSet<>(b.graph().getAdjacentAscendants(nodeName));
-            Collection<String> bDescendants = new HashSet<>(b.graph().getAdjacentDescendants(nodeName));
+            Collection<Long> bAscendants = new HashSet<>(b.graph().getAdjacentAscendants(node.getId()));
+            Collection<Long> bDescendants = new HashSet<>(b.graph().getAdjacentDescendants(node.getId()));
 
             assertEquals(aAscendants, bAscendants);
             assertEquals(aDescendants, bDescendants);
 
-            Collection<Association> aSourceAssocs = new HashSet<>(a.graph().getAssociationsWithSource(nodeName));
-            Collection<Association> aTargetAssocs = new HashSet<>(a.graph().getAssociationsWithTarget(nodeName));
+            Collection<Association> aSourceAssocs = new HashSet<>(a.graph().getAssociationsWithSource(node.getId()));
+            Collection<Association> aTargetAssocs = new HashSet<>(a.graph().getAssociationsWithTarget(node.getId()));
 
-            Collection<Association> bSourceAssocs = new HashSet<>(b.graph().getAssociationsWithSource(nodeName));
-            Collection<Association> bTargetAssocs = new HashSet<>(b.graph().getAssociationsWithTarget(nodeName));
+            Collection<Association> bSourceAssocs = new HashSet<>(b.graph().getAssociationsWithSource(node.getId()));
+            Collection<Association> bTargetAssocs = new HashSet<>(b.graph().getAssociationsWithTarget(node.getId()));
 
             assertEquals(aSourceAssocs, bSourceAssocs);
             assertEquals(aTargetAssocs, bTargetAssocs);
         }
 
         // check prohibitions
-        Map<String, Collection<Prohibition>> aProhibitions = a.prohibitions().getProhibitions();
-        Map<String, Collection<Prohibition>> bProhibitions = b.prohibitions().getProhibitions();
+        Collection<Prohibition> aProhibitions = a.prohibitions().getProhibitions();
+        Collection<Prohibition> bProhibitions = b.prohibitions().getProhibitions();
 
         assertEquals(aProhibitions, bProhibitions);
 

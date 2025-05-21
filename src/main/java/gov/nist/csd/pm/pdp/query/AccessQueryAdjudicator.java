@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.pdp.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.graph.node.Node;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
 import gov.nist.csd.pm.pap.query.AccessQuery;
 import gov.nist.csd.pm.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.pap.query.model.subgraph.SubgraphPrivileges;
@@ -16,15 +16,8 @@ import java.util.Map;
 
 public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
-    private final UserContext adjUserContext;
-    private final PAP pap;
-    private final PrivilegeChecker privilegeChecker;
-
-    public AccessQueryAdjudicator(UserContext adjUserContext, PAP pap, PrivilegeChecker privilegeChecker) {
-        super(privilegeChecker);
-        this.adjUserContext = adjUserContext;
-        this.pap = pap;
-        this.privilegeChecker = privilegeChecker;
+    public AccessQueryAdjudicator(PAP pap, UserContext userCtx) {
+        super(pap, userCtx);
     }
 
     @Override
@@ -43,32 +36,32 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<String, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
         return pap.query().access().computeCapabilityList(userCtx);
     }
 
     @Override
-    public Map<String, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeACL(TargetContext targetCtx) throws PMException {
         return pap.query().access().computeACL(targetCtx);
     }
 
     @Override
-    public Map<String, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
+    public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
         return pap.query().access().computeDestinationAttributes(userCtx);
     }
 
     @Override
-    public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, String root) throws PMException {
+    public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
         return pap.query().access().computeSubgraphPrivileges(userCtx, root);
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, String root) throws PMException {
+    public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
         return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
     }
 
     @Override
-    public Map<String, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, String root) throws PMException {
+    public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
         return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
     }
 
@@ -78,7 +71,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     }
 
     @Override
-    public Map<String, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
+    public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
 	    return pap.query().access().computePersonalObjectSystem(userCtx);
     }
 }

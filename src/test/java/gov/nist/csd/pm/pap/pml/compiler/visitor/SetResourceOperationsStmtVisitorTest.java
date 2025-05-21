@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.PMLContextVisitor;
+import gov.nist.csd.pm.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.scope.CompileGlobalScope;
+import gov.nist.csd.pm.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.pap.pml.statement.operation.SetResourceOperationsStatement;
 import org.junit.jupiter.api.Test;
@@ -17,14 +17,13 @@ class SetResourceOperationsStmtVisitorTest {
 
     @Test
     void testSuccess() throws PMException {
-        PMLParser.SetResourceOperationsStatementContext ctx = PMLContextVisitor.toCtx(
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 set resource operations ["a", "b"]
-                """,
-                PMLParser.SetResourceOperationsStatementContext.class);
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+                """);
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new SetResourceOperationsStmtVisitor(visitorCtx)
-                .visitSetResourceOperationsStatement(ctx);
+                .visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new SetResourceOperationsStatement(buildArrayLiteral("a", "b")),
@@ -34,13 +33,13 @@ class SetResourceOperationsStmtVisitorTest {
 
     @Test
     void testInvalidExpressions() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileGlobalScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
 
         testCompilationError(
                 """
                 set resource operations "a"
                 """, visitorCtx, 1,
-                "expected expression type(s) [[]string], got string"
+                "expected expression type []string, got string"
         );
     }
 

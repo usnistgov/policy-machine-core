@@ -2,8 +2,6 @@ package gov.nist.csd.pm.common.graph.node;
 
 import gov.nist.csd.pm.common.exception.UnknownTypeException;
 
-import java.io.Serializable;
-
 /**
  * Allowed types of nodes in an NGAC Graph
  * <p>
@@ -12,9 +10,8 @@ import java.io.Serializable;
  * U = User
  * O = Object
  * PC = policy class
- * OS = Operation Set
  */
-public enum NodeType implements Serializable {
+public enum NodeType {
     OA(0),
     UA(1),
     U(2),

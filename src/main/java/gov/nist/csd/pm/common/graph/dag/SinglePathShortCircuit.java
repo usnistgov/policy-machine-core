@@ -4,14 +4,14 @@ import gov.nist.csd.pm.common.exception.PMException;
 
 public class SinglePathShortCircuit implements ShortCircuit {
 
-    private ShortCircuit shortCircuit;
+    private final ShortCircuit shortCircuit;
 
     public SinglePathShortCircuit(ShortCircuit shortCircuit) {
         this.shortCircuit = shortCircuit;
     }
 
     @Override
-    public boolean evaluate(String node) throws PMException {
-        return shortCircuit.evaluate(node);
+    public boolean evaluate(long nodeId) throws PMException {
+        return shortCircuit.evaluate(nodeId);
     }
 }

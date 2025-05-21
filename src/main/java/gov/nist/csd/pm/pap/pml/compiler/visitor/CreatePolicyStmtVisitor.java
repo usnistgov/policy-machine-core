@@ -1,21 +1,23 @@
 package gov.nist.csd.pm.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.pml.type.Type;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 
-public class CreatePolicyStmtVisitor extends PMLBaseVisitor<CreatePolicyStatement> {
+import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.pap.pml.expression.Expression;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
+
+
+public class CreatePolicyStmtVisitor extends PMLBaseVisitor<CreatePolicyClassStatement> {
 
     public CreatePolicyStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public CreatePolicyStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
-        Expression name = Expression.compile(visitorCtx, ctx.name, Type.string());
+    public CreatePolicyClassStatement visitCreatePolicyStatement(PMLParser.CreatePolicyStatementContext ctx) {
+        Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.name, STRING_TYPE);
 
-        return new CreatePolicyStatement(name);
+        return new CreatePolicyClassStatement(name);
     }
 }

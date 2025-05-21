@@ -1,32 +1,20 @@
 package gov.nist.csd.pm.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.op.graph.*;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.common.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.common.op.prohibition.DeleteProhibitionOp;
-import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
 
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
+public abstract class DeleteStatement<A extends Args> extends OperationStatement<A> {
 
-public class DeleteStatement extends OperationStatement {
+    protected Type type;
+    protected Expression<String> expression;
 
-    private Type type;
-    private Expression expression;
-
-    public DeleteStatement(Type type, Expression expression) {
-        super(getOpFromType(type));
+    public DeleteStatement(Operation<?, A> op, Type type, Expression<String> expression) {
+        super(op);
         this.type = type;
         this.expression = expression;
-    }
-
-    public DeleteStatement(Operation<Void> op) {
-        super(op);
     }
 
     public Type getType() {
@@ -37,19 +25,12 @@ public class DeleteStatement extends OperationStatement {
         this.type = type;
     }
 
-    public Expression getExpression() {
+    public Expression<String> getExpression() {
         return expression;
     }
 
-    public void setExpression(Expression expression) {
+    public void setExpression(Expression<String> expression) {
         this.expression = expression;
-    }
-
-    @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-        String name = expression.execute(ctx, pap).getStringValue();
-
-        return Map.of(NAME_OPERAND, name);
     }
 
     @Override
@@ -58,11 +39,7 @@ public class DeleteStatement extends OperationStatement {
         switch (type) {
             case PROHIBITION -> typeStr = "prohibition";
             case OBLIGATION -> typeStr = "obligation";
-            case POLICY_CLASS -> typeStr = "PC";
-            case OBJECT_ATTRIBUTE -> typeStr = "OA";
-            case USER_ATTRIBUTE -> typeStr = "UA";
-            case OBJECT -> typeStr = "O";
-            case USER -> typeStr = "U";
+            case NODE -> typeStr = "node";
         }
 
         return indent(indentLevel) + String.format("delete %s %s", typeStr, expression);
@@ -71,7 +48,7 @@ public class DeleteStatement extends OperationStatement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeleteStatement that)) return false;
+        if (!(o instanceof DeleteStatement<?> that)) return false;
         return type == that.type && Objects.equals(expression, that.expression);
     }
 
@@ -81,24 +58,8 @@ public class DeleteStatement extends OperationStatement {
     }
 
     public enum Type {
-        POLICY_CLASS,
-        OBJECT_ATTRIBUTE,
-        USER_ATTRIBUTE,
-        OBJECT,
-        USER,
+        NODE,
         PROHIBITION,
         OBLIGATION
-    }
-
-    private static Operation<Void> getOpFromType(Type type) {
-        return switch (type) {
-            case POLICY_CLASS -> new DeletePolicyClassOp();
-            case OBJECT_ATTRIBUTE -> new DeleteObjectAttributeOp();
-            case USER_ATTRIBUTE -> new DeleteUserAttributeOp();
-            case OBJECT -> new DeleteObjectOp();
-            case USER -> new DeleteUserOp();
-            case PROHIBITION -> new DeleteProhibitionOp();
-            case OBLIGATION -> new DeleteObligationOp();
-        };
     }
 }

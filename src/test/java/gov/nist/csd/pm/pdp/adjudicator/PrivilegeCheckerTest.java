@@ -1,16 +1,19 @@
 package gov.nist.csd.pm.pdp.adjudicator;
 
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
 import gov.nist.csd.pm.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PrivilegeCheckerTest {
 
@@ -18,9 +21,9 @@ class PrivilegeCheckerTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        pap = new MemoryPAP();
-        pap.deserialize(
-                new UserContext("u1"),
+        pap = new TestPAP();
+        pap.executePML(
+                new TestUserContext("u1"),
                 """
                         set resource operations ["read", "write"]
                         
@@ -38,38 +41,37 @@ class PrivilegeCheckerTest {
                         create user "u2" in ["ua2"]
                         
                         create object "o1" in ["oa1"]
-                        """,
-                        new PMLDeserializer()
+                        """
         );
     }
 
     @Test
     void testCheckUserAndTargetDoesNotExist() throws PMException {
         assertThrows(NodeDoesNotExistException.class,
-                     () -> new PrivilegeChecker(pap).check(new UserContext("u3"), "o1", "read"));
+                     () -> pap.privilegeChecker().check(new UserContext(-3), id("o1"), List.of("read")));
         assertThrows(NodeDoesNotExistException.class,
-                     () -> new PrivilegeChecker(pap).check(new UserContext("u1"), "o2", "read"));
+                     () -> pap.privilegeChecker().check(new TestUserContext( "u1"), id("o2"), List.of("read")));
     }
 
     @Test
     void testCheckNodeIsPC() {
-        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext("u1"), "pc1", "read"));
+        assertDoesNotThrow(() -> pap.privilegeChecker().check(new TestUserContext("u1"), id("pc1"), List.of("read")));
     }
 
     @Test
     void testAuthorize() {
-        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext("u1"), "o1", "read"));
+        assertDoesNotThrow(() -> pap.privilegeChecker().check(new TestUserContext("u1"), id("o1"), List.of("read")));
     }
 
     @Test
     void testUnauthorized() {
         assertThrows(PMException.class,
-                     () -> new PrivilegeChecker(pap).check(new UserContext("u2"), "o1", "read"));
+                     () -> pap.privilegeChecker().check(new UserContext(id("u2")), id("o1"), List.of("read")));
     }
 
     @Test
     void testEmptyAccessRights() {
-        assertDoesNotThrow(() -> new PrivilegeChecker(pap).check(new UserContext("u1"), "o1"));
+        assertDoesNotThrow(() -> pap.privilegeChecker().check(new TestUserContext("u1"), id("o1"), List.of()));
     }
 
 }

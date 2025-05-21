@@ -1,42 +1,29 @@
 package gov.nist.csd.pm.pap.pml.expression;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.BOOLEAN_TYPE;
+
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.pap.function.arg.type.Type;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.pap.pml.executable.PMLExecutableSignature;
-import gov.nist.csd.pm.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.pap.pml.scope.Scope;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.BoolValue;
-import gov.nist.csd.pm.pap.pml.value.Value;
 
 import java.util.Objects;
 
-public class EqualsExpression extends Expression {
+public class EqualsExpression extends Expression<Boolean> {
 
-    public static Expression compileEqualsExpression(VisitorContext visitorCtx, PMLParser.EqualsExpressionContext equalsExpressionContext) {
-        Expression left = Expression.compile(visitorCtx, equalsExpressionContext.left, Type.any());
-        Expression right = Expression.compile(visitorCtx, equalsExpressionContext.right, Type.any());
+    private final Expression<?> left;
+    private final Expression<?> right;
+    private final boolean isEquals;
 
-        return new EqualsExpression(left, right, equalsExpressionContext.EQUALS() != null);
-    }
-
-    private Expression left;
-    private Expression right;
-    private boolean isEquals;
-
-    public EqualsExpression(Expression left, Expression right, boolean isEquals) {
+    public EqualsExpression(Expression<?> left, Expression<?> right, boolean isEquals) {
         this.left = left;
         this.right = right;
         this.isEquals = isEquals;
     }
 
     @Override
-    public Type getType(Scope<Variable, PMLExecutableSignature> scope) throws PMLScopeException {
-        return Type.bool();
+    public Type<Boolean> getType() {
+        return BOOLEAN_TYPE;
     }
 
     @Override
@@ -47,19 +34,23 @@ public class EqualsExpression extends Expression {
     }
 
     @Override
-    public Value execute(ExecutionContext ctx, PAP pap) throws PMException {
-        Value leftValue = left.execute(ctx, pap);
-        Value rightValue = right.execute(ctx, pap);
+    public Boolean execute(ExecutionContext ctx, PAP pap) throws PMException {
+        Object leftValue = left.execute(ctx, pap);
+        Object rightValue = right.execute(ctx, pap);
 
-        return new BoolValue(isEquals == (leftValue.equals(rightValue)));
+        return isEquals == (leftValue.equals(rightValue));
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        EqualsExpression that = (EqualsExpression) o;
-        return isEquals == that.isEquals && Objects.equals(left, that.left) && Objects.equals(right, that.right);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof EqualsExpression that)) {
+            return false;
+        }
+        return isEquals == that.isEquals && Objects.equals(left, that.left) && Objects.equals(right,
+            that.right);
     }
 
     @Override

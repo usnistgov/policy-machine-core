@@ -8,11 +8,11 @@ import java.util.Map;
 
 public class VertexWithProps extends Vertex{
 
-    private Vertex vertex;
-    private Map<String, String> properties;
+    private final Vertex vertex;
+    private final Map<String, String> properties;
 
-    public VertexWithProps(Vertex vertex, Map<String, String> properties) {
-        super(vertex.name, vertex.type);
+    public VertexWithProps(long id, Vertex vertex, Map<String, String> properties) {
+        super(id, vertex.name, vertex.type);
         this.vertex = vertex;
         this.properties = properties;
     }
@@ -27,12 +27,12 @@ public class VertexWithProps extends Vertex{
     }
 
     @Override
-    protected Collection<String> getAdjacentDescendants() {
+    protected Collection<Long> getAdjacentDescendants() {
         return vertex.getAdjacentDescendants();
     }
 
     @Override
-    protected Collection<String> getAdjacentAscendants() {
+    protected Collection<Long> getAdjacentAscendants() {
         return vertex.getAdjacentAscendants();
     }
 
@@ -47,22 +47,22 @@ public class VertexWithProps extends Vertex{
     }
 
     @Override
-    protected void addAssignment(String ascendant, String descendant) {
+    protected void addAssignment(long ascendant, long descendant) {
         vertex.addAssignment(ascendant, descendant);
     }
 
     @Override
-    protected void deleteAssignment(String ascendant, String descendant) {
+    protected void deleteAssignment(long ascendant, long descendant) {
         vertex.deleteAssignment(ascendant, descendant);
     }
 
     @Override
-    protected void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
+    protected void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
         vertex.addAssociation(ua, target, accessRightSet);
     }
 
     @Override
-    protected void deleteAssociation(String ua, String target) {
+    protected void deleteAssociation(long ua, long target) {
         vertex.deleteAssociation(ua, target);
     }
 }

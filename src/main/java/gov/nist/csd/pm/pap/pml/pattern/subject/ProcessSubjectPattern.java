@@ -1,18 +1,17 @@
 package gov.nist.csd.pm.pap.pml.pattern.subject;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.pattern.ReferencedNodes;
 
 import java.util.Objects;
 
 public class ProcessSubjectPattern extends SubjectPatternExpression {
 
-    private String process;
+    private final String process;
 
-    public ProcessSubjectPattern(StringLiteral process) {
+    public ProcessSubjectPattern(StringLiteralExpression process) {
         this.process = process.getValue();
     }
 
@@ -32,7 +31,7 @@ public class ProcessSubjectPattern extends SubjectPatternExpression {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return "process " + new StringValue(process);
+        return "process \"" + (process) + "\"";
     }
 
     @Override

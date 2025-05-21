@@ -2,20 +2,24 @@ package gov.nist.csd.pm.pap.pml.statement;
 
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.pml.expression.reference.ReferenceByID;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.pap.pml.scope.UnknownVariableInScopeException;
-import gov.nist.csd.pm.pap.pml.value.StringValue;
+import gov.nist.csd.pm.pap.pml.expression.reference.VariableReferenceExpression;
+import gov.nist.csd.pm.pap.pml.statement.basic.ForeachStatement;
+import gov.nist.csd.pm.pap.pml.statement.basic.VariableAssignmentStatement;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
+
+import gov.nist.csd.pm.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.pap.pml.PMLUtil.buildMapLiteral;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ForeachStatementTest {
@@ -24,71 +28,71 @@ class ForeachStatementTest {
     void testSuccess() throws PMException {
         // array
         ForeachStatement stmt = new ForeachStatement("x", null, buildArrayLiteral("a", "b", "c"),
-                                                     List.of(new CreatePolicyStatement(new ReferenceByID("x")))
+                                                     List.of(new CreatePolicyClassStatement(new VariableReferenceExpression<>("x", STRING_TYPE)))
         );
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        UserContext userContext = new UserContext("u1");
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createUser("u1", ids("ua1"));
+        UserContext userContext = new TestUserContext("u1");
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
         assertEquals(5, pap.query().graph().getPolicyClasses().size());
-        assertTrue(pap.query().graph().getPolicyClasses().containsAll(List.of("a", "b", "c")));
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids("a", "b", "c")));
 
         // map with key and value vars
         stmt = new ForeachStatement("x", "y", buildMapLiteral("a", "b", "c", "d"), List.of(
-                new CreatePolicyStatement(new ReferenceByID("x")),
-                new CreatePolicyStatement(new ReferenceByID("y"))
+                new CreatePolicyClassStatement(new VariableReferenceExpression<>("x", STRING_TYPE)),
+                new CreatePolicyClassStatement(new VariableReferenceExpression<>("y", STRING_TYPE))
         ));
 
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createUser("u1", ids("ua1"));
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
         assertEquals(6, pap.query().graph().getPolicyClasses().size());
-        assertTrue(pap.query().graph().getPolicyClasses().containsAll(List.of("a", "b", "c", "d")));
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids("a", "b", "c", "d")));
 
         // map with key only
         stmt = new ForeachStatement("x", null, buildMapLiteral("a", "b", "c", "d"), List.of(
-                new CreatePolicyStatement(new ReferenceByID("x"))
+                new CreatePolicyClassStatement(new VariableReferenceExpression<>("x", STRING_TYPE))
         ));
 
-        pap = new MemoryPAP();
+        pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createUser("u1", ids("ua1"));
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
         assertEquals(4, pap.query().graph().getPolicyClasses().size());
-        assertTrue(pap.query().graph().getPolicyClasses().containsAll(List.of("a", "c")));
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids("a", "c")));
     }
 
     @Test
-    void testOverwriteValues() throws PMException, UnknownVariableInScopeException {
+    void testOverwriteValues() throws PMException {
         ForeachStatement stmt = new ForeachStatement("x", null, buildArrayLiteral("a", "b", "c"), List.of(
-                new VariableAssignmentStatement("test", false, new ReferenceByID("x"))
+                new VariableAssignmentStatement("test", false, new VariableReferenceExpression<>("x", STRING_TYPE))
         ));
 
-        PAP pap = new MemoryPAP();
+        PAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
-        pap.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-        pap.modify().graph().createUser("u1", List.of("ua1"));
-        UserContext userContext = new UserContext("u1");
+        pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+        pap.modify().graph().createUser("u1", ids("ua1"));
+        UserContext userContext = new TestUserContext("u1");
 
         ExecutionContext executionContext = new ExecutionContext(userContext, pap);
-        executionContext.scope().addVariable("test", new StringValue("test"));
+        executionContext.scope().addVariable("test", "test");
         stmt.execute(executionContext, pap);
 
         assertEquals(
                 "c",
-                executionContext.scope().getVariable("test").getStringValue()
+                executionContext.scope().getVariable("test")
         );
     }
 
@@ -96,7 +100,7 @@ class ForeachStatementTest {
     void testArrayToFormattedString() {
         ForeachStatement stmt = new ForeachStatement("x", null, buildArrayLiteral("a", "b", "c"),
                                                      List.of(
-                                                             new CreatePolicyStatement(new ReferenceByID("x"))
+                                                             new CreatePolicyClassStatement(new VariableReferenceExpression<>("x", STRING_TYPE))
                                                      )
         );
 
@@ -118,7 +122,7 @@ class ForeachStatementTest {
     void testMapToFormattedString() {
         ForeachStatement stmt = new ForeachStatement("x", "y", buildMapLiteral("a", "b", "c", "d"),
                                                      List.of(
-                                                             new CreatePolicyStatement(new ReferenceByID("x"))
+                                                             new CreatePolicyClassStatement(new VariableReferenceExpression<>("x", STRING_TYPE))
                                                      )
         );
 
@@ -151,8 +155,8 @@ class ForeachStatementTest {
                     }
                 }
                 """;
-        PAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        PAP pap = new TestPAP();
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));
@@ -170,8 +174,8 @@ class ForeachStatementTest {
                     }
                 }
                 """;
-        pap = new MemoryPAP();
-        pap.executePML(new UserContext(""), pml);
+        pap = new TestPAP();
+        pap.executePML(new UserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));

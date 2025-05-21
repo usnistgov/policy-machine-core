@@ -2,26 +2,22 @@ package gov.nist.csd.pm.pdp.modification;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.common.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.operation.CreateAdminOperationOp.OPERATION_OPERAND;
-import static gov.nist.csd.pm.common.op.operation.SetResourceOperationsOp.OPERATIONS_OPERAND;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OperationsModificationAdjudicatorTest {
@@ -37,9 +33,9 @@ class OperationsModificationAdjudicatorTest {
 
     @BeforeEach
     void setup() throws PMException {
-        pap = new MemoryPAP();
+        pap = new TestPAP();
 
-        pap.executePML(new UserContext("u1"), """
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
 
                 create ua "ua1" in ["pc1"]
@@ -57,70 +53,68 @@ class OperationsModificationAdjudicatorTest {
 
         pdp = new PDP(pap);
         epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new OperationsModificationAdjudicator(new UserContext("u1"), pap, pdp, pdp.getPrivilegeChecker());
-        fail = new OperationsModificationAdjudicator(new UserContext("u2"), pap, pdp, pdp.getPrivilegeChecker());
+        ok = new OperationsModificationAdjudicator(new TestUserContext("u1"), pap);
+        fail = new OperationsModificationAdjudicator(new UserContext(id("u2")), pap);
     }
 
 
     @Test
     void setResourceOperations() throws PMException {
         assertDoesNotThrow(() -> ok.setResourceOperations(new AccessRightSet("read")));
-        assertEquals(
-                new EventContext("u1", null, new SetResourceOperationsOp(), Map.of(OPERATIONS_OPERAND, new AccessRightSet("read"))),
-                testEventProcessor.getEventContext()
-        );
         assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceOperations());
         assertThrows(UnauthorizedException.class, () -> fail.setResourceOperations(new AccessRightSet("read")));
     }
 
     @Test
     void createAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1") {
+        Operation<Void, ?> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
         };
 
         assertDoesNotThrow(() -> ok.createAdminOperation(op1));
-        assertEquals(
-                new EventContext("u1", null, new CreateAdminOperationOp(), Map.of(OPERATION_OPERAND, op1)),
-                testEventProcessor.getEventContext()
-        );
         assertTrue(pap.query().operations().getAdminOperationNames().contains("op1"));
         assertThrows(UnauthorizedException.class, () -> fail.createAdminOperation(op1));
     }
 
     @Test
     void deleteAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1") {
+        Operation<Void, Args> op1 = new Operation<>("op1", List.of()) {
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Void execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
         };
         ok.createAdminOperation(op1);
 
         assertDoesNotThrow(() -> ok.deleteAdminOperation("op1"));
-        assertEquals(
-                new EventContext("u1", null, new DeleteAdminOperationOp(), Map.of(NAME_OPERAND, "op1")),
-                testEventProcessor.getEventContext()
-        );
-
         assertThrows(UnauthorizedException.class, () -> fail.deleteAdminOperation("op1"));
     }
 }

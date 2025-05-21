@@ -1,21 +1,21 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
 import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.store.*;
+import gov.nist.csd.pm.pap.store.PolicyStore;
 
 import java.util.List;
 
 public class MemoryPolicyStore implements PolicyStore {
 
-    private TxCmdTracker txCmdTracker;
-    private MemoryTx tx;
-    private MemoryPolicy policy;
+    private final TxCmdTracker txCmdTracker;
+    private final MemoryTx tx;
+    private final MemoryPolicy policy;
 
-    private MemoryGraphStore graph;
-    private MemoryProhibitionsStore prohibitions;
-    private MemoryObligationsStore obligations;
-    private MemoryOperationsStore operations;
-    private MemoryRoutinesStore routines;
+    private final MemoryGraphStore graph;
+    private final MemoryProhibitionsStore prohibitions;
+    private final MemoryObligationsStore obligations;
+    private final MemoryOperationsStore operations;
+    private final MemoryRoutinesStore routines;
 
     public MemoryPolicyStore() {
         this.policy = new MemoryPolicy();

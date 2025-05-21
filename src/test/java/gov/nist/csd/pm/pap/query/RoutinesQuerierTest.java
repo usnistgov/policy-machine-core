@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.routine.Routine;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.PAPTestInitializer;
-import gov.nist.csd.pm.common.exception.RoutineDoesNotExistException;
-import gov.nist.csd.pm.common.routine.Routine;
 import gov.nist.csd.pm.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,19 +14,31 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
-    static Routine<Object> r1 = new Routine<>("r1", List.of()) {
+    static Routine<Object, Args> r1 = new Routine<>("r1", List.of()) {
         @Override
-        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Object execute(PAP pap, Args args) throws PMException {
+            return null;
+        }
+
+        @Override
+        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };
-    static Routine<Object> r2 = new Routine<>("r2", List.of()) {
+    static Routine<Object, Args> r2 = new Routine<>("r2", List.of()) {
+
         @Override
-        public Object execute(PAP pap, Map<String, Object> operands) throws PMException {
+        public Object execute(PAP pap, Args args) throws PMException {
+            return null;
+        }
+
+        @Override
+        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
     };
@@ -49,7 +63,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
             pap.modify().routines().createAdminRoutine(r1);
 
-            Routine<?> actual = pap.query().routines().getAdminRoutine(r1.getName());
+            Routine<?, ?> actual = pap.query().routines().getAdminRoutine(r1.getName());
             assertEquals(r1, actual);
         }
 

@@ -2,26 +2,21 @@ package gov.nist.csd.pm.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.pap.function.op.graph.AssignOp.AssignOpArgs;
 import gov.nist.csd.pm.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.value.Value;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import static gov.nist.csd.pm.common.op.graph.AssignOp.ASCENDANT_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
+public class AssignStatement extends OperationStatement<AssignOpArgs> {
 
+    private final Expression<String> ascendant;
+    private final Expression<List<String>> descendants;
 
-public class AssignStatement extends OperationStatement {
-
-    private Expression ascendant;
-    private Expression descendants;
-
-    public AssignStatement(Expression ascendant, Expression descendants) {
+    public AssignStatement(Expression<String> ascendant, Expression<List<String>> descendants) {
         super(new AssignOp());
 
         this.ascendant = ascendant;
@@ -29,15 +24,18 @@ public class AssignStatement extends OperationStatement {
     }
 
     @Override
-    public Map<String, Object> prepareOperands(ExecutionContext ctx, PAP pap) throws PMException {
-        String asc = ascendant.execute(ctx, pap).getStringValue();
-        List<Value> assignToValue = descendants.execute(ctx, pap).getArrayValue();
-        List<String> descs = new ArrayList<>();
-        for (Value value : assignToValue) {
-            descs.add(value.getStringValue());
+    public AssignOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String asc = ascendant.execute(ctx, pap);
+        List<String> descs = descendants.execute(ctx, pap);
+
+        // convert to ids
+        long ascId = pap.query().graph().getNodeByName(asc).getId();
+        LongArrayList descIds = new LongArrayList();
+        for (String desc : descs) {
+            descIds.add(pap.query().graph().getNodeByName(desc).getId());
         }
 
-        return Map.of(ASCENDANT_OPERAND, asc, DESCENDANTS_OPERAND, descs);
+        return new AssignOpArgs(ascId, descIds);
     }
 
     @Override
@@ -56,4 +54,4 @@ public class AssignStatement extends OperationStatement {
     public int hashCode() {
         return Objects.hash(ascendant, descendants);
     }
-}
+} 

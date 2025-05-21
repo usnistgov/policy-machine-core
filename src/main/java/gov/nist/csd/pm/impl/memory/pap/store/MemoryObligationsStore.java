@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.obligation.Obligation;
-import gov.nist.csd.pm.common.obligation.Rule;
 import gov.nist.csd.pm.common.exception.ObligationDoesNotExistException;
+import gov.nist.csd.pm.common.exception.PMException;
+import gov.nist.csd.pm.pap.obligation.Obligation;
+import gov.nist.csd.pm.pap.obligation.Rule;
 import gov.nist.csd.pm.pap.store.ObligationsStore;
 
 import java.util.ArrayList;
@@ -17,8 +17,8 @@ class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
     }
 
     @Override
-    public void createObligation(String author, String name, List<Rule> rules) throws PMException {
-        Obligation obligation = new Obligation(author, name, rules.stream().toList());
+    public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
+        Obligation obligation = new Obligation(authorId, name, rules.stream().toList());
 
         policy.obligations.add(obligation);
 
@@ -53,10 +53,10 @@ class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(String user) throws PMException {
+    public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : getObligations()) {
-            if (obligation.getAuthor().equals(user)) {
+            if (obligation.getAuthorId() == userId) {
                 obls.add(obligation);
             }
         }

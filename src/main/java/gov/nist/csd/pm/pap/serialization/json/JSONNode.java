@@ -6,12 +6,17 @@ import java.util.Objects;
 
 public class JSONNode {
 
+    private long id;
     private String name;
     private List<JSONProperty> properties;
-    private Collection<String> assignments;
+    private Collection<Long> assignments;
     private List<JSONAssociation> associations;
 
-    public JSONNode(String name, List<JSONProperty> properties, Collection<String> assignments, List<JSONAssociation> associations) {
+    public JSONNode() {
+    }
+
+    public JSONNode(long id, String name, List<JSONProperty> properties, Collection<Long> assignments, List<JSONAssociation> associations) {
+        this.id = id;
         this.name = name;
 
         if (properties != null && !properties.isEmpty()) {
@@ -25,6 +30,14 @@ public class JSONNode {
         if (associations != null && !associations.isEmpty()) {
             this.associations = associations;
         }
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -43,11 +56,11 @@ public class JSONNode {
         this.properties = properties;
     }
 
-    public Collection<String> getAssignments() {
+    public Collection<Long> getAssignments() {
         return assignments;
     }
 
-    public void setAssignments(Collection<String> assignments) {
+    public void setAssignments(Collection<Long> assignments) {
         this.assignments = assignments;
     }
 

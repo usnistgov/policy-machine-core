@@ -2,9 +2,9 @@ package gov.nist.csd.pm.pap.query;
 
 import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.prohibition.Prohibition;
+import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Interface to query prohibitions.
@@ -12,12 +12,12 @@ import java.util.Map;
 public interface ProhibitionsQuery {
 
     /**
-     * Get all prohibitions.
+     * Get all prohibitions, organized by the subject.
      *
      * @return All prohibitions.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Map<String, Collection<Prohibition>> getProhibitions() throws PMException;
+    Collection<Prohibition> getProhibitions() throws PMException;
 
     /**
      * Get prohibitions with the given subject.
@@ -26,7 +26,7 @@ public interface ProhibitionsQuery {
      * @return The prohibitions with the given subject.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<Prohibition> getProhibitionsWithSubject(String subject) throws PMException;
+    Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException;
 
     /**
      * Get the prohibition with the given name.
@@ -38,18 +38,19 @@ public interface ProhibitionsQuery {
 
     /**
      * Get the prohibitions the given subject inherits through assignments.
-     * @param subject The subject node.
+     * @param subjectId The subject node.
      * @return The prohibitions the given subject inherits.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<Prohibition> getInheritedProhibitionsFor(String subject) throws PMException;
+    Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException;
 
     /**
      * Get the prohibitions that define the given container as a container condition.
-     * @param container The container to search for.
+     *
+     * @param containerId The container to search for.
      * @return The prohibitions that define the given container as a container condition.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<Prohibition> getProhibitionsWithContainer(String container) throws PMException;
+    Collection<Prohibition> getProhibitionsWithContainer(long containerId) throws PMException;
 
 }

@@ -1,52 +1,54 @@
 package gov.nist.csd.pm.epp;
 
+import gov.nist.csd.pm.common.event.EventContext;
+import gov.nist.csd.pm.common.exception.PMException;
 import gov.nist.csd.pm.common.graph.node.NodeType;
 import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.event.EventContext;
-import gov.nist.csd.pm.common.obligation.EventPattern;
-import gov.nist.csd.pm.common.obligation.Response;
-import gov.nist.csd.pm.common.obligation.Rule;
+import gov.nist.csd.pm.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.pap.function.arg.Args;
+import gov.nist.csd.pm.pap.function.arg.type.VoidType;
+import gov.nist.csd.pm.pap.obligation.EventPattern;
+import gov.nist.csd.pm.pap.obligation.Response;
+import gov.nist.csd.pm.pap.obligation.Rule;
+import gov.nist.csd.pm.pap.function.op.Operation;
 import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.pap.PAP;
 import gov.nist.csd.pm.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.common.op.Operation;
-import gov.nist.csd.pm.pap.PrivilegeChecker;
-import gov.nist.csd.pm.pap.pml.executable.operation.PMLOperation;
+import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.csd.pm.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.pap.pml.statement.operation.CreateNonPCStatement;
-import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyStatement;
-import gov.nist.csd.pm.pap.pml.value.Value;
-import gov.nist.csd.pm.pap.serialization.pml.PMLDeserializer;
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.pap.pml.expression.Expression;
-import gov.nist.csd.pm.pap.pml.expression.literal.ArrayLiteral;
-import gov.nist.csd.pm.pap.pml.expression.literal.StringLiteral;
-import gov.nist.csd.pm.pap.pml.type.Type;
-import gov.nist.csd.pm.pap.pml.value.VoidValue;
+import gov.nist.csd.pm.pap.pml.statement.operation.CreatePolicyClassStatement;
+import gov.nist.csd.pm.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pdp.*;
+import gov.nist.csd.pm.pdp.PDP;
 import gov.nist.csd.pm.pdp.UnauthorizedException;
 import gov.nist.csd.pm.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.pdp.adjudication.Decision;
+import gov.nist.csd.pm.util.TestPAP;
+import gov.nist.csd.pm.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.pap.AdminAccessRights.*;
-import static gov.nist.csd.pm.common.op.Operation.NAME_OPERAND;
-import static gov.nist.csd.pm.common.op.graph.GraphOp.DESCENDANTS_OPERAND;
+import static gov.nist.csd.pm.pap.admin.AdminAccessRights.*;
+import static gov.nist.csd.pm.pap.PAPTest.ARG_A;
+import static gov.nist.csd.pm.pap.PAPTest.ARG_B;
+import static gov.nist.csd.pm.pap.function.arg.type.Type.STRING_TYPE;
 import static gov.nist.csd.pm.pdp.adjudication.Decision.GRANT;
+import static gov.nist.csd.pm.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EPPTest {
 
     @Test
     void testCustomOperationEvent() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -54,7 +56,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                operation op1(nodeop string a, nodeop []string b) {
+                operation op1(@node string a, @node []string b) {
                     
                 }
                 
@@ -67,9 +69,9 @@ class EPPTest {
                         b: "oa1"
                     }
                     do(ctx) {
-                        create pc ctx.operands.a + "pc1"
+                        create pc ctx.args.a + "pc1"
                         
-                        foreach x in ctx.operands.b {
+                        foreach x in ctx.args.b {
                             create pc x + "pc2"
                         }
                     }
@@ -82,61 +84,80 @@ class EPPTest {
                         b: "oa2"
                     }
                     do(ctx) {
-                        create pc ctx.operands.a + "pc1"
+                        create pc ctx.args.a + "pc3"
                         
-                        foreach x in ctx.operands.b {
-                            create pc x + "pc2"
+                        foreach x in ctx.args.b {
+                            create pc x + "pc4"
                         }
                     }
                 }
                 """);
 
-        pap.modify().operations().createAdminOperation(new Operation<>("op2", List.of("a", "b"), List.of("a", "b")) {
+        Operation<String, Args> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
+
             @Override
-            public Object execute(PAP pap, Map operands) throws PMException {
-                return null;
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return new Args(argsMap);
             }
 
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map operands) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws
+                                                                                                         PMException {
 
             }
-        });
+
+            @Override
+            public String execute(PAP pap, Args args) throws PMException {
+                return "";
+            }
+        };
+
+        pap.modify().operations().createAdminOperation(op2);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         AdjudicationResponse response = pdp.adjudicateAdminOperation(
-                new UserContext("u1"),
-                "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
+            new TestUserContext("u1"),
+            "op1",
+            Map.of("a", "oa1",
+                "b", List.of("oa1", "oa2"))
         );
         assertEquals(Decision.DENY, response.getDecision());
 
-        pap.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*a"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*a"));
 
         response = pdp.adjudicateAdminOperation(
-                new UserContext("u1"),
-                "op1", Map.of("a", "oa1", "b", List.of("oa1", "oa2"))
+            new TestUserContext("u1"),
+            "op1",
+            Map.of(
+                "a", "oa1",
+                "b", List.of("oa1", "oa2"))
         );
         assertEquals(GRANT, response.getDecision());
 
         response = pdp.adjudicateAdminOperation(
-                new UserContext("u1"),
-                "op2", Map.of("a", "oa2", "b", "oa2")
+            new TestUserContext("u1"),
+            "op2",
+            Map.of(
+                ARG_A.getName(), "oa2",
+                ARG_B.getName(), List.of("oa2")
+            )
         );
         assertEquals(GRANT, response.getDecision());
 
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1pc2"));
         assertTrue(pap.query().graph().nodeExists("oa2pc2"));
-        assertTrue(pap.query().graph().nodeExists("oa2pc1"));
-        assertTrue(pap.query().graph().nodeExists("oa2pc2"));
+        assertTrue(pap.query().graph().nodeExists("oa2pc3"));
+        assertTrue(pap.query().graph().nodeExists("oa2pc4"));
     }
 
     @Test
     void testResourceOperationEvent() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext("u1"), """
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -157,13 +178,15 @@ class EPPTest {
                         target: "oa1"
                     }
                     do(ctx) {
-                        create pc ctx.operands.target + "pc1"
+                        create pc ctx.args.target + "pc1"
                     }
                 }
                 """);
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        AdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext("u1"), "oa1", "read");
+        epp.subscribeTo(pdp);
+
+        AdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext(id("u1")), id("oa1"), "read");
         assertEquals(GRANT, response.getDecision());
 
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
@@ -171,9 +194,10 @@ class EPPTest {
 
     @Test
     void test() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """
                 create pc "pc1"
@@ -194,12 +218,12 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
 
-        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", List.of("oa1")));
+        pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
 
@@ -207,9 +231,10 @@ class EPPTest {
 
     @Test
     void testAccessingEventContextInResponse() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """                
                 create pc "pc1"
@@ -231,7 +256,7 @@ class EPPTest {
                         name := ctx.opName
                         create policy class name
 
-                        name = ctx.operands.name
+                        name = ctx.args.name
                         create policy class name + "_test"
                         set properties of name + "_test" to {"key": name}
 
@@ -240,69 +265,71 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
-        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
-                List.of("oa1")));
+        pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
+            ids("oa1")));
 
-        assertTrue(pap.query().graph().getPolicyClasses().containsAll(Arrays.asList(
-                "pc1", "create_object_attribute", "oa2_test", "u1_test"
+        assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids(
+            "pc1", "create_object_attribute", "oa2_test", "u1_test"
         )));
     }
 
     @Test
     void testErrorInEPPResponse() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         pap.runTx((txPAP) -> {
             txPAP.modify().graph().createPolicyClass("pc1");
-            txPAP.modify().graph().createUserAttribute("ua1", List.of("pc1"));
-            txPAP.modify().graph().createUserAttribute("ua2", List.of("pc1"));
-            txPAP.modify().graph().associate("ua2", "ua1", new AccessRightSet("*"));
-            txPAP.modify().graph().associate("ua2", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
-            txPAP.modify().graph().createObjectAttribute("oa1",  List.of("pc1"));
-            txPAP.modify().graph().createUser("u1",  List.of("ua1", "ua2"));
-            txPAP.modify().graph().createObject("o1",  List.of("oa1"));
-            txPAP.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(),
-                    new AccessRightSet(CREATE_OBLIGATION));
-            txPAP.modify().graph().associate("ua1", "oa1", new AccessRightSet(CREATE_OBJECT));
-            txPAP.modify().graph().associate("ua1", AdminPolicyNode.PM_ADMIN_OBJECT.nodeName(), new AccessRightSet("*"));
+            txPAP.modify().graph().createUserAttribute("ua1", ids("pc1"));
+            txPAP.modify().graph().createUserAttribute("ua2", ids("pc1"));
+            txPAP.modify().graph().associate(id("ua2"), id("ua1"), new AccessRightSet("*"));
+            txPAP.modify().graph().associate(id("ua2"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+            txPAP.modify().graph().createObjectAttribute("oa1",  ids("pc1"));
+            txPAP.modify().graph().createUser("u1",  ids("ua1", "ua2"));
+            txPAP.modify().graph().createObject("o1",  ids("oa1"));
+            txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(),
+                new AccessRightSet(CREATE_OBLIGATION));
+            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT));
+            txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
         });
 
-        pdp.runTx(new UserContext("u1"), (policy) -> {
-            policy.modify().obligations().createObligation("u1", "test",
-                    List.of(new Rule(
-                            "rule1",
-                            new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
-                            new Response("evtCtx", List.of(
-                                    new CreateNonPCStatement(
-                                            new StringLiteral("o2"),
-                                            NodeType.O,
-                                            new ArrayLiteral(new Expression[]{new StringLiteral("oa1")}, Type.string())
-                                    ),
+        pdp.runTx(new UserContext(id("u1")), (policy) -> {
+            policy.modify().obligations().createObligation(id("u1"), "test",
+                List.of(new Rule(
+                    "rule1",
+                    new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
+                    new Response("evtCtx", List.of(
+                        new CreateNonPCStatement(
+                            new StringLiteralExpression("o2"),
+                            NodeType.O,
+                            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("oa1")), STRING_TYPE)
+                        ),
 
-                                    // expect error for node already exists
-                                    new CreatePolicyStatement(new StringLiteral("pc1"))
-                            ))
+                        // expect error for node already exists
+                        new CreatePolicyClassStatement(new StringLiteralExpression("pc1"))
                     ))
+                ))
             );
 
             return null;
         });
 
         EventContext eventCtx = new EventContext(
-                "u1",
-                CREATE_OBJECT_ATTRIBUTE,
-                Map.of(
-                        NAME_OPERAND, "oa2",
-                        DESCENDANTS_OPERAND, List.of("pc1")
-                )
+            "u1",
+            null,
+            CREATE_OBJECT_ATTRIBUTE,
+            Map.of(
+                "name", "oa2",
+                "descendants", List.of("pc1")
+            )
         );
 
         assertThrows(PMException.class, () -> {
-            epp.getEventProcessor().processEvent(eventCtx);
+            epp.processEvent(eventCtx);
         });
 
         assertFalse(pap.query().graph().nodeExists("o2"));
@@ -311,26 +338,34 @@ class EPPTest {
 
     @Test
     void testCustomFunctionInResponse() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
-        PMLOperation pmlOperation = new PMLOperation("testFunc", Type.voidType()) {
+        PMLOperation pmlOperation = new PMLOperation("testFunc", new VoidType()) {
+
             @Override
-            public void canExecute(PrivilegeChecker privilegeChecker, UserContext userCtx, Map<String, Object> operands) throws PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws
+                                                                                                         PMException {
 
             }
 
             @Override
-            public Value execute(PAP pap, Map<String, Object> operands) throws PMException {
+            public Object execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
-                return new VoidValue();
+                return new VoidResult();
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
             }
         };
 
-        pap.setPMLOperations(pmlOperation);
+        pap.modify().operations().createAdminOperation(pmlOperation);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """                
                 create pc "pc1"
@@ -353,10 +388,10 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
-        pdp.runTx(new UserContext("u1"), (txPDP) -> {
-            txPDP.modify().graph().createObjectAttribute("oa2", List.of("oa1"));
+        pdp.runTx(new UserContext(id("u1")), (txPDP) -> {
+            txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1"));
 
             return null;
         });
@@ -366,10 +401,11 @@ class EPPTest {
 
     @Test
     void testReturnInResponse() throws PMException {
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
 
         String pml = """                
                 create pc "pc1"
@@ -396,9 +432,9 @@ class EPPTest {
                     }
                 }
                 """;
-        pap.deserialize(new UserContext("u1"), pml, new PMLDeserializer());
+        pap.executePML(new TestUserContext("u1"), pml);
 
-        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", List.of("oa1")));
+        pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
         assertFalse(pap.query().graph().nodeExists("test"));
     }
 
@@ -416,7 +452,7 @@ class EPPTest {
                 associate "ua2" and PM_ADMIN_OBJECT with ["*a"]
                 
                 operation op1() {
-                    check "assign" on "oa1"
+                    check "assign" on ["oa1"]
                 } {
                     create pc "test_pc"
                 }
@@ -436,21 +472,24 @@ class EPPTest {
                 }
                 """;
         // as u1 - ok
-        MemoryPAP pap = new MemoryPAP();
+        MemoryPAP pap = new TestPAP();
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        pap.executePML(new UserContext("u1"), pml);
-        pdp.runTx(new UserContext("u1"), (txPDP) -> txPDP.modify().graph().createPolicyClass("u1_pc"));
+        epp.subscribeTo(pdp);
+        pap.executePML(new TestUserContext("u1"), pml);
+        pdp.runTx(new TestUserContext("u1"), (txPDP) -> txPDP.modify().graph().createPolicyClass("u1_pc"));
         assertTrue(pap.query().graph().nodeExists("test_pc"));
         assertTrue(pap.query().graph().nodeExists("o1"));
         assertTrue(pap.query().graph().nodeExists("u1_pc"));
 
         // as u2 fail
-        pap = new MemoryPAP();
+        pap.reset();
         PDP pdp2 = new PDP(pap);
         epp = new EPP(pdp2, pap);
-        pap.executePML(new UserContext("u2"), pml);
-        assertThrows(UnauthorizedException.class, () -> pdp2.runTx(new UserContext("u2"), (txPDP) -> txPDP.modify().graph().createPolicyClass("u2_pc")));
+        epp.subscribeTo(pdp2);
+
+        pap.executePML(new TestUserContext("u2"), pml);
+        assertThrows(UnauthorizedException.class, () -> pdp2.runTx(new UserContext(id("u2")), (txPDP) -> txPDP.modify().graph().createPolicyClass("u2_pc")));
         assertFalse(pap.query().graph().nodeExists("test_pc"));
         assertFalse(pap.query().graph().nodeExists("o1"));
         assertFalse(pap.query().graph().nodeExists("u1_pc"));

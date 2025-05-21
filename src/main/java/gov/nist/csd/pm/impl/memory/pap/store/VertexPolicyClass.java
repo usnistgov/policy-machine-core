@@ -1,24 +1,21 @@
 package gov.nist.csd.pm.impl.memory.pap.store;
 
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.node.NodeType;
+import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.common.graph.relationship.Association;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 class VertexPolicyClass extends Vertex {
-    private ObjectOpenHashSet<String> ascendants;
+    private final LongArrayList ascendants;
 
-    public VertexPolicyClass(String name) {
-        super(name, NodeType.PC);
-        this.ascendants = new ObjectOpenHashSet<>();
-    }
-
-    public VertexPolicyClass(String name, ObjectOpenHashSet<String> ascendants) {
-        super(name, NodeType.PC);
-        this.ascendants = ascendants;
+    public VertexPolicyClass(long id, String name) {
+        super(id, name, NodeType.PC);
+        this.ascendants = new LongArrayList();
     }
 
     @Override
@@ -27,42 +24,42 @@ class VertexPolicyClass extends Vertex {
     }
 
     @Override
-    protected ObjectOpenHashSet<String> getAdjacentDescendants() {
-        return new ObjectOpenHashSet<>();
+    protected Collection<Long> getAdjacentDescendants() {
+        return new LongArrayList();
     }
 
     @Override
-    protected ObjectOpenHashSet<String> getAdjacentAscendants() {
-        return new ObjectOpenHashSet<>(ascendants);
+    protected Collection<Long> getAdjacentAscendants() {
+        return ascendants;
     }
 
     @Override
-    protected ObjectOpenHashSet<Association> getOutgoingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Collection<Association> getOutgoingAssociations() {
+        return new ObjectArrayList<>();
     }
 
     @Override
-    protected ObjectOpenHashSet<Association> getIncomingAssociations() {
-        return new ObjectOpenHashSet<>();
+    protected Collection<Association> getIncomingAssociations() {
+        return new ObjectArrayList<>();
     }
 
     @Override
-    public void addAssignment(String ascendant, String descendant) {
+    public void addAssignment(long ascendant, long descendant) {
         ascendants.add(ascendant);
     }
 
     @Override
-    public void deleteAssignment(String ascendant, String descendant) {
-        ascendants.remove(ascendant);
+    public void deleteAssignment(long ascendant, long descendant) {
+        ascendants.removeLong(ascendants.indexOf(ascendant));
     }
 
     @Override
-    public void addAssociation(String ua, String target, AccessRightSet accessRightSet) {
+    public void addAssociation(long ua, long target, AccessRightSet accessRightSet) {
 
     }
 
     @Override
-    public void deleteAssociation(String ua, String target) {
+    public void deleteAssociation(long ua, long target) {
 
     }
 }
