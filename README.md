@@ -60,16 +60,16 @@ The following examples use the provided in memory PAP.
 ```java
 package gov.nist.csd.pm;
 
-import gov.nist.csd.pm.epp.EPP;
-import gov.nist.csd.pm.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.pap.PAP;
-import gov.nist.csd.pm.common.exception.PMException;
-import gov.nist.csd.pm.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.pdp.PDP;
+import epp.gov.nist.csd.pm.core.EPP;
+import pap.memory.impl.gov.nist.csd.pm.core.MemoryPAP;
+import pap.gov.nist.csd.pm.core.PAP;
+import exception.common.gov.nist.csd.pm.core.PMException;
+import relationship.graph.common.gov.nist.csd.pm.core.AccessRightSet;
+import prohibition.common.gov.nist.csd.pm.core.ContainerCondition;
+import prohibition.common.gov.nist.csd.pm.core.ProhibitionSubject;
+import context.model.query.pap.gov.nist.csd.pm.core.UserContext;
+import context.model.query.pap.gov.nist.csd.pm.core.TargetContext;
+import pdp.gov.nist.csd.pm.core.PDP;
 
 import java.util.List;
 
@@ -96,7 +96,7 @@ public class Main {
 		// create a prohibition
 		pap.modify().prohibitions().createProhibition(
 				"deny u1 write on oa1",
-				ProhibitionSubject.userAttribute("u1"), ,
+				ProhibitionSubject.userAttribute("u1"),
 				new AccessRightSet("write"),
 				false,
 				List.of(new ContainerCondition("oa1", false)));
