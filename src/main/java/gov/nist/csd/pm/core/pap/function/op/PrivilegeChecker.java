@@ -43,6 +43,11 @@ public class PrivilegeChecker {
         checkOrThrow(userCtx, targetCtx, computed, rightsToCheck);
     }
 
+    public void check(UserContext userCtx, TargetContext targetCtx, String ... rightsToCheck) throws PMException {
+        AccessRightSet computed = accessQuerier.computePrivileges(userCtx, targetCtx);
+        checkOrThrow(userCtx, targetCtx, computed, List.of(rightsToCheck));
+    }
+
     public void check(UserContext userCtx, long targetId, Collection<String> rightsToCheck) throws PMException {
         check(userCtx, new TargetContext(targetId), rightsToCheck);
     }
@@ -53,6 +58,10 @@ public class PrivilegeChecker {
 
     public void check(UserContext userCtx, UserContext targetUserCtx, Collection<String> rightsToCheck) throws PMException {
         check(userCtx, new TargetContext(targetUserCtx), rightsToCheck);
+    }
+
+    public void check(UserContext userCtx, UserContext targetUserCtx, String ... rightsToCheck) throws PMException {
+        check(userCtx, new TargetContext(targetUserCtx), List.of(rightsToCheck));
     }
 
     public void check(UserContext userCtx, List<Long> targetIds, String... rightsToCheck) throws PMException {
