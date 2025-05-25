@@ -35,7 +35,6 @@ ASSIGN: 'assign' ;
 DEASSIGN: 'deassign' ;
 FROM: 'from' ;
 SET_PROPERTIES: 'set properties' ;
-WITH_PROPERTIES: 'with properties' ;
 OF: 'of' ;
 TO: 'to' ;
 ASSOCIATE: 'associate' ;
