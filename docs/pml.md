@@ -18,6 +18,7 @@ pap.executePML(new UserContext(userId), pml);
 ## Basics  
   
 The syntax for basic PML statements is based on [Golang]([https://github.com/antlr/grammars-v4/tree/master/golang](https://github.com/antlr/grammars-v4/tree/master/golang "https://github.com/antlr/grammars-v4/tree/master/golang"))  
+
 ### Comments  
   
 ```  
@@ -43,7 +44,7 @@ string
 | any ;  
 ```  
   
-The `any` type will compile without error regardless of expected type. However, during execution if the evaluated type does not match the expected, an error will occur.   
+The `any` type will compile without error regardless of expected type. However, during execution if the evaluated type does not match the expected, an error will occur.   
 ### Expressions  
   
 Expressions are the fundamental way to define values in PML statements. Each expression has a **type**. Some statements will only support expressions of a certain type.  
@@ -61,7 +62,7 @@ boolLiteral: (true | false) ;
 mapLiteral: '{' expression: expression (',' expression: expression)* '}' ;  
 arrayLiteral: '[' expression (',' expression)* ']' ;  
   
-fragment EscapeSequenc
+fragment EscapeSequence
  : '\\' [btnfr"'\\]
  | '\\' ([0-3]? [0-7])? [0-7] 
  | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit  
@@ -161,9 +162,11 @@ The variable must already exist AND be of type **string**.
   
 ```  
 'if' expression '{' statement* '}'  
-('else if {' statement* '}' )*  
-(else {' statement* '}' )?  
+('else if' expression '{' statement* '}' )*  
+('else' '{' statement* '}' )?  
 ```  
+
+- `expression` is a **bool** expression.  
   
 ### Foreach  
   
@@ -172,6 +175,9 @@ Use `break` and `continue` to short circuit
 ```  
 'foreach' ID (',' ID)? 'in' expression '{' statement* '}' ;  
 ```  
+
+- `expression` is a **[]any** or **map[any]any** expression.  
+
 #### Array  
   
 ```  
@@ -200,11 +206,15 @@ foreach x, y in {"key1": "value1", "key2": "value2"} {
 ```  
 
 - `@node` denotes if the arg is a **node arg** (represents a node or array of nodes).
+
 #### CheckStatement
 Check if a user has an access right on a node or array of nodes. The first expression is the access right the second is the node or array of nodes. This statement will only take affect in an **Operation**, not a routine.
 ```
 check expression on expression
 ```
+
+- First `expression` is a **string** expression (access right).
+- Second `expression` is a **[]string** expression (nodes).
   
 #### Example  
   
@@ -225,22 +235,24 @@ operation op1(a string, b []string, c map[string]string) string {
   
 ### Create Policy Class  
   
-Create a policy class node with the given **name**, **properties** (optional) and attribute **hierarchy** (optional).  
+Create a policy class node with the given **name**.  
   
 ```  
 'create policy class' name=expression
 ```  
+
+- `name` is a **string** expression.  
+
 ### Create Non Policy Class Nodes  
   
-Create a node of type object attribute, user attribute, object, or user with properties (optional) and assign it to a set of existing nodes. Types can also be expressed using their short version: pc, ua, oa, u, o.
+Create a node of type object attribute, user attribute, object, or user and assign it to a set of existing nodes. Types can also be expressed using their short version: pc, ua, oa, u, o.
   
 ```  
 'create' ('object attribute' | 'user attribute' | 'object' | 'user') name=expression   
 'in' assignTo=expression   
 ```  
-  
-- `name` is a **string** expression.  
-- `properties` is a **map[string]string** expression.  
+
+- `name` is a **string** expression.
 - `assignTo` is a **[]string** expression.  
   
 ### Set Node Properties  
@@ -250,8 +262,8 @@ Set the properties for a node. This will overwrite any existing properties.
 ```  
 'set properties of' name=expression 'to' properties=expression  
 ```  
-  
-- `name` is a **string** expression.  
+
+- `name` is a **string** expression.
 - `properties` is a **map[string]string** expression.  
   
 ### Assign  
@@ -261,9 +273,10 @@ Assign a node to a set of nodes.
 ```  
 'assign' childNode=expression 'to' parentNodes=expression  
 ```  
-  
-- `childNode` is a **string** expression.  
+
+- `childNode` is a **string** expression.
 - `parentNodes` is a **[]string** expression.  
+  
 ### Deassign  
   
 Deassign a node from a set of nodes.  
@@ -271,9 +284,10 @@ Deassign a node from a set of nodes.
 ```  
 'deassign' childNode=expression 'from' parentNodes=expression  
 ```  
-  
-- `childNode` is a **string** expression.  
+
+- `childNode` is a **string** expression.
 - `parentNodes` is a **[]string** expression.  
+  
 ### Associate  
   
 Create an association between two nodes with an access right set.  
@@ -281,9 +295,9 @@ Create an association between two nodes with an access right set.
 ```  
 'associate' ua=expression 'and' target=expression 'with' accessRights=expression  
 ```  
-  
-- `ua` is a **string** expression.  
-- `target` is a **string** expression.  
+
+- `ua` is a **string** expression.
+- `target` is a **string** expression.
 - `accessRights` is a **[]string** expression.  
   
 ### Dissociate  
@@ -293,9 +307,19 @@ Delete an association.
 ```  
 'dissociate' ua=expression 'and' target=expression  
 ```  
-  
-- `ua` is a **string** expression.  
+
+- `ua` is a **string** expression.
 - `target` is a **string** expression.  
+
+### Set Resource Operations
+
+Set the resource operations for the policy.
+
+```
+'set resource operations' accessRights=expression
+```
+
+- `accessRights` is a **[]string** expression.
   
 ### Create Prohibition  
   
@@ -307,10 +331,10 @@ Create a new prohibition.
 'access rights' accessRights=expression   
 'on' ('intersection'|'union') 'of' containers=expression ;  
 ```  
-  
-- `name` is a **string** expression.  
-- `subject` is a **string** expression.  
-- `accessRights` is a **[]string** expression.  
+
+- `name` is a **string** expression.
+- `subject` is a **string** expression.
+- `accessRights` is a **[]string** expression.
 - `containers` is a **[]string** expression. Complement containers are specified using a [negation expression](#negation), where the negated expression is a **string**. For example, `!"oa1"`  
   
 ### Create Obligation
@@ -375,9 +399,9 @@ responseStatement:
     | createRuleStatement  
     | deleteRuleStatement ;
 ```  
-  
-- `name` is a **string** expression.  
-- `ruleName` is a **string** expression.  
+
+- `name` is a **string** expression.
+- `ruleName` is a **string** expression.
 - arg pattern expressions can only be defined for node args of the given operation. Any non node args (i.e. access rights) will be ignored.
 - if an event context arg is an array of nodes and
 	- the arg expression is a single expression, the single expression will only need to match one element in the array
@@ -391,16 +415,16 @@ Delete a node, prohibition, or obligation.
 'delete'  
 ('policy class' | 'object attribute' | 'user attribute' | 'object' | 'user' | 'obligation' | 'prohibition') expression  
 ```  
-  
+
 - `expression` is a **string** expression.  
   
 ### Delete Obligation Rule  
   
-Delete a rule from an obligation.  Can only be called from an obligation response block.
+Delete a rule from an obligation. Can only be called from an obligation response block.
   
 ```  
 'delete rule' ruleName=expression 'from obligation' obligationName=expression ;  
 ```  
-  
-- `ruleName` is a **string** expression.  
+
+- `ruleName` is a **string** expression.
 - `obligationName` is a **string** expression.
