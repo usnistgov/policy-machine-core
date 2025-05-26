@@ -8,12 +8,12 @@ See PML [lexer](src/main/java/gov/nist/csd/pm/core/pap/pml/antlr4/PMLLexer.g4) a
 
 ```java  
 String pml = "...";  
-pap.executePML(new UserContext("user1", pml));
+pap.executePML(new UserContext(userId), pml);
 ```  
 
 - Any operations and routines will be stored in the policy store.
 - All [admin policy nodes](/src/main/java/gov/nist/csd/pm/core/pap/admin/AdminPolicyNode.java) will be defined as constants during compilation and execution.  
-  `create object attribute "oa1" assign to [PM_ADMIN_OBJECT] `
+  `create object attribute "oa1" in [PM_ADMIN_OBJECT] `
 
 ## Basics  
   
