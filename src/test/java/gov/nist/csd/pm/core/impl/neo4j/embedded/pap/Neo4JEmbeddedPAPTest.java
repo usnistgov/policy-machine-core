@@ -13,8 +13,11 @@ import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerierTest;
 import gov.nist.csd.pm.core.pap.query.RoutinesQuerierTest;
 import gov.nist.csd.pm.core.util.TestIdGenerator;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.io.TempDir;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -26,13 +29,19 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.TestTx.init;
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
 class TestTx {
-	
+
 	private static GraphDatabaseService graphDb;
 	
 	public static GraphDatabaseService getTx() {
         if (graphDb == null) {
-			DatabaseManagementService managementService = new DatabaseManagementServiceBuilder(new File("/tmp/test").toPath()).build();
-			graphDb = managementService.database(DEFAULT_DATABASE_NAME);
+            DatabaseManagementService managementService;
+            try {
+                managementService = new DatabaseManagementServiceBuilder(
+                    Files.createTempDirectory("neo4jEmbeddedTest")).build();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            graphDb = managementService.database(DEFAULT_DATABASE_NAME);
 			Neo4jEmbeddedPolicyStore.createIndexes(graphDb);
 		}
 
@@ -48,11 +57,6 @@ class TestTx {
 		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
 			.withIdGenerator(new TestIdGenerator());
 	}
-
-	public static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
-	}
 }
 
 public class Neo4JEmbeddedPAPTest extends PAPTest {
@@ -60,12 +64,6 @@ public class Neo4JEmbeddedPAPTest extends PAPTest {
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
 	}
 }
 

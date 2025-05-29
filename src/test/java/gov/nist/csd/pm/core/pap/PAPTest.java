@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
@@ -45,6 +46,16 @@ public abstract class PAPTest extends PAPTestInitializer {
             return null;
         }
     };
+
+    @Test
+    void testBootstrapHasAdminNodes() throws PMException {
+        assertDoesNotThrow(() -> pap.bootstrap(new PolicyBootstrapper() {
+            @Override
+            public void bootstrap(PAP pap) throws PMException {
+                pap.modify().graph().createUserAttribute("ua1", List.of(AdminPolicyNode.PM_ADMIN_PC.nodeId()));
+            }
+        }));
+    }
 
     @Test
     void testTx() throws PMException {
