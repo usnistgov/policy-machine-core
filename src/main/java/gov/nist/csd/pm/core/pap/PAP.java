@@ -98,12 +98,11 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
      * @throws PMException if there is an error bootstrapping.
      */
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
-        if(!isPolicyEmpty()) {
-            throw new BootstrapExistingPolicyException();
-        }
-
         // verify the admin nodes exist in the policy
         policyStore.verifyAdminPolicy();
+
+        // verify the policy is empty except for admin nodes
+        verifyPolicyIsEmpty();
 
         // execute the bootstrapper
         runTx(bootstrapper::bootstrap);
@@ -198,7 +197,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         void runTx(PAP pap) throws PMException;
     }
 
-    private boolean isPolicyEmpty() throws PMException {
+    private void verifyPolicyIsEmpty() throws PMException {
         HashSet<Node> nodes = new HashSet<>(query().graph().search(ANY, NO_PROPERTIES));
 
         boolean prohibitionsEmpty = query().prohibitions().getProhibitions().isEmpty();
@@ -208,11 +207,15 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         boolean adminOpsEmpty =  query().operations().getAdminOperationNames().isEmpty();
         boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
 
-        return (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))
+        boolean empty = (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))
             && prohibitionsEmpty
             && obligationsEmpty
             && resOpsEmpty
             && adminOpsEmpty
             && routinesEmpty;
+
+        if (!empty) {
+            throw new BootstrapExistingPolicyException();
+        }
     }
 }
