@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap;
 
+import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -48,8 +49,16 @@ public abstract class PAPTest extends PAPTestInitializer {
     };
 
     @Test
-    void testBootstrapHasAdminNodes() {
+    void testBootstrapHasAdminNodes() throws PMException {
         assertDoesNotThrow(() -> pap.bootstrap(new PolicyBootstrapper() {
+            @Override
+            public void bootstrap(PAP pap) throws PMException {
+                pap.modify().graph().createUserAttribute("ua1", List.of(AdminPolicyNode.PM_ADMIN_PC.nodeId()));
+            }
+        }));
+
+        pap.modify().graph().createPolicyClass("test");
+        assertThrows(BootstrapExistingPolicyException.class, () -> pap.bootstrap(new PolicyBootstrapper() {
             @Override
             public void bootstrap(PAP pap) throws PMException {
                 pap.modify().graph().createUserAttribute("ua1", List.of(AdminPolicyNode.PM_ADMIN_PC.nodeId()));
