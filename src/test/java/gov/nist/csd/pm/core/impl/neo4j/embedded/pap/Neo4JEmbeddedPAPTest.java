@@ -12,33 +12,24 @@ import gov.nist.csd.pm.core.pap.query.OperationsQuerierTest;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerierTest;
 import gov.nist.csd.pm.core.pap.query.RoutinesQuerierTest;
 import gov.nist.csd.pm.core.util.TestIdGenerator;
-import java.io.IOException;
-import java.nio.file.Files;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
+import java.nio.file.Path;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.io.TempDir;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
-import java.io.File;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.TestTx.init;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.Neo4jTestInitializer.init;
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
-class TestTx {
-
+class Neo4jTestInitializer {
+	
 	private static GraphDatabaseService graphDb;
 	
-	public static GraphDatabaseService getTx() {
+	public static GraphDatabaseService getTx(Path tempDir) {
         if (graphDb == null) {
-            DatabaseManagementService managementService;
-            try {
-                managementService = new DatabaseManagementServiceBuilder(
-                    Files.createTempDirectory("neo4jEmbeddedTest")).build();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+			DatabaseManagementService managementService = new DatabaseManagementServiceBuilder(tempDir).build();
             graphDb = managementService.database(DEFAULT_DATABASE_NAME);
 			Neo4jEmbeddedPolicyStore.createIndexes(graphDb);
 		}
@@ -51,161 +42,149 @@ class TestTx {
 		return graphDb;
 	}
 
-	public static PAP init() throws PMException {
-		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(TestTx.getTx()))
+	public static PAP init(Path tempDir) throws PMException {
+		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(Neo4jTestInitializer.getTx(tempDir)))
 			.withIdGenerator(new TestIdGenerator());
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Neo4JEmbeddedPAPTest extends PAPTest {
+	
+	@TempDir
+	private Path tempDir;
 	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedAccessQuerierTest extends AccessQuerierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedGraphModifierTest extends GraphModifierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedGraphQuerierTest extends GraphQuerierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedObligationsModifierTest extends ObligationsModifierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedObligationsQuerierTest extends ObligationsQuerierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedOperationsModifierTest extends OperationsModifierTest {
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedOperationsQueryTest extends OperationsQuerierTest {
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedProhibitionsModifierTest extends ProhibitionsModifierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedRoutinesModifierTest extends RoutinesModifierTest {
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedRoutinesQuerierTest extends RoutinesQuerierTest {
+	@TempDir
+	private Path tempDir;
+	
 	@Override
 	public PAP initializePAP() throws PMException {
-		return init();
-	}
-
-	@AfterAll
-	static void teardown() throws IOException {
-		File file = new File("/tmp/test");
-		FileUtils.deleteDirectory(file);
+		return init(tempDir);
 	}
 }
