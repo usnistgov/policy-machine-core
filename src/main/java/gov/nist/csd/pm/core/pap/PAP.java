@@ -102,6 +102,9 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
             throw new BootstrapExistingPolicyException();
         }
 
+        // verify the admin nodes exist in the policy
+        policyStore.verifyAdminPolicy();
+
         // execute the bootstrapper
         runTx(bootstrapper::bootstrap);
     }
@@ -205,7 +208,11 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         boolean adminOpsEmpty =  query().operations().getAdminOperationNames().isEmpty();
         boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
 
-        return (nodes.isEmpty() || (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))) &&
-                prohibitionsEmpty && obligationsEmpty && resOpsEmpty && adminOpsEmpty && routinesEmpty;
+        return (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))
+            && prohibitionsEmpty
+            && obligationsEmpty
+            && resOpsEmpty
+            && adminOpsEmpty
+            && routinesEmpty;
     }
 }

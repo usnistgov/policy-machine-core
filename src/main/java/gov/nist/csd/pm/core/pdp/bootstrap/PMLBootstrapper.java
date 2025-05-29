@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.core.pdp.bootstrap;
 
-import static gov.nist.csd.pm.core.common.tx.TxRunner.runTx;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
@@ -38,7 +36,7 @@ public class PMLBootstrapper extends PolicyBootstrapper {
             long bootstrapUserId = tx.modify().graph().createUser(bootstrapUser, List.of(ua));
 
             // execute the pml
-            pap.executePML(new UserContext(bootstrapUserId), pml);
+            tx.executePML(new UserContext(bootstrapUserId), pml);
 
             // clean up bootstrap policy
             tx.modify().graph().deassign(bootstrapUserId, List.of(ua));

@@ -100,7 +100,7 @@
                     }
                 }
             },
-            "requiredProperties": [
+            "required": [
                 "id",
                 "name"
             ],
@@ -146,7 +146,7 @@
                     }
                 }
             },
-            "requiredProperties": [
+            "required": [
                 "id",
                 "name",
                 "assignments"
@@ -176,7 +176,7 @@
                     }
                 }
             },
-            "requiredProperties": [
+            "required": [
                 "id",
                 "name",
                 "assignments"
@@ -196,7 +196,7 @@
                     "type": "string"
                 }
             },
-            "requiredProperties": [
+            "required": [
                 "name",
                 "author",
                 "pml"
@@ -213,7 +213,7 @@
                     "type": "boolean"
                 }
             },
-            "requiredProperties": [
+            "required": [
                 "id",
                 "complement"
             ],
@@ -267,7 +267,7 @@
                     "default": true
                 }
             },
-            "requiredProperties": [
+            "required": [
                 "name",
                 "subject",
                 "containers",
