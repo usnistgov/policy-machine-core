@@ -31,7 +31,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     static Operation<Object, Args> op = new Operation<>("testFunc", List.of()) {
         @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        public void canExecute(PAP pap, UserContext userCtx, Args args) {
 
         }
 
@@ -48,7 +48,7 @@ public abstract class PAPTest extends PAPTestInitializer {
     };
 
     @Test
-    void testBootstrapHasAdminNodes() throws PMException {
+    void testBootstrapHasAdminNodes() {
         assertDoesNotThrow(() -> pap.bootstrap(new PolicyBootstrapper() {
             @Override
             public void bootstrap(PAP pap) throws PMException {
