@@ -216,7 +216,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>5.25.1</version>
+            <version>2025.04.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.neo4j</groupId>
