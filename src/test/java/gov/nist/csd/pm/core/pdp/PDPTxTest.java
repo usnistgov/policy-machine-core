@@ -1,7 +1,11 @@
 package gov.nist.csd.pm.core.pdp;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -71,5 +75,19 @@ class PDPTxTest {
 
         PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
         assertDoesNotThrow(() -> u1.executePML(serialize));
+    }
+
+    @Test
+    void testPrivilegesOnNodesCreatedInPC() throws PMException {
+        PAP pap = new TestPAP();
+        GraphModification graph = pap.modify().graph();
+        long pc1 = graph.createPolicyClass("pc1");
+        long ua1 = graph.createUserAttribute("ua1", List.of(pc1));
+        long u1 = graph.createUser("u1", List.of(ua1));
+        graph.associate(ua1, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet(AdminAccessRights.ALL_ACCESS_RIGHTS));
+
+        PDPTx pdpTx = new PDPTx(new UserContext(u1), pap, List.of());
+        long oa1 = pdpTx.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        assertDoesNotThrow(() -> pdpTx.modify().graph().createObjectAttribute("oa2", List.of(oa1)));
     }
 }

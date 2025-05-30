@@ -57,7 +57,7 @@ class EPPTest {
                 create oa "oa2" in ["pc1"]
                 
                 operation op1(@node string a, @node []string b) {
-                    
+                
                 }
                 
                 create obligation "obl1" {
@@ -70,12 +70,12 @@ class EPPTest {
                     }
                     do(ctx) {
                         create pc ctx.args.a + "pc1"
-                        
+                
                         foreach x in ctx.args.b {
                             create pc x + "pc2"
                         }
                     }
-                    
+                
                     create rule "op2"
                     when any user
                     performs "op2"
@@ -85,7 +85,7 @@ class EPPTest {
                     }
                     do(ctx) {
                         create pc ctx.args.a + "pc3"
-                        
+                
                         foreach x in ctx.args.b {
                             create pc x + "pc4"
                         }
@@ -101,13 +101,12 @@ class EPPTest {
             }
 
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws
-                                                                                                         PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) {
 
             }
 
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, Args args) {
                 return "";
             }
         };
@@ -328,9 +327,7 @@ class EPPTest {
             )
         );
 
-        assertThrows(PMException.class, () -> {
-            epp.processEvent(eventCtx);
-        });
+        assertThrows(PMException.class, () -> epp.processEvent(eventCtx));
 
         assertFalse(pap.query().graph().nodeExists("o2"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -343,8 +340,7 @@ class EPPTest {
         PMLOperation pmlOperation = new PMLOperation("testFunc", new VoidType()) {
 
             @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws
-                                                                                                         PMException {
+            public void canExecute(PAP pap, UserContext userCtx, Args args) {
 
             }
 
@@ -427,7 +423,7 @@ class EPPTest {
                         if true {
                             return
                         }
-                        
+                
                         create policy class "test"
                     }
                 }
@@ -449,7 +445,6 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
-                associate "ua2" and PM_ADMIN_OBJECT with ["*a"]
                 
                 operation op1() {
                     check "assign" on ["oa1"]

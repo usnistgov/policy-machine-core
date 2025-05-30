@@ -32,13 +32,15 @@ public class TargetEvaluator {
 	 * Perform a depth first search on the object side of the graph.  Start at the target node and recursively visit nodes
 	 * until a policy class is reached.  On each node visited, collect any operation the user has on the target. At the
 	 * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
-	 * each policy class.
+	 * each policy class. If the PM_ADMIN_OBJECT is a border target, then add the association access rights to every policy
+	 * class by default.
 	 */
 	public TargetDagResult evaluate(UserDagResult userCtx, TargetContext targetCtx) throws PMException {
 		targetCtx.checkExists(policyStore.graph());
 
 		Set<Long> policyClasses = new LongOpenHashSet(policyStore.graph().getPolicyClasses());
 		Map<Long, AccessRightSet> borderTargets = userCtx.borderTargets();
+		boolean isAdminObjBorderTarget = borderTargets.containsKey(PM_ADMIN_OBJECT.nodeId());
 		Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userCtx.prohibitions());
 		Map<Long, Map<Long, AccessRightSet>> visitedNodes = new Long2ObjectOpenHashMap<>();
 		Set<Long> reachedTargets = new LongOpenHashSet();
@@ -55,7 +57,12 @@ public class TargetEvaluator {
 			}
 
 			if (policyClasses.contains(node)) {
-				nodeCtx.put(node, new AccessRightSet());
+				AccessRightSet arset = new AccessRightSet();
+				if (isAdminObjBorderTarget) {
+					arset.addAll(borderTargets.get(PM_ADMIN_OBJECT.nodeId()));
+				}
+
+				nodeCtx.put(node, arset);
 			} else if (borderTargets.containsKey(node)) {
 				Set<String> uaOps = borderTargets.get(node);
 
@@ -81,9 +88,9 @@ public class TargetEvaluator {
 		};
 
 		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
-				.withDirection(Direction.DESCENDANTS)
-				.withVisitor(visitor)
-				.withPropagator(propagator);
+			.withDirection(Direction.DESCENDANTS)
+			.withVisitor(visitor)
+			.withPropagator(propagator);
 
 		Collection<Long> targetNodes;
 		if (targetCtx.isNode()) {
@@ -118,26 +125,20 @@ public class TargetEvaluator {
 	}
 
 	private Map<Long, AccessRightSet> mergeResults(Collection<Long> targetNodes, Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
-		Map<Long, AccessRightSet> merged = new Long2ObjectOpenHashMap<>();
+		Long2ObjectOpenHashMap<AccessRightSet> merged = new Long2ObjectOpenHashMap<>();
 
-		for (long target : targetNodes) {
-			Map<Long, AccessRightSet> pcMap = visitedNodes.getOrDefault(target, new HashMap<>());
+		targetNodes.forEach(target ->
+			visitedNodes
+				.getOrDefault(target, Collections.emptyMap())
+				.forEach((pc, rights) ->
+					merged.merge(pc, rights, (existing, incoming) -> {
+						existing.retainAll(incoming);
+						return existing;
+					})
+				)
+		);
 
-			for (Map.Entry<Long, AccessRightSet> entry : pcMap.entrySet()) {
-				long pc = entry.getKey();
-				AccessRightSet pcArset = entry.getValue();
-
-				if (!merged.containsKey(pc)) {
-					merged.put(pc, pcArset);
-				} else {
-					AccessRightSet mergedArset = merged.get(pc);
-					mergedArset.retainAll(pcArset);
-					merged.put(pc, mergedArset);
-				}
-			}
-		}
 
 		return merged;
 	}
-
 }

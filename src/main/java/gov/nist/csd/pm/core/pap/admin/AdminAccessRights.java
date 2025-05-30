@@ -35,10 +35,6 @@ public class AdminAccessRights {
     public static final String DISSOCIATE = "dissociate";
     public static final String DISSOCIATE_FROM = "dissociate_from";
 
-    public static final String GET_ASSOCIATIONS = "get_associations";
-    public static final String GET_PROHIBITIONS = "get_prohibitions";
-    public static final String GET_ACCESS_RIGHTS = "get_access_rights";
-
     // prohibitions
     public static final String CREATE_PROHIBITION = "create_prohibition";
     public static final String CREATE_PROCESS_PROHIBITION = "create_process_prohibition";
@@ -50,9 +46,7 @@ public class AdminAccessRights {
     public static final String CREATE_OBLIGATION = "create_obligation";
     public static final String DELETE_OBLIGATION = "delete_obligation";
     public static final String GET_OBLIGATION = "get_obligation";
-    public static final String DELETE_RULE = "delete_rule";
     public static final String SET_RESOURCE_OPERATIONS = "set_resource_operations";
-    public static final String GET_RESOURCE_OPERATIONS = "get_resource_operations";
 
     // operations
     public static final String CREATE_ADMIN_OPERATION = "create_admin_operation";
@@ -70,85 +64,75 @@ public class AdminAccessRights {
     public static final String SERIALIZE_POLICY = "serialize_policy";
     public static final String DESERIALIZE_POLICY = "deserialize_policy";
 
-    // pml
-    public static final String SET_PML_OPS = "set_pml_operations";
-    public static final String SET_PML_ROUTINES = "set_pml_routines";
-    public static final String SET_PML_CONSTANTS = "set_pml_constants";
-
     public static final String ALL_ACCESS_RIGHTS = "*";
     public static final String ALL_ADMIN_ACCESS_RIGHTS = "*a";
     public static final String ALL_RESOURCE_ACCESS_RIGHTS = "*r";
 
     private static final AccessRightSet ALL_ADMIN_ACCESS_RIGHTS_SET = new AccessRightSet(
-            CREATE_POLICY_CLASS,
-            CREATE_OBJECT,
-            CREATE_OBJECT_ATTRIBUTE ,
-            CREATE_USER_ATTRIBUTE,
-            CREATE_USER,
+        // graph
+        CREATE_POLICY_CLASS,
+        CREATE_OBJECT,
+        CREATE_OBJECT_ATTRIBUTE ,
+        CREATE_USER_ATTRIBUTE,
+        CREATE_USER,
 
-            SET_NODE_PROPERTIES,
+        SET_NODE_PROPERTIES,
 
-            DELETE_POLICY_CLASS,
-            DELETE_OBJECT,
-            DELETE_OBJECT_ATTRIBUTE,
-            DELETE_USER_ATTRIBUTE,
-            DELETE_USER,
+        DELETE_POLICY_CLASS,
+        DELETE_OBJECT,
+        DELETE_OBJECT_ATTRIBUTE,
+        DELETE_USER_ATTRIBUTE,
+        DELETE_USER,
 
-            DELETE_POLICY_CLASS_FROM,
-            DELETE_OBJECT_FROM,
-            DELETE_OBJECT_ATTRIBUTE_FROM,
-            DELETE_USER_ATTRIBUTE_FROM,
-            DELETE_USER_FROM,
+        DELETE_POLICY_CLASS_FROM,
+        DELETE_OBJECT_FROM,
+        DELETE_OBJECT_ATTRIBUTE_FROM,
+        DELETE_USER_ATTRIBUTE_FROM,
+        DELETE_USER_FROM,
 
-            ASSIGN,
-            ASSIGN_TO,
-            DEASSIGN,
-            DEASSIGN_FROM,
-            ASSOCIATE,
-            ASSOCIATE_TO,
-            DISSOCIATE,
-            DISSOCIATE_FROM,
+        ASSIGN,
+        ASSIGN_TO,
+        DEASSIGN,
+        DEASSIGN_FROM,
+        ASSOCIATE,
+        ASSOCIATE_TO,
+        DISSOCIATE,
+        DISSOCIATE_FROM,
 
-            // prohibitions
-            CREATE_PROHIBITION,
-            CREATE_PROCESS_PROHIBITION,
-            DELETE_PROCESS_PROHIBITION,
-            GET_PROCESS_PROHIBITIONS,
-            DELETE_PROHIBITION,
+        // prohibitions
+        CREATE_PROHIBITION,
+        CREATE_PROCESS_PROHIBITION,
+        DELETE_PROCESS_PROHIBITION,
+        GET_PROCESS_PROHIBITIONS,
+        DELETE_PROHIBITION,
 
-            // obligations
-            CREATE_OBLIGATION,
-            DELETE_OBLIGATION,
-            GET_OBLIGATION,
-            DELETE_RULE,
-            SET_RESOURCE_OPERATIONS,
-            GET_RESOURCE_OPERATIONS,
+        // obligations
+        CREATE_OBLIGATION,
+        DELETE_OBLIGATION,
+        GET_OBLIGATION,
 
-            // operations
-            CREATE_ADMIN_OPERATION,
-            DELETE_ADMIN_OPERATION,
+        // operations
+        SET_RESOURCE_OPERATIONS,
+        CREATE_ADMIN_OPERATION,
+        DELETE_ADMIN_OPERATION,
 
-            // routines
-            CREATE_ADMIN_ROUTINE,
-            DELETE_ADMIN_ROUTINE,
+        // routines
+        CREATE_ADMIN_ROUTINE,
+        DELETE_ADMIN_ROUTINE,
 
-            // policy
-            RESET,
-            SERIALIZE_POLICY,
-            DESERIALIZE_POLICY,
+        // policy
+        RESET,
+        SERIALIZE_POLICY,
+        DESERIALIZE_POLICY,
 
-            // pml
-            SET_PML_OPS,
-            SET_PML_ROUTINES,
-
-            // review
-            REVIEW_POLICY
+        // review
+        REVIEW_POLICY
     );
 
     private static final AccessRightSet WILDCARD_ACCESS_RIGHTS_SET = new AccessRightSet(
-            ALL_ACCESS_RIGHTS,
-            ALL_ADMIN_ACCESS_RIGHTS,
-            ALL_RESOURCE_ACCESS_RIGHTS
+        ALL_ACCESS_RIGHTS,
+        ALL_ADMIN_ACCESS_RIGHTS,
+        ALL_RESOURCE_ACCESS_RIGHTS
     );
 
     private static final AccessRightSet ALL_ACCESS_RIGHTS_SET = new AccessRightSet(ALL_ACCESS_RIGHTS);
