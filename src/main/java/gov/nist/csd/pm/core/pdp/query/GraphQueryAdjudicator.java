@@ -2,25 +2,26 @@ package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.REVIEW_POLICY;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_ASSIGNMENTS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_ASSOCIATIONS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_POLICY_CLASSES;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_SUBGRAPH;
 
 public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
@@ -99,32 +100,21 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Collection<Long> getPolicyClasses() throws PMException {
-        LongArrayList policyClasses = new LongArrayList();
-        for (long pc : pap.query().graph().getPolicyClasses()) {
-            try {
-                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId());
-            } catch (UnauthorizedException e) {
-                continue;
-            }
-
-            policyClasses.add(pc);
-        }
-
-        return policyClasses;
+        return filterNodes(pap.query().graph().getPolicyClasses(), QUERY_POLICY_CLASSES);
     }
 
     @Override
     public Collection<Long> getAdjacentDescendants(long nodeId) throws PMException {
-        pap.privilegeChecker().check(userCtx, nodeId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, nodeId, QUERY_ASSIGNMENTS);
 
-        return pap.query().graph().getAdjacentDescendants(nodeId);
+        return filterNodes(pap.query().graph().getAdjacentDescendants(nodeId), QUERY_ASSIGNMENTS);
     }
 
     @Override
     public Collection<Long> getAdjacentAscendants(long nodeId) throws PMException {
-        pap.privilegeChecker().check(userCtx, nodeId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, nodeId, QUERY_ASSIGNMENTS);
 
-        return pap.query().graph().getAdjacentAscendants(nodeId);
+        return filterNodes(pap.query().graph().getAdjacentAscendants(nodeId), QUERY_ASSIGNMENTS);
     }
 
     @Override
@@ -139,60 +129,89 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Subgraph getAscendantSubgraph(long nodeId) throws PMException {
-        pap.privilegeChecker().check(userCtx, nodeId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, nodeId, QUERY_SUBGRAPH);
 
         return pap.query().graph().getAscendantSubgraph(nodeId);
     }
 
     @Override
     public Subgraph getDescendantSubgraph(long nodeId) throws PMException {
-        pap.privilegeChecker().check(userCtx, nodeId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, nodeId, QUERY_SUBGRAPH);
 
         return pap.query().graph().getDescendantSubgraph(nodeId);
     }
 
     @Override
     public Collection<Long> getAttributeDescendants(long nodeId) throws PMException {
-        pap.privilegeChecker().check(userCtx, nodeId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, nodeId, QUERY_ASSIGNMENTS);
 
-        return pap.query().graph().getAttributeDescendants(nodeId);
+        Collection<Long> attributeDescendants = pap.query().graph().getAttributeDescendants(nodeId);
+        return filterNodes(attributeDescendants, QUERY_ASSIGNMENTS);
     }
 
     @Override
     public Collection<Long> getPolicyClassDescendants(long nodeId) throws PMException {
-        pap.privilegeChecker().check(userCtx, nodeId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, nodeId, QUERY_ASSIGNMENTS);
 
-        return pap.query().graph().getPolicyClassDescendants(nodeId);
+        Collection<Long> policyClassDescendants = pap.query().graph().getPolicyClassDescendants(nodeId);
+        return filterNodes(policyClassDescendants, QUERY_ASSIGNMENTS);
     }
 
     @Override
     public boolean isAscendant(long ascendantId, long descendantId) throws PMException {
-        pap.privilegeChecker().check(userCtx, ascendantId, REVIEW_POLICY);
-        pap.privilegeChecker().check(userCtx, descendantId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, ascendantId, QUERY_ASSIGNMENTS);
+        pap.privilegeChecker().check(userCtx, descendantId, QUERY_ASSIGNMENTS);
 
         return pap.query().graph().isAscendant(ascendantId, descendantId);
     }
 
     @Override
     public boolean isDescendant(long ascendantId, long descendantId) throws PMException {
-        pap.privilegeChecker().check(userCtx, ascendantId, REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, ascendantId, QUERY_ASSIGNMENTS);
+        pap.privilegeChecker().check(userCtx, descendantId, QUERY_ASSIGNMENTS);
 
         return pap.query().graph().isDescendant(ascendantId, descendantId);
     }
 
-    private List<Association> getAssociations(Collection<Association> associations) {
+    private List<Association> getAssociations(Collection<Association> associations) throws PMException {
         List<Association> ret = new ArrayList<>();
         for (Association association : associations) {
             try {
-                pap.privilegeChecker().check(userCtx, association.getSource(), REVIEW_POLICY);
-                pap.privilegeChecker().check(userCtx, association.getTarget(), REVIEW_POLICY);
-            } catch (PMException e) {
+                pap.privilegeChecker().check(userCtx, association.getSource(), QUERY_ASSOCIATIONS);
+                pap.privilegeChecker().check(userCtx, association.getTarget(), QUERY_ASSOCIATIONS);
+            } catch (UnauthorizedException e) {
                 continue;
+            } catch (PMException e) {
+                throw e;
             }
 
             ret.add(association);
         }
 
         return ret;
+    }
+
+    private Collection<Long> filterNodes(Collection<Long> nodes, String ar) throws PMException {
+        try {
+            nodes.removeIf(id -> {
+                try {
+                    pap.privilegeChecker().check(userCtx, id, ar);
+                    return false;
+                } catch (UnauthorizedException e) {
+                    return true;
+                } catch (PMException e) {
+                    throw new PMRuntimeException(e);
+                }
+            });
+        } catch (PMRuntimeException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof PMException pmException) {
+                throw pmException;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return nodes;
     }
 }

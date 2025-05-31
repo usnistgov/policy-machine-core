@@ -2,9 +2,9 @@ package gov.nist.csd.pm.core.pap.query;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
 import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolveDeniedAccessRights;
 import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolvePrivileges;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
@@ -115,8 +115,8 @@ public class AccessQuerier extends Querier implements AccessQuery {
         }
 
         // add policy classes
-        if (results.containsKey(PM_ADMIN_OBJECT.nodeId())) {
-            AccessRightSet arset = results.get(PM_ADMIN_OBJECT.nodeId());
+        if (results.containsKey(PM_ADMIN_POLICY_CLASSES.nodeId())) {
+            AccessRightSet arset = results.get(PM_ADMIN_POLICY_CLASSES.nodeId());
             for (long pc : store.graph().getPolicyClasses()) {
                 results.put(pc, arset);
             }

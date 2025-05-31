@@ -125,7 +125,7 @@ class EPPTest {
         );
         assertEquals(Decision.DENY, response.getDecision());
 
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*a"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("*a"));
 
         response = pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
@@ -167,7 +167,7 @@ class EPPTest {
                 create oa "oa2" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
                 create obligation "obl1" {
                     create rule "op1"
@@ -204,7 +204,7 @@ class EPPTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 create obligation "test" {
                     create rule "rule1"
                     when any user
@@ -242,7 +242,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -286,14 +286,14 @@ class EPPTest {
             txPAP.modify().graph().createUserAttribute("ua1", ids("pc1"));
             txPAP.modify().graph().createUserAttribute("ua2", ids("pc1"));
             txPAP.modify().graph().associate(id("ua2"), id("ua1"), new AccessRightSet("*"));
-            txPAP.modify().graph().associate(id("ua2"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+            txPAP.modify().graph().associate(id("ua2"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
             txPAP.modify().graph().createObjectAttribute("oa1",  ids("pc1"));
             txPAP.modify().graph().createUser("u1",  ids("ua1", "ua2"));
             txPAP.modify().graph().createObject("o1",  ids("oa1"));
-            txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(),
+            txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(),
                 new AccessRightSet(CREATE_OBLIGATION));
             txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT));
-            txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+            txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
@@ -370,7 +370,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -410,7 +410,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
                 create obligation "test" {
                     create rule "rule1"
@@ -444,7 +444,7 @@ class EPPTest {
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
                 operation op1() {
                     check "assign" on ["oa1"]

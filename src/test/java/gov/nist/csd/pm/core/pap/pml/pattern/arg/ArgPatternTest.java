@@ -147,7 +147,7 @@ public class ArgPatternTest {
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
         assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext(u1), """
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 create obligation "ob1" {
                     create rule "r1"
                     when user "u1"

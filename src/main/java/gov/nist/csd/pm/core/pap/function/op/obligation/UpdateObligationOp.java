@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class UpdateObligationOp extends ObligationOp<ObligationOpArgs> {
+public class UpdateObligationOp extends ObligationOp {
 
     public UpdateObligationOp() {
         super(
             "update_obligation",
-            List.of(AUTHOR_PARAM, NAME_PARAM, RULES_PARAM),
-            ""
+            List.of(AUTHOR_PARAM, NAME_PARAM, RULES_PARAM)
         );
     }
 
@@ -39,17 +38,5 @@ public class UpdateObligationOp extends ObligationOp<ObligationOpArgs> {
         pap.modify().obligations().createObligation(author, name, rules);
 
         return null;
-    }
-
-    @Override
-    protected ObligationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long authorId = prepareArg(AUTHOR_PARAM, argsMap);
-        String name = prepareArg(NAME_PARAM, argsMap);
-        List<Object> objs = prepareArg(RULES_PARAM, argsMap);
-        List<Rule> rules = new ArrayList<>();
-        for (Object obj : objs) {
-            rules.add((Rule) obj);
-        }
-        return new ObligationOpArgs(authorId, name, rules);
     }
 }

@@ -35,7 +35,7 @@ class PrivilegeCheckerTest {
                             create oa "oa2" in ["pc1"]
 
                             associate "ua1" and "oa1" with ["read", "write"]
-                            associate "ua1" and PM_ADMIN_OBJECT with ["read"]
+                            associate "ua1" and PM_ADMIN_BASE_OA with ["read"]
                       
                         create user "u1" in ["ua1"]
                         create user "u2" in ["ua2"]
@@ -48,7 +48,7 @@ class PrivilegeCheckerTest {
     @Test
     void testCheckUserAndTargetDoesNotExist() throws PMException {
         assertThrows(NodeDoesNotExistException.class,
-                     () -> pap.privilegeChecker().check(new UserContext(-3), id("o1"), List.of("read")));
+                     () -> pap.privilegeChecker().check(new UserContext(-99), id("o1"), List.of("read")));
         assertThrows(NodeDoesNotExistException.class,
                      () -> pap.privilegeChecker().check(new TestUserContext( "u1"), id("o2"), List.of("read")));
     }

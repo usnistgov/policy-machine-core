@@ -142,7 +142,7 @@ class PDPTest {
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
-        pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+        pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
 
         assertThrows(NodeNameExistsException.class, () -> {
             pdp.runTx(new TestUserContext("u1"), policy -> {
@@ -295,7 +295,7 @@ class PDPTest {
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
         pap.modify().graph().createUser("u1", List.of(ua1));
         pap.modify().graph().createUser("u2", List.of(ua2));
-        pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+        pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
@@ -346,7 +346,7 @@ class PDPTest {
                                 new AccessRightSet(),
                                 List.of(
                                         List.of(
-                                                new ExplainNode(pap.query().graph().getNodeById(AdminPolicyNode.PM_ADMIN_OBJECT.nodeId()), List.of(
+                                                new ExplainNode(pap.query().graph().getNodeById(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()), List.of(
                                                         new ExplainAssociation(pap.query().graph().getNodeByName("ua1"), new AccessRightSet("*"), List.of())
                                                 )),
                                                 new ExplainNode(pap.query().graph().getNodeByName("PM_ADMIN"), List.of())
@@ -422,7 +422,7 @@ class PDPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 associate "ua1" and "oa1" with ["create_object"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -460,7 +460,7 @@ class PDPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and PM_ADMIN_OBJECT with ["create_policy_class", "create_object_attribute"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["create_policy_class", "create_object_attribute"]
                 
                 create u "u1" in ["ua1"]
                 

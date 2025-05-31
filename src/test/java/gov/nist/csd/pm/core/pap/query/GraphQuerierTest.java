@@ -126,7 +126,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void NodeDoesNotExist() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAdjacentAscendants(-3));
+                    () -> pap.query().graph().getAdjacentAscendants(-99));
         }
 
         @Test
@@ -146,7 +146,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void NodeDoesNotExist() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAdjacentDescendants(-3));
+                    () -> pap.query().graph().getAdjacentDescendants(-99));
         }
 
         @Test
@@ -169,7 +169,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void testNodeDoesNotExistException() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAssociationsWithSource(-3));
+                    () -> pap.query().graph().getAssociationsWithSource(-99));
         }
 
         @Test

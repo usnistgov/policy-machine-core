@@ -25,7 +25,7 @@ public class PMLBasicFunctionsTest {
                 create U "u1" in ["ua1"]
                 create OA "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 operation op1(string name) {
                     check "assign" on ["oa1"]
@@ -67,7 +67,7 @@ public class PMLBasicFunctionsTest {
                 create U "u1" in ["ua1"]
                 create OA "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 routine op1(string name) {
                     if !nodeExists(name) {

@@ -1,9 +1,15 @@
 package gov.nist.csd.pm.core.pap.admin;
 
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AdminAccessRights {
 
+    // graph
     public static final String CREATE_POLICY_CLASS = "create_policy_class";
     public static final String CREATE_OBJECT = "create_object";
     public static final String CREATE_OBJECT_ATTRIBUTE = "create_object_attribute";
@@ -38,17 +44,19 @@ public class AdminAccessRights {
     // prohibitions
     public static final String CREATE_PROHIBITION = "create_prohibition";
     public static final String CREATE_PROCESS_PROHIBITION = "create_process_prohibition";
+    public static final String CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER = "create_prohibition_with_complement_container";
     public static final String DELETE_PROCESS_PROHIBITION = "delete_process_prohibition";
-    public static final String GET_PROCESS_PROHIBITIONS = "get_process_prohibitions";
     public static final String DELETE_PROHIBITION = "delete_prohibition";
+    public static final String DELETE_PROHIBITION_WITH_COMPLEMENT_CONTAINER = "delete_prohibition_with_complement_container";
 
     // obligations
     public static final String CREATE_OBLIGATION = "create_obligation";
+    public static final String CREATE_OBLIGATION_WITH_ANY_PATTERN = "create_obligation_with_any_pattern";
     public static final String DELETE_OBLIGATION = "delete_obligation";
-    public static final String GET_OBLIGATION = "get_obligation";
-    public static final String SET_RESOURCE_OPERATIONS = "set_resource_operations";
+    public static final String DELETE_OBLIGATION_WITH_ANY_PATTERN = "delete_obligation_with_any_pattern";
 
     // operations
+    public static final String SET_RESOURCE_OPERATIONS = "set_resource_operations";
     public static final String CREATE_ADMIN_OPERATION = "create_admin_operation";
     public static final String DELETE_ADMIN_OPERATION = "delete_admin_operation";
 
@@ -56,40 +64,56 @@ public class AdminAccessRights {
     public static final String CREATE_ADMIN_ROUTINE = "create_admin_routine";
     public static final String DELETE_ADMIN_ROUTINE = "delete_admin_routine";
 
-    // policy review
-    public static final String REVIEW_POLICY = "review_policy";
-
-    // policy
+    // general
     public static final String RESET = "reset";
     public static final String SERIALIZE_POLICY = "serialize_policy";
     public static final String DESERIALIZE_POLICY = "deserialize_policy";
 
-    public static final String ALL_ACCESS_RIGHTS = "*";
-    public static final String ALL_ADMIN_ACCESS_RIGHTS = "*a";
-    public static final String ALL_RESOURCE_ACCESS_RIGHTS = "*r";
+    // query
+    public static final String QUERY_ACCESS = "query_access";
+    public static final String QUERY_POLICY_CLASSES = "query_policy_classes";
+    public static final String QUERY_ASSIGNMENTS = "query_assignments";
+    public static final String QUERY_SUBGRAPH = "query_subgraph";
+    public static final String QUERY_ASSOCIATIONS = "query_associations";
+    public static final String QUERY_PROHIBITIONS = "query_prohibitions";
+    public static final String QUERY_PROCESS_PROHIBITIONS = "query_process_prohibitions";
+    public static final String QUERY_OBLIGATIONS = "query_obligations";
+    public static final String QUERY_RESOURCE_OPERATIONS = "query_resource_operations";
+    public static final String QUERY_ADMIN_OPERATIONS = "query_admin_operations";
+    public static final String QUERY_ADMIN_ROUTINES = "query_admin_routines";
 
-    private static final AccessRightSet ALL_ADMIN_ACCESS_RIGHTS_SET = new AccessRightSet(
-        // graph
+    public static final String WC_ALL = "*";
+    public static final String WC_ADMIN = "*a";
+    public static final String WC_RESOURCE = "*r";
+    public static final String WC_ADMIN_GRAPH = "*a:graph";
+    public static final String WC_ADMIN_PROHIBITION = "*a:prohibition";
+    public static final String WC_ADMIN_OBLIGATION = "*a:obligation";
+    public static final String WC_ADMIN_OPERATION = "*a:operation";
+    public static final String WC_ADMIN_ROUTINE = "*a:routine";
+    public static final String WC_QUERY = "*q";
+    public static final String WC_QUERY_GRAPH = "*q:graph";
+    public static final String WC_QUERY_PROHIBITION = "*q:prohibition";
+    public static final String WC_QUERY_OBLIGATION = "*q:obligation";
+    public static final String WC_QUERY_OPERATION = "*q:operation";
+    public static final String WC_QUERY_ROUTINE = "*q:routine";
+
+    public static final Set<String> ALL_ADMIN_GRAPH_ACCESS_RIGHTS_SET = Set.of(
         CREATE_POLICY_CLASS,
         CREATE_OBJECT,
-        CREATE_OBJECT_ATTRIBUTE ,
+        CREATE_OBJECT_ATTRIBUTE,
         CREATE_USER_ATTRIBUTE,
         CREATE_USER,
-
         SET_NODE_PROPERTIES,
-
         DELETE_POLICY_CLASS,
         DELETE_OBJECT,
         DELETE_OBJECT_ATTRIBUTE,
         DELETE_USER_ATTRIBUTE,
         DELETE_USER,
-
         DELETE_POLICY_CLASS_FROM,
         DELETE_OBJECT_FROM,
         DELETE_OBJECT_ATTRIBUTE_FROM,
         DELETE_USER_ATTRIBUTE_FROM,
         DELETE_USER_FROM,
-
         ASSIGN,
         ASSIGN_TO,
         DEASSIGN,
@@ -97,65 +121,129 @@ public class AdminAccessRights {
         ASSOCIATE,
         ASSOCIATE_TO,
         DISSOCIATE,
-        DISSOCIATE_FROM,
+        DISSOCIATE_FROM
+    );
 
-        // prohibitions
+    public static final Set<String> ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET = Set.of(
         CREATE_PROHIBITION,
         CREATE_PROCESS_PROHIBITION,
+        CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER,
         DELETE_PROCESS_PROHIBITION,
-        GET_PROCESS_PROHIBITIONS,
         DELETE_PROHIBITION,
+        DELETE_PROHIBITION_WITH_COMPLEMENT_CONTAINER
+    );
 
-        // obligations
+    public static final Set<String> ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET = Set.of(
         CREATE_OBLIGATION,
+        CREATE_OBLIGATION_WITH_ANY_PATTERN,
         DELETE_OBLIGATION,
-        GET_OBLIGATION,
+        DELETE_OBLIGATION_WITH_ANY_PATTERN
+    );
 
-        // operations
+    public static final Set<String> ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET = Set.of(
         SET_RESOURCE_OPERATIONS,
         CREATE_ADMIN_OPERATION,
-        DELETE_ADMIN_OPERATION,
+        DELETE_ADMIN_OPERATION
+    );
 
-        // routines
+    public static final Set<String> ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET = Set.of(
         CREATE_ADMIN_ROUTINE,
-        DELETE_ADMIN_ROUTINE,
-
-        // policy
-        RESET,
-        SERIALIZE_POLICY,
-        DESERIALIZE_POLICY,
-
-        // review
-        REVIEW_POLICY
+        DELETE_ADMIN_ROUTINE
     );
 
-    private static final AccessRightSet WILDCARD_ACCESS_RIGHTS_SET = new AccessRightSet(
-        ALL_ACCESS_RIGHTS,
-        ALL_ADMIN_ACCESS_RIGHTS,
-        ALL_RESOURCE_ACCESS_RIGHTS
+    public static final Set<String> ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET = Set.of(
+        QUERY_POLICY_CLASSES,
+        QUERY_ASSIGNMENTS,
+        QUERY_SUBGRAPH,
+        QUERY_ASSOCIATIONS
     );
 
-    private static final AccessRightSet ALL_ACCESS_RIGHTS_SET = new AccessRightSet(ALL_ACCESS_RIGHTS);
+    public static final Set<String> ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET = Set.of(
+        QUERY_PROHIBITIONS,
+        QUERY_PROCESS_PROHIBITIONS
+    );
 
-    private AdminAccessRights() {}
+    public static final Set<String> ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET = Set.of(
+        QUERY_OBLIGATIONS
+    );
 
-    public static AccessRightSet allAdminAccessRights() {
-        return new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS_SET);
+    public static final Set<String> ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET = Set.of(
+        QUERY_RESOURCE_OPERATIONS,
+        QUERY_ADMIN_OPERATIONS
+    );
+
+    public static final Set<String> ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET = Set.of(
+        QUERY_ADMIN_ROUTINES
+    );
+
+    private static final Set<String> allQueryAccessRights = new HashSet<>();
+    static {
+        allQueryAccessRights.addAll(ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET);
+        allQueryAccessRights.addAll(ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET);
+        allQueryAccessRights.addAll(ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET);
+        allQueryAccessRights.addAll(ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET);
+        allQueryAccessRights.addAll(ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET);
     }
+    public static final Set<String> ALL_QUERY_ACCESS_RIGHTS_SET = Collections.unmodifiableSet(allQueryAccessRights);
 
-    public static AccessRightSet allAccessRights() {
-        return new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
+    private static final Set<String> allAdminAccessRights = new HashSet<>();
+    static {
+        allAdminAccessRights.addAll(ALL_ADMIN_GRAPH_ACCESS_RIGHTS_SET);
+        allAdminAccessRights.addAll(ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET);
+        allAdminAccessRights.addAll(ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET);
+        allAdminAccessRights.addAll(ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET);
+        allAdminAccessRights.addAll(ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET);
+        allAdminAccessRights.add(RESET);
+        allAdminAccessRights.add(SERIALIZE_POLICY);
+        allAdminAccessRights.add(DESERIALIZE_POLICY);
     }
+    public static final Set<String> ALL_ADMIN_ACCESS_RIGHTS_SET = Collections.unmodifiableSet(allAdminAccessRights);
 
-    public static AccessRightSet wildcardAccessRights() {
-        return new AccessRightSet(WILDCARD_ACCESS_RIGHTS_SET);
+    private static final Set<String> allAccessRights = new HashSet<>();
+    static {
+        allAccessRights.addAll(allAdminAccessRights);
+        allAccessRights.addAll(allQueryAccessRights);
     }
+    public static final Set<String> ALL_ACCESS_RIGHTS_SET = Collections.unmodifiableSet(allAccessRights);
 
     public static boolean isAdminAccessRight(String ar) {
         return ALL_ADMIN_ACCESS_RIGHTS_SET.contains(ar);
     }
 
+    private static final Set<String> WILDCARD_ACCESS_RIGHTS = new HashSet<>(List.of(
+        WC_ALL,
+        WC_ADMIN,
+        WC_RESOURCE,
+        WC_ADMIN_GRAPH,
+        WC_ADMIN_PROHIBITION,
+        WC_ADMIN_OBLIGATION,
+        WC_ADMIN_OPERATION,
+        WC_ADMIN_ROUTINE,
+        WC_QUERY,
+        WC_QUERY_GRAPH,
+        WC_QUERY_PROHIBITION,
+        WC_QUERY_OBLIGATION,
+        WC_QUERY_OPERATION,
+        WC_QUERY_ROUTINE
+    ));
     public static boolean isWildcardAccessRight(String ar) {
-        return WILDCARD_ACCESS_RIGHTS_SET.contains(ar);
+        return WILDCARD_ACCESS_RIGHTS.contains(ar);
     }
+
+    public static Map<String, Set<String>> WILDCARD_MAP = Map.ofEntries(
+        Map.entry(WC_ADMIN, allAdminAccessRights),
+        Map.entry(WC_ADMIN_GRAPH, ALL_ADMIN_GRAPH_ACCESS_RIGHTS_SET),
+        Map.entry(WC_ADMIN_PROHIBITION, ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET),
+        Map.entry(WC_ADMIN_OBLIGATION, ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET),
+        Map.entry(WC_ADMIN_OPERATION, ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET),
+        Map.entry(WC_ADMIN_ROUTINE, ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET),
+        Map.entry(WC_QUERY, ALL_QUERY_ACCESS_RIGHTS_SET),
+        Map.entry(WC_QUERY_GRAPH, ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET),
+        Map.entry(WC_QUERY_PROHIBITION, ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET),
+        Map.entry(WC_QUERY_OBLIGATION, ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET),
+        Map.entry(WC_QUERY_OPERATION, ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET),
+        Map.entry(WC_QUERY_ROUTINE, ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET)
+    );
+
+    private AdminAccessRights() {}
 }

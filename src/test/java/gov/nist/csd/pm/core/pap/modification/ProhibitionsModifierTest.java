@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
+import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
@@ -39,7 +39,8 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         void testProhibitionSubjectDoesNotExistException() {
             assertThrows(
                     NodeDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(
+                        AdminAccessRights.WC_ALL), false, List.of()));
         }
 
 

@@ -2,30 +2,21 @@ package gov.nist.csd.pm.core.pap.function.op.prohibition;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_PROCESS_PROHIBITION;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_PROHIBITION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_PROHIBITION_WITH_COMPLEMENT_CONTAINER;
 
-public class DeleteProhibitionOp extends ProhibitionOp<ProhibitionOpArgs> {
+public class DeleteProhibitionOp extends ProhibitionOp {
 
     public DeleteProhibitionOp() {
         super(
             "delete_prohibition",
-            List.of(NAME_PARAM),
-            DELETE_PROCESS_PROHIBITION,
-            DELETE_PROHIBITION
+            List.of(NAME_PARAM)
         );
-    }
-
-    @Override
-    protected ProhibitionOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_PARAM, argsMap);
-        return new ProhibitionOpArgs(name);
     }
 
     @Override
@@ -34,5 +25,11 @@ public class DeleteProhibitionOp extends ProhibitionOp<ProhibitionOpArgs> {
             args.getName()
         );
         return null;
+    }
+
+    @Override
+    public void canExecute(PAP pap, UserContext userCtx, ProhibitionOpArgs args) throws PMException {
+        checkSubject(pap, userCtx, args.getSubject(), DELETE_PROHIBITION, DELETE_PROCESS_PROHIBITION);
+        checkContainers(pap, userCtx, args.getContainers(), DELETE_PROHIBITION, DELETE_PROHIBITION_WITH_COMPLEMENT_CONTAINER);
     }
 }
